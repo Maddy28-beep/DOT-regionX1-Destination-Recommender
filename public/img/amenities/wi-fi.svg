@@ -1,0 +1,15 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Wi-Fi">
+    <rect width="800" height="600" fill="#FFF7E9"/>
+    <rect x="24" y="24" width="752" height="552" fill="none" stroke="#0B5E52" stroke-width="4" stroke-dasharray="14 10" opacity=".4"/>
+    <circle cx="400" cy="300" r="200" fill="#e6f4ef"/>
+    <g fill="none" stroke-linecap="round">
+        <path d="M244.5,284.5 A220,220 0 0 1 555.5,284.5" stroke="#BFE3E0" stroke-width="40"/>
+        <path d="M294,334 A150,150 0 0 1 506,334" stroke="#12836F" stroke-width="38"/>
+        <path d="M343.4,383.4 A80,80 0 0 1 456.6,383.4" stroke="#0B5E52" stroke-width="36"/>
+    </g>
+    <circle cx="400" cy="446" r="30" fill="#D9472C"/>
+    <g fill="#0B5E52" opacity=".22">
+        <circle cx="112" cy="140" r="7"/><circle cx="146" cy="176" r="7"/><circle cx="112" cy="212" r="7"/>
+        <circle cx="688" cy="140" r="7"/><circle cx="654" cy="176" r="7"/><circle cx="688" cy="212" r="7"/>
+    </g>
+</svg>

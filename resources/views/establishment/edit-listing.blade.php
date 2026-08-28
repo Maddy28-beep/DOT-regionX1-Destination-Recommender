@@ -23,10 +23,15 @@
     <div class="panel-head">
         <div>
             <h2>{{ $listing->name }}</h2>
-            <p>Some fields (name, accreditation) are managed by DOT Admin and can't be edited here.</p>
+            <p>Update the details travelers see on your listing page.</p>
         </div>
     </div>
     <div class="panel-body">
+        <x-banner tone="info">
+            Your listing <strong>name</strong> and <strong>accreditation details</strong> are managed by
+            DOT Region XI Admin and can't be edited here. Contact DOT Region XI if either needs correcting.
+        </x-banner>
+
         <form method="POST" action="{{ route('establishment.listing.update') }}">
             @csrf
             @method('PUT')
@@ -38,7 +43,7 @@
 
             <div class="field">
                 <label for="price_tier">Budget tier</label>
-                <select id="price_tier" name="price_tier">
+                <select id="price_tier" name="price_tier" class="form-select">
                     <option value="">Not specified</option>
                     <option value="Budget-Friendly" @selected(old('price_tier', $listing->price_tier) === 'Budget-Friendly')>Budget-Friendly</option>
                     <option value="Mid-range" @selected(old('price_tier', $listing->price_tier) === 'Mid-range')>Mid-range</option>
@@ -67,12 +72,34 @@
     </div>
     <div class="panel-body">
         @if ($listing->is_accredited && ! $listing->archived_at)
-            <img src="{{ route('establishment.listing.qr-code') }}" alt="QR code linking to {{ $listing->name }}" width="180" height="180" style="border:1px solid var(--border); border-radius:8px; padding:8px;">
-            <div style="margin-top:12px;">
-                <a href="{{ route('establishment.listing.qr-code') }}" download="{{ \Illuminate\Support\Str::slug($listing->name) }}-qr-code.svg" class="btn btn-outline">Download QR Code</a>
+            <div class="qr-block">
+                <div class="qr-frame">
+                    <span class="qr-frame__tab">Scan me</span>
+                    <img src="{{ route('establishment.listing.qr-code') }}" alt="QR code linking to {{ $listing->name }}">
+                </div>
+
+                <div class="qr-meta">
+                    <div class="qr-meta__label">Where this code goes</div>
+                    <a href="{{ $qrTargetUrl }}" class="qr-url" target="_blank" rel="noopener">{{ $qrTargetUrl }}</a>
+
+                    <x-banner tone="info">
+                        Scanning also records a check-in for signed-in travelers before forwarding
+                        them to your listing page &mdash; that's what powers your visit counts.
+                    </x-banner>
+
+                    <div class="qr-actions">
+                        <a href="{{ route('establishment.listing.qr-code') }}"
+                           download="{{ \Illuminate\Support\Str::slug($listing->name) }}-qr-code.svg"
+                           class="btn btn-primary">Download QR Code</a>
+                        <a href="{{ route('establishment.listing.qr-code') }}" target="_blank" rel="noopener"
+                           class="btn btn-outline">Open for printing</a>
+                    </div>
+                </div>
             </div>
         @else
-            <p style="color:var(--muted); font-size:.85rem;">A QR code becomes available once your listing is DOT-accredited and active.</p>
+            <x-banner tone="warn">
+                A QR code becomes available once your listing is DOT-accredited and active.
+            </x-banner>
         @endif
     </div>
 </div>

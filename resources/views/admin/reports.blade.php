@@ -6,8 +6,33 @@
 
 @section('content')
 
+@php
+    /*
+     * One click sets both From and To. "Custom" is the active state whenever
+     * the current range matches none of the presets, so the row always shows
+     * exactly which one is in effect rather than nothing being highlighted.
+     */
+    $today = now()->toDateString();
+    $presets = [
+        'Last 7 days' => [now()->subDays(6)->toDateString(), $today],
+        'Last 30 days' => [now()->subDays(29)->toDateString(), $today],
+        'This Month' => [now()->startOfMonth()->toDateString(), $today],
+        'This Year' => [now()->startOfYear()->toDateString(), $today],
+    ];
+    $activePreset = collect($presets)->search(fn ($range) => $range[0] === $from && $range[1] === $to) ?: 'Custom';
+@endphp
+
 <div class="panel">
     <div class="panel-body">
+        <div class="chip-row" style="margin-bottom:14px;">
+            @foreach ($presets as $label => [$presetFrom, $presetTo])
+                <a href="{{ route('admin.reports', ['from' => $presetFrom, 'to' => $presetTo, 'report_type' => $reportType]) }}"
+                   class="chip {{ $activePreset === $label ? 'active' : '' }}">{{ $label }}</a>
+            @endforeach
+            <span class="chip {{ $activePreset === 'Custom' ? 'active' : '' }}"
+                  title="Set the From and To dates below">Custom</span>
+        </div>
+
         <form method="GET" class="filter-inline">
             <div class="field">
                 <label for="from">From date</label>

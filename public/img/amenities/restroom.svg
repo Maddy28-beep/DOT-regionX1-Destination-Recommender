@@ -1,0 +1,20 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Restroom">
+    <rect width="800" height="600" fill="#FFF7E9"/>
+    <rect x="24" y="24" width="752" height="552" fill="none" stroke="#0B5E52" stroke-width="4" stroke-dasharray="14 10" opacity=".4"/>
+    <circle cx="400" cy="300" r="200" fill="#e6f4ef"/>
+    <rect x="150" y="140" width="230" height="320" rx="18" fill="#12836F"/>
+    <rect x="420" y="140" width="230" height="320" rx="18" fill="#D9472C"/>
+    <g fill="#FFF7E9">
+        <circle cx="265" cy="222" r="36"/>
+        <path d="M232,278 h66 a16,16 0 0 1 16,16 v72 a10,10 0 0 1 -20,0 v-2 h-58 v2 a10,10 0 0 1 -20,0 v-72 a16,16 0 0 1 16,-16 z"/>
+        <rect x="240" y="368" width="20" height="66" rx="9"/>
+        <rect x="270" y="368" width="20" height="66" rx="9"/>
+    </g>
+    <g fill="#FFF7E9">
+        <circle cx="535" cy="222" r="36"/>
+        <path d="M535,272 q42,0 52,64 l6,38 h-38 l-4,-30 h-32 l-4,30 h-38 l6,-38 q10,-64 52,-64 z"/>
+        <rect x="510" y="376" width="20" height="58" rx="9"/>
+        <rect x="540" y="376" width="20" height="58" rx="9"/>
+    </g>
+    <rect x="392" y="150" width="16" height="300" rx="8" fill="#0B5E52" opacity=".25"/>
+</svg>

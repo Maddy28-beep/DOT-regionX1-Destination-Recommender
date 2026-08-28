@@ -1,0 +1,23 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Parking area">
+    <rect width="800" height="600" fill="#FFF7E9"/>
+    <rect x="24" y="24" width="752" height="552" fill="none" stroke="#0B5E52" stroke-width="4" stroke-dasharray="14 10" opacity=".4"/>
+    <circle cx="400" cy="300" r="196" fill="#e6f4ef"/>
+    <rect x="130" y="430" width="540" height="76" rx="10" fill="#5b6b64" opacity=".2"/>
+    <g stroke="#FFF7E9" stroke-width="7" stroke-linecap="round">
+        <line x1="188" y1="444" x2="188" y2="494"/>
+        <line x1="612" y1="444" x2="612" y2="494"/>
+    </g>
+    <path d="M232,432 L232,378 Q232,356 256,356 L318,356 L352,308 L466,308 L500,356 L556,356 Q580,356 580,378 L580,432 Z" fill="#12836F"/>
+    <path d="M364,328 L458,328 L482,356 L340,356 Z" fill="#BFE3E0"/>
+    <rect x="232" y="392" width="348" height="12" fill="#0B5E52" opacity=".35"/>
+    <circle cx="292" cy="432" r="34" fill="#1a2420"/>
+    <circle cx="292" cy="432" r="13" fill="#FFF7E9"/>
+    <circle cx="522" cy="432" r="34" fill="#1a2420"/>
+    <circle cx="522" cy="432" r="13" fill="#FFF7E9"/>
+    <rect x="650" y="262" width="12" height="196" rx="4" fill="#5b6b64"/>
+    <rect x="596" y="158" width="120" height="120" rx="12" fill="#D9472C"/>
+    <text x="656" y="242" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="104" font-weight="bold" fill="#FFF7E9">P</text>
+    <g fill="#0B5E52" opacity=".22">
+        <circle cx="112" cy="140" r="7"/><circle cx="146" cy="176" r="7"/><circle cx="112" cy="212" r="7"/>
+    </g>
+</svg>

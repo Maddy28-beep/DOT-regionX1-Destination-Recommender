@@ -32,8 +32,8 @@
             <input type="hidden" name="portal" value="{{ $portal }}">
 
             <div class="field">
-                <label for="identifier">{{ $portal === 'admin' ? 'Username' : 'Email address' }}</label>
-                <input type="text" id="identifier" name="identifier" value="{{ old('identifier') }}" required autofocus>
+                <label for="identifier">Email address</label>
+                <input type="email" id="identifier" name="identifier" value="{{ old('identifier') }}" required autofocus>
             </div>
             <div class="field">
                 <label for="password">Password</label>

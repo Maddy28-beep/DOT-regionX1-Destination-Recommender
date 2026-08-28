@@ -5,7 +5,8 @@
 @section('content')
 <div class="page-head">
     <div class="container">
-        <h1>Restaurants in the Davao Region</h1>
+        <span class="poster-kicker">eat like a local</span>
+        <h1 class="poster-title">Restaurants in the Davao Region</h1>
         <p>DOT-accredited dining spots &mdash; verified for quality, safety, and authentic local flavor.</p>
     </div>
 </div>
@@ -13,7 +14,7 @@
 <div class="section-tight">
     <div class="container">
 
-        <div class="chip-row">
+        <div class="chip-row chip-row--poster">
             <a href="{{ request()->fullUrlWithQuery(['cuisine_type' => null, 'page' => null]) }}" class="chip {{ request('cuisine_type') ? '' : 'active' }}">All Cuisines</a>
             @foreach ($cuisineTypes as $c)
                 <a href="{{ request()->fullUrlWithQuery(['cuisine_type' => $c, 'page' => null]) }}" class="chip {{ request('cuisine_type') === $c ? 'active' : '' }}">{{ $c }}</a>
@@ -64,9 +65,9 @@
                         </select>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block">Apply Filters</button>
+                    <button type="submit" class="btn btn-poster-primary btn-block">Apply Filters</button>
                     @if (request()->anyFilled(['q', 'region_id', 'price_tier', 'cuisine_type']))
-                        <a href="{{ route('restaurants.index') }}" class="btn btn-ghost btn-block" style="margin-top:8px;">Clear all</a>
+                        <a href="{{ route('restaurants.index') }}" class="btn btn-poster-ghost btn-block" style="margin-top:8px;">Clear all</a>
                     @endif
                 </form>
             </aside>
@@ -79,7 +80,7 @@
                 @if ($restaurants->count())
                     <div class="card-grid">
                         @foreach ($restaurants as $restaurant)
-                            @include('partials.restaurant-card', ['restaurant' => $restaurant])
+                            @include('partials.listing-poster-card', ['listing' => $restaurant])
                         @endforeach
                     </div>
 

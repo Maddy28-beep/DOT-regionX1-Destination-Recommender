@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\HasArchiving;
 use App\Models\Concerns\HasListingPhotos;
+use App\Models\Concerns\PresentsAsPosterCard;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class TourOperator extends Model
 {
-    use HasListingPhotos, HasArchiving;
+    use HasListingPhotos, HasArchiving, PresentsAsPosterCard;
 
     const UPDATED_AT = null;
 
@@ -29,6 +30,21 @@ class TourOperator extends Model
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
         ];
+    }
+
+    public function posterUrl(): string
+    {
+        return route('tour-operators.show', $this);
+    }
+
+    public function posterScene(): string
+    {
+        return $this->posterSceneVariant(['tour-van', 'tour-boat']);
+    }
+
+    public function posterTags(): array
+    {
+        return array_values(array_filter([$this->specialization]));
     }
 
     public function region(): BelongsTo

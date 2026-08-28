@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\HasArchiving;
 use App\Models\Concerns\HasListingPhotos;
+use App\Models\Concerns\PresentsAsPosterCard;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Accommodation extends Model
 {
-    use HasListingPhotos, HasArchiving;
+    use HasListingPhotos, HasArchiving, PresentsAsPosterCard;
 
     const UPDATED_AT = null;
 
@@ -33,6 +34,28 @@ class Accommodation extends Model
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
         ];
+    }
+
+    public function posterUrl(): string
+    {
+        return route('accommodations.show', $this);
+    }
+
+    public function posterScene(): string
+    {
+        return $this->posterSceneVariant(['resort', 'resort-pool']);
+    }
+
+    public function posterTags(): array
+    {
+        return array_values(array_filter([$this->type, $this->dot_classification]));
+    }
+
+    public function posterPriceAmount(): ?string
+    {
+        return $this->price_per_night
+            ? number_format($this->price_per_night).' / night'
+            : null;
     }
 
     public function region(): BelongsTo

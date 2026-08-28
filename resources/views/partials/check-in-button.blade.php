@@ -11,6 +11,6 @@
     $type: the check-in route's URL-segment listing type (e.g. "destinations").
     $listing: the listing model instance (needs ->id).
 --}}
-<a href="{{ route('check-in', ['type' => $type, 'id' => $listing->id]) }}" class="btn btn-outline btn-block" style="margin-top:10px;">
+<a href="{{ route('check-in', ['type' => $type, 'id' => $listing->id]) }}" class="btn dpost-cta btn-block" style="margin-top:10px;">
     Check In Here
 </a>

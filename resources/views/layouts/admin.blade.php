@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'DOT Admin — ExploreDVO')</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
+    @include('partials.head-assets')
 </head>
-<body>
+<body class="admin">
     <header class="site-header">
         <div class="container bar">
             <a href="{{ route('admin.overview') }}" class="brand">Explore<span class="dot">DVO</span> <span class="brand-badge" style="font-size:.7rem; font-weight:700; color:var(--muted); margin-left:6px;">DOT ADMIN</span></a>
@@ -32,13 +32,11 @@
 
     <div class="admin-shell">
         <aside class="admin-sidebar" id="adminSidebar">
+            {{-- One entry, not six: the in-page tab row already switches
+                 between listing types, so duplicating that in the sidebar
+                 was two controls for one job. --}}
             <div class="group-label">Tourism Information</div>
-            <a href="{{ route('admin.listings.index', 'destinations') }}" class="{{ request()->routeIs('admin.listings.*') && request()->route('type') === 'destinations' ? 'active' : '' }}">Destinations</a>
-            <a href="{{ route('admin.listings.index', 'accommodations') }}" class="{{ request()->routeIs('admin.listings.*') && request()->route('type') === 'accommodations' ? 'active' : '' }}">Accommodations</a>
-            <a href="{{ route('admin.listings.index', 'restaurants') }}" class="{{ request()->routeIs('admin.listings.*') && request()->route('type') === 'restaurants' ? 'active' : '' }}">Restaurants</a>
-            <a href="{{ route('admin.listings.index', 'packages') }}" class="{{ request()->routeIs('admin.listings.*') && request()->route('type') === 'packages' ? 'active' : '' }}">Tour Packages</a>
-            <a href="{{ route('admin.listings.index', 'souvenir-centers') }}" class="{{ request()->routeIs('admin.listings.*') && request()->route('type') === 'souvenir-centers' ? 'active' : '' }}">Souvenir Centers</a>
-            <a href="{{ route('admin.listings.index', 'tour-operators') }}" class="{{ request()->routeIs('admin.listings.*') && request()->route('type') === 'tour-operators' ? 'active' : '' }}">Tour Operators</a>
+            <a href="{{ route('admin.listings.index', 'destinations') }}" class="{{ request()->routeIs('admin.listings.*') ? 'active' : '' }}">Manage Listings</a>
 
             <div class="group-label">Monitoring</div>
             <a href="{{ route('admin.overview') }}" class="{{ request()->routeIs('admin.overview') ? 'active' : '' }}">Overview</a>
@@ -64,5 +62,9 @@
             </div>
         </main>
     </div>
+
+    {{-- Shared behaviours (bulk row selection). Everything in app.js is
+         guarded by element lookups, so the public-site code is inert here. --}}
+    <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
 </body>
 </html>

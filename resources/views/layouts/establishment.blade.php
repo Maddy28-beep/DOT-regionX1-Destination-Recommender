@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Partner Dashboard — ExploreDVO')</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
+    @include('partials.head-assets')
 </head>
-<body>
+<body class="portal">
     <header class="site-header">
         <div class="container bar">
             <a href="{{ route('establishment.overview') }}" class="brand">Explore<span class="dot">DVO</span> <span class="brand-badge" style="font-size:.7rem; font-weight:700; color:var(--muted); margin-left:6px;">PARTNER</span></a>
@@ -42,6 +42,26 @@
         </div>
     </header>
 
+    {{--
+        Portal-wide alert bar. Composed in AppServiceProvider from
+        EstablishmentAccount::portalStatus(), the single source of truth the
+        Overview cards also read -- so the bar can never contradict the status
+        shown further down the page.
+    --}}
+    @if (($navStatus['actionRequired'] ?? false) && $navStatus['detail'])
+        <div class="portal-alert {{ $navStatus['tone'] === 'warn' ? 'portal-alert--warn' : '' }}">
+            <div class="container">
+                <svg class="portal-alert__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>
+                </svg>
+                <div class="portal-alert__text">
+                    <strong>{{ $navStatus['label'] }}.</strong> {{ $navStatus['detail'] }}
+                </div>
+                <a href="{{ route('establishment.notifications') }}" class="btn">Renew Accreditation &rarr;</a>
+            </div>
+        </div>
+    @endif
+
     <div class="admin-topbar">
         <div class="container">
             <div>
@@ -57,8 +77,18 @@
             <a href="{{ route('establishment.overview') }}" class="{{ request()->routeIs('establishment.overview') ? 'active' : '' }}">Overview</a>
             <a href="{{ route('establishment.listing.edit') }}" class="{{ request()->routeIs('establishment.listing.*') ? 'active' : '' }}">My Listing</a>
             <a href="{{ route('establishment.photos') }}" class="{{ request()->routeIs('establishment.photos') ? 'active' : '' }}">Photos</a>
-            <a href="{{ route('establishment.reviews') }}" class="{{ request()->routeIs('establishment.reviews') ? 'active' : '' }}">Guest Reviews</a>
-            <a href="{{ route('establishment.notifications') }}" class="{{ request()->routeIs('establishment.notifications') ? 'active' : '' }}">Notifications</a>
+            <a href="{{ route('establishment.reviews') }}" class="{{ request()->routeIs('establishment.reviews') ? 'active' : '' }}">
+                <span>Guest Reviews</span>
+                @if ($navUnrepliedCount > 0)
+                    <span class="nav-badge" title="{{ $navUnrepliedCount }} awaiting your reply">{{ $navUnrepliedCount }}</span>
+                @endif
+            </a>
+            <a href="{{ route('establishment.notifications') }}" class="{{ request()->routeIs('establishment.notifications') ? 'active' : '' }}">
+                <span>Notifications</span>
+                @if ($navUnreadCount > 0)
+                    <span class="nav-badge" title="{{ $navUnreadCount }} unread">{{ $navUnreadCount }}</span>
+                @endif
+            </a>
         </aside>
 
         <main class="admin-main">
@@ -71,6 +101,11 @@
             </div>
         </main>
     </div>
+
+    {{-- Shared behaviours (custom file-input status, etc.). Everything in
+         app.js is guarded by element lookups, so the public-site carousel and
+         lightbox code is inert here. --}}
+    <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
 
     <script>
         document.addEventListener('click', function (e) {

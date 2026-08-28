@@ -33,7 +33,7 @@ class QrCodeController extends Controller
      * ADMIN_TYPES URL segment, so the establishment entry point can build
      * the same check-in URL shape the admin entry point does.
      */
-    private const KIND_TO_SEGMENT = [
+    public const KIND_TO_SEGMENT = [
         'destination' => 'destinations',
         'accommodation' => 'accommodations',
         'restaurant' => 'restaurants',
@@ -63,6 +63,20 @@ class QrCodeController extends Controller
         abort_unless($segment, 404);
 
         return $this->render($listing, $segment);
+    }
+
+    /**
+     * The URL a rendered code actually encodes.
+     *
+     * Exposed so the partner portal can display the destination next to the
+     * code without re-deriving it -- if the encoded target ever changes, the
+     * printed URL follows automatically instead of silently disagreeing.
+     */
+    public static function targetUrlFor(string $listingKind, mixed $listing): ?string
+    {
+        $segment = self::KIND_TO_SEGMENT[$listingKind] ?? null;
+
+        return $segment ? route('check-in', ['type' => $segment, 'id' => $listing->id]) : null;
     }
 
     /**

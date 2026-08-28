@@ -5,7 +5,8 @@
 @section('content')
 <div class="page-head">
     <div class="container">
-        <h1>Curated Tour Packages</h1>
+        <span class="poster-kicker">planned end to end</span>
+        <h1 class="poster-title">Curated Tour Packages</h1>
         <p>DOT-accredited, all-inclusive experiences across the Davao Region.</p>
     </div>
 </div>
@@ -13,7 +14,7 @@
 <div class="section-tight">
     <div class="container">
 
-        <div class="chip-row">
+        <div class="chip-row chip-row--poster">
             <a href="{{ request()->fullUrlWithQuery(['type' => null, 'page' => null]) }}" class="chip {{ request('type') ? '' : 'active' }}">All Types</a>
             @foreach ($types as $t)
                 <a href="{{ request()->fullUrlWithQuery(['type' => $t, 'page' => null]) }}" class="chip {{ request('type') === $t ? 'active' : '' }}">{{ $t }}</a>
@@ -66,9 +67,9 @@
                         </select>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block">Apply Filters</button>
+                    <button type="submit" class="btn btn-poster-primary btn-block">Apply Filters</button>
                     @if (request()->anyFilled(['q', 'region_id', 'price_tier', 'type']))
-                        <a href="{{ route('packages.index') }}" class="btn btn-ghost btn-block" style="margin-top:8px;">Clear all</a>
+                        <a href="{{ route('packages.index') }}" class="btn btn-poster-ghost btn-block" style="margin-top:8px;">Clear all</a>
                     @endif
                 </form>
             </aside>
@@ -81,7 +82,7 @@
                 @if ($packages->count())
                     <div class="card-grid">
                         @foreach ($packages as $package)
-                            @include('partials.package-card', ['package' => $package])
+                            @include('partials.listing-poster-card', ['listing' => $package])
                         @endforeach
                     </div>
 

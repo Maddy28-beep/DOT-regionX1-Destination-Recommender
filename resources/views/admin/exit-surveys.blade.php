@@ -21,7 +21,7 @@
             <div class="stat-card-label">Total Responses</div>
         </div>
         <div class="stat-card">
-            <div class="stat-card-val">{{ $avgRatings['Overall Satisfaction'] ?: '—' }}<span style="font-size:1rem; color:var(--muted);">/5</span></div>
+            <div class="stat-card-val">{{ $avgRatings['Overall Satisfaction'] ? number_format($avgRatings['Overall Satisfaction'], 2) : '—' }}<span style="font-size:1rem; color:var(--muted);">/5</span></div>
             <div class="stat-card-label">Avg. Overall Satisfaction</div>
         </div>
         <div class="stat-card">
@@ -42,12 +42,18 @@
             </div>
         </div>
         <div class="panel-body">
+            {{-- Bars are a data visualisation, so a fill colour is correct here --
+                 this is not a status badge. Bands: leaf green >= 4.0,
+                 amber 3.5-3.99, stamp red < 3.5. --}}
             <div class="bar-chart">
                 @foreach ($avgRatings as $label => $value)
+                    @php
+                        $band = ! $value ? 'low' : ($value >= 4 ? 'good' : ($value >= 3.5 ? 'mid' : 'low'));
+                    @endphp
                     <div class="bar-row">
                         <span class="bar-row-label">{{ $label }}</span>
-                        <div class="bar-track"><div class="bar-fill" style="width:{{ $value ? ($value / 5 * 100) : 0 }}%"></div></div>
-                        <span class="bar-row-value">{{ $value ?: '—' }}</span>
+                        <div class="bar-track"><div class="bar-fill bar-fill--{{ $band }}" style="width:{{ $value ? ($value / 5 * 100) : 0 }}%"></div></div>
+                        <span class="bar-row-value">{{ $value ? number_format($value, 2) : '—' }}</span>
                     </div>
                 @endforeach
             </div>

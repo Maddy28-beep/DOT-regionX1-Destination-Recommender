@@ -31,12 +31,33 @@
         @else
             <div class="table-scroll">
                 <table class="data-table">
+                    @php
+                        // Clicking the column that is already sorted flips direction.
+                        $sortLink = fn (string $key) => route('admin.association-rules', [
+                            'sort' => $key,
+                            'dir' => ($sort === $key && $dir === 'desc') ? 'asc' : 'desc',
+                        ]);
+                    @endphp
                     <thead>
                         <tr>
                             <th>Rule</th>
-                            <th>Co-visits</th>
-                            <th>Support</th>
-                            <th>Confidence</th>
+                            @foreach (['co_count' => 'Co-visits', 'support' => 'Support', 'confidence' => 'Confidence'] as $key => $label)
+                                <th>
+                                    <a href="{{ $sortLink($key) }}" class="sort-link {{ $sort === $key ? 'is-sorted' : '' }}">
+                                        {{ $label }}
+                                        <svg class="sort-arrow" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                            @if ($sort === $key && $dir === 'asc')
+                                                <path fill="currentColor" d="M6 2.5 10 8H2z"/>
+                                            @else
+                                                <path fill="currentColor" d="M6 9.5 2 4h8z"/>
+                                            @endif
+                                        </svg>
+                                        <span class="sr-only">
+                                            {{ $sort === $key ? ($dir === 'asc' ? '(sorted ascending)' : '(sorted descending)') : '(sort)' }}
+                                        </span>
+                                    </a>
+                                </th>
+                            @endforeach
                         </tr>
                     </thead>
                     <tbody>
@@ -51,7 +72,14 @@
                                 </td>
                                 <td>{{ $rule['co_count'] }}</td>
                                 <td>{{ number_format($rule['support'] * 100, 1) }}%</td>
-                                <td>{{ number_format($rule['confidence'] * 100, 1) }}%</td>
+                                <td style="white-space:nowrap;">
+                                    {{ number_format($rule['confidence'] * 100, 1) }}%
+                                    {{-- Data bar, so a fill colour is correct here. Inline and
+                                         5px tall so it sits inside the existing line box. --}}
+                                    <span class="inline-bar" role="presentation">
+                                        <span style="width:{{ min(100, $rule['confidence'] * 100) }}%"></span>
+                                    </span>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

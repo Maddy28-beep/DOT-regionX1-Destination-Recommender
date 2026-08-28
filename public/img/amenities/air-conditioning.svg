@@ -1,0 +1,26 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Air conditioning">
+    <rect width="800" height="600" fill="#FFF7E9"/>
+    <rect x="24" y="24" width="752" height="552" fill="none" stroke="#0B5E52" stroke-width="4" stroke-dasharray="14 10" opacity=".4"/>
+    <circle cx="400" cy="300" r="200" fill="#e6f4ef"/>
+    <rect x="170" y="150" width="460" height="140" rx="24" fill="#FFF7E9" stroke="#0B5E52" stroke-width="9"/>
+    <g stroke="#12836F" stroke-width="9" stroke-linecap="round">
+        <line x1="206" y1="248" x2="594" y2="248"/>
+        <line x1="206" y1="268" x2="594" y2="268"/>
+    </g>
+    <circle cx="572" cy="188" r="12" fill="#D9472C"/>
+    <g fill="none" stroke="#7fd4d8" stroke-width="14" stroke-linecap="round">
+        <path d="M258,330 q34,34 0,68 t0,68"/>
+        <path d="M542,330 q34,34 0,68 t0,68"/>
+    </g>
+    <g stroke="#0B5E52" stroke-width="16" stroke-linecap="round">
+        <line x1="400" y1="334" x2="400" y2="504"/>
+        <line x1="326" y1="376" x2="474" y2="462"/>
+        <line x1="474" y1="376" x2="326" y2="462"/>
+    </g>
+    <g stroke="#0B5E52" stroke-width="12" stroke-linecap="round">
+        <path d="M400,368 l-26,-26 M400,368 l26,-26"/>
+        <path d="M400,470 l-26,26 M400,470 l26,26"/>
+        <path d="M356,394 l-36,-6 M444,444 l36,6"/>
+        <path d="M444,394 l36,-6 M356,444 l-36,6"/>
+    </g>
+</svg>

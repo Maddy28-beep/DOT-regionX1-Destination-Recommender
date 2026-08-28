@@ -34,6 +34,7 @@ class DestinationSeeder extends Seeder
                 'price_tier' => 'Mid-range', 'entry_fee_min' => 100, 'entry_fee_max' => 500,
                 'distance_km' => 7.5, 'latitude' => 7.1553, 'longitude' => 125.7080,
                 'tags' => ['Beach', 'Island Hopping', 'Family Friendly'],
+                'description' => "A short pump-boat ride from Davao City puts you on white sand beaches, marine sanctuaries, and cliffside resorts across the Island Garden City of Samal. Whether it's a day trip for island hopping and snorkeling or an overnight stay at a beachfront resort, Samal pairs easily with a Davao City itinerary without needing a flight.",
             ],
             [
                 'name' => 'Eden Nature Park', 'region' => 'Davao City', 'type' => 'Nature & Adventure',
@@ -41,6 +42,7 @@ class DestinationSeeder extends Seeder
                 'price_tier' => 'Mid-range', 'entry_fee_min' => 150, 'entry_fee_max' => 450,
                 'distance_km' => 32, 'latitude' => 7.0322, 'longitude' => 125.3739,
                 'tags' => ['Nature', 'Cool Climate', 'Zipline'],
+                'description' => "Perched roughly 3,000 feet above sea level in Toril, Eden Nature Park trades Davao City's tropical heat for pine-scented mountain air, cool-climate gardens, and a zipline strung across the ridge. It's a favorite for family day trips and small events, with viewpoints overlooking the city and gulf below.",
             ],
             [
                 'name' => 'Philippine Eagle Center', 'region' => 'Davao City', 'type' => 'Wildlife',
@@ -48,6 +50,7 @@ class DestinationSeeder extends Seeder
                 'price_tier' => 'Budget-Friendly', 'entry_fee_min' => 150, 'entry_fee_max' => 150,
                 'distance_km' => 28, 'latitude' => 7.1547, 'longitude' => 125.4064,
                 'tags' => ['Wildlife', 'Conservation', 'Family Friendly'],
+                'description' => "Home to the Philippine Eagle Foundation's captive-breeding program, this forested sanctuary in Malagos lets visitors see the country's national bird — among the largest eagles alive — up close in walk-through aviaries built around its natural forest habitat. Beyond the eagles, the trail passes native wildlife including the Visayan warty pig and Philippine hornbill, making it as much a conservation education stop as a wildlife encounter.",
             ],
             [
                 'name' => "People's Park", 'region' => 'Davao City', 'type' => 'Cultural Heritage',
@@ -55,6 +58,7 @@ class DestinationSeeder extends Seeder
                 'price_tier' => 'Free', 'entry_fee_min' => 0, 'entry_fee_max' => 0,
                 'distance_km' => 3, 'latitude' => 7.0644, 'longitude' => 125.6079,
                 'tags' => ['Cultural Heritage', 'City Center'],
+                'description' => "A landscaped city-center park built around Mindanao's indigenous tribal heritage, with sculptures, fountains, and a resident collection of native birds. It's free to enter and an easy stop between other Davao City destinations, especially for a shaded break or a look at Mindanao's tribal art in an open-air setting.",
             ],
             [
                 'name' => 'Davao Crocodile Park', 'region' => 'Davao City', 'type' => 'Wildlife',
@@ -62,6 +66,7 @@ class DestinationSeeder extends Seeder
                 'price_tier' => 'Mid-range', 'entry_fee_min' => 300, 'entry_fee_max' => 500,
                 'distance_km' => 15, 'latitude' => 7.1204, 'longitude' => 125.6461,
                 'tags' => ['Wildlife', 'Family Friendly'],
+                'description' => "Part zoo, part crocodile farm, this riverside park along the Davao Diversion Road houses hundreds of crocodiles alongside other native and exotic wildlife, with feeding shows and handling demonstrations. It's one of the region's most family-oriented wildlife stops, built around both education and up-close animal encounters.",
             ],
             [
                 'name' => 'Malagos Garden Resort', 'region' => 'Davao City', 'type' => 'Nature & Leisure',
@@ -69,6 +74,7 @@ class DestinationSeeder extends Seeder
                 'price_tier' => 'Mid-range', 'entry_fee_min' => 100, 'entry_fee_max' => 350,
                 'distance_km' => 30, 'latitude' => 7.1622, 'longitude' => 125.4106,
                 'tags' => ['Nature', 'Chocolate Experience', 'Garden'],
+                'description' => "Best known for its award-winning Malagos Chocolate, this garden resort in Malagos combines butterfly sanctuaries, flower gardens, and a petting zoo with cacao-to-bar tasting experiences. It's a slower-paced counterpart to the nearby Eagle Center — worth pairing on the same day trip north of Davao City.",
             ],
             [
                 'name' => 'Mount Apo Natural Park', 'region' => 'Davao del Sur', 'type' => 'Adventure & Hiking',
@@ -76,6 +82,7 @@ class DestinationSeeder extends Seeder
                 'price_tier' => 'Budget-Friendly', 'entry_fee_min' => 500, 'entry_fee_max' => 1500,
                 'distance_km' => 65, 'latitude' => 6.9847, 'longitude' => 125.2725,
                 'tags' => ['Hiking', 'Highest Peak', 'Wildlife'],
+                'description' => "At 2,954 meters, Mount Apo is the Philippines' highest peak and one of Mindanao's defining hiking challenges, protected as a natural park spanning Davao del Sur, Davao City, and Cotabato. Multi-day treks to the summit pass through mossy forest, grasslands, and volcanic terrain, with Lake Venado a popular basecamp stop below the peak.",
             ],
             [
                 'name' => 'Dahican Beach', 'region' => 'Davao Oriental', 'type' => 'Beach & Surfing',
@@ -83,6 +90,7 @@ class DestinationSeeder extends Seeder
                 'price_tier' => 'Budget-Friendly', 'entry_fee_min' => 0, 'entry_fee_max' => 50,
                 'distance_km' => 165, 'latitude' => 6.9553, 'longitude' => 126.2758,
                 'tags' => ['Surfing', 'Beach', 'Turtle Sanctuary'],
+                'description' => "A long stretch of golden sand on the Pacific-facing coast of Mati City, Dahican has grown into Mindanao's most established surf beach, with a small community of surf schools and beachfront stays. It also borders a marine turtle nesting sanctuary, making it a stop for both surfing and conservation-minded travelers.",
             ],
         ];
 
@@ -93,7 +101,7 @@ class DestinationSeeder extends Seeder
                 'location' => $d['location'],
                 'region_id' => $regions[$d['region']]->id,
                 'type' => $d['type'],
-                'description' => "{$d['name']} is a DOT-accredited destination in {$d['region']}, part of the Davao Region tourism circuit.",
+                'description' => $d['description'],
                 'is_accredited' => true,
                 'rating' => $d['rating'],
                 'review_count' => $d['review_count'],

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\HasArchiving;
 use App\Models\Concerns\HasListingPhotos;
+use App\Models\Concerns\PresentsAsPosterCard;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Destination extends Model
 {
-    use HasListingPhotos, HasArchiving;
+    use HasListingPhotos, HasArchiving, PresentsAsPosterCard;
 
     const UPDATED_AT = null;
 
@@ -74,5 +75,41 @@ class Destination extends Model
     public function accreditationRecords(): MorphMany
     {
         return $this->morphMany(AccreditationRecord::class, 'listing', 'listing_kind', 'listing_id');
+    }
+
+    public function posterUrl(): string
+    {
+        return route('destinations.show', $this);
+    }
+
+    public function posterScene(): string
+    {
+        return self::illustrationScene($this->name);
+    }
+
+    public function posterTags(): array
+    {
+        return $this->relationLoaded('tags')
+            ? $this->tags->take(2)->pluck('value')->all()
+            : [];
+    }
+
+    /**
+     * Curated flat-vector scene key for the homepage/detail-page poster
+     * illustrations (see partials/poster-illustration.blade.php), keyed by
+     * name so a rename falls back to the generic scene instead of breaking.
+     */
+    public static function illustrationScene(string $name): string
+    {
+        return [
+            'Philippine Eagle Center' => 'eagle',
+            'Samal Island' => 'island',
+            'Eden Nature Park' => 'zipline',
+            'Malagos Garden Resort' => 'garden',
+            "People's Park" => 'heritage',
+            'Davao Crocodile Park' => 'crocodile',
+            'Mount Apo Natural Park' => 'mountain-peak',
+            'Dahican Beach' => 'surf',
+        ][$name] ?? 'default';
     }
 }

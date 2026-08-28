@@ -83,7 +83,7 @@
 
         <div>
             <div class="side-card">
-                <h3 class="mt-0">Book this package</h3>
+                <h3 class="mt-0">Plan this package</h3>
                 <p style="font-size:.85rem; color:var(--muted); margin-top:0;">
                     Budget tier: {{ $package->price_tier ?? 'Not specified' }}<br>
                     Provided by: {{ $providerLabel ?? 'DOT-accredited operator' }}
@@ -103,7 +103,7 @@
             </div>
             <div class="card-grid">
                 @foreach ($nearby as $n)
-                    @include('partials.package-card', ['package' => $n])
+                    @include('partials.listing-poster-card', ['listing' => $n])
                 @endforeach
             </div>
         </div>

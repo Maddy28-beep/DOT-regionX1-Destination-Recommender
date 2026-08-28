@@ -24,3 +24,8 @@ desktop.ini
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Seeded local database — contains real email addresses and password hashes.
+# Regenerate with: php artisan migrate --seed
+/database/*.sqlite
+/database/*.sqlite-journal

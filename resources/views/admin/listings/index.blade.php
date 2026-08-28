@@ -34,14 +34,36 @@
         </div>
     </div>
 
-    <div class="table-scroll">
+    <div data-bulk>
+        <div class="bulk-bar">
+            <span class="bulk-bar__count" data-bulk-count>0 selected</span>
+            <form method="POST" action="{{ route('admin.listings.bulk', $type) }}"
+                  onsubmit="return confirm('Archive the selected listings? They will be hidden from the public site.');">
+                @csrf
+                <input type="hidden" name="action" value="archive">
+                <button type="submit" class="btn btn-outline btn-xs">Archive Selected</button>
+            </form>
+            <form method="POST" action="{{ route('admin.listings.bulk', $type) }}">
+                @csrf
+                <input type="hidden" name="action" value="unarchive">
+                <button type="submit" class="btn btn-outline btn-xs">Restore Selected</button>
+            </form>
+        </div>
+
+        <div class="table-scroll">
         <table class="data-table">
             <thead>
-                <tr><th>Name</th><th>Region</th><th>Price Tier</th><th>Accredited</th><th>Rating</th><th>Status</th><th></th></tr>
+                <tr>
+                    <th class="col-check"><input type="checkbox" data-bulk-all aria-label="Select all rows"></th>
+                    <th>Name</th><th>Region</th><th>Price Tier</th><th>Accredited</th><th>Rating</th><th>Status</th><th></th>
+                </tr>
             </thead>
             <tbody>
                 @forelse ($listings as $listing)
                     <tr>
+                        <td class="col-check">
+                            <input type="checkbox" data-bulk-row value="{{ $listing->id }}" aria-label="Select {{ $listing->name }}">
+                        </td>
                         <td>{{ $listing->name }}</td>
                         <td class="cell-muted">{{ $listing->region?->name ?? '—' }}</td>
                         <td class="cell-muted">{{ $listing->price_tier ?? '—' }}</td>
@@ -61,27 +83,31 @@
                             @endif
                         </td>
                         <td>
+                            {{-- Edit is filled, Archive outlined: the primary action reads
+                                 first. Same height as before via .btn-xs, which replaced the
+                                 inline padding/font-size overrides. --}}
                             <div class="util-row">
-                                <a href="{{ route('admin.listings.edit', [$type, $listing->id]) }}" class="btn btn-outline" style="padding:6px 12px; font-size:.8rem;">Edit</a>
+                                <a href="{{ route('admin.listings.edit', [$type, $listing->id]) }}" class="btn btn-primary btn-xs">Edit</a>
                                 @if ($listing->archived_at)
                                     <form method="POST" action="{{ route('admin.listings.unarchive', [$type, $listing->id]) }}">
                                         @csrf
-                                        <button type="submit" class="btn btn-outline" style="padding:6px 12px; font-size:.8rem;">Restore</button>
+                                        <button type="submit" class="btn btn-outline btn-xs">Restore</button>
                                     </form>
                                 @else
                                     <form method="POST" action="{{ route('admin.listings.archive', [$type, $listing->id]) }}" onsubmit="return confirm('Archive this listing? It will be hidden from the public site.');">
                                         @csrf
-                                        <button type="submit" class="btn btn-outline" style="padding:6px 12px; font-size:.8rem;">Archive</button>
+                                        <button type="submit" class="btn btn-outline btn-xs">Archive</button>
                                     </form>
                                 @endif
                             </div>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" class="cell-muted">No {{ strtolower($config['label']) }} found.</td></tr>
+                    <tr><td colspan="8" class="cell-muted">No {{ strtolower($config['label']) }} found.</td></tr>
                 @endforelse
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 

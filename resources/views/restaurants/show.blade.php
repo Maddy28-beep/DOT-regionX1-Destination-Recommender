@@ -87,7 +87,7 @@
             </div>
             <div class="card-grid">
                 @foreach ($nearby as $n)
-                    @include('partials.restaurant-card', ['restaurant' => $n])
+                    @include('partials.listing-poster-card', ['listing' => $n])
                 @endforeach
             </div>
         </div>

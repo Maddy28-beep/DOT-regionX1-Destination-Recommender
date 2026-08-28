@@ -25,7 +25,7 @@ class PortalAuthController extends Controller
 
         if ($data['portal'] === 'admin') {
             $ok = Auth::guard('admin')->attempt([
-                'username' => $data['identifier'],
+                'email' => $data['identifier'],
                 'password' => $data['password'],
             ], $request->boolean('remember'));
 

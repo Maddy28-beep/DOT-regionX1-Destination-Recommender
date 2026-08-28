@@ -1,0 +1,27 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Swimming pool">
+    <rect width="800" height="600" fill="#FFF7E9"/>
+    <rect x="24" y="24" width="752" height="552" fill="none" stroke="#0B5E52" stroke-width="4" stroke-dasharray="14 10" opacity=".4"/>
+    <circle cx="640" cy="150" r="66" fill="#FFE07A" opacity=".4"/>
+    <circle cx="640" cy="150" r="44" fill="#FFE07A"/>
+    <rect x="96" y="262" width="608" height="252" rx="20" fill="#0B5E52"/>
+    <rect x="116" y="282" width="568" height="212" rx="12" fill="#7fd4d8"/>
+    <g stroke="#FFF7E9" stroke-width="8" fill="none" stroke-linecap="round" opacity=".75">
+        <path d="M150,340 q46,-22 92,0 t92,0 t92,0 t92,0 t92,0"/>
+        <path d="M150,404 q46,-22 92,0 t92,0 t92,0 t92,0 t92,0"/>
+        <path d="M150,458 q46,-22 92,0 t92,0 t92,0 t92,0 t92,0"/>
+    </g>
+    <g stroke="#e1e8e4" stroke-width="12" fill="none" stroke-linecap="round">
+        <path d="M566,268 v-64 a26,26 0 0 0 -52,0 v64"/>
+    </g>
+    <g stroke="#e1e8e4" stroke-width="9" stroke-linecap="round">
+        <line x1="516" y1="228" x2="564" y2="228"/>
+        <line x1="516" y1="254" x2="564" y2="254"/>
+    </g>
+    <g fill="#D9472C">
+        <circle cx="250" cy="214" r="30"/>
+        <path d="M196,258 q56,-26 112,0 l70,32 a14,14 0 0 1 -12,25 l-64,-29 q-44,-18 -88,0 l-64,29 a14,14 0 0 1 -12,-25 z"/>
+    </g>
+    <g fill="#0B5E52" opacity=".22">
+        <circle cx="112" cy="140" r="7"/><circle cx="146" cy="176" r="7"/><circle cx="112" cy="212" r="7"/>
+    </g>
+</svg>
