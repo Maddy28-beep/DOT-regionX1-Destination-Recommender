@@ -6,7 +6,7 @@
     @php
         $mapId = 'map-'.\Illuminate\Support\Str::random(8);
     @endphp
-    <div id="{{ $mapId }}" class="listing-map" style="height:260px; border-radius:var(--radius-sm); margin-top:14px;"></div>
+    <div id="{{ $mapId }}" class="listing-map"></div>
     <script>
         (function () {
             function initMap() {

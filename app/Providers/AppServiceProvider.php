@@ -59,9 +59,24 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('layouts.establishment', function ($view) {
             $establishment = Auth::guard('establishment')->user();
+            $listing = $establishment?->matchedListing;
 
             $view->with('navNotifications', $establishment ? $establishment->notifications()->latest()->limit(5)->get() : collect());
             $view->with('navUnreadCount', $establishment ? $establishment->notifications()->where('is_read', false)->count() : 0);
+
+            // Sidebar count badge — same "needs your attention" signal the
+            // Overview panel shows, surfaced on every page so it isn't missed.
+            $view->with('navUnrepliedCount', $listing ? $listing->reviews()->whereNull('owner_reply')->count() : 0);
+
+            /*
+             * Portal-wide alert bar. Accreditation lapsing affects every page,
+             * not just Overview, so it is composed here rather than yielded per
+             * view. Visibility comes from the same source of truth the Overview
+             * cards use: scopePubliclyVisible() is is_accredited AND not
+             * archived -- never the AccreditationRecord status string, which is
+             * a separate human-maintained field and can disagree.
+             */
+            $view->with('navStatus', $establishment?->portalStatus());
         });
     }
 }

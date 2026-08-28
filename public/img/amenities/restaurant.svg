@@ -1,0 +1,22 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Restaurant">
+    <rect width="800" height="600" fill="#FFF7E9"/>
+    <rect x="24" y="24" width="752" height="552" fill="none" stroke="#0B5E52" stroke-width="4" stroke-dasharray="14 10" opacity=".4"/>
+    <circle cx="400" cy="300" r="196" fill="#e6f4ef"/>
+    <circle cx="400" cy="308" r="140" fill="#FFF7E9" stroke="#0B5E52" stroke-width="9"/>
+    <circle cx="400" cy="308" r="100" fill="none" stroke="#12836F" stroke-width="5" opacity=".55"/>
+    <circle cx="400" cy="308" r="60" fill="#D9472C" opacity=".9"/>
+    <path d="M400,258 Q438,272 428,306 Q400,300 400,258 Z" fill="#1E5C43"/>
+    <g fill="#1E5C43">
+        <rect x="170" y="150" width="13" height="88" rx="6"/>
+        <rect x="195" y="150" width="13" height="88" rx="6"/>
+        <rect x="220" y="150" width="13" height="88" rx="6"/>
+        <path d="M164,232 h76 v28 q0,22 -25,27 v181 a13,13 0 0 1 -26,0 v-181 q-25,-5 -25,-27 z"/>
+    </g>
+    <g fill="#1E5C43">
+        <path d="M588,152 q36,74 27,150 h-52 q-4,-92 25,-150 z"/>
+        <rect x="580" y="302" width="21" height="166" rx="10"/>
+    </g>
+    <g fill="#0B5E52" opacity=".22">
+        <circle cx="688" cy="140" r="7"/><circle cx="654" cy="176" r="7"/><circle cx="688" cy="212" r="7"/>
+    </g>
+</svg>

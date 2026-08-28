@@ -146,8 +146,20 @@ class AdminDashboardController extends Controller
             'expiration_date' => ['required', 'date', 'after:today'],
         ]);
 
+        $this->applyRenewal($accreditation, $data['expiration_date']);
+
+        return back()->with('status', "Accreditation {$accreditation->accreditation_number} renewed through {$accreditation->expiration_date->format('M d, Y')}.");
+    }
+
+    /**
+     * The actual renewal side-effects, shared by the single-row and bulk
+     * paths: extend the record, re-flag the listing as accredited (this is
+     * what puts it back into public search), and tell the owner.
+     */
+    private function applyRenewal(AccreditationRecord $accreditation, string $expirationDate): void
+    {
         $accreditation->update([
-            'expiration_date' => $data['expiration_date'],
+            'expiration_date' => $expirationDate,
             'status' => 'Active',
         ]);
 
@@ -166,8 +178,33 @@ class AdminDashboardController extends Controller
                 'message' => "Your DOT accreditation for {$accreditation->listing?->name} has been renewed through {$accreditation->expiration_date->format('M d, Y')}. Your listing is visible to the public.",
             ]);
         }
+    }
 
-        return back()->with('status', "Accreditation {$accreditation->accreditation_number} renewed through {$accreditation->expiration_date->format('M d, Y')}.");
+    /**
+     * Renew many accreditation records to the same expiry date.
+     *
+     * Reuses renewAccreditation()'s per-record logic (status, listing flag,
+     * owner notification) rather than duplicating it, so a bulk renewal and a
+     * single renewal leave identical state behind.
+     */
+    public function bulkRenewAccreditation(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array'],
+            'ids.*' => ['integer'],
+            'expiration_date' => ['required', 'date', 'after:today'],
+        ]);
+
+        $records = AccreditationRecord::whereIn('id', $data['ids'])->get();
+
+        foreach ($records as $record) {
+            $this->applyRenewal($record, $data['expiration_date']);
+        }
+
+        $n = $records->count();
+
+        return back()->with('status', "{$n} accreditation record".($n === 1 ? '' : 's')
+            ." renewed through ".\Illuminate\Support\Carbon::parse($data['expiration_date'])->format('M d, Y').'.');
     }
 
     public function exitSurveys(): View
@@ -229,11 +266,21 @@ class AdminDashboardController extends Controller
         ));
     }
 
-    public function associationRules(AprioriService $apriori): View
+    public function associationRules(Request $request, AprioriService $apriori): View
     {
         $rules = $apriori->topRules();
 
-        return view('admin.association-rules', compact('rules'));
+        // Whitelisted so a crafted ?sort= can't reach an arbitrary key.
+        $sort = in_array($request->get('sort'), ['co_count', 'support', 'confidence'], true)
+            ? $request->get('sort')
+            : 'confidence';
+        $dir = $request->get('dir') === 'asc' ? 'asc' : 'desc';
+
+        $rules = $dir === 'asc'
+            ? $rules->sortBy($sort)->values()
+            : $rules->sortByDesc($sort)->values();
+
+        return view('admin.association-rules', compact('rules', 'sort', 'dir'));
     }
 
     public function reports(Request $request): View

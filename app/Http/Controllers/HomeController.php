@@ -31,6 +31,10 @@ class HomeController extends Controller
             'avg_rating' => round((float) Destination::publiclyVisible()->avg('rating'), 1),
         ];
 
-        return view('welcome', compact('destinations', 'packages', 'stats'));
+        // Drives the About-the-Region pills, so each one links through to that
+        // area's listings instead of being decorative text.
+        $regions = Region::orderBy('name')->get();
+
+        return view('welcome', compact('destinations', 'packages', 'stats', 'regions'));
     }
 }

@@ -57,7 +57,7 @@
                     @else
                         <div class="card-grid">
                             @foreach ($savedDestinations as $destination)
-                                @include('partials.dest-card', ['destination' => $destination])
+                                @include('partials.listing-poster-card', ['listing' => $destination])
                             @endforeach
                         </div>
                     @endif

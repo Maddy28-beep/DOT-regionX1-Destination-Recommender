@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         AdminUser::create([
-            'username' => 'dotadmin',
+            'email' => 'dotadmin@dot.gov.ph',
             'password_hash' => Hash::make('password'),
             'full_name' => 'DOT Region XI Admin',
             'role' => 'super_admin',

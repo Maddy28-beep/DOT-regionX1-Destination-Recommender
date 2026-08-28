@@ -19,9 +19,19 @@
             <div class="upload-dropzone">
                 <div class="upload-icon"><x-icon name="camera" /></div>
                 <p>Choose photos to upload, tag them with a category, and add them to your listing.</p>
-                <input type="file" name="photos[]" accept="image/png,image/jpeg,image/webp" multiple required>
+
+                <label class="file-field">
+                    <input type="file" name="photos[]" accept="image/png,image/jpeg,image/webp" multiple required>
+                    <span class="file-field__btn">
+                        <x-icon name="camera" />
+                        Choose photos
+                    </span>
+                    <span class="file-field__status" data-file-status>No files chosen</span>
+                </label>
+
                 <div class="upload-controls">
-                    <select name="category" required>
+                    <label for="photo_category" class="sr-only">Photo category</label>
+                    <select id="photo_category" name="category" class="form-select" required>
                         @foreach ($categories as $cat)
                             <option value="{{ $cat }}">{{ $cat }}</option>
                         @endforeach
@@ -45,10 +55,19 @@
     </div>
     <div class="panel-body">
         @if ($photos->isEmpty())
+            {{--
+                Shows the actual illustrated placeholder rendered on the public
+                card grid right now, at the same 4:3 the card uses, rather than
+                describing it in prose. It is a branded scene, not a flat colour
+                block -- see partials/poster-illustration.
+            --}}
             <div class="empty-panel" style="padding:24px;">
-                <div class="icon"><x-icon name="camera" /></div>
+                <div class="photo-empty-caption">What travelers see today</div>
+                <div class="photo-empty-preview">
+                    @include('partials.poster-illustration', ['scene' => $listing->posterScene()])
+                </div>
                 <h3>No photos yet</h3>
-                <p>Upload your first photo above &mdash; travelers currently see a placeholder color block instead.</p>
+                <p>Your listing falls back to this illustration until you upload a photo. A real photo replaces it everywhere &mdash; search results, cards, and your listing page.</p>
             </div>
         @else
             <div class="photo-grid">

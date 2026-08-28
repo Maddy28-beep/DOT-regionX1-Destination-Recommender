@@ -6,23 +6,36 @@
 
 @section('content')
 
+@php $portalStatus = $establishment->portalStatus(); @endphp
+
 <div class="stat-cards">
+    {{--
+        One effective status, from EstablishmentAccount::portalStatus(). It
+        folds account approval and accreditation validity together, so this
+        card can't read "Approved" while the panel below reads "Expired" --
+        the contradiction that made the page look like it disagreed with
+        itself. The alert bar in the layout reads the same method.
+    --}}
     <div class="stat-card">
-        <div class="stat-card-val" style="font-size:1.1rem;">
-            <span class="status-pill status-{{ $establishment->status }}">{{ ucfirst($establishment->status) }}</span>
-        </div>
+        @if ($portalStatus['actionRequired'])
+            <span class="status-pill status-{{ $portalStatus['tone'] === 'danger' ? 'expired' : 'expiring' }}">Action Required</span>
+        @endif
+        <div class="stat-card-val">{{ $portalStatus['label'] }}</div>
         <div class="stat-card-label">Account Status</div>
     </div>
+    {{-- Visibility is no longer its own card: portalStatus() already folds it
+         into the status above, so a separate "Live / Hidden" tile would be a
+         second place for the same fact to drift out of sync. --}}
     <div class="stat-card">
-        <div class="stat-card-val" style="font-size:1.1rem;">{{ ucfirst(str_replace('_', ' ', $establishment->listing_kind)) }}</div>
+        <div class="stat-card-val">{{ ucwords(str_replace('_', ' ', $establishment->listing_kind)) }}</div>
         <div class="stat-card-label">Establishment Type</div>
     </div>
     <div class="stat-card">
-        <div class="stat-card-val" style="font-size:1.1rem;">{{ $listing?->rating ? number_format($listing->rating, 1).' ★' : '—' }}</div>
+        <div class="stat-card-val">{{ $listing?->rating ? number_format($listing->rating, 1).' ★' : '—' }}</div>
         <div class="stat-card-label">Current Rating</div>
     </div>
     <div class="stat-card">
-        <div class="stat-card-val" style="font-size:1.1rem;">{{ $listing?->review_count ?? 0 }}</div>
+        <div class="stat-card-val">{{ $listing?->review_count ?? 0 }}</div>
         <div class="stat-card-label">Total Reviews</div>
     </div>
 </div>
@@ -73,19 +86,37 @@
             </div>
             <div class="panel-body">
                 @if ($accreditation->status === 'Expired')
-                    <p style="color:var(--danger); font-size:.88rem; margin:0;">
-                        Your accreditation expired on {{ $accreditation->expiration_date->format('M d, Y') }}. Your listing is currently
-                        hidden from public search until DOT renews your accreditation. Please contact DOT Region XI.
-                    </p>
+                    <x-banner tone="danger">
+                        {{-- Stated from the visibility flag, not inferred from the record status --}}
+                        @if ($isPubliclyVisible)
+                            Your listing is still visible to travelers, but DOT Region XI may hide it at any time &mdash; please arrange renewal.
+                        @else
+                            Your listing is currently hidden from public search until DOT Region XI processes your renewal.
+                        @endif
+                        <x-slot:action>
+                            <a href="{{ route('establishment.notifications') }}" class="btn btn-danger">Upload Renewal Documents</a>
+                        </x-slot:action>
+                    </x-banner>
                 @elseif ($accreditation->status === 'Expiring Soon')
-                    <p style="color:#b5680a; font-size:.88rem; margin:0;">
-                        Expires {{ $accreditation->expiration_date->format('M d, Y') }} ({{ $daysLeft }} day{{ $daysLeft === 1 ? '' : 's' }} left).
-                        Please coordinate with DOT Region XI on renewal before your listing is hidden from public search.
-                    </p>
+                    <x-banner tone="warn">
+                        Expires <strong>{{ $accreditation->expiration_date->format('M d, Y') }}</strong>
+                        ({{ $daysLeft }} day{{ $daysLeft === 1 ? '' : 's' }} left). Coordinate with DOT Region XI
+                        on renewal before your listing is hidden from public search.
+                        <x-slot:action>
+                            <a href="{{ route('establishment.notifications') }}" class="btn btn-primary">Start Renewal</a>
+                        </x-slot:action>
+                    </x-banner>
                 @else
-                    <p style="color:var(--muted); font-size:.88rem; margin:0;">
-                        Valid through {{ $accreditation->expiration_date?->format('M d, Y') ?? 'N/A' }}.
-                    </p>
+                    <x-banner tone="success">
+                        Valid through <strong>{{ $accreditation->expiration_date?->format('M d, Y') ?? 'N/A' }}</strong>.
+                    </x-banner>
+                @endif
+
+                @if (! $isPubliclyVisible && $accreditation->status !== 'Expired')
+                    <x-banner tone="warn">
+                        Your listing is currently <strong>hidden from public search</strong>, even though this
+                        accreditation record is marked {{ $accreditation->status }}. Contact DOT Region XI to have it restored.
+                    </x-banner>
                 @endif
             </div>
         </div>
@@ -116,7 +147,9 @@
                 @if ($photoCount > 0)
                     <p style="color:var(--muted); font-size:.88rem; margin:0;">{{ $photoCount }} photo{{ $photoCount === 1 ? '' : 's' }} uploaded.</p>
                 @else
-                    <p style="color:#b5680a; font-size:.88rem; margin:0;">No photos uploaded yet. Listings with photos get far more attention from travelers.</p>
+                    <x-banner tone="warn">
+                        No photos uploaded yet &mdash; your listing falls back to an illustration.
+                    </x-banner>
                 @endif
             </div>
         </div>
@@ -126,12 +159,17 @@
                 <div>
                     <h2>Recent Reviews</h2>
                     @if ($unrepliedCount > 0)
-                        <p style="color:#b5680a;">{{ $unrepliedCount }} awaiting your reply</p>
+                        <p style="color:var(--tone-warn-ink); font-weight:600;">{{ $unrepliedCount }} awaiting your reply</p>
                     @endif
                 </div>
                 <a href="{{ route('establishment.reviews') }}" class="btn btn-outline">View All</a>
             </div>
             <div class="panel-body">
+                @if ($unrepliedCount > 0)
+                    <x-banner tone="success">
+                        {{ $unrepliedCount }} review{{ $unrepliedCount === 1 ? '' : 's' }} awaiting your response.
+                    </x-banner>
+                @endif
                 @forelse ($recentReviews as $review)
                     <div class="review-item">
                         <div class="author">{{ $review->author_name ?? 'Traveler' }}</div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Establishment;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\QrCodeController;
 use App\Models\Review;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,8 +28,23 @@ class EstablishmentDashboardController extends Controller
             $unrepliedCount = $listing->reviews()->whereNull('owner_reply')->count();
         }
 
+        /*
+         * Single source of truth for "can travelers see this listing".
+         *
+         * Public visibility is decided by scopePubliclyVisible() -- is_accredited
+         * AND not archived -- and by nothing else. The AccreditationRecord's
+         * status string is a separate, human-maintained field, so the two can
+         * legitimately disagree: a record can read "Expired" while the listing
+         * flag is still on (or vice versa). The dashboard used to assert
+         * "your listing is hidden" purely from the record status, which was
+         * wrong whenever an admin had not also flipped the flag. Every status
+         * shown on this page now derives from this one value.
+         */
+        $isPubliclyVisible = (bool) ($listing && $listing->is_accredited && ! $listing->archived_at);
+
         return view('establishment.overview', compact(
-            'establishment', 'listing', 'accreditation', 'photoCount', 'recentReviews', 'unrepliedCount'
+            'establishment', 'listing', 'accreditation', 'photoCount',
+            'recentReviews', 'unrepliedCount', 'isPubliclyVisible'
         ));
     }
 
@@ -42,7 +58,11 @@ class EstablishmentDashboardController extends Controller
                 ->with('status', 'Your establishment is not yet linked to a catalog listing. A DOT Admin will link it once your accreditation is verified.');
         }
 
-        return view('establishment.edit-listing', compact('establishment', 'listing'));
+        // Same map the QR encoder uses, so the URL shown beside the code can't
+        // drift from the one it actually encodes.
+        $qrTargetUrl = QrCodeController::targetUrlFor($establishment->listing_kind, $listing);
+
+        return view('establishment.edit-listing', compact('establishment', 'listing', 'qrTargetUrl'));
     }
 
     public function updateListing(Request $request): RedirectResponse
@@ -102,10 +122,35 @@ class EstablishmentDashboardController extends Controller
     {
         $establishment = $request->user('establishment');
 
+        /*
+         * Notifications used to be flagged read on page load. That made an
+         * All/Unread filter impossible -- Unread was empty by the time it
+         * rendered -- and left no way to keep something marked for later.
+         * Reading is now an explicit action (markAllRead below).
+         */
+        $filter = $request->string('filter')->toString() === 'unread' ? 'unread' : 'all';
+
+        $query = $establishment->notifications()->latest();
+
+        if ($filter === 'unread') {
+            $query->where('is_read', false);
+        }
+
+        $notifications = $query->paginate(15)->withQueryString();
+        $unreadCount = $establishment->notifications()->where('is_read', false)->count();
+        $totalCount = $establishment->notifications()->count();
+
+        return view('establishment.notifications', compact(
+            'establishment', 'notifications', 'filter', 'unreadCount', 'totalCount'
+        ));
+    }
+
+    public function markNotificationsRead(Request $request): RedirectResponse
+    {
+        $establishment = $request->user('establishment');
+
         $establishment->notifications()->where('is_read', false)->update(['is_read' => true]);
 
-        $notifications = $establishment->notifications()->latest()->paginate(15);
-
-        return view('establishment.notifications', compact('establishment', 'notifications'));
+        return back()->with('status', 'All notifications marked as read.');
     }
 }

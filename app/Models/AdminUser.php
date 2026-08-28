@@ -13,7 +13,7 @@ class AdminUser extends Authenticatable
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'username',
+        'email',
         'password_hash',
         'full_name',
         'role',

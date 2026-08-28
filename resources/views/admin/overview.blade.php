@@ -50,7 +50,7 @@
                         <td>{{ $e->business_name }}</td>
                         <td class="cell-muted">{{ ucfirst(str_replace('_', ' ', $e->listing_kind)) }}</td>
                         <td class="cell-muted">{{ $e->contact_person }}</td>
-                        <td class="cell-muted">{{ $e->submitted_at->format('M d, Y') }}</td>
+                        <td class="cell-muted cell-date">{{ $e->submitted_at->format('M d, Y') }}</td>
                         <td><span class="status-pill status-pending">Pending</span></td>
                     </tr>
                 @empty
@@ -79,7 +79,7 @@
                     <tr>
                         <td>{{ $r->accreditation_number }}</td>
                         <td class="cell-muted">{{ ucfirst(str_replace('_', ' ', $r->listing_kind)) }}</td>
-                        <td class="cell-muted">{{ $r->expiration_date->format('M d, Y') }}</td>
+                        <td class="cell-muted cell-date">{{ $r->expiration_date->format('M d, Y') }}</td>
                         <td>
                             @if ($r->status === 'Expired')
                                 <span class="status-pill status-expired">Expired</span>
@@ -115,7 +115,7 @@
                         <td class="cell-muted">{{ $t->nationality }}</td>
                         <td class="cell-muted">{{ $t->preferences->first()->travel_type ?? '—' }}</td>
                         <td class="cell-muted">{{ $t->preferences->first()->budget ?? '—' }}</td>
-                        <td class="cell-muted">{{ $t->created_at->format('M d, Y') }}</td>
+                        <td class="cell-muted cell-date">{{ $t->created_at->format('M d, Y') }}</td>
                     </tr>
                 @empty
                     <tr><td colspan="5" class="cell-muted">No tourists registered yet.</td></tr>

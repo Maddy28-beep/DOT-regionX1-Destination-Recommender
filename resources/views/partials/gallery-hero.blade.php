@@ -15,11 +15,20 @@
             </div>
             <div class="badges">
                 @if ($isAccredited)
-                    <span class="badge badge-accredited"><img src="{{ asset('images/dot-seal.jpg') }}" alt="DOT Seal"> DOT Accredited</span>
+                    <span class="dpost-badge-accredited" title="DOT Accredited">
+                    <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+                        <circle cx="10" cy="10" r="3.4" fill="currentColor"/>
+                    </svg>
+                    DOT Accredited
+                </span>
                 @else
                     <span></span>
                 @endif
-                <span class="rating-pill">@if ($reviewCount > 0) &#9733; {{ $rating }} &middot; {{ $reviewCount }} reviews @else Not yet rated @endif</span>
+                <span class="dpost-badge-rating">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+                @if ($reviewCount > 0) {{ $rating }} &middot; {{ $reviewCount }} reviews @else New @endif
+            </span>
             </div>
             @if ($total > 1)
                 <div class="carousel-dots">
@@ -47,11 +56,20 @@
             @endif
             <div class="badges">
                 @if ($isAccredited)
-                    <span class="badge badge-accredited"><img src="{{ asset('images/dot-seal.jpg') }}" alt="DOT Seal"> DOT Accredited</span>
+                    <span class="dpost-badge-accredited" title="DOT Accredited">
+                    <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+                        <circle cx="10" cy="10" r="3.4" fill="currentColor"/>
+                    </svg>
+                    DOT Accredited
+                </span>
                 @else
                     <span></span>
                 @endif
-                <span class="rating-pill">@if ($reviewCount > 0) &#9733; {{ $rating }} &middot; {{ $reviewCount }} reviews @else Not yet rated @endif</span>
+                <span class="dpost-badge-rating">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+                @if ($reviewCount > 0) {{ $rating }} &middot; {{ $reviewCount }} reviews @else New @endif
+            </span>
             </div>
         </div>
 
@@ -73,17 +91,26 @@
         </div>
     </div>
 
-    <h1 style="margin:20px 0 4px; font-size:clamp(1.6rem, 4vw, 2.2rem);">{{ $title }}</h1>
+    <h1 class="poster-title" style="margin:20px 0 4px; font-size:clamp(1.6rem, 4vw, 2.2rem); color:var(--ocean-teal-dark);">{{ $title }}</h1>
     <div style="color:var(--muted); font-size:.95rem;">{{ $subtitle }}</div>
 @else
     <div class="detail-hero" style="background:{{ $fallbackGradient }}">
         <div class="badges">
             @if ($isAccredited)
-                <span class="badge badge-accredited"><img src="{{ asset('images/dot-seal.jpg') }}" alt="DOT Seal"> DOT Accredited</span>
+                <span class="dpost-badge-accredited" title="DOT Accredited">
+                    <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+                        <circle cx="10" cy="10" r="3.4" fill="currentColor"/>
+                    </svg>
+                    DOT Accredited
+                </span>
             @else
                 <span></span>
             @endif
-            <span class="rating-pill">@if ($reviewCount > 0) &#9733; {{ $rating }} &middot; {{ $reviewCount }} reviews @else Not yet rated @endif</span>
+            <span class="dpost-badge-rating">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+                @if ($reviewCount > 0) {{ $rating }} &middot; {{ $reviewCount }} reviews @else New @endif
+            </span>
         </div>
         <div class="detail-hero-content">
             <h1>{{ $title }}</h1>

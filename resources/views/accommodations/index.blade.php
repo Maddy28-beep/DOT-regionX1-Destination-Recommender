@@ -5,7 +5,8 @@
 @section('content')
 <div class="page-head">
     <div class="container">
-        <h1>Accommodations in the Davao Region</h1>
+        <span class="poster-kicker">somewhere to land</span>
+        <h1 class="poster-title">Accommodations in the Davao Region</h1>
         <p>DOT-accredited hotels, resorts, and lodging &mdash; verified for quality and safety.</p>
     </div>
 </div>
@@ -13,7 +14,7 @@
 <div class="section-tight">
     <div class="container">
 
-        <div class="chip-row">
+        <div class="chip-row chip-row--poster">
             <a href="{{ request()->fullUrlWithQuery(['type' => null, 'page' => null]) }}" class="chip {{ request('type') ? '' : 'active' }}">All Types</a>
             @foreach ($types as $t)
                 <a href="{{ request()->fullUrlWithQuery(['type' => $t, 'page' => null]) }}" class="chip {{ request('type') === $t ? 'active' : '' }}">{{ $t }}</a>
@@ -66,9 +67,9 @@
                         </select>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block">Apply Filters</button>
+                    <button type="submit" class="btn btn-poster-primary btn-block">Apply Filters</button>
                     @if (request()->anyFilled(['q', 'region_id', 'price_tier', 'type']))
-                        <a href="{{ route('accommodations.index') }}" class="btn btn-ghost btn-block" style="margin-top:8px;">Clear all</a>
+                        <a href="{{ route('accommodations.index') }}" class="btn btn-poster-ghost btn-block" style="margin-top:8px;">Clear all</a>
                     @endif
                 </form>
             </aside>
@@ -81,7 +82,7 @@
                 @if ($accommodations->count())
                     <div class="card-grid">
                         @foreach ($accommodations as $accommodation)
-                            @include('partials.accom-card', ['accommodation' => $accommodation])
+                            @include('partials.listing-poster-card', ['listing' => $accommodation])
                         @endforeach
                     </div>
 

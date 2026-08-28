@@ -5,7 +5,8 @@
 @section('content')
 <div class="page-head">
     <div class="container">
-        <h1>Souvenir Centers in the Davao Region</h1>
+        <span class="poster-kicker">something to bring home</span>
+        <h1 class="poster-title">Souvenir Centers in the Davao Region</h1>
         <p>DOT-accredited shops for authentic local crafts and memorabilia.</p>
     </div>
 </div>
@@ -45,9 +46,9 @@
                         </select>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block">Apply Filters</button>
+                    <button type="submit" class="btn btn-poster-primary btn-block">Apply Filters</button>
                     @if (request()->anyFilled(['q', 'region_id']))
-                        <a href="{{ route('souvenir-centers.index') }}" class="btn btn-ghost btn-block" style="margin-top:8px;">Clear all</a>
+                        <a href="{{ route('souvenir-centers.index') }}" class="btn btn-poster-ghost btn-block" style="margin-top:8px;">Clear all</a>
                     @endif
                 </form>
             </aside>
@@ -60,7 +61,7 @@
                 @if ($souvenirCenters->count())
                     <div class="card-grid">
                         @foreach ($souvenirCenters as $souvenirCenter)
-                            @include('partials.souvenir-card', ['souvenirCenter' => $souvenirCenter])
+                            @include('partials.listing-poster-card', ['listing' => $souvenirCenter])
                         @endforeach
                     </div>
 

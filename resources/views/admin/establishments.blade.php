@@ -33,7 +33,7 @@
                         <td class="cell-muted">{{ ucfirst(str_replace('_', ' ', $e->listing_kind)) }}</td>
                         <td class="cell-muted">{{ $e->contact_person }}<br>{{ $e->contact_number }}</td>
                         <td class="cell-muted">{{ $e->claimed_accreditation_number ?? '—' }}</td>
-                        <td class="cell-muted">{{ $e->submitted_at->format('M d, Y') }}</td>
+                        <td class="cell-muted cell-date">{{ $e->submitted_at->format('M d, Y') }}</td>
                         <td>
                             <span class="status-pill status-{{ $e->status }}">{{ ucfirst($e->status) }}</span>
                         </td>

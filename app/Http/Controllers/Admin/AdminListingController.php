@@ -163,6 +163,35 @@ class AdminListingController extends Controller
         return back()->with('status', "{$config['singular']} \"{$listing->name}\" restored.");
     }
 
+    /**
+     * Archive or restore many listings at once.
+     *
+     * These tables run to hundreds of rows; acting on them one at a time was
+     * the only option before. Ids are validated against the requested type, so
+     * a posted id from another listing type can't be archived through here.
+     */
+    public function bulk(Request $request, string $type): RedirectResponse
+    {
+        $config = $this->config($type);
+
+        $data = $request->validate([
+            'ids' => ['required', 'array'],
+            'ids.*' => ['integer'],
+            'action' => ['required', 'in:archive,unarchive'],
+        ]);
+
+        $listings = $config['model']::whereIn('id', $data['ids'])->get();
+
+        foreach ($listings as $listing) {
+            $data['action'] === 'archive' ? $listing->archive() : $listing->unarchive();
+        }
+
+        $verb = $data['action'] === 'archive' ? 'archived' : 'restored';
+        $n = $listings->count();
+
+        return back()->with('status', "{$n} ".Str::plural(strtolower($config['singular']), $n)." {$verb}.");
+    }
+
     private function config(string $type): array
     {
         abort_unless(isset(self::TYPES[$type]), 404);

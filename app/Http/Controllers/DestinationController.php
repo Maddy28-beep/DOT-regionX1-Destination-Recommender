@@ -52,12 +52,25 @@ class DestinationController extends Controller
 
         $destination->load(['region', 'tags', 'photos', 'reviews' => fn ($q) => $q->latest()->take(10)]);
 
-        $nearby = Destination::publiclyVisible()->with('region', 'photos')
+        $nearby = Destination::publiclyVisible()->with('region', 'tags')
             ->where('region_id', $destination->region_id)
             ->where('id', '!=', $destination->id)
             ->orderByDesc('rating')
             ->take(3)
             ->get();
+        $nearbyIsSameRegion = $nearby->isNotEmpty();
+
+        // Some regions (e.g. Samal, which is the only destination seeded in
+        // Island Garden City of Samal) have no other same-region listing at
+        // all -- fall back to top-rated destinations elsewhere rather than
+        // silently hiding the section for those.
+        if ($nearby->isEmpty()) {
+            $nearby = Destination::publiclyVisible()->with('region', 'tags')
+                ->where('id', '!=', $destination->id)
+                ->orderByDesc('rating')
+                ->take(3)
+                ->get();
+        }
 
         $isSaved = false;
         if (Auth::guard('tourist')->check()) {
@@ -66,7 +79,7 @@ class DestinationController extends Controller
                 ->exists();
         }
 
-        return view('destinations.show', compact('destination', 'nearby', 'isSaved'));
+        return view('destinations.show', compact('destination', 'nearby', 'nearbyIsSameRegion', 'isSaved'));
     }
 
     public function toggleSave(Destination $destination)

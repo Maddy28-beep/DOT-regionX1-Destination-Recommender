@@ -5,7 +5,8 @@
 @section('content')
 <div class="page-head">
     <div class="container">
-        <h1>Tour Operators in the Davao Region</h1>
+        <span class="poster-kicker">guided, if you'd rather</span>
+        <h1 class="poster-title">Tour Operators in the Davao Region</h1>
         <p>DOT-accredited travel and tour operators &mdash; the businesses behind the guided tours and packages on ExploreDVO.</p>
     </div>
 </div>
@@ -13,7 +14,7 @@
 <div class="section-tight">
     <div class="container">
 
-        <div class="chip-row">
+        <div class="chip-row chip-row--poster">
             <a href="{{ request()->fullUrlWithQuery(['specialization' => null, 'page' => null]) }}" class="chip {{ request('specialization') ? '' : 'active' }}">All Specializations</a>
             @foreach ($specializations as $s)
                 <a href="{{ request()->fullUrlWithQuery(['specialization' => $s, 'page' => null]) }}" class="chip {{ request('specialization') === $s ? 'active' : '' }}">{{ $s }}</a>
@@ -64,9 +65,9 @@
                         </select>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block">Apply Filters</button>
+                    <button type="submit" class="btn btn-poster-primary btn-block">Apply Filters</button>
                     @if (request()->anyFilled(['q', 'region_id', 'price_tier', 'specialization']))
-                        <a href="{{ route('tour-operators.index') }}" class="btn btn-ghost btn-block" style="margin-top:8px;">Clear all</a>
+                        <a href="{{ route('tour-operators.index') }}" class="btn btn-poster-ghost btn-block" style="margin-top:8px;">Clear all</a>
                     @endif
                 </form>
             </aside>
@@ -79,7 +80,7 @@
                 @if ($tourOperators->count())
                     <div class="card-grid">
                         @foreach ($tourOperators as $tourOperator)
-                            @include('partials.tour-operator-card', ['tourOperator' => $tourOperator])
+                            @include('partials.listing-poster-card', ['listing' => $tourOperator])
                         @endforeach
                     </div>
 

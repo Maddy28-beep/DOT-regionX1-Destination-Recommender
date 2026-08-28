@@ -39,9 +39,11 @@
                             @csrf
                             <div class="field">
                                 <label for="owner_reply_{{ $review->id }}">Reply to this review</label>
-                                <textarea name="owner_reply" id="owner_reply_{{ $review->id }}" rows="2" maxlength="500" required placeholder="Thank the traveler or address their feedback..."></textarea>
+                                <textarea name="owner_reply" id="owner_reply_{{ $review->id }}" rows="3" maxlength="500" required placeholder="Thank the traveler or address their feedback..."></textarea>
                             </div>
-                            <button type="submit" class="btn btn-outline">Post Reply</button>
+                            {{-- Primary: this is the submit action for its form, matching
+                                 Save Changes and Upload in the other modules. --}}
+                            <button type="submit" class="btn btn-primary">Post Reply</button>
                         </form>
                     @endif
                 </div>

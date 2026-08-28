@@ -118,6 +118,7 @@ Route::prefix('portal/admin')->name('admin.')->middleware('auth:admin')->group(f
 
     Route::get('/accreditation', [AdminDashboardController::class, 'accreditation'])->name('accreditation');
     Route::post('/accreditation/{accreditation}/renew', [AdminDashboardController::class, 'renewAccreditation'])->name('accreditation.renew');
+    Route::post('/accreditation/bulk-renew', [AdminDashboardController::class, 'bulkRenewAccreditation'])->name('accreditation.bulk-renew');
     Route::get('/exit-surveys', [AdminDashboardController::class, 'exitSurveys'])->name('exit-surveys');
     Route::get('/association-rules', [AdminDashboardController::class, 'associationRules'])->name('association-rules');
     Route::get('/reports', [AdminDashboardController::class, 'reports'])->name('reports');
@@ -131,6 +132,7 @@ Route::prefix('portal/admin')->name('admin.')->middleware('auth:admin')->group(f
         Route::post('/', [AdminListingController::class, 'store'])->name('store');
         Route::get('/{id}/edit', [AdminListingController::class, 'edit'])->name('edit');
         Route::put('/{id}', [AdminListingController::class, 'update'])->name('update');
+        Route::post('/bulk', [AdminListingController::class, 'bulk'])->name('bulk');
         Route::post('/{id}/archive', [AdminListingController::class, 'archive'])->name('archive');
         Route::post('/{id}/unarchive', [AdminListingController::class, 'unarchive'])->name('unarchive');
         Route::get('/{id}/qr-code', [QrCodeController::class, 'admin'])->name('qr-code');
@@ -146,6 +148,7 @@ Route::prefix('portal/establishment')->name('establishment.')->middleware('auth:
     Route::get('/reviews', [EstablishmentDashboardController::class, 'reviews'])->name('reviews');
     Route::post('/reviews/{review}/reply', [EstablishmentDashboardController::class, 'replyToReview'])->name('reviews.reply');
     Route::get('/notifications', [EstablishmentDashboardController::class, 'notifications'])->name('notifications');
+    Route::post('/notifications/read-all', [EstablishmentDashboardController::class, 'markNotificationsRead'])->name('notifications.read-all');
 
     Route::get('/photos', [EstablishmentPhotoController::class, 'index'])->name('photos');
     Route::post('/photos', [EstablishmentPhotoController::class, 'store'])->name('photos.store');

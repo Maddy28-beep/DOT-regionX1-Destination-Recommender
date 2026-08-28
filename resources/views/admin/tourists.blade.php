@@ -31,6 +31,11 @@
                         </td>
                         <td class="cell-muted">{{ $t->nationality }}</td>
                         <td class="cell-muted">{{ $t->age_range }}</td>
+                        {{-- Plain muted text, not badges. These are descriptive
+                             attributes rather than states needing attention, so
+                             outlining all three made the row busier without
+                             telling the reader anything more. Status colour in
+                             this console is reserved for accreditation state. --}}
                         <td class="cell-muted">{{ $pref->travel_type ?? '—' }}</td>
                         <td class="cell-muted">{{ $pref->budget ?? '—' }}</td>
                         <td class="cell-muted">
@@ -40,7 +45,7 @@
                                 —
                             @endif
                         </td>
-                        <td class="cell-muted">{{ $t->created_at->format('M d, Y') }}</td>
+                        <td class="cell-muted cell-date">{{ $t->created_at->format('M d, Y') }}</td>
                     </tr>
                 @empty
                     <tr><td colspan="7" class="cell-muted">No tourists registered yet.</td></tr>
