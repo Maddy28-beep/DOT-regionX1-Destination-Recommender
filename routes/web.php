@@ -24,6 +24,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Legal pages linked from the footer. Static content, no controller needed;
+// the Privacy Policy also serves as the RA 10173 (Data Privacy Act) notice
+// rather than duplicating the same facts across two documents that could
+// drift apart.
+Route::view('/privacy-policy', 'legal.privacy-policy')->name('legal.privacy');
+Route::view('/terms-of-service', 'legal.terms-of-service')->name('legal.terms');
+Route::view('/accessibility', 'legal.accessibility')->name('legal.accessibility');
+
 /*
  * QR-code check-in (records a visit on scan; see CheckInController). Open to
  * everyone: the visitor scans the establishment's code and is counted, with
