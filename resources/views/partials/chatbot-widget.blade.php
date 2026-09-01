@@ -37,6 +37,12 @@
         box-shadow: 0 12px 32px rgba(0,0,0,.18); display: flex; flex-direction: column; overflow: hidden;
         max-height: 480px;
     }
+    /* `display: flex` above has the same specificity as the browser's own
+       `[hidden] { display: none }` rule, and an author rule wins that tie
+       regardless of source order -- so without this, the panel's `hidden`
+       attribute was cosmetic and it rendered open on every fresh page load,
+       every time, until a click on #chatbot-toggle set an inline style. */
+    .chatbot-panel[hidden] { display: none; }
     .chatbot-panel-head {
         display: flex; align-items: center; justify-content: space-between;
         padding: 14px 16px; background: var(--primary); color: var(--white);
