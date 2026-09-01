@@ -10,10 +10,7 @@ use App\Models\Package;
 use App\Models\Restaurant;
 use App\Models\SouvenirCenter;
 use App\Models\TourOperator;
-use App\Models\Tourist;
-use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -43,19 +40,9 @@ class AppServiceProvider extends ServiceProvider
             'souvenir_center' => SouvenirCenter::class,
             'package' => Package::class,
             'tour_operator' => TourOperator::class,
-            'tourist' => Tourist::class,
             'admin' => AdminUser::class,
             'establishment' => EstablishmentAccount::class,
         ]);
-
-        // Route unauthenticated visitors to the right login screen: the
-        // partner/admin portal lives under /portal, everything else is
-        // the public tourist-facing app (2.3.2 actor split).
-        Authenticate::redirectUsing(function (Request $request) {
-            return $request->is('portal/*')
-                ? route('portal.login')
-                : route('tourist.login');
-        });
 
         View::composer('layouts.establishment', function ($view) {
             $establishment = Auth::guard('establishment')->user();

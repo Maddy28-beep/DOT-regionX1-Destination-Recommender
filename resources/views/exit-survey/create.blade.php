@@ -77,7 +77,7 @@
                             <label for="travel_purpose">Purpose of this trip:</label>
                             <select id="travel_purpose" name="travel_purpose">
                                 <option value="">Prefer not to say</option>
-                                @foreach (['Leisure', 'Business', 'Visiting Friends/Family', 'Educational', 'Medical', 'Religious/Pilgrimage', 'Other'] as $purpose)
+                                @foreach ($travelPurposes as $purpose)
                                     <option value="{{ $purpose }}" @selected(old('travel_purpose') === $purpose)>{{ $purpose }}</option>
                                 @endforeach
                             </select>
@@ -117,7 +117,7 @@
                     <div class="field" style="margin-top:18px;">
                         <label>Activities you participated in</label>
                         <div class="checkbox-grid">
-                            @foreach (['Beach & Island', 'Nature & Adventure', 'Cultural Heritage', 'Wildlife', 'Food Tourism', 'Shopping & Souvenirs', 'Hiking & Trekking', 'Relaxation & Wellness'] as $activity)
+                            @foreach ($activityOptions as $activity)
                                 <label class="field-check">
                                     <input type="checkbox" name="activities[]" value="{{ $activity }}" @checked(in_array($activity, old('activities', [])))>
                                     <span>{{ $activity }}</span>

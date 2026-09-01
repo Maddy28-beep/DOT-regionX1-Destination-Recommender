@@ -277,4 +277,84 @@ document.addEventListener('DOMContentLoaded', function () {
             status.classList.add('has-files');
         });
     });
+
+    // Save/unsave heart: toggled over fetch so hearting a place doesn't
+    // reload the page. Delegated on document rather than bound per-form,
+    // since a listing grid renders one of these per card and the same
+    // handler should cover every one without a separate listener each.
+    document.addEventListener('submit', function (e) {
+        var form = e.target.closest('.save-form');
+        if (!form) return;
+
+        var tokenMeta = document.querySelector('meta[name="csrf-token"]');
+        var button = form.querySelector('button');
+        if (!tokenMeta || !button) return; // let the plain form submit through
+
+        e.preventDefault();
+
+        fetch(form.getAttribute('action'), {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': tokenMeta.content, 'Accept': 'application/json' },
+        })
+            .then(function (response) {
+                if (!response.ok) throw new Error('save-toggle request failed');
+                return response.json();
+            })
+            .then(function (data) { applySavedState(form, button, data.saved); })
+            .catch(function () {
+                // Network hiccup or server error: fall back to a normal
+                // full-page submit rather than leaving the heart stuck.
+                form.submit();
+            });
+    });
+
+    function applySavedState(form, button, saved) {
+        button.classList.toggle('is-saved', saved);
+        button.setAttribute('aria-pressed', saved ? 'true' : 'false');
+
+        var svg = button.querySelector('svg');
+        if (svg) svg.setAttribute('fill', saved ? 'currentColor' : 'none');
+
+        var isIconVariant = form.classList.contains('save-form--icon');
+        if (isIconVariant) {
+            button.title = saved ? 'Remove from saved' : 'Save this place';
+        } else {
+            Array.prototype.forEach.call(button.childNodes, function (node) {
+                if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+                    node.textContent = saved ? ' Saved' : ' Save this place';
+                }
+            });
+        }
+
+        var srOnly = button.querySelector('.sr-only');
+        if (srOnly) {
+            var name = srOnly.textContent.replace(/^(Remove|Save)\s+/, '');
+            srOnly.textContent = (saved ? 'Remove ' : 'Save ') + name;
+        }
+
+        // Bounce the heart itself on every toggle, and on save (icon variant
+        // only) send a few small hearts drifting outward -- the "something
+        // just happened here" cue a page reload used to provide for free.
+        form.classList.remove('save-form--pop');
+        void form.offsetWidth; // restart the animation if clicked again quickly
+        form.classList.add('save-form--pop');
+
+        if (saved && isIconVariant && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            spawnHeartParticles(form);
+        }
+    }
+
+    function spawnHeartParticles(form) {
+        var offsets = [
+            [-14, -22], [0, -28], [14, -22], [-8, -16],
+        ];
+        offsets.forEach(function (offset) {
+            var particle = document.createElement('span');
+            particle.className = 'save-heart-particle';
+            particle.style.setProperty('--particle-end', 'translate(' + offset[0] + 'px, ' + offset[1] + 'px) scale(1)');
+            particle.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-10-9.3C.5 8 2 4 6 4c2 0 3.5 1.2 4.5 2.7C11.5 5.2 13 4 15 4c4 0 5.5 4 4 7.7C19.5 16.4 12 21 12 21z"/></svg>';
+            form.appendChild(particle);
+            particle.addEventListener('animationend', function () { particle.remove(); });
+        });
+    }
 });

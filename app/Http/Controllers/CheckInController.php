@@ -8,18 +8,22 @@ use App\Models\Package;
 use App\Models\Restaurant;
 use App\Models\SouvenirCenter;
 use App\Models\TourOperator;
+use App\Http\Middleware\EnsureVisitorToken;
 use App\Models\TouristVisit;
-use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 /**
- * QR-code check-in: scanning a listing's QR code (see QrCodeController) now
- * lands here instead of going straight to the public detail page. If the
- * scanning tourist is logged in, this records a real TouristVisit row before
- * continuing on to that same detail page — the missing piece behind
- * accurate, DOT-requested "how many unique tourists visited today" reporting
- * (see AdminDashboardController::verifiedVisitsReport()).
+ * QR-code check-in: scanning the code displayed at an establishment (see
+ * QrCodeController) lands here, records the visit, and forwards to that
+ * listing's public detail page.
+ *
+ * No login, and nothing personal is stored. The visit is attributed to an
+ * opaque random browser token (EnsureVisitorToken), which exists only so the
+ * same phone cannot count the same establishment twice in one day — the
+ * double-counting case DOT raised. Counts stay accurate; the visitor stays
+ * anonymous.
  */
 class CheckInController extends Controller
 {
@@ -45,30 +49,41 @@ class CheckInController extends Controller
         $listing = $config['model']::findOrFail($id);
         abort_unless($listing->is_accredited && ! $listing->archived_at, 404, 'Check-in is only available for currently DOT-accredited, active listings.');
 
-        $tourist = $request->user('tourist');
+        $today = now()->toDateString();
 
         $attributes = [
-            'tourist_id' => $tourist->id,
+            'visitor_token' => EnsureVisitorToken::get($request),
             'listing_kind' => $config['kind'],
             'listing_id' => $listing->id,
-            'visit_date' => now()->toDateString(),
         ];
 
-        // firstOrCreate on (tourist, listing, today) so re-scanning the same
-        // code later the same day never creates a second row for the same
-        // visit — this is the actual fix for the "Alex visits Eden Park
-        // twice in one day" double-counting concern DOT raised. A DB-level
-        // unique constraint backs this too (tourist_visits_unique_daily), so
-        // two near-simultaneous requests (a fast double-tap, a retried scan)
-        // can't both slip past the SELECT and insert duplicate rows — the
-        // loser of that race hits the catch below instead.
-        try {
-            $visit = TouristVisit::firstOrCreate($attributes, ['source' => 'qr_scan']);
-        } catch (QueryException $e) {
-            if ($e->getCode() !== '23505') {
-                throw $e;
+        /*
+         * One row per (browser, listing, day), so re-scanning the same code
+         * later the same day never counts a second visit — this is the "Alex
+         * visits Eden Park twice in one day" double-counting concern DOT
+         * raised, still handled now that there is no account to key it on.
+         *
+         * whereDate rather than a plain equality on visit_date: the column is
+         * cast to a date, so Eloquent stores it as "2026-08-30 00:00:00" while
+         * toDateString() produces "2026-08-30". Comparing those directly never
+         * matched, so every rescan fell through to an INSERT and died on the
+         * unique index instead of saying "you already checked in today".
+         */
+        $visit = TouristVisit::where($attributes)->whereDate('visit_date', $today)->first();
+
+        if (! $visit) {
+            /*
+             * A DB-level unique constraint backs the check above
+             * (visits_unique_daily_per_browser), so two near-simultaneous
+             * requests — a fast double-tap, a retried scan — can't both slip
+             * past the SELECT and insert duplicate rows. The loser of that
+             * race lands in the catch and reads back the winner's row.
+             */
+            try {
+                $visit = TouristVisit::create($attributes + ['visit_date' => $today, 'source' => 'qr_scan']);
+            } catch (UniqueConstraintViolationException) {
+                $visit = TouristVisit::where($attributes)->whereDate('visit_date', $today)->firstOrFail();
             }
-            $visit = TouristVisit::where($attributes)->firstOrFail();
         }
 
         $status = $visit->wasRecentlyCreated

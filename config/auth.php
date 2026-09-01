@@ -2,7 +2,6 @@
 
 use App\Models\AdminUser;
 use App\Models\EstablishmentAccount;
-use App\Models\Tourist;
 
 return [
 
@@ -11,24 +10,25 @@ return [
     | Authentication Defaults
     |--------------------------------------------------------------------------
     |
-    | ExploreDVO has no single generic user: 2.3.2 defines three actors
-    | (Tourist, Tourism Administrator, DOT-Accredited Establishment), each
-    | authenticated independently. The "tourist" guard is the default since
-    | it's the public-facing surface of the platform.
+    | ExploreDVO has no single generic user. Of the three actors in 2.3.2 only
+    | two log in: the Tourism Administrator and the DOT-Accredited
+    | Establishment, each authenticated independently.
+    |
+    | Travelers have no accounts at all. Registration and login were removed
+    | for Data Privacy Act compliance -- the public site collects no personal
+    | data, visits are counted by QR scan at the establishment, and saved
+    | places and trip plans are kept against an opaque browser token (see
+    | EnsureVisitorToken). The default guard is therefore the admin guard,
+    | which is the only one a bare auth() call could sensibly mean.
     |
     */
 
     'defaults' => [
-        'guard' => env('AUTH_GUARD', 'tourist'),
-        'passwords' => env('AUTH_PASSWORD_BROKER', 'tourists'),
+        'guard' => env('AUTH_GUARD', 'admin'),
+        'passwords' => env('AUTH_PASSWORD_BROKER', 'admin_users'),
     ],
 
     'guards' => [
-        'tourist' => [
-            'driver' => 'session',
-            'provider' => 'tourists',
-        ],
-
         'admin' => [
             'driver' => 'session',
             'provider' => 'admin_users',
@@ -41,11 +41,6 @@ return [
     ],
 
     'providers' => [
-        'tourists' => [
-            'driver' => 'eloquent',
-            'model' => Tourist::class,
-        ],
-
         'admin_users' => [
             'driver' => 'eloquent',
             'model' => AdminUser::class,
@@ -64,8 +59,8 @@ return [
     */
 
     'passwords' => [
-        'tourists' => [
-            'provider' => 'tourists',
+        'admin_users' => [
+            'provider' => 'admin_users',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,

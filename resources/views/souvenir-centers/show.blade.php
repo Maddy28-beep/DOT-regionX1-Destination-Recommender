@@ -53,6 +53,7 @@
                 <h3 class="mt-0">Plan your visit</h3>
                 <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="btn btn-primary btn-block">Get Directions</a>
                 @include('partials.check-in-button', ['type' => 'souvenir-centers', 'listing' => $souvenirCenter])
+                <x-save-heart type="souvenir-centers" :listing="$souvenirCenter" variant="button" class="mt-10" />
 
                 @include('partials.map-embed', ['latitude' => $souvenirCenter->latitude, 'longitude' => $souvenirCenter->longitude, 'name' => $souvenirCenter->name])
             </div>
@@ -75,5 +76,6 @@
 
 <div class="sticky-cta">
     <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="btn btn-primary btn-block">Get Directions</a>
+    <x-save-heart type="souvenir-centers" :listing="$souvenirCenter" variant="button" class="cta-half" />
 </div>
 @endsection

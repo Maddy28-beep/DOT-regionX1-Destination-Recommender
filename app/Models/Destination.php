@@ -57,11 +57,6 @@ class Destination extends Model
         return $this->hasMany(ItineraryItem::class);
     }
 
-    public function savedBy(): HasMany
-    {
-        return $this->hasMany(SavedDestination::class);
-    }
-
     public function reviews(): MorphMany
     {
         return $this->morphMany(Review::class, 'listing', 'listing_kind', 'listing_id');
