@@ -36,7 +36,7 @@
         <p class="poster-hero__subhead">Sun-warmed islands, misty highlands, and the Philippine Eagle's home &mdash; discover DOT-accredited stays, tours, and eats across Region XI.</p>
     </div>
 
-    <form class="ticket-search container" action="{{ route('tourist.register') }}" method="GET">
+    <form class="ticket-search container" action="{{ route('plan.edit') }}" method="GET">
         <div class="field">
             <label for="purpose">I want to&hellip;</label>
             <select id="purpose" name="purpose">
@@ -461,9 +461,9 @@
             <div class="cta-banner__copy">
                 <span class="poster-kicker">your move</span>
                 <h2 class="poster-title">Ready to explore the Davao Region?</h2>
-                <p>Create a free account and get your personalized itinerary in minutes.</p>
+                <p>Answer a few questions and get a personalized day-by-day itinerary in minutes &mdash; no account needed.</p>
             </div>
-            <a href="{{ route('tourist.register') }}" class="btn btn-lg">Get Started Free</a>
+            <a href="{{ route('plan.edit') }}" class="btn btn-lg">Build My Itinerary</a>
         </div>
     </div>
 </section>

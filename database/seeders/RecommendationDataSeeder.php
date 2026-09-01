@@ -9,10 +9,10 @@ use App\Models\ExitSurvey;
 use App\Models\Package;
 use App\Models\Restaurant;
 use App\Models\SouvenirCenter;
-use App\Models\Tourist;
+use App\Models\TouristPreference;
 use App\Models\TouristVisit;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 /**
  * Seeds a realistic volume of tourist visits and exit-survey visitation
@@ -30,8 +30,8 @@ class RecommendationDataSeeder extends Seeder
         $this->loadListingPool();
         $clusters = $this->buildClusters();
 
-        $tourists = $this->seedTourists(40);
-        $this->seedTouristVisits($tourists, $clusters);
+        $this->seedTripPlans(40);
+        $this->seedVisits(40, $clusters);
         $this->seedExitSurveys(90, $clusters);
         $this->seedDestinationAmenities();
     }
@@ -194,22 +194,16 @@ class RecommendationDataSeeder extends Seeder
         }));
     }
 
-    private function seedTourists(int $count): array
+    /**
+     * Survey answers with nobody attached to them.
+     *
+     * These used to be seeded as tourist accounts with names, emails and
+     * password hashes. There are no accounts any more, and the recommender
+     * never needed the person -- only the preferences -- so this seeds the
+     * preferences directly.
+     */
+    private function seedTripPlans(int $count): void
     {
-        $firstNames = [
-            'Maria', 'Jose', 'Juan', 'Angelica', 'Mark', 'Kristine', 'Paolo', 'Andrea', 'Ronald', 'Cherry',
-            'Rafael', 'Bea', 'Miguel', 'Joyce', 'Carlo', 'Alyssa', 'Vincent', 'Danica', 'Nathaniel', 'Precious',
-            'Emmanuel', 'Kaye', 'Christian', 'Grace', 'Renz', 'Michelle', 'Aldrin', 'Camille', 'Jerome', 'Trisha',
-            'Hannah', 'Kim', 'Yuki', 'Wei', 'Sophie', 'Liam', 'Noah', 'Emma', 'Lucas', 'Chloe',
-        ];
-        $lastNames = [
-            'Dela Cruz', 'Santos', 'Reyes', 'Bautista', 'Garcia', 'Torres', 'Mendoza', 'Ramos', 'Villanueva', 'Flores',
-            'Gonzales', 'Aquino', 'Castillo', 'Rivera', 'Domingo', 'Salazar', 'Navarro', 'Pascual', 'Tan', 'Uy',
-            'Tanaka', 'Chen', 'Müller', 'Carter', 'Anderson', 'Nguyen', 'Park', 'Silva', 'Johansson', 'Fischer',
-        ];
-        $nationalities = ['Filipino', 'Filipino', 'Filipino', 'Filipino', 'Filipino', 'Filipino', 'American', 'Japanese', 'Chinese', 'German', 'Australian', 'Korean', 'British', 'Singaporean'];
-        $ageRanges = ['18-24', '25-34', '35-44', '45-54', '55+'];
-        $genders = ['Male', 'Female'];
         $travelTypes = ['Solo', 'Couple', 'Family', 'Friends', 'Business'];
         $budgets = ['Budget-Friendly', 'Mid-range', 'Premium'];
         $accommodationPrefs = ['Any', 'Beach Resort', 'Hotel', 'Homestay', 'Hostel'];
@@ -218,26 +212,8 @@ class RecommendationDataSeeder extends Seeder
         $visitorTypes = ['First-time Visitor', 'Returning Visitor', 'Regular / Local'];
         $activityOptions = ['Beach & Island', 'Nature & Adventure', 'Cultural Heritage', 'Wildlife', 'Food Tourism', 'Shopping & Souvenirs', 'Hiking & Trekking', 'Relaxation & Wellness'];
 
-        $tourists = [];
-
         for ($i = 0; $i < $count; $i++) {
-            $first = $firstNames[array_rand($firstNames)];
-            $last = $lastNames[array_rand($lastNames)];
-            $fullName = "{$first} {$last}";
-            $email = strtolower(str_replace(' ', '.', $fullName)).$i.'@example.com';
-
-            $tourist = Tourist::create([
-                'full_name' => $fullName,
-                'email' => $email,
-                'password_hash' => Hash::make('password'),
-                'nationality' => $nationalities[array_rand($nationalities)],
-                'age_range' => $ageRanges[array_rand($ageRanges)],
-                'gender' => $genders[array_rand($genders)],
-                'privacy_consent' => true,
-                'privacy_consent_at' => now()->subDays(mt_rand(1, 180)),
-            ]);
-
-            $preference = $tourist->preferences()->create([
+            $preference = TouristPreference::create([
                 'travel_days' => mt_rand(1, 7),
                 'travel_type' => $travelTypes[array_rand($travelTypes)],
                 'budget' => $budgets[array_rand($budgets)],
@@ -247,20 +223,21 @@ class RecommendationDataSeeder extends Seeder
                 'visitor_type' => $visitorTypes[array_rand($visitorTypes)],
             ]);
 
-            $chosenActivities = collect($activityOptions)->shuffle()->take(mt_rand(1, 3));
-            foreach ($chosenActivities as $activity) {
+            foreach (collect($activityOptions)->shuffle()->take(mt_rand(1, 3)) as $activity) {
                 $preference->activities()->create(['activity' => $activity]);
             }
-
-            $tourists[] = $tourist;
         }
-
-        return $tourists;
     }
 
-    private function seedTouristVisits(array $tourists, array $clusters): void
+    /**
+     * Visits keyed to an anonymous browser token, matching what a real QR
+     * scan records. One token stands in for one device, which is what the
+     * daily-dedupe index and the Apriori transactions are grouped by.
+     */
+    private function seedVisits(int $visitorCount, array $clusters): void
     {
-        foreach ($tourists as $tourist) {
+        for ($i = 0; $i < $visitorCount; $i++) {
+            $token = (string) Str::uuid();
             $visitCount = mt_rand(2, 5);
             $cluster = $this->pickCluster($clusters);
             $items = $this->drawFromCluster($cluster);
@@ -272,13 +249,27 @@ class RecommendationDataSeeder extends Seeder
             }
 
             shuffle($items);
+
+            // Deduped in PHP against the same key the unique index uses. A
+            // firstOrCreate would not do: visit_date is a cast date, stored
+            // with a time component, so matching it against a plain date
+            // string silently misses and the insert hits the index.
+            $seen = [];
             foreach (array_slice($items, 0, $visitCount) as $item) {
+                $date = now()->subDays(mt_rand(1, 200))->toDateString();
+                $key = $item['listing_kind'].':'.$item['listing_id'].':'.$date;
+
+                if (isset($seen[$key])) {
+                    continue;
+                }
+                $seen[$key] = true;
+
                 TouristVisit::create([
-                    'tourist_id' => $tourist->id,
+                    'visitor_token' => $token,
                     'listing_kind' => $item['listing_kind'],
                     'listing_id' => $item['listing_id'],
-                    'visit_date' => now()->subDays(mt_rand(1, 200))->toDateString(),
-                    'source' => mt_rand(0, 1) ? 'itinerary' : 'manual',
+                    'visit_date' => $date,
+                    'source' => 'qr_scan',
                 ]);
             }
         }

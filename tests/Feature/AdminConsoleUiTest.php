@@ -5,10 +5,11 @@ namespace Tests\Feature;
 use App\Models\AccreditationRecord;
 use App\Models\AdminUser;
 use App\Models\Destination;
+use App\Models\ExitSurvey;
 use App\Models\PreferenceActivity;
 use App\Models\Region;
-use App\Models\Tourist;
 use App\Models\TouristPreference;
+use App\Models\TouristVisit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -61,7 +62,7 @@ class AdminConsoleUiTest extends TestCase
         $modules = [
             '/portal/admin/listings/destinations',
             '/portal/admin/listings/accommodations',
-            '/portal/admin/tourists',
+            '/portal/admin/',
             '/portal/admin/exit-surveys',
             '/portal/admin/association-rules',
             '/portal/admin/accreditation',
@@ -86,9 +87,9 @@ class AdminConsoleUiTest extends TestCase
             '/\.admin \.status-pill \{[^}]*border:\s*1\.5px solid currentColor/s', $css,
             'Admin status pills must be border-only.'
         );
-        // Tourist Profiles deliberately carries no badges at all -- those
-        // columns are descriptive attributes, not states, so they render as
-        // plain muted text. Status colour is reserved for accreditation state.
+        // The Tourist Profiles module and its attribute badges are both gone
+        // -- there are no traveler accounts to profile. Status colour is
+        // reserved for accreditation state.
         $this->assertStringNotContainsString('.tag-badge', $css,
             'Tourist attribute badges were removed; no dead rules should remain.');
     }
@@ -198,31 +199,129 @@ class AdminConsoleUiTest extends TestCase
             'An unknown sort key must fall back to the default, not be echoed back.');
     }
 
-    /** Tourist attributes stay plain text -- no badge chrome in this table. */
-    public function test_tourist_attributes_render_as_plain_text(): void
+    /**
+     * The Tourist Profiles module is gone along with the accounts it listed,
+     * and nothing may link to it.
+     */
+    public function test_tourist_profiles_module_is_gone(): void
     {
-        $tourist = Tourist::create([
-            'full_name' => 'Maria Santos', 'email' => 't@x.test', 'password_hash' => Hash::make('x'),
-            'nationality' => 'Filipino', 'age_range' => '25-34', 'privacy_consent' => true,
-        ]);
+        $this->assertFalse(\Illuminate\Support\Facades\Route::has('admin.tourists'),
+            'The tourist profiles route must not exist after the DPA change.');
 
-        $pref = TouristPreference::create([
-            'tourist_id' => $tourist->id, 'travel_type' => 'Family', 'budget' => 'Mid-range',
-            'travel_days' => 4, 'accommodation_pref' => 'Hotel', 'distance_pref' => 'moderate',
-        ]);
+        $admin = $this->admin();
 
-        foreach (['Beach', 'Hiking'] as $activity) {
-            PreferenceActivity::create(['preference_id' => $pref->id, 'activity' => $activity]);
+        $html = $this->actingAs($admin, 'admin')->get('/portal/admin/')->getContent();
+
+        $this->assertStringNotContainsString('Tourist Profiles', $html,
+            'The sidebar must not link to a module that no longer exists.');
+
+        $this->actingAs($admin, 'admin')->get('/portal/admin/tourists')->assertNotFound();
+    }
+
+    /** The overview reports activity without naming anybody. */
+    public function test_overview_reports_check_ins_rather_than_registrations(): void
+    {
+        $this->seedListings();
+
+        $html = $this->actingAs($this->admin(), 'admin')->get('/portal/admin/')->getContent();
+
+        $this->assertStringContainsString('QR Check-ins Today', $html);
+        $this->assertStringNotContainsString('Registered Tourists', $html);
+    }
+
+    /**
+     * Today's check-ins must actually be counted.
+     *
+     * visit_date is a cast date, so it is stored as "2026-08-30 00:00:00" and
+     * a plain where('visit_date', '2026-08-30') matches nothing -- the card
+     * read a confident, permanent 0. Asserting the rendered number, not just
+     * the label, is what catches that.
+     */
+    /**
+     * The exit survey is anonymous and voluntary, so there is no way to know
+     * exactly who did or didn't respond -- the best available signal is
+     * distinct browsers seen checking in anywhere, versus surveys submitted.
+     */
+    public function test_response_rate_compares_surveys_to_distinct_checked_in_browsers(): void
+    {
+        [[$listing]] = $this->seedListings();
+
+        foreach (['browser-a', 'browser-b'] as $token) {
+            TouristVisit::create([
+                'visitor_token' => $token,
+                'listing_kind' => 'destination',
+                'listing_id' => $listing->id,
+                'visit_date' => now()->toDateString(),
+                'source' => 'qr_scan',
+            ]);
         }
 
-        $html = $this->actingAs($this->admin(), 'admin')->get('/portal/admin/tourists')->getContent();
+        // Same browser checking in twice must not inflate the denominator.
+        TouristVisit::create([
+            'visitor_token' => 'browser-a',
+            'listing_kind' => 'destination',
+            'listing_id' => $listing->id,
+            'visit_date' => now()->subDay()->toDateString(),
+            'source' => 'qr_scan',
+        ]);
 
-        $this->assertStringNotContainsString('tag-badge', $html, 'No badge chrome in Tourist Profiles.');
+        ExitSurvey::create(['overall_rating' => 5, 'would_recommend' => 'Yes']);
 
-        // The values are still all present, just unadorned.
-        $this->assertStringContainsString('Family', $html);
-        $this->assertStringContainsString('Mid-range', $html);
-        $this->assertStringContainsString('Beach, Hiking', $html);
+        $html = $this->actingAs($this->admin(), 'admin')->get(route('admin.exit-surveys'))->getContent();
+
+        // 1 survey / 2 distinct browsers = 50%.
+        $this->assertStringContainsString('50%', $html);
+        $this->assertStringContainsString('Response Rate', $html);
+    }
+
+    public function test_todays_check_in_count_is_not_stuck_at_zero(): void
+    {
+        [[$listing]] = $this->seedListings();
+
+        foreach (['browser-a', 'browser-b'] as $token) {
+            TouristVisit::create([
+                'visitor_token' => $token,
+                'listing_kind' => 'destination',
+                'listing_id' => $listing->id,
+                'visit_date' => now()->toDateString(),
+                'source' => 'qr_scan',
+            ]);
+        }
+
+        $html = $this->actingAs($this->admin(), 'admin')->get('/portal/admin/')->getContent();
+
+        preg_match('/<div class="stat-card-val">(\d+)<\/div>\s*<div class="stat-card-label">QR Check-ins Today/', $html, $m);
+
+        $this->assertNotEmpty($m, 'Could not read the check-ins stat card.');
+        $this->assertSame('2', $m[1], "Two check-ins were recorded today but the card shows {$m[1]}.");
+    }
+
+    /**
+     * A visit recorded today has to appear in a report whose range ends today.
+     *
+     * whereBetween against a bare date excluded the final day, so the most
+     * recent -- and most interesting -- visits were invisible.
+     */
+    public function test_verified_visits_report_includes_the_last_day_of_the_range(): void
+    {
+        [[$listing]] = $this->seedListings();
+
+        TouristVisit::create([
+            'visitor_token' => 'browser-a',
+            'listing_kind' => 'destination',
+            'listing_id' => $listing->id,
+            'visit_date' => now()->toDateString(),
+            'source' => 'qr_scan',
+        ]);
+
+        $html = $this->actingAs($this->admin(), 'admin')->get(
+            '/portal/admin/reports?report_type='.urlencode('Verified Visits (QR Check-ins)')
+            .'&from='.now()->subDays(7)->toDateString().'&to='.now()->toDateString()
+        )->assertOk()->getContent();
+
+        $this->assertStringContainsString($listing->name, $html,
+            "Today's check-in must be inside a range that ends today.");
+        $this->assertStringContainsString('1 unique visitor', $html);
     }
 
     public function test_reports_expose_quick_presets(): void

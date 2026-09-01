@@ -29,7 +29,6 @@ class DatabaseSeeder extends Seeder
             TourOperatorSeeder::class,
             RealAccreditedEstablishmentSeeder::class,
             AccreditationSeeder::class,
-            TouristSeeder::class,
             EstablishmentSeeder::class,
             ListingPhotoSeeder::class,
             RecommendationDataSeeder::class,

@@ -40,7 +40,6 @@
 
             <div class="group-label">Monitoring</div>
             <a href="{{ route('admin.overview') }}" class="{{ request()->routeIs('admin.overview') ? 'active' : '' }}">Overview</a>
-            <a href="{{ route('admin.tourists') }}" class="{{ request()->routeIs('admin.tourists') ? 'active' : '' }}">Tourist Profiles</a>
             <a href="{{ route('admin.exit-surveys') }}" class="{{ request()->routeIs('admin.exit-surveys') ? 'active' : '' }}">Exit Survey Insights</a>
             <a href="{{ route('admin.association-rules') }}" class="{{ request()->routeIs('admin.association-rules') ? 'active' : '' }}">Association Rules</a>
 

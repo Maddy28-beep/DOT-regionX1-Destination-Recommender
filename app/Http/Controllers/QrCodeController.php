@@ -88,9 +88,12 @@ class QrCodeController extends Controller
         abort_unless($listing->is_accredited && ! $listing->archived_at, 404, 'A QR code is only available for currently DOT-accredited, active listings.');
 
         // The code encodes the check-in route, not the plain detail page
-        // directly: scanning it now records a real visit (if the scanning
-        // tourist is logged in) before continuing on to the same page a
-        // tourist would have landed on before this feature existed.
+        // directly: scanning it records a real visit against THIS listing --
+        // no login needed -- before continuing on to the same page a traveler
+        // would have landed on before this feature existed. Because the id is
+        // baked into the encoded URL, every listing's code is distinct and a
+        // scan can only ever be credited to the listing it was printed for.
+        // See TouristVisit for the whole counting flow.
         $url = route('check-in', ['type' => $segment, 'id' => $listing->id]);
 
         $builder = new Builder(

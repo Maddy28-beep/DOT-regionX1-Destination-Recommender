@@ -31,12 +31,12 @@
         </nav>
 
         <div class="header-actions">
-            @auth('tourist')
-                <a href="{{ route('tourist.dashboard') }}" class="btn btn-outline">My Trip</a>
-            @else
-                <a href="{{ route('tourist.login') }}" class="btn btn-outline">Sign in</a>
-                <a href="{{ route('tourist.register') }}" class="btn btn-primary">Plan My Trip</a>
-            @endauth
+            {{--
+                No Sign in button: travelers have no accounts. Saved places
+                take its slot, since that is what people used to sign in for.
+            --}}
+            <a href="{{ route('saved.index') }}" class="btn btn-outline">Saved</a>
+            <a href="{{ route('plan.edit') }}" class="btn btn-primary">Plan My Trip</a>
 
             <button type="button" class="nav-toggle" aria-label="Toggle menu" onclick="document.getElementById('mobileMenu').classList.toggle('open')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -51,12 +51,15 @@
         <a href="{{ route('packages.index') }}">Packages</a>
         <a href="{{ route('souvenir-centers.index') }}">Souvenir Centers</a>
         <a href="{{ route('tour-operators.index') }}">Tour Operators</a>
-        <a href="{{ route('portal.establishment.register') }}">List your establishment</a>
-        @auth('tourist')
-            <a href="{{ route('tourist.dashboard') }}" class="btn btn-primary btn-block">My Trip</a>
-        @else
-            <a href="{{ route('tourist.login') }}" class="btn btn-outline btn-block">Sign in</a>
-            <a href="{{ route('tourist.register') }}" class="btn btn-primary btn-block">Plan My Trip</a>
-        @endauth
+        <a href="{{ config('dot.accreditation_portal') }}" target="_blank" rel="noopener noreferrer" class="ext-link">
+            List your establishment
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <path d="M15 3h6v6"/><path d="M10 14 21 3"/>
+            </svg>
+            <span class="sr-only">(opens the DOT accreditation portal in a new tab)</span>
+        </a>
+        <a href="{{ route('saved.index') }}" class="btn btn-outline btn-block">Saved</a>
+        <a href="{{ route('plan.edit') }}" class="btn btn-primary btn-block">Plan My Trip</a>
     </div>
 </header>

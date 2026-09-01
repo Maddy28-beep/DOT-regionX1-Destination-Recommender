@@ -43,4 +43,16 @@ return [
         'model' => env('GROQ_MODEL', 'llama-3.1-8b-instant'),
     ],
 
+    /*
+     * Address autocomplete for the trip planner's starting-point field.
+     *
+     * Geoapify has a free tier and, unlike Google Places, does not require a
+     * billing account. With no key set the lookup falls back to OpenStreetMap's
+     * Nominatim, which is keyless but not built for per-keystroke typeahead --
+     * so the feature degrades rather than disappearing.
+     */
+    'geoapify' => [
+        'key' => env('GEOAPIFY_KEY'),
+    ],
+
 ];

@@ -8,7 +8,6 @@ use App\Models\Destination;
 use App\Models\Package;
 use App\Models\Restaurant;
 use App\Models\SouvenirCenter;
-use App\Models\Tourist;
 use App\Models\TourOperator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -55,7 +54,7 @@ class ChatbotService
 
     public function __construct(private readonly GroqChatbotClient $groq) {}
 
-    public function respond(string $message, ?Tourist $tourist): array
+    public function respond(string $message): array
     {
         $intent = $this->detectIntent($message);
         [$response, $source] = $this->groq->isConfigured()
@@ -63,7 +62,6 @@ class ChatbotService
             : [$this->buildResponse($intent, $message), 'rule_based'];
 
         ChatbotLog::create([
-            'tourist_id' => $tourist?->id,
             'user_query' => Str::limit($message, 500, ''),
             'chatbot_response' => Str::limit($response, 1000, ''),
             'intent_detected' => $source === 'groq' ? $intent.':ai' : $intent,
@@ -111,7 +109,7 @@ class ChatbotService
             - Keep replies short (2-4 sentences), friendly, and specific to Davao Region tourism.
             - Never invent a listing that isn't in the list above. If nothing fits, say so and suggest browsing the site.
             - You do not handle bookings, reservations, or payments — say so if asked.
-            - For personalized itineraries, direct the tourist to set their Travel Preferences on the dashboard.
+            - For personalized itineraries, point people at Plan My Trip. No account or sign-in is needed anywhere on this site.
             - If asked something unrelated to Davao Region tourism, politely redirect to what you can help with.
             PROMPT;
     }
@@ -136,7 +134,7 @@ class ChatbotService
             'greeting' => "Hi! I'm the ExploreDVO assistant. Ask me about destinations, accommodations, restaurants, tour packages, souvenir centers, or tour operators in the Davao Region — or ask whether a place is DOT-accredited.",
             'thanks' => "You're welcome! Let me know if there's anything else about Davao Region tourism I can help with.",
             'help' => "I can help you find DOT-accredited destinations, accommodations, restaurants, souvenir centers, tour operators, and packages. You can also ask me to check if a specific place is accredited, or ask about your travel itinerary.",
-            'itinerary' => "Your personalized itinerary is generated automatically after you fill out your Travel Preferences. Go to My Trip → Set Travel Preferences, and I'll factor in your interests, budget, and travel dates.",
+            'itinerary' => "Your personalized itinerary is generated the moment you finish the short travel survey — no sign-up needed. Hit Plan My Trip and I'll factor in your interests, budget, travel dates, and any accessibility needs you tell us about.",
             'accreditation' => $this->accreditationResponse($message),
             'destination' => $this->listingResponse('destination', $message),
             'accommodation' => $this->listingResponse('accommodation', $message),

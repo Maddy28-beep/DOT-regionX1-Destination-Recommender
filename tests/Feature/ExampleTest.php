@@ -2,11 +2,15 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
+    // The homepage queries listings, so it needs a schema. Without this the
+    // stock scaffold test hit ":memory: has no tables" and 500'd.
+    use RefreshDatabase;
+
     /**
      * A basic test example.
      */
