@@ -1511,9 +1511,9 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 
 /* ---------- Footer ---------- */
 
-.site-footer { background: #0d221b; color: #cfe3da; padding: 48px 0 24px; margin-top: 40px; }
+.site-footer { background: #0d221b; color: #cfe3da; padding: 48px 0 24px; margin-top: 40px; border-top: 3px solid var(--gold); }
 .footer-grid { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 28px; }
-.footer-grid h4 { color: var(--white); font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 14px; }
+.footer-grid h4 { color: var(--gold); font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 14px; }
 .footer-grid a, .footer-grid p { display: block; color: #a9c2b7; font-size: .88rem; margin-bottom: 8px; }
 /* Marks a link that leaves the site, so "List your establishment" reads as
    handing off to the national DOT portal rather than opening a page here. */
@@ -1522,8 +1522,20 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 
 .footer-grid a { transition: color .15s ease; }
 .footer-grid a:hover { color: var(--white); }
-.footer-brand { font-weight: 800; font-size: 1.15rem; color: var(--white); margin-bottom: 10px; }
+.footer-brand-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.footer-brand-icon { width: 24px; height: 24px; flex-shrink: 0; color: var(--gold); }
+.footer-brand { font-weight: 800; font-size: 1.15rem; color: var(--white); }
+.footer-contact { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.1); }
+.footer-contact p { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+.footer-contact svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; opacity: .75; }
+.footer-contact a { display: inline; color: #a9c2b7; }
+.footer-contact a:hover { color: var(--white); }
+
 .footer-bottom { border-top: 1px solid rgba(255,255,255,.1); margin-top: 32px; padding-top: 18px; font-size: .8rem; color: #7f9c8f; text-align: center; }
+.footer-legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 20px; margin-bottom: 12px; }
+.footer-legal a { display: inline; color: #a9c2b7; font-size: .8rem; }
+.footer-legal a:hover { color: var(--gold); }
+.footer-copyright { margin: 0; }
 
 @media (max-width: 800px) {
     .footer-grid { grid-template-columns: 1fr 1fr; }
@@ -2174,6 +2186,15 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 .panel-head h2 { margin: 0; font-size: 1rem; }
 .panel-head p { margin: 2px 0 0; font-size: .8rem; color: var(--muted); }
 .panel-body { padding: 20px; }
+
+/* Long-form legal/policy pages: readable line length and spacing rather
+   than the tight, dense rhythm the console/panel components use elsewhere. */
+.legal-content p { line-height: 1.65; margin: 0 0 14px; color: var(--ink); }
+.legal-content p:last-child { margin-bottom: 0; }
+.legal-content ul { margin: 0 0 14px; padding-left: 22px; }
+.legal-content ul:last-child { margin-bottom: 0; }
+.legal-content li { line-height: 1.6; margin-bottom: 8px; color: var(--ink); }
+.legal-content code { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; font-size: .85em; }
 
 .data-table { width: 100%; border-collapse: collapse; font-size: .86rem; }
 .data-table th { text-align: left; font-size: .74rem; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }

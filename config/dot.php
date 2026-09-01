@@ -26,4 +26,23 @@ return [
         'https://accreditation.tourism.gov.ph/register'
     ),
 
+    /*
+    |--------------------------------------------------------------------------
+    | DOT Region XI Contact Details
+    |--------------------------------------------------------------------------
+    |
+    | Shown in the footer and on the legal pages (Privacy Policy, data
+    | requests). Kept in one place so the footer and the privacy page can
+    | never quote a different address or email from each other.
+    |
+    */
+
+    'contact_email' => env('DOT_CONTACT_EMAIL', 'dot11@tourism.gov.ph'),
+
+    // TODO: placeholder -- replace with DOT Region XI's actual current office
+    // address before this ships. Not fabricated by design: an invented
+    // government office address is exactly the kind of inaccurate official
+    // claim this whole footer fix exists to remove.
+    'office_address' => env('DOT_OFFICE_ADDRESS', 'DOT Region XI Office, Davao City, Davao Region'),
+
 ];

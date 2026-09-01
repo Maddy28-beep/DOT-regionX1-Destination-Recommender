@@ -2,10 +2,30 @@
     <div class="container">
         <div class="footer-grid">
             <div>
-                <div class="footer-brand">Explore<span style="color:var(--gold)">DVO</span></div>
+                <div class="footer-brand-row">
+                    <svg class="footer-brand-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" fill="currentColor"/>
+                        <circle cx="12" cy="12" r="4" fill="var(--stamp-red)"/>
+                    </svg>
+                    <div class="footer-brand">Explore<span style="color:var(--gold)">DVO</span></div>
+                </div>
                 <p>A tourism information and DOT-accreditation platform built for the Department of Tourism
                     Region XI, covering Davao City, Davao del Norte, Davao de Oro, Davao Occidental, Davao Oriental,
                     and Davao del Sur.</p>
+                <div class="footer-contact">
+                    <p>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.3"/>
+                        </svg>
+                        <span>{{ config('dot.office_address') }}</span>
+                    </p>
+                    <p>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M4 5h16v14H4V5z"/><path d="M4 6l8 7 8-7"/>
+                        </svg>
+                        <a href="mailto:{{ config('dot.contact_email') }}">{{ config('dot.contact_email') }}</a>
+                    </p>
+                </div>
             </div>
             <div>
                 <h4>For Travelers</h4>
@@ -39,6 +59,14 @@
                 <p>Tourism analytics &amp; accreditation monitoring</p>
             </div>
         </div>
-        <div class="footer-bottom">&copy; {{ date('Y') }} ExploreDVO &middot; Department of Tourism Region XI &middot; No traveler accounts, no personal data collected &middot; RA 10173 (Data Privacy Act)</div>
+        <div class="footer-bottom">
+            <nav class="footer-legal" aria-label="Legal">
+                <a href="{{ route('legal.privacy') }}">Privacy Policy</a>
+                <a href="{{ route('legal.terms') }}">Terms of Service</a>
+                <a href="{{ route('legal.privacy') }}#ra-10173">Data Privacy Act (RA 10173) Notice</a>
+                <a href="{{ route('legal.accessibility') }}">Accessibility Statement</a>
+            </nav>
+            <p class="footer-copyright">&copy; {{ date('Y') }} ExploreDVO &middot; Department of Tourism Region XI</p>
+        </div>
     </div>
 </footer>
