@@ -16,10 +16,20 @@
     $tier = $listing->posterTier();
     $priceAmount = $listing->posterPriceAmount();
     $tags = $listing->posterTags();
+
+    // Places can be hearted; packages and tour operators can't (see
+    // SavedListingController::segmentFor). The heart has to live outside the
+    // card's anchor -- a form nested in a link is invalid markup and the
+    // button would swallow the click -- so the wrapper is what lifts on hover.
+    $saveSegment = \App\Http\Controllers\SavedListingController::segmentFor($listing);
 @endphp
 
+<div class="dpost-card-wrap">
+@if ($saveSegment)
+    <x-save-heart :type="$saveSegment" :listing="$listing" />
+@endif
 <a href="{{ $listing->posterUrl() }}" class="dpost-card">
-    <div class="dpost-card__art">
+    <div class="dpost-card__art {{ $saveSegment ? 'has-save' : '' }}">
         @include('partials.poster-illustration', ['scene' => $listing->posterScene()])
         <div class="halftone"></div>
         <div class="dpost-card__scrim"></div>
@@ -70,3 +80,4 @@
         @endif
     </div>
 </a>
+</div>

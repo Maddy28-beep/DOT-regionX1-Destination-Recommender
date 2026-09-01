@@ -14,8 +14,8 @@ use App\Models\Notification;
 use App\Models\Package;
 use App\Models\Restaurant;
 use App\Models\SouvenirCenter;
-use App\Models\Tourist;
 use App\Models\TourOperator;
+use App\Models\TouristPreference;
 use App\Models\TouristVisit;
 use App\Services\Recommendation\AprioriService;
 use Illuminate\Http\Request;
@@ -24,7 +24,7 @@ use Illuminate\View\View;
 
 class AdminDashboardController extends Controller
 {
-    private const REPORT_TYPES = ['Tourist Registrations', 'Exit Survey Responses', 'Accreditation Status', 'Destination Visits', 'Verified Visits (QR Check-ins)'];
+    private const REPORT_TYPES = ['Verified Visits (QR Check-ins)', 'Exit Survey Responses', 'Accreditation Status', 'Destination Visits', 'Trip Plans Created'];
 
     /** listing_kind values an establishment account can register under, mapped to their model class. */
     private const ESTABLISHMENT_LISTING_KINDS = [
@@ -38,24 +38,34 @@ class AdminDashboardController extends Controller
     public function overview(): View
     {
         $stats = [
-            'tourists' => Tourist::count(),
+            // whereDate, not a plain equality: visit_date is a cast date, so
+            // it is stored as "2026-08-30 00:00:00" and never equals the plain
+            // "2026-08-30" a toDateString() produces. A straight comparison
+            // reads 0 forever. Same trap as CheckInController's dedupe.
+            'checkins_today' => TouristVisit::whereDate('visit_date', now()->toDateString())->count(),
             'destinations' => Destination::where('is_accredited', true)->count(),
             'pending_establishments' => EstablishmentAccount::where('status', 'pending')->count(),
             'expiring_accreditations' => AccreditationRecord::where('status', 'Expiring Soon')->count(),
         ];
 
-        $recentTourists = Tourist::with('preferences')->latest('created_at')->take(5)->get();
+        /*
+         * Recent activity is shown as QR check-ins rather than tourist
+         * accounts: there are no traveler accounts to list. A check-in row
+         * carries a place, a date and an opaque browser token, so this panel
+         * reports where people are going without reporting who they are.
+         */
+        $recentVisits = TouristVisit::latest('visit_date')->latest('id')->take(8)->get()
+            ->map(fn ($visit) => [
+                'name' => $this->resolveListingName($visit->listing_kind, $visit->listing_id) ?? 'Removed listing',
+                'kind' => ucfirst(str_replace('_', ' ', $visit->listing_kind)),
+                'date' => $visit->visit_date,
+                'source' => $visit->source === 'qr_scan' ? 'QR scan' : ucfirst(str_replace('_', ' ', (string) $visit->source)),
+            ]);
+
         $pendingEstablishments = EstablishmentAccount::where('status', 'pending')->latest('submitted_at')->take(5)->get();
         $expiring = AccreditationRecord::whereIn('status', ['Expiring Soon', 'Expired'])->orderBy('expiration_date')->take(5)->get();
 
-        return view('admin.overview', compact('stats', 'recentTourists', 'pendingEstablishments', 'expiring'));
-    }
-
-    public function tourists(): View
-    {
-        $tourists = Tourist::with(['preferences.activities'])->latest('created_at')->paginate(10);
-
-        return view('admin.tourists', compact('tourists'));
+        return view('admin.overview', compact('stats', 'recentVisits', 'pendingEstablishments', 'expiring'));
     }
 
     public function establishments(Request $request): View
@@ -211,6 +221,14 @@ class AdminDashboardController extends Controller
     {
         $count = ExitSurvey::count();
 
+        // The survey is voluntary and fully anonymous -- there is no account
+        // and no link from a survey back to a specific visit, so this can
+        // only ever be an approximate, population-level response rate:
+        // distinct browsers known to have checked in somewhere, versus
+        // total surveys submitted. It is not a per-visitor completion rate.
+        $checkedInVisitors = TouristVisit::whereNotNull('visitor_token')->distinct('visitor_token')->count('visitor_token');
+        $responseRatePct = $checkedInVisitors > 0 ? round($count / $checkedInVisitors * 100, 1) : null;
+
         $avgRatings = collect([
             'Overall Satisfaction' => 'overall_rating',
             'Destination Relevance' => 'destination_relevant',
@@ -261,8 +279,9 @@ class AdminDashboardController extends Controller
             ->get();
 
         return view('admin.exit-surveys', compact(
-            'count', 'avgRatings', 'wouldRecommendPct', 'residencyBreakdown', 'visitorTypeBreakdown',
-            'travelPurposeBreakdown', 'avgDaysStayed', 'topPlaces', 'topActivities'
+            'count', 'checkedInVisitors', 'responseRatePct', 'avgRatings', 'wouldRecommendPct',
+            'residencyBreakdown', 'visitorTypeBreakdown', 'travelPurposeBreakdown', 'avgDaysStayed',
+            'topPlaces', 'topActivities'
         ));
     }
 
@@ -343,24 +362,32 @@ class AdminDashboardController extends Controller
             'Exit Survey Responses' => $this->exitSurveyReport($from, $rangeEnd),
             'Accreditation Status' => $this->accreditationReport($from, $rangeEnd),
             'Destination Visits' => $this->destinationVisitsReport($from, $rangeEnd),
-            'Verified Visits (QR Check-ins)' => $this->verifiedVisitsReport($from, $to),
-            default => $this->touristRegistrationsReport($from, $rangeEnd),
+            'Trip Plans Created' => $this->tripPlansReport($from, $rangeEnd),
+            default => $this->verifiedVisitsReport($from, $to),
         };
     }
 
     /**
      * Unlike Destination Visits (self-reported via the anonymous Exit Survey,
-     * counted per submission), this counts real, identified visits from QR
-     * check-ins (CheckInController), deduplicated to distinct tourists per
-     * listing per day — directly answering the "how many unique tourists
-     * actually visited today" question the Exit Survey report structurally
-     * cannot (see §3.14 Problem-Solving in the development documentation).
+     * counted per submission), this counts real visits from QR
+     * check-ins (CheckInController), deduplicated per browser per listing per
+     * day — directly answering the "how many unique visitors actually came
+     * today" question the Exit Survey report structurally cannot (see §3.14
+     * Problem-Solving in the development documentation).
+     *
+     * The visitor token is a random per-browser identifier and nothing more;
+     * it makes the dedupe possible without the system knowing who anyone is.
      */
     private function verifiedVisitsReport(string $from, string $to): array
     {
         $rows = TouristVisit::where('source', 'qr_scan')
-            ->whereBetween('visit_date', [$from, $to])
-            ->selectRaw('listing_kind, listing_id, count(distinct tourist_id) as visitors')
+            // whereDate on both bounds rather than whereBetween: the stored
+            // value carries a 00:00:00 time, so "2026-08-30 00:00:00" sorts
+            // after the bare "2026-08-30" upper bound and the final day of
+            // every range -- including today -- was silently dropped.
+            ->whereDate('visit_date', '>=', $from)
+            ->whereDate('visit_date', '<=', $to)
+            ->selectRaw('listing_kind, listing_id, count(distinct visitor_token) as visitors')
             ->groupBy('listing_kind', 'listing_id')
             ->orderByDesc('visitors')
             ->get()
@@ -373,20 +400,33 @@ class AdminDashboardController extends Controller
             ->values();
 
         return [
-            'summary' => $rows->sum('visitors').' unique tourist visitor'.($rows->sum('visitors') === 1 ? '' : 's').' across '.$rows->count().' place'.($rows->count() === 1 ? '' : 's').', verified via QR check-in between '.$from.' and '.$to.'. A tourist who checks in at the same place more than once on the same day is counted once, not once per scan.',
+            'summary' => $rows->sum('visitors').' unique visitor'.($rows->sum('visitors') === 1 ? '' : 's').' across '.$rows->count().' place'.($rows->count() === 1 ? '' : 's').', verified via QR check-in between '.$from.' and '.$to.'. Someone who scans the same place more than once on the same day is counted once, not once per scan.',
             'headers' => ['Place', 'Type', 'Unique Visitors'],
             'rows' => $rows->map(fn ($r) => [$r['name'], $r['kind'], $r['visitors']])->all(),
         ];
     }
 
-    private function touristRegistrationsReport(string $from, string $rangeEnd): array
+    /**
+     * Replaces the old Tourist Registrations report, which no longer has
+     * anything to count: travelers do not register. This reports the demand
+     * signal that report was really used for -- how many trips people are
+     * planning, and what kind -- from the survey answers alone, with no
+     * person attached to any row.
+     */
+    private function tripPlansReport(string $from, string $rangeEnd): array
     {
-        $tourists = Tourist::whereBetween('created_at', [$from, $rangeEnd])->orderBy('created_at')->get();
+        $plans = TouristPreference::whereBetween('created_at', [$from, $rangeEnd])->orderBy('created_at')->get();
 
         return [
-            'summary' => $tourists->count().' tourist registration'.($tourists->count() === 1 ? '' : 's').' in the selected range.',
-            'headers' => ['Full Name', 'Email', 'Nationality', 'Age Range', 'Registered At'],
-            'rows' => $tourists->map(fn ($t) => [$t->full_name, $t->email, $t->nationality, $t->age_range, $t->created_at->format('Y-m-d H:i')])->all(),
+            'summary' => $plans->count().' trip plan'.($plans->count() === 1 ? '' : 's').' created in the selected range.',
+            'headers' => ['Travel Type', 'Purpose', 'Budget', 'Days', 'Created'],
+            'rows' => $plans->map(fn ($p) => [
+                $p->travel_type ?? '-',
+                $p->travel_purpose ?? '-',
+                $p->budget ?? '-',
+                $p->travel_days,
+                $p->created_at->format('Y-m-d H:i'),
+            ])->all(),
         ];
     }
 

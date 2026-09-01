@@ -16,7 +16,7 @@ class ChatbotController extends Controller
             'message' => ['required', 'string', 'max:500'],
         ]);
 
-        $result = $this->chatbot->respond($data['message'], $request->user('tourist'));
+        $result = $this->chatbot->respond($data['message']);
 
         return response()->json($result);
     }

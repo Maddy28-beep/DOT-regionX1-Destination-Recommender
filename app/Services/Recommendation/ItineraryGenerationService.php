@@ -4,7 +4,6 @@ namespace App\Services\Recommendation;
 
 use App\Models\Accommodation;
 use App\Models\Itinerary;
-use App\Models\Tourist;
 use App\Models\TouristPreference;
 use Illuminate\Support\Facades\DB;
 
@@ -26,33 +25,83 @@ class ItineraryGenerationService
 
     private const DEFAULT_ORIGIN_LNG = 125.6128;
 
+    /** What to call the fallback baseline on the schedule's arrival row. */
+    private const DEFAULT_ORIGIN_LABEL = 'Davao City centre';
+
     private const DESTINATIONS_PER_DAY = 2;
+
+    /**
+     * When each sightseeing slot opens. A slot is only offered on arrival day
+     * if the traveller is on the ground before it starts -- landing at 18:00
+     * and being handed a morning stop is the bug this exists to prevent.
+     */
+    private const SLOT_START_HOUR = [
+        'Morning' => 8,
+        'Afternoon' => 12,
+        'Evening' => 17,
+    ];
 
     public function __construct(
         private readonly ContentBasedRecommendationService $contentBased,
         private readonly AprioriService $apriori,
+        private readonly ItineraryScheduleBuilder $schedule,
     ) {}
 
-    public function generate(Tourist $tourist, TouristPreference $preference, ?float $originLat = null, ?float $originLng = null): Itinerary
+    /**
+     * An itinerary belongs to the preference it was generated from, and to
+     * nobody else -- the site has no traveler accounts. The row is persisted
+     * (the algorithm below writes the full ranking and the day-by-day items,
+     * and the view reads them back) and reached through the session.
+     */
+    public function generate(TouristPreference $preference, ?float $originLat = null, ?float $originLng = null): Itinerary
     {
-        $originLat ??= self::DEFAULT_ORIGIN_LAT;
-        $originLng ??= self::DEFAULT_ORIGIN_LNG;
+        /*
+         * Origin precedence: an explicitly passed position (a fresh reading
+         * taken on "regenerate") beats the one saved with the preference, which
+         * in turn beats the regional default. Falling straight through to the
+         * default whenever no argument was passed is what used to make the
+         * saved plan and every regeneration disagree about where the trip
+         * started.
+         */
+        $saved = $preference->origin();
+        $shared = ($originLat !== null && $originLng !== null) || $saved !== null;
 
-        $ranked = $this->contentBased->rank($tourist, $preference);
+        $originLat ??= $saved['lat'] ?? self::DEFAULT_ORIGIN_LAT;
+        $originLng ??= $saved['lng'] ?? self::DEFAULT_ORIGIN_LNG;
+
+        /*
+         * The schedule names this point on its first and last rows. Prefer what
+         * the traveller called it -- an address they typed or picked -- over a
+         * generic phrase, so "Travel to Francisco Bangoy International Airport"
+         * reads as a real instruction rather than "travel to your starting
+         * point".
+         */
+        $origin = [
+            'lat' => $originLat,
+            'lng' => $originLng,
+            'label' => $preference->origin_label
+                ?: ($shared ? 'your starting point' : self::DEFAULT_ORIGIN_LABEL),
+            'region' => null,
+        ];
+
+        $ranked = $this->contentBased->rank($preference);
 
         if ($ranked->isEmpty()) {
             throw new \RuntimeException('No accredited destinations are available to build an itinerary.');
         }
 
         $totalDays = max(1, (int) $preference->travel_days);
-        $maxStops = min($ranked->count(), $totalDays * self::DESTINATIONS_PER_DAY);
+
+        // Arrival day may hold fewer stops than a full day, so capacity has to
+        // be summed per day rather than assumed uniform.
+        $dayCapacities = $this->dayCapacities($preference, $totalDays);
+        $maxStops = min($ranked->count(), array_sum(array_map('count', $dayCapacities)));
         $topRanked = $ranked->take($maxStops);
 
         $sequence = $this->sequenceByNearestNeighbor($topRanked, $originLat, $originLng);
 
-        return DB::transaction(function () use ($tourist, $preference, $totalDays, $ranked, $sequence) {
+        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin) {
             $itinerary = Itinerary::create([
-                'tourist_id' => $tourist->id,
                 'preference_id' => $preference->id,
                 'total_days' => $totalDays,
                 'est_party_size' => null,
@@ -61,14 +110,35 @@ class ItineraryGenerationService
 
             // Table 8: full computed Destination Recommendation ranking, not just the stops used.
             foreach ($ranked->values() as $index => $row) {
+                // The five factors are kept alongside the combined score:
+                // they are already computed, and without them the itinerary
+                // can state a ranking but not show how it was reached.
                 $itinerary->matches()->create([
                     'destination_id' => $row['destination']->id,
                     'rank' => $index + 1,
                     'match_score' => $row['drs'],
+                    'pm' => $row['pm'],
+                    'rs' => $row['rs'],
+                    'ps' => $row['ps'],
+                    'ds' => $row['ds'],
+                    'as' => $row['as'],
                 ]);
             }
 
-            $this->buildDayByDayItems($itinerary, $sequence, $preference, $totalDays);
+            /*
+             * The stops and their order are settled above; turning them into a
+             * timed day -- journeys, meals, the night -- is the schedule
+             * builder's job. Keeping that separate stops this method from
+             * owning both "which places" and "at what o'clock".
+             */
+            $this->schedule->build(
+                $itinerary,
+                $sequence,
+                $preference,
+                $dayCapacities,
+                $origin,
+                $this->pickAccommodation($sequence, $preference),
+            );
 
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);
         });
@@ -134,52 +204,85 @@ class ItineraryGenerationService
         return $earthRadiusKm * $c;
     }
 
-    private function buildDayByDayItems(Itinerary $itinerary, array $sequence, TouristPreference $preference, int $totalDays): void
+    /**
+     * Which sightseeing slots each day can actually hold.
+     *
+     * Every day but the first gets the standard allowance. Day 1 is trimmed to
+     * the slots that have not already passed by the time the traveller lands,
+     * so a 6pm arrival no longer produces a morning stop nobody can reach. With
+     * no arrival time given, nothing changes from the previous behaviour.
+     *
+     * @return array<int, array<int, string>> day number => ordered slot names
+     */
+    private function dayCapacities(TouristPreference $preference, int $totalDays): array
     {
-        $slots = ['Morning', 'Afternoon', 'Evening'];
-        $stopsPerDay = self::DESTINATIONS_PER_DAY;
-        $chunks = array_chunk($sequence, $stopsPerDay);
+        $slots = array_keys(self::SLOT_START_HOUR);
+        $standard = array_slice($slots, 0, self::DESTINATIONS_PER_DAY);
 
-        $accommodationPlaced = false;
-
-        foreach ($chunks as $dayIndex => $dayStops) {
-            $dayNumber = $dayIndex + 1;
-            if ($dayNumber > $totalDays) {
-                break;
-            }
-
-            if (! $accommodationPlaced) {
-                $accommodation = $this->pickAccommodation($dayStops, $preference);
-                if ($accommodation) {
-                    $itinerary->items()->create([
-                        'day_number' => $dayNumber,
-                        'slot' => 'Check-in',
-                        'destination_id' => null,
-                        'accommodation_id' => $accommodation->id,
-                        'note' => 'Suggested accommodation for the trip, based on tourist visitation patterns near your recommended destinations.',
-                    ]);
-                    $accommodationPlaced = true;
-                }
-            }
-
-            foreach ($dayStops as $stopIndex => $stop) {
-                $destination = $stop['row']['destination'];
-                $slot = $slots[$stopIndex] ?? 'Afternoon';
-                $note = $this->buildComplementaryNote($destination, $stop['distance_km']);
-
-                $itinerary->items()->create([
-                    'day_number' => $dayNumber,
-                    'slot' => $slot,
-                    'destination_id' => $destination->id,
-                    'accommodation_id' => null,
-                    'note' => $note,
-                ]);
-            }
+        $capacities = [];
+        for ($day = 1; $day <= $totalDays; $day++) {
+            $capacities[$day] = $standard;
         }
+
+        $arrivalHour = $this->arrivalHour($preference);
+        if ($arrivalHour === null) {
+            return $capacities;
+        }
+
+        /*
+         * Arrival day offers only the slots that begin AFTER the traveller
+         * lands, on the assumption that the block they arrive in is spent
+         * getting to their accommodation and settling in. Landing at 14:00
+         * therefore buys the evening, not the afternoon they are still
+         * travelling through.
+         *
+         * All three slots are candidates here, not just the two a normal day
+         * uses -- restricting the pool first was a bug: a 2pm arrival matched
+         * neither Morning nor Afternoon and silently lost the whole day.
+         * The result is still capped at the normal daily allowance.
+         */
+        $remaining = array_values(array_filter(
+            $slots,
+            fn (string $slot) => self::SLOT_START_HOUR[$slot] > $arrivalHour
+        ));
+
+        // An evening landing legitimately leaves day 1 with no sightseeing at
+        // all. The day still exists and still carries the accommodation
+        // check-in, which is the only thing that can honestly happen that night.
+        $capacities[1] = array_slice($remaining, 0, self::DESTINATIONS_PER_DAY);
+
+        return $capacities;
     }
 
-    /** Suggests a nearby accommodation using Apriori co-visitation, falling back to the tourist's stated accommodation preference. */
-    private function pickAccommodation(array $dayStops, TouristPreference $preference): ?Accommodation
+    /** Arrival hour as a number, or null when the traveller did not say. */
+    private function arrivalHour(TouristPreference $preference): ?int
+    {
+        $time = $preference->arrival_time;
+
+        if (blank($time)) {
+            return null;
+        }
+
+        // The column is a time; depending on driver it comes back as a string
+        // or a date object, so normalise rather than assuming either.
+        if ($time instanceof \DateTimeInterface) {
+            return (int) $time->format('G');
+        }
+
+        return (int) explode(':', (string) $time)[0];
+    }
+
+    /**
+     * Suggests a nearby accommodation using Apriori co-visitation, falling back
+     * to the traveller's stated accommodation preference.
+     *
+     * Returns the rule that produced it as well as the listing, so the
+     * itinerary can show WHY this stay was suggested -- an association rule
+     * with no support or confidence attached is an assertion, not evidence.
+     *
+     * @return array{listing: Accommodation, rule: array|null}|null
+     */
+    private function pickAccommodation(array $dayStops, TouristPreference $preference): ?array
     {
         foreach ($dayStops as $stop) {
             $destination = $stop['row']['destination'];
@@ -187,7 +290,17 @@ class ItineraryGenerationService
                 ->filter(fn ($rule) => $rule['listing_kind'] === 'accommodation');
 
             if ($suggestions->isNotEmpty()) {
-                return $suggestions->first()['listing'];
+                $rule = $suggestions->first();
+
+                return [
+                    'listing' => $rule['listing'],
+                    'rule' => [
+                        'basis' => $destination->name,
+                        'support' => $rule['support'],
+                        'confidence' => $rule['confidence'],
+                        'co_count' => $rule['co_count'],
+                    ],
+                ];
             }
         }
 
@@ -196,25 +309,20 @@ class ItineraryGenerationService
             $query->where('type', $preference->accommodation_pref);
         }
 
-        return $query->orderByDesc('rating')->first()
-            ?? Accommodation::where('is_accredited', true)->whereNull('archived_at')->orderByDesc('rating')->first();
-    }
+        /*
+         * Prefer a stay we can actually place on the map. Most of the
+         * catalogue has no coordinates (the accreditation import carried
+         * addresses, not positions), and picking one of those leaves every
+         * transfer to and from the hotel unmeasurable. Rating still decides
+         * among the ones we can locate, and an unlocatable stay is still
+         * offered rather than none at all.
+         */
+        $listing = (clone $query)->whereNotNull('latitude')->whereNotNull('longitude')
+                ->orderByDesc('rating')->first()
+            ?? $query->orderByDesc('rating')->first()
+            ?? Accommodation::where('is_accredited', true)->whereNull('archived_at')
+                ->orderByDesc('rating')->first();
 
-    /** Builds a short note listing Apriori-derived complementary restaurants/souvenir shops/packages for this stop. */
-    private function buildComplementaryNote($destination, ?float $distanceKm): string
-    {
-        $suggestions = $this->apriori->suggestionsFor('destination', $destination->id, 4)
-            ->filter(fn ($rule) => in_array($rule['listing_kind'], ['restaurant', 'souvenir_center', 'package', 'tour_operator']));
-
-        $parts = [];
-        if ($distanceKm !== null) {
-            $parts[] = sprintf('~%.1f km from the previous stop', $distanceKm);
-        }
-        if ($suggestions->isNotEmpty()) {
-            $labels = $suggestions->take(2)->map(fn ($rule) => $rule['listing']->name.' ('.str_replace('_', ' ', $rule['listing_kind']).')');
-            $parts[] = 'Frequently visited together: '.$labels->implode(', ');
-        }
-
-        return $parts ? implode('. ', $parts).'.' : '';
+        return $listing ? ['listing' => $listing, 'rule' => null] : null;
     }
 }

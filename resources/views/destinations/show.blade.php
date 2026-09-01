@@ -152,16 +152,7 @@
                 <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="btn btn-poster-primary btn-block">Get Directions</a>
                 @include('partials.check-in-button', ['type' => 'destinations', 'listing' => $destination])
 
-                @auth('tourist')
-                    <form method="POST" action="{{ route('destinations.save', $destination) }}">
-                        @csrf
-                        <button type="submit" class="btn btn-poster-ghost btn-block" style="margin-top:10px;">
-                            <x-icon name="heart" :filled="$isSaved" /> {{ $isSaved ? 'Saved to My Trip' : 'Save to My Trip' }}
-                        </button>
-                    </form>
-                @else
-                    <a href="{{ route('tourist.login') }}" class="btn btn-poster-ghost btn-block" style="margin-top:10px;">Sign in to Save</a>
-                @endauth
+                <x-save-heart type="destinations" :listing="$destination" variant="button" class="mt-10" />
 
                 @include('partials.map-embed', ['latitude' => $destination->latitude, 'longitude' => $destination->longitude, 'name' => $destination->name])
             </div>
@@ -192,15 +183,6 @@
 
 <div class="sticky-cta">
     <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="btn btn-poster-primary" style="flex:1;">Directions</a>
-    @auth('tourist')
-        <form method="POST" action="{{ route('destinations.save', $destination) }}" style="flex:1;">
-            @csrf
-            <button type="submit" class="btn btn-poster-ghost btn-block">
-                <x-icon name="heart" :filled="$isSaved" /> {{ $isSaved ? 'Saved' : 'Save to My Trip' }}
-            </button>
-        </form>
-    @else
-        <a href="{{ route('tourist.login') }}" class="btn btn-poster-ghost btn-block" style="flex:1;">Sign in to Save</a>
-    @endauth
+    <x-save-heart type="destinations" :listing="$destination" variant="button" class="cta-half" />
 </div>
 @endsection

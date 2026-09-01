@@ -88,7 +88,7 @@
                     Budget tier: {{ $package->price_tier ?? 'Not specified' }}<br>
                     Provided by: {{ $providerLabel ?? 'DOT-accredited operator' }}
                 </p>
-                <a href="{{ route('tourist.register') }}" class="btn btn-primary btn-block">Plan with this Package</a>
+                <a href="{{ route('plan.edit') }}" class="btn btn-primary btn-block">Plan with this Package</a>
                 @include('partials.check-in-button', ['type' => 'packages', 'listing' => $package])
 
                 @include('partials.map-embed', ['latitude' => $package->latitude, 'longitude' => $package->longitude, 'name' => $package->name])
@@ -111,6 +111,6 @@
 </div>
 
 <div class="sticky-cta">
-    <a href="{{ route('tourist.register') }}" class="btn btn-primary btn-block">Plan with this Package</a>
+    <a href="{{ route('plan.edit') }}" class="btn btn-primary btn-block">Plan with this Package</a>
 </div>
 @endsection

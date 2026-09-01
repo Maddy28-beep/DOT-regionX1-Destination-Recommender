@@ -15,10 +15,15 @@
         </div>
     </div>
 @else
-    <div class="stat-cards" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="stat-cards" style="grid-template-columns: repeat(5, 1fr);">
         <div class="stat-card">
             <div class="stat-card-val">{{ $count }}</div>
             <div class="stat-card-label">Total Responses</div>
+        </div>
+        <div class="stat-card"
+             title="Approximate: the survey is anonymous and not linked to a specific check-in, so this compares total surveys submitted against distinct browsers known to have checked in anywhere. Treat it as a rough participation signal, not a precise completion rate.">
+            <div class="stat-card-val">{{ $responseRatePct !== null ? $responseRatePct.'%' : '—' }}</div>
+            <div class="stat-card-label">Response Rate (approx.)</div>
         </div>
         <div class="stat-card">
             <div class="stat-card-val">{{ $avgRatings['Overall Satisfaction'] ? number_format($avgRatings['Overall Satisfaction'], 2) : '—' }}<span style="font-size:1rem; color:var(--muted);">/5</span></div>
@@ -33,6 +38,9 @@
             <div class="stat-card-label">Avg. Days Stayed</div>
         </div>
     </div>
+    <p style="color:var(--muted); font-size:.85rem; margin-top:-8px;">
+        Response rate is approximate: {{ $checkedInVisitors }} distinct browser{{ $checkedInVisitors === 1 ? '' : 's' }} checked in somewhere via QR/manual check-in, against {{ $count }} exit survey{{ $count === 1 ? '' : 's' }} submitted. The survey is voluntary and anonymous, so this is a population-level signal, not a per-visitor completion rate.
+    </p>
 
     <div class="panel">
         <div class="panel-head">

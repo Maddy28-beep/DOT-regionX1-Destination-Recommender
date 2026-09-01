@@ -8,8 +8,8 @@
 
 <div class="stat-cards">
     <div class="stat-card">
-        <div class="stat-card-val">{{ $stats['tourists'] }}</div>
-        <div class="stat-card-label">Registered Tourists</div>
+        <div class="stat-card-val">{{ $stats['checkins_today'] }}</div>
+        <div class="stat-card-label">QR Check-ins Today</div>
     </div>
     <div class="stat-card">
         <div class="stat-card-val">{{ $stats['destinations'] }}</div>
@@ -99,26 +99,26 @@
 <div class="panel">
     <div class="panel-head">
         <div>
-            <h2>Recently Registered Tourists</h2>
+            <h2>Recent Check-ins</h2>
+            <p>Verified visits from travelers scanning an establishment's QR code.</p>
         </div>
-        <a href="{{ route('admin.tourists') }}" class="btn btn-outline">View all</a>
+        <a href="{{ route('admin.reports') }}" class="btn btn-outline">View report</a>
     </div>
     <div class="table-scroll">
         <table class="data-table">
             <thead>
-                <tr><th>Name</th><th>Nationality</th><th>Travel Type</th><th>Budget</th><th>Registered</th></tr>
+                <tr><th>Place</th><th>Type</th><th>Source</th><th>Visited</th></tr>
             </thead>
             <tbody>
-                @forelse ($recentTourists as $t)
+                @forelse ($recentVisits as $v)
                     <tr>
-                        <td>{{ $t->full_name }}</td>
-                        <td class="cell-muted">{{ $t->nationality }}</td>
-                        <td class="cell-muted">{{ $t->preferences->first()->travel_type ?? '—' }}</td>
-                        <td class="cell-muted">{{ $t->preferences->first()->budget ?? '—' }}</td>
-                        <td class="cell-muted cell-date">{{ $t->created_at->format('M d, Y') }}</td>
+                        <td>{{ $v['name'] }}</td>
+                        <td class="cell-muted">{{ $v['kind'] }}</td>
+                        <td class="cell-muted">{{ $v['source'] }}</td>
+                        <td class="cell-muted cell-date">{{ $v['date']->format('M d, Y') }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="cell-muted">No tourists registered yet.</td></tr>
+                    <tr><td colspan="4" class="cell-muted">No check-ins recorded yet.</td></tr>
                 @endforelse
             </tbody>
         </table>

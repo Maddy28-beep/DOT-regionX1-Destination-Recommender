@@ -1,11 +1,11 @@
 <?php
 
 use App\Http\Controllers\AccommodationController;
+use App\Http\Controllers\AddressSuggestionController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminListingController;
 use App\Http\Controllers\Auth\EstablishmentRegistrationController;
 use App\Http\Controllers\Auth\PortalAuthController;
-use App\Http\Controllers\Auth\TouristAuthController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\DestinationController;
@@ -13,30 +13,30 @@ use App\Http\Controllers\Establishment\EstablishmentDashboardController;
 use App\Http\Controllers\Establishment\EstablishmentPhotoController;
 use App\Http\Controllers\ExitSurveyController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ItineraryController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\SavedListingController;
 use App\Http\Controllers\SouvenirCenterController;
-use App\Http\Controllers\TouristDashboardController;
 use App\Http\Controllers\TourOperatorController;
-use App\Http\Controllers\TouristHealthProfileController;
-use App\Http\Controllers\TouristPreferenceController;
+use App\Http\Controllers\TripPlannerController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// QR-code check-in (records a real TouristVisit on scan; see CheckInController)
+/*
+ * QR-code check-in (records a visit on scan; see CheckInController). Open to
+ * everyone: the visitor scans the establishment's code and is counted, with
+ * no account and nothing personal stored. Throttled because the URL is public
+ * and printed on a poster.
+ */
 Route::get('/check-in/{type}/{id}', [CheckInController::class, 'checkIn'])
-    ->middleware('auth:tourist')
+    ->middleware('throttle:20,1')
     ->name('check-in');
 
 // Public destination catalog (2.2.1.3, Figure 12)
 Route::get('/destinations', [DestinationController::class, 'index'])->name('destinations.index');
 Route::get('/destinations/{destination:slug}', [DestinationController::class, 'show'])->name('destinations.show');
-Route::post('/destinations/{destination:slug}/save', [DestinationController::class, 'toggleSave'])
-    ->middleware('auth:tourist')
-    ->name('destinations.save');
 
 // Public accommodations catalog
 Route::get('/accommodations', [AccommodationController::class, 'index'])->name('accommodations.index');
@@ -58,43 +58,47 @@ Route::get('/souvenir-centers/{souvenirCenter:slug}', [SouvenirCenterController:
 Route::get('/tour-operators', [TourOperatorController::class, 'index'])->name('tour-operators.index');
 Route::get('/tour-operators/{tourOperator:slug}', [TourOperatorController::class, 'show'])->name('tour-operators.show');
 
+/*
+ * Trip planner: the travel-preference survey and AI itinerary (2.2.1.4,
+ * Sec. 2.3.4). Open to everyone -- there are no traveler accounts at all, so
+ * a visitor fills in the survey, including the optional health and
+ * accessibility questions the itinerary takes into account, and gets a plan.
+ * The plan lives in the session; see TripPlannerController.
+ */
+Route::get('/plan', [TripPlannerController::class, 'edit'])->name('plan.edit');
+
+/*
+ * Address type-ahead for the starting-point field. Throttled because it is an
+ * unauthenticated endpoint that costs an upstream geocoder request whenever it
+ * misses the cache -- see AddressSuggestionService.
+ */
+Route::get('/plan/address-suggest', AddressSuggestionController::class)
+    ->middleware('throttle:40,1')
+    ->name('plan.address-suggest');
+Route::post('/plan', [TripPlannerController::class, 'update'])->name('plan.update');
+Route::get('/plan/itinerary', [TripPlannerController::class, 'itinerary'])->name('plan.itinerary');
+Route::post('/plan/itinerary/regenerate', [TripPlannerController::class, 'regenerate'])->name('plan.regenerate');
+
 // Exit survey (2.2.1.7, Figures 13-15) — anonymous by design, no login required
 Route::get('/exit-survey', [ExitSurveyController::class, 'create'])->name('exit-survey.create');
-Route::post('/exit-survey', [ExitSurveyController::class, 'store'])->name('exit-survey.store');
+Route::post('/exit-survey', [ExitSurveyController::class, 'store'])
+    ->middleware('throttle:20,1')
+    ->name('exit-survey.store');
 
-// Chatbot Assistance Module (2.2.1.13, Sec. 2.2.3.1.10) — available to guests and logged-in tourists
+// Chatbot Assistance Module (2.2.1.13, Sec. 2.2.3.1.10)
 Route::post('/chatbot/message', [ChatbotController::class, 'respond'])
     ->middleware('throttle:30,1')
     ->name('chatbot.respond');
 
-// Tourist-facing auth (2.2.1.1 / 2.2.1.2, Figure 8)
-Route::middleware('guest:tourist')->group(function () {
-    Route::get('/register', [TouristAuthController::class, 'showRegister'])->name('tourist.register');
-    Route::post('/register', [TouristAuthController::class, 'register']);
-    Route::get('/login', [TouristAuthController::class, 'showLogin'])->name('tourist.login');
-    Route::post('/login', [TouristAuthController::class, 'login']);
-});
-Route::post('/logout', [TouristAuthController::class, 'logout'])
-    ->middleware('auth:tourist')
-    ->name('tourist.logout');
-
-Route::middleware('auth:tourist')->group(function () {
-    Route::get('/dashboard', [TouristDashboardController::class, 'index'])->name('tourist.dashboard');
-    Route::put('/dashboard/profile', [TouristDashboardController::class, 'updateProfile'])->name('tourist.profile.update');
-
-    // Travel preference survey (2.2.1.4, Figure 9) — collects inputs for the recommendation engine
-    Route::get('/dashboard/preferences', [TouristPreferenceController::class, 'edit'])->name('tourist.preferences.edit');
-    Route::put('/dashboard/preferences', [TouristPreferenceController::class, 'update'])->name('tourist.preferences.update');
-
-    // AI-driven itinerary (Content-Based Recommendation + Apriori Algorithm, Sec. 2.3.3-2.3.4)
-    Route::get('/dashboard/itinerary', [ItineraryController::class, 'show'])->name('tourist.itinerary.show');
-    Route::post('/dashboard/itinerary/regenerate', [ItineraryController::class, 'regenerate'])->name('tourist.itinerary.regenerate');
-
-    // Health/accessibility profile (2.2.1.14, Table 38-39) — optional, consent-gated, editable/deletable anytime
-    Route::get('/dashboard/health-profile', [TouristHealthProfileController::class, 'edit'])->name('tourist.health-profile.edit');
-    Route::put('/dashboard/health-profile', [TouristHealthProfileController::class, 'update'])->name('tourist.health-profile.update');
-    Route::delete('/dashboard/health-profile', [TouristHealthProfileController::class, 'destroy'])->name('tourist.health-profile.destroy');
-});
+/*
+ * Saved places — the heart control on every listing card and detail page.
+ *
+ * There is no traveler account (removed for Data Privacy Act compliance), so
+ * the list is kept against an opaque random browser token rather than a
+ * person; see EnsureVisitorToken and SavedListingController.
+ */
+Route::get('/saved', [SavedListingController::class, 'index'])->name('saved.index');
+Route::post('/saved/{type}/{id}', [SavedListingController::class, 'toggle'])->name('saved.toggle');
 
 // Partner Portal (2.3.2 Tourism Administrator + DOT-Accredited Establishment, Figure 7)
 Route::prefix('portal')->name('portal.')->group(function () {
@@ -109,7 +113,6 @@ Route::prefix('portal')->name('portal.')->group(function () {
 // DOT Admin console (2.3.2 Tourism Administrator, Figures 16-21)
 Route::prefix('portal/admin')->name('admin.')->middleware('auth:admin')->group(function () {
     Route::get('/', [AdminDashboardController::class, 'overview'])->name('overview');
-    Route::get('/tourists', [AdminDashboardController::class, 'tourists'])->name('tourists');
 
     Route::get('/establishments', [AdminDashboardController::class, 'establishments'])->name('establishments');
     Route::post('/establishments/{establishment}/approve', [AdminDashboardController::class, 'approveEstablishment'])->name('establishments.approve');

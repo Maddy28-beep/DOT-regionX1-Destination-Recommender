@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Destination;
 use App\Models\Region;
-use App\Models\SavedDestination;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class DestinationController extends Controller
@@ -72,34 +70,6 @@ class DestinationController extends Controller
                 ->get();
         }
 
-        $isSaved = false;
-        if (Auth::guard('tourist')->check()) {
-            $isSaved = SavedDestination::where('tourist_id', Auth::guard('tourist')->id())
-                ->where('destination_id', $destination->id)
-                ->exists();
-        }
-
-        return view('destinations.show', compact('destination', 'nearby', 'nearbyIsSameRegion', 'isSaved'));
-    }
-
-    public function toggleSave(Destination $destination)
-    {
-        $touristId = Auth::guard('tourist')->id();
-
-        $existing = SavedDestination::where('tourist_id', $touristId)
-            ->where('destination_id', $destination->id)
-            ->first();
-
-        if ($existing) {
-            $existing->delete();
-            $status = 'removed';
-        } else {
-            SavedDestination::create(['tourist_id' => $touristId, 'destination_id' => $destination->id]);
-            $status = 'saved';
-        }
-
-        return back()->with('status', $status === 'saved'
-            ? "Added {$destination->name} to your saved list."
-            : "Removed {$destination->name} from your saved list.");
+        return view('destinations.show', compact('destination', 'nearby', 'nearbyIsSameRegion'));
     }
 }
