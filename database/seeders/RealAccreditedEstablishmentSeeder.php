@@ -104,7 +104,7 @@ class RealAccreditedEstablishmentSeeder extends Seeder
                 'price_tier' => $row['price_tier'] ?? null,
                 'cuisine_type' => $row['cuisine_type'] ?? null,
                 'specialization' => $row['specialization'] ?? null,
-                'contact_number' => $row['contact'] ?? null,
+                'contact_number' => $this->cleanContact($row['contact'] ?? null),
                 'distance_km' => $row['distance_km'] ?? null,
                 'dot_classification' => $kind === 'accommodation' ? 'DOT-Accredited' : null,
             ];
@@ -143,6 +143,26 @@ class RealAccreditedEstablishmentSeeder extends Seeder
         );
 
         return isset($this->columns[$table][$column]);
+    }
+
+    /**
+     * The sheet often lists two or three numbers separated by "/", ",", or
+     * "to" (e.g. "0915 0511123/ 296-4543"), and contact_number is
+     * VARCHAR(20) on every listing table -- inserting the raw string
+     * overflows it for a meaningful share of the 372 rows. Keep just the
+     * first number, then hard-cap as a last resort so a still-long single
+     * number can never fail the insert either.
+     */
+    private function cleanContact(?string $raw): ?string
+    {
+        if (! $raw) {
+            return null;
+        }
+
+        $first = preg_split('/[,\/;]|(?<=\d)\s+to\s+/', $raw)[0];
+        $first = trim(preg_replace('/\s+/', ' ', $first));
+
+        return $first !== '' ? mb_substr($first, 0, 20) : null;
     }
 
     private function describe(array $row, string $kind): string

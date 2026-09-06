@@ -28,7 +28,12 @@ class HomeController extends Controller
             'destinations' => Destination::publiclyVisible()->count(),
             'regions' => Region::count(),
             'accommodations' => Accommodation::publiclyVisible()->count(),
-            'avg_rating' => round((float) Destination::publiclyVisible()->avg('rating'), 1),
+            // Only among destinations that actually have reviews: real,
+            // freshly-accredited establishments are seeded at rating=0
+            // ("Not yet rated") rather than a guessed score, so folding them
+            // into this average would drag a genuine 4.6-ish figure down to
+            // near-zero as more unrated real places are imported.
+            'avg_rating' => round((float) Destination::publiclyVisible()->where('review_count', '>', 0)->avg('rating'), 1),
         ];
 
         // Drives the About-the-Region pills, so each one links through to that
