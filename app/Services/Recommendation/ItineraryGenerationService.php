@@ -92,11 +92,26 @@ class ItineraryGenerationService
 
         $totalDays = max(1, (int) $preference->travel_days);
 
+        /*
+         * Several DOT-accredited destinations are different branches of the
+         * same business (three Elysia Wellness Spa locations, two Rancho
+         * Palos Verdes venues), imported as separate rows because they are
+         * genuinely separate addresses. None of them carry their own
+         * coordinates, rating, or tags, so they score identically and can
+         * sweep the top of the ranking together -- which turned "visit
+         * Elysia Wellness Spa" into three separate days of the same trip.
+         * $ranked keeps every branch, scored honestly, for the full
+         * Table 8 ranking persisted below; only the pool actually used to
+         * pick and schedule stops is thinned to one (the best-scoring)
+         * branch per business name.
+         */
+        $distinctRanked = $this->distinctByDestinationName($ranked);
+
         // Arrival day may hold fewer stops than a full day, so capacity has to
         // be summed per day rather than assumed uniform.
         $dayCapacities = $this->dayCapacities($preference, $totalDays);
-        $maxStops = min($ranked->count(), array_sum(array_map('count', $dayCapacities)));
-        $topRanked = $ranked->take($maxStops);
+        $maxStops = min($distinctRanked->count(), array_sum(array_map('count', $dayCapacities)));
+        $topRanked = $distinctRanked->take($maxStops);
 
         $sequence = $this->sequenceByNearestNeighbor($topRanked, $originLat, $originLng);
 
@@ -142,6 +157,25 @@ class ItineraryGenerationService
 
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);
         });
+    }
+
+    /**
+     * Keeps only the best-ranked row per distinct destination name.
+     *
+     * $ranked is already sorted highest DRS to lowest (with the deterministic
+     * tie-break already applied), so keeping the first occurrence of each
+     * name keeps the best-scoring branch and drops the rest -- no new
+     * comparison or randomness, just a name-based filter over an order that
+     * was already decided by Content-Based Recommendation.
+     *
+     * @param  Collection<int, array{destination: \App\Models\Destination, pm: float, rs: float, ps: float, ds: float, as: float, drs: float}>  $ranked
+     * @return Collection<int, array{destination: \App\Models\Destination, pm: float, rs: float, ps: float, ds: float, as: float, drs: float}>
+     */
+    private function distinctByDestinationName(\Illuminate\Support\Collection $ranked): \Illuminate\Support\Collection
+    {
+        return $ranked
+            ->unique(fn (array $row) => mb_strtolower(trim($row['destination']->name)))
+            ->values();
     }
 
     /**

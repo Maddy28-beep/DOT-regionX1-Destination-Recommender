@@ -5,7 +5,7 @@
 @section('content')
 @php
     $itemsByDay = $itinerary->items->sortBy(['day_number', 'sort_order'])->groupBy('day_number');
-    $topMatches = $itinerary->matches->sortBy('rank')->take(5);
+    $topMatches = $itinerary->distinctTopMatches(5);
     $routeStops = $itinerary->routeStops();
 @endphp
 
