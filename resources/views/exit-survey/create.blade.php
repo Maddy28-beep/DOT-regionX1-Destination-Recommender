@@ -106,7 +106,7 @@
                                     @foreach ($group['items'] as $item)
                                         <label class="field-check">
                                             <input type="checkbox" name="places_visited[]" value="{{ $kind }}:{{ $item->id }}" @checked(in_array($kind.':'.$item->id, old('places_visited', [])))>
-                                            <span>{{ $item->name }}</span>
+                                            <span>{{ $item->display_label }}</span>
                                         </label>
                                     @endforeach
                                 </div>

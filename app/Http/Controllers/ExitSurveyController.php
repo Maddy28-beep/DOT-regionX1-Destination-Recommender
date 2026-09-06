@@ -42,19 +42,48 @@ class ExitSurveyController extends Controller
     public function create(): View
     {
         $placeGroups = [
-            'destination' => ['label' => 'Destinations', 'items' => Destination::publiclyVisible()->orderBy('name')->get(['id', 'name'])],
-            'accommodation' => ['label' => 'Accommodations', 'items' => Accommodation::publiclyVisible()->orderBy('name')->get(['id', 'name'])],
-            'restaurant' => ['label' => 'Restaurants', 'items' => Restaurant::publiclyVisible()->orderBy('name')->get(['id', 'name'])],
-            'package' => ['label' => 'Tour Packages', 'items' => Package::publiclyVisible()->orderBy('name')->get(['id', 'name'])],
-            'souvenir_center' => ['label' => 'Souvenir Centers', 'items' => SouvenirCenter::publiclyVisible()->orderBy('name')->get(['id', 'name'])],
-            'tour_operator' => ['label' => 'Tour Operators', 'items' => TourOperator::publiclyVisible()->orderBy('name')->get(['id', 'name'])],
+            'destination' => ['label' => 'Destinations', 'items' => Destination::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location'])],
+            'accommodation' => ['label' => 'Accommodations', 'items' => Accommodation::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location'])],
+            'restaurant' => ['label' => 'Restaurants', 'items' => Restaurant::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location'])],
+            'package' => ['label' => 'Tour Packages', 'items' => Package::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location'])],
+            'souvenir_center' => ['label' => 'Souvenir Centers', 'items' => SouvenirCenter::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location'])],
+            'tour_operator' => ['label' => 'Tour Operators', 'items' => TourOperator::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location'])],
         ];
+
+        foreach ($placeGroups as &$group) {
+            $group['items'] = $this->labelDistinctly($group['items']);
+        }
 
         return view('exit-survey.create', [
             'placeGroups' => $placeGroups,
             'travelPurposes' => self::TRAVEL_PURPOSES,
             'activityOptions' => self::ACTIVITIES,
         ]);
+    }
+
+    /**
+     * Appends the location to any listing whose name is shared by another
+     * listing in the same group, so the checkbox itself says which one it is.
+     *
+     * DOT accreditation covers businesses with more than one branch (three
+     * Elysia Wellness Spa locations, two Rancho Palos Verdes venues), each a
+     * real, separately addressed listing a visitor can genuinely tell apart
+     * -- but "Elysia Wellness Spa" printed three times with no way to
+     * distinguish them left a visitor unable to say which one they actually
+     * went to. A listing with a name nobody else shares is left exactly as
+     * it was.
+     */
+    private function labelDistinctly(\Illuminate\Support\Collection $items): \Illuminate\Support\Collection
+    {
+        $nameCounts = $items->countBy(fn ($item) => $item->name);
+
+        return $items->map(function ($item) use ($nameCounts) {
+            $item->display_label = $nameCounts[$item->name] > 1 && filled($item->location)
+                ? "{$item->name} ({$item->location})"
+                : $item->name;
+
+            return $item;
+        });
     }
 
     public function store(Request $request): RedirectResponse
