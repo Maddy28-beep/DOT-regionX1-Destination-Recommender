@@ -17,13 +17,14 @@ class Itinerary extends Model
 
     protected $fillable = [
         'preference_id', 'total_days', 'est_budget_total',
-        'est_party_size', 'generated_at',
+        'est_party_size', 'generated_at', 'range_tier_used', 'range_widened',
     ];
 
     protected function casts(): array
     {
         return [
             'est_budget_total' => 'decimal:2',
+            'range_widened' => 'boolean',
         ];
     }
 

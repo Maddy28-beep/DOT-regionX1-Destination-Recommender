@@ -5,15 +5,23 @@
 @section('content')
 @php
     $itemsByDay = $itinerary->items->sortBy(['day_number', 'sort_order'])->groupBy('day_number');
-    $topMatches = $itinerary->matches->sortBy('rank')->take(5);
+    // At least 5, but never fewer than the destinations actually scheduled
+    // below -- a fixed take(5) let the day-by-day plan use a 6th (or later)
+    // ranked destination that then never appeared in this summary table at
+    // all, which read as the itinerary using a place it hadn't recommended.
+    $scheduledDestinationCount = $itinerary->items->pluck('destination_id')->filter()->unique()->count();
+    $topMatches = $itinerary->matches->sortBy('rank')->take(max(5, $scheduledDestinationCount));
     $routeStops = $itinerary->routeStops();
+
+    $rangeTierLabels = ['near' => 'Within the City', 'moderate' => 'Moderate distance', 'far' => 'Willing to travel farther'];
 @endphp
 
 <div class="dash-shell">
     <div class="dash-header">
         <div class="container">
             <div>
-                <h1>My Itinerary</h1>
+                <span class="poster-kicker" style="font-size:1.05rem;">ready to go</span>
+                <h1 class="page-title" style="font-size:1.9rem; margin:0;">My Itinerary</h1>
                 <div class="sub">
                     Generated {{ $itinerary->generated_at->format('F j, Y g:i A') }}
                     &middot; {{ $itinerary->total_days }} day{{ $itinerary->total_days === 1 ? '' : 's' }}
@@ -38,19 +46,25 @@
 
             {{-- Set expectations honestly: there is no account to keep this
                  in, by design. What a visitor CAN keep is the shortlist, so
-                 that is what the banner points at. --}}
-            <x-banner tone="info">
-                This plan lives in your browser session, so it disappears when you close the tab.
-                Nothing here is tied to your name &mdash; there are no traveler accounts.
-                <a href="{{ route('saved.index') }}"><strong>Heart the places you like</strong></a>
-                and they will still be here when you come back.
-            </x-banner>
+                 that is what the note points at. Cream + dashed gold rather
+                 than the internal console's blue x-banner, so a standing
+                 fact about this page reads in its own brand voice instead of
+                 an admin-console notice. --}}
+            <div class="session-note" role="status">
+                <x-icon name="alert-triangle" />
+                <p>
+                    This plan lives in your browser session, so it disappears when you close the tab
+                    &mdash; there are no traveler accounts.
+                    <a href="{{ route('saved.index') }}">Heart the places you like</a>
+                    and they will still be here when you come back.
+                </p>
+            </div>
 
             <div class="panel">
                 <div class="panel-head">
                     <div>
                         <h2>Recommended Destinations</h2>
-                        <p>Ranked by Destination Recommendation Score, based on your travel preferences (Content-Based Recommendation).</p>
+                        <p>Ranked by how well each place matches your travel preferences.</p>
                     </div>
                     <form method="POST" action="{{ route('plan.regenerate') }}" id="regenerate-form">
                         @csrf
@@ -60,26 +74,21 @@
                     </form>
                 </div>
                 <div class="panel-body">
-                    <div class="table-scroll">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Destination</th>
-                                    <th>Match Score</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($topMatches as $match)
-                                    <tr>
-                                        <td>{{ $match->rank }}</td>
-                                        <td><a href="{{ route('destinations.show', $match->destination) }}">{{ $match->destination->name }}</a></td>
-                                        <td>{{ number_format($match->match_score, 2) }} / 5.00</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                    <ul class="match-list">
+                        @foreach ($topMatches as $match)
+                            @php $tier = $match->match_score >= 3.5 ? 'strong' : 'fair'; @endphp
+                            <li class="match-row">
+                                <span class="match-rank">{{ $match->rank }}</span>
+                                <div class="match-info">
+                                    <a href="{{ route('destinations.show', $match->destination) }}">{{ $match->destination->name }}</a>
+                                    <div class="match-bar-track">
+                                        <div class="match-bar-fill match-bar-fill--{{ $tier }}" style="width: {{ min(100, max(0, $match->match_score / 5 * 100)) }}%;"></div>
+                                    </div>
+                                </div>
+                                <span class="match-score"><span class="sr-only">Match Score: </span>{{ number_format($match->match_score, 2) }} / 5.00</span>
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
             </div>
 
@@ -87,7 +96,7 @@
                 <div class="panel-head">
                     <div>
                         <h2>Day-by-Day Travel Plan</h2>
-                        <p>Sequenced by geographic proximity (Haversine distance + Nearest Neighbor heuristic), with complementary establishments surfaced via Association Rule Mining (Apriori Algorithm).</p>
+                        <p>Sequenced by geographic proximity, with complementary stops surfaced from what past travelers tend to pair together.</p>
                     </div>
                 </div>
                 <div class="panel-body">
@@ -123,6 +132,7 @@
                             <div class="itinerary-day">
                                 <h3>Day {{ $day }}</h3>
 
+                                <div class="day-timeline">
                                 @foreach ($items as $item)
                                     @php
                                         $listing = $item->listing();
@@ -135,8 +145,20 @@
                                         };
                                     @endphp
                                     <div class="itinerary-item itinerary-item--{{ $item->kind }}">
-                                        <span class="badge">{{ $item->slot }}</span>
                                         <div class="itinerary-item__body">
+                                            {{-- A travel connector only ever needs the bare clock
+                                                 time -- it isn't a scheduled stop with a slot of its
+                                                 own, so pairing it with "AFTERNOON" read as a second,
+                                                 phantom stop rather than the journey between two. --}}
+                                            @if ($item->timeLabel() || ($item->kind !== 'travel' && $item->slot))
+                                                <div class="itinerary-item__meta">
+                                                    @if ($item->kind !== 'travel' && $item->slot)
+                                                        {{ $item->slot }}
+                                                        @if ($item->timeLabel()) &middot; @endif
+                                                    @endif
+                                                    {{ $item->timeLabel() }}
+                                                </div>
+                                            @endif
                                             <strong>
                                                 {{-- Most titles already name the place, so linking the
                                                      title itself avoids "Dinner at Acacia — Acacia". --}}
@@ -150,26 +172,31 @@
                                                 @endif
                                             </strong>
                                             <div class="sub">
-                                                {{ $item->timeLabel() }}
-                                                @if ($item->timeLabel()) &middot; @endif
                                                 {{ $item->travelSummary() }}
                                             </div>
                                             @if ($item->ruleExplanation())
-                                                <div class="sub itinerary-item__rule">{{ $item->ruleExplanation() }}</div>
+                                                <div>
+                                                    <span class="pairing-tag">Popular pairing with {{ $item->rule_basis }}</span>
+                                                    <details class="pairing-why">
+                                                        <summary>why this pick?</summary>
+                                                        <p>{{ $item->ruleExplanation() }}</p>
+                                                    </details>
+                                                </div>
                                             @endif
                                         </div>
                                     </div>
                                 @endforeach
+                                </div>
 
                                 @if ($stops)
                                     <div class="day-actions">
                                         @if ($mapsUrl)
                                             <a href="{{ $mapsUrl }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline ext-link">
-                                                Open Day {{ $day }} in Google Maps
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                                     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
                                                     <path d="M15 3h6v6"/><path d="M10 14 21 3"/>
                                                 </svg>
+                                                Open Day {{ $day }} in Google Maps
                                                 <span class="sr-only">(opens all {{ count($stops) }} stops as a route in a new tab)</span>
                                             </a>
                                         @endif
@@ -188,7 +215,7 @@
                                          quietly drawing an incomplete day. --}}
                                     @if ($unplottable->isNotEmpty())
                                         <p class="sub day-unmapped">
-                                            Not on the map below &mdash; we don't hold coordinates for
+                                            Not on the map above &mdash; we don't hold coordinates for
                                             {{ $unplottable->join(', ', ' and ') }}.
                                             The Google Maps link includes {{ $unplottable->count() === 1 ? 'it' : 'them' }}.
                                         </p>
@@ -217,6 +244,15 @@
                                 {{ $provenance['catalogue_size'] }} accredited destinations against your
                                 survey answers, combining five weighted factors into the Destination
                                 Recommendation Score shown above (Sec. 2.3.3, Equations 1&ndash;3).
+                                @if ($provenance['range_widened'])
+                                    <br><strong>Note:</strong> you asked for
+                                    &ldquo;{{ $rangeTierLabels[$provenance['range_requested']] ?? $provenance['range_requested'] }}&rdquo;,
+                                    but there weren&rsquo;t enough destinations that close to
+                                    {{ $provenance['origin'] }} to fill a {{ $itinerary->total_days }}-day
+                                    plan, so the search was automatically widened to
+                                    &ldquo;{{ $rangeTierLabels[$provenance['range_tier_used']] ?? $provenance['range_tier_used'] }}&rdquo;
+                                    range. Some stops below may be farther than you expected.
+                                @endif
                             </div>
                         </li>
                         <li>

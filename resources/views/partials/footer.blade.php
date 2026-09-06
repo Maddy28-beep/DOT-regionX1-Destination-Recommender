@@ -3,10 +3,7 @@
         <div class="footer-grid">
             <div>
                 <div class="footer-brand-row">
-                    <svg class="footer-brand-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <circle cx="12" cy="12" r="10" fill="currentColor"/>
-                        <circle cx="12" cy="12" r="4" fill="var(--stamp-red)"/>
-                    </svg>
+                    <x-brand-mark class="footer-brand-icon" />
                     <div class="footer-brand">Explore<span style="color:var(--gold)">DVO</span></div>
                 </div>
                 <p>A tourism information and DOT-accreditation platform built for the Department of Tourism

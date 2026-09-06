@@ -357,4 +357,22 @@ document.addEventListener('DOMContentLoaded', function () {
             particle.addEventListener('animationend', function () { particle.remove(); });
         });
     }
+
+    // Trip planner pill-toggle chips (.chip-checkbox-grid): keeps a
+    // .is-checked class on the label in sync with its checkbox, both on load
+    // (for options pre-selected from a previous submission) and on every
+    // change. The CSS also declares a :has(input:checked) rule for browsers
+    // where that keeps working, but this class is what's actually relied on
+    // -- :has() was found not to reliably repaint after a programmatic
+    // checked-state change in testing, and a chip that silently stops
+    // reflecting its own selection state is worse than not having the
+    // effect at all.
+    document.querySelectorAll('.chip-checkbox-grid .field-check').forEach(function (label) {
+        var input = label.querySelector('input');
+        if (!input) return;
+
+        var sync = function () { label.classList.toggle('is-checked', input.checked); };
+        sync();
+        input.addEventListener('change', sync);
+    });
 });

@@ -315,27 +315,106 @@ a { color: inherit; text-decoration: none; }
     padding: 3px 9px; border-radius: 3px; margin-top: 2px; text-align: center;
 }
 
-/* Itinerary day blocks. Each row of the generated schedule -- setting off, a
-   journey, time on site, a meal, the night -- is one badged line. */
+/* Itinerary day blocks: a vertical timeline rather than a flat list, so a
+   place actually worth visiting (arrival, a meal, an activity, the night)
+   reads as heavier than the journey connecting it to the next one. */
 .itinerary-day {
     margin-bottom: 20px;
     padding-bottom: 16px;
     border-bottom: 1px solid var(--border);
 }
 .itinerary-day:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
-.itinerary-day h3 { margin-bottom: 10px; }
-.itinerary-item { display: flex; gap: 12px; padding: 10px 0; align-items: flex-start; }
-.itinerary-item .badge { flex-shrink: 0; min-width: 90px; text-align: center; }
+.itinerary-day h3 { margin-bottom: 10px; font-family: 'Alfa Slab One', serif; font-weight: 400; font-size: 1.05rem; color: var(--ocean-teal-dark); }
+
+.day-timeline { position: relative; padding-left: 30px; }
+.day-timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px; top: 8px; bottom: 8px;
+    width: 2px;
+    background: var(--border);
+}
+.itinerary-item { position: relative; padding: 10px 0; }
+/* Small uppercase time-of-day + clock-time line above the title, replacing
+   the old side-by-side badge column -- a connector row (kind--travel) only
+   ever needs the bare time, never the "Afternoon" label, since it isn't a
+   scheduled stop in its own right. */
+.itinerary-item__meta {
+    font-size: .72rem; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 2px;
+}
+/* A solid dot for a real stop, matching the leaf-green brand colour. */
+.itinerary-item::before {
+    content: '';
+    position: absolute;
+    left: -30px; top: 14px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 2px solid var(--white);
+    box-shadow: 0 0 0 1.5px var(--primary);
+    z-index: 1;
+}
+/* A smaller, fainter dot for the travel leg between two stops -- the trip
+   getting you there, not a destination in its own right. */
+.itinerary-item--travel::before {
+    left: -27.5px; top: 16.5px;
+    width: 7px; height: 7px;
+    background: var(--border);
+    border: none;
+    box-shadow: none;
+}
+.itinerary-item--travel { opacity: .82; }
 .itinerary-item__body { flex: 1; min-width: 0; }
 .itinerary-item__body .sub { margin-top: 2px; }
 .itinerary-item__rule { font-style: italic; }
-/* Journeys connect the day rather than being part of it, so they recede. */
 .itinerary-item--travel .itinerary-item__body strong { font-weight: 400; color: var(--muted); }
 .itinerary-item--baseline .itinerary-item__body strong,
 .itinerary-item--departure .itinerary-item__body strong { color: var(--primary-dark); }
 .day-actions { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px; margin-top: 12px; }
 .day-actions details { flex: 1 1 100%; }
-.day-unmapped { margin-top: 8px; }
+.day-unmapped { margin-top: 8px; font-style: italic; }
+
+/* Friendly pairing caption replacing raw confidence/support/trip-count
+   jargon, with the technical detail still available behind an expander
+   rather than deleted -- a curious traveller (or a panel) can still see it. */
+.pairing-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--primary-light); color: var(--primary-dark);
+    border-radius: 999px; padding: 3px 10px;
+    font-size: .74rem; font-weight: 700;
+    margin-top: 4px;
+}
+.pairing-why { margin-top: 4px; }
+.pairing-why summary {
+    cursor: pointer; list-style: none;
+    display: inline-block;
+    font-size: .74rem; color: var(--muted); text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.pairing-why summary::-webkit-details-marker { display: none; }
+.pairing-why p { margin: 4px 0 0; font-size: .76rem; color: var(--muted); font-style: italic; }
+
+/* Rank list with a match-strength bar, replacing a bare number table so
+   relative fit is visible at a glance. */
+.match-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
+.match-row { display: flex; align-items: center; gap: 14px; }
+.match-rank {
+    flex-shrink: 0; width: 36px; text-align: center;
+    font-family: 'Alfa Slab One', serif; font-weight: 400;
+    font-size: 1.3rem; color: var(--gold);
+}
+.match-info { flex: 1; min-width: 0; }
+.match-info a { font-weight: 700; color: var(--ink); }
+.match-bar-track { height: 8px; border-radius: 999px; background: var(--bg); margin-top: 7px; overflow: hidden; }
+.match-bar-fill { height: 100%; border-radius: 999px; background: var(--primary); }
+/* A place scoring at or above the midpoint of the two "genuinely different
+   from neutral" outcomes reads as a strong match (leaf green); anything
+   below that -- a real result, just a weaker one -- reads as gold rather
+   than the same green, so relative fit is visible at a glance down the list. */
+.match-bar-fill--strong { background: var(--primary); }
+.match-bar-fill--fair { background: var(--gold); }
+.match-score { flex-shrink: 0; width: 64px; text-align: right; font-size: .82rem; font-weight: 700; color: var(--muted); }
 
 /* Address type-ahead on the trip planner's starting-point field. */
 .address-field { position: relative; }
@@ -371,6 +450,121 @@ a { color: inherit; text-decoration: none; }
 
 .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 4px 16px; margin-top: 10px; }
 .checkbox-grid .field-check { margin-top: 8px; }
+
+/*
+ * Trip planner pill-toggle chips: the same rounded, outline/solid-fill
+ * language as .chip (the catalog filter pills), reused here instead of
+ * inventing a second input style just for this page. Scoped to this class
+ * rather than restyling .field-check/.checkbox-grid globally, since the
+ * exit survey uses that same markup and its plain-checkbox styling is
+ * intentionally untouched.
+ *
+ * The checkbox input itself is kept in the DOM (visually hidden, not
+ * display:none) so the label-for-input relationship, keyboard toggling and
+ * form submission all keep working exactly as before -- only the paint
+ * changes.
+ */
+.chip-checkbox-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.chip-checkbox-grid .field-check {
+    margin-top: 0;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: .85rem;
+    cursor: pointer;
+    gap: 0;
+    transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.chip-checkbox-grid .field-check:hover { border-color: var(--muted); background: var(--bg); }
+/* .is-checked is kept in sync by app.js on load and on every change event --
+   not left to :has(input:checked) alone, and declared as its own separate
+   rule rather than grouped with the :has() one in a comma list: testing
+   found that combining them invalidated the *entire* rule in at least one
+   engine, silently dropping the .is-checked styling along with it. */
+.chip-checkbox-grid .field-check.is-checked {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--white);
+}
+.chip-checkbox-grid .field-check:has(input:checked) {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--white);
+}
+.chip-checkbox-grid .field-check input {
+    position: absolute;
+    width: 1px; height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* A single yes/no consent toggle -- a real custom checkbox, not the
+   hide-the-input-and-repaint-the-label chip pattern above it, since this is
+   one consent decision rather than a tag being added to a set. Scoped to
+   .consent-check rather than restyling .field-check input globally: the
+   exit survey's checkboxes intentionally keep their plain browser look (see
+   the chip-checkbox-grid comment above). */
+.consent-check { align-items: center; }
+.consent-check input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    flex-shrink: 0;
+    border: 1.5px solid var(--muted);
+    border-radius: 5px;
+    background-color: var(--white);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 13px 13px;
+    cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+.consent-check input[type="checkbox"]:hover { border-color: var(--primary); }
+.consent-check input[type="checkbox"]:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+}
+.consent-check input[type="checkbox"]:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* Privacy/reassurance callout: a quiet neutral inset rather than a coloured
+   alert -- this is routine reassurance read on every visit, not a warning,
+   so it should recede into the form instead of drawing the eye. */
+.privacy-note {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    margin-top: 10px;
+}
+.privacy-note svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--muted); margin-top: 1px; }
+.privacy-note p { margin: 0; font-size: .84rem; color: var(--ink); line-height: 1.5; }
+
+/* Cream + gold dashed callout, per the itinerary-page mockup -- this is a
+   standing fact about the whole page ("no traveler accounts") rather than a
+   field-level note, so it gets its own bordered-boundary treatment instead
+   of .privacy-note's quieter neutral inset. */
+.session-note {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--paper);
+    border: 1.5px dashed var(--gold);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    margin: 0 0 20px;
+}
+.session-note svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--accent); margin-top: 2px; }
+.session-note p { margin: 0; font-size: .86rem; color: var(--ink); line-height: 1.6; }
+.session-note a { font-weight: 700; }
 
 .rating-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
 .rating-row:last-child { border-bottom: none; }
@@ -557,6 +751,18 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     font-family: 'Barabara', 'Alfa Slab One', serif;
     letter-spacing: .02em;
     text-transform: uppercase;
+}
+
+/* Mixed-case display heading for traveler-facing pages (Plan Your Trip, My
+   Itinerary). .poster-title can't be reused here -- Barabara is an
+   uppercase-only face with no lowercase glyphs at all -- so this falls back
+   to Alfa Slab One directly, the same display face already used for
+   .itinerary-day h3 and .match-rank, just set in real sentence case. */
+.page-title {
+    font-family: 'Alfa Slab One', serif;
+    font-weight: 400;
+    letter-spacing: .01em;
+    color: var(--ink);
 }
 
 /* Stamp red is the kicker's default, not something each consumer opts into.
@@ -999,8 +1205,19 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 22px;
 }
+/*
+ * Every card in a grid is the same size, whatever it happens to know about
+ * itself. The body carries three optional blocks -- location, tags, price --
+ * so a listing with no tags and no price tier used to render a visibly
+ * shorter card than its neighbours, leaving the grid ragged. The wrapper is
+ * stretched to the row by the grid, so the card only has to fill the wrapper
+ * and let its body absorb the slack; the artwork keeps its 4:3 ratio and any
+ * spare height collects harmlessly below the last line of text.
+ */
 .dpost-card {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     background: var(--paper);
     border: 1px solid var(--border);
     border-radius: 10px;
@@ -1018,7 +1235,7 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
  * wrapper carries the hover lift and the heart rides along with it instead of
  * staying behind while the card moves.
  */
-.dpost-card-wrap { position: relative; }
+.dpost-card-wrap { position: relative; height: 100%; }
 .dpost-card-wrap:hover .dpost-card { transform: translateY(-5px); box-shadow: var(--shadow-md); }
 .save-form--icon {
     position: absolute;
@@ -1141,7 +1358,7 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     font-size: 1rem;
     text-shadow: 0 1px 4px rgba(0, 0, 0, .4);
 }
-.dpost-card__body { padding: 14px 16px 16px; }
+.dpost-card__body { padding: 14px 16px 16px; flex: 1; }
 .dpost-loc { font-size: .8rem; color: var(--muted); margin-bottom: 8px; }
 .dpost-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
 .dpost-tag { background: var(--primary-light); color: var(--primary-dark); font-size: .7rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
@@ -1258,6 +1475,11 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 22px;
+    /* Without this a grid row is only as tall as its own tallest card, so
+       the second row of results could sit visibly shorter than the first.
+       1fr makes every row take the height of the tallest card in the grid,
+       so the whole page of results is one consistent card size. */
+    grid-auto-rows: 1fr;
 }
 
 .dest-card {
@@ -1523,7 +1745,7 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 .footer-grid a { transition: color .15s ease; }
 .footer-grid a:hover { color: var(--white); }
 .footer-brand-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.footer-brand-icon { width: 24px; height: 24px; flex-shrink: 0; color: var(--gold); }
+.footer-brand-icon { width: 26px; height: 26px; flex-shrink: 0; }
 .footer-brand { font-weight: 800; font-size: 1.15rem; color: var(--white); }
 .footer-contact { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.1); }
 .footer-contact p { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }

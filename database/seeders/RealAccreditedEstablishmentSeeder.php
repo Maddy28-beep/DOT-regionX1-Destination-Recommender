@@ -100,7 +100,12 @@ class RealAccreditedEstablishmentSeeder extends Seeder
             // Only set columns the model actually has; the five listing tables
             // do not share a schema.
             $optional = [
-                'type' => $row['type'] ?? null,
+                // "Mabuhay Accommodation" is an accreditation category rather
+                // than a kind of lodging, and this column is what the trip
+                // planner filters on -- see MabuhayAccommodationTypeSeeder.
+                'type' => $kind === 'accommodation'
+                    ? MabuhayAccommodationTypeSeeder::lodgingTypeFor($row['name'], $row['type'] ?? null)
+                    : ($row['type'] ?? null),
                 'price_tier' => $row['price_tier'] ?? null,
                 'cuisine_type' => $row['cuisine_type'] ?? null,
                 'specialization' => $row['specialization'] ?? null,
