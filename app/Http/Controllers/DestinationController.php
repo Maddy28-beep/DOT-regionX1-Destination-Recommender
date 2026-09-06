@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Destination;
 use App\Models\Region;
+use App\Services\Recommendation\ContentBasedRecommendationService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -23,6 +24,19 @@ class DestinationController extends Controller
 
         if ($request->filled('type')) {
             $query->where('type', $request->string('type'));
+        }
+
+        /*
+         * A tourist-facing interest from the homepage search bar, which spans
+         * several stored types -- "Beach & Island" is filed as both "Beach &
+         * Leisure" and "Beach & Surfing". Resolved through the recommender so
+         * browsing for an interest and being recommended for it can never
+         * disagree about what counts.
+         */
+        if ($request->filled('interest')) {
+            $query->whereIn('type', ContentBasedRecommendationService::typesForInterest(
+                (string) $request->string('interest')
+            ));
         }
 
         if ($request->filled('price_tier')) {

@@ -67,7 +67,17 @@ class AprioriService
             ->values();
     }
 
-    /** Attach the resolved Eloquent model to each rule row (via the morph map), dropping any that no longer resolve. */
+    /**
+     * Attach the resolved Eloquent model to each rule row (via the morph map),
+     * dropping any that no longer resolve.
+     *
+     * Scoped through publiclyVisible() where the model supports it (every
+     * real tourism listing kind does): a plain find() previously resolved
+     * whatever the id pointed at regardless of accreditation or archiving,
+     * so an establishment that later closed down -- or lost accreditation --
+     * kept being suggested to travellers forever, since nothing about the
+     * historical exit-survey data it was mined from ever changes.
+     */
     public function resolveListings(Collection $rules): Collection
     {
         $morphMap = Relation::morphMap();
@@ -75,7 +85,13 @@ class AprioriService
         return $rules
             ->map(function (array $rule) use ($morphMap) {
                 $modelClass = $morphMap[$rule['listing_kind']] ?? null;
-                $rule['listing'] = $modelClass ? $modelClass::find($rule['listing_id']) : null;
+                $query = $modelClass ? $modelClass::query() : null;
+
+                if ($query && method_exists($modelClass, 'scopePubliclyVisible')) {
+                    $query->publiclyVisible();
+                }
+
+                $rule['listing'] = $query?->find($rule['listing_id']);
 
                 return $rule;
             })
@@ -118,12 +134,30 @@ class AprioriService
 
         foreach ($visitsByTransaction as $visits) {
             $items = $visits->map(fn ($v) => $v->listing_kind.':'.$v->listing_id)->unique()->values();
+
+            /*
+             * Equation 9 divides by every transaction containing A, and that
+             * has to include the ones where A was the only place visited: a
+             * tourist who went to A and nowhere else is evidence AGAINST
+             * "people who visit A also visit B", so leaving them out only ever
+             * inflates confidence. This tally used to sit below the guard
+             * beneath it, which quietly dropped them -- Samal Island appears
+             * in 32 transactions but was counted as 26, reporting Samal ->
+             * BlueJaz at 73.1% where the data gives 59.4%. It also disagreed
+             * with getAssociatedListings(), which has always counted the full
+             * set, and with this method's own support figure, which has always
+             * divided by every transaction.
+             */
+            foreach ($items as $a) {
+                $antecedentCounts[$a] = ($antecedentCounts[$a] ?? 0) + 1;
+            }
+
+            // Counted above, but a lone visit yields no pair to mine.
             if ($items->count() < 2) {
                 continue;
             }
 
             foreach ($items as $a) {
-                $antecedentCounts[$a] = ($antecedentCounts[$a] ?? 0) + 1;
                 foreach ($items as $b) {
                     if ($a === $b) {
                         continue;

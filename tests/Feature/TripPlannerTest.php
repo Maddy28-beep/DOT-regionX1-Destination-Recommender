@@ -566,6 +566,54 @@ class TripPlannerTest extends TestCase
     }
 
     /**
+     * A 3-day trip schedules up to 6 destinations (2/day), but the
+     * "Recommended Destinations" summary table above the schedule was
+     * hardcoded to its top 5 -- so a 6th-ranked destination could be sitting
+     * in the actual day-by-day plan below while never appearing in the list
+     * that supposedly ranks everything the plan was built from.
+     */
+    public function test_every_scheduled_destination_appears_in_the_recommended_list(): void
+    {
+        $region = Region::create(['name' => 'Davao City']);
+        $names = ['Alpha Park', 'Beta Falls', 'Gamma Cove', 'Delta Ridge', 'Epsilon Trail', 'Zeta Point', 'Eta Garden'];
+
+        foreach ($names as $i => $name) {
+            Destination::create([
+                'slug' => 'dest-'.$i, 'name' => $name, 'location' => 'Davao City',
+                'region_id' => $region->id, 'type' => 'Nature & Leisure',
+                'is_accredited' => true, 'rating' => 4.5, 'review_count' => 10,
+                'price_tier' => 'Mid-range',
+                'latitude' => 7.05 + $i * 0.01, 'longitude' => 125.55 + $i * 0.01,
+                'distance_km' => 12,
+            ]);
+        }
+
+        $this->post('/plan', $this->surveyPayload(['travel_days' => 3]));
+        $html = $this->get('/plan/itinerary')->assertOk()->getContent();
+
+        $itinerary = Itinerary::latest('generated_at')->firstOrFail();
+        $scheduledNames = $itinerary->items->pluck('destination.name')->filter()->unique();
+
+        $this->assertGreaterThan(5, $scheduledNames->count(),
+            'This test needs a 6th scheduled destination to actually exercise the bug.');
+
+        // Every destination name also appears in the day-by-day schedule
+        // text further down the same page, so a plain assertStringContains
+        // against the whole page can never fail here even with the bug
+        // present -- isolate just the Recommended Destinations table first.
+        $start = strpos($html, 'Recommended Destinations');
+        $end = strpos($html, 'Day-by-Day Travel Plan');
+        $this->assertNotFalse($start);
+        $this->assertNotFalse($end);
+        $summaryTableHtml = substr($html, $start, $end - $start);
+
+        foreach ($scheduledNames as $name) {
+            $this->assertStringContainsString($name, $summaryTableHtml,
+                "\"{$name}\" is in the day-by-day schedule but missing from the Recommended Destinations table.");
+        }
+    }
+
+    /**
      * Apriori has to be credited where it acted, and only where it acted.
      *
      * The "frequently visited together" note was lost when the schedule
@@ -611,6 +659,187 @@ class TripPlannerTest extends TestCase
 
         // Rows nobody mined stay silent rather than borrowing the credit.
         $this->assertNull($items->firstWhere('kind', 'travel')->ruleExplanation());
+    }
+
+    /**
+     * AprioriService::resolveListings() used to resolve a listing with a
+     * plain find(), regardless of accreditation or archiving -- so an
+     * establishment that later permanently closed (BlueJaz Beach Resort, in
+     * production) kept being suggested forever, since nothing about the
+     * historical exit-survey data it was mined from ever changes on its own.
+     */
+    public function test_an_archived_establishment_is_never_suggested_by_apriori(): void
+    {
+        $this->seedDestinations();
+        $eden = Destination::where('slug', 'eden-nature-park')->sole();
+        $region = Region::sole();
+
+        $accommodation = \App\Models\Accommodation::create([
+            'slug' => 'closed-resort', 'name' => 'Closed Resort', 'location' => 'Davao City',
+            'region_id' => $region->id, 'type' => 'Resort', 'is_accredited' => true,
+            'rating' => 4.5, 'review_count' => 10, 'price_tier' => 'Mid-range',
+        ]);
+
+        foreach (range(1, 3) as $i) {
+            $survey = \App\Models\ExitSurvey::create(['submitted_at' => now()]);
+            \App\Models\ExitSurveyVisit::create([
+                'exit_survey_id' => $survey->id, 'listing_kind' => 'destination', 'listing_id' => $eden->id,
+            ]);
+            \App\Models\ExitSurveyVisit::create([
+                'exit_survey_id' => $survey->id, 'listing_kind' => 'accommodation', 'listing_id' => $accommodation->id,
+            ]);
+        }
+
+        $apriori = app(\App\Services\Recommendation\AprioriService::class);
+
+        $before = $apriori->suggestionsFor('destination', $eden->id, 5)
+            ->where('listing_kind', 'accommodation')->pluck('listing.name');
+        $this->assertContains('Closed Resort', $before, 'Sanity check: the rule must exist before archiving.');
+
+        $accommodation->archive();
+
+        $after = $apriori->suggestionsFor('destination', $eden->id, 5)
+            ->where('listing_kind', 'accommodation')->pluck('listing.name');
+        $this->assertNotContains('Closed Resort', $after,
+            'An archived establishment must never be suggested, no matter how strong its historical rule is.');
+    }
+
+    /**
+     * Equation 9 divides by every transaction containing A. topRules() tallied
+     * the antecedent below its "a lone visit makes no pairs" guard, so a
+     * tourist who visited one place and nothing else vanished from the
+     * denominator entirely -- and the busier a destination was, the more
+     * confidence the admin console credited it with. On the real survey data
+     * this overstated 18 of 78 rules, by as much as 15 points.
+     */
+    public function test_confidence_counts_transactions_where_the_antecedent_was_the_only_visit(): void
+    {
+        $this->seedDestinations();
+        $eden = Destination::where('slug', 'eden-nature-park')->sole();
+        $eagle = Destination::where('slug', 'philippine-eagle-center')->sole();
+
+        $visit = function (array $destinations) {
+            $survey = \App\Models\ExitSurvey::create(['submitted_at' => now()]);
+            foreach ($destinations as $destination) {
+                \App\Models\ExitSurveyVisit::create([
+                    'exit_survey_id' => $survey->id,
+                    'listing_kind' => 'destination',
+                    'listing_id' => $destination->id,
+                ]);
+            }
+        };
+
+        // Two tourists saw both places...
+        $visit([$eden, $eagle]);
+        $visit([$eden, $eagle]);
+        // ...and two saw Eden and nothing else.
+        $visit([$eden]);
+        $visit([$eden]);
+
+        $apriori = app(\App\Services\Recommendation\AprioriService::class);
+
+        $rule = $apriori->topRules()
+            ->first(fn (array $r) => $r['a_id'] === $eden->id && $r['b_id'] === $eagle->id);
+
+        $this->assertNotNull($rule, 'Sanity check: the Eden -> Eagle Center rule should be mined at all.');
+        $this->assertSame(0.5, $rule['confidence'],
+            'Eden appears in 4 transactions and shares 2 of them with the Eagle Center, so confidence is 2/4, not 2/2.');
+
+        // getAssociatedListings() has always used the full denominator, so the
+        // two methods must not report different confidence for one same rule.
+        $sibling = $apriori->getAssociatedListings('destination', $eden->id)
+            ->firstWhere('listing_id', $eagle->id);
+        $this->assertSame($rule['confidence'], $sibling['confidence'],
+            'The two Apriori entry points must agree about the same rule.');
+    }
+
+    /**
+     * Seeds a Beach Resort that every destination has a strong co-visitation
+     * rule with, plus an unremarkable Hotel that has none -- the shape of the
+     * real catalogue, where all three accommodations Apriori can suggest
+     * (Pearl Farm, Paradise Island, BlueJaz) are Beach Resorts.
+     *
+     * @return array{0: \App\Models\Accommodation, 1: \App\Models\Accommodation}
+     */
+    private function seedRivalAccommodations(): array
+    {
+        $region = Region::sole();
+
+        $resort = \App\Models\Accommodation::create([
+            'slug' => 'co-visited-resort', 'name' => 'Co-Visited Beach Resort', 'location' => 'Davao City',
+            'region_id' => $region->id, 'type' => 'Beach Resort', 'is_accredited' => true,
+            'rating' => 4.9, 'review_count' => 50, 'price_tier' => 'Mid-range',
+        ]);
+
+        $hotel = \App\Models\Accommodation::create([
+            'slug' => 'plain-city-hotel', 'name' => 'Plain City Hotel', 'location' => 'Davao City',
+            'region_id' => $region->id, 'type' => 'Hotel', 'is_accredited' => true,
+            'rating' => 4.0, 'review_count' => 5, 'price_tier' => 'Mid-range',
+        ]);
+
+        foreach (Destination::all() as $destination) {
+            foreach (range(1, 3) as $i) {
+                $survey = \App\Models\ExitSurvey::create(['submitted_at' => now()]);
+                \App\Models\ExitSurveyVisit::create([
+                    'exit_survey_id' => $survey->id,
+                    'listing_kind' => 'destination', 'listing_id' => $destination->id,
+                ]);
+                \App\Models\ExitSurveyVisit::create([
+                    'exit_survey_id' => $survey->id,
+                    'listing_kind' => 'accommodation', 'listing_id' => $resort->id,
+                ]);
+            }
+        }
+
+        return [$resort, $hotel];
+    }
+
+    /** @return \Illuminate\Support\Collection<int, string> names of every accommodation the plan booked */
+    private function bookedAccommodationNames(): \Illuminate\Support\Collection
+    {
+        $ids = \App\Models\ItineraryItem::whereNotNull('accommodation_id')
+            ->pluck('accommodation_id')->unique();
+
+        return \App\Models\Accommodation::whereIn('id', $ids)->pluck('name');
+    }
+
+    /**
+     * A stated accommodation type is a requirement, not a hint.
+     * pickAccommodation() only consulted it in the catalogue query at the
+     * bottom, which any destination carrying an Apriori co-visitation rule
+     * returned long before reaching -- so a traveller who asked for a Hotel
+     * was booked into Pearl Farm Beach Resort purely because Samal Island is
+     * popular with past tourists.
+     */
+    public function test_a_stated_accommodation_type_is_not_overruled_by_apriori(): void
+    {
+        $this->seedDestinations();
+        $this->seedRivalAccommodations();
+
+        $this->post('/plan', $this->surveyPayload(['accommodation_pref' => 'Hotel']));
+
+        $booked = $this->bookedAccommodationNames();
+
+        $this->assertNotEmpty($booked, 'Sanity check: the plan has to book somewhere to sleep.');
+        $this->assertContains('Plain City Hotel', $booked);
+        $this->assertNotContains('Co-Visited Beach Resort', $booked,
+            'A Beach Resort must not be booked for a traveller who asked for a Hotel, however strong its Apriori rule.');
+    }
+
+    /**
+     * The other half of the same rule: filtering by a stated type must not
+     * quietly disable Apriori for everyone else. With no type stated, the
+     * co-visitation pairing is still what picks the stay.
+     */
+    public function test_apriori_still_picks_the_stay_when_no_type_was_stated(): void
+    {
+        $this->seedDestinations();
+        $this->seedRivalAccommodations();
+
+        $this->post('/plan', $this->surveyPayload(['accommodation_pref' => 'Any']));
+
+        $this->assertContains('Co-Visited Beach Resort', $this->bookedAccommodationNames(),
+            'With no stated preference, the strongly co-visited resort should still win.');
     }
 
     /** The provenance panel reports the real size of each algorithm's input. */
@@ -750,6 +979,46 @@ class TripPlannerTest extends TestCase
         // ...and the same seed always gives the same answer, so a plan stays
         // reproducible and testable.
         $this->assertSame($first, $topThree(0));
+    }
+
+    /**
+     * The accommodation Apriori suggests had the same "always the same pick"
+     * problem destinations did, but no fix: suggestionsFor() always returns
+     * its results sorted by confidence, and pickAccommodation() always took
+     * ->first() -- so whichever accommodation had the single strongest
+     * historical pairing with a destination (e.g. BlueJaz Beach Resort at
+     * 59% confidence with Samal Island) won every time that destination
+     * appeared, no matter how many times the plan was regenerated. Real
+     * alternatives with real support never got a chance.
+     */
+    public function test_accommodation_choice_rotates_between_apriori_suggestions(): void
+    {
+        $ref = new \ReflectionClass(\App\Services\Recommendation\ItineraryGenerationService::class);
+        $method = $ref->getMethod('weightedPick');
+        $method->setAccessible(true);
+        $service = app(\App\Services\Recommendation\ItineraryGenerationService::class);
+
+        $suggestions = collect([
+            ['listing_id' => 1, 'listing' => 'BlueJaz Beach Resort', 'confidence' => 0.59, 'support' => 0.21, 'co_count' => 19],
+            ['listing_id' => 2, 'listing' => 'Pearl Farm Beach Resort', 'confidence' => 0.31, 'support' => 0.11, 'co_count' => 10],
+            ['listing_id' => 3, 'listing' => 'Paradise Island Park & Beach Resort', 'confidence' => 0.16, 'support' => 0.06, 'co_count' => 5],
+        ]);
+
+        $picks = [];
+        for ($variation = 0; $variation < 30; $variation++) {
+            $preference = new TouristPreference(['variation' => $variation]);
+            $picks[] = $method->invoke($service, $suggestions, $preference)['listing'];
+        }
+
+        $this->assertGreaterThan(1, count(array_unique($picks)),
+            'Across 30 different regeneration seeds, more than one accommodation must ever be chosen.');
+
+        // Same seed, same answer -- a plan stays reproducible.
+        $preference = new TouristPreference(['variation' => 7]);
+        $this->assertSame(
+            $method->invoke($service, $suggestions, $preference)['listing'],
+            $method->invoke($service, $suggestions, $preference)['listing']
+        );
     }
 
     /**
@@ -1020,6 +1289,61 @@ class TripPlannerTest extends TestCase
             'With only one destination anywhere near Mati City, the range had to widen.');
         $this->assertContains('Dahican-like Beach', $ranked->pluck('destination.name')->all(),
             'The one genuinely local destination must still be included once widened.');
+    }
+
+    /**
+     * candidatesWithinRange() has always computed whether it had to widen the
+     * search past what the traveller asked for, but nothing downstream ever
+     * read lastRangeTierUsed/lastRangeWidened -- so a traveller who picked
+     * "Within the City" for a baseline like Mati City (which doesn't have
+     * enough destinations inside 25km) got stops 60-70km away with no
+     * indication their preference had been loosened to build the plan.
+     */
+    public function test_the_page_discloses_when_the_range_was_widened(): void
+    {
+        $region = Region::create(['name' => 'Davao Oriental']);
+
+        Destination::create([
+            'slug' => 'dahican-like', 'name' => 'Dahican-like Beach', 'location' => 'Mati City',
+            'region_id' => $region->id, 'type' => 'Beach & Leisure', 'is_accredited' => true,
+            'rating' => 4.5, 'review_count' => 5, 'price_tier' => 'Mid-range',
+            'latitude' => 6.96, 'longitude' => 126.22,
+        ]);
+
+        foreach (range(1, 3) as $i) {
+            Destination::create([
+                'slug' => "davao-city-{$i}", 'name' => "Davao City Spot {$i}", 'location' => 'Davao City',
+                'region_id' => Region::create(['name' => "Davao City {$i}"])->id,
+                'type' => 'Nature & Leisure', 'is_accredited' => true,
+                'rating' => 4.0, 'review_count' => 4, 'price_tier' => 'Mid-range',
+                'latitude' => 7.07 + $i * 0.01, 'longitude' => 125.61 + $i * 0.01,
+            ]);
+        }
+
+        $this->post('/plan', $this->surveyPayload([
+            'travel_days' => 2,
+            'distance_pref' => 'near',
+            'origin_lat' => 6.9521657,
+            'origin_lng' => 126.2166758,
+            'origin_label' => 'Mati City, Davao Oriental, Philippines',
+        ]));
+
+        $html = $this->get('/plan/itinerary')->assertOk()->getContent();
+
+        $this->assertStringContainsString('widened', $html);
+        $this->assertStringContainsString('Within the City', $html);
+        $this->assertStringContainsString('Moderate distance', $html);
+    }
+
+    /** The disclosure must not appear when the requested range already held enough destinations. */
+    public function test_the_page_says_nothing_about_widening_when_it_did_not_happen(): void
+    {
+        $this->seedDestinations();
+        $this->post('/plan', $this->surveyPayload(['distance_pref' => 'far']));
+
+        $html = $this->get('/plan/itinerary')->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('automatically widened', $html);
     }
 
     /** Baseline is dynamic: the SAME rules apply from any Davao Region starting point, not just Davao City. */

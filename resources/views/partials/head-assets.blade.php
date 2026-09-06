@@ -22,6 +22,9 @@
     preload.
 --}}
 
+{{-- The same mark as <x-brand-mark />, standalone so the tab matches the page. --}}
+<link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Alfa+Slab+One&family=Caveat:wght@600;700&display=swap">

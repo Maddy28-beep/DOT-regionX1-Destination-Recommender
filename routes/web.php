@@ -42,6 +42,10 @@ Route::get('/check-in/{type}/{id}', [CheckInController::class, 'checkIn'])
     ->middleware('throttle:20,1')
     ->name('check-in');
 
+// Homepage hero search: routes the visitor to the catalogue that answers
+// "I want to...", carrying the rest of the bar across as filters.
+Route::get('/search', \App\Http\Controllers\SearchController::class)->name('search');
+
 // Public destination catalog (2.2.1.3, Figure 12)
 Route::get('/destinations', [DestinationController::class, 'index'])->name('destinations.index');
 Route::get('/destinations/{destination:slug}', [DestinationController::class, 'show'])->name('destinations.show');

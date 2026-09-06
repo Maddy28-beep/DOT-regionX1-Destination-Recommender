@@ -153,6 +153,9 @@ class TripPlannerController extends Controller
             'transactions' => ExitSurvey::count(),
             'rules_applied' => $itinerary->items()->whereNotNull('rule_basis')->count(),
             'origin' => $preference->origin_label ?: 'Davao City centre',
+            'range_requested' => $preference->distance_pref,
+            'range_tier_used' => $itinerary->range_tier_used,
+            'range_widened' => $itinerary->range_widened,
         ];
 
         return view('plan.itinerary', compact('itinerary', 'preference', 'provenance'));

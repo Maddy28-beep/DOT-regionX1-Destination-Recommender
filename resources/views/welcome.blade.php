@@ -36,39 +36,46 @@
         <p class="poster-hero__subhead">Sun-warmed islands, misty highlands, and the Philippine Eagle's home &mdash; discover DOT-accredited stays, tours, and eats across Region XI.</p>
     </div>
 
-    <form class="ticket-search container" action="{{ route('plan.edit') }}" method="GET">
+    {{--
+        Every option carries an explicit value. Without one a select submits
+        its own label, so "Duration" arrived as the string "1–2 days" -- en
+        dash and all -- and anything reading it had to parse display text back
+        into a number. The labels stay free to change without breaking the
+        search.
+    --}}
+    <form class="ticket-search container" action="{{ route('search') }}" method="GET">
         <div class="field">
             <label for="purpose">I want to&hellip;</label>
             <select id="purpose" name="purpose">
-                <option>Explore destinations</option>
-                <option>Book accommodations</option>
-                <option>Find tour packages</option>
-                <option>Try local restaurants</option>
+                <option value="destinations">Explore destinations</option>
+                <option value="accommodations">Book accommodations</option>
+                <option value="packages">Find tour packages</option>
+                <option value="restaurants">Try local restaurants</option>
             </select>
         </div>
         <div class="field">
             <label for="duration">Duration</label>
             <select id="duration" name="duration">
-                <option>1&ndash;2 days</option>
-                <option>3&ndash;4 days</option>
-                <option>5+ days</option>
+                <option value="1-2">1&ndash;2 days</option>
+                <option value="3-4">3&ndash;4 days</option>
+                <option value="5-plus">5+ days</option>
             </select>
         </div>
         <div class="field">
             <label for="budget">Budget</label>
             <select id="budget" name="budget">
-                <option>Budget-Friendly</option>
-                <option>Mid-range</option>
-                <option>Premium</option>
+                <option value="Budget-Friendly">Budget-Friendly</option>
+                <option value="Mid-range">Mid-range</option>
+                <option value="Premium">Premium</option>
             </select>
         </div>
         <div class="field">
             <label for="interest">Interest</label>
             <select id="interest" name="interest">
-                <option>Beach &amp; Island</option>
-                <option>Nature &amp; Adventure</option>
-                <option>Cultural Heritage</option>
-                <option>Wildlife</option>
+                <option value="Beach &amp; Island">Beach &amp; Island</option>
+                <option value="Nature &amp; Adventure">Nature &amp; Adventure</option>
+                <option value="Cultural Heritage">Cultural Heritage</option>
+                <option value="Wildlife">Wildlife</option>
             </select>
         </div>
         <button type="submit" class="btn btn-accent">Search &rarr;</button>
@@ -88,10 +95,16 @@
                 <div class="stat-num">{{ $stats['accommodations'] }}+</div>
                 <div class="stat-label">Accommodations</div>
             </div>
-            <div class="stat-item stat-item--rating">
-                <div class="stat-num">{{ $stats['avg_rating'] ?: '4.8' }}</div>
-                <div class="stat-label">Traveler Rating</div>
-            </div>
+            {{-- No fabricated placeholder here: this stood at a hard-coded
+                 "4.8" whenever nothing was rated yet, which is a review score
+                 no traveller ever gave. If there is nothing real to show, the
+                 stat simply stands down. --}}
+            @if ($stats['avg_rating'])
+                <div class="stat-item stat-item--rating">
+                    <div class="stat-num">{{ number_format($stats['avg_rating'], 1) }}</div>
+                    <div class="stat-label">Traveler Rating</div>
+                </div>
+            @endif
         </div>
     </div>
 </section>
