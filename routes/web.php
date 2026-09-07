@@ -42,6 +42,12 @@ Route::get('/check-in/{type}/{id}', [CheckInController::class, 'checkIn'])
     ->middleware('throttle:20,1')
     ->name('check-in');
 
+// Leaving a review, open only to a browser that checked in at the listing by
+// scanning its QR code. Throttled like the check-in it depends on.
+Route::post('/reviews/{type}/{id}', [\App\Http\Controllers\ReviewController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('reviews.store');
+
 // Homepage hero search: routes the visitor to the catalogue that answers
 // "I want to...", carrying the rest of the bar across as filters.
 Route::get('/search', \App\Http\Controllers\SearchController::class)->name('search');

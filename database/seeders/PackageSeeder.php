@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Package;
 use App\Models\Region;
-use App\Models\Review;
 use Illuminate\Database\Seeder;
 
 class PackageSeeder extends Seeder
@@ -75,13 +74,8 @@ class PackageSeeder extends Seeder
                 $package->inclusions()->create(['item' => $item]);
             }
 
-            Review::create([
-                'listing_kind' => 'package',
-                'listing_id' => $package->id,
-                'author_name' => 'Traveler',
-                'rating' => (int) round($p['rating']),
-                'comment' => 'Well-organized tour, guide was very knowledgeable.',
-            ]);
+            // See DestinationSeeder: invented reviews of real businesses are
+            // not seeded any more; real ones arrive via ReviewController.
         }
     }
 }

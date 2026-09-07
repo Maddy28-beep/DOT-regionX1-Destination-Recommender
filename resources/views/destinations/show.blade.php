@@ -137,6 +137,8 @@
                 @empty
                     <p style="color:var(--muted);">No reviews yet. Be the first to visit and share your experience.</p>
                 @endforelse
+
+                @include("partials.review-form", ["listing" => $destination, "type" => "destinations", "kind" => "destination"])
             </div>
         </div>
 

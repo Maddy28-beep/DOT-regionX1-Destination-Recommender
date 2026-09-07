@@ -12,15 +12,22 @@ class HomeController extends Controller
 {
     public function index(): View
     {
+        /*
+         * Weighted rather than raw: ordering on `rating` alone read the 17
+         * accredited listings imported without reviews as nought-star places
+         * and pinned them below all eight hand-written ones, so no genuinely
+         * DOT-accredited establishment could ever reach the landing page. See
+         * RanksByRating.
+         */
         $destinations = Destination::publiclyVisible()->with('region', 'tags', 'photos')
             ->orderByDesc('featured')
-            ->orderByDesc('rating')
+            ->orderByWeightedRating()
             ->take(8)
             ->get();
 
         $packages = Package::publiclyVisible()->with('region', 'photos')
             ->orderByDesc('featured')
-            ->orderByDesc('rating')
+            ->orderByWeightedRating()
             ->take(3)
             ->get();
 
