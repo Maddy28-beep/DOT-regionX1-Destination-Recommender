@@ -44,7 +44,10 @@ class DestinationController extends Controller
         }
 
         match ($request->string('sort')->toString()) {
-            'rating' => $query->orderByDesc('rating'),
+            // Weighted, so "no reviews yet" sorts as average rather than as
+            // nought stars -- see RanksByRating. Raw rating buried all 17
+            // accredited imports below every hand-written entry.
+            'rating' => $query->orderByWeightedRating(),
             'name' => $query->orderBy('name'),
             'nearest' => $query->orderBy('distance_km'),
             default => $query->orderByDesc('featured')->orderByDesc('rating'),
@@ -64,7 +67,7 @@ class DestinationController extends Controller
 
         $destination->load(['region', 'tags', 'photos', 'reviews' => fn ($q) => $q->latest()->take(10)]);
 
-        $nearby = Destination::publiclyVisible()->with('region', 'tags')
+        $nearby = Destination::publiclyVisible()->with('region', 'tags', 'photos')
             ->where('region_id', $destination->region_id)
             ->where('id', '!=', $destination->id)
             ->orderByDesc('rating')
@@ -77,7 +80,7 @@ class DestinationController extends Controller
         // all -- fall back to top-rated destinations elsewhere rather than
         // silently hiding the section for those.
         if ($nearby->isEmpty()) {
-            $nearby = Destination::publiclyVisible()->with('region', 'tags')
+            $nearby = Destination::publiclyVisible()->with('region', 'tags', 'photos')
                 ->where('id', '!=', $destination->id)
                 ->orderByDesc('rating')
                 ->take(3)

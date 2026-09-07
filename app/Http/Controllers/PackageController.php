@@ -69,7 +69,8 @@ class PackageController extends Controller
         }
 
         match ($request->string('sort')->toString()) {
-            'rating' => $query->orderByDesc('rating'),
+            // See RanksByRating / DestinationController::index().
+            'rating' => $query->orderByWeightedRating(),
             'price_low' => $query->orderBy('price_per_pax'),
             'price_high' => $query->orderByDesc('price_per_pax'),
             'name' => $query->orderBy('name'),

@@ -6,7 +6,6 @@ use App\Models\Accommodation;
 use App\Models\Destination;
 use App\Models\Region;
 use App\Models\Restaurant;
-use App\Models\Review;
 use App\Models\SouvenirCenter;
 use Illuminate\Database\Seeder;
 
@@ -118,13 +117,15 @@ class DestinationSeeder extends Seeder
                 $destination->tags()->create(['kind' => 'category', 'value' => $tag]);
             }
 
-            Review::create([
-                'listing_kind' => 'destination',
-                'listing_id' => $destination->id,
-                'author_name' => 'Traveler',
-                'rating' => (int) round($d['rating']),
-                'comment' => 'Wonderful spot, well worth the visit.',
-            ]);
+            /*
+             * No seeded review here any more. Every one of these was the same
+             * sentence -- "Wonderful spot, well worth the visit." by an author
+             * called "Traveler" -- attached to a real, named establishment, and
+             * they were the only rows the reviews table ever held. Travellers
+             * now leave real ones after checking in on site
+             * (ReviewController), so inventing them is both unnecessary and
+             * the kind of thing this platform should never publish.
+             */
         }
 
         $accommodations = [
