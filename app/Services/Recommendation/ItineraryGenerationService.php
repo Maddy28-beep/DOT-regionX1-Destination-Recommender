@@ -369,10 +369,15 @@ class ItineraryGenerationService
         }
 
         /*
-         * Prefer a stay we can actually place on the map, and place it near
-         * the trip rather than anywhere on it. The same accommodation is
-         * booked for every night of the trip, so "near" means the centroid
-         * of every stop's coordinates, not any single one of them.
+         * Prefer a stay we can actually place on the map, and place it to
+         * minimise the total distance back to it across the whole trip --
+         * not the distance to the average of the stops' coordinates. The
+         * two sound alike but are not the same thing: a single far-flung
+         * stop (a "willing to travel far" trip that includes Dahican Beach,
+         * ~68 km out on its own) drags a centroid out to a point that isn't
+         * actually near anything, and the accommodation nearest to *that*
+         * empty patch of map is not the one that minimises real travel. The
+         * sum of distances to every stop does not have this failure mode.
          *
          * Picking by rating alone here (every listing in this catalogue is
          * tied at 0.0, so in practice "first matching row") could -- and
@@ -380,14 +385,18 @@ class ItineraryGenerationService
          * actually are: a traveller sequenced onto the mainland for the
          * afternoon got booked back onto Samal Island for the night, adding
          * a return ferry crossing nothing about the plan called for. Rating
-         * still breaks ties among stays at similar distance; an unlocatable
-         * stay is still offered rather than none at all.
+         * still breaks ties among stays at similar total distance; an
+         * unlocatable stay is still offered rather than none at all.
          */
-        $centroid = $this->stopsCentroid($dayStops);
+        $mappedStops = $this->mappedStopCoordinates($dayStops);
 
-        $listing = $centroid
+        $listing = $mappedStops->isNotEmpty()
                 ? (clone $query)->whereNotNull('latitude')->whereNotNull('longitude')->get()
-                    ->sortBy(fn (Accommodation $a) => $this->haversineKm($centroid['lat'], $centroid['lng'], (float) $a->latitude, (float) $a->longitude))
+                    ->sortBy(function (Accommodation $a) use ($mappedStops) {
+                        return $mappedStops->sum(fn (array $stop) => $this->haversineKm(
+                            (float) $a->latitude, (float) $a->longitude, $stop['lat'], $stop['lng']
+                        ));
+                    })
                     ->first()
                 : null;
 
@@ -401,27 +410,23 @@ class ItineraryGenerationService
     }
 
     /**
-     * The average position of every stop that has coordinates, or null when
-     * none do -- the same "unknown means unknown, not the equator" rule
-     * applied everywhere else a centre point is needed.
+     * The coordinates of every stop that has them, or an empty collection
+     * when none do -- the same "unknown means unknown, not the equator"
+     * rule applied everywhere else a stop's position is needed.
      *
      * @param  array<int, array{row: array, distance_km: float|null}>  $dayStops
-     * @return array{lat: float, lng: float}|null
+     * @return \Illuminate\Support\Collection<int, array{lat: float, lng: float}>
      */
-    private function stopsCentroid(array $dayStops): ?array
+    private function mappedStopCoordinates(array $dayStops): \Illuminate\Support\Collection
     {
         $mapped = collect($dayStops)
             ->map(fn (array $stop) => $stop['row']['destination'])
             ->filter(fn ($destination) => $destination->latitude !== null && $destination->longitude !== null);
 
-        if ($mapped->isEmpty()) {
-            return null;
-        }
-
-        return [
-            'lat' => (float) $mapped->avg(fn ($destination) => (float) $destination->latitude),
-            'lng' => (float) $mapped->avg(fn ($destination) => (float) $destination->longitude),
-        ];
+        return $mapped->map(fn ($destination) => [
+            'lat' => (float) $destination->latitude,
+            'lng' => (float) $destination->longitude,
+        ]);
     }
 
     /**
