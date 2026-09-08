@@ -299,6 +299,11 @@ a { color: inherit; text-decoration: none; }
 .pill-toggle .count { opacity: .75; font-weight: 700; }
 
 .field-hint { font-size: .82rem; color: var(--muted); margin: 2px 0 10px; line-height: 1.5; }
+/* A hint is muted grey, so an unstyled link inside one is the same colour as
+   the prose around it and nothing but the cursor says it can be clicked --
+   colour alone is not a distinguishing feature at that point. Matches the
+   .auth-foot link treatment. */
+.field-hint a { color: var(--primary); font-weight: 600; }
 /* Apriori attribution under a schedule row */
 .sched-rule {
     display: block; margin-top: 3px;
@@ -508,6 +513,11 @@ a { color: inherit; text-decoration: none; }
    exit survey's checkboxes intentionally keep their plain browser look (see
    the chip-checkbox-grid comment above). */
 .consent-check { align-items: center; }
+/* Centring reads well against the one-line consent on Plan Your Trip, but the
+   partner form's label is four lines of legal text and the box ends up
+   floating beside the middle of a paragraph. Scoped to the auth card so the
+   shared component is unchanged. */
+.auth-card .consent-check { align-items: flex-start; }
 .consent-check input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
@@ -547,6 +557,13 @@ a { color: inherit; text-decoration: none; }
 }
 .privacy-note svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--muted); margin-top: 1px; }
 .privacy-note p { margin: 0; font-size: .84rem; color: var(--ink); line-height: 1.5; }
+/* Both of these components set their own prose colour, so a link inside one
+   inherits it and is left indistinguishable from the sentence around it --
+   colour is the only affordance these have, and there it carried no signal.
+   It matters most in the consent box, where the two links ARE the Terms and
+   the Privacy Policy a partner is being asked to agree to. */
+.privacy-note p a,
+.consent-check a { color: var(--primary); font-weight: 600; }
 
 /* Cream + gold dashed callout, per the itinerary-page mockup -- this is a
    standing fact about the whole page ("no traveler accounts") rather than a
@@ -779,6 +796,86 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     color: var(--stamp-red);
 }
 
+/*
+ * Hero footage, when any is supplied. Sits behind everything and only
+ * appears once app.js has attached a source, so a phone, a metered
+ * connection or a reduced-motion preference keeps the illustrated scene
+ * instead -- which stays the real fallback, not a placeholder.
+ */
+.poster-hero__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    opacity: 0;
+    /* No transition. The element is made visible before it has any data --
+       an empty <video> paints nothing, so the hero ground shows through --
+       and the footage simply appears the moment a frame decodes. Fading here
+       would animate an empty box and then jump. */
+    pointer-events: none;
+}
+.poster-hero.has-video .poster-hero__video { opacity: 1; }
+
+/*
+ * Footage is busier than the flat illustration, so the wordmark needs its own
+ * ground to stay readable.
+ *
+ * The weights are measured against the actual clip rather than guessed. The
+ * band the wordmark sits on swings from pale hazy sky to near-black forest
+ * across a single loop -- 2.2:1 to 15:1 against the cream text. This gradient
+ * used to thin to .15 at exactly the height the wordmark occupies, which was
+ * the worst possible place for it: the brightest frames left the title at
+ * 2.24:1, under the 3:1 WCAG asks for large text and nowhere near the 4.5:1
+ * the subhead beneath it needs.
+ *
+ * At these values the brightest frame measures 5.19:1, so both clear their
+ * thresholds with the footage still plainly visible through it. Swap the clip
+ * and these want re-measuring; a darker one can afford less.
+ */
+.poster-hero__video-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity .25s ease;
+    pointer-events: none;
+    background:
+        linear-gradient(to bottom, rgba(11, 40, 30, .50) 0%, rgba(11, 40, 30, .55) 45%, rgba(11, 40, 30, .68) 100%);
+}
+
+/*
+ * A second line of defence over the scrim. An averaged brightness reading can
+ * look fine while text still fights fine detail underneath it -- foliage,
+ * broken water, the ridgeline. The shadow only exists while footage is
+ * playing; the flat illustration never needed it.
+ */
+.poster-hero.has-video .poster-hero__kicker,
+.poster-hero.has-video .poster-hero__title,
+.poster-hero.has-video .poster-hero__subhead {
+    text-shadow: 0 2px 14px rgba(11, 40, 30, .55);
+}
+.poster-hero.has-video .poster-hero__video-scrim { opacity: 1; }
+
+/*
+ * The painted horizon and banca are the fallback, and they sit above the
+ * video in the stack -- so they have to be out of the way for footage to
+ * show at all.
+ *
+ * .has-footage is set server-side whenever a clip exists, which keeps them
+ * from being painted even once. Hiding them from script instead always
+ * flashed the illustration first, because an inline script is held until
+ * pending stylesheets apply and so cannot run before the first paint.
+ *
+ * The script restores them by removing .has-footage when it decides against
+ * the video (a phone, reduced motion, a metered connection, or a clip that
+ * fails), and the <noscript> block in the markup does the same where no
+ * script runs at all.
+ */
+.poster-hero.has-footage .poster-hero__horizon,
+.poster-hero.has-footage .poster-hero__banca { display: none; }
+
 .poster-hero {
     position: relative;
     overflow: hidden;
@@ -792,27 +889,56 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     justify-content: flex-start;
     text-align: center;
     color: var(--paper);
+    /*
+     * A dark ground, not the old sunset.
+     *
+     * This used to run coral -> gold -> red before reaching the teal, which
+     * put warm orange underneath everything. Once the hero carried footage
+     * that became a liability: the orange showed through the video's fade and
+     * filled the moment before the first frame decoded, so every refresh
+     * flashed a completely different colour scheme for ~130ms.
+     *
+     * Ending where the scrim begins means the painted hero, the loading gap
+     * and the footage are all the same family, and the swap between them
+     * stops being an event.
+     */
     background: linear-gradient(180deg,
-        var(--sunset-coral) 0%,
-        var(--sunset-gold) 28%,
-        var(--sunset-red) 46%,
-        var(--ocean-teal) 62%,
-        var(--ocean-teal-dark) 100%);
+        var(--ocean-teal) 0%,
+        var(--ocean-teal-dark) 55%,
+        rgb(11, 40, 30) 100%);
 }
 
-/* Sun disc + halo, high in the sky. */
-.poster-hero__sun {
-    position: absolute;
-    top: 14%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: clamp(150px, 19vw, 230px);
-    height: clamp(150px, 19vw, 230px);
-    border-radius: 50%;
-    background: radial-gradient(circle at 50% 50%, var(--sun-glow) 0%, var(--sunset-gold) 70%, var(--sunset-red) 100%);
-    box-shadow: 0 0 0 22px rgba(255, 224, 122, .16), 0 0 0 52px rgba(255, 224, 122, .09);
-    z-index: 1;
+/*
+ * With footage, the ground is the clip's own first frame (set inline on the
+ * section, since the URL is dynamic) rather than a colour.
+ *
+ * The video cannot paint until it has decoded, so whatever is behind it shows
+ * on every load. A colour there reads as the page displaying something else
+ * first -- which is what the sunset did, and then the teal after it. The
+ * first frame reads as the video not having started yet, because that is
+ * precisely what it is: the still and the first painted frame are the same
+ * image, so there is no visible moment of change at all.
+ */
+.poster-hero.has-footage {
+    /* Behind the still, in case it is the thing that fails to load. */
+    background-color: rgb(11, 40, 30);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
 }
+
+/*
+ * The scrim covers the still as well as the footage, not just the footage.
+ *
+ * The first frame here is a bright aerial: measured against the cream
+ * wordmark it is 1.73:1 unscrimmed, far under the 3:1 large text needs.
+ * Waiting for .has-video would have left the title illegible for exactly as
+ * long as the still was showing -- and the whole point of the still is that
+ * you cannot tell it from the video.
+ */
+.poster-hero.has-footage .poster-hero__video-scrim { opacity: 1; }
+
+/* Sun disc + halo, high in the sky. */
 
 /* Horizon: layered mountain ridge, Mt. Apo-inspired. */
 .poster-hero__horizon {
@@ -1177,8 +1303,14 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
    the card's much shorter art area. Scaled down proportionally instead of
    reusing the banner's absolute pixel values as-is. */
 .dpost-ribbon--sm {
-    top: 14px;
-    left: -30px;
+    /* A corner ribbon only fits the words it spans. The strip's centre line
+       cuts a chord across the corner whose length is ~2.03x its perpendicular
+       distance from that corner, and "Most Popular" measures 79px: at 14/-30
+       the chord was 77px, so the M and the R were shaved by about a pixel each
+       -- the "clipping" that looked like an overflow bug. Sitting the strip
+       ~45px out gives a 92px chord, six clear pixels past each end. */
+    top: 20px;
+    left: -25px;
     width: 118px;
     padding: 4px 0;
     font-size: .58rem;
@@ -1337,6 +1469,17 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     border-radius: 3px;
 }
 .dpost-badge-accredited svg { width: 13px; height: 13px; flex-shrink: 0; }
+/* The corner ribbon runs diagonally through the very corner the accreditation
+   pill sits in. Both were z-index 3, so the pill -- opaque cream, later in the
+   document -- painted straight over the middle of the strip and hid its text:
+   the ribbon read as "clipped" when nothing was clipping it. Raising either
+   above the other only swaps which one is unreadable, so step the pill clear of
+   the strip -- sideways along the top edge, the way the rating pill already
+   steps aside for the save heart. Dropping it below the diagonal instead would
+   push it a third of the way down the artwork, where it reads as a floating
+   label rather than a corner mark. 84px clears the strip's lower edge at the
+   pill's top-left corner, and still leaves ~50px before the rating pill. */
+.dpost-card__art.has-ribbon .dpost-badge-accredited { left: 84px; }
 .dpost-badge-rating {
     position: absolute;
     top: 10px; right: 10px;
@@ -1385,22 +1528,58 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 }
 /* Poppins has no peso glyph either, so the symbol gets the one face on the
    site that does. */
-.dpost-price .dpost-price__amount .currency { font-family: 'Barabara', 'Alfa Slab One', serif; font-size: .92em; }
+/* colour: inherit is load-bearing, not tidiness. `.dpost-price span` (0,1,1)
+   paints every span in this row the greyed-out meter colour, and it matches
+   this one too -- the rule below sets only the face and size, so the peso sign
+   on a real price rendered in the "unfilled band symbol" grey while its digits
+   were primary-dark. Beside three band symbols that passed unnoticed; alone in
+   front of "8,500 / night" it just looked disabled. Inheriting takes the
+   amount's own colour, whatever that becomes later. */
+.dpost-price .dpost-price__amount .currency { font-family: 'Barabara', 'Alfa Slab One', serif; font-size: .92em; color: inherit; }
 
-/* Featured Tour Packages — reuses .dpost-card/.dpost-badge-*/.dpost-tag from
-   Popular Destinations for a consistent poster language across both
-   homepage sections; only the package-specific footer is new here. */
-.pkg-card__body { padding: 14px 16px 16px; }
+/* Featured Tour Packages -- reuses .dpost-card, the .dpost-badge- classes and
+   .dpost-tag from Popular Destinations for a consistent poster language across
+   both homepage sections; only the package-specific footer is new here.
+
+   Do not write a bare `.dpost-badge-*` followed by a slash here: the `*` and
+   the `/` close the comment early, the prose that follows is then parsed as a
+   selector, and it swallows the rule underneath it. That is exactly what had
+   been happening -- .pkg-card__body was silently dropped, so every package
+   card rendered with no padding at all and its text, dashed rule and button
+   ran flush into the card edges while the destination cards were inset 16px. */
+.pkg-card__body {
+    padding: 14px 16px 16px;
+    /* The grid stretches every card to the tallest in the row, so the body has
+       to take that extra height rather than let it pool as dead space under
+       the card. This is the `flex: 1` .dpost-card__body already carries -- it
+       was missing here only because the rule above was being swallowed. */
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+/* A package with one row of tags is 29px shorter through the middle than one
+   with two, which floated its price and button that much higher than its
+   neighbours'. The slack is taken here instead, so the footers line up across
+   the row whatever the tags do. 24px keeps the gap above the dashed rule at
+   what the tags' 10px plus the footer's 14px used to give. */
+.pkg-card__body .dpost-tags { margin-bottom: 24px; }
+/*
+ * No frame around the duration and region -- it reads as a line of card copy,
+ * not a field.
+ *
+ * The padding goes with the border rather than staying behind it: it existed
+ * to hold the text off the dashed edge, so keeping it once the edge is gone
+ * would indent this line ~11px while the tag pills directly beneath it start
+ * flush. The margins below absorb what the padding and border contributed to
+ * the vertical rhythm, so the spacing above and below is unchanged.
+ */
 .pkg-itinerary {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    border: 1.5px dashed var(--border);
-    border-radius: 4px;
-    padding: 5px 10px;
     font-size: .76rem;
     color: var(--muted);
-    margin-bottom: 10px;
+    margin: 6px 0 16px;
 }
 .pkg-itinerary svg { width: 13px; height: 13px; flex-shrink: 0; color: var(--stamp-red); }
 .pkg-footer {
@@ -1408,11 +1587,10 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-top: 14px;
+    margin-top: auto;
     padding-top: 14px;
     border-top: 1.5px dashed var(--border);
 }
-.pkg-footer > div:first-child { margin-left: 10px; }
 .pkg-price__starting { font-size: .64rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 1px; }
 .pkg-price {
     display: flex;
@@ -1744,6 +1922,15 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 /* Marks a link that leaves the site, so "List your establishment" reads as
    handing off to the national DOT portal rather than opening a page here. */
 .ext-link { display: inline-flex; align-items: center; gap: 5px; }
+/* inline-flex makes the link an unbreakable inline-level box. Standing alone
+   in a nav that is what you want -- the label and its icon never split. Inside
+   a sentence it cannot wrap, so the line breaks before the whole link and any
+   punctuation after it orphans onto the next line ("...portal" then "." on its
+   own). In prose the link has to flow like the words around it. */
+.privacy-note p .ext-link,
+.field-hint .ext-link { display: inline; }
+.privacy-note p .ext-link svg,
+.field-hint .ext-link svg { display: inline-block; vertical-align: -2px; margin-left: 3px; }
 .ext-link svg { width: 12px; height: 12px; flex-shrink: 0; opacity: .7; }
 
 .footer-grid a { transition: color .15s ease; }
@@ -1789,7 +1976,68 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     padding: 32px 30px;
 }
 .auth-card.wide { max-width: 560px; }
+
+/* ---- Grouped form sections ----------------------------------------------
+   A long request form reads as one undifferentiated run of inputs, which is
+   where people lose their place. There was no existing section component to
+   reuse: the partner dashboard and Plan Your Trip both group with .panel, but
+   .panel is a white bordered card and these sections sit INSIDE one already,
+   so nesting them would draw a box inside an identical box.
+
+   Built from tokens the rest of the site already uses -- the dashed rule is
+   the same 1.5px dashed --border that separates the package card's footer,
+   and the label is the uppercase treatment from .pkg-price__starting. */
+.form-section + .form-section { margin-top: 22px; padding-top: 22px; border-top: 1.5px dashed var(--border); }
+.form-section__label {
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 14px;
+}
+
+/* ---- Password reveal -----------------------------------------------------
+   Confirming a password you cannot see is guesswork, and this form asks for
+   it twice. The button sits inside the field's border rather than beside it,
+   so the control keeps the same footprint as every other input on the page.
+   Padding-right on the input reserves the space so a long password scrolls
+   under the button instead of behind it. */
+.password-field { position: relative; }
+.password-field input { padding-right: 44px; }
+.password-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--muted);
+    border-radius: var(--field-radius);
+}
+.password-toggle:hover { color: var(--primary); }
+.password-toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.password-toggle svg { width: 18px; height: 18px; display: block; }
+/* Only one of the two icons is ever in the tree; swapping which is hidden is
+   cheaper and less fragile than re-rendering the SVG. */
+.password-toggle .icon-hide { display: none; }
+.password-toggle.is-revealed .icon-show { display: none; }
+.password-toggle.is-revealed .icon-hide { display: block; }
 .auth-card h1 { font-size: 1.4rem; margin: 0 0 4px; }
+/* The lockup from the site header, re-laid-out for a centred card: the header
+   sits it in a horizontal bar, here it stacks above the kicker. */
+.auth-brand { justify-content: center; margin-bottom: 18px; }
+/* A label and its companion action share the row, so "Forgot password?" sits
+   with the field it belongs to instead of below the input where it reads as a
+   note about whatever comes next. The label keeps its own bottom margin. */
+.field-label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.field-label-row__aside { font-size: .78rem; font-weight: 600; color: var(--primary); margin-bottom: 6px; }
 .auth-sub { color: var(--muted); font-size: .88rem; margin: 0 0 20px; }
 .auth-foot { margin-top: 22px; font-size: .86rem; color: var(--muted); text-align: center; }
 .auth-foot a { color: var(--primary); font-weight: 600; }
@@ -2836,3 +3084,132 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 
 .text-center { text-align: center; }
 .mt-0 { margin-top: 0; }
+
+/* ==========================================================================
+   Toast notifications
+   --------------------------------------------------------------------------
+   One component for every one-time confirmation on all three surfaces -- the
+   public site, the partner dashboard and the DOT Admin console. They share
+   app.css and app.js already, so this is defined once and reached by all
+   three; there is no per-surface copy to drift.
+
+   Deliberately transient. A toast is a DOM node plus a timeout and nothing
+   else: no database column, no session flag, no "dismissed_at". That is the
+   whole point -- the banner this replaces could be re-rendered by a reload
+   and appear stuck long after the action it described.
+
+   What stays a banner instead of becoming a toast: inline validation errors
+   (they must persist until fixed), standing disclaimers, and the partner's
+   accreditation-expired warning (it must keep showing until resolved).
+   ========================================================================== */
+.toast-stack {
+    position: fixed;
+    top: 84px;
+    right: 20px;
+    z-index: 1200;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    /* The stack spans the corner but must not swallow clicks on the page
+       underneath it; each toast re-enables pointer events for itself. */
+    pointer-events: none;
+    max-width: min(360px, calc(100vw - 40px));
+}
+.toast {
+    pointer-events: auto;
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: 14px 14px 16px;
+    overflow: hidden;
+    /*
+     * No `both` fill here, and the resting state is fully visible.
+     *
+     * `animation: toast-in .25s ease both` looks equivalent but fails closed in
+     * the wrong direction: backwards-fill applies the `from` frame -- opacity 0
+     * -- until the animation clock actually advances. Anywhere it does not (a
+     * throttled background tab, a compositor that never starts it), the toast
+     * sits invisible while its four-second timer runs down and the user simply
+     * never sees the confirmation.
+     *
+     * Animating from a visible baseline inverts that: if the animation runs the
+     * card slides in, and if it never runs the card is just there immediately,
+     * which is the reduced-motion behaviour anyway. The message is what matters;
+     * the motion is decoration.
+     */
+    opacity: 1;
+    animation: toast-in .25s ease;
+}
+.toast.is-leaving { animation: toast-out .18s ease both; }
+@keyframes toast-in {
+    from { opacity: 0; transform: translateX(24px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+@keyframes toast-out {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(24px); }
+}
+/* Tinted badge: soft ground, full-strength glyph.
+   Uses the --tone-* pairs the alerts and banners already use rather than a
+   one-off tint, so the toast reads as the same family as every other
+   success/error surface and follows if those tokens are ever retuned.
+   Still distinct from the admin tables' border-only status pills: those are
+   persistent row state and stay quiet, this carries a filled ground. */
+.toast__badge {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.toast__badge svg { width: 15px; height: 15px; }
+.toast--success .toast__badge { background: var(--tone-success-bg); color: var(--tone-success-ink); }
+.toast--error .toast__badge { background: var(--tone-danger-bg); color: var(--tone-danger-ink); }
+.toast__body { flex: 1; min-width: 0; }
+.toast__title { font-weight: 700; font-size: .88rem; color: var(--ink); line-height: 1.35; }
+.toast__sub { font-size: .8rem; color: var(--muted); line-height: 1.45; margin-top: 2px; }
+.toast__close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    padding: 2px;
+    margin: -2px -2px 0 0;
+    cursor: pointer;
+    color: var(--muted);
+    line-height: 1;
+    border-radius: 4px;
+}
+.toast__close:hover { color: var(--ink); }
+.toast__close:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.toast__close svg { width: 14px; height: 14px; display: block; }
+.toast__progress {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 100%;
+    transform-origin: left center;
+    animation: toast-drain linear both;
+}
+.toast--success .toast__progress { background: var(--primary); }
+.toast--error .toast__progress { background: var(--stamp-red); }
+@keyframes toast-drain {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+}
+@media (max-width: 560px) {
+    /* Full-width across the top on a phone: a 360px card pinned right leaves
+       the title cramped against the edge on a 375px screen. */
+    .toast-stack { top: 72px; left: 16px; right: 16px; max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    /* The drain bar is the only remaining cue for how long is left, so it
+       keeps animating -- it conveys information rather than decoration. */
+    .toast, .toast.is-leaving { animation: none; }
+}

@@ -53,9 +53,6 @@
 
         <main class="admin-main">
             <div class="container" style="padding-inline:0; max-width:100%;">
-                @if (session('status'))
-                    <div class="alert alert-success">{{ session('status') }}</div>
-                @endif
 
                 @yield('content')
             </div>
@@ -65,5 +62,6 @@
     {{-- Shared behaviours (bulk row selection). Everything in app.js is
          guarded by element lookups, so the public-site code is inert here. --}}
     <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
+    @include('partials.flash-toast')
 </body>
 </html>

@@ -38,7 +38,38 @@ class EstablishmentRegistrationFlowTest extends TestCase
             'password_confirmation' => 'a-real-password',
             'contact_person' => 'Maria Santos',
             'contact_number' => '09170000001',
+            'terms_accepted' => '1',
         ];
+    }
+
+    /**
+     * Consent to the Terms and Privacy Policy is a required, explicit act --
+     * this form takes account credentials and business records, so agreement
+     * cannot be inferred from the fact that someone pressed Submit.
+     *
+     * The checkbox carries HTML `required`, but an unchecked box is simply not
+     * posted at all, so only a server-side rule actually stops it. Passing the
+     * whole application minus that one key is exactly what a browser sends
+     * when the box is left unticked.
+     */
+    public function test_an_application_without_consent_is_refused(): void
+    {
+        $payload = $this->application();
+        unset($payload['terms_accepted']);
+
+        $this->post('/portal/register', $payload)
+            ->assertSessionHasErrors('terms_accepted');
+
+        $this->assertDatabaseCount('establishment_accounts', 0);
+    }
+
+    /** An explicitly unticked box is refused the same way a missing one is. */
+    public function test_consent_must_be_ticked_not_merely_present(): void
+    {
+        $this->post('/portal/register', $this->application(['terms_accepted' => '0']))
+            ->assertSessionHasErrors('terms_accepted');
+
+        $this->assertDatabaseCount('establishment_accounts', 0);
     }
 
     private function admin(): AdminUser

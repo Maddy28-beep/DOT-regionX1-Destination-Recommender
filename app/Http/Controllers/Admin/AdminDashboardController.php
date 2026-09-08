@@ -21,6 +21,7 @@ use App\Services\Recommendation\AprioriService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use App\Support\Toast;
 
 class AdminDashboardController extends Controller
 {
@@ -93,7 +94,7 @@ class AdminDashboardController extends Controller
             'review_note' => 'Approved via DOT Admin portal.',
         ]);
 
-        return back()->with('status', "{$establishment->business_name} has been approved.");
+        return back()->with(Toast::success('Establishment approved', "{$establishment->business_name} is now able to sign in."));
     }
 
     public function rejectEstablishment(Request $request, EstablishmentAccount $establishment)
@@ -105,7 +106,7 @@ class AdminDashboardController extends Controller
             'review_note' => 'Rejected via DOT Admin portal.',
         ]);
 
-        return back()->with('status', "{$establishment->business_name} has been rejected.");
+        return back()->with(Toast::success('Establishment rejected', "{$establishment->business_name} has been notified."));
     }
 
     /**
@@ -124,11 +125,11 @@ class AdminDashboardController extends Controller
 
         $establishment->update(['matched_listing_id' => $data['matched_listing_id'] ?? null]);
 
-        $message = $data['matched_listing_id']
-            ? "{$establishment->business_name} has been linked to its listing."
-            : "{$establishment->business_name}'s listing link has been cleared.";
+        $toast = $data['matched_listing_id']
+            ? Toast::success('Listing linked', "{$establishment->business_name} is now matched to its catalog listing.")
+            : Toast::success('Listing link cleared', "{$establishment->business_name} is no longer matched to a listing.");
 
-        return back()->with('status', $message);
+        return back()->with($toast);
     }
 
     public function accreditation(Request $request): View
@@ -158,7 +159,7 @@ class AdminDashboardController extends Controller
 
         $this->applyRenewal($accreditation, $data['expiration_date']);
 
-        return back()->with('status', "Accreditation {$accreditation->accreditation_number} renewed through {$accreditation->expiration_date->format('M d, Y')}.");
+        return back()->with(Toast::success('Accreditation renewed', "{$accreditation->accreditation_number} is valid through {$accreditation->expiration_date->format('M d, Y')}."));
     }
 
     /**
@@ -213,8 +214,12 @@ class AdminDashboardController extends Controller
 
         $n = $records->count();
 
-        return back()->with('status', "{$n} accreditation record".($n === 1 ? '' : 's')
-            ." renewed through ".\Illuminate\Support\Carbon::parse($data['expiration_date'])->format('M d, Y').'.');
+        $through = \Illuminate\Support\Carbon::parse($data['expiration_date'])->format('M d, Y');
+
+        return back()->with(Toast::success(
+            'Accreditations renewed',
+            "{$n} record".($n === 1 ? '' : 's')." now valid through {$through}."
+        ));
     }
 
     public function exitSurveys(): View

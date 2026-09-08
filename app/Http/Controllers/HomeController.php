@@ -10,6 +10,40 @@ use Illuminate\View\View;
 
 class HomeController extends Controller
 {
+    /**
+     * Footage for the hero, when any has been supplied.
+     *
+     * Drop a file at public/video/hero.mp4 (optionally hero.webm alongside it)
+     * and the landing page starts using it. Nothing is committed to the
+     * repository: video belongs in storage or a CDN, not in git, and the
+     * illustrated hero remains the fallback so the page is complete without it.
+     *
+     * hero-poster.jpg is the clip's own first frame, used as the hero's
+     * background rather than as a <video poster>. The video cannot paint until
+     * it has decoded, and whatever sits behind it in the meantime is visible
+     * on every load -- a colour there reads as the page showing something
+     * else first. The first frame reads as the video simply not having
+     * started yet, because that is exactly what it is.
+     *
+     * It must be genuine Davao Region footage that DOT or the project owns.
+     * Stock coastline standing in for the region on a government tourism site
+     * is the same misrepresentation as a stock photo on a named listing.
+     *
+     * @return array{mp4: string, webm: ?string, poster: ?string}|null
+     */
+    private function heroVideo(): ?array
+    {
+        if (! file_exists(public_path('video/hero.mp4'))) {
+            return null;
+        }
+
+        return [
+            'mp4' => asset('video/hero.mp4'),
+            'webm' => file_exists(public_path('video/hero.webm')) ? asset('video/hero.webm') : null,
+            'poster' => file_exists(public_path('video/hero-poster.jpg')) ? asset('video/hero-poster.jpg') : null,
+        ];
+    }
+
     public function index(): View
     {
         /*
@@ -51,6 +85,8 @@ class HomeController extends Controller
         // area's listings instead of being decorative text.
         $regions = Region::orderBy('name')->get();
 
-        return view('welcome', compact('destinations', 'packages', 'stats', 'regions'));
+        $heroVideo = $this->heroVideo();
+
+        return view('welcome', compact('destinations', 'packages', 'stats', 'regions', 'heroVideo'));
     }
 }

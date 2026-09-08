@@ -14,6 +14,7 @@ use App\Models\TouristVisit;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use App\Support\Toast;
 
 /**
  * Lets a traveller rate a place they actually went to.
@@ -85,7 +86,7 @@ class ReviewController extends Controller
 
         self::refreshRating($listing, $config['kind']);
 
-        return $back->with('status', 'Thank you — your review is now on '.$listing->name.'.');
+        return $back->with(Toast::success('Review posted', 'Thank you — it is now live on '.$listing->name.'.'));
     }
 
     /** Has this browser scanned the QR code at this listing? */

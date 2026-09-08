@@ -128,7 +128,10 @@ class QrCheckInFlowTest extends TestCase
         }
 
         $this->assertSame(1, TouristVisit::count());
-        $this->assertStringContainsString('already checked in', session('status'));
+        // The flash is two parts now -- a short title and a detail line -- so
+        // assert the title, which is the part that states what happened.
+        $this->assertSame('Already checked in', session('status'));
+        $this->assertStringContainsString('earlier today', session('status_detail'));
     }
 
     /** Two different phones at the same place on the same day are two visits. */

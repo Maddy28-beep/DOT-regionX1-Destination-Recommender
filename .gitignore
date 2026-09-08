@@ -29,3 +29,7 @@ Thumbs.db
 # Regenerate with: php artisan migrate --seed
 /database/*.sqlite
 /database/*.sqlite-journal
+
+# Hero footage lives in storage or a CDN, not in git history.
+/public/video/*
+!/public/video/README.md

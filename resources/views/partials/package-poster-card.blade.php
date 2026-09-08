@@ -1,7 +1,7 @@
 @props(['package', 'scene', 'mostPopular' => false])
 
 <a href="{{ route('packages.show', $package) }}" class="dpost-card pkg-card">
-    <div class="dpost-card__art">
+    <div class="dpost-card__art{{ $mostPopular ? ' has-ribbon' : '' }}">
         @include('partials.poster-illustration', ['scene' => $scene])
         <div class="halftone"></div>
         <div class="dpost-card__scrim"></div>

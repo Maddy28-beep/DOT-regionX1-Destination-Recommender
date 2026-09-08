@@ -22,31 +22,31 @@ class PackageSeeder extends Seeder
             [
                 'name' => 'Samal Island Hopping Day Tour', 'region' => $samal, 'type' => 'Beach & Island',
                 'duration_label' => '1 Day', 'duration_days' => 1, 'price_per_pax' => 1500,
-                'price_tier' => 'Mid-range', 'provider_name' => 'Davao Island Explorers', 'rating' => 4.6, 'review_count' => 52,
+                'price_tier' => 'Mid-range', 'provider_name' => 'Davao Island Explorers',
                 'inclusions' => ['Roundtrip ferry transfers', 'Island hopping boat', 'Lunch buffet', 'Snorkeling gear', 'Tour guide'],
             ],
             [
                 'name' => 'Eden Nature Park Day Adventure', 'region' => $davaoCity, 'type' => 'Nature & Adventure',
                 'duration_label' => '1 Day', 'duration_days' => 1, 'price_per_pax' => 1200,
-                'price_tier' => 'Mid-range', 'provider_name' => 'Highland Trails Davao', 'rating' => 4.5, 'review_count' => 38,
+                'price_tier' => 'Mid-range', 'provider_name' => 'Highland Trails Davao',
                 'inclusions' => ['Entrance fee', 'Zipline session', 'Buffet lunch', 'Cable car ride'],
             ],
             [
                 'name' => 'Mount Apo 3-Day Summit Trek', 'region' => $davaoDelSur, 'type' => 'Adventure & Hiking',
                 'duration_label' => '3 Days, 2 Nights', 'duration_days' => 3, 'price_per_pax' => 6500,
-                'price_tier' => 'Premium', 'provider_name' => 'Apo Summit Guides', 'rating' => 4.9, 'review_count' => 21,
+                'price_tier' => 'Premium', 'provider_name' => 'Apo Summit Guides',
                 'inclusions' => ['Registered mountain guide', 'Porter service', 'Camping gear', 'Meals for 3 days', 'Environmental fees'],
             ],
             [
                 'name' => 'Davao City Cultural Heritage Tour', 'region' => $davaoCity, 'type' => 'Cultural Heritage',
                 'duration_label' => 'Half Day', 'duration_days' => 1, 'price_per_pax' => 800,
-                'price_tier' => 'Budget-Friendly', 'provider_name' => 'Davao Heritage Walks', 'rating' => 4.3, 'review_count' => 29,
+                'price_tier' => 'Budget-Friendly', 'provider_name' => 'Davao Heritage Walks',
                 'inclusions' => ["People's Park visit", 'Museum entrance', 'Local guide', 'Air-conditioned van transfers'],
             ],
             [
                 'name' => 'Dahican Beach Surf & Chill Package', 'region' => $davaoOriental, 'type' => 'Beach & Surfing',
                 'duration_label' => '2 Days, 1 Night', 'duration_days' => 2, 'price_per_pax' => 3200,
-                'price_tier' => 'Mid-range', 'provider_name' => 'Mati Surf Co.', 'rating' => 4.7, 'review_count' => 17,
+                'price_tier' => 'Mid-range', 'provider_name' => 'Mati Surf Co.',
                 'inclusions' => ['Overnight accommodation', 'Surfboard rental', '2 surf lessons', 'Breakfast'],
             ],
         ];
@@ -62,10 +62,16 @@ class PackageSeeder extends Seeder
                 'duration_days' => $p['duration_days'],
                 'description' => "{$p['name']} is a curated tour package covering DOT-accredited stops in {$p['region']?->name}.",
                 'is_accredited' => true,
+                /*
+                 * Ratings are not seeded. These columns are recomputed from
+                 * real Review rows by ReviewController::refreshRating(), so a
+                 * seeded figure is a claim about what travellers said that no
+                 * traveller made -- and it appeared verbatim on the public
+                 * cards, the catalogue sort and the partner's own dashboard.
+                 * A listing with no reviews reads as "New", which is true.
+                 */
                 'price_per_pax' => $p['price_per_pax'],
                 'price_tier' => $p['price_tier'],
-                'rating' => $p['rating'],
-                'review_count' => $p['review_count'],
                 'provider_name' => $p['provider_name'],
                 'featured' => true,
             ]);

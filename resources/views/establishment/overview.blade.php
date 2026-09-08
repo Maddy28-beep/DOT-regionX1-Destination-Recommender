@@ -31,7 +31,15 @@
         <div class="stat-card-label">Establishment Type</div>
     </div>
     <div class="stat-card">
-        <div class="stat-card-val">{{ $listing?->rating ? number_format($listing->rating, 1).' ★' : '—' }}</div>
+        {{--
+            Guard on review_count, not on rating. `rating` is cast to decimal:2,
+            so an unrated listing hands the view the STRING "0.0" -- and every
+            string but "0" is truthy in PHP, so the em-dash branch could never
+            run and the dashboard greeted an unreviewed partner with "0.0 ★".
+            review_count is a plain integer and says the thing that actually
+            matters: whether anybody has rated this at all.
+        --}}
+        <div class="stat-card-val">{{ ($listing?->review_count ?? 0) > 0 ? number_format($listing->rating, 1).' ★' : '—' }}</div>
         <div class="stat-card-label">Current Rating</div>
     </div>
     <div class="stat-card">
