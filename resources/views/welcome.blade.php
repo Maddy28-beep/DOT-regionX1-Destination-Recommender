@@ -536,57 +536,18 @@
 
             <figure class="about-map">
                 {{--
-                    Hand-drawn locator, not a map embed: seven interlocking pieces in
-                    stepped shades of the leaf/ocean palette, seamed in cream so the
-                    region reads as a set of parts rather than one silhouette. Shapes
-                    are deliberately stylised -- close enough to be recognisable,
-                    simple enough to stay legible at card size.
+                    Was a hand-drawn SVG locator. Replaced with a real map because the
+                    illustration could not be checked against anything, and the
+                    published maps considered as an alternative each carried a
+                    licensing question -- one of them still labelled the province
+                    Compostela Valley, seven years after it became Davao de Oro.
+                    This one reads its names and counts from the regions table, so it
+                    cannot drift from the catalogue.
                 --}}
-                <svg class="about-map__svg" viewBox="0 0 400 480" xmlns="http://www.w3.org/2000/svg" role="img"
-                     aria-label="Stylised map of Davao Region showing its seven provinces and cities, with Mount Apo marked">
-                    <g class="about-map__pieces" stroke="#FFF7E9" stroke-width="2.5" stroke-linejoin="round">
-                        <path fill="#12836F" d="M62,92 L188,66 L214,128 L190,198 L92,208 L52,150 Z"/>
-                        <path fill="#2f9e8f" d="M188,66 L300,58 L322,124 L288,186 L190,198 L214,128 Z"/>
-                        <path fill="#0B5E52" d="M300,58 L362,80 L370,196 L326,292 L276,262 L288,186 L322,124 Z"/>
-                        <path fill="#0b6b4f" d="M92,208 L190,198 L288,186 L276,262 L232,302 L140,298 L100,262 Z"/>
-                        <path fill="#1E5C43" d="M100,262 L140,298 L204,344 L210,410 L152,418 L104,356 Z"/>
-                        <path fill="#084d39" d="M104,356 L152,418 L142,458 L76,442 L60,380 Z"/>
-                    </g>
-
-                    {{-- Davao Gulf, drawn after the land so the coastline reads as a bite out of it --}}
-                    <path fill="#7fd4d8" opacity=".55" stroke="#FFF7E9" stroke-width="2.5" stroke-linejoin="round"
-                          d="M232,302 L276,262 L300,352 L266,438 L210,410 L204,344 Z"/>
-                    {{-- Sized to carry its own label rather than to scale: at true relative
-                         size the island is too small for "IGACOS" to sit on it. --}}
-                    <path fill="#BFE3E0" stroke="#FFF7E9" stroke-width="2.5" stroke-linejoin="round"
-                          d="M234,330 L266,338 L278,364 L262,392 L232,386 L222,356 Z"/>
-
-                    {{-- Mount Apo: the Davao City / Davao del Sur seam, where the real summit sits --}}
-                    <g class="about-map__peak">
-                        <path d="M126,258 L138,280 L114,280 Z" fill="#FFF7E9" stroke="#1a2420" stroke-width="1.3" stroke-linejoin="round"/>
-                        <path d="M126,258 L131,267 L121,267 Z" fill="#e1e8e4"/>
-                    </g>
-                    <text class="about-map__peaklabel" x="126" y="294" text-anchor="middle">Mt. Apo</text>
-
-                    <g class="about-map__labels" text-anchor="middle">
-                        <text x="128" y="136">Davao<tspan x="128" dy="12">del Norte</tspan></text>
-                        <text x="252" y="120">Davao<tspan x="252" dy="12">de Oro</tspan></text>
-                        <text x="322" y="176">Davao<tspan x="322" dy="12">Oriental</tspan></text>
-                        <text x="196" y="240">Davao City</text>
-                        <text x="150" y="356">Davao<tspan x="150" dy="12">del Sur</tspan></text>
-                        <text x="104" y="404">Davao<tspan x="104" dy="12">Occidental</tspan></text>
-                        <text class="about-map__label--dark" x="250" y="366">IGACOS</text>
-                    </g>
-
-                    <g class="about-map__compass" transform="translate(50,46)">
-                        <circle r="20" fill="none" style="stroke:var(--ocean-teal-dark)" stroke-width="1.5" opacity=".55"/>
-                        <path d="M0,-15 L4.5,-3 L0,0 L-4.5,-3 Z" style="fill:var(--stamp-red)"/>
-                        <path d="M0,15 L4.5,3 L0,0 L-4.5,3 Z" style="fill:var(--ocean-teal-dark)" opacity=".65"/>
-                        <text class="about-map__compass-n" y="-24" text-anchor="middle">N</text>
-                    </g>
-                </svg>
-
-                <figcaption class="about-map__caption poster-kicker">Davao Region at a glance</figcaption>
+                @include('partials.region-map', ['regions' => $regionMap])
+                <figcaption class="about-map__caption poster-kicker">
+                    Accredited listings by province &mdash; tap a circle to browse
+                </figcaption>
             </figure>
         </div>
 
