@@ -40,10 +40,6 @@
 
     <div class="dash-body">
         <div class="container">
-            @if (session('status'))
-                <div class="alert alert-success">{{ session('status') }}</div>
-            @endif
-
             {{-- Set expectations honestly: there is no account to keep this
                  in, by design. What a visitor CAN keep is the shortlist, so
                  that is what the note points at. Cream + dashed gold rather

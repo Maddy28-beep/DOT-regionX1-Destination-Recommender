@@ -74,7 +74,7 @@
                                 <span class="cell-muted">—</span>
                             @endif
                         </td>
-                        <td class="cell-muted">{{ $listing->rating ? number_format($listing->rating, 1).' ★' : '—' }}</td>
+                        <td class="cell-muted">{{-- decimal:2 cast means an unrated listing yields the truthy string "0.0"; review_count is the honest test. --}}{{ $listing->review_count > 0 ? number_format($listing->rating, 1).' ★' : '—' }}</td>
                         <td>
                             @if ($listing->archived_at)
                                 <span class="status-pill status-expired">Archived</span>

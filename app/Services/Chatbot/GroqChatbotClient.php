@@ -37,7 +37,23 @@ class GroqChatbotClient
                     ['role' => 'user', 'content' => $userMessage],
                 ],
                 'temperature' => 0.4,
-                'max_tokens' => 300,
+                /*
+                 * Room for the answer AND the thinking.
+                 *
+                 * The models this key can reach are reasoning models: they
+                 * spend completion tokens on internal chain-of-thought before
+                 * writing a word the visitor sees, and that reasoning is
+                 * billed against max_tokens. At the previous cap of 300 the
+                 * model used 298 of them thinking, returned finish_reason
+                 * "length" with empty content, and every question fell back to
+                 * the rule-based responder -- so the chatbot looked like it
+                 * worked while never actually being answered by the model.
+                 */
+                'max_tokens' => 1024,
+                // Keeps the thinking short, which both leaves more of the
+                // budget for the reply and cuts latency (~1.3s vs ~1.7s) --
+                // it has to stay under the 8s timeout above.
+                'reasoning_effort' => 'low',
             ]);
 
         if ($response->failed()) {
@@ -46,7 +62,18 @@ class GroqChatbotClient
 
         $text = $response->json('choices.0.message.content');
         if (blank($text)) {
-            throw new RuntimeException('Groq API returned an empty response.');
+            /*
+             * Say why. The caller catches this and quietly falls back, so
+             * without the reason in the log an empty reply is indistinguishable
+             * from a healthy rule-based one -- which is exactly how the
+             * max_tokens problem above went unnoticed.
+             */
+            throw new RuntimeException(sprintf(
+                'Groq returned no content (finish_reason: %s, reasoning tokens: %s, model: %s).',
+                $response->json('choices.0.finish_reason') ?? 'unknown',
+                $response->json('usage.completion_tokens_details.reasoning_tokens') ?? 'n/a',
+                $response->json('model') ?? config('services.groq.model'),
+            ));
         }
 
         return trim($text);

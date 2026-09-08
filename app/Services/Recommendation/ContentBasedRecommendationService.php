@@ -195,7 +195,7 @@ class ContentBasedRecommendationService
      * outside Davao Region to begin with, so no cap already means exactly
      * what was asked for -- the whole region, nothing more.
      */
-    private const RANGE_RADIUS_KM = [
+    public const RANGE_RADIUS_KM = [
         'near' => 25.0,
         'moderate' => 75.0,
         'far' => null,

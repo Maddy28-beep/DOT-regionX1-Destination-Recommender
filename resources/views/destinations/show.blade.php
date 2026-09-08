@@ -16,10 +16,6 @@
         {{ $destination->name }}
     </nav>
 
-    @if (session('status'))
-        <div class="alert alert-success">{{ session('status') }}</div>
-    @endif
-
     {{--
         Always the illustrated poster hero here, matching Popular Destinations
         and Featured Packages -- not conditional on whether photos exist.

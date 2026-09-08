@@ -13,6 +13,7 @@ use App\Models\TouristVisit;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use App\Support\Toast;
 
 /**
  * QR-code check-in: scanning the code displayed at an establishment (see
@@ -86,10 +87,10 @@ class CheckInController extends Controller
             }
         }
 
-        $status = $visit->wasRecentlyCreated
-            ? "You're checked in at {$listing->name}! Thanks for visiting."
-            : "You already checked in at {$listing->name} today.";
+        $toast = $visit->wasRecentlyCreated
+            ? Toast::success('Checked in', "Thanks for visiting {$listing->name}!")
+            : Toast::success('Already checked in', "You checked in at {$listing->name} earlier today.");
 
-        return redirect()->route($config['route'], $listing)->with('status', $status);
+        return redirect()->route($config['route'], $listing)->with($toast);
     }
 }

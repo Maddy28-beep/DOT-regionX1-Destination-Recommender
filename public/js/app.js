@@ -1,6 +1,129 @@
 // ExploreDVO — card photo carousels + detail-page gallery lightbox.
 // Vanilla JS, no dependencies.
 
+/* ---------------------------------------------------------------------------
+ * Toast notifications -- the single implementation for all three surfaces.
+ *
+ * app.js is loaded by layouts/app, layouts/admin and layouts/establishment
+ * alike, so defining showToast here puts it on the public site, the partner
+ * dashboard and the DOT Admin console at once. Do not copy this into a
+ * surface-specific script; call window.showToast instead.
+ *
+ * Declared OUTSIDE the DOMContentLoaded handler below so the function object
+ * exists the moment this file executes. Inline scripts in the page body run
+ * during parsing, before any deferred script -- so a page that fires a toast
+ * inline cannot call it directly. Those queue on window.__toastQueue and are
+ * drained once the DOM is ready (see the drain at the end of this file).
+ *
+ * State lives entirely in this closure: a node and a setTimeout. Nothing is
+ * persisted anywhere, which is precisely why a reload cannot resurrect one.
+ * ------------------------------------------------------------------------- */
+(function () {
+    var DURATION_MS = 4000;
+    var ICONS = {
+        success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 12.5 9.5 18 20 6.5"/></svg>',
+        error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5" stroke-width="2"/><line x1="12" y1="7" x2="12" y2="13"/><line x1="12" y1="16.8" x2="12" y2="16.9"/></svg>'
+    };
+
+    function stack() {
+        var el = document.querySelector('.toast-stack');
+        if (!el) {
+            el = document.createElement('div');
+            el.className = 'toast-stack';
+            /*
+             * "polite", not "assertive": these confirm something the user just
+             * did. Assertive interrupts whatever a screen reader is currently
+             * saying, which for a success message is rude rather than helpful.
+             */
+            el.setAttribute('aria-live', 'polite');
+            el.setAttribute('aria-atomic', 'false');
+            document.body.appendChild(el);
+        }
+        return el;
+    }
+
+    window.showToast = function (type, title, subtitle) {
+        if (!title) return null;
+        var kind = type === 'error' ? 'error' : 'success';
+
+        var toast = document.createElement('div');
+        toast.className = 'toast toast--' + kind;
+        // role=status pairs with the container's aria-live so the whole card is
+        // announced as one unit rather than word by word as it is assembled.
+        toast.setAttribute('role', 'status');
+
+        var badge = document.createElement('div');
+        badge.className = 'toast__badge';
+        badge.innerHTML = ICONS[kind];
+
+        var body = document.createElement('div');
+        body.className = 'toast__body';
+
+        var heading = document.createElement('div');
+        heading.className = 'toast__title';
+        // textContent, never innerHTML: these strings carry listing and
+        // business names that came from user input.
+        heading.textContent = title;
+        body.appendChild(heading);
+
+        if (subtitle) {
+            var sub = document.createElement('div');
+            sub.className = 'toast__sub';
+            sub.textContent = subtitle;
+            body.appendChild(sub);
+        }
+
+        var close = document.createElement('button');
+        close.type = 'button';
+        close.className = 'toast__close';
+        close.setAttribute('aria-label', 'Dismiss notification');
+        close.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>';
+
+        var progress = document.createElement('div');
+        progress.className = 'toast__progress';
+        progress.style.animationDuration = DURATION_MS + 'ms';
+
+        toast.appendChild(badge);
+        toast.appendChild(body);
+        toast.appendChild(close);
+        toast.appendChild(progress);
+        stack().appendChild(toast);
+
+        var timer = setTimeout(dismiss, DURATION_MS);
+        var gone = false;
+
+        function dismiss() {
+            if (gone) return;
+            gone = true;
+            // Clearing matters on the click path: without it the timeout still
+            // fires later and would remove whichever toast had since taken
+            // this one's place in the stack.
+            clearTimeout(timer);
+            toast.classList.add('is-leaving');
+            var drop = function () { if (toast.parentNode) toast.parentNode.removeChild(toast); };
+            toast.addEventListener('animationend', drop, { once: true });
+            // animationend never fires under prefers-reduced-motion, where the
+            // animation is set to none, so the node would linger forever.
+            setTimeout(drop, 400);
+        }
+
+        close.addEventListener('click', dismiss);
+        return toast;
+    };
+
+    // Anything queued by an inline script before this file ran.
+    window.__toastQueue = window.__toastQueue || [];
+    document.addEventListener('DOMContentLoaded', function () {
+        var queued = window.__toastQueue.splice(0);
+        queued.forEach(function (args) { window.showToast.apply(null, args); });
+        // Later pushes go straight through rather than sitting in the array.
+        window.__toastQueue.push = function () {
+            for (var i = 0; i < arguments.length; i++) window.showToast.apply(null, arguments[i]);
+            return 0;
+        };
+    });
+})();
+
 document.addEventListener('DOMContentLoaded', function () {
     // Sticky header: add shadow + compact slightly once the page scrolls.
     //
@@ -300,7 +423,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!response.ok) throw new Error('save-toggle request failed');
                 return response.json();
             })
-            .then(function (data) { applySavedState(form, button, data.saved); })
+            .then(function (data) {
+                applySavedState(form, button, data.saved);
+                // Without this the JS path succeeded silently while the no-JS
+                // path got a flash message -- the same action confirming itself
+                // only when JavaScript was off. The server sends the identical
+                // two strings either way.
+                if (data.title) window.showToast('success', data.title, data.detail);
+            })
             .catch(function () {
                 // Network hiccup or server error: fall back to a normal
                 // full-page submit rather than leaving the heart stuck.
@@ -375,4 +505,42 @@ document.addEventListener('DOMContentLoaded', function () {
         sync();
         input.addEventListener('change', sync);
     });
+
+    /*
+     * Password reveal.
+     *
+     * Progressive enhancement: the buttons are rendered hidden-capable but do
+     * nothing until this runs, and the field stays a normal masked input if it
+     * never does -- so a JS failure costs the convenience, not the form.
+     */
+    document.querySelectorAll('[data-password-toggle]').forEach(function (button) {
+        var input = document.getElementById(button.getAttribute('data-password-toggle'));
+        if (!input) return;
+
+        button.addEventListener('click', function () {
+            var revealed = input.type === 'text';
+            input.type = revealed ? 'password' : 'text';
+            button.classList.toggle('is-revealed', !revealed);
+            button.setAttribute('aria-pressed', String(!revealed));
+            button.setAttribute('aria-label', revealed ? 'Show password' : 'Hide password');
+            /*
+             * Returning focus to the input would be the obvious move, but it
+             * drops the caret to position 0 in several browsers -- mid-typing
+             * that silently rewrites the password. Focus stays on the button.
+             */
+        });
+    });
+
+    /*
+     * The hero footage logic deliberately does NOT live here.
+     *
+     * This file is loaded with `defer`, so anything in it waits for the whole
+     * document to parse -- measured at ~1450ms on the landing page, against
+     * only ~350ms to actually fetch the clip. Running the gate from here left
+     * the painted hero on screen for nearly two seconds before the video
+     * appeared, which read as the page changing its mind.
+     *
+     * It now runs inline, immediately beneath the <video> element in
+     * welcome.blade.php, so it starts during parsing instead.
+     */
 });

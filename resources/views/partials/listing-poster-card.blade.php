@@ -86,7 +86,15 @@
             <div class="dpost-price">
                 @if ($tier === 0)
                     <span class="dpost-price__free">Free entry</span>
-                @elseif ($tier !== null)
+                @elseif ($tier !== null && ! $priceAmount)
+                    {{--
+                        The meter is a price BAND, so it only earns its place
+                        while the exact figure is unknown. Shown next to one it
+                        said the same thing twice and put four peso signs in a
+                        row -- three greyed-out band symbols running straight
+                        into the amount's own -- which read as a single garbled
+                        number rather than as a meter plus a price.
+                    --}}
                     @for ($i = 1; $i <= 3; $i++)
                         <span class="{{ $i <= $tier ? 'is-active' : '' }}">&#8369;</span>
                     @endfor

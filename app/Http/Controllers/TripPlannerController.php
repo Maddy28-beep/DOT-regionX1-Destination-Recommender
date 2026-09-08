@@ -11,11 +11,13 @@ use App\Models\TouristHealthCondition;
 use App\Models\TouristHealthProfile;
 use App\Models\TouristPreference;
 use App\Services\Geocoding\AddressSuggestionService;
+use App\Services\Recommendation\ContentBasedRecommendationService;
 use App\Services\Recommendation\ItineraryGenerationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use App\Support\Toast;
 
 /**
  * The travel-preference survey and AI itinerary.
@@ -66,6 +68,13 @@ class TripPlannerController extends Controller
             'preference' => $preference,
             'healthProfile' => $healthProfile,
             'healthOptions' => self::HEALTH_CONDITIONS,
+            /*
+             * The radii the range gate actually applies, so the select can show
+             * what each choice means in kilometres. Read from the service
+             * rather than restated here: a label that quietly disagreed with
+             * the gate would be worse than no label at all.
+             */
+            'distanceRadii' => ContentBasedRecommendationService::RANGE_RADIUS_KM,
         ]);
     }
 
@@ -126,7 +135,7 @@ class TripPlannerController extends Controller
         $request->session()->put(self::ITINERARY_KEY, $itinerary->id);
 
         return redirect()->route('plan.itinerary')
-            ->with('status', 'Your travel preferences are saved and your itinerary is ready.');
+            ->with(Toast::success('Preferences saved', 'Your itinerary is ready below.'));
     }
 
     public function itinerary(Request $request): View|RedirectResponse
@@ -135,7 +144,7 @@ class TripPlannerController extends Controller
 
         if (! $preference) {
             return redirect()->route('plan.edit')
-                ->with('status', 'Tell us about your trip first and we will build your itinerary.');
+                ->with(Toast::success('Tell us about your trip', 'Answer a few questions and we will build your itinerary.'));
         }
 
         $itinerary = $this->currentItinerary($request)
@@ -167,7 +176,7 @@ class TripPlannerController extends Controller
 
         if (! $preference) {
             return redirect()->route('plan.edit')
-                ->with('status', 'Tell us about your trip first and we will build your itinerary.');
+                ->with(Toast::success('Tell us about your trip', 'Answer a few questions and we will build your itinerary.'));
         }
 
         $position = $request->validate([
@@ -202,7 +211,7 @@ class TripPlannerController extends Controller
 
         $request->session()->put(self::ITINERARY_KEY, $itinerary->id);
 
-        return redirect()->route('plan.itinerary')->with('status', 'Your itinerary has been regenerated.');
+        return redirect()->route('plan.itinerary')->with(Toast::success('Itinerary regenerated', 'Rebuilt from your current preferences.'));
     }
 
     /**

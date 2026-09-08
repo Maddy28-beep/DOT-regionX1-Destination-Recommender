@@ -119,11 +119,47 @@
                             </div>
                             <div class="field" style="flex:1; min-width:180px;">
                                 <label for="distance_pref">Preferred travel distance</label>
-                                <select id="distance_pref" name="distance_pref" class="form-select" required>
-                                    <option value="near" @selected(old('distance_pref', $preference->distance_pref) === 'near')>Nearby (within city)</option>
-                                    <option value="moderate" @selected(old('distance_pref', $preference->distance_pref) === 'moderate')>Moderate distance</option>
-                                    <option value="far" @selected(old('distance_pref', $preference->distance_pref) === 'far')>Far / willing to travel</option>
+                                {{--
+                                    The radius comes from the recommender's own gate
+                                    (ContentBasedRecommendationService::RANGE_RADIUS_KM) rather
+                                    than being written out here, so the number a traveller reads
+                                    is the number their results are actually filtered by.
+                                --}}
+                                @php
+                                    $distanceNames = [
+                                        'near' => 'Nearby (within city)',
+                                        'moderate' => 'Moderate distance',
+                                        'far' => 'Far / willing to travel',
+                                    ];
+                                @endphp
+                                <select id="distance_pref" name="distance_pref" class="form-select" required
+                                        aria-describedby="distance_pref_hint">
+                                    @foreach ($distanceNames as $value => $name)
+                                        <option value="{{ $value }}" @selected(old('distance_pref', $preference->distance_pref) === $value)>
+                                            {{-- Kept terse deliberately. A closed <select> clips
+                                                 rather than wraps, and at 375px only ~240px of
+                                                 text fits: the longer phrasing ("... — anywhere in
+                                                 the region", 338px) was cut off mid-word on a
+                                                 phone, which is where most of these are filled in. --}}
+                                            {{ $name }} &middot;
+                                            @if ($distanceRadii[$value] === null)
+                                                no limit
+                                            @else
+                                                ~{{ (int) $distanceRadii[$value] }} km
+                                            @endif
+                                        </option>
+                                    @endforeach
                                 </select>
+                                {{-- "~" is doing real work: when a radius holds too few places for
+                                     the trip length the gate widens to the next tier rather than
+                                     returning a half-empty plan, and the itinerary says so when it
+                                     happens. Stating a hard figure here would promise a ceiling
+                                     the recommender is designed to break. --}}
+                                <p class="field-hint" id="distance_pref_hint">
+                                    Measured from your starting point. If there aren't enough
+                                    DOT-accredited places in range, we widen the search and tell
+                                    you on the itinerary.
+                                </p>
                             </div>
                         </div>
 
