@@ -51,8 +51,23 @@ class ExitSurveyController extends Controller
             'tour_operator' => ['label' => 'Tour Operators', 'items' => TourOperator::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location'])],
         ];
 
-        foreach ($placeGroups as &$group) {
-            $group['items'] = $this->labelDistinctly($group['items']);
+        $oldPlaces = old('places_visited', []);
+
+        foreach ($placeGroups as $kind => &$group) {
+            $distinct = $this->labelDistinctly($group['items']);
+
+            // The tag-search component only knows {value, label} pairs -- it
+            // has no idea "kind:id" is the convention places_visited uses,
+            // which is what keeps it reusable for any other picker later.
+            $group['options'] = $distinct->map(fn ($item) => [
+                'value' => "{$kind}:{$item->id}",
+                'label' => $item->display_label,
+            ])->values();
+
+            $group['selected'] = array_values(array_filter(
+                $oldPlaces,
+                fn ($value) => str_starts_with($value, "{$kind}:")
+            ));
         }
 
         return view('exit-survey.create', [

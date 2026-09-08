@@ -5,7 +5,8 @@
 @section('content')
 <div class="page-head">
     <div class="container">
-        <h1>Visitor Exit Survey</h1>
+        <span class="poster-kicker" style="font-size:1.05rem;">how was your trip?</span>
+        <h1 class="page-title" style="font-size:1.9rem; margin:0;">Visitor Exit Survey</h1>
         <p>Help DOT Region XI improve tourism services and destination management in the Davao Region.</p>
     </div>
 </div>
@@ -23,13 +24,14 @@
             </div>
         @endif
 
-        <div class="panel">
-            <div class="panel-head">
-                <div>
-                    <h2>Data Privacy Notice</h2>
-                    <p>Your responses are <strong>anonymous</strong>. This survey does not collect your name, email, or account information, and is not linked to your ExploreDVO profile if you have one. Data is handled per the Philippine Data Privacy Act of 2012 (RA 10173) and used only for tourism analytics and service improvement.</p>
-                </div>
-            </div>
+        <div class="privacy-note" style="margin-top:0;">
+            <x-icon name="shield-check" />
+            <p>
+                Your responses are <strong>anonymous</strong>. This survey does not collect your name, email, or
+                account information, and is not linked to your ExploreDVO profile if you have one. Data is handled
+                per the Philippine Data Privacy Act of 2012 (RA 10173) and used only for tourism analytics and
+                service improvement.
+            </p>
         </div>
 
         <form method="POST" action="{{ route('exit-survey.store') }}">
@@ -90,29 +92,25 @@
                 <div class="panel-head">
                     <div>
                         <h2>Your Visit</h2>
-                        <p>What did you experience during your trip? (optional &mdash; select all that apply)</p>
+                        <p>What did you experience during your trip? (optional &mdash; search and add the places you went)</p>
                     </div>
                 </div>
                 <div class="panel-body">
                     @foreach ($placeGroups as $kind => $group)
-                        @if ($group['items']->isNotEmpty())
-                            <div class="field" style="margin-top:{{ $loop->first ? '0' : '18' }}px;">
-                                <label>{{ $group['label'] }} visited</label>
-                                <div class="checkbox-grid">
-                                    @foreach ($group['items'] as $item)
-                                        <label class="field-check">
-                                            <input type="checkbox" name="places_visited[]" value="{{ $kind }}:{{ $item->id }}" @checked(in_array($kind.':'.$item->id, old('places_visited', [])))>
-                                            <span>{{ $item->display_label }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </div>
+                        @if ($group['options']->isNotEmpty())
+                            <x-tag-search
+                                name="places_visited[]"
+                                :items="$group['options']"
+                                :selected="$group['selected']"
+                                :label="$group['label'].' visited'"
+                                :placeholder="'Search '.strtolower($group['label']).'…'"
+                            />
                         @endif
                     @endforeach
 
-                    <div class="field" style="margin-top:18px;">
+                    <div class="field" style="margin-top:22px;">
                         <label>Activities you participated in</label>
-                        <div class="checkbox-grid">
+                        <div class="chip-checkbox-grid">
                             @foreach ($activityOptions as $activity)
                                 <label class="field-check">
                                     <input type="checkbox" name="activities[]" value="{{ $activity }}" @checked(in_array($activity, old('activities', [])))>
@@ -161,11 +159,11 @@
                     <div class="field" style="margin-top:22px;">
                         <label>Would you recommend the Davao Region to friends or family?</label>
                         <div style="display:flex; gap:20px; margin-top:8px;">
-                            <label class="field-check" style="margin-top:0;">
+                            <label class="field-check radio-check" style="margin-top:0;">
                                 <input type="radio" name="would_recommend" value="Yes" @checked(old('would_recommend') === 'Yes') required>
                                 <span>Yes, definitely</span>
                             </label>
-                            <label class="field-check" style="margin-top:0;">
+                            <label class="field-check radio-check" style="margin-top:0;">
                                 <input type="radio" name="would_recommend" value="No" @checked(old('would_recommend') === 'No')>
                                 <span>Probably not</span>
                             </label>
@@ -177,7 +175,7 @@
                         <textarea id="comments" name="comments" rows="3" placeholder="What did you love? What could DOT improve? Any specific attractions or experiences worth highlighting?">{{ old('comments') }}</textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block" style="margin-top:20px;">Submit Survey</button>
+                    <button type="submit" class="btn btn-accent btn-block" style="margin-top:20px;">Submit Survey</button>
                 </div>
             </div>
         </form>
