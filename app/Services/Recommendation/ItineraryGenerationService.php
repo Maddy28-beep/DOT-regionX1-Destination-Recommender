@@ -369,20 +369,59 @@ class ItineraryGenerationService
         }
 
         /*
-         * Prefer a stay we can actually place on the map. Most of the
-         * catalogue has no coordinates (the accreditation import carried
-         * addresses, not positions), and picking one of those leaves every
-         * transfer to and from the hotel unmeasurable. Rating still decides
-         * among the ones we can locate, and an unlocatable stay is still
-         * offered rather than none at all.
+         * Prefer a stay we can actually place on the map, and place it near
+         * the trip rather than anywhere on it. The same accommodation is
+         * booked for every night of the trip, so "near" means the centroid
+         * of every stop's coordinates, not any single one of them.
+         *
+         * Picking by rating alone here (every listing in this catalogue is
+         * tied at 0.0, so in practice "first matching row") could -- and
+         * did -- land on a stay across a strait from where the day's stops
+         * actually are: a traveller sequenced onto the mainland for the
+         * afternoon got booked back onto Samal Island for the night, adding
+         * a return ferry crossing nothing about the plan called for. Rating
+         * still breaks ties among stays at similar distance; an unlocatable
+         * stay is still offered rather than none at all.
          */
-        $listing = (clone $query)->whereNotNull('latitude')->whereNotNull('longitude')
+        $centroid = $this->stopsCentroid($dayStops);
+
+        $listing = $centroid
+                ? (clone $query)->whereNotNull('latitude')->whereNotNull('longitude')->get()
+                    ->sortBy(fn (Accommodation $a) => $this->haversineKm($centroid['lat'], $centroid['lng'], (float) $a->latitude, (float) $a->longitude))
+                    ->first()
+                : null;
+
+        $listing ??= (clone $query)->whereNotNull('latitude')->whereNotNull('longitude')
                 ->orderByDesc('rating')->first()
             ?? $query->orderByDesc('rating')->first()
             ?? Accommodation::where('is_accredited', true)->whereNull('archived_at')
                 ->orderByDesc('rating')->first();
 
         return $listing ? ['listing' => $listing, 'rule' => null] : null;
+    }
+
+    /**
+     * The average position of every stop that has coordinates, or null when
+     * none do -- the same "unknown means unknown, not the equator" rule
+     * applied everywhere else a centre point is needed.
+     *
+     * @param  array<int, array{row: array, distance_km: float|null}>  $dayStops
+     * @return array{lat: float, lng: float}|null
+     */
+    private function stopsCentroid(array $dayStops): ?array
+    {
+        $mapped = collect($dayStops)
+            ->map(fn (array $stop) => $stop['row']['destination'])
+            ->filter(fn ($destination) => $destination->latitude !== null && $destination->longitude !== null);
+
+        if ($mapped->isEmpty()) {
+            return null;
+        }
+
+        return [
+            'lat' => (float) $mapped->avg(fn ($destination) => (float) $destination->latitude),
+            'lng' => (float) $mapped->avg(fn ($destination) => (float) $destination->longitude),
+        ];
     }
 
     /**
