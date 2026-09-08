@@ -31,7 +31,9 @@ class DiagnoseRecommendations extends Command
         {--distance=moderate : near, moderate, or far}
         {--accommodation=Any : Accommodation preference}
         {--activity=* : Selected interest/activity (repeatable)}
-        {--amenity=* : Selected amenity (repeatable)}';
+        {--amenity=* : Selected amenity (repeatable)}
+        {--origin-lat= : Optional starting latitude}
+        {--origin-lng= : Optional starting longitude}';
 
     protected $description = 'Trace the destination recommendation pipeline for a hypothetical trip preference, without saving anything.';
 
@@ -51,6 +53,8 @@ class DiagnoseRecommendations extends Command
                 'budget' => $this->option('budget'),
                 'accommodation_pref' => $this->option('accommodation'),
                 'distance_pref' => $this->option('distance'),
+                'origin_lat' => $this->option('origin-lat') !== null ? (float) $this->option('origin-lat') : null,
+                'origin_lng' => $this->option('origin-lng') !== null ? (float) $this->option('origin-lng') : null,
             ]);
 
             foreach ($this->option('activity') as $activity) {
@@ -106,6 +110,21 @@ class DiagnoseRecommendations extends Command
                 $this->error('Visited more than once: '.$repeats->unique()->implode(', '));
             }
 
+            $accommodation = $itinerary->items->firstWhere('kind', 'overnight')?->accommodation;
+            if ($accommodation && $accommodation->latitude !== null) {
+                $this->line('');
+                $this->info("Accommodation: {$accommodation->name} (lat={$accommodation->latitude}, lng={$accommodation->longitude})");
+                foreach ($itinerary->items->where('kind', 'activity') as $stop) {
+                    if ($stop->destination && $stop->destination->latitude !== null) {
+                        $km = $this->haversine(
+                            (float) $accommodation->latitude, (float) $accommodation->longitude,
+                            (float) $stop->destination->latitude, (float) $stop->destination->longitude
+                        );
+                        $this->line(sprintf('  %.1f km from %s', $km, $stop->destination->name));
+                    }
+                }
+            }
+
             $this->line('');
             $this->info('Top 5 distinct recommended destinations:');
             foreach ($itinerary->distinctTopMatches(5) as $match) {
@@ -119,5 +138,14 @@ class DiagnoseRecommendations extends Command
         $this->comment('(Test preference and itinerary were rolled back -- nothing was saved.)');
 
         return self::SUCCESS;
+    }
+
+    private function haversine(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+        $a = sin($dLat / 2) ** 2 + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
+
+        return 6371.0 * 2 * atan2(sqrt($a), sqrt(1 - $a));
     }
 }
