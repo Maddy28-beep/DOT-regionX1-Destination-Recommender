@@ -84,6 +84,25 @@ class RealAccreditedEstablishmentSeeder extends Seeder
         // up, so a hand-written destination keeps its description.
         $listing = $model::where('slug', $row['slug'])->first();
 
+        /*
+         * A repeated name with a DIFFERENT address (three Elysia Wellness Spa
+         * locations, two Rancho Palos Verdes venues) is a genuinely separate
+         * branch, and the sheet's pre-built slug already suffixes it (-2,
+         * -3, ...) to keep it that way. But an IDENTICAL name at the SAME
+         * address, as with two "Playa del Rosario Resort" rows sharing one
+         * Baganga address, is one physical business holding two distinct DOT
+         * accreditation numbers (DOT-R11-RES-01656-2025 as a Resort and
+         * DOT-R11-MAB-01510-2025 under the separate Mabuhay tier) -- not two
+         * businesses. Importing that as two listing rows double-counted it
+         * everywhere a listing count or a pick-one-establishment list is
+         * built. The second accreditation number still needs to attach
+         * somewhere, so it lands on the one real listing instead of minting
+         * a second one for it.
+         */
+        if (! $listing) {
+            $listing = $model::where('name', $row['name'])->where('location', $row['location'])->first();
+        }
+
         if (! $listing) {
             $listing = new $model();
             $listing->slug = $row['slug'];
