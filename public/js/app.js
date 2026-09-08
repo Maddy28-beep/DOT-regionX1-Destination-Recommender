@@ -543,4 +543,176 @@ document.addEventListener('DOMContentLoaded', function () {
      * It now runs inline, immediately beneath the <video> element in
      * welcome.blade.php, so it starts during parsing instead.
      */
+
+    /*
+     * Tag search: replaces a static wall of checkboxes with a text field that
+     * filters a list as the user types and adds a removable chip on click.
+     *
+     * State per instance lives entirely in the DOM: the chip container holds
+     * one hidden <input> per selection (so the surrounding <form> submits
+     * them exactly as it always did -- no controller change needed) and the
+     * dropdown is rebuilt from the items/selected JSON embedded by the
+     * component on every keystroke. Rebuilding rather than diffing is fine
+     * at this scale (the largest list here is ~220 rows) and keeps the whole
+     * thing easy to reason about instead of tracking indices by hand.
+     */
+    document.querySelectorAll('[data-tag-search]').forEach(function (root) {
+        var box = root.querySelector('[data-tag-search-box]');
+        var chipsEl = root.querySelector('[data-tag-search-chips]');
+        var input = root.querySelector('[data-tag-search-input]');
+        var dropdown = root.querySelector('[data-tag-search-dropdown]');
+        var countEl = root.querySelector('[data-tag-search-count]');
+        var hiddenHost = root.querySelector('[data-tag-search-hidden-inputs]');
+        var fieldName = root.querySelector('[data-tag-search-name]').value;
+        var items = JSON.parse(root.querySelector('[data-tag-search-items]').textContent || '[]');
+        var selectedValues = JSON.parse(root.querySelector('[data-tag-search-selected]').textContent || '[]');
+
+        var byValue = {};
+        items.forEach(function (item) { byValue[item.value] = item; });
+
+        var MAX_RESULTS = 8;
+        var activeIndex = -1;
+
+        function isSelected(value) { return selectedValues.indexOf(value) !== -1; }
+
+        function updateCount() {
+            countEl.textContent = selectedValues.length + (selectedValues.length === 1 ? ' selected' : ' selected');
+        }
+
+        function addChip(value) {
+            var item = byValue[value];
+            if (!item || isSelected(value)) return;
+
+            selectedValues.push(value);
+
+            var chip = document.createElement('span');
+            chip.className = 'tag-search__chip';
+            chip.setAttribute('data-value', value);
+
+            var label = document.createElement('span');
+            label.className = 'tag-search__chip-label';
+            label.textContent = item.label;
+
+            var remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'tag-search__chip-remove';
+            remove.setAttribute('aria-label', 'Remove ' + item.label);
+            remove.textContent = '×';
+            remove.addEventListener('click', function () { removeChip(value, chip); });
+
+            chip.appendChild(label);
+            chip.appendChild(remove);
+            chipsEl.appendChild(chip);
+
+            var hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = fieldName;
+            hidden.value = value;
+            hidden.setAttribute('data-value', value);
+            hiddenHost.appendChild(hidden);
+
+            updateCount();
+        }
+
+        function removeChip(value, chipEl) {
+            selectedValues = selectedValues.filter(function (v) { return v !== value; });
+            chipEl.remove();
+            var hidden = hiddenHost.querySelector('[data-value="' + value.replace(/"/g, '\\"') + '"]');
+            if (hidden) hidden.remove();
+            updateCount();
+        }
+
+        function closeDropdown() {
+            dropdown.hidden = true;
+            dropdown.innerHTML = '';
+            input.setAttribute('aria-expanded', 'false');
+            activeIndex = -1;
+        }
+
+        function highlight(index) {
+            var options = dropdown.querySelectorAll('[data-option]');
+            options.forEach(function (opt, i) { opt.classList.toggle('is-active', i === index); });
+            activeIndex = index;
+        }
+
+        function renderDropdown() {
+            var query = input.value.trim().toLowerCase();
+            var matches = items.filter(function (item) {
+                return !isSelected(item.value) && (query === '' || item.label.toLowerCase().indexOf(query) !== -1);
+            }).slice(0, MAX_RESULTS);
+
+            if (matches.length === 0) {
+                closeDropdown();
+                return;
+            }
+
+            dropdown.innerHTML = '';
+            matches.forEach(function (item) {
+                var li = document.createElement('li');
+                li.setAttribute('data-option', '');
+                li.setAttribute('data-value', item.value);
+                li.setAttribute('role', 'option');
+                li.textContent = item.label;
+                li.addEventListener('mousedown', function (e) {
+                    // mousedown (not click) fires before the input's blur, so
+                    // the dropdown is still open when the value is read.
+                    e.preventDefault();
+                    addChip(item.value);
+                    input.value = '';
+                    renderDropdown();
+                    input.focus();
+                });
+                dropdown.appendChild(li);
+            });
+
+            dropdown.hidden = false;
+            input.setAttribute('aria-expanded', 'true');
+            highlight(-1);
+        }
+
+        // Existing selections (old() repopulation on a validation error)
+        // render their chips up front, in the order they were submitted.
+        selectedValues.slice().forEach(function (value) {
+            selectedValues = selectedValues.filter(function (v) { return v !== value; });
+            addChip(value);
+        });
+
+        input.addEventListener('input', renderDropdown);
+        input.addEventListener('focus', renderDropdown);
+
+        input.addEventListener('keydown', function (e) {
+            var options = dropdown.querySelectorAll('[data-option]');
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (dropdown.hidden) { renderDropdown(); return; }
+                highlight(Math.min(activeIndex + 1, options.length - 1));
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                highlight(Math.max(activeIndex - 1, 0));
+            } else if (e.key === 'Enter') {
+                if (!dropdown.hidden && activeIndex >= 0 && options[activeIndex]) {
+                    e.preventDefault();
+                    var value = options[activeIndex].getAttribute('data-value');
+                    addChip(value);
+                    input.value = '';
+                    renderDropdown();
+                }
+            } else if (e.key === 'Escape') {
+                closeDropdown();
+            } else if (e.key === 'Backspace' && input.value === '') {
+                // Backspace on an empty field removes the most recently added
+                // chip, matching the pattern most chip inputs already use.
+                var last = chipsEl.lastElementChild;
+                if (last) removeChip(last.getAttribute('data-value'), last);
+            }
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!box.contains(e.target) && !dropdown.contains(e.target)) {
+                closeDropdown();
+            }
+        });
+
+        updateCount();
+    });
 });
