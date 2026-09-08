@@ -3266,3 +3266,138 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
        keeps animating -- it conveys information rather than decoration. */
     .toast, .toast.is-leaving { animation: none; }
 }
+
+/* ==========================================================================
+   Tag picker — searchable multi-select
+   --------------------------------------------------------------------------
+   Replaces checkbox walls. On the exit survey six of these stand in for 395
+   raw checkboxes; the component itself knows nothing about establishments, so
+   anywhere else that asks a person to pick a few rows out of hundreds can use
+   it as-is.
+   ========================================================================== */
+.tag-picker { margin-top: 16px; }
+.tag-picker > label {
+    display: block;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+}
+/* The box mimics a text input so the control reads as one field rather than a
+   widget bolted beside one -- same border, radius and focus ring as .field
+   input, which it sits alongside. */
+.tag-picker__box {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border: var(--field-border);
+    border-radius: var(--field-radius);
+    background: var(--white);
+    cursor: text;
+}
+.tag-picker__box:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+.tag-picker__chips { display: contents; }
+.tag-picker__search {
+    flex: 1;
+    min-width: 140px;
+    border: none;
+    outline: none;
+    padding: 4px 0;
+    font-size: var(--field-size);
+    font-family: inherit;
+    color: var(--ink);
+    background: transparent;
+}
+.tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    border-radius: 999px;
+    padding: 4px 6px 4px 11px;
+    font-size: .8rem;
+    font-weight: 600;
+    max-width: 100%;
+}
+.tag-chip__x {
+    border: none;
+    background: none;
+    padding: 0 2px;
+    cursor: pointer;
+    color: var(--primary-dark);
+    font-size: 1rem;
+    line-height: 1;
+    opacity: .65;
+    border-radius: 50%;
+}
+.tag-chip__x:hover { opacity: 1; }
+.tag-chip__x:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+
+.tag-picker__results {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 4px;
+    border: 1px solid var(--border);
+    border-radius: var(--field-radius);
+    background: var(--white);
+    box-shadow: var(--shadow-md);
+    max-height: 280px;
+    overflow-y: auto;
+}
+.tag-picker__result {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 8px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.tag-picker__result:hover,
+.tag-picker__result.is-active { background: var(--bg); }
+.tag-picker__result-name { font-size: .86rem; font-weight: 600; color: var(--ink); }
+/* The address line. Several accredited businesses run multiple branches, each
+   separately accredited -- without this they read as duplicated rows. */
+.tag-picker__result-meta { font-size: .74rem; color: var(--muted); line-height: 1.35; }
+.tag-picker__count { font-size: .78rem; color: var(--muted); margin: 6px 0 0; }
+
+/* ---- Custom radio -------------------------------------------------------
+   The checkbox equivalent (.consent-check) was already custom; the radios on
+   the exit survey were still the OS control, so a form that looked considered
+   everywhere else fell back to the browser default at the last question. */
+.radio-check input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin: 0;
+    border: 2px solid var(--muted);
+    border-radius: 50%;
+    background: var(--white);
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+    transition: border-color .12s ease, background .12s ease;
+}
+.radio-check input[type="radio"]::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    transform: scale(0);
+    background: var(--white);
+    transition: transform .12s ease;
+}
+.radio-check input[type="radio"]:hover { border-color: var(--primary); }
+.radio-check input[type="radio"]:checked {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+.radio-check input[type="radio"]:checked::before { transform: scale(1); }
+.radio-check input[type="radio"]:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }

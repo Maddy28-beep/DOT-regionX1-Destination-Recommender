@@ -507,6 +507,165 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     /*
+     * Tag picker -- searchable multi-select for long lists.
+     *
+     * Generic on purpose: it reads its options and its input name off the
+     * element, so it is not tied to establishments. See
+     * resources/views/partials/tag-picker.blade.php.
+     */
+    document.querySelectorAll('[data-tag-picker]').forEach(function (root) {
+        var items = JSON.parse(root.getAttribute('data-items') || '[]');
+        var name = root.getAttribute('data-name');
+        var prefix = root.getAttribute('data-prefix') || '';
+        var chips = root.querySelector('[data-chips]');
+        var search = root.querySelector('[data-search]');
+        var results = root.querySelector('[data-results]');
+        var count = root.querySelector('[data-count]');
+        var values = root.querySelector('[data-values]');
+        var MAX_RESULTS = 8;
+
+        var selected = (JSON.parse(root.getAttribute('data-selected') || '[]') || [])
+            .map(function (v) { return String(v).replace(prefix, ''); });
+        var active = -1;
+
+        function byId(id) {
+            for (var i = 0; i < items.length; i++) {
+                if (String(items[i].id) === String(id)) return items[i];
+            }
+            return null;
+        }
+
+        function render() {
+            chips.innerHTML = '';
+            values.innerHTML = '';
+            selected.forEach(function (id) {
+                var item = byId(id);
+                if (!item) return;
+
+                var chip = document.createElement('span');
+                chip.className = 'tag-chip';
+                chip.textContent = item.name;
+
+                var x = document.createElement('button');
+                x.type = 'button';           // inside a form, a bare button submits it
+                x.className = 'tag-chip__x';
+                x.setAttribute('aria-label', 'Remove ' + item.name);
+                x.innerHTML = '&times;';
+                x.addEventListener('click', function () {
+                    selected = selected.filter(function (s) { return s !== id; });
+                    render();
+                    search.focus();
+                });
+                chip.appendChild(x);
+                chips.appendChild(chip);
+
+                var hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = name;
+                hidden.value = prefix + id;
+                values.appendChild(hidden);
+            });
+
+            count.textContent = selected.length === 0
+                ? 'None selected'
+                : selected.length + ' selected';
+        }
+
+        function close() {
+            results.hidden = true;
+            search.setAttribute('aria-expanded', 'false');
+            active = -1;
+        }
+
+        function open(matches) {
+            results.innerHTML = '';
+            matches.forEach(function (item, i) {
+                var li = document.createElement('li');
+                li.className = 'tag-picker__result';
+                li.setAttribute('role', 'option');
+                li.dataset.id = item.id;
+
+                var nameEl = document.createElement('span');
+                nameEl.className = 'tag-picker__result-name';
+                nameEl.textContent = item.name;
+                li.appendChild(nameEl);
+
+                /*
+                 * The address is what tells three separately accredited Elysia
+                 * Wellness Spa branches apart. Without it the list looks like
+                 * duplicated rows and the respondent is guessing.
+                 */
+                if (item.meta) {
+                    var metaEl = document.createElement('span');
+                    metaEl.className = 'tag-picker__result-meta';
+                    metaEl.textContent = item.meta;
+                    li.appendChild(metaEl);
+                }
+
+                li.addEventListener('mousedown', function (e) {
+                    e.preventDefault();      // keep focus so blur does not close first
+                    add(item.id);
+                });
+                results.appendChild(li);
+            });
+            results.hidden = matches.length === 0;
+            search.setAttribute('aria-expanded', String(matches.length > 0));
+        }
+
+        function add(id) {
+            if (selected.indexOf(String(id)) === -1) selected.push(String(id));
+            render();
+            search.value = '';
+            close();
+            search.focus();
+        }
+
+        function filter() {
+            var q = search.value.trim().toLowerCase();
+            if (!q) return close();
+
+            var matches = [];
+            for (var i = 0; i < items.length && matches.length < MAX_RESULTS; i++) {
+                var it = items[i];
+                if (selected.indexOf(String(it.id)) !== -1) continue;
+                var hay = (it.name + ' ' + (it.meta || '')).toLowerCase();
+                if (hay.indexOf(q) !== -1) matches.push(it);
+            }
+            open(matches);
+        }
+
+        search.addEventListener('input', filter);
+        search.addEventListener('focus', filter);
+        search.addEventListener('blur', function () { setTimeout(close, 120); });
+
+        search.addEventListener('keydown', function (e) {
+            var opts = results.querySelectorAll('.tag-picker__result');
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                if (!opts.length) return;
+                e.preventDefault();
+                active += (e.key === 'ArrowDown' ? 1 : -1);
+                if (active < 0) active = opts.length - 1;
+                if (active >= opts.length) active = 0;
+                opts.forEach(function (o, i) { o.classList.toggle('is-active', i === active); });
+            } else if (e.key === 'Enter') {
+                // Never let Enter submit the form from this field -- the user is
+                // choosing an option, not finishing the survey.
+                if (opts.length) {
+                    e.preventDefault();
+                    add(opts[active >= 0 ? active : 0].dataset.id);
+                }
+            } else if (e.key === 'Escape') {
+                close();
+            } else if (e.key === 'Backspace' && !search.value && selected.length) {
+                selected.pop();
+                render();
+            }
+        });
+
+        render();
+    });
+
+    /*
      * Password reveal.
      *
      * Progressive enhancement: the buttons are rendered hidden-capable but do

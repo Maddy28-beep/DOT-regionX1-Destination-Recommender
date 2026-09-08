@@ -42,13 +42,32 @@ class ExitSurveyController extends Controller
 
     public function create(): View
     {
+        /*
+         * `location` is selected alongside the name because several accredited
+         * businesses run more than one branch and each branch is separately
+         * accredited -- Elysia Wellness Spa has three, Oh George Inn three,
+         * Rancho Palos Verdes two, each with its own DOT accreditation number
+         * and expiry. Rendered as bare names they looked like duplicated rows;
+         * with the address they are what they actually are, and a respondent
+         * can pick the branch they visited rather than guessing between three
+         * identical labels.
+         *
+         * Packages have no address of their own -- they are itineraries, not
+         * premises -- so the provider stands in.
+         */
+        $withAddress = fn ($model) => $model::publiclyVisible()->orderBy('name')
+            ->get(['id', 'name', 'location'])
+            ->map(fn ($row) => ['id' => $row->id, 'name' => $row->name, 'meta' => $row->location]);
+
         $placeGroups = [
-            'destination' => ['label' => 'Destinations', 'items' => Destination::publiclyVisible()->orderBy('name')->get(['id', 'name'])],
-            'accommodation' => ['label' => 'Accommodations', 'items' => Accommodation::publiclyVisible()->orderBy('name')->get(['id', 'name'])],
-            'restaurant' => ['label' => 'Restaurants', 'items' => Restaurant::publiclyVisible()->orderBy('name')->get(['id', 'name'])],
-            'package' => ['label' => 'Tour Packages', 'items' => Package::publiclyVisible()->orderBy('name')->get(['id', 'name'])],
-            'souvenir_center' => ['label' => 'Souvenir Centers', 'items' => SouvenirCenter::publiclyVisible()->orderBy('name')->get(['id', 'name'])],
-            'tour_operator' => ['label' => 'Tour Operators', 'items' => TourOperator::publiclyVisible()->orderBy('name')->get(['id', 'name'])],
+            'destination' => ['label' => 'Destinations', 'items' => $withAddress(Destination::class)],
+            'accommodation' => ['label' => 'Accommodations', 'items' => $withAddress(Accommodation::class)],
+            'restaurant' => ['label' => 'Restaurants', 'items' => $withAddress(Restaurant::class)],
+            'package' => ['label' => 'Tour Packages', 'items' => Package::publiclyVisible()->orderBy('name')
+                ->get(['id', 'name', 'provider_name'])
+                ->map(fn ($row) => ['id' => $row->id, 'name' => $row->name, 'meta' => $row->provider_name])],
+            'souvenir_center' => ['label' => 'Souvenir Centers', 'items' => $withAddress(SouvenirCenter::class)],
+            'tour_operator' => ['label' => 'Tour Operators', 'items' => $withAddress(TourOperator::class)],
         ];
 
         return view('exit-survey.create', [
