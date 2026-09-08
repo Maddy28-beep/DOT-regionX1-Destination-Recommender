@@ -30,6 +30,12 @@ Thumbs.db
 /database/*.sqlite
 /database/*.sqlite-journal
 
-# Hero footage lives in storage or a CDN, not in git history.
+# Hero footage. Large clips belong in storage or a CDN, but the current one is
+# under 1 MB after the ffmpeg pass, so it is committed: a clone that renders the
+# illustrated fallback because someone forgot to copy a file is a worse problem
+# than a few hundred kilobytes of history. Anything bigger should stay out.
 /public/video/*
 !/public/video/README.md
+!/public/video/hero.mp4
+!/public/video/hero.webm
+!/public/video/hero-poster.jpg

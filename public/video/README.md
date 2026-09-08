@@ -26,8 +26,13 @@ It is set as the section's `background-image`, not as a `<video poster>` --
 a poster paints over the video element, one layer above the ground, so it
 arrives and departs as its own visible step.
 
-The video files themselves are deliberately **not committed** (see
-`.gitignore`) — footage belongs in storage or a CDN, not in git history.
+`hero.mp4`, `hero.webm` and `hero-poster.jpg` **are committed**, so a fresh
+clone renders the video hero with no extra setup. That is a deliberate
+exception: the current clip is under 1 MB after the encode below, and a
+teammate seeing the illustrated fallback because they never received a file is
+a worse failure than a little history. `.gitignore` still excludes everything
+else in this directory — if the footage is ever replaced with something large,
+put it in storage or a CDN and drop these exceptions.
 
 ## What the footage has to be
 
