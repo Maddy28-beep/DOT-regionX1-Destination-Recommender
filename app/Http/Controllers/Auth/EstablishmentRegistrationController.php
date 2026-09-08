@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use App\Support\Toast;
 
 class EstablishmentRegistrationController extends Controller
 {
@@ -27,6 +28,16 @@ class EstablishmentRegistrationController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'contact_person' => ['required', 'string', 'max:100'],
             'contact_number' => ['required', 'string', 'max:20'],
+            /*
+             * `accepted` rather than `boolean`: it rejects an unticked box and a
+             * missing key alike. The checkbox carries HTML `required` too, but
+             * that is a courtesy to the browser -- an unchecked checkbox simply
+             * is not posted, so without this rule the account would be created
+             * with no record of consent at all.
+             */
+            'terms_accepted' => ['accepted'],
+        ], [
+            'terms_accepted.accepted' => 'Please accept the Terms of Service and Privacy Policy to continue.',
         ]);
 
         EstablishmentAccount::create([
@@ -44,6 +55,6 @@ class EstablishmentRegistrationController extends Controller
 
         return redirect()
             ->route('portal.login')
-            ->with('status', 'Your establishment account was submitted and is pending DOT Region XI review. You will be able to sign in once approved.');
+            ->with(Toast::success('Request submitted', 'DOT Region XI will review it. You can sign in once approved.'));
     }
 }

@@ -16,10 +16,6 @@
         {{ $destination->name }}
     </nav>
 
-    @if (session('status'))
-        <div class="alert alert-success">{{ session('status') }}</div>
-    @endif
-
     {{--
         Always the illustrated poster hero here, matching Popular Destinations
         and Featured Packages -- not conditional on whether photos exist.
@@ -137,6 +133,8 @@
                 @empty
                     <p style="color:var(--muted);">No reviews yet. Be the first to visit and share your experience.</p>
                 @endforelse
+
+                @include("partials.review-form", ["listing" => $destination, "type" => "destinations", "kind" => "destination"])
             </div>
         </div>
 

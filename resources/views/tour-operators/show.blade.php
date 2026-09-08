@@ -77,6 +77,8 @@
                 @empty
                     <p style="color:var(--muted);">No reviews yet. Be the first to book and share your experience.</p>
                 @endforelse
+
+                @include("partials.review-form", ["listing" => $tourOperator, "type" => "tour-operators", "kind" => "tour_operator"])
             </div>
         </div>
 

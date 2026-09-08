@@ -27,31 +27,26 @@ class TourOperatorSeeder extends Seeder
             [
                 'name' => 'Davao Island Explorers', 'region' => $samal, 'specialization' => 'Beach & Island',
                 'description' => 'Island-hopping and beach tour specialist operating out of Island Garden City of Samal, running day trips to Samal Island and nearby beach destinations.',
-                'rating' => 4.6, 'price_tier' => 'Mid-range', 'contact_number' => '0917-555-0101',
                 'latitude' => 7.1553000, 'longitude' => 125.7080000,
             ],
             [
                 'name' => 'Highland Trails Davao', 'region' => $davaoCity, 'specialization' => 'Nature & Adventure',
                 'description' => 'Nature and adventure tour operator specializing in day trips to Eden Nature Park and other highland destinations around Davao City.',
-                'rating' => 4.5, 'price_tier' => 'Mid-range', 'contact_number' => '0917-555-0102',
                 'latitude' => null, 'longitude' => null,
             ],
             [
                 'name' => 'Apo Summit Guides', 'region' => $davaoDelSur, 'specialization' => 'Adventure & Hiking',
                 'description' => 'DOT-accredited mountaineering guide service specializing in multi-day Mount Apo summit treks, with certified guides and full trekking support.',
-                'rating' => 4.9, 'price_tier' => 'Premium', 'contact_number' => '0917-555-0103',
                 'latitude' => null, 'longitude' => null,
             ],
             [
                 'name' => 'Davao Heritage Walks', 'region' => $davaoCity, 'specialization' => 'Cultural Heritage',
                 'description' => 'Cultural heritage tour operator offering guided walking tours of historical and cultural sites across Davao City.',
-                'rating' => 4.3, 'price_tier' => 'Budget-Friendly', 'contact_number' => '0917-555-0104',
                 'latitude' => null, 'longitude' => null,
             ],
             [
                 'name' => 'Mati Surf Co.', 'region' => $davaoOriental, 'specialization' => 'Beach & Surfing',
                 'description' => 'Surf tour and beach getaway operator based in Mati City, Davao Oriental, running surf packages at Dahican Beach.',
-                'rating' => 4.7, 'price_tier' => 'Mid-range', 'contact_number' => '0917-555-0105',
                 'latitude' => null, 'longitude' => null,
             ],
         ];
@@ -65,8 +60,6 @@ class TourOperatorSeeder extends Seeder
                 'specialization' => $o['specialization'],
                 'description' => $o['description'],
                 'is_accredited' => true,
-                'rating' => $o['rating'],
-                'review_count' => 0,
                 'price_tier' => $o['price_tier'],
                 'contact_number' => $o['contact_number'],
                 'latitude' => $o['latitude'],

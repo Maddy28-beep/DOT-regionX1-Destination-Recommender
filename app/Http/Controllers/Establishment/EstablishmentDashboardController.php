@@ -8,9 +8,22 @@ use App\Models\Review;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Support\Toast;
 
 class EstablishmentDashboardController extends Controller
 {
+    /**
+     * The bounding box of Davao Region, used to sanity-check a pin an
+     * establishment drops on the map. Wide enough to hold every province in
+     * the region (Davao Occidental's southern tip down to roughly 5.4, Davao
+     * Oriental's east coast out to roughly 126.8) without reaching Cebu or
+     * Caraga.
+     */
+    public const REGION_BOUNDS = ['lat' => [5.4, 8.1], 'lng' => [125.0, 126.8]];
+
+    /** Davao City centre — where the picker opens when nothing is set yet. */
+    public const MAP_DEFAULT = ['lat' => 7.0731, 'lng' => 125.6128];
+
     public function overview(Request $request): View
     {
         $establishment = $request->user('establishment');
@@ -55,7 +68,7 @@ class EstablishmentDashboardController extends Controller
 
         if (! $listing) {
             return redirect()->route('establishment.overview')
-                ->with('status', 'Your establishment is not yet linked to a catalog listing. A DOT Admin will link it once your accreditation is verified.');
+                ->with(Toast::success('No listing linked yet', 'A DOT Admin will link one once your accreditation is verified.'));
         }
 
         // Same map the QR encoder uses, so the URL shown beside the code can't
@@ -76,10 +89,34 @@ class EstablishmentDashboardController extends Controller
             'description' => ['nullable', 'string', 'max:1000'],
             'price_tier' => ['nullable', 'string', 'max:20'],
             'price_amount' => ['nullable', 'numeric', 'min:0'],
+            /*
+             * Position, set by the establishment itself on the map.
+             *
+             * Bounded to Davao Region rather than merely to valid coordinates.
+             * Bulk-geocoding these addresses was tried and abandoned: they are
+             * barangay/purok level, below what a geocoder resolves, so it
+             * matched stray words and returned an elementary school for one
+             * listing and a street in the wrong province for another -- with
+             * confidence scores that gave no way to tell good from bad. The
+             * business knows where it is; the bounds just stop a mis-drag or a
+             * fat-fingered paste putting it in another region, which matters
+             * because a stored coordinate is treated as exact by
+             * distanceKmFor() while a missing one is honestly treated as
+             * unknown.
+             */
+            'latitude' => ['nullable', 'required_with:longitude', 'numeric', 'between:'.self::REGION_BOUNDS['lat'][0].','.self::REGION_BOUNDS['lat'][1]],
+            'longitude' => ['nullable', 'required_with:latitude', 'numeric', 'between:'.self::REGION_BOUNDS['lng'][0].','.self::REGION_BOUNDS['lng'][1]],
+        ], [
+            'latitude.between' => 'That point is outside the Davao Region. Drag the marker to your establishment.',
+            'longitude.between' => 'That point is outside the Davao Region. Drag the marker to your establishment.',
         ]);
 
         $listing->description = $data['description'] ?? null;
         $listing->price_tier = $data['price_tier'] ?? null;
+        // Blank clears it: "we do not know" is a better answer than a wrong
+        // pin, because the recommender trusts a stored coordinate completely.
+        $listing->latitude = $data['latitude'] ?? null;
+        $listing->longitude = $data['longitude'] ?? null;
 
         match ($establishment->listing_kind) {
             'accommodation' => $listing->price_per_night = $data['price_amount'] ?? null,
@@ -89,7 +126,7 @@ class EstablishmentDashboardController extends Controller
 
         $listing->save();
 
-        return redirect()->route('establishment.overview')->with('status', 'Your listing has been updated.');
+        return redirect()->route('establishment.overview')->with(Toast::success('Listing updated', 'Your changes are now live on the public catalog.'));
     }
 
     public function reviews(Request $request): View
@@ -115,7 +152,7 @@ class EstablishmentDashboardController extends Controller
 
         $review->update(['owner_reply' => $data['owner_reply'], 'owner_replied_at' => now()]);
 
-        return back()->with('status', 'Your reply has been posted.');
+        return back()->with(Toast::success('Reply posted', 'Travelers can now see your response on this review.'));
     }
 
     public function notifications(Request $request): View
@@ -151,6 +188,6 @@ class EstablishmentDashboardController extends Controller
 
         $establishment->notifications()->where('is_read', false)->update(['is_read' => true]);
 
-        return back()->with('status', 'All notifications marked as read.');
+        return back()->with(Toast::success('Notifications cleared', 'All of them are now marked as read.'));
     }
 }

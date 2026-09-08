@@ -33,7 +33,7 @@
 
                     <div class="field">
                         <label for="q">Search by name</label>
-                        <input type="text" id="q" name="q" value="{{ request('q') }}" placeholder="e.g. BlueJaz">
+                        <input type="text" id="q" name="q" value="{{ request('q') }}" placeholder="e.g. Pearl Farm">
                     </div>
 
                     <div class="field">

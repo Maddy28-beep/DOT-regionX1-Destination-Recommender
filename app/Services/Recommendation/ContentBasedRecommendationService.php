@@ -63,17 +63,28 @@ class ContentBasedRecommendationService
 
     public bool $lastRangeWidened = false;
 
-    /** Table 5. Preference Category Weights (sum = 100). */
+    /**
+     * Table 5. Preference Category Weights (sum = 100).
+     *
+     * EXPERIMENTAL, not yet applied: duration_of_stay and demographic always
+     * evaluate to a fixed neutral 1.0 in preferenceMatch() (visit_duration
+     * isn't populated on destinations, and multi-select demographic groups
+     * aren't part of the schema), so they never actually differentiate one
+     * destination from another -- adding the same constant to every
+     * candidate changes nothing about the ranking. Reclaiming that dead
+     * weight for 'interest' costs zero real signal and lets a tourist's
+     * stated interest actually compete with popularity.
+     */
     private const PM_WEIGHTS = [
         'travel_purpose' => 15,
         'visitor_type' => 5,
         'budget' => 15,
         'accommodation_type' => 10,
-        'duration_of_stay' => 10,
+        'duration_of_stay' => 0,
         'distance' => 15,
         'health_accessibility' => 10,
-        'interest' => 15,
-        'demographic' => 5,
+        'interest' => 30,
+        'demographic' => 0,
     ];
 
     /** Equation 3 factor weights. */
@@ -133,6 +144,30 @@ class ContentBasedRecommendationService
         'Events & Conventions' => 'Cultural Heritage',
     ];
 
+    /**
+     * The listing types that count as a given tourist-facing interest.
+     *
+     * The inverse of TYPE_TO_INTEREST, exposed so the catalogue's browse
+     * filters can resolve an interest the same way the recommender does. An
+     * interest covers several types -- "Beach & Island" is stored as both
+     * "Beach & Leisure" and "Beach & Surfing" -- so a plain equality filter on
+     * `type` silently returned nothing for it. Keeping one owner of this
+     * vocabulary is the point: if searching for Beach & Island and being
+     * recommended Beach & Island ever disagreed, one of them would be wrong.
+     *
+     * The interest itself is always included, because the packages table
+     * stores the interest names directly as its own types.
+     *
+     * @return array<int, string>
+     */
+    public static function typesForInterest(string $interest): array
+    {
+        $types = array_keys(self::TYPE_TO_INTEREST, $interest, true);
+        $types[] = $interest;
+
+        return array_values(array_unique($types));
+    }
+
     /** Distance buckets (km) backing both the PM "Distance" category and the DS factor (Table 6). */
     private const DISTANCE_BUCKETS = [
         'near' => [0, 15],
@@ -160,7 +195,7 @@ class ContentBasedRecommendationService
      * outside Davao Region to begin with, so no cap already means exactly
      * what was asked for -- the whole region, nothing more.
      */
-    private const RANGE_RADIUS_KM = [
+    public const RANGE_RADIUS_KM = [
         'near' => 25.0,
         'moderate' => 75.0,
         'far' => null,

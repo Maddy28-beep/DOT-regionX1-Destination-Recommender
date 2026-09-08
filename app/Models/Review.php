@@ -9,7 +9,7 @@ class Review extends Model
 {
     const UPDATED_AT = null;
 
-    protected $fillable = ['listing_kind', 'listing_id', 'author_name', 'rating', 'comment', 'owner_reply', 'owner_replied_at'];
+    protected $fillable = ['listing_kind', 'listing_id', 'visitor_token', 'author_name', 'rating', 'comment', 'owner_reply', 'owner_replied_at'];
 
     protected function casts(): array
     {

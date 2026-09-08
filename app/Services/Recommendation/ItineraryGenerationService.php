@@ -85,6 +85,11 @@ class ItineraryGenerationService
         ];
 
         $ranked = $this->contentBased->rank($preference);
+        // rank() decides this as a side effect and only exposes it on the
+        // service instance for the duration of this request -- capture it
+        // now so it can be persisted, or it's gone once this method returns.
+        $rangeTierUsed = $this->contentBased->lastRangeTierUsed;
+        $rangeWidened = $this->contentBased->lastRangeWidened;
 
         if ($ranked->isEmpty()) {
             throw new \RuntimeException('No accredited destinations are available to build an itinerary.');
@@ -115,12 +120,14 @@ class ItineraryGenerationService
 
         $sequence = $this->sequenceByNearestNeighbor($topRanked, $originLat, $originLng);
 
-        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin) {
+        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened) {
             $itinerary = Itinerary::create([
                 'preference_id' => $preference->id,
                 'total_days' => $totalDays,
                 'est_party_size' => null,
                 'generated_at' => now(),
+                'range_tier_used' => $rangeTierUsed,
+                'range_widened' => $rangeWidened,
             ]);
 
             // Table 8: full computed Destination Recommendation ranking, not just the stops used.
@@ -318,13 +325,31 @@ class ItineraryGenerationService
      */
     private function pickAccommodation(array $dayStops, TouristPreference $preference): ?array
     {
+        $wanted = $preference->accommodation_pref;
+        $wanted = ($wanted && $wanted !== 'Any') ? $wanted : null;
+
         foreach ($dayStops as $stop) {
             $destination = $stop['row']['destination'];
             $suggestions = $this->apriori->suggestionsFor('destination', $destination->id, 3)
-                ->filter(fn ($rule) => $rule['listing_kind'] === 'accommodation');
+                ->filter(fn ($rule) => $rule['listing_kind'] === 'accommodation')
+                /*
+                 * The stated accommodation type is a requirement, not a hint.
+                 * Apriori only knows what past tourists happened to pair with a
+                 * destination, and every accommodation it can suggest in this
+                 * catalogue is a Beach Resort -- so a traveller who asked for a
+                 * Hotel was handed Pearl Farm Beach Resort purely because Samal
+                 * Island is popular. This preference used to be consulted only
+                 * in the catalogue query below, which any destination carrying
+                 * a co-visitation rule never reached. A soft historical signal
+                 * must not overrule a hard stated one: when nothing Apriori
+                 * suggests fits, fall through and book from the catalogue
+                 * instead of quietly ignoring what was asked for.
+                 */
+                ->filter(fn ($rule) => $wanted === null || $rule['listing']->type === $wanted)
+                ->values();
 
             if ($suggestions->isNotEmpty()) {
-                $rule = $suggestions->first();
+                $rule = $this->weightedPick($suggestions, $preference);
 
                 return [
                     'listing' => $rule['listing'],
@@ -339,8 +364,8 @@ class ItineraryGenerationService
         }
 
         $query = Accommodation::where('is_accredited', true)->whereNull('archived_at');
-        if ($preference->accommodation_pref && $preference->accommodation_pref !== 'Any') {
-            $query->where('type', $preference->accommodation_pref);
+        if ($wanted !== null) {
+            $query->where('type', $wanted);
         }
 
         /*
@@ -358,5 +383,48 @@ class ItineraryGenerationService
                 ->orderByDesc('rating')->first();
 
         return $listing ? ['listing' => $listing, 'rule' => null] : null;
+    }
+
+    /**
+     * Chooses among several Apriori-suggested accommodations, weighted by
+     * confidence, on a seed that changes when the traveller regenerates.
+     *
+     * suggestionsFor() always returned the single highest-confidence rule
+     * before this: whichever accommodation happened to have the strongest
+     * historical pairing with a popular destination (Samal Island -> BlueJaz
+     * Beach Resort, 59% confidence) won every single time that destination
+     * appeared, regardless of how many times the plan was regenerated --
+     * real alternatives with real support (Pearl Farm Beach Resort at 31%,
+     * Paradise Island at 16%) never got a chance. Destination ranking
+     * already solves this exact "always the same pick" problem with a
+     * variation-seeded tie-break (see ContentBasedRecommendationService);
+     * this applies the same idea here; a weighted draw rather than a plain
+     * tie-break because these confidences are genuinely different, not tied.
+     *
+     * @param  \Illuminate\Support\Collection<int, array{listing_id: int, confidence: float}>  $suggestions  sorted by confidence, already non-empty
+     * @return array{listing: Accommodation, support: float, confidence: float, co_count: int}
+     */
+    private function weightedPick($suggestions, TouristPreference $preference): array
+    {
+        $totalConfidence = $suggestions->sum('confidence');
+
+        // All-zero confidence can't be weighted meaningfully; keep the
+        // strongest suggestion rather than divide by zero.
+        if ($totalConfidence <= 0) {
+            return $suggestions->first();
+        }
+
+        $seed = crc32($suggestions->first()['listing_id'].':'.((int) $preference->variation));
+        $threshold = ($seed % 10000 / 10000) * $totalConfidence;
+
+        $cumulative = 0.0;
+        foreach ($suggestions as $rule) {
+            $cumulative += $rule['confidence'];
+            if ($threshold < $cumulative) {
+                return $rule;
+            }
+        }
+
+        return $suggestions->last();
     }
 }

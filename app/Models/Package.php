@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\HasArchiving;
 use App\Models\Concerns\HasListingPhotos;
 use App\Models\Concerns\PresentsAsPosterCard;
+use App\Models\Concerns\RanksByRating;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Package extends Model
 {
-    use HasListingPhotos, HasArchiving, PresentsAsPosterCard;
+    use HasListingPhotos, HasArchiving, PresentsAsPosterCard, RanksByRating;
 
     const UPDATED_AT = null;
 

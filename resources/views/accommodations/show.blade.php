@@ -81,6 +81,8 @@
                 @empty
                     <p style="color:var(--muted);">No reviews yet.</p>
                 @endforelse
+
+                @include("partials.review-form", ["listing" => $accommodation, "type" => "accommodations", "kind" => "accommodation"])
             </div>
         </div>
 

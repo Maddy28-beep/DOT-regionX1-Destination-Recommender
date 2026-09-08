@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Destination;
 use App\Models\Region;
+use App\Services\Recommendation\ContentBasedRecommendationService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -25,12 +26,28 @@ class DestinationController extends Controller
             $query->where('type', $request->string('type'));
         }
 
+        /*
+         * A tourist-facing interest from the homepage search bar, which spans
+         * several stored types -- "Beach & Island" is filed as both "Beach &
+         * Leisure" and "Beach & Surfing". Resolved through the recommender so
+         * browsing for an interest and being recommended for it can never
+         * disagree about what counts.
+         */
+        if ($request->filled('interest')) {
+            $query->whereIn('type', ContentBasedRecommendationService::typesForInterest(
+                (string) $request->string('interest')
+            ));
+        }
+
         if ($request->filled('price_tier')) {
             $query->where('price_tier', $request->string('price_tier'));
         }
 
         match ($request->string('sort')->toString()) {
-            'rating' => $query->orderByDesc('rating'),
+            // Weighted, so "no reviews yet" sorts as average rather than as
+            // nought stars -- see RanksByRating. Raw rating buried all 17
+            // accredited imports below every hand-written entry.
+            'rating' => $query->orderByWeightedRating(),
             'name' => $query->orderBy('name'),
             'nearest' => $query->orderBy('distance_km'),
             default => $query->orderByDesc('featured')->orderByDesc('rating'),
@@ -50,7 +67,7 @@ class DestinationController extends Controller
 
         $destination->load(['region', 'tags', 'photos', 'reviews' => fn ($q) => $q->latest()->take(10)]);
 
-        $nearby = Destination::publiclyVisible()->with('region', 'tags')
+        $nearby = Destination::publiclyVisible()->with('region', 'tags', 'photos')
             ->where('region_id', $destination->region_id)
             ->where('id', '!=', $destination->id)
             ->orderByDesc('rating')
@@ -63,7 +80,7 @@ class DestinationController extends Controller
         // all -- fall back to top-rated destinations elsewhere rather than
         // silently hiding the section for those.
         if ($nearby->isEmpty()) {
-            $nearby = Destination::publiclyVisible()->with('region', 'tags')
+            $nearby = Destination::publiclyVisible()->with('region', 'tags', 'photos')
                 ->where('id', '!=', $destination->id)
                 ->orderByDesc('rating')
                 ->take(3)

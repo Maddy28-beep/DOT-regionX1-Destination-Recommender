@@ -249,7 +249,7 @@ class ItineraryScheduleBuilder
 
             $this->row($itinerary, $dayNumber, $sortOrder, [
                 'kind' => 'baseline',
-                'title' => 'Arrival at '.$origin['label'],
+                'title' => 'Arrival — '.$origin['label'],
                 'starts_at' => $arrival,
             ]);
 
@@ -258,7 +258,7 @@ class ItineraryScheduleBuilder
 
         $this->row($itinerary, $dayNumber, $sortOrder, [
             'kind' => 'meal',
-            'title' => 'Breakfast at '.($accommodation?->name ?? 'your accommodation'),
+            'title' => 'Breakfast — '.($accommodation?->name ?? 'your accommodation'),
             'starts_at' => Carbon::parse(self::BREAKFAST),
             'accommodation_id' => $accommodation?->id,
         ]);
@@ -315,7 +315,7 @@ class ItineraryScheduleBuilder
 
         $this->row($itinerary, $dayNumber, $sortOrder, array_merge([
             'kind' => 'meal',
-            'title' => 'Lunch at '.($restaurant?->name ?? $destination->name),
+            'title' => 'Lunch — '.($restaurant?->name ?? $destination->name),
             'starts_at' => $start,
             'ends_at' => $start->copy()->addMinutes(self::MEAL_MINUTES),
             'restaurant_id' => $restaurant?->id,
@@ -358,7 +358,7 @@ class ItineraryScheduleBuilder
 
         $this->row($itinerary, $dayNumber, $sortOrder, [
             'kind' => 'meal',
-            'title' => 'Dinner at '.$accommodation->name,
+            'title' => 'Dinner — '.$accommodation->name,
             'starts_at' => Carbon::parse(self::DINNER),
             'accommodation_id' => $accommodation->id,
         ]);

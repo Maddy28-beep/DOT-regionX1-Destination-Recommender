@@ -44,12 +44,26 @@ class EnsureVisitorToken
 
         $response = $next($request);
 
-        return $response->withCookie(cookie(
+        /*
+         * setCookie() on the headers rather than the response's own
+         * withCookie(): that helper only exists on Laravel's own response
+         * classes, and this middleware runs on every web route -- including
+         * the ones that hand back a Symfony StreamedResponse. The admin
+         * reports CSV export did exactly that and died on
+         * "Call to undefined method StreamedResponse::withCookie()", so the
+         * download 500'd for every admin who tried it.
+         *
+         * withCookie() is itself only a wrapper around this call, so the
+         * cookie is set and encrypted exactly as it was before.
+         */
+        $response->headers->setCookie(cookie(
             name: self::COOKIE,
             value: $token,
             minutes: self::LIFETIME_MINUTES,
             httpOnly: true,
         ));
+
+        return $response;
     }
 
     /** The current browser's token. */

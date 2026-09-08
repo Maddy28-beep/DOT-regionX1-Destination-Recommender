@@ -16,5 +16,6 @@
     @include('partials.chatbot-widget')
 
     <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
+    @include('partials.flash-toast')
 </body>
 </html>
