@@ -6,6 +6,9 @@ use App\Models\Accommodation;
 use App\Models\Destination;
 use App\Models\Package;
 use App\Models\Region;
+use App\Models\Restaurant;
+use App\Models\SouvenirCenter;
+use App\Models\TourOperator;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -42,6 +45,93 @@ class HomeController extends Controller
             'webm' => file_exists(public_path('video/hero.webm')) ? asset('video/hero.webm') : null,
             'poster' => file_exists(public_path('video/hero-poster.jpg')) ? asset('video/hero-poster.jpg') : null,
         ];
+    }
+
+
+    /**
+     * Provincial capitals, used only for a region whose own listings carry no
+     * coordinates. Mirrors ContentBasedRecommendationService::REGION_FALLBACK_CENTRE
+     * -- duplicated rather than shared because the recommender's copy exists to
+     * keep a distance gate honest, while this one only has to put a pin roughly
+     * in the right province. Tying the two together would couple a presentation
+     * detail to a scoring decision.
+     */
+    private const REGION_FALLBACK_CENTRE = [
+        'Davao del Norte' => ['lat' => 7.4471, 'lng' => 125.8095],   // Tagum City
+        'Davao de Oro' => ['lat' => 7.6022, 'lng' => 125.9688],       // Nabunturan
+        'Davao Occidental' => ['lat' => 6.4144, 'lng' => 125.6109],   // Malita
+    ];
+
+    /**
+     * Markers for the About-the-Region map: one per region, with what is
+     * actually accredited there.
+     *
+     * The centre is averaged from that region's own mapped destinations where
+     * any exist, and falls back to the provincial capital otherwise. Only 8 of
+     * 25 destinations carry coordinates today, so three regions are still on the
+     * fallback -- flagged as approximate rather than presented as exact, and
+     * each region that gains a mapped destination stops needing it.
+     *
+     * Counts cover every listing type, not destinations alone: Davao de Oro and
+     * Davao Occidental hold no destinations at all, and a pin reading "0" would
+     * misrepresent a province that has 25 and 1 accredited establishments
+     * respectively. For the same reason a type is linked only when it has
+     * something to show -- an empty filtered index is a dead end.
+     *
+     * @param  \Illuminate\Support\Collection<int, Region>  $regions
+     * @return array<int, array<string, mixed>>
+     */
+    private function regionMap($regions): array
+    {
+        $types = [
+            ['label' => 'Destinations', 'model' => Destination::class, 'route' => 'destinations.index'],
+            ['label' => 'Accommodations', 'model' => Accommodation::class, 'route' => 'accommodations.index'],
+            ['label' => 'Restaurants', 'model' => Restaurant::class, 'route' => 'restaurants.index'],
+            ['label' => 'Packages', 'model' => Package::class, 'route' => 'packages.index'],
+            ['label' => 'Souvenir Centers', 'model' => SouvenirCenter::class, 'route' => 'souvenir-centers.index'],
+            ['label' => 'Tour Operators', 'model' => TourOperator::class, 'route' => 'tour-operators.index'],
+        ];
+
+        return $regions->map(function (Region $region) use ($types) {
+            $mapped = Destination::where('region_id', $region->id)
+                ->whereNotNull('latitude')->whereNotNull('longitude')
+                ->get(['latitude', 'longitude']);
+
+            if ($mapped->isNotEmpty()) {
+                $lat = (float) $mapped->avg('latitude');
+                $lng = (float) $mapped->avg('longitude');
+                $approximate = false;
+            } elseif ($fallback = self::REGION_FALLBACK_CENTRE[$region->name] ?? null) {
+                $lat = $fallback['lat'];
+                $lng = $fallback['lng'];
+                $approximate = true;
+            } else {
+                return null;   // nowhere to put a pin; drop it rather than guess
+            }
+
+            $links = [];
+            $total = 0;
+            foreach ($types as $type) {
+                $count = $type['model']::publiclyVisible()->where('region_id', $region->id)->count();
+                $total += $count;
+                if ($count > 0) {
+                    $links[] = [
+                        'label' => $type['label'],
+                        'count' => $count,
+                        'url' => route($type['route'], ['region_id' => $region->id]),
+                    ];
+                }
+            }
+
+            return [
+                'name' => $region->name,
+                'lat' => $lat,
+                'lng' => $lng,
+                'approximate' => $approximate,
+                'total' => $total,
+                'links' => $links,
+            ];
+        })->filter()->values()->all();
     }
 
     public function index(): View
@@ -87,6 +177,7 @@ class HomeController extends Controller
 
         $heroVideo = $this->heroVideo();
 
-        return view('welcome', compact('destinations', 'packages', 'stats', 'regions', 'heroVideo'));
+        return view('welcome', compact('destinations', 'packages', 'stats', 'regions', 'heroVideo'))
+            ->with('regionMap', $this->regionMap($regions));
     }
 }

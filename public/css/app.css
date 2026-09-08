@@ -1802,6 +1802,59 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     padding: 16px 16px 34px;
 }
 .about-map__svg { display: block; width: 100%; height: auto; }
+
+/* ---- Interactive region map --------------------------------------------
+   Replaces the SVG locator that used to fill this figure. Leaflet needs an
+   explicit height -- its container has no intrinsic size, so a percentage or
+   `auto` collapses it to zero and the tiles never appear. */
+.region-map {
+    height: 420px;
+    width: 100%;
+    border-radius: var(--radius-md);
+    /* Sits under the popups and tooltips Leaflet appends, but above the figure
+       background, which would otherwise show through the tile seams. */
+    background: var(--bg);
+}
+.region-map__fallback { font-size: .85rem; color: var(--muted); margin: 10px 0 0; }
+/* The figure's caption is absolutely positioned so it could overlay the SVG
+   this map replaced. Over a Leaflet map it lands on the attribution bar, which
+   is both unreadable and a licence notice that must stay legible. Put it back
+   in flow for this variant and drop the padding that reserved the overlay
+   space. */
+.about-map:has(.region-map) { padding: 12px; }
+.about-map:has(.region-map) .about-map__caption {
+    position: static;
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+}
+/* Leaflet writes its own popup shell, so these style the content we put inside it. */
+.region-pop { min-width: 178px; font-family: 'Poppins', sans-serif; }
+.region-pop strong { display: block; font-size: .92rem; color: var(--ink); }
+.region-pop__total { font-size: .78rem; color: var(--muted); margin: 2px 0 8px; }
+.region-pop__link {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--primary);
+    border-top: 1px solid var(--border);
+}
+.region-pop__link span { color: var(--muted); font-weight: 400; }
+.region-pop__link:hover { color: var(--primary-dark); }
+.region-pop__note {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+    font-size: .74rem;
+    color: var(--muted);
+    line-height: 1.45;
+}
+@media (max-width: 800px) {
+    .region-map { height: 320px; }
+}
 .about-map__caption {
     position: absolute;
     right: 18px;
