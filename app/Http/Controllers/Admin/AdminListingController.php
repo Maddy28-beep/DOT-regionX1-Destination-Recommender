@@ -14,6 +14,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use App\Support\Toast;
 
 class AdminListingController extends Controller
 {
@@ -93,7 +94,7 @@ class AdminListingController extends Controller
         }
 
         return redirect()->route('admin.listings.index', $type)
-            ->with('status', "{$config['singular']} \"{$listing->name}\" created.");
+            ->with(Toast::success("{$config['singular']} created", "\"{$listing->name}\" has been added to the catalog."));
     }
 
     public function edit(string $type, int $id): View
@@ -142,7 +143,7 @@ class AdminListingController extends Controller
         }
 
         return redirect()->route('admin.listings.index', $type)
-            ->with('status', "{$config['singular']} \"{$listing->name}\" updated.");
+            ->with(Toast::success("{$config['singular']} updated", "Your changes to \"{$listing->name}\" have been saved."));
     }
 
     public function archive(string $type, int $id): RedirectResponse
@@ -151,7 +152,7 @@ class AdminListingController extends Controller
         $listing = $config['model']::findOrFail($id);
         $listing->archive();
 
-        return back()->with('status', "{$config['singular']} \"{$listing->name}\" archived. It's now hidden from the public catalog.");
+        return back()->with(Toast::success("{$config['singular']} archived", "\"{$listing->name}\" is now hidden from the public catalog."));
     }
 
     public function unarchive(string $type, int $id): RedirectResponse
@@ -160,7 +161,7 @@ class AdminListingController extends Controller
         $listing = $config['model']::findOrFail($id);
         $listing->unarchive();
 
-        return back()->with('status', "{$config['singular']} \"{$listing->name}\" restored.");
+        return back()->with(Toast::success("{$config['singular']} restored", "\"{$listing->name}\" is publicly visible again."));
     }
 
     /**
@@ -189,7 +190,7 @@ class AdminListingController extends Controller
         $verb = $data['action'] === 'archive' ? 'archived' : 'restored';
         $n = $listings->count();
 
-        return back()->with('status', "{$n} ".Str::plural(strtolower($config['singular']), $n)." {$verb}.");
+        return back()->with(Toast::success('Bulk action complete', "{$n} ".Str::plural(strtolower($config['singular']), $n)." {$verb}."));
     }
 
     private function config(string $type): array

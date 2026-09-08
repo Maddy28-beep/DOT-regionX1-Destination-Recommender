@@ -15,6 +15,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use App\Support\Toast;
 
 class ExitSurveyController extends Controller
 {
@@ -110,8 +111,28 @@ class ExitSurveyController extends Controller
             'comments' => ['nullable', 'string', 'max:500'],
         ]);
 
-        DB::transaction(function () use ($data) {
-            $survey = ExitSurvey::create(collect($data)->except(['places_visited', 'activities'])->all());
+        /*
+         * Tie the survey to the plan it is reporting back on, when the
+         * traveller still has one in this session.
+         *
+         * This is what turns a survey into a labelled example: the preference
+         * records what they asked for and what the recommender scored against,
+         * the survey records where they actually went. Without the key, the
+         * DRS weights in Equation 3 can only ever be hand-set, because nothing
+         * can be checked against an outcome.
+         *
+         * Read straight from the session rather than required: the survey is
+         * open to anyone, including a traveller who never made a plan, and it
+         * must keep working for them.
+         */
+        $preferenceId = $request->session()->get(TripPlannerController::PREFERENCE_KEY);
+
+        DB::transaction(function () use ($data, $preferenceId) {
+            $survey = ExitSurvey::create(
+                collect($data)->except(['places_visited', 'activities'])
+                    ->put('preference_id', $preferenceId)
+                    ->all()
+            );
 
             foreach ($data['places_visited'] ?? [] as $place) {
                 [$kind, $id] = explode(':', $place, 2);
@@ -123,6 +144,6 @@ class ExitSurveyController extends Controller
             }
         });
 
-        return redirect()->route('exit-survey.create')->with('status', 'Thank you for sharing your feedback! Your response helps DOT Region XI improve tourism services.');
+        return redirect()->route('exit-survey.create')->with(Toast::success('Thanks for your feedback', 'Your response helps DOT Region XI improve tourism services.'));
     }
 }

@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use App\Support\Toast;
 
 class EstablishmentPhotoController extends Controller
 {
@@ -21,7 +22,7 @@ class EstablishmentPhotoController extends Controller
 
         if (! $listing) {
             return redirect()->route('establishment.overview')
-                ->with('status', 'Your establishment is not yet linked to a catalog listing.');
+                ->with(Toast::success('No listing linked yet', 'A DOT Admin will link one once your accreditation is verified.'));
         }
 
         $photos = $listing->photos;
@@ -63,7 +64,9 @@ class EstablishmentPhotoController extends Controller
             ]);
         }
 
-        return back()->with('status', count($data['photos']).' photo(s) uploaded.');
+        $n = count($data['photos']);
+
+        return back()->with(Toast::success('Photos uploaded', "{$n} photo".($n === 1 ? '' : 's').' added to your listing.'));
     }
 
     public function setPrimary(Request $request, ListingPhoto $photo): RedirectResponse
@@ -76,7 +79,7 @@ class EstablishmentPhotoController extends Controller
 
         $photo->update(['is_primary' => true]);
 
-        return back()->with('status', 'Cover photo updated.');
+        return back()->with(Toast::success('Cover photo updated', 'This image now leads your listing in search results.'));
     }
 
     public function destroy(Request $request, ListingPhoto $photo): RedirectResponse
@@ -98,7 +101,7 @@ class EstablishmentPhotoController extends Controller
                 ->first()?->update(['is_primary' => true]);
         }
 
-        return back()->with('status', 'Photo removed.');
+        return back()->with(Toast::success('Photo removed', 'It no longer appears on your listing.'));
     }
 
     public function moveUp(Request $request, ListingPhoto $photo): RedirectResponse

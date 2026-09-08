@@ -1,10 +1,7 @@
 <header class="site-header">
     <div class="container bar">
         <a href="{{ route('home') }}" class="brand poster-title">
-            <svg class="brand-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <circle cx="12" cy="12" r="10" fill="currentColor"/>
-                <circle cx="12" cy="12" r="4" fill="var(--stamp-red)"/>
-            </svg>
+            <x-brand-mark class="brand-icon" />
             Explore<span class="dot">DVO</span>
         </a>
 
@@ -51,14 +48,7 @@
         <a href="{{ route('packages.index') }}">Packages</a>
         <a href="{{ route('souvenir-centers.index') }}">Souvenir Centers</a>
         <a href="{{ route('tour-operators.index') }}">Tour Operators</a>
-        <a href="{{ config('dot.accreditation_portal') }}" target="_blank" rel="noopener noreferrer" class="ext-link">
-            List your establishment
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                <path d="M15 3h6v6"/><path d="M10 14 21 3"/>
-            </svg>
-            <span class="sr-only">(opens the DOT accreditation portal in a new tab)</span>
-        </a>
+        <a href="{{ route('portal.establishment.register') }}">List your establishment</a>
         <a href="{{ route('saved.index') }}" class="btn btn-outline btn-block">Saved</a>
         <a href="{{ route('plan.edit') }}" class="btn btn-primary btn-block">Plan My Trip</a>
     </div>

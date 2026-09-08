@@ -19,7 +19,8 @@
     <div class="dash-header">
         <div class="container">
             <div>
-                <h1>Plan Your Trip</h1>
+                <span class="poster-kicker" style="font-size:1.05rem;">no sign-up needed</span>
+                <h1 class="page-title" style="font-size:1.9rem; margin:0;">Plan Your Trip</h1>
                 <div class="sub">Tell us how you like to travel and we'll build a day-by-day itinerary across DOT-accredited places &mdash; no account needed.</div>
             </div>
             <a href="{{ route('saved.index') }}" class="btn btn-outline">Saved Places</a>
@@ -70,10 +71,10 @@
                             </div>
                         </div>
 
-                        <div class="filter-inline" style="align-items:start; margin-top:14px;">
+                        <div class="filter-inline" style="align-items:start; margin-top:12px;">
                             <div class="field" style="flex:1; min-width:180px;">
                                 <label for="travel_type">Who are you traveling with?</label>
-                                <select id="travel_type" name="travel_type" required>
+                                <select id="travel_type" name="travel_type" class="form-select" required>
                                     @foreach ($travelTypes as $value => $label)
                                         <option value="{{ $value }}" @selected(old('travel_type', $preference->travel_type) === $value)>{{ $label }}</option>
                                     @endforeach
@@ -81,7 +82,7 @@
                             </div>
                             <div class="field" style="flex:1; min-width:180px;">
                                 <label for="travel_purpose">Purpose of travel</label>
-                                <select id="travel_purpose" name="travel_purpose">
+                                <select id="travel_purpose" name="travel_purpose" class="form-select">
                                     <option value="">Prefer not to say</option>
                                     @foreach ($travelPurposes as $purpose)
                                         <option value="{{ $purpose }}" @selected(old('travel_purpose', $preference->travel_purpose) === $purpose)>{{ $purpose }}</option>
@@ -90,7 +91,7 @@
                             </div>
                             <div class="field" style="flex:1; min-width:180px;">
                                 <label for="visitor_type">Is this your first visit to Davao?</label>
-                                <select id="visitor_type" name="visitor_type">
+                                <select id="visitor_type" name="visitor_type" class="form-select">
                                     <option value="">Prefer not to say</option>
                                     @foreach ($visitorTypes as $type)
                                         <option value="{{ $type }}" @selected(old('visitor_type', $preference->visitor_type) === $type)>{{ $type }}</option>
@@ -99,10 +100,10 @@
                             </div>
                         </div>
 
-                        <div class="filter-inline" style="align-items:start; margin-top:14px;">
+                        <div class="filter-inline" style="align-items:start; margin-top:12px;">
                             <div class="field" style="flex:1; min-width:180px;">
                                 <label for="budget">Budget</label>
-                                <select id="budget" name="budget" required>
+                                <select id="budget" name="budget" class="form-select" required>
                                     @foreach (['Budget-Friendly', 'Mid-range', 'Premium'] as $b)
                                         <option value="{{ $b }}" @selected(old('budget', $preference->budget) === $b)>{{ $b }}</option>
                                     @endforeach
@@ -110,25 +111,61 @@
                             </div>
                             <div class="field" style="flex:1; min-width:180px;">
                                 <label for="accommodation_pref">Accommodation preference</label>
-                                <select id="accommodation_pref" name="accommodation_pref" required>
-                                    @foreach (['Any', 'Beach Resort', 'Hotel', 'Homestay', 'Hostel'] as $a)
+                                <select id="accommodation_pref" name="accommodation_pref" class="form-select" required>
+                                    @foreach (['Any', 'Hotel', 'Resort', 'Beach Resort', 'Homestay'] as $a)
                                         <option value="{{ $a }}" @selected(old('accommodation_pref', $preference->accommodation_pref) === $a)>{{ $a === 'Homestay' ? 'Homestay / Self-catering' : $a }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="field" style="flex:1; min-width:180px;">
                                 <label for="distance_pref">Preferred travel distance</label>
-                                <select id="distance_pref" name="distance_pref" required>
-                                    <option value="near" @selected(old('distance_pref', $preference->distance_pref) === 'near')>Nearby (within city)</option>
-                                    <option value="moderate" @selected(old('distance_pref', $preference->distance_pref) === 'moderate')>Moderate distance</option>
-                                    <option value="far" @selected(old('distance_pref', $preference->distance_pref) === 'far')>Far / willing to travel</option>
+                                {{--
+                                    The radius comes from the recommender's own gate
+                                    (ContentBasedRecommendationService::RANGE_RADIUS_KM) rather
+                                    than being written out here, so the number a traveller reads
+                                    is the number their results are actually filtered by.
+                                --}}
+                                @php
+                                    $distanceNames = [
+                                        'near' => 'Nearby (within city)',
+                                        'moderate' => 'Moderate distance',
+                                        'far' => 'Far / willing to travel',
+                                    ];
+                                @endphp
+                                <select id="distance_pref" name="distance_pref" class="form-select" required
+                                        aria-describedby="distance_pref_hint">
+                                    @foreach ($distanceNames as $value => $name)
+                                        <option value="{{ $value }}" @selected(old('distance_pref', $preference->distance_pref) === $value)>
+                                            {{-- Kept terse deliberately. A closed <select> clips
+                                                 rather than wraps, and at 375px only ~240px of
+                                                 text fits: the longer phrasing ("... — anywhere in
+                                                 the region", 338px) was cut off mid-word on a
+                                                 phone, which is where most of these are filled in. --}}
+                                            {{ $name }} &middot;
+                                            @if ($distanceRadii[$value] === null)
+                                                no limit
+                                            @else
+                                                ~{{ (int) $distanceRadii[$value] }} km
+                                            @endif
+                                        </option>
+                                    @endforeach
                                 </select>
+                                {{-- "~" is doing real work: when a radius holds too few places for
+                                     the trip length the gate widens to the next tier rather than
+                                     returning a half-empty plan, and the itinerary says so when it
+                                     happens. Stating a hard figure here would promise a ceiling
+                                     the recommender is designed to break. --}}
+                                <p class="field-hint" id="distance_pref_hint">
+                                    Measured from your starting point. If there aren't enough
+                                    DOT-accredited places in range, we widen the search and tell
+                                    you on the itinerary.
+                                </p>
                             </div>
                         </div>
 
-                        <div class="field" style="margin-top:18px;">
+                        <div class="field" style="margin-top:16px;">
                             <label>Interests &amp; activities</label>
-                            <div class="checkbox-grid">
+                            <div class="chip-checkbox-grid">
                                 @foreach ($activityOptions as $activity)
                                     <label class="field-check">
                                         <input type="checkbox" name="activities[]" value="{{ $activity }}" @checked(in_array($activity, old('activities', $selectedActivities)))>
@@ -140,7 +177,7 @@
 
                         <div class="field" style="margin-top:18px;">
                             <label>Preferred amenities</label>
-                            <div class="checkbox-grid">
+                            <div class="chip-checkbox-grid">
                                 @foreach ($amenityOptions as $amenity)
                                     <label class="field-check">
                                         <input type="checkbox" name="amenities[]" value="{{ $amenity }}" @checked(in_array($amenity, old('amenities', $selectedAmenities)))>
@@ -169,11 +206,14 @@
                         --}}
                         <div class="field" style="margin-top:18px;">
                             <label for="origin_label">Where are you starting from? (optional)</label>
-                            <p class="field-hint">
-                                Your hotel, the airport, or any address. We order your stops from nearest to
-                                furthest. Rounded to about 100 metres before we store it, never linked to your
-                                name, and cleared when you clear the trip.
-                            </p>
+                            <div class="privacy-note">
+                                <x-icon name="map-pin" />
+                                <p>
+                                    Your hotel, the airport, or any address. We order your stops from nearest to
+                                    furthest. Rounded to about 100 metres before we store it, never linked to your
+                                    name, and cleared when you clear the trip.
+                                </p>
+                            </div>
 
                             <input type="hidden" name="origin_lat" id="origin_lat" value="{{ old('origin_lat', $preference->origin_lat) }}">
                             <input type="hidden" name="origin_lng" id="origin_lng" value="{{ old('origin_lng', $preference->origin_lng) }}">
@@ -221,11 +261,14 @@
                         --}}
                         <div class="field" style="margin-top:22px;">
                             <label>Health &amp; accessibility (optional)</label>
-                            <p class="field-hint">
-                                If you tell us, we will favour places that can accommodate you. Kept with this trip
-                                plan only, never linked to your name, and removed the moment you untick the box below.
-                            </p>
-                            <div class="checkbox-grid">
+                            <div class="privacy-note">
+                                <x-icon name="shield-check" />
+                                <p>
+                                    If you tell us, we will favour places that can accommodate you. Kept with this trip
+                                    plan only, never linked to your name, and removed the moment you untick the box below.
+                                </p>
+                            </div>
+                            <div class="chip-checkbox-grid">
                                 @foreach ($healthOptions as $key => $label)
                                     <label class="field-check">
                                         <input type="checkbox" name="health_conditions[]" value="{{ $key }}" @checked(in_array($key, old('health_conditions', $selectedConditions)))>
@@ -242,12 +285,12 @@
                                    placeholder="e.g. needs step-free access to the shoreline">
                         </div>
 
-                        <label class="field-check" style="margin-top:12px;">
+                        <label class="field-check consent-check" style="margin-top:12px;">
                             <input type="checkbox" name="health_consent" value="1" @checked(old('health_consent', (bool) $healthProfile))>
                             <span>Use this to tailor my itinerary. I can clear it any time by unticking this box.</span>
                         </label>
 
-                        <button type="submit" class="btn btn-primary" style="margin-top:20px;">Build My Itinerary</button>
+                        <button type="submit" class="btn btn-accent" style="margin-top:20px;">Build My Itinerary &rarr;</button>
                     </form>
                 </div>
             </div>

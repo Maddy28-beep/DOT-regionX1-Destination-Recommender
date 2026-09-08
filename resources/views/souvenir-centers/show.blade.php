@@ -45,6 +45,8 @@
                 @empty
                     <p style="color:var(--muted);">No reviews yet. Be the first to visit and share your experience.</p>
                 @endforelse
+
+                @include("partials.review-form", ["listing" => $souvenirCenter, "type" => "souvenir-centers", "kind" => "souvenir_center"])
             </div>
         </div>
 

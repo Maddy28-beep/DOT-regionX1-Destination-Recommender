@@ -6,18 +6,180 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>ExploreDVO — Discover the Wonders of Davao Region</title>
     @include('partials.head-assets')
+    @if ($heroVideo && $heroVideo['poster'])
+        {{-- Fetched in parallel with the stylesheet so the hero's ground is
+             ready at first paint, rather than arriving after it. --}}
+        <link rel="preload" as="image" href="{{ $heroVideo['poster'] }}">
+    @endif
 </head>
 <body class="hero-page">
 
 @include('partials.header')
 
-<section class="poster-hero">
+{{-- has-footage is set server-side so the painted horizon is never drawn in
+     the first place when a clip is available. Waiting for JavaScript to hide
+     it meant it always flashed first: an inline script is held until pending
+     stylesheets apply, so it cannot run before the illustration has painted.
+     The script below puts the illustration back if it decides against the
+     video, and the <noscript> block does the same when there is no script at
+     all. --}}
+<section class="poster-hero{{ $heroVideo ? ' has-footage' : '' }}"
+    @if ($heroVideo && $heroVideo['poster'])
+        {{-- The clip's own first frame, as the ground the video paints onto.
+             Inline because the URL is dynamic. Preloaded in the head so it is
+             already decoded when the section paints. --}}
+        style="background-image: url('{{ $heroVideo['poster'] }}');"
+    @endif
+>
+
+    @if ($heroVideo)
+        {{--
+            Hero footage, carrying no src so the browser cannot start
+            downloading before the script below has decided this visit can
+            afford it. On a phone, a metered connection, or with reduced
+            motion asked for, that script restores the painted hero instead.
+
+            Muted + playsinline because no mobile browser will autoplay
+            otherwise, and a background clip that makes noise is a bug rather
+            than a feature.
+
+            No poster frame: the hero's own dark ground already covers the
+            moment before the first frame decodes, so a poster could only
+            flash over it.
+        --}}
+        <video class="poster-hero__video" aria-hidden="true" tabindex="-1"
+               muted loop playsinline preload="none"
+               data-mp4="{{ $heroVideo['mp4'] }}"
+               @if ($heroVideo['webm']) data-webm="{{ $heroVideo['webm'] }}" @endif></video>
+        <div class="poster-hero__video-scrim" aria-hidden="true"></div>
+
+        {{-- No script means no video, so the painted hero has to come back. --}}
+        <noscript>
+            <style>
+                .poster-hero.has-footage .poster-hero__horizon,
+                .poster-hero.has-footage .poster-hero__banca { display: block; }
+                .poster-hero__video, .poster-hero__video-scrim { display: none; }
+            </style>
+        </noscript>
+
+        <script>
+            /*
+             * Inline and immediately beneath the element on purpose. app.js is
+             * deferred, so running this from there waited for the whole
+             * document to parse -- ~1450ms, against ~350ms to actually fetch
+             * the clip -- and the painted hero sat on screen for close to two
+             * seconds before the video replaced it. Starting during parsing
+             * cuts almost all of that.
+             *
+             * It still cannot run before the first paint, because a browser
+             * holds even an inline script until pending stylesheets apply.
+             * That is why the illustration is withheld server-side via
+             * .has-footage and put back here, rather than the other way round.
+             *
+             * The <video> carries no src; this decides whether the visit can
+             * afford one. Three reasons to refuse, and the painted hero is
+             * restored in every one of them:
+             *
+             *   1. Reduced motion -- a full-bleed moving background is exactly
+             *      what that preference exists to stop.
+             *   2. A narrow screen. Most visitors to a tourism site are on a
+             *      phone, often roaming.
+             *   3. Data Saver, or a connection reporting itself as 2g/3g.
+             */
+            (function () {
+                var video = document.currentScript.parentNode.querySelector('.poster-hero__video');
+                if (!video) return;
+
+                var refuse = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                    || !window.matchMedia('(min-width: 900px)').matches;
+
+                var connection = navigator.connection || {};
+                if (connection.saveData === true || /(^|-)(2g|3g)$/.test(connection.effectiveType || '')) {
+                    refuse = true;
+                }
+
+                var hero = video.closest('.poster-hero');
+
+                // Declining the footage means putting the painted hero back,
+                // since the markup shipped without it.
+                var fallBack = function () {
+                    hero.classList.remove('has-footage', 'has-video');
+                };
+
+                if (refuse) {
+                    fallBack();
+
+                    return;
+                }
+
+                /*
+                 * Commit to the footage now, before it has loaded.
+                 *
+                 * The painted horizon sits above the video in the stack, so it
+                 * has to be cleared for the footage to show at all -- waiting
+                 * for loadeddata to do that meant the fallback was always
+                 * visible first, however briefly. Clearing it up front lets
+                 * the video paint the instant it has a frame, which on a
+                 * refresh with the clip cached is effectively immediate.
+                 *
+                 * Safe because the hero's own ground is already the dark of
+                 * the scrim: an empty <video> paints nothing, so what shows in
+                 * the meantime is the same colour the footage arrives on.
+                 */
+                hero.classList.add('has-video');
+
+                // preload="none" in the markup keeps the browser from fetching
+                // before the checks above have run. Now that they have passed,
+                // say it is wanted.
+                video.preload = 'auto';
+
+                /*
+                 * If no frame ever arrives, put the illustration back. Both
+                 * paths are needed: `error` does not fire reliably on a media
+                 * element whose sources are <source> children, and a clip can
+                 * also simply stall. loadeddata re-commits if it turns up late.
+                 */
+                var giveUp = setTimeout(function () {
+                    if (video.readyState < 2) fallBack();
+                }, 2500);
+
+                video.addEventListener('error', function () {
+                    clearTimeout(giveUp);
+                    fallBack();
+                }, { once: true });
+
+                ['webm', 'mp4'].forEach(function (type) {
+                    var url = video.getAttribute('data-' + type);
+                    if (!url) return;
+
+                    var source = document.createElement('source');
+                    source.src = url;
+                    source.type = type === 'webm' ? 'video/webm' : 'video/mp4';
+                    video.appendChild(source);
+                });
+
+                video.load();
+
+                // Re-commit if the clip turns up after the deadline above had
+                // already put the illustration back.
+                video.addEventListener('loadeddata', function () {
+                    clearTimeout(giveUp);
+                    hero.classList.add('has-video');
+                }, { once: true });
+
+                // play() can reject on its own even when muted; the
+                // illustration is still there if it does.
+                var attempt = video.play();
+                if (attempt && typeof attempt.catch === 'function') {
+                    attempt.catch(function () {});
+                }
+            })();
+        </script>
+    @endif
 
     <div class="stamp-badge">
         <span class="stamp-badge__text"><strong>Official</strong><span>DOT Region XI</span><span>Philippines</span></span>
     </div>
-
-    <div class="poster-hero__sun" aria-hidden="true"></div>
 
     <svg class="poster-hero__horizon" viewBox="0 0 1200 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path style="fill:var(--ocean-teal-dark)" d="M0,220 L0,150 L150,110 L300,150 L450,100 L600,140 L750,90 L900,150 L1050,120 L1200,150 L1200,220 Z"/>
@@ -36,39 +198,46 @@
         <p class="poster-hero__subhead">Sun-warmed islands, misty highlands, and the Philippine Eagle's home &mdash; discover DOT-accredited stays, tours, and eats across Region XI.</p>
     </div>
 
-    <form class="ticket-search container" action="{{ route('plan.edit') }}" method="GET">
+    {{--
+        Every option carries an explicit value. Without one a select submits
+        its own label, so "Duration" arrived as the string "1–2 days" -- en
+        dash and all -- and anything reading it had to parse display text back
+        into a number. The labels stay free to change without breaking the
+        search.
+    --}}
+    <form class="ticket-search container" action="{{ route('search') }}" method="GET">
         <div class="field">
             <label for="purpose">I want to&hellip;</label>
             <select id="purpose" name="purpose">
-                <option>Explore destinations</option>
-                <option>Book accommodations</option>
-                <option>Find tour packages</option>
-                <option>Try local restaurants</option>
+                <option value="destinations">Explore destinations</option>
+                <option value="accommodations">Book accommodations</option>
+                <option value="packages">Find tour packages</option>
+                <option value="restaurants">Try local restaurants</option>
             </select>
         </div>
         <div class="field">
             <label for="duration">Duration</label>
             <select id="duration" name="duration">
-                <option>1&ndash;2 days</option>
-                <option>3&ndash;4 days</option>
-                <option>5+ days</option>
+                <option value="1-2">1&ndash;2 days</option>
+                <option value="3-4">3&ndash;4 days</option>
+                <option value="5-plus">5+ days</option>
             </select>
         </div>
         <div class="field">
             <label for="budget">Budget</label>
             <select id="budget" name="budget">
-                <option>Budget-Friendly</option>
-                <option>Mid-range</option>
-                <option>Premium</option>
+                <option value="Budget-Friendly">Budget-Friendly</option>
+                <option value="Mid-range">Mid-range</option>
+                <option value="Premium">Premium</option>
             </select>
         </div>
         <div class="field">
             <label for="interest">Interest</label>
             <select id="interest" name="interest">
-                <option>Beach &amp; Island</option>
-                <option>Nature &amp; Adventure</option>
-                <option>Cultural Heritage</option>
-                <option>Wildlife</option>
+                <option value="Beach &amp; Island">Beach &amp; Island</option>
+                <option value="Nature &amp; Adventure">Nature &amp; Adventure</option>
+                <option value="Cultural Heritage">Cultural Heritage</option>
+                <option value="Wildlife">Wildlife</option>
             </select>
         </div>
         <button type="submit" class="btn btn-accent">Search &rarr;</button>
@@ -88,10 +257,16 @@
                 <div class="stat-num">{{ $stats['accommodations'] }}+</div>
                 <div class="stat-label">Accommodations</div>
             </div>
-            <div class="stat-item stat-item--rating">
-                <div class="stat-num">{{ $stats['avg_rating'] ?: '4.8' }}</div>
-                <div class="stat-label">Traveler Rating</div>
-            </div>
+            {{-- No fabricated placeholder here: this stood at a hard-coded
+                 "4.8" whenever nothing was rated yet, which is a review score
+                 no traveller ever gave. If there is nothing real to show, the
+                 stat simply stands down. --}}
+            @if ($stats['avg_rating'])
+                <div class="stat-item stat-item--rating">
+                    <div class="stat-num">{{ number_format($stats['avg_rating'], 1) }}</div>
+                    <div class="stat-label">Traveler Rating</div>
+                </div>
+            @endif
         </div>
     </div>
 </section>
@@ -161,7 +336,17 @@
             <div>
                 <span class="dpost-kicker poster-kicker">handpicked for you</span>
                 <h2 class="poster-title" style="color:var(--ocean-teal-dark);">Popular Destinations</h2>
-                <p>Verified DOT-accredited spots across the Davao Region, ranked by traveler ratings.</p>
+                {{-- Both this line and the banner's "Top Rated" ribbon below are
+                     claims about traveller ratings, so they hold only while some
+                     listing actually carries one. With the invented review counts
+                     gone the catalogue starts unrated, and the ordering falls back
+                     to the DOT-featured flag -- which is what the alternative
+                     copy describes. --}}
+                @if ($stats['avg_rating'])
+                    <p>Verified DOT-accredited spots across the Davao Region, ranked by traveler ratings.</p>
+                @else
+                    <p>Verified DOT-accredited spots across the Davao Region.</p>
+                @endif
             </div>
             <div class="dpost-head__right">
                 <svg class="dpost-flight" viewBox="0 0 160 46" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -178,7 +363,11 @@
                 <div class="dpost-banner__art">
                     @include('partials.poster-illustration', ['scene' => $featuredScene])
                     <div class="halftone"></div>
-                    <span class="dpost-ribbon">Top Rated</span>
+                    @if ($stats['avg_rating'])
+                        <span class="dpost-ribbon">Top Rated</span>
+                    @else
+                        <span class="dpost-ribbon">Featured</span>
+                    @endif
                 </div>
                 <div class="dpost-banner__copy">
                     <span class="dpost-banner__kicker poster-kicker">the crown jewel of</span>

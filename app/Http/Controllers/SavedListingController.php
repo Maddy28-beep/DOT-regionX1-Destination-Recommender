@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Support\Toast;
 
 /**
  * The heart control: places a visitor wants to keep.
@@ -92,22 +93,29 @@ class SavedListingController extends Controller
         if ($existing) {
             $existing->delete();
             $saved = false;
-            $status = "Removed {$listing->name} from your saved list.";
+            $toast = Toast::success('Removed from Saved Places', "{$listing->name} is no longer in your list.");
         } else {
             SavedListing::create($attributes + ['saved_at' => now()]);
             $saved = true;
-            $status = "Saved {$listing->name}.";
+            $toast = Toast::success('Added to Saved Places', "{$listing->name} is now in your list.");
         }
 
         // The heart is toggled in place by JS without a page reload; JSON keeps
         // that path from re-rendering anything. A plain form submit (no JS)
         // still gets the redirect it always has, so the control keeps working
         // with JavaScript off.
+        // The same two strings the redirect path flashes, so the heart shows an
+        // identical toast whether or not JavaScript handled the click.
         if ($request->wantsJson()) {
-            return response()->json(['saved' => $saved, 'status' => $status, 'name' => $listing->name]);
+            return response()->json([
+                'saved' => $saved,
+                'title' => $toast['status'],
+                'detail' => $toast['status_detail'],
+                'name' => $listing->name,
+            ]);
         }
 
-        return back()->with('status', $status);
+        return back()->with($toast);
     }
 
     /** Where the per-request memo of savedKeys() lives on the request. */

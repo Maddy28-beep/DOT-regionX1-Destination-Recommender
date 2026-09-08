@@ -62,6 +62,8 @@
                 @empty
                     <p style="color:var(--muted);">No reviews yet. Be the first to dine and share your experience.</p>
                 @endforelse
+
+                @include("partials.review-form", ["listing" => $restaurant, "type" => "restaurants", "kind" => "restaurant"])
             </div>
         </div>
 

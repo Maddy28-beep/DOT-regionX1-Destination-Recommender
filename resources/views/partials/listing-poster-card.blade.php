@@ -22,6 +22,18 @@
     // card's anchor -- a form nested in a link is invalid markup and the
     // button would swallow the click -- so the wrapper is what lifts on hover.
     $saveSegment = \App\Http\Controllers\SavedListingController::segmentFor($listing);
+
+    /*
+     * A real photograph wins over the generated artwork whenever the listing
+     * has one. The card used to render the illustration unconditionally, so a
+     * photo an establishment had already uploaded through its own portal
+     * never reached the grid it was uploaded for.
+     *
+     * coverPhoto() reads the eager-loaded relation when there is one -- every
+     * query that renders these cards loads `photos` -- so this costs no extra
+     * queries per card.
+     */
+    $coverPhoto = $listing->coverPhoto();
 @endphp
 
 <div class="dpost-card-wrap">
@@ -30,7 +42,14 @@
 @endif
 <a href="{{ $listing->posterUrl() }}" class="dpost-card">
     <div class="dpost-card__art {{ $saveSegment ? 'has-save' : '' }}">
-        @include('partials.poster-illustration', ['scene' => $listing->posterScene()])
+        @if ($coverPhoto)
+            {{-- alt is empty deliberately: .dpost-card__name below already
+                 names the place and the whole card is a single link, so
+                 describing it here would only be read out twice. --}}
+            <img src="{{ $coverPhoto->url() }}" alt="" class="dpost-card__photo" loading="lazy" decoding="async">
+        @else
+            @include('partials.poster-illustration', ['scene' => $listing->posterScene()])
+        @endif
         <div class="halftone"></div>
         <div class="dpost-card__scrim"></div>
 
@@ -67,7 +86,15 @@
             <div class="dpost-price">
                 @if ($tier === 0)
                     <span class="dpost-price__free">Free entry</span>
-                @elseif ($tier !== null)
+                @elseif ($tier !== null && ! $priceAmount)
+                    {{--
+                        The meter is a price BAND, so it only earns its place
+                        while the exact figure is unknown. Shown next to one it
+                        said the same thing twice and put four peso signs in a
+                        row -- three greyed-out band symbols running straight
+                        into the amount's own -- which read as a single garbled
+                        number rather than as a meter plus a price.
+                    --}}
                     @for ($i = 1; $i <= 3; $i++)
                         <span class="{{ $i <= $tier ? 'is-active' : '' }}">&#8369;</span>
                     @endfor

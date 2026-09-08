@@ -58,6 +58,8 @@
                 </div>
             @endif
 
+            @include('partials.location-picker', ['listing' => $listing])
+
             <button type="submit" class="btn btn-primary" style="margin-top:20px;">Save Changes</button>
         </form>
     </div>
