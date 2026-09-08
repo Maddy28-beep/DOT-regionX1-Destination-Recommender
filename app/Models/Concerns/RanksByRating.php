@@ -39,9 +39,17 @@ trait RanksByRating
     {
         $mean = static::query()->where('review_count', '>', 0)->avg('rating');
 
+        /*
+         * The prior and the mean are both bound parameters, and multiplying
+         * two untyped placeholders together is something Postgres refuses to
+         * resolve a type for ("operator is not unique: unknown * unknown") --
+         * SQLite tolerates it, which is why the test suite (sqlite :memory:)
+         * never caught this against the project's real Postgres database.
+         * Casting each one is portable across all three drivers.
+         */
         return $query
             ->orderByRaw(
-                '(review_count * rating + ? * ?) / (review_count + ?) desc',
+                '(review_count * rating + CAST(? AS float) * CAST(? AS float)) / (review_count + CAST(? AS float)) desc',
                 [self::$ratingPrior, (float) ($mean ?? 0), self::$ratingPrior]
             )
             ->orderByDesc('review_count');
