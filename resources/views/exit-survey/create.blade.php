@@ -5,7 +5,8 @@
 @section('content')
 <div class="page-head">
     <div class="container">
-        <h1>Visitor Exit Survey</h1>
+        <span class="poster-kicker">before you go</span>
+        <h1 class="page-title">Visitor Exit Survey</h1>
         <p>Help DOT Region XI improve tourism services and destination management in the Davao Region.</p>
     </div>
 </div>
@@ -23,13 +24,25 @@
             </div>
         @endif
 
-        <div class="panel">
-            <div class="panel-head">
-                <div>
-                    <h2>Data Privacy Notice</h2>
-                    <p>Your responses are <strong>anonymous</strong>. This survey does not collect your name, email, or account information, and is not linked to your ExploreDVO profile if you have one. Data is handled per the Philippine Data Privacy Act of 2012 (RA 10173) and used only for tourism analytics and service improvement.</p>
-                </div>
-            </div>
+        {{--
+            The .privacy-note callout Plan Your Trip already uses, rather than a
+            panel of plain prose -- this is guidance that must not be skimmed
+            past, and it should look the same everywhere it appears.
+
+            "not linked to your ExploreDVO profile if you have one" was removed:
+            there are no traveller profiles to link to. Offering the possibility
+            implies accounts exist and quietly weakens the actual claim, which is
+            stronger -- nothing here identifies anyone, because there is nothing
+            to identify them with.
+        --}}
+        <div class="privacy-note" style="margin-bottom:20px;">
+            <x-icon name="shield-check" />
+            <p>
+                <strong>Your responses are anonymous.</strong> This survey collects no name, email
+                address or contact details, and ExploreDVO holds no traveller accounts to link them
+                to. Answers are handled under the Philippine Data Privacy Act of 2012 (RA 10173) and
+                used only for tourism analytics and service improvement by DOT Region XI.
+            </p>
         </div>
 
         <form method="POST" action="{{ route('exit-survey.store') }}">
@@ -94,19 +107,25 @@
                     </div>
                 </div>
                 <div class="panel-body">
+                    {{--
+                        One searchable picker per category, replacing what were
+                        395 checkboxes across six alphabetical grids. A
+                        respondent visited two or three places; asking them to
+                        find those in an unfiltered wall is how you lose the
+                        response before the ratings section.
+                    --}}
                     @foreach ($placeGroups as $kind => $group)
-                        @if ($group['items']->isNotEmpty())
-                            <div class="field" style="margin-top:{{ $loop->first ? '0' : '18' }}px;">
-                                <label>{{ $group['label'] }} visited</label>
-                                <div class="checkbox-grid">
-                                    @foreach ($group['items'] as $item)
-                                        <label class="field-check">
-                                            <input type="checkbox" name="places_visited[]" value="{{ $kind }}:{{ $item->id }}" @checked(in_array($kind.':'.$item->id, old('places_visited', [])))>
-                                            <span>{{ $item->name }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </div>
+                        @if (count($group['items']))
+                            @include('partials.tag-picker', [
+                                'name' => 'places_visited[]',
+                                'label' => $group['label'].' visited',
+                                'items' => $group['items'],
+                                'kind' => $kind,
+                                'placeholder' => 'Search '.strtolower($group['label']).'…',
+                                'selected' => collect(old('places_visited', []))
+                                    ->filter(fn ($v) => str_starts_with($v, $kind.':'))
+                                    ->all(),
+                            ])
                         @endif
                     @endforeach
 
@@ -161,11 +180,11 @@
                     <div class="field" style="margin-top:22px;">
                         <label>Would you recommend the Davao Region to friends or family?</label>
                         <div style="display:flex; gap:20px; margin-top:8px;">
-                            <label class="field-check" style="margin-top:0;">
+                            <label class="field-check radio-check" style="margin-top:0; align-items:center;">
                                 <input type="radio" name="would_recommend" value="Yes" @checked(old('would_recommend') === 'Yes') required>
                                 <span>Yes, definitely</span>
                             </label>
-                            <label class="field-check" style="margin-top:0;">
+                            <label class="field-check radio-check" style="margin-top:0; align-items:center;">
                                 <input type="radio" name="would_recommend" value="No" @checked(old('would_recommend') === 'No')>
                                 <span>Probably not</span>
                             </label>
@@ -177,7 +196,7 @@
                         <textarea id="comments" name="comments" rows="3" placeholder="What did you love? What could DOT improve? Any specific attractions or experiences worth highlighting?">{{ old('comments') }}</textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block" style="margin-top:20px;">Submit Survey</button>
+                    <button type="submit" class="btn btn-accent btn-block" style="margin-top:20px;">Submit Survey &rarr;</button>
                 </div>
             </div>
         </form>
