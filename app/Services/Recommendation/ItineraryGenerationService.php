@@ -45,6 +45,7 @@ class ItineraryGenerationService
         private readonly ContentBasedRecommendationService $contentBased,
         private readonly AprioriService $apriori,
         private readonly ItineraryScheduleBuilder $schedule,
+        private readonly ItinerarySkeletonMlService $skeletonMl,
     ) {}
 
     /**
@@ -120,7 +121,37 @@ class ItineraryGenerationService
 
         $sequence = $this->sequenceByNearestNeighbor($topRanked, $originLat, $originLng);
 
-        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened) {
+        /*
+         * Apriori accommodation pick moved here, ahead of the transaction: it
+         * only reads (co-visitation rules, then a catalogue query), never
+         * writes, so computing it now — instead of inside the transaction
+         * closure as before — is safe, and it lets the pretrained ML step
+         * below see the same accommodation hint the schedule will actually
+         * use, without querying for it twice.
+         */
+        $accommodationPick = $this->pickAccommodation($sequence, $preference);
+
+        /*
+         * Pretrained ML inference step (manuscript Sec. 2.3.4, "Pretrained ML
+         * Model"): Phi-4-mini-instruct, served locally via Ollama,
+         * inference-only. Proposes which day each already-ranked,
+         * already-sequenced stop belongs to. Returns null whenever the model
+         * is unconfigured, unreachable, or its output fails validation —
+         * ItineraryScheduleBuilder treats null exactly like "no skeleton was
+         * ever proposed" and uses $sequence's own Haversine/Nearest-Neighbor
+         * order unchanged, so this step can only ever refine the plan, never
+         * break it.
+         */
+        $skeleton = $this->skeletonMl->proposeSkeleton(
+            $sequence,
+            $dayCapacities,
+            $preference,
+            $accommodationPick && $accommodationPick['rule']
+                ? ['name' => $accommodationPick['listing']->name, 'apriori_confidence' => $accommodationPick['rule']['confidence']]
+                : null,
+        );
+
+        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $skeleton) {
             $itinerary = Itinerary::create([
                 'preference_id' => $preference->id,
                 'total_days' => $totalDays,
@@ -159,7 +190,8 @@ class ItineraryGenerationService
                 $preference,
                 $dayCapacities,
                 $origin,
-                $this->pickAccommodation($sequence, $preference),
+                $accommodationPick,
+                $skeleton,
             );
 
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);

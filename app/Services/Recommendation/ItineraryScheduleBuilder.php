@@ -116,6 +116,7 @@ class ItineraryScheduleBuilder
         array $dayCapacities,
         array $origin,
         ?array $stay,
+        ?array $skeleton = null,
     ): void {
         $accommodation = $stay['listing'] ?? null;
         $stayRule = $stay['rule'] ?? null;
@@ -127,8 +128,19 @@ class ItineraryScheduleBuilder
          * visited before the day's cutoff stays at the front of the queue and
          * is tried again tomorrow, rather than being crammed into tonight. That
          * is what stops a distant stop dragging the day past midnight.
+         *
+         * $skeleton, when present, is the pretrained ML model's validated
+         * day/slot grouping (ItinerarySkeletonMlService) — it only ever
+         * reorders this same queue so that one day's stops tend to come up
+         * together; every stop below still passes through the exact same
+         * fitsInDay()/addTravel()/addActivity() simulation regardless of
+         * which order it arrives in, so a stop the model placed on a day that
+         * turns out not to have time for it still falls through to the next
+         * day exactly as it always has. $skeleton is null whenever the model
+         * was unconfigured, unreachable, or failed validation, in which case
+         * this is precisely the original nearest-neighbor order.
          */
-        $queue = $sequence;
+        $queue = $skeleton ? $this->reorderBySkeleton($sequence, $skeleton) : $sequence;
 
         // Where the traveller physically is. Starts at their baseline and moves
         // with them, which is what makes each journey estimate honest rather
@@ -188,6 +200,41 @@ class ItineraryScheduleBuilder
                 $here = $accommodation ? $this->place($accommodation) : $here;
             }
         }
+    }
+
+    /**
+     * Reorders the nearest-neighbor queue to follow the pretrained ML model's
+     * day grouping, so the day loop below tends to fill each day with the
+     * stops the model assigned to it — without changing how that loop
+     * decides whether a stop actually fits.
+     *
+     * @param  array<int, array{row: array{destination: \App\Models\Destination}, distance_km: float|null}>  $sequence
+     * @param  array<int, array<int, array{destination_id: int, slot: string}>>  $skeleton  day number => ordered stops (ItinerarySkeletonMlService::validate())
+     * @return array<int, array{row: array, distance_km: float|null}>
+     */
+    private function reorderBySkeleton(array $sequence, array $skeleton): array
+    {
+        $byId = [];
+        foreach ($sequence as $entry) {
+            $byId[$entry['row']['destination']->id] = $entry;
+        }
+
+        $ordered = [];
+        ksort($skeleton);
+        foreach ($skeleton as $stops) {
+            foreach ($stops as $stop) {
+                if (isset($byId[$stop['destination_id']])) {
+                    $ordered[] = $byId[$stop['destination_id']];
+                    unset($byId[$stop['destination_id']]);
+                }
+            }
+        }
+
+        // Anything the skeleton didn't account for (shouldn't happen after
+        // ItinerarySkeletonMlService::validate()'s "every candidate exactly
+        // once" check, but kept as a safety net) keeps its original
+        // nearest-neighbor order at the end rather than being dropped.
+        return array_merge($ordered, array_values($byId));
     }
 
     /**
