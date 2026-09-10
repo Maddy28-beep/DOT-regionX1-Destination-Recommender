@@ -52,7 +52,7 @@ class ItinerarySkeletonMlService
         $candidates = $this->buildCandidates($sequence);
 
         try {
-            $response = Http::timeout((int) config('services.phi4mini.timeout', 12))
+            $response = Http::timeout((int) config('services.phi4mini.timeout', 20))
                 ->post(rtrim(config('services.phi4mini.url'), '/').'/api/generate', [
                     'model' => config('services.phi4mini.model', 'phi4-mini'),
                     'prompt' => $this->buildPrompt($candidates, $dayCapacities, $preference, $accommodationHint),
@@ -197,10 +197,10 @@ class ItinerarySkeletonMlService
         $grouped = [];
 
         foreach ($days as $day) {
-            $dayNumber = $day['day_number'] ?? null;
+            $dayNumber = $this->toWholeInt($day['day_number'] ?? null);
             $stops = $day['stops'] ?? null;
 
-            if (! is_int($dayNumber) || ! is_array($stops)) {
+            if ($dayNumber === null || ! is_array($stops)) {
                 return null;
             }
 
@@ -216,10 +216,10 @@ class ItinerarySkeletonMlService
 
             $dayGroup = [];
             foreach ($stops as $stop) {
-                $id = $stop['destination_id'] ?? null;
+                $id = $this->toWholeInt($stop['destination_id'] ?? null);
                 $slot = $stop['slot'] ?? null;
 
-                if (! is_int($id) || ! is_string($slot) || $slot === '') {
+                if ($id === null || ! is_string($slot) || $slot === '') {
                     return null;
                 }
 
@@ -248,5 +248,25 @@ class ItinerarySkeletonMlService
         }
 
         return $grouped;
+    }
+
+    /**
+     * Accepts a JSON-decoded integer OR a whole-number float (some JSON
+     * encoders write a schema-valid "integer" field as e.g. 1.0 rather than
+     * 1), and rejects anything else — a fractional number, a numeric string,
+     * null. Returns the value as a genuine PHP int so every caller can keep
+     * comparing/indexing with strict types.
+     */
+    private function toWholeInt(mixed $value): ?int
+    {
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (is_float($value) && floor($value) === $value) {
+            return (int) $value;
+        }
+
+        return null;
     }
 }
