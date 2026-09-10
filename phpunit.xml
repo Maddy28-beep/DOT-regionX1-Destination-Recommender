@@ -30,6 +30,10 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
+        <!-- Keeps the test suite fast and deterministic: itinerary generation
+             tests exercise ItinerarySkeletonMlService's fallback path instead
+             of making live calls to a local Ollama server. -->
+        <env name="PHI4MINI_URL" value=""/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
     </php>
