@@ -16,7 +16,7 @@ class Itinerary extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'preference_id', 'total_days', 'est_budget_total',
+        'preference_id', 'package_id', 'total_days', 'est_budget_total',
         'est_party_size', 'generated_at', 'range_tier_used', 'range_widened',
     ];
 
@@ -31,6 +31,12 @@ class Itinerary extends Model
     public function preference(): BelongsTo
     {
         return $this->belongsTo(TouristPreference::class, 'preference_id');
+    }
+
+    /** Set only when this plan was adopted whole from a tour operator's package rather than generated. */
+    public function package(): BelongsTo
+    {
+        return $this->belongsTo(Package::class);
     }
 
     public function matches(): HasMany

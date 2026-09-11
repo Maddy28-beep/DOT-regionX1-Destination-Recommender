@@ -65,6 +65,7 @@ Route::get('/accommodations/{accommodation:slug}', [AccommodationController::cla
 // Public tour packages catalog
 Route::get('/packages', [PackageController::class, 'index'])->name('packages.index');
 Route::get('/packages/{package:slug}', [PackageController::class, 'show'])->name('packages.show');
+Route::post('/packages/{package:slug}/plan-with', [PackageController::class, 'planWith'])->name('packages.plan-with');
 
 // Public restaurants catalog (2.2.1.3)
 Route::get('/restaurants', [RestaurantController::class, 'index'])->name('restaurants.index');

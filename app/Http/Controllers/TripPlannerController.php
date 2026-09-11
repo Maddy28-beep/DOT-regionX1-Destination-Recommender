@@ -189,6 +189,15 @@ class TripPlannerController extends Controller
                 ->with(Toast::success('Tell us about your trip', 'Answer a few questions and we will build your itinerary.'));
         }
 
+        // A package-adopted itinerary is a fixed schedule the provider
+        // published, not something the recommender produced -- there is
+        // nothing here for it to regenerate. The button is hidden for this
+        // case; this guards the route itself against a direct POST.
+        if ($this->currentItinerary($request)?->package_id) {
+            return redirect()->route('plan.itinerary')
+                ->with(Toast::success('Nothing to regenerate', 'This itinerary comes from a package, not the trip planner.'));
+        }
+
         $position = $request->validate([
             'lat' => ['nullable', 'numeric', 'between:-90,90', 'required_with:lng'],
             'lng' => ['nullable', 'numeric', 'between:-180,180', 'required_with:lat'],
@@ -314,7 +323,7 @@ class TripPlannerController extends Controller
         $id = $request->session()->get(self::ITINERARY_KEY);
 
         return $id
-            ? Itinerary::with(['matches.destination', 'items.destination', 'items.accommodation'])->find($id)
+            ? Itinerary::with(['matches.destination', 'items.destination', 'items.accommodation', 'package'])->find($id)
             : null;
     }
 }
