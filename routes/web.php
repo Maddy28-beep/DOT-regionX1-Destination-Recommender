@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminListingController;
 use App\Http\Controllers\Auth\EstablishmentRegistrationController;
 use App\Http\Controllers\Auth\PortalAuthController;
+use App\Http\Controllers\Auth\TouristAuthController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\DestinationController;
@@ -21,6 +22,8 @@ use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\SavedListingController;
 use App\Http\Controllers\SouvenirCenterController;
 use App\Http\Controllers\TourOperatorController;
+use App\Http\Controllers\Tourist\TouristItineraryController;
+use App\Http\Controllers\Tourist\TouristSavedDestinationController;
 use App\Http\Controllers\TripPlannerController;
 use Illuminate\Support\Facades\Route;
 
@@ -99,6 +102,10 @@ Route::get('/plan/address-suggest', AddressSuggestionController::class)
 Route::post('/plan', [TripPlannerController::class, 'update'])->name('plan.update');
 Route::get('/plan/itinerary', [TripPlannerController::class, 'itinerary'])->name('plan.itinerary');
 Route::post('/plan/itinerary/regenerate', [TripPlannerController::class, 'regenerate'])->name('plan.regenerate');
+// Claims the session's current itinerary onto an optional tourist account. Not
+// gated by auth:tourist -- a guest must be able to hit this, get sent to
+// register, and land back here to finish. See TouristItineraryController.
+Route::post('/plan/itinerary/save', [TouristItineraryController::class, 'store'])->name('plan.itinerary.save');
 
 // Exit survey (2.2.1.7, Figures 13-15) — anonymous by design, no login required
 Route::get('/exit-survey', [ExitSurveyController::class, 'create'])->name('exit-survey.create');
@@ -114,12 +121,39 @@ Route::post('/chatbot/message', [ChatbotController::class, 'respond'])
 /*
  * Saved places — the heart control on every listing card and detail page.
  *
- * There is no traveler account (removed for Data Privacy Act compliance), so
- * the list is kept against an opaque random browser token rather than a
- * person; see EnsureVisitorToken and SavedListingController.
+ * Trip planning needs no account by default, so this list is kept against an
+ * opaque random browser token rather than a person; see EnsureVisitorToken
+ * and SavedListingController. A tourist who wants this to survive past the
+ * browser can optionally create the separate account below instead.
  */
 Route::get('/saved', [SavedListingController::class, 'index'])->name('saved.index');
 Route::post('/saved/{type}/{id}', [SavedListingController::class, 'toggle'])->name('saved.toggle');
+
+/*
+ * Optional tourist account (alias + password, no real identity) -- purely a
+ * convenience for saving an itinerary/favorites past the browser session.
+ * Every core feature above keeps working with no account at all; see
+ * TouristAuthController / TouristItineraryController / TouristSavedDestinationController.
+ */
+Route::prefix('account')->name('account.')->group(function () {
+    Route::get('/register', [TouristAuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [TouristAuthController::class, 'register']);
+    Route::get('/login', [TouristAuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [TouristAuthController::class, 'login']);
+    Route::post('/logout', [TouristAuthController::class, 'logout'])->name('logout');
+});
+
+Route::prefix('account')->name('account.')->middleware('auth:tourist')->group(function () {
+    Route::get('/', fn () => redirect()->route('account.itineraries'));
+
+    Route::get('/itineraries', [TouristItineraryController::class, 'index'])->name('itineraries');
+    Route::get('/itineraries/{itinerary}', [TouristItineraryController::class, 'show'])->name('itineraries.show');
+    Route::get('/itineraries/{itinerary}/edit', [TouristItineraryController::class, 'edit'])->name('itineraries.edit');
+    Route::delete('/itineraries/{itinerary}', [TouristItineraryController::class, 'destroy'])->name('itineraries.destroy');
+
+    Route::get('/saved', [TouristSavedDestinationController::class, 'index'])->name('saved');
+    Route::post('/saved/{type}/{id}', [TouristSavedDestinationController::class, 'toggle'])->name('saved.toggle');
+});
 
 // Partner Portal (2.3.2 Tourism Administrator + DOT-Accredited Establishment, Figure 7)
 Route::prefix('portal')->name('portal.')->group(function () {

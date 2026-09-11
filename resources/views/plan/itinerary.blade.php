@@ -25,7 +25,7 @@
         <div class="container">
             <div>
                 <span class="poster-kicker" style="font-size:1.05rem;">ready to go</span>
-                <h1 class="page-title" style="font-size:1.9rem; margin:0;">My Itinerary</h1>
+                <h1 class="page-title" style="font-size:1.9rem; margin:0;">{{ $itinerary->title ?: 'My Itinerary' }}</h1>
                 <div class="sub">
                     Generated {{ $itinerary->generated_at->format('F j, Y g:i A') }}
                     &middot; {{ $itinerary->total_days }} day{{ $itinerary->total_days === 1 ? '' : 's' }}
@@ -42,25 +42,49 @@
                     @endif
                 </div>
             </div>
-            <a href="{{ route('plan.edit') }}" class="btn btn-outline">Edit preferences</a>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                @if ($itinerary->tourist_account_id)
+                    <a href="{{ route('account.itineraries.show', $itinerary) }}" class="btn btn-outline">Saved to My Itineraries &check;</a>
+                @else
+                    <form method="POST" action="{{ route('plan.itinerary.save') }}">
+                        @csrf
+                        <button type="submit" class="btn btn-outline">Save Itinerary</button>
+                    </form>
+                @endif
+                <a href="{{ route('plan.edit') }}" class="btn btn-outline">Edit preferences</a>
+            </div>
         </div>
     </div>
 
     <div class="dash-body">
         <div class="container">
-            {{-- Set expectations honestly: there is no account to keep this
-                 in, by design. What a visitor CAN keep is the shortlist, so
-                 that is what the note points at. Cream + dashed gold rather
-                 than the internal console's blue x-banner, so a standing
-                 fact about this page reads in its own brand voice instead of
-                 an admin-console notice. --}}
+            @if (session('pending_save_itinerary'))
+                <div class="privacy-note" role="status">
+                    <x-icon name="shield-check" />
+                    <p>
+                        <strong>Save your itinerary.</strong> Your current itinerary can now be saved to your
+                        new account.
+                        <form method="POST" action="{{ route('plan.itinerary.save') }}" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-primary btn-xs" style="margin-left:6px;">Save Itinerary</button>
+                        </form>
+                    </p>
+                </div>
+            @endif
+
+            {{-- Set expectations honestly: no account is needed to plan or view
+                 a trip, by design -- this note is about what happens if you
+                 don't create the optional one. Cream + dashed gold rather than
+                 the internal console's blue x-banner, so a standing fact about
+                 this page reads in its own brand voice instead of an
+                 admin-console notice. --}}
             <div class="session-note" role="status">
                 <x-icon name="alert-triangle" />
                 <p>
                     This plan lives in your browser session, so it disappears when you close the tab
-                    &mdash; there are no traveler accounts.
-                    <a href="{{ route('saved.index') }}">Heart the places you like</a>
-                    and they will still be here when you come back.
+                    &mdash; unless you save it. <a href="{{ route('saved.index') }}">Heart the places you like</a>
+                    and they will still be here when you come back, or
+                    <a href="{{ route('account.register') }}">create a free account</a> to keep this whole itinerary.
                 </p>
             </div>
 

@@ -29,9 +29,22 @@
 
         <div class="header-actions">
             {{--
-                No Sign in button: travelers have no accounts. Saved places
-                take its slot, since that is what people used to sign in for.
+                Exactly one extra element added here for the optional tourist
+                account, not a whole button row -- this bar already fought a
+                127px overflow from a single extra link (see the nav comment
+                above), so a second header-actions button would repeat that.
             --}}
+            @auth('tourist')
+                <span class="header-account-chip">
+                    <a href="{{ route('account.itineraries') }}">Hi, {{ auth('tourist')->user()->alias }}</a>
+                    <form method="POST" action="{{ route('account.logout') }}" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="header-account-chip__logout">Log out</button>
+                    </form>
+                </span>
+            @else
+                <a href="{{ route('account.login') }}" class="header-account-link">Log in</a>
+            @endauth
             <a href="{{ route('saved.index') }}" class="btn btn-outline">Saved</a>
             <a href="{{ route('plan.edit') }}" class="btn btn-primary">Plan My Trip</a>
 
@@ -49,6 +62,17 @@
         <a href="{{ route('souvenir-centers.index') }}">Souvenir Centers</a>
         <a href="{{ route('tour-operators.index') }}">Tour Operators</a>
         <a href="{{ route('portal.establishment.register') }}">List your establishment</a>
+        @auth('tourist')
+            <a href="{{ route('account.itineraries') }}">My Itineraries</a>
+            <a href="{{ route('account.saved') }}">Saved Places (Account)</a>
+            <form method="POST" action="{{ route('account.logout') }}">
+                @csrf
+                <button type="submit" class="btn btn-outline btn-block">Log Out</button>
+            </form>
+        @else
+            <a href="{{ route('account.login') }}">Log In</a>
+            <a href="{{ route('account.register') }}">Create Free Account</a>
+        @endauth
         <a href="{{ route('saved.index') }}" class="btn btn-outline btn-block">Saved</a>
         <a href="{{ route('plan.edit') }}" class="btn btn-primary btn-block">Plan My Trip</a>
     </div>
