@@ -94,6 +94,11 @@ class Package extends Model
         return $this->hasMany(PackageInclusion::class);
     }
 
+    public function itineraryDays(): HasMany
+    {
+        return $this->hasMany(PackageItineraryDay::class)->orderBy('day_number');
+    }
+
     public function reviews(): MorphMany
     {
         return $this->morphMany(Review::class, 'listing', 'listing_kind', 'listing_id');

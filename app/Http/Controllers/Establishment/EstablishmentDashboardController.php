@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Establishment;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\QrCodeController;
+use App\Models\Package;
 use App\Models\Review;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -106,6 +107,7 @@ class EstablishmentDashboardController extends Controller
              */
             'latitude' => ['nullable', 'required_with:longitude', 'numeric', 'between:'.self::REGION_BOUNDS['lat'][0].','.self::REGION_BOUNDS['lat'][1]],
             'longitude' => ['nullable', 'required_with:latitude', 'numeric', 'between:'.self::REGION_BOUNDS['lng'][0].','.self::REGION_BOUNDS['lng'][1]],
+            'itinerary' => ['nullable', 'string', 'max:5000'],
         ], [
             'latitude.between' => 'That point is outside the Davao Region. Drag the marker to your establishment.',
             'longitude.between' => 'That point is outside the Davao Region. Drag the marker to your establishment.',
@@ -126,7 +128,38 @@ class EstablishmentDashboardController extends Controller
 
         $listing->save();
 
+        // Self-service, same as everything else on this page: no DOT
+        // approval step before a package's day-by-day breakdown goes live.
+        if ($establishment->listing_kind === 'package') {
+            $this->syncItineraryDays($listing, $data['itinerary'] ?? '');
+        }
+
         return redirect()->route('establishment.overview')->with(Toast::success('Listing updated', 'Your changes are now live on the public catalog.'));
+    }
+
+    /**
+     * One day per line, "Title | Description" -- the description half is
+     * optional (a bare title line is still a valid day). Day numbers are
+     * assigned by line order rather than typed by the operator, so removing
+     * or reordering a line can't leave a gap or a duplicate day number.
+     */
+    private function syncItineraryDays(Package $package, string $itinerary): void
+    {
+        $package->itineraryDays()->delete();
+
+        collect(explode("\n", $itinerary))
+            ->map(fn ($line) => trim($line))
+            ->filter()
+            ->values()
+            ->each(function (string $line, int $index) use ($package) {
+                [$title, $description] = array_pad(explode('|', $line, 2), 2, null);
+
+                $package->itineraryDays()->create([
+                    'day_number' => $index + 1,
+                    'title' => trim($title),
+                    'description' => $description !== null ? trim($description) ?: null : null,
+                ]);
+            });
     }
 
     public function reviews(Request $request): View

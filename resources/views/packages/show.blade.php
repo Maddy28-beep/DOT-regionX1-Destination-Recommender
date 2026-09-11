@@ -63,6 +63,27 @@
                 <p>{{ $package->description ?? 'No description available yet for this package.' }}</p>
             </div>
 
+            @if ($package->itineraryDays->isNotEmpty())
+                <div class="side-card">
+                    <h3 class="mt-0">Day-by-Day Itinerary</h3>
+                    @foreach ($package->itineraryDays as $day)
+                        <div class="itinerary-day">
+                            <h3>Day {{ $day->day_number }}</h3>
+                            <div class="day-timeline">
+                                <div class="itinerary-item">
+                                    <div class="itinerary-item__body">
+                                        <strong>{{ $day->title }}</strong>
+                                        @if ($day->description)
+                                            <div class="sub">{{ $day->description }}</div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
             @if ($package->inclusions->count())
                 <div class="side-card">
                     <h3 class="mt-0">What's included</h3>

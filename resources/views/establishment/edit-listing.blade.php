@@ -17,6 +17,12 @@
         'package' => $listing->price_per_pax,
         default => null,
     };
+
+    // One line per day, "Title | Description", matching what the form
+    // posts back -- so re-editing shows exactly what was last saved.
+    $itineraryText = $establishment->listing_kind === 'package'
+        ? $listing->itineraryDays->map(fn ($day) => $day->description ? "{$day->title} | {$day->description}" : $day->title)->implode("\n")
+        : '';
 @endphp
 
 <div class="panel">
@@ -59,6 +65,14 @@
             @endif
 
             @include('partials.location-picker', ['listing' => $listing])
+
+            @if ($establishment->listing_kind === 'package')
+                <div class="field" style="margin-top:20px;">
+                    <label for="itinerary">Day-by-Day Itinerary</label>
+                    <textarea id="itinerary" name="itinerary" rows="6" placeholder="Day 1 title | Day 1 details (optional)&#10;Day 2 title | Day 2 details (optional)">{{ old('itinerary', $itineraryText) }}</textarea>
+                    <p class="field-hint">One day per line: a short title, then optionally a "|" and more detail. The day number comes from the line's order.</p>
+                </div>
+            @endif
 
             <button type="submit" class="btn btn-primary" style="margin-top:20px;">Save Changes</button>
         </form>
