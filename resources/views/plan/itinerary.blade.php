@@ -29,12 +29,16 @@
                 <div class="sub">
                     Generated {{ $itinerary->generated_at->format('F j, Y g:i A') }}
                     &middot; {{ $itinerary->total_days }} day{{ $itinerary->total_days === 1 ? '' : 's' }}
-                    {{-- Say what the ordering was actually measured from, so a
-                         plan sequenced from the regional default is not mistaken
-                         for one sequenced from where the traveller is. --}}
-                    &middot; ordered from {{ $preference->origin_label ?: 'Davao City centre' }}
-                    @if ($preference->arrival_time)
-                        &middot; arriving {{ \Illuminate\Support\Carbon::parse($preference->arrival_time)->format('g:i A') }}
+                    @if ($itinerary->package)
+                        &middot; from the <a href="{{ route('packages.show', $itinerary->package) }}">{{ $itinerary->package->name }}</a> package
+                    @else
+                        {{-- Say what the ordering was actually measured from, so a
+                             plan sequenced from the regional default is not mistaken
+                             for one sequenced from where the traveller is. --}}
+                        &middot; ordered from {{ $preference->origin_label ?: 'Davao City centre' }}
+                        @if ($preference->arrival_time)
+                            &middot; arriving {{ \Illuminate\Support\Carbon::parse($preference->arrival_time)->format('g:i A') }}
+                        @endif
                     @endif
                 </div>
             </div>
@@ -60,6 +64,7 @@
                 </p>
             </div>
 
+            @unless ($itinerary->package)
             <div class="panel">
                 <div class="panel-head">
                     <div>
@@ -91,12 +96,19 @@
                     </ul>
                 </div>
             </div>
+            @endunless
 
             <div class="panel">
                 <div class="panel-head">
                     <div>
                         <h2>Day-by-Day Travel Plan</h2>
-                        <p>Sequenced by geographic proximity, with complementary stops surfaced from what past travelers tend to pair together.</p>
+                        <p>
+                            @if ($itinerary->package)
+                                As published by {{ $itinerary->package->provider_name ?? 'the provider' }} for this package.
+                            @else
+                                Sequenced by geographic proximity, with complementary stops surfaced from what past travelers tend to pair together.
+                            @endif
+                        </p>
                     </div>
                 </div>
                 <div class="panel-body">
@@ -174,6 +186,9 @@
                                             <div class="sub">
                                                 {{ $item->travelSummary() }}
                                             </div>
+                                            @if ($item->note)
+                                                <div class="sub">{{ $item->note }}</div>
+                                            @endif
                                             @if ($item->ruleExplanation())
                                                 <div>
                                                     <span class="pairing-tag">Popular pairing with {{ $item->rule_basis }}</span>
@@ -227,6 +242,29 @@
                 </div>
             </div>
 
+            @if ($itinerary->package)
+            <div class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h2>How This Plan Was Built</h2>
+                        <p>This one isn't generated.</p>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <p class="sub">
+                        This itinerary is the day-by-day schedule
+                        <a href="{{ route('packages.show', $itinerary->package) }}">{{ $itinerary->package->name }}</a>'s
+                        provider published for this package, copied here as-is &mdash; no recommendation
+                        algorithm ranked or reordered any of it. Want a plan built around your own
+                        preferences instead? <a href="{{ route('plan.edit') }}">Start the trip planner</a>.
+                    </p>
+                    <p class="sub" style="margin-top:14px;">
+                        This is a recommended plan, not a booking. It performs no reservation or payment,
+                        and it is yours to change to fit your time, budget and pace.
+                    </p>
+                </div>
+            </div>
+            @else
             <div class="panel">
                 <div class="panel-head">
                     <div>
@@ -289,6 +327,7 @@
                     </p>
                 </div>
             </div>
+            @endif
 
             <div class="panel">
                 <div class="panel-head">
