@@ -268,6 +268,24 @@ class AdminDashboardController extends Controller
 
         $avgDaysStayed = round((float) ExitSurvey::whereNotNull('actual_days_stayed')->avg('actual_days_stayed'), 1);
 
+        $avgDailySpend = ExitSurvey::whereNotNull('estimated_daily_spend')->avg('estimated_daily_spend');
+        $avgDailySpend = $avgDailySpend ? round((float) $avgDailySpend, 2) : null;
+
+        // Total spend per trip, not just per day: only counted for a survey
+        // that reported both figures, since neither one alone says anything
+        // about the whole visit.
+        $avgTotalSpend = ExitSurvey::whereNotNull('estimated_daily_spend')->whereNotNull('actual_days_stayed')
+            ->selectRaw('avg(estimated_daily_spend * actual_days_stayed) as total')
+            ->value('total');
+        $avgTotalSpend = $avgTotalSpend ? round((float) $avgTotalSpend, 2) : null;
+
+        $spendByResidency = ExitSurvey::whereNotNull('estimated_daily_spend')->whereNotNull('residency_type')
+            ->selectRaw('residency_type, avg(estimated_daily_spend) as avg_spend')
+            ->groupBy('residency_type')
+            ->orderByDesc('avg_spend')
+            ->get()
+            ->mapWithKeys(fn ($row) => [$row->residency_type => round((float) $row->avg_spend, 2)]);
+
         $topPlaces = ExitSurveyVisit::selectRaw('listing_kind, listing_id, count(*) as visits')
             ->groupBy('listing_kind', 'listing_id')
             ->orderByDesc('visits')
@@ -286,6 +304,7 @@ class AdminDashboardController extends Controller
         return view('admin.exit-surveys', compact(
             'count', 'checkedInVisitors', 'responseRatePct', 'avgRatings', 'wouldRecommendPct',
             'residencyBreakdown', 'visitorTypeBreakdown', 'travelPurposeBreakdown', 'avgDaysStayed',
+            'avgDailySpend', 'avgTotalSpend', 'spendByResidency',
             'topPlaces', 'topActivities'
         ));
     }
@@ -443,10 +462,10 @@ class AdminDashboardController extends Controller
         return [
             'summary' => $surveys->count().' exit survey response'.($surveys->count() === 1 ? '' : 's').' in the selected range'
                 .($avg ? ', averaging '.round($avg, 1).'/5 overall satisfaction.' : '.'),
-            'headers' => ['Submitted At', 'Residency', 'Visitor Type', 'Purpose', 'Days Stayed', 'Overall Rating', 'Would Recommend', 'Comments'],
+            'headers' => ['Submitted At', 'Residency', 'Visitor Type', 'Purpose', 'Days Stayed', 'Daily Spend (₱)', 'Overall Rating', 'Would Recommend', 'Comments'],
             'rows' => $surveys->map(fn ($s) => [
                 $s->submitted_at->format('Y-m-d H:i'), $s->residency_type ?? '—', $s->visitor_type ?? '—',
-                $s->travel_purpose ?? '—', $s->actual_days_stayed ?? '—',
+                $s->travel_purpose ?? '—', $s->actual_days_stayed ?? '—', $s->estimated_daily_spend ?? '—',
                 $s->overall_rating ?? '—', $s->would_recommend ?? '—', $s->comments ?? '',
             ])->all(),
         ];

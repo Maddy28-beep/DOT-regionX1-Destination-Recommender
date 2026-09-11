@@ -38,6 +38,17 @@
             <div class="stat-card-label">Avg. Days Stayed</div>
         </div>
     </div>
+
+    <div class="stat-cards" style="grid-template-columns: repeat(2, 1fr); margin-top:16px;">
+        <div class="stat-card" title="Self-reported. Only counts responses that answered this optional question.">
+            <div class="stat-card-val">{{ $avgDailySpend !== null ? '₱'.number_format($avgDailySpend, 2) : '—' }}</div>
+            <div class="stat-card-label">Avg. Spend per Day</div>
+        </div>
+        <div class="stat-card" title="Daily spend × days stayed, averaged only across responses that answered both questions.">
+            <div class="stat-card-val">{{ $avgTotalSpend !== null ? '₱'.number_format($avgTotalSpend, 2) : '—' }}</div>
+            <div class="stat-card-label">Avg. Spend per Trip</div>
+        </div>
+    </div>
     <p style="color:var(--muted); font-size:.85rem; margin-top:-8px;">
         Response rate is approximate: {{ $checkedInVisitors }} distinct browser{{ $checkedInVisitors === 1 ? '' : 's' }} checked in somewhere via QR/manual check-in, against {{ $count }} exit survey{{ $count === 1 ? '' : 's' }} submitted. The survey is voluntary and anonymous, so this is a population-level signal, not a per-visitor completion rate.
     </p>
@@ -117,6 +128,31 @@
                     </div>
                 @endif
             </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <div>
+                <h2>Average Daily Spend by Residency</h2>
+                <p>Self-reported (₱), across respondents who answered both questions.</p>
+            </div>
+        </div>
+        <div class="panel-body">
+            @if ($spendByResidency->isEmpty())
+                <p style="color:var(--muted); font-size:.85rem;">No responses provided this yet.</p>
+            @else
+                <div class="bar-chart">
+                    @php $maxSpend = $spendByResidency->max(); @endphp
+                    @foreach ($spendByResidency as $label => $avgSpend)
+                        <div class="bar-row">
+                            <span class="bar-row-label">{{ $label }}</span>
+                            <div class="bar-track"><div class="bar-fill" style="width:{{ $maxSpend ? ($avgSpend / $maxSpend * 100) : 0 }}%"></div></div>
+                            <span class="bar-row-value">₱{{ number_format($avgSpend, 2) }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
     </div>
 

@@ -85,6 +85,14 @@
                             <input type="number" id="actual_days_stayed" name="actual_days_stayed" min="1" max="365" value="{{ old('actual_days_stayed') }}" placeholder="e.g. 3">
                         </div>
                     </div>
+
+                    <div class="filter-inline" style="align-items:start; margin-top:14px;">
+                        <div class="field" style="flex:1; min-width:200px;">
+                            <label for="estimated_daily_spend">About how much did you spend per day here? (&#8369;, optional)</label>
+                            <input type="number" id="estimated_daily_spend" name="estimated_daily_spend" min="0" step="0.01" value="{{ old('estimated_daily_spend') }}" placeholder="e.g. 1500">
+                            <p class="field-hint">Include food, transport, activities, and shopping &mdash; not accommodation, if you paid for that separately in advance.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
