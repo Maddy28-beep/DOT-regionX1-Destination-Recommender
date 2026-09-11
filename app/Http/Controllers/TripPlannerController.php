@@ -85,6 +85,16 @@ class TripPlannerController extends Controller
             'travel_type' => ['required', 'string', 'max:20'],
             'travel_purpose' => ['nullable', 'string', 'max:30'],
             'visitor_type' => ['nullable', 'string', 'max:30'],
+            /*
+             * DOT Region XI asked for this specifically because the exit
+             * survey's own origin question only reaches whoever finishes that
+             * optional, post-trip survey. Required here so it lands for every
+             * itinerary generated, not just the minority who complete a
+             * survey afterward -- except for a traveller who already said
+             * they're local (Regular / Local), for whom "where are you
+             * visiting from" isn't a question that makes sense to force.
+             */
+            'place_of_origin' => ['nullable', 'string', 'max:150', 'required_unless:visitor_type,Regular / Local'],
             'budget' => ['required', 'string', 'max:20'],
             'accommodation_pref' => ['required', 'string', 'max:20'],
             'distance_pref' => ['required', 'in:near,moderate,far'],
