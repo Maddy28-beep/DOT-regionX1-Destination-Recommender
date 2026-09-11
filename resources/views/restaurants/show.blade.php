@@ -23,6 +23,8 @@
         {{ $restaurant->name }}
     </nav>
 
+    <x-advisory-banner :advisories="\App\Models\Advisory::active()->forListing($restaurant->getMorphClass(), $restaurant->id)->latest()->get()" />
+
     @include('partials.gallery-hero', [
         'photos' => $restaurant->photos,
         'title' => $restaurant->name,

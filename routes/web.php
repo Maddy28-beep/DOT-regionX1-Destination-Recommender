@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccommodationController;
 use App\Http\Controllers\AddressSuggestionController;
+use App\Http\Controllers\Admin\AdminAdvisoryController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminListingController;
 use App\Http\Controllers\Auth\EstablishmentRegistrationController;
@@ -157,6 +158,16 @@ Route::prefix('portal/admin')->name('admin.')->middleware('auth:admin')->group(f
         Route::post('/{id}/archive', [AdminListingController::class, 'archive'])->name('archive');
         Route::post('/{id}/unarchive', [AdminListingController::class, 'unarchive'])->name('unarchive');
         Route::get('/{id}/qr-code', [QrCodeController::class, 'admin'])->name('qr-code');
+    });
+
+    // Advisories (2.2.3.1.5) -- DOT-authored notices, per-listing or general
+    Route::prefix('advisories')->name('advisories.')->group(function () {
+        Route::get('/', [AdminAdvisoryController::class, 'index'])->name('index');
+        Route::get('/create', [AdminAdvisoryController::class, 'create'])->name('create');
+        Route::post('/', [AdminAdvisoryController::class, 'store'])->name('store');
+        Route::get('/{advisory}/edit', [AdminAdvisoryController::class, 'edit'])->name('edit');
+        Route::put('/{advisory}', [AdminAdvisoryController::class, 'update'])->name('update');
+        Route::delete('/{advisory}', [AdminAdvisoryController::class, 'destroy'])->name('destroy');
     });
 });
 

@@ -20,6 +20,8 @@
         {{ $accommodation->name }}
     </nav>
 
+    <x-advisory-banner :advisories="\App\Models\Advisory::active()->forListing($accommodation->getMorphClass(), $accommodation->id)->latest()->get()" />
+
     @include('partials.gallery-hero', [
         'photos' => $accommodation->photos,
         'title' => $accommodation->name,

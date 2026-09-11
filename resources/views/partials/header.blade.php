@@ -53,3 +53,9 @@
         <a href="{{ route('plan.edit') }}" class="btn btn-primary btn-block">Plan My Trip</a>
     </div>
 </header>
+
+@if (($generalAdvisories ?? collect())->isNotEmpty())
+    <div class="container" style="padding-top:16px;">
+        <x-advisory-banner :advisories="$generalAdvisories" />
+    </div>
+@endif
