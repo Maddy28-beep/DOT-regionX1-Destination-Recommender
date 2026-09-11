@@ -773,6 +773,14 @@ a { color: inherit; text-decoration: none; }
 .header-actions { display: flex; align-items: center; gap: 8px; }
 .header-actions .btn { white-space: nowrap; flex-shrink: 0; padding: 10px 16px; font-size: .88rem; }
 
+.header-account-link { font-size: .85rem; font-weight: 600; color: var(--ink); white-space: nowrap; }
+.header-account-chip { display: flex; align-items: center; gap: 6px; font-size: .85rem; white-space: nowrap; }
+.header-account-chip a { font-weight: 600; color: var(--ink); }
+.header-account-chip__logout {
+    background: none; border: none; padding: 0; font: inherit;
+    color: var(--muted); text-decoration: underline; cursor: pointer;
+}
+
 .nav-toggle {
     display: none;
     background: none;

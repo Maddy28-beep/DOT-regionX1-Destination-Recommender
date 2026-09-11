@@ -2,6 +2,7 @@
 
 use App\Models\AdminUser;
 use App\Models\EstablishmentAccount;
+use App\Models\TouristAccount;
 
 return [
 
@@ -10,16 +11,19 @@ return [
     | Authentication Defaults
     |--------------------------------------------------------------------------
     |
-    | ExploreDVO has no single generic user. Of the three actors in 2.3.2 only
-    | two log in: the Tourism Administrator and the DOT-Accredited
-    | Establishment, each authenticated independently.
+    | ExploreDVO has no single generic user. Of the three actors in 2.3.2 two
+    | log in with real credentials: the Tourism Administrator and the
+    | DOT-Accredited Establishment.
     |
-    | Travelers have no accounts at all. Registration and login were removed
-    | for Data Privacy Act compliance -- the public site collects no personal
-    | data, visits are counted by QR scan at the establishment, and saved
-    | places and trip plans are kept against an opaque browser token (see
-    | EnsureVisitorToken). The default guard is therefore the admin guard,
-    | which is the only one a bare auth() call could sensibly mean.
+    | Trip planning itself still needs no account and collects no personal
+    | data -- visits are counted by QR scan at the establishment, and saved
+    | places and trip plans are kept against an opaque browser token by
+    | default (see EnsureVisitorToken). The `tourist` guard below is a
+    | separate, entirely OPTIONAL account (alias + password, no real
+    | identity) a traveler may create only if they want an itinerary to
+    | survive past the browser session -- it never gates any core feature.
+    | The default guard is the admin guard, which is the only one a bare
+    | auth() call could sensibly mean.
     |
     */
 
@@ -38,6 +42,11 @@ return [
             'driver' => 'session',
             'provider' => 'establishment_accounts',
         ],
+
+        'tourist' => [
+            'driver' => 'session',
+            'provider' => 'tourist_accounts',
+        ],
     ],
 
     'providers' => [
@@ -49,6 +58,11 @@ return [
         'establishment_accounts' => [
             'driver' => 'eloquent',
             'model' => EstablishmentAccount::class,
+        ],
+
+        'tourist_accounts' => [
+            'driver' => 'eloquent',
+            'model' => TouristAccount::class,
         ],
     ],
 

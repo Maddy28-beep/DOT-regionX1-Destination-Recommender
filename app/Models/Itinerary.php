@@ -13,11 +13,10 @@ class Itinerary extends Model
 
     const CREATED_AT = 'generated_at';
 
-    const UPDATED_AT = null;
-
     protected $fillable = [
         'preference_id', 'package_id', 'total_days', 'est_budget_total',
         'est_party_size', 'generated_at', 'range_tier_used', 'range_widened',
+        'tourist_account_id', 'title',
     ];
 
     protected function casts(): array
@@ -37,6 +36,12 @@ class Itinerary extends Model
     public function package(): BelongsTo
     {
         return $this->belongsTo(Package::class);
+    }
+
+    /** Set only once a tourist has chosen to save this plan permanently to their optional account. */
+    public function touristAccount(): BelongsTo
+    {
+        return $this->belongsTo(TouristAccount::class);
     }
 
     public function matches(): HasMany
