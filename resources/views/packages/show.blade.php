@@ -22,6 +22,8 @@
         {{ $package->name }}
     </nav>
 
+    <x-advisory-banner :advisories="\App\Models\Advisory::active()->forListing($package->getMorphClass(), $package->id)->latest()->get()" />
+
     @include('partials.gallery-hero', [
         'photos' => $package->photos,
         'title' => $package->name,

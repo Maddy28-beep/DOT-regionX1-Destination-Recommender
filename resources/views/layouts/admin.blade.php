@@ -38,6 +38,8 @@
             <div class="group-label">Tourism Information</div>
             <a href="{{ route('admin.listings.index', 'destinations') }}" class="{{ request()->routeIs('admin.listings.*') ? 'active' : '' }}">Manage Listings</a>
 
+            <a href="{{ route('admin.advisories.index') }}" class="{{ request()->routeIs('admin.advisories.*') ? 'active' : '' }}">Advisories</a>
+
             <div class="group-label">Monitoring</div>
             <a href="{{ route('admin.overview') }}" class="{{ request()->routeIs('admin.overview') ? 'active' : '' }}">Overview</a>
             <a href="{{ route('admin.exit-surveys') }}" class="{{ request()->routeIs('admin.exit-surveys') ? 'active' : '' }}">Exit Survey Insights</a>

@@ -16,6 +16,8 @@
         {{ $destination->name }}
     </nav>
 
+    <x-advisory-banner :advisories="\App\Models\Advisory::active()->forListing($destination->getMorphClass(), $destination->id)->latest()->get()" />
+
     {{--
         Always the illustrated poster hero here, matching Popular Destinations
         and Featured Packages -- not conditional on whether photos exist.
