@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\Http\Controllers\ExitSurveyController;
+use App\Http\Controllers\TripPlannerController;
 use App\Models\Destination;
 use App\Models\ExitSurvey;
 use App\Models\ExitSurveyActivity;
 use App\Models\ExitSurveyVisit;
 use App\Models\Region;
+use App\Models\TouristPreference;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -130,6 +132,62 @@ class ExitSurveyTest extends TestCase
         $response->assertSessionHasErrors();
         $this->assertSame(0, ExitSurvey::count());
         $this->assertSame(0, ExitSurveyVisit::count());
+    }
+
+    public function test_a_daily_spend_amount_is_recorded(): void
+    {
+        $this->post(route('exit-survey.store'), $this->validPayload([
+            'actual_days_stayed' => 3,
+            'estimated_daily_spend' => 1500,
+        ]))->assertRedirect(route('exit-survey.create'));
+
+        $survey = ExitSurvey::sole();
+        $this->assertEquals(1500, $survey->estimated_daily_spend);
+    }
+
+    public function test_a_negative_spend_amount_is_rejected(): void
+    {
+        $response = $this->post(route('exit-survey.store'), $this->validPayload([
+            'estimated_daily_spend' => -50,
+        ]));
+
+        $response->assertSessionHasErrors('estimated_daily_spend');
+        $this->assertSame(0, ExitSurvey::count());
+    }
+
+    /**
+     * DOT asked for spending per day of the visit specifically, and it must
+     * stay optional like the rest of the survey -- most of the questions
+     * around it are, and forcing this one would be an inconsistent ask.
+     */
+    public function test_the_spend_field_is_optional(): void
+    {
+        $this->post(route('exit-survey.store'), $this->validPayload())
+            ->assertRedirect(route('exit-survey.create'));
+
+        $this->assertNull(ExitSurvey::sole()->estimated_daily_spend);
+    }
+
+    /**
+     * A survey's session can point to a TouristPreference that no longer
+     * exists (a re-plan, a stale cookie surviving past other data being
+     * cleared) -- the foreign key must not turn a perfectly valid survey
+     * into a 500, since the survey is meant to work for anyone regardless of
+     * whether they ever made a plan.
+     */
+    public function test_a_stale_preference_id_in_session_does_not_break_submission(): void
+    {
+        $preference = TouristPreference::create([
+            'travel_days' => 2, 'travel_type' => 'Solo', 'budget' => 'Mid-range',
+            'accommodation_pref' => 'Any', 'distance_pref' => 'near',
+        ]);
+        $this->withSession([TripPlannerController::PREFERENCE_KEY => $preference->id]);
+        $preference->delete();
+
+        $response = $this->post(route('exit-survey.store'), $this->validPayload());
+
+        $response->assertRedirect(route('exit-survey.create'));
+        $this->assertNull(ExitSurvey::sole()->preference_id);
     }
 
     public function test_the_options_shown_on_the_form_match_what_validation_accepts(): void

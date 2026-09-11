@@ -274,6 +274,31 @@ class AdminConsoleUiTest extends TestCase
         $this->assertStringContainsString('Response Rate', $html);
     }
 
+    /** DOT asked how much visitors spend per day -- average per day, average per trip, and a breakdown by residency. */
+    public function test_spending_statistics_are_computed_from_reported_answers_only(): void
+    {
+        ExitSurvey::create([
+            'overall_rating' => 5, 'would_recommend' => 'Yes',
+            'residency_type' => 'Domestic Tourist', 'actual_days_stayed' => 3, 'estimated_daily_spend' => 1000,
+        ]);
+        ExitSurvey::create([
+            'overall_rating' => 4, 'would_recommend' => 'Yes',
+            'residency_type' => 'Foreign Tourist', 'actual_days_stayed' => 5, 'estimated_daily_spend' => 3000,
+        ]);
+        // No spend reported: must not drag the averages toward zero.
+        ExitSurvey::create(['overall_rating' => 5, 'would_recommend' => 'Yes', 'residency_type' => 'Local Resident']);
+
+        $html = $this->actingAs($this->admin(), 'admin')->get(route('admin.exit-surveys'))->getContent();
+
+        // Avg. daily spend: (1000 + 3000) / 2 = 2000.
+        $this->assertStringContainsString('₱2,000.00', $html);
+        $this->assertStringContainsString('Avg. Spend per Day', $html);
+        // Avg. per trip: (1000*3 + 3000*5) / 2 = 9000.
+        $this->assertStringContainsString('₱9,000.00', $html);
+        $this->assertStringContainsString('₱1,000.00', $html);
+        $this->assertStringContainsString('₱3,000.00', $html);
+    }
+
     public function test_todays_check_in_count_is_not_stuck_at_zero(): void
     {
         [[$listing]] = $this->seedListings();

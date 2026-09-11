@@ -11,6 +11,7 @@ use App\Models\Package;
 use App\Models\Restaurant;
 use App\Models\SouvenirCenter;
 use App\Models\TourOperator;
+use App\Models\TouristPreference;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -112,6 +113,7 @@ class ExitSurveyController extends Controller
             'origin' => ['nullable', 'string', 'max:150'],
             'travel_purpose' => ['nullable', 'in:'.implode(',', self::TRAVEL_PURPOSES)],
             'actual_days_stayed' => ['nullable', 'integer', 'min:1', 'max:365'],
+            'estimated_daily_spend' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
             'places_visited' => ['nullable', 'array', 'max:'.self::MAX_LIST_ITEMS],
             'places_visited.*' => ['string', 'regex:/^('.$visitableKinds.'):\d+$/'],
             'activities' => ['nullable', 'array', 'max:'.self::MAX_LIST_ITEMS],
@@ -139,8 +141,18 @@ class ExitSurveyController extends Controller
          * Read straight from the session rather than required: the survey is
          * open to anyone, including a traveller who never made a plan, and it
          * must keep working for them.
+         *
+         * Existence is checked rather than trusted: the plan a long-lived
+         * session points to can since have been deleted (a re-plan, a stale
+         * cookie surviving past a reseed), and without this check that stale
+         * id hit the preference_id foreign key and crashed a survey that
+         * otherwise had nothing wrong with it.
          */
         $preferenceId = $request->session()->get(TripPlannerController::PREFERENCE_KEY);
+
+        if ($preferenceId && ! TouristPreference::whereKey($preferenceId)->exists()) {
+            $preferenceId = null;
+        }
 
         DB::transaction(function () use ($data, $preferenceId) {
             $survey = ExitSurvey::create(
