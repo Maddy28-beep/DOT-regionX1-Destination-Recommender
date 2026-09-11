@@ -91,12 +91,20 @@
                             </div>
                             <div class="field" style="flex:1; min-width:180px;">
                                 <label for="visitor_type">Is this your first visit to Davao?</label>
-                                <select id="visitor_type" name="visitor_type" class="form-select">
+                                <select id="visitor_type" name="visitor_type" class="form-select" data-local-toggle>
                                     <option value="">Prefer not to say</option>
                                     @foreach ($visitorTypes as $type)
                                         <option value="{{ $type }}" @selected(old('visitor_type', $preference->visitor_type) === $type)>{{ $type }}</option>
                                     @endforeach
                                 </select>
+                            </div>
+                            <div class="field" style="flex:1; min-width:200px;" data-origin-field>
+                                <label for="place_of_origin" data-origin-label>Where are you visiting from?</label>
+                                <input type="text" id="place_of_origin" name="place_of_origin"
+                                       value="{{ old('place_of_origin', $preference->place_of_origin) }}"
+                                       placeholder="e.g. Manila, Cebu, South Korea"
+                                       @unless(old('visitor_type', $preference->visitor_type) === 'Regular / Local') required @endunless>
+                                <p class="field-hint" data-origin-hint>Helps DOT understand where visitors are travelling from.</p>
                             </div>
                         </div>
 

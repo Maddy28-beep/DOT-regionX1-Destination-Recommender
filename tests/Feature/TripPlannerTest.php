@@ -55,6 +55,10 @@ class TripPlannerTest extends TestCase
             'distance_pref' => 'moderate',
             'activities' => ['Nature', 'Hiking'],
             'amenities' => ['Parking Area'],
+            // Required unless visitor_type is 'Regular / Local' (TripPlannerController)
+            // -- DOT Region XI asked for this specifically, so a test payload
+            // that omits it should fail validation just like a real visitor would.
+            'place_of_origin' => 'Cebu City',
         ];
     }
 
@@ -154,6 +158,51 @@ class TripPlannerTest extends TestCase
         $this->assertSame($itinerary->id, session(TripPlannerController::ITINERARY_KEY));
 
         $this->get('/plan/itinerary')->assertOk()->assertSee('Eden Nature Park');
+    }
+
+    /**
+     * DOT Region XI asked for this specifically because the exit survey's own
+     * origin question only ever reaches whoever finishes that optional,
+     * post-trip survey -- a small fraction of travellers. Requiring it here,
+     * in the one form every itinerary has to pass through, is what actually
+     * gets DOT origin data at scale.
+     */
+    public function test_place_of_origin_is_required_for_a_non_local_visitor(): void
+    {
+        $this->seedDestinations();
+
+        $payload = $this->surveyPayload(['visitor_type' => 'First-time Visitor']);
+        unset($payload['place_of_origin']);
+
+        $this->post('/plan', $payload)->assertSessionHasErrors('place_of_origin');
+        $this->assertSame(0, TouristPreference::count(), 'Nothing should be saved when a required field is missing.');
+    }
+
+    /**
+     * A traveller who already says they're local isn't "visiting from"
+     * anywhere in the sense DOT is asking about, so the field is not forced
+     * for them -- even though the requirement above still applies to
+     * everyone else.
+     */
+    public function test_place_of_origin_is_not_required_for_a_local_visitor(): void
+    {
+        $this->seedDestinations();
+
+        $payload = $this->surveyPayload(['visitor_type' => 'Regular / Local']);
+        unset($payload['place_of_origin']);
+
+        $this->post('/plan', $payload)->assertRedirect(route('plan.itinerary'));
+        $this->assertNull(TouristPreference::sole()->place_of_origin);
+    }
+
+    public function test_place_of_origin_is_saved_when_provided(): void
+    {
+        $this->seedDestinations();
+
+        $this->post('/plan', $this->surveyPayload(['place_of_origin' => 'Cagayan de Oro']))
+            ->assertRedirect(route('plan.itinerary'));
+
+        $this->assertSame('Cagayan de Oro', TouristPreference::sole()->place_of_origin);
     }
 
     public function test_no_column_on_a_plan_can_identify_the_visitor(): void

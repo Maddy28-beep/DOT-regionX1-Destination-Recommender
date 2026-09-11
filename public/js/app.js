@@ -716,3 +716,34 @@ document.addEventListener('DOMContentLoaded', function () {
         updateCount();
     });
 });
+
+/*
+ * Travel preference survey: "Where are you visiting from?" is required
+ * unless the traveller already said they're local (Regular / Local) --
+ * asking a resident where they're "visiting from" doesn't make sense. The
+ * server enforces this either way (required_unless in TripPlannerController);
+ * this only keeps the browser's own validation UI and hint text honest about
+ * the same rule as the visitor-type dropdown changes, instead of showing a
+ * red "required" outline on a field the server isn't actually going to
+ * require for this traveller.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    var toggle = document.querySelector('[data-local-toggle]');
+    var field = document.querySelector('[data-origin-field]');
+    if (!toggle || !field) return;
+
+    var input = field.querySelector('input');
+    var hint = field.querySelector('[data-origin-hint]');
+    var label = field.querySelector('[data-origin-label]');
+    var defaultHint = hint ? hint.textContent : '';
+
+    function sync() {
+        var isLocal = toggle.value === 'Regular / Local';
+        input.required = !isLocal;
+        if (label) label.textContent = isLocal ? 'Where are you visiting from? (optional)' : 'Where are you visiting from?';
+        if (hint) hint.textContent = isLocal ? "Optional since you're local." : defaultHint;
+    }
+
+    toggle.addEventListener('change', sync);
+    sync();
+});
