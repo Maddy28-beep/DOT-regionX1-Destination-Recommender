@@ -24,6 +24,7 @@
     </nav>
 
     <x-advisory-banner :advisories="\App\Models\Advisory::active()->forListing($tourOperator->getMorphClass(), $tourOperator->id)->latest()->get()" />
+    <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($tourOperator->getMorphClass(), $tourOperator->id)->latest()->get()" />
 
     @include('partials.gallery-hero', [
         'photos' => $tourOperator->photos,
