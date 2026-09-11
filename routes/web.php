@@ -12,6 +12,7 @@ use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\Establishment\EstablishmentDashboardController;
 use App\Http\Controllers\Establishment\EstablishmentPhotoController;
+use App\Http\Controllers\Establishment\EstablishmentPromotionController;
 use App\Http\Controllers\ExitSurveyController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PackageController;
@@ -188,4 +189,8 @@ Route::prefix('portal/establishment')->name('establishment.')->middleware('auth:
     Route::delete('/photos/{photo}', [EstablishmentPhotoController::class, 'destroy'])->name('photos.destroy');
     Route::post('/photos/{photo}/up', [EstablishmentPhotoController::class, 'moveUp'])->name('photos.up');
     Route::post('/photos/{photo}/down', [EstablishmentPhotoController::class, 'moveDown'])->name('photos.down');
+
+    Route::get('/promotions', [EstablishmentPromotionController::class, 'index'])->name('promotions');
+    Route::post('/promotions', [EstablishmentPromotionController::class, 'store'])->name('promotions.store');
+    Route::delete('/promotions/{promotion}', [EstablishmentPromotionController::class, 'destroy'])->name('promotions.destroy');
 });
