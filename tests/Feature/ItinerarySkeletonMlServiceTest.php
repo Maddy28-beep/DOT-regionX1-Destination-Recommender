@@ -15,12 +15,15 @@ use Tests\TestCase;
 /**
  * Pretrained ML inference step (manuscript Sec. 2.3.4, "Pretrained ML Model").
  *
- * ItinerarySkeletonMlService is the one place the closed-candidate-list
- * guarantee ("the model must not invent a destination") and the
- * always-safe-to-fall-back guarantee are actually enforced. Every test here
- * uses Http::fake() -- no real Ollama server is required to run this suite,
- * and phpunit.xml already forces PHI4MINI_URL="" globally so nothing here
- * can accidentally reach a live model.
+ * ItinerarySkeletonMlService is where three guarantees are enforced: the
+ * closed-candidate-list guarantee ("the model must not invent, drop, or
+ * repeat a destination"), the deterministic-repair guarantee (a duplicate or
+ * missing id is fixed rather than discarded, whenever it can be), and the
+ * always-safe-to-fall-back guarantee. Every test here uses Http::fake() — no
+ * real Ollama server is required to run this suite, and phpunit.xml already
+ * forces PHI4MINI_URL="" globally so nothing here can accidentally reach a
+ * live model. Real-model accuracy is measured separately by
+ * `php artisan recommendation:diagnose-ml`, which never runs under phpunit.
  */
 class ItinerarySkeletonMlServiceTest extends TestCase
 {
@@ -41,7 +44,7 @@ class ItinerarySkeletonMlServiceTest extends TestCase
         // day/order a stop lands in, not whether it survives fitsInDay()'s
         // travel-time cutoff, so keeping every stop a few km apart removes
         // that as a variable.
-        $coords = [[7.0731, 125.6128], [7.0800, 125.6200], [7.0650, 125.6050], [7.0900, 125.6300]];
+        $coords = [[7.0731, 125.6128], [7.0800, 125.6200], [7.0650, 125.6050], [7.0900, 125.6300], [7.0600, 125.6400]];
 
         for ($i = 0; $i < $count; $i++) {
             $destinations[] = Destination::create([
@@ -74,7 +77,12 @@ class ItinerarySkeletonMlServiceTest extends TestCase
         ]);
     }
 
-    // ---- proposeSkeleton() / validate() -----------------------------------
+    private function fakeOllama(array $decodedResponse): void
+    {
+        Http::fake(['localhost:11434/*' => Http::response(['response' => json_encode($decodedResponse)])]);
+    }
+
+    // ---- proposeSkeleton(): a fully valid raw response ---------------------
 
     public function test_a_valid_response_is_accepted_and_grouped_by_day(): void
     {
@@ -82,18 +90,10 @@ class ItinerarySkeletonMlServiceTest extends TestCase
         [$a, $b, $c, $d] = $this->makeDestinations(4);
         $sequence = $this->sequenceFor([$a, $b, $c, $d]);
 
-        Http::fake(['localhost:11434/*' => Http::response(['response' => json_encode([
-            'days' => [
-                ['day_number' => 1, 'stops' => [
-                    ['destination_id' => $a->id, 'slot' => 'Morning'],
-                    ['destination_id' => $d->id, 'slot' => 'Afternoon'],
-                ]],
-                ['day_number' => 2, 'stops' => [
-                    ['destination_id' => $b->id, 'slot' => 'Morning'],
-                    ['destination_id' => $c->id, 'slot' => 'Afternoon'],
-                ]],
-            ],
-        ])])]);
+        $this->fakeOllama([
+            'day_1' => ['morning' => $a->id, 'afternoon' => $d->id],
+            'day_2' => ['morning' => $b->id, 'afternoon' => $c->id],
+        ]);
 
         $skeleton = (new ItinerarySkeletonMlService())->proposeSkeleton(
             $sequence, [1 => ['Morning', 'Afternoon'], 2 => ['Morning', 'Afternoon']], $this->preference(), null
@@ -104,142 +104,189 @@ class ItinerarySkeletonMlServiceTest extends TestCase
         $this->assertSame([$b->id, $c->id], array_column($skeleton[2], 'destination_id'));
     }
 
-    public function test_a_response_missing_a_candidate_is_rejected(): void
+    // ---- deterministic repair -----------------------------------------------
+
+    public function test_a_duplicated_id_is_repaired_by_filling_in_the_missing_candidate(): void
+    {
+        $this->configure();
+        [$a, $b, $c, $d] = $this->makeDestinations(4);
+        $sequence = $this->sequenceFor([$a, $b, $c, $d]);
+
+        // $a is used twice; $d never appears -- the exact real-world failure
+        // mode this feature was built to fix.
+        $this->fakeOllama([
+            'day_1' => ['morning' => $a->id, 'afternoon' => $b->id],
+            'day_2' => ['morning' => $c->id, 'afternoon' => $a->id],
+        ]);
+
+        $service = new ItinerarySkeletonMlService();
+        $skeleton = $service->proposeSkeleton(
+            $sequence, [1 => ['Morning', 'Afternoon'], 2 => ['Morning', 'Afternoon']], $this->preference(), null
+        );
+
+        $this->assertNotNull($skeleton, 'A duplicate/missing pair must be repaired, not discarded.');
+        $ids = array_merge(array_column($skeleton[1], 'destination_id'), array_column($skeleton[2], 'destination_id'));
+        $this->assertEqualsCanonicalizing([$a->id, $b->id, $c->id, $d->id], $ids, 'Every candidate must appear exactly once after repair.');
+        $this->assertSame($d->id, $skeleton[2][1]['destination_id'], 'The repaired id should take over the exact slot the duplicate occupied.');
+
+        $this->assertNotNull($service->lastDiagnostics);
+        $this->assertFalse($service->lastDiagnostics['raw_valid']);
+        $this->assertTrue($service->lastDiagnostics['repaired']);
+        $this->assertSame([$a->id], $service->lastDiagnostics['duplicate_ids']);
+        $this->assertSame([$d->id], $service->lastDiagnostics['missing_ids']);
+    }
+
+    public function test_an_unknown_id_is_dropped_and_repaired_with_the_missing_candidate(): void
+    {
+        $this->configure();
+        [$a, $b] = $this->makeDestinations(2);
+        $sequence = $this->sequenceFor([$a, $b]);
+
+        $this->fakeOllama([
+            'day_1' => ['morning' => $a->id, 'afternoon' => 999999],
+        ]);
+
+        $service = new ItinerarySkeletonMlService();
+        $skeleton = $service->proposeSkeleton($sequence, [1 => ['Morning', 'Afternoon']], $this->preference(), null);
+
+        $this->assertNotNull($skeleton, 'An unknown id must be dropped and repaired, not cause a full rejection.');
+        $this->assertEqualsCanonicalizing([$a->id, $b->id], array_column($skeleton[1], 'destination_id'));
+        $this->assertSame([999999], $service->lastDiagnostics['unknown_values']);
+        $this->assertTrue($service->lastDiagnostics['repaired']);
+    }
+
+    public function test_a_missing_property_is_repaired_with_the_missing_candidate(): void
+    {
+        $this->configure();
+        [$a, $b] = $this->makeDestinations(2);
+        $sequence = $this->sequenceFor([$a, $b]);
+
+        // The model omits "afternoon" entirely.
+        $this->fakeOllama(['day_1' => ['morning' => $a->id]]);
+
+        $service = new ItinerarySkeletonMlService();
+        $skeleton = $service->proposeSkeleton($sequence, [1 => ['Morning', 'Afternoon']], $this->preference(), null);
+
+        $this->assertNotNull($skeleton);
+        $this->assertEqualsCanonicalizing([$a->id, $b->id], array_column($skeleton[1], 'destination_id'));
+        $this->assertSame([$b->id], $service->lastDiagnostics['missing_ids']);
+    }
+
+    public function test_completely_unrelated_json_is_fully_repaired_into_nearest_neighbor_order(): void
     {
         $this->configure();
         [$a, $b, $c] = $this->makeDestinations(3);
         $sequence = $this->sequenceFor([$a, $b, $c]);
 
-        // $c never appears anywhere in the response.
-        Http::fake(['localhost:11434/*' => Http::response(['response' => json_encode([
-            'days' => [
-                ['day_number' => 1, 'stops' => [['destination_id' => $a->id, 'slot' => 'Morning']]],
-                ['day_number' => 2, 'stops' => [['destination_id' => $b->id, 'slot' => 'Morning']]],
-            ],
-        ])])]);
+        // Nothing in here matches the expected day_N/slot shape at all.
+        $this->fakeOllama(['unexpected' => 'shape']);
+
+        $service = new ItinerarySkeletonMlService();
+        $skeleton = $service->proposeSkeleton(
+            $sequence, [1 => ['Morning', 'Afternoon'], 2 => ['Morning']], $this->preference(), null
+        );
+
+        $this->assertNotNull($skeleton, 'Every slot becoming a gap is still repairable -- it degrades to nearest-neighbor order, not a fallback.');
+        $ids = array_merge(array_column($skeleton[1], 'destination_id'), array_column($skeleton[2], 'destination_id'));
+        $this->assertEqualsCanonicalizing([$a->id, $b->id, $c->id], $ids);
+        $this->assertSame([$a->id, $b->id, $c->id], $ids, 'With nothing usable from the model, repair should fall back to the original nearest-neighbor order.');
+    }
+
+    // ---- day-capacity trimming (buildDaySlotPlan) --------------------------
+
+    public function test_a_short_candidate_list_never_forces_a_fill_beyond_the_candidate_count(): void
+    {
+        $this->configure();
+        // 3 candidates, but day capacities offer room for 4 -- day 2's
+        // "afternoon" slot must never be sent to the model or required.
+        [$a, $b, $c] = $this->makeDestinations(3);
+        $sequence = $this->sequenceFor([$a, $b, $c]);
+
+        $capturedSchema = null;
+        Http::fake(function ($request) use (&$capturedSchema, $a, $b, $c) {
+            $capturedSchema = $request->data()['format'];
+
+            return Http::response(['response' => json_encode([
+                'day_1' => ['morning' => $a->id, 'afternoon' => $b->id],
+                'day_2' => ['morning' => $c->id],
+            ])]);
+        });
 
         $skeleton = (new ItinerarySkeletonMlService())->proposeSkeleton(
             $sequence, [1 => ['Morning', 'Afternoon'], 2 => ['Morning', 'Afternoon']], $this->preference(), null
         );
 
-        $this->assertNull($skeleton, 'Dropping a candidate must discard the whole response, not just that stop.');
+        $this->assertNotNull($skeleton);
+        $this->assertArrayNotHasKey('afternoon', $capturedSchema['properties']['day_2']['properties'], 'The schema must not declare a slot beyond the candidate count.');
+        $this->assertCount(1, $skeleton[2], 'Day 2 must only receive as many stops as there are leftover candidates.');
     }
 
-    public function test_a_response_with_a_duplicate_candidate_is_rejected(): void
+    // ---- structured-output schema -------------------------------------------
+
+    public function test_the_schema_constrains_destination_ids_to_the_closed_candidate_set(): void
     {
         $this->configure();
         [$a, $b] = $this->makeDestinations(2);
         $sequence = $this->sequenceFor([$a, $b]);
 
-        // $a is assigned to both days; $b never appears.
-        Http::fake(['localhost:11434/*' => Http::response(['response' => json_encode([
-            'days' => [
-                ['day_number' => 1, 'stops' => [['destination_id' => $a->id, 'slot' => 'Morning']]],
-                ['day_number' => 2, 'stops' => [['destination_id' => $a->id, 'slot' => 'Morning']]],
-            ],
-        ])])]);
+        $capturedSchema = null;
+        Http::fake(function ($request) use (&$capturedSchema, $a, $b) {
+            $capturedSchema = $request->data()['format'];
 
-        $skeleton = (new ItinerarySkeletonMlService())->proposeSkeleton(
-            $sequence, [1 => ['Morning', 'Afternoon'], 2 => ['Morning', 'Afternoon']], $this->preference(), null
-        );
+            return Http::response(['response' => json_encode(['day_1' => ['morning' => $a->id, 'afternoon' => $b->id]])]);
+        });
 
-        $this->assertNull($skeleton, 'A repeated destination_id must discard the whole response.');
+        (new ItinerarySkeletonMlService())->proposeSkeleton($sequence, [1 => ['Morning', 'Afternoon']], $this->preference(), null);
+
+        $this->assertNotNull($capturedSchema);
+        $enum = $capturedSchema['properties']['day_1']['properties']['morning']['enum'];
+        $this->assertEqualsCanonicalizing([$a->id, $b->id], $enum);
+        $this->assertSame(['morning', 'afternoon'], $capturedSchema['properties']['day_1']['required']);
+        $this->assertFalse($capturedSchema['properties']['day_1']['additionalProperties']);
     }
 
-    public function test_a_response_inventing_a_destination_is_rejected(): void
+    public function test_temperature_is_low_and_configurable(): void
     {
         $this->configure();
-        [$a, $b] = $this->makeDestinations(2);
-        $sequence = $this->sequenceFor([$a, $b]);
-
-        Http::fake(['localhost:11434/*' => Http::response(['response' => json_encode([
-            'days' => [
-                ['day_number' => 1, 'stops' => [
-                    ['destination_id' => $a->id, 'slot' => 'Morning'],
-                    // An id that was never in the candidate list at all.
-                    ['destination_id' => 999999, 'slot' => 'Afternoon'],
-                ]],
-                ['day_number' => 2, 'stops' => [['destination_id' => $b->id, 'slot' => 'Morning']]],
-            ],
-        ])])]);
-
-        $skeleton = (new ItinerarySkeletonMlService())->proposeSkeleton(
-            $sequence, [1 => ['Morning', 'Afternoon'], 2 => ['Morning', 'Afternoon']], $this->preference(), null
-        );
-
-        $this->assertNull($skeleton, 'An id outside the candidate list must never be accepted — this is what stops the model inventing a destination.');
-    }
-
-    public function test_a_response_with_an_out_of_range_day_number_is_rejected(): void
-    {
-        $this->configure();
+        config(['services.phi4mini.temperature' => 0.1]);
         [$a] = $this->makeDestinations(1);
         $sequence = $this->sequenceFor([$a]);
 
-        // Only one day was requested; the response invents day 2.
-        Http::fake(['localhost:11434/*' => Http::response(['response' => json_encode([
-            'days' => [
-                ['day_number' => 2, 'stops' => [['destination_id' => $a->id, 'slot' => 'Morning']]],
-            ],
-        ])])]);
+        $capturedOptions = null;
+        Http::fake(function ($request) use (&$capturedOptions, $a) {
+            $capturedOptions = $request->data()['options'];
 
-        $skeleton = (new ItinerarySkeletonMlService())->proposeSkeleton(
-            $sequence, [1 => ['Morning', 'Afternoon']], $this->preference(), null
-        );
+            return Http::response(['response' => json_encode(['day_1' => ['morning' => $a->id]])]);
+        });
 
-        $this->assertNull($skeleton, 'A day_number beyond total_days must be rejected.');
+        (new ItinerarySkeletonMlService())->proposeSkeleton($sequence, [1 => ['Morning']], $this->preference(), null);
+
+        $this->assertSame(0.1, $capturedOptions['temperature']);
     }
 
-    public function test_a_response_exceeding_day_capacity_is_rejected(): void
-    {
-        $this->configure();
-        [$a, $b, $c] = $this->makeDestinations(3);
-        $sequence = $this->sequenceFor([$a, $b, $c]);
-
-        // Day 1 only has one slot, but the response packs three stops into it.
-        Http::fake(['localhost:11434/*' => Http::response(['response' => json_encode([
-            'days' => [
-                ['day_number' => 1, 'stops' => [
-                    ['destination_id' => $a->id, 'slot' => 'Morning'],
-                    ['destination_id' => $b->id, 'slot' => 'Morning'],
-                    ['destination_id' => $c->id, 'slot' => 'Morning'],
-                ]],
-            ],
-        ])])]);
-
-        $skeleton = (new ItinerarySkeletonMlService())->proposeSkeleton(
-            $sequence, [1 => ['Morning']], $this->preference(), null
-        );
-
-        $this->assertNull($skeleton, 'A day must never receive more stops than it has slots for.');
-    }
+    // ---- whole-number floats -------------------------------------------------
 
     /**
      * Some JSON encoders write a schema-valid "integer" as e.g. 1.0 rather
      * than 1. A strict is_int() check used to reject this outright, discarding
      * an otherwise perfectly valid, complete response.
      */
-    public function test_whole_number_floats_are_accepted_for_ids_and_day_numbers(): void
+    public function test_whole_number_floats_are_accepted_for_ids(): void
     {
         $this->configure();
         [$a, $b] = $this->makeDestinations(2);
         $sequence = $this->sequenceFor([$a, $b]);
 
-        Http::fake(['localhost:11434/*' => Http::response(['response' => json_encode([
-            'days' => [
-                ['day_number' => 1.0, 'stops' => [['destination_id' => (float) $a->id, 'slot' => 'Morning']]],
-                ['day_number' => 2.0, 'stops' => [['destination_id' => (float) $b->id, 'slot' => 'Morning']]],
-            ],
-        ])])]);
+        $this->fakeOllama(['day_1' => ['morning' => (float) $a->id, 'afternoon' => (float) $b->id]]);
 
-        $skeleton = (new ItinerarySkeletonMlService())->proposeSkeleton(
-            $sequence, [1 => ['Morning', 'Afternoon'], 2 => ['Morning', 'Afternoon']], $this->preference(), null
-        );
+        $skeleton = (new ItinerarySkeletonMlService())->proposeSkeleton($sequence, [1 => ['Morning', 'Afternoon']], $this->preference(), null);
 
         $this->assertNotNull($skeleton, 'A whole-number float must be accepted the same as a genuine integer.');
         $this->assertSame($a->id, $skeleton[1][0]['destination_id']);
         $this->assertIsInt($skeleton[1][0]['destination_id'], 'The stored id must be a genuine int, not a float, for strict downstream comparisons.');
     }
+
+    // ---- transport/parsing failures still fall back safely -------------------
 
     public function test_an_http_failure_returns_null_rather_than_throwing(): void
     {
@@ -249,9 +296,7 @@ class ItinerarySkeletonMlServiceTest extends TestCase
 
         Http::fake(['localhost:11434/*' => Http::response(['error' => 'model not found'], 500)]);
 
-        $skeleton = (new ItinerarySkeletonMlService())->proposeSkeleton(
-            $sequence, [1 => ['Morning']], $this->preference(), null
-        );
+        $skeleton = (new ItinerarySkeletonMlService())->proposeSkeleton($sequence, [1 => ['Morning']], $this->preference(), null);
 
         $this->assertNull($skeleton, 'A non-2xx response must fall back quietly, not surface an error.');
     }
@@ -267,9 +312,7 @@ class ItinerarySkeletonMlServiceTest extends TestCase
             throw new ConnectionException('Connection refused');
         });
 
-        $skeleton = (new ItinerarySkeletonMlService())->proposeSkeleton(
-            $sequence, [1 => ['Morning']], $this->preference(), null
-        );
+        $skeleton = (new ItinerarySkeletonMlService())->proposeSkeleton($sequence, [1 => ['Morning']], $this->preference(), null);
 
         $this->assertNull($skeleton, 'Ollama being unreachable must never bubble up as an exception to the caller.');
     }
@@ -284,9 +327,7 @@ class ItinerarySkeletonMlServiceTest extends TestCase
         // it — the model's actual completion — is not.
         Http::fake(['localhost:11434/*' => Http::response(['response' => 'not valid json {{{'])]);
 
-        $skeleton = (new ItinerarySkeletonMlService())->proposeSkeleton(
-            $sequence, [1 => ['Morning']], $this->preference(), null
-        );
+        $skeleton = (new ItinerarySkeletonMlService())->proposeSkeleton($sequence, [1 => ['Morning']], $this->preference(), null);
 
         $this->assertNull($skeleton, 'A response field that is not valid JSON must fall back quietly.');
     }
@@ -310,18 +351,10 @@ class ItinerarySkeletonMlServiceTest extends TestCase
         // day2=[c,d]. The faked skeleton deliberately proposes a different
         // pairing (day1=[a,d], day2=[b,c]) so the assertion can tell whether
         // the model's grouping actually took effect or was ignored.
-        Http::fake(['localhost:11434/*' => Http::response(['response' => json_encode([
-            'days' => [
-                ['day_number' => 1, 'stops' => [
-                    ['destination_id' => $a->id, 'slot' => 'Morning'],
-                    ['destination_id' => $d->id, 'slot' => 'Afternoon'],
-                ]],
-                ['day_number' => 2, 'stops' => [
-                    ['destination_id' => $b->id, 'slot' => 'Morning'],
-                    ['destination_id' => $c->id, 'slot' => 'Afternoon'],
-                ]],
-            ],
-        ])])]);
+        $this->fakeOllama([
+            'day_1' => ['morning' => $a->id, 'afternoon' => $d->id],
+            'day_2' => ['morning' => $b->id, 'afternoon' => $c->id],
+        ]);
 
         $preference = $this->preference()->load('activities', 'amenities');
         $itinerary = app(ItineraryGenerationService::class)->generate($preference);
