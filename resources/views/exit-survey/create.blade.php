@@ -7,7 +7,7 @@
     <div class="container">
         <span class="poster-kicker" style="font-size:1.05rem;">how was your trip?</span>
         <h1 class="page-title" style="font-size:1.9rem; margin:0;">Visitor Exit Survey</h1>
-        <p>Help DOT Region XI improve tourism services and destination management in the Davao Region.</p>
+        <p>A short, anonymous survey to help DOT Region XI improve tourism services in the Davao Region.</p>
     </div>
 </div>
 
@@ -40,39 +40,29 @@
             <div class="panel">
                 <div class="panel-head">
                     <div>
-                        <h2>About You</h2>
-                        <p>Help us understand who's visiting the Davao Region (optional).</p>
+                        <h2>About Your Trip</h2>
+                        <p>A few quick questions for DOT Region XI's tourism statistics.</p>
                     </div>
                 </div>
                 <div class="panel-body">
-                    <div class="filter-inline" style="align-items:start;">
-                        <div class="field" style="flex:1; min-width:200px;">
-                            <label for="residency_type">I am a:</label>
-                            <select id="residency_type" name="residency_type">
-                                <option value="">Prefer not to say</option>
-                                <option value="Local Resident" @selected(old('residency_type') === 'Local Resident')>Local Resident</option>
-                                <option value="Domestic Tourist" @selected(old('residency_type') === 'Domestic Tourist')>Domestic Tourist</option>
-                                <option value="Foreign Tourist" @selected(old('residency_type') === 'Foreign Tourist')>Foreign Tourist</option>
-                            </select>
-                        </div>
-                        <div class="field" style="flex:1; min-width:200px;">
-                            <label for="visitor_type">My visit type:</label>
-                            <select id="visitor_type" name="visitor_type">
-                                <option value="">Prefer not to say</option>
-                                <option value="First-time Visitor" @selected(old('visitor_type') === 'First-time Visitor')>First-time Visitor</option>
-                                <option value="Returning Visitor" @selected(old('visitor_type') === 'Returning Visitor')>Returning Visitor</option>
-                                <option value="Regular / Local" @selected(old('visitor_type') === 'Regular / Local')>Regular / Local</option>
-                            </select>
-                        </div>
-                        <div class="field" style="flex:1; min-width:200px;">
-                            <label for="origin">Place of origin (optional)</label>
-                            <input type="text" id="origin" name="origin" value="{{ old('origin') }}" placeholder="e.g. Cebu City, Philippines">
-                        </div>
+                    <div class="field">
+                        <label for="origin">Where are you visiting from?</label>
+                        <input type="text" id="origin" name="origin" value="{{ old('origin') }}" placeholder="e.g. Cebu City, Philippines">
+                        <p class="field-hint">Helps DOT Region XI understand where visitors are travelling from.</p>
                     </div>
 
                     <div class="filter-inline" style="align-items:start; margin-top:14px;">
-                        <div class="field" style="flex:1; min-width:200px;">
-                            <label for="travel_purpose">Purpose of this trip:</label>
+                        <div class="field" style="flex:1; min-width:180px;">
+                            <label for="residency_type">Visit type</label>
+                            <select id="residency_type" name="residency_type">
+                                <option value="">Prefer not to say</option>
+                                <option value="Local Resident" @selected(old('residency_type') === 'Local Resident')>Local</option>
+                                <option value="Domestic Tourist" @selected(old('residency_type') === 'Domestic Tourist')>Domestic</option>
+                                <option value="Foreign Tourist" @selected(old('residency_type') === 'Foreign Tourist')>International</option>
+                            </select>
+                        </div>
+                        <div class="field" style="flex:1; min-width:180px;">
+                            <label for="travel_purpose">Purpose of trip</label>
                             <select id="travel_purpose" name="travel_purpose">
                                 <option value="">Prefer not to say</option>
                                 @foreach ($travelPurposes as $purpose)
@@ -80,19 +70,19 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="field" style="flex:1; min-width:200px;">
-                            <label for="actual_days_stayed">How many days did you stay in Davao Region?</label>
-                            <input type="number" id="actual_days_stayed" name="actual_days_stayed" min="1" max="365" value="{{ old('actual_days_stayed') }}" placeholder="e.g. 3">
-                        </div>
                     </div>
 
                     <div class="filter-inline" style="align-items:start; margin-top:14px;">
-                        <div class="field" style="flex:1; min-width:200px;">
-                            <label for="estimated_daily_spend">About how much did you spend per day here? (&#8369;, optional)</label>
+                        <div class="field" style="flex:1; min-width:180px;">
+                            <label for="actual_days_stayed">Days stayed</label>
+                            <input type="number" id="actual_days_stayed" name="actual_days_stayed" min="1" max="365" value="{{ old('actual_days_stayed') }}" placeholder="e.g. 3">
+                        </div>
+                        <div class="field" style="flex:1; min-width:180px;">
+                            <label for="estimated_daily_spend">Spend per day (&#8369;)</label>
                             <input type="number" id="estimated_daily_spend" name="estimated_daily_spend" min="0" step="0.01" value="{{ old('estimated_daily_spend') }}" placeholder="e.g. 1500">
-                            <p class="field-hint">Include food, transport, activities, and shopping &mdash; not accommodation, if you paid for that separately in advance.</p>
                         </div>
                     </div>
+                    <p class="field-hint">Daily spend includes food, transport, activities, and shopping &mdash; not accommodation, if you paid for that separately in advance.</p>
                 </div>
             </div>
 
@@ -100,24 +90,20 @@
                 <div class="panel-head">
                     <div>
                         <h2>Your Visit</h2>
-                        <p>What did you experience during your trip? (optional &mdash; search and add the places you went)</p>
+                        <p>Optional &mdash; search and add the places you went.</p>
                     </div>
                 </div>
                 <div class="panel-body">
-                    @foreach ($placeGroups as $kind => $group)
-                        @if ($group['options']->isNotEmpty())
-                            <x-tag-search
-                                name="places_visited[]"
-                                :items="$group['options']"
-                                :selected="$group['selected']"
-                                :label="$group['label'].' visited'"
-                                :placeholder="'Search '.strtolower($group['label']).'…'"
-                            />
-                        @endif
-                    @endforeach
+                    <x-tag-search
+                        name="places_visited[]"
+                        :items="$placeOptions"
+                        :selected="$selectedPlaces"
+                        label="Where did you go during your trip?"
+                        placeholder="Search places you visited…"
+                    />
 
                     <div class="field" style="margin-top:22px;">
-                        <label>Activities you participated in</label>
+                        <label>Activities you participated in (optional)</label>
                         <div class="chip-checkbox-grid">
                             @foreach ($activityOptions as $activity)
                                 <label class="field-check">
@@ -133,11 +119,15 @@
             <div class="panel">
                 <div class="panel-head">
                     <div>
-                        <h2>Rate Your Experience</h2>
-                        <p>How would you rate the following aspects of your trip? (optional)</p>
+                        <h2>Your Experience</h2>
+                        <p>How would you rate your trip? (optional, except overall satisfaction)</p>
                     </div>
                 </div>
                 <div class="panel-body">
+                    <div class="rating-row">
+                        <span class="rating-row-label"><strong>Overall satisfaction with your visit</strong></span>
+                        @include('partials.star-input', ['name' => 'overall_rating', 'required' => true])
+                    </div>
                     <div class="rating-row">
                         <span class="rating-row-label">Relevance of recommended destinations</span>
                         @include('partials.star-input', ['name' => 'destination_relevant'])
@@ -145,23 +135,6 @@
                     <div class="rating-row">
                         <span class="rating-row-label">Usefulness of the suggested itinerary</span>
                         @include('partials.star-input', ['name' => 'itinerary_useful'])
-                    </div>
-                    <div class="rating-row">
-                        <span class="rating-row-label">Quality of attractions visited</span>
-                        @include('partials.star-input', ['name' => 'attractions_quality'])
-                    </div>
-                    <div class="rating-row">
-                        <span class="rating-row-label">Accommodation experience</span>
-                        @include('partials.star-input', ['name' => 'accommodation_rating'])
-                    </div>
-                    <div class="rating-row">
-                        <span class="rating-row-label">Transportation experience</span>
-                        @include('partials.star-input', ['name' => 'transport_rating'])
-                    </div>
-
-                    <div class="rating-row" style="margin-top:10px; border-top:2px solid var(--border); padding-top:16px;">
-                        <span class="rating-row-label"><strong>Overall satisfaction with your visit</strong></span>
-                        @include('partials.star-input', ['name' => 'overall_rating', 'required' => true])
                     </div>
 
                     <div class="field" style="margin-top:22px;">
@@ -180,7 +153,7 @@
 
                     <div class="field" style="margin-top:18px;">
                         <label for="comments">Any comments or suggestions? (optional)</label>
-                        <textarea id="comments" name="comments" rows="3" placeholder="What did you love? What could DOT improve? Any specific attractions or experiences worth highlighting?">{{ old('comments') }}</textarea>
+                        <textarea id="comments" name="comments" rows="3" placeholder="What did you love? What could DOT improve?">{{ old('comments') }}</textarea>
                     </div>
 
                     <button type="submit" class="btn btn-accent btn-block" style="margin-top:20px;">Submit Survey</button>

@@ -42,38 +42,56 @@ class ExitSurveyController extends Controller
      *  request can't trigger thousands of one-row-at-a-time inserts. */
     private const MAX_LIST_ITEMS = 50;
 
+    /** listing_kind => the singular label appended to every option so a merged, cross-category list stays legible. */
+    private const PLACE_KIND_LABELS = [
+        'destination' => 'Destination',
+        'accommodation' => 'Accommodation',
+        'restaurant' => 'Restaurant',
+        'package' => 'Tour Package',
+        'souvenir_center' => 'Souvenir Center',
+        'tour_operator' => 'Tour Operator',
+    ];
+
     public function create(): View
     {
-        $placeGroups = [
-            'destination' => ['label' => 'Destinations', 'items' => Destination::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location'])],
-            'accommodation' => ['label' => 'Accommodations', 'items' => Accommodation::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location'])],
-            'restaurant' => ['label' => 'Restaurants', 'items' => Restaurant::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location'])],
-            'package' => ['label' => 'Tour Packages', 'items' => Package::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location'])],
-            'souvenir_center' => ['label' => 'Souvenir Centers', 'items' => SouvenirCenter::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location'])],
-            'tour_operator' => ['label' => 'Tour Operators', 'items' => TourOperator::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location'])],
+        $placeModels = [
+            'destination' => Destination::class,
+            'accommodation' => Accommodation::class,
+            'restaurant' => Restaurant::class,
+            'package' => Package::class,
+            'souvenir_center' => SouvenirCenter::class,
+            'tour_operator' => TourOperator::class,
         ];
 
-        $oldPlaces = old('places_visited', []);
+        /*
+         * One searchable list across every kind, rather than six separate
+         * boxes -- a tourist does not think in database categories when
+         * asked "where did you go," and a wall of six near-identical search
+         * fields was a real completion-rate risk. The category is folded
+         * into each option's own label ("Eden Nature Park · Destination")
+         * instead of dropped, since a restaurant and a destination can
+         * plausibly share a name and the picker has no other way to tell
+         * them apart in one flat list.
+         *
+         * The value stays exactly "{kind}:{id}" -- store() and every
+         * downstream reader of ExitSurveyVisit (Apriori's transaction data,
+         * the Trip Recap, the admin "Most Visited Places" panel) parse that
+         * same format either way, so none of them needed to change.
+         */
+        $placeOptions = collect($placeModels)
+            ->flatMap(function (string $model, string $kind) {
+                $items = $this->labelDistinctly($model::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location']));
 
-        foreach ($placeGroups as $kind => &$group) {
-            $distinct = $this->labelDistinctly($group['items']);
-
-            // The tag-search component only knows {value, label} pairs -- it
-            // has no idea "kind:id" is the convention places_visited uses,
-            // which is what keeps it reusable for any other picker later.
-            $group['options'] = $distinct->map(fn ($item) => [
-                'value' => "{$kind}:{$item->id}",
-                'label' => $item->display_label,
-            ])->values();
-
-            $group['selected'] = array_values(array_filter(
-                $oldPlaces,
-                fn ($value) => str_starts_with($value, "{$kind}:")
-            ));
-        }
+                return $items->map(fn ($item) => [
+                    'value' => "{$kind}:{$item->id}",
+                    'label' => $item->display_label.' · '.self::PLACE_KIND_LABELS[$kind],
+                ]);
+            })
+            ->values();
 
         return view('exit-survey.create', [
-            'placeGroups' => $placeGroups,
+            'placeOptions' => $placeOptions,
+            'selectedPlaces' => old('places_visited', []),
             'travelPurposes' => self::TRAVEL_PURPOSES,
             'activityOptions' => self::ACTIVITIES,
         ]);
@@ -81,12 +99,12 @@ class ExitSurveyController extends Controller
 
     /**
      * Appends the location to any listing whose name is shared by another
-     * listing in the same group, so the checkbox itself says which one it is.
+     * listing of the same kind, so the picker itself says which one it is.
      *
      * DOT accreditation covers businesses with more than one branch (three
      * Elysia Wellness Spa locations, two Rancho Palos Verdes venues), each a
      * real, separately addressed listing a visitor can genuinely tell apart
-     * -- but "Elysia Wellness Spa" printed three times with no way to
+     * -- but "Elysia Wellness Spa" listed three times with no way to
      * distinguish them left a visitor unable to say which one they actually
      * went to. A listing with a name nobody else shares is left exactly as
      * it was.
