@@ -59,6 +59,10 @@ return [
         'url' => env('PHI4MINI_URL', 'http://localhost:11434'),
         'model' => env('PHI4MINI_MODEL', 'phi4-mini'),
         'timeout' => env('PHI4MINI_TIMEOUT', 20),
+        // Low and close to deterministic: itinerary skeleton assignment is a
+        // closed-set arrangement task, not open-ended generation, so sampling
+        // randomness only costs correctness here.
+        'temperature' => env('PHI4MINI_TEMPERATURE', 0.1),
     ],
 
     /*
