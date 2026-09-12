@@ -53,7 +53,7 @@ class ExitSurveyTest extends TestCase
             'places_visited' => ["destination:{$destination->id}"],
         ]));
 
-        $response->assertRedirect(route('exit-survey.create'));
+        $response->assertRedirect(route('exit-survey.recap'));
         $this->assertSame(1, ExitSurvey::count());
         $this->assertSame(1, ExitSurveyVisit::count());
         $this->assertSame(1, ExitSurveyActivity::count());
@@ -139,7 +139,7 @@ class ExitSurveyTest extends TestCase
         $this->post(route('exit-survey.store'), $this->validPayload([
             'actual_days_stayed' => 3,
             'estimated_daily_spend' => 1500,
-        ]))->assertRedirect(route('exit-survey.create'));
+        ]))->assertRedirect(route('exit-survey.recap'));
 
         $survey = ExitSurvey::sole();
         $this->assertEquals(1500, $survey->estimated_daily_spend);
@@ -163,7 +163,7 @@ class ExitSurveyTest extends TestCase
     public function test_the_spend_field_is_optional(): void
     {
         $this->post(route('exit-survey.store'), $this->validPayload())
-            ->assertRedirect(route('exit-survey.create'));
+            ->assertRedirect(route('exit-survey.recap'));
 
         $this->assertNull(ExitSurvey::sole()->estimated_daily_spend);
     }
@@ -186,7 +186,7 @@ class ExitSurveyTest extends TestCase
 
         $response = $this->post(route('exit-survey.store'), $this->validPayload());
 
-        $response->assertRedirect(route('exit-survey.create'));
+        $response->assertRedirect(route('exit-survey.recap'));
         $this->assertNull(ExitSurvey::sole()->preference_id);
     }
 

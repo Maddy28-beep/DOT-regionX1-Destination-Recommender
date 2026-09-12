@@ -157,4 +157,43 @@ class QrCheckInFlowTest extends TestCase
 
         $this->assertSame(0, TouristVisit::count());
     }
+
+    /** A genuinely new check-in nudges the traveler toward the exit survey -- once, not repeatedly. */
+    public function test_a_fresh_check_in_flashes_the_survey_invite(): void
+    {
+        $listing = $this->listing();
+
+        $this->get("/check-in/destinations/{$listing->id}");
+
+        $this->assertTrue(session('show_survey_invite'));
+    }
+
+    /** A same-day rescan is not a new visit, so it must not repeat the invite either. */
+    public function test_a_repeat_same_day_check_in_does_not_flash_the_invite(): void
+    {
+        $listing = $this->listing();
+        $token = (string) \Illuminate\Support\Str::uuid();
+
+        $this->withCookie(EnsureVisitorToken::COOKIE, $token)->get("/check-in/destinations/{$listing->id}");
+        // The flash from the first request is consumed by reading it above;
+        // start clean before the rescan so only the second request's own
+        // flash (or lack of one) is being asserted.
+        session()->forget('show_survey_invite');
+
+        $this->withCookie(EnsureVisitorToken::COOKIE, $token)->get("/check-in/destinations/{$listing->id}");
+
+        $this->assertNull(session('show_survey_invite'));
+    }
+
+    /** The invite is a one-request flash -- it must not still be there on the very next, unrelated page. */
+    public function test_the_invite_does_not_persist_past_the_next_page(): void
+    {
+        $listing = $this->listing();
+
+        $this->get("/check-in/destinations/{$listing->id}");
+        $this->get(route('destinations.show', $listing));
+
+        $this->get(route('home'))->assertOk();
+        $this->assertNull(session('show_survey_invite'));
+    }
 }

@@ -112,6 +112,10 @@ Route::get('/exit-survey', [ExitSurveyController::class, 'create'])->name('exit-
 Route::post('/exit-survey', [ExitSurveyController::class, 'store'])
     ->middleware('throttle:20,1')
     ->name('exit-survey.store');
+// The immediate trip recap shown right after submitting -- reads a
+// session-stored survey id rather than taking one in the URL, so there's
+// nothing sensitive to leak via a shared link.
+Route::get('/exit-survey/recap', [ExitSurveyController::class, 'recap'])->name('exit-survey.recap');
 
 // Chatbot Assistance Module (2.2.1.13, Sec. 2.2.3.1.10)
 Route::post('/chatbot/message', [ChatbotController::class, 'respond'])
