@@ -202,4 +202,106 @@ class ExitSurveyTest extends TestCase
             $response->assertSee($activity);
         }
     }
+
+    /**
+     * The six per-kind pickers were merged into one searchable box; the
+     * regression that actually matters is that a mixed-kind selection still
+     * produces correctly-typed ExitSurveyVisit rows, since those are the
+     * transaction data Apriori reads.
+     */
+    public function test_the_merged_place_picker_still_records_the_correct_kind_per_place(): void
+    {
+        $destination = $this->destination();
+        $accommodation = \App\Models\Accommodation::create([
+            'slug' => 'test-inn', 'name' => 'Test Inn', 'location' => 'Davao City',
+            'region_id' => $destination->region_id, 'type' => 'Hotel', 'is_accredited' => true,
+            'rating' => 0, 'review_count' => 0, 'price_tier' => 'Mid-range',
+        ]);
+
+        $this->post(route('exit-survey.store'), $this->validPayload([
+            'places_visited' => ["destination:{$destination->id}", "accommodation:{$accommodation->id}"],
+        ]))->assertRedirect(route('exit-survey.recap'));
+
+        $survey = ExitSurvey::sole();
+        $this->assertTrue($survey->visits()->where('listing_kind', 'destination')->where('listing_id', $destination->id)->exists());
+        $this->assertTrue($survey->visits()->where('listing_kind', 'accommodation')->where('listing_id', $accommodation->id)->exists());
+    }
+
+    /** The merged picker must offer places from more than one kind, not just destinations. */
+    public function test_the_place_picker_offers_more_than_one_kind(): void
+    {
+        $destination = $this->destination();
+        \App\Models\Accommodation::create([
+            'slug' => 'test-inn-2', 'name' => 'Second Test Inn', 'location' => 'Davao City',
+            'region_id' => $destination->region_id, 'type' => 'Hotel', 'is_accredited' => true,
+            'rating' => 0, 'review_count' => 0, 'price_tier' => 'Mid-range',
+        ]);
+
+        $html = $this->get(route('exit-survey.create'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('Eden Nature Park', $html);
+        $this->assertStringContainsString('Second Test Inn', $html);
+        // The category is folded into the label, not dropped, since a merged
+        // list has no other way to tell same-named places of different
+        // kinds apart.
+        $this->assertStringContainsString('Destination', $html);
+        $this->assertStringContainsString('Accommodation', $html);
+    }
+
+    /** "My visit type" (First-time/Returning/Regular-Local) was retired from the UI -- it fed nothing DOT asked for. */
+    public function test_the_retired_visitor_type_question_is_no_longer_shown(): void
+    {
+        $html = $this->get(route('exit-survey.create'))->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('My visit type', $html);
+        $this->assertStringNotContainsString('First-time Visitor', $html);
+    }
+
+    /** residency_type survives as "Visit type," relabeled -- it still feeds the admin spend-by-residency panel. */
+    public function test_the_visit_type_question_still_submits_the_same_stored_values(): void
+    {
+        $html = $this->get(route('exit-survey.create'))->assertOk()->getContent();
+        $this->assertStringContainsString('Visit type', $html);
+
+        $this->post(route('exit-survey.store'), $this->validPayload(['residency_type' => 'Domestic Tourist']));
+
+        $this->assertSame('Domestic Tourist', ExitSurvey::sole()->residency_type);
+    }
+
+    /** Three of five star ratings were retired from the UI -- the backend/admin analytics for them are untouched. */
+    public function test_the_retired_ratings_are_no_longer_shown_but_still_accepted(): void
+    {
+        $html = $this->get(route('exit-survey.create'))->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('Quality of attractions visited', $html);
+        $this->assertStringNotContainsString('Accommodation experience', $html);
+        $this->assertStringNotContainsString('Transportation experience', $html);
+        $this->assertStringNotContainsString('name="attractions_quality"', $html);
+        $this->assertStringNotContainsString('name="accommodation_rating"', $html);
+        $this->assertStringNotContainsString('name="transport_rating"', $html);
+
+        // A non-JS or stale client could still post these; the backend rule
+        // is unchanged, so they must not be rejected.
+        $this->post(route('exit-survey.store'), $this->validPayload([
+            'attractions_quality' => 4, 'accommodation_rating' => 5, 'transport_rating' => 3,
+        ]))->assertRedirect(route('exit-survey.recap'));
+
+        $survey = ExitSurvey::sole();
+        $this->assertSame(4, $survey->attractions_quality);
+        $this->assertSame(5, $survey->accommodation_rating);
+        $this->assertSame(3, $survey->transport_rating);
+    }
+
+    /** Place of Origin and Amount Spent are the two fields DOT specifically asked to keep -- both must still work exactly as before. */
+    public function test_place_of_origin_and_spend_are_still_collected(): void
+    {
+        $this->post(route('exit-survey.store'), $this->validPayload([
+            'origin' => 'Cebu City, Philippines',
+            'estimated_daily_spend' => 2000,
+        ]));
+
+        $survey = ExitSurvey::sole();
+        $this->assertSame('Cebu City, Philippines', $survey->origin);
+        $this->assertEquals(2000, $survey->estimated_daily_spend);
+    }
 }
