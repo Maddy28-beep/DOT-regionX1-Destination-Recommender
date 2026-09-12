@@ -12,6 +12,7 @@ use App\Models\Restaurant;
 use App\Models\SouvenirCenter;
 use App\Models\TourOperator;
 use App\Models\TouristPreference;
+use App\Services\Recommendation\ContentBasedRecommendationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -154,7 +155,7 @@ class ExitSurveyController extends Controller
             $preferenceId = null;
         }
 
-        DB::transaction(function () use ($data, $preferenceId) {
+        $survey = DB::transaction(function () use ($data, $preferenceId) {
             $survey = ExitSurvey::create(
                 collect($data)->except(['places_visited', 'activities'])
                     ->put('preference_id', $preferenceId)
@@ -169,8 +170,75 @@ class ExitSurveyController extends Controller
             foreach ($data['activities'] ?? [] as $activity) {
                 ExitSurveyActivity::create(['exit_survey_id' => $survey->id, 'activity' => $activity]);
             }
+
+            return $survey;
         });
 
-        return redirect()->route('exit-survey.create')->with(Toast::success('Thanks for your feedback', 'Your response helps DOT Region XI improve tourism services.'));
+        // Read back on the very next request by recap() -- a plain session
+        // value (not flash), so refreshing or briefly navigating away from
+        // the recap page doesn't lose it, the same durability the trip
+        // planner already gives guest_itinerary_id.
+        $request->session()->put('last_exit_survey_id', $survey->id);
+
+        return redirect()->route('exit-survey.recap')->with(Toast::success('Thanks for your feedback', 'Your response helps DOT Region XI improve tourism services.'));
+    }
+
+    /**
+     * The immediate payoff for finishing an anonymous survey: a recap of the
+     * trip itself, built entirely from what was just submitted, plus a few
+     * places not yet visited.
+     *
+     * The survey a submission actually reported visiting (ExitSurveyVisit) is
+     * used rather than TouristVisit (QR check-ins): check-ins are an
+     * unscoped running log per browser with no trip boundary, so "everything
+     * this token ever checked into" is not reliably "this trip" -- what the
+     * tourist just told the survey they visited already is.
+     */
+    public function recap(Request $request, ContentBasedRecommendationService $recommender): View|RedirectResponse
+    {
+        $surveyId = $request->session()->get('last_exit_survey_id');
+        $survey = $surveyId ? ExitSurvey::with(['visits.listing', 'preference'])->find($surveyId) : null;
+
+        if (! $survey) {
+            return redirect()->route('home')
+                ->with(Toast::success('Thanks for exploring Davao Region', null));
+        }
+
+        $visited = $survey->visits
+            ->unique(fn ($visit) => $visit->listing_kind.':'.$visit->listing_id)
+            ->map(fn ($visit) => $visit->listing)
+            ->filter()
+            ->values();
+
+        $visitedDestinationIds = $visited
+            ->filter(fn ($listing) => $listing instanceof Destination)
+            ->pluck('id');
+
+        $missed = collect();
+
+        if ($survey->preference) {
+            $missed = $recommender->rank($survey->preference)
+                ->pluck('destination')
+                ->reject(fn ($destination) => $visitedDestinationIds->contains($destination->id))
+                ->take(5)
+                ->values();
+        }
+
+        // No plan to personalize against, or nothing survived it -- fall back
+        // to a plainly "popular" list rather than pretending it's tailored.
+        if ($missed->isEmpty()) {
+            $missed = Destination::publiclyVisible()
+                ->whereNotIn('id', $visitedDestinationIds)
+                ->orderByWeightedRating()
+                ->take(5)
+                ->get();
+        }
+
+        return view('exit-survey.recap', [
+            'visited' => $visited,
+            'daysStayed' => $survey->actual_days_stayed,
+            'missed' => $missed,
+            'personalized' => (bool) $survey->preference,
+        ]);
     }
 }

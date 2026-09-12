@@ -91,6 +91,15 @@ class CheckInController extends Controller
             ? Toast::success('Checked in', "Thanks for visiting {$listing->name}!")
             : Toast::success('Already checked in', "You checked in at {$listing->name} earlier today.");
 
-        return redirect()->route($config['route'], $listing)->with($toast);
+        $redirect = redirect()->route($config['route'], $listing)->with($toast);
+
+        // Only nudge on a genuinely new visit, not a same-day rescan -- and only
+        // once: this is a one-request flash, not a tracked dismissal, so it
+        // never has to remember whether this browser already said no.
+        if ($visit->wasRecentlyCreated) {
+            $redirect->with('show_survey_invite', true);
+        }
+
+        return $redirect;
     }
 }
