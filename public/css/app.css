@@ -2578,7 +2578,26 @@ body.hero-page .site-header.scrolled {
 .page-head h1 { margin: 0 0 6px; font-size: clamp(1.7rem, 4vw, 2.5rem); line-height: 1.06; color: var(--ocean-teal-dark); }
 .page-head p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
 
+/*
+   .page-head is shared by every catalog/listing page AND a few unrelated
+   ones (the exit survey, saved places) that also open with a page-head but
+   have no reason to trim the space below it. :has(.catalog-layout) scopes
+   this to pages that actually contain the filter-sidebar + card-grid
+   layout -- i.e. exactly destinations/accommodations/restaurants/packages
+   /souvenir-centers/tour-operators, all six of which share this identical
+   page-head -> chip-row -> catalog-layout structure -- without adding a
+   class to six separate Blade files or touching the exit-survey/saved
+   pages that reuse the same .page-head class for something else entirely.
+*/
+body:has(.catalog-layout) .page-head { padding: 16px 0 4px; }
+body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12px; }
+
 .catalog-layout { display: grid; grid-template-columns: 240px 1fr; gap: 28px; align-items: flex-start; }
+/* Grid tracks default to min-width:auto, not 0 -- meaning a track can refuse
+   to shrink below its content's intrinsic width and force the grid (and the
+   page) wider than intended. Nothing currently inside this column is that
+   wide, but this is the standard, cheap guard against it regressing. */
+.catalog-layout > * { min-width: 0; }
 
 .filter-toggle { display: none; }
 .filter-toggle svg { width: 16px; height: 16px; }
@@ -2632,6 +2651,25 @@ body.hero-page .site-header.scrolled {
 .chip-row--poster .chip { background: transparent; border-color: var(--primary); color: var(--primary-dark); }
 .chip-row--poster .chip:hover:not(.active) { border-color: var(--primary-dark); background: var(--primary-light); }
 .chip-row--poster .chip.active { background: var(--primary); border-color: var(--primary); color: var(--paper); }
+
+/*
+   At desktop widths there is room to wrap the category row onto a second
+   line instead of scrolling it -- .chip-row's horizontal-scroll (above) was
+   built for narrow screens, but on a wide viewport it just left the last
+   category permanently half off-screen behind a scrollbar, which reads as
+   broken rather than intentional. Left as horizontal scroll below 1024px,
+   per the original design, since wrapping there would take up much more
+   vertical space than a single scrollable row (only the public poster
+   variant -- the admin console's plain .chip-row keeps its existing
+   scroll-only behavior at every width).
+*/
+@media (min-width: 1024px) {
+    .chip-row--poster {
+        flex-wrap: wrap;
+        overflow-x: visible;
+        padding-bottom: 0;
+    }
+}
 
 .results-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
 .results-count { font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
