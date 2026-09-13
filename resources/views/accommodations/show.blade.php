@@ -100,6 +100,8 @@
                 @include('partials.check-in-button', ['type' => 'accommodations', 'listing' => $accommodation])
                 <x-save-heart type="accommodations" :listing="$accommodation" variant="button" class="mt-10" />
 
+                @include('partials.listing-external-links', ['listing' => $accommodation])
+
                 @include('partials.map-embed', ['latitude' => $accommodation->latitude, 'longitude' => $accommodation->longitude, 'name' => $accommodation->name])
             </div>
         </div>

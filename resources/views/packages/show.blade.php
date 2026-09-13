@@ -125,6 +125,8 @@
                 @endif
                 @include('partials.check-in-button', ['type' => 'packages', 'listing' => $package])
 
+                @include('partials.listing-external-links', ['listing' => $package])
+
                 @include('partials.map-embed', ['latitude' => $package->latitude, 'longitude' => $package->longitude, 'name' => $package->name])
             </div>
         </div>

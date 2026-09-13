@@ -108,9 +108,17 @@ class EstablishmentDashboardController extends Controller
             'latitude' => ['nullable', 'required_with:longitude', 'numeric', 'between:'.self::REGION_BOUNDS['lat'][0].','.self::REGION_BOUNDS['lat'][1]],
             'longitude' => ['nullable', 'required_with:latitude', 'numeric', 'between:'.self::REGION_BOUNDS['lng'][0].','.self::REGION_BOUNDS['lng'][1]],
             'itinerary' => ['nullable', 'string', 'max:5000'],
+            'website_url' => ['nullable', 'url:http,https', 'max:255'],
+            'facebook_url' => ['nullable', 'url:http,https', 'max:255'],
+            'instagram_url' => ['nullable', 'url:http,https', 'max:255'],
+            'tiktok_url' => ['nullable', 'url:http,https', 'max:255'],
         ], [
             'latitude.between' => 'That point is outside the Davao Region. Drag the marker to your establishment.',
             'longitude.between' => 'That point is outside the Davao Region. Drag the marker to your establishment.',
+            'website_url.url' => 'Enter a full web address, starting with http:// or https://.',
+            'facebook_url.url' => 'Enter a full web address, starting with http:// or https://.',
+            'instagram_url.url' => 'Enter a full web address, starting with http:// or https://.',
+            'tiktok_url.url' => 'Enter a full web address, starting with http:// or https://.',
         ]);
 
         $listing->description = $data['description'] ?? null;
@@ -119,6 +127,10 @@ class EstablishmentDashboardController extends Controller
         // pin, because the recommender trusts a stored coordinate completely.
         $listing->latitude = $data['latitude'] ?? null;
         $listing->longitude = $data['longitude'] ?? null;
+        $listing->website_url = $data['website_url'] ?? null;
+        $listing->facebook_url = $data['facebook_url'] ?? null;
+        $listing->instagram_url = $data['instagram_url'] ?? null;
+        $listing->tiktok_url = $data['tiktok_url'] ?? null;
 
         match ($establishment->listing_kind) {
             'accommodation' => $listing->price_per_night = $data['price_amount'] ?? null,

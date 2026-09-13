@@ -154,6 +154,8 @@
 
                 <x-save-heart type="destinations" :listing="$destination" variant="button" class="mt-10" />
 
+                @include('partials.listing-external-links', ['listing' => $destination])
+
                 @include('partials.map-embed', ['latitude' => $destination->latitude, 'longitude' => $destination->longitude, 'name' => $destination->name])
             </div>
         </div>

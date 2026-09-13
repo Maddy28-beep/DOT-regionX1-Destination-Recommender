@@ -74,6 +74,31 @@
                 </div>
             @endif
 
+            <div class="field-group" style="margin-top:24px;">
+                <h3 style="margin-bottom:4px;">Online Presence</h3>
+                <p class="field-hint" style="margin-top:0;">Optional. Add links so travelers can find you online &mdash; they'll appear on your public listing page automatically.</p>
+
+                <div class="field">
+                    <label for="website_url">Official Website</label>
+                    <input type="url" id="website_url" name="website_url" placeholder="https://www.yourbusiness.com" value="{{ old('website_url', $listing->website_url) }}">
+                </div>
+
+                <div class="field">
+                    <label for="facebook_url">Facebook Page</label>
+                    <input type="url" id="facebook_url" name="facebook_url" placeholder="https://facebook.com/yourbusiness" value="{{ old('facebook_url', $listing->facebook_url) }}">
+                </div>
+
+                <div class="field">
+                    <label for="instagram_url">Instagram (optional)</label>
+                    <input type="url" id="instagram_url" name="instagram_url" placeholder="https://instagram.com/yourbusiness" value="{{ old('instagram_url', $listing->instagram_url) }}">
+                </div>
+
+                <div class="field">
+                    <label for="tiktok_url">TikTok (optional)</label>
+                    <input type="url" id="tiktok_url" name="tiktok_url" placeholder="https://tiktok.com/@yourbusiness" value="{{ old('tiktok_url', $listing->tiktok_url) }}">
+                </div>
+            </div>
+
             <button type="submit" class="btn btn-primary" style="margin-top:20px;">Save Changes</button>
         </form>
     </div>
