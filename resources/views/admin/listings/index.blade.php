@@ -111,22 +111,6 @@
     </div>
 </div>
 
-<div class="pagination">
-    @if ($listings->onFirstPage())
-        <span class="disabled">&laquo;</span>
-    @else
-        <a href="{{ $listings->previousPageUrl() }}">&laquo;</a>
-    @endif
-
-    @foreach ($listings->getUrlRange(1, $listings->lastPage()) as $page => $url)
-        <span class="{{ $page === $listings->currentPage() ? 'active' : '' }}"><a href="{{ $url }}">{{ $page }}</a></span>
-    @endforeach
-
-    @if ($listings->hasMorePages())
-        <a href="{{ $listings->nextPageUrl() }}">&raquo;</a>
-    @else
-        <span class="disabled">&raquo;</span>
-    @endif
-</div>
+<x-admin-pagination :paginator="$listings" />
 
 @endsection
