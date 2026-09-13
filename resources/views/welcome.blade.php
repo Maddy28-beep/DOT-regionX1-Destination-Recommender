@@ -525,6 +525,7 @@
                         ->concat($regions->reject(fn ($r) => in_array($r->name, $regionOrder, true)));
                 @endphp
 
+                <span class="about-regions-label">Browse by province</span>
                 <div class="about-regions">
                     @foreach ($orderedRegions as $region)
                         <a href="{{ route('destinations.index', ['region_id' => $region->id]) }}" class="about-region-pill">
