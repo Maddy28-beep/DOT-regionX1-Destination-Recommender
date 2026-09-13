@@ -20,6 +20,7 @@ class TourOperator extends Model
         'slug', 'name', 'location', 'region_id', 'specialization', 'description',
         'image_path', 'is_accredited', 'rating', 'review_count', 'price_tier',
         'contact_number', 'latitude', 'longitude',
+        'website_url', 'facebook_url', 'instagram_url', 'tiktok_url',
     ];
 
     protected function casts(): array

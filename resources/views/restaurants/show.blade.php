@@ -81,6 +81,8 @@
                 @include('partials.check-in-button', ['type' => 'restaurants', 'listing' => $restaurant])
                 <x-save-heart type="restaurants" :listing="$restaurant" variant="button" class="mt-10" />
 
+                @include('partials.listing-external-links', ['listing' => $restaurant])
+
                 @include('partials.map-embed', ['latitude' => $restaurant->latitude, 'longitude' => $restaurant->longitude, 'name' => $restaurant->name])
             </div>
         </div>
