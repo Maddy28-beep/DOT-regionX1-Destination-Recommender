@@ -1217,6 +1217,7 @@ body.hero-page .site-header.scrolled {
     position: relative;
     overflow: hidden;
     min-height: 100vh;
+    min-height: 100svh;
     min-height: 100dvh;
     padding-top: clamp(130px, 20vh, 180px);
     padding-bottom: 28px;
