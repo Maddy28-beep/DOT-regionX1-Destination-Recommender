@@ -2095,16 +2095,54 @@ body.hero-page .site-header.scrolled {
 @media (max-width: 560px) { .feature-grid { grid-template-columns: 1fr; } }
 
 /* ---------- About the Region ---------- */
+/* Premium "Discover Davao Region" editorial section: intro copy, province
+   links, and the interactive Leaflet locator. Every class here (.about-*) is
+   used exclusively in this one section of welcome.blade.php (confirmed via
+   a repo-wide search before touching any of it), so nothing here reaches
+   another page or another section. */
+
+.about-region {
+    /*
+       76px is .site-header's unscrolled height (its tallest state -- the
+       header is position:fixed on this page in both states, so the taller
+       figure is the safe one to clear), +32px of comfortable breathing room
+       once the section itself is in view. Nothing currently links to
+       #about-region, but the id has existed since the map was added and
+       costs nothing to make scroll-safe now rather than the next time
+       something anchors to it.
+    */
+    scroll-margin-top: 108px;
+    /* A soft wash, not a hard color block, so the section reads as its own
+       editorial "chapter" of the page without breaking the light palette
+       every section around it already uses. */
+    background: linear-gradient(180deg, var(--bg) 0%, var(--primary-light) 45%, var(--bg) 100%);
+    padding-block: 96px;
+}
+
+.about-region .section-head { max-width: 640px; margin-inline: 0; }
 
 .about-grid {
     display: grid;
     grid-template-columns: 1.05fr .95fr;
-    gap: 44px;
+    gap: 56px;
     align-items: start;
 }
 
-.about-copy p { margin: 0 0 16px; font-size: .96rem; line-height: 1.75; color: var(--ink); }
+.about-copy {
+    /* A divider between the two columns, not just a gap -- the classic
+       editorial magazine-column rule, sitting in the grid gutter rather than
+       consuming column width from either side. */
+    border-right: 1px solid var(--border);
+    padding-right: 56px;
+}
+.about-copy p { margin: 0 0 16px; line-height: 1.75; color: var(--ink); }
 .about-copy p:last-of-type { margin-bottom: 0; }
+/* Lead paragraph reads first and carries the most weight; the second
+   paragraph is supporting detail, sized down a notch -- the "body vs.
+   supporting text" hierarchy the redesign asked for, without cutting either
+   sentence of the original copy. */
+.about-copy p:first-of-type { font-size: 1.05rem; }
+.about-copy p:not(:first-of-type) { font-size: .92rem; color: var(--muted); }
 /* Editorial drop cap. Barabara is safe here despite having no lowercase --
    ::first-letter only ever receives the single opening capital. */
 .about-copy p:first-of-type::first-letter {
@@ -2116,27 +2154,73 @@ body.hero-page .site-header.scrolled {
     color: var(--stamp-red);
 }
 
-.about-regions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+.about-regions-label {
+    display: block;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 30px 0 10px;
+}
+.about-regions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 0; }
+/*
+   Adopts the same outlined-default / solid-on-hover language as
+   .pill-toggle and .chip-row--poster .chip elsewhere in the app, for a
+   consistent "filter pill" feel -- even though these are plain navigation
+   links to a filtered listing page, not stateful toggles (there is no
+   "currently selected province" on the homepage to reflect; this is
+   deliberate, not an oversight -- see the chat message this was flagged in).
+   min-height guarantees a real ~44px tap target regardless of font metrics.
+*/
 .about-region-pill {
-    background: var(--primary);
-    color: var(--paper);
-    font-size: .73rem;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    background: var(--white);
+    color: var(--primary-dark);
+    border: 1.5px solid var(--primary);
+    font-size: .82rem;
     font-weight: 700;
     letter-spacing: .01em;
-    padding: 6px 14px;
+    padding: 0 18px;
     border-radius: 999px;
-    transition: background .15s ease, transform .12s ease;
+    transition: background .15s ease, color .15s ease, border-color .15s ease, transform .12s ease, box-shadow .15s ease;
 }
-.about-region-pill:hover { background: var(--ocean-teal-dark); transform: translateY(-1px); }
+.about-region-pill:hover {
+    background: var(--primary);
+    color: var(--paper);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+.about-region-pill:active { transform: translateY(0); box-shadow: none; }
+.about-region-pill:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
-/* Ticket/passport framing, same dashed language as the itinerary chip and the
-   fact-strip dividers. */
+/*
+   Was a 2px dashed "ticket/passport" border, matching the itinerary chip's
+   decorative language. Switched to a solid border + soft elevation so the
+   map reads as a premium product component rather than a scrapbook cutout
+   -- flagged to the user as a deliberate, reversible style call, not an
+   accident. Kept: rounded corners, the paper background, generous padding.
+*/
 .about-map {
     position: relative;
+    /* Leaflet's own panes/controls/popups carry z-index values from 400 up
+       to 1000+ (see .listing-map elsewhere in this file, which already
+       isolates for the same reason). Without isolation, position:relative
+       alone does not create a new stacking context, so those high z-index
+       values compete in the page's root stacking context instead of being
+       contained to this figure -- which is exactly what let the map render
+       on top of the z-index:60 mobile navigation drawer once that drawer
+       was introduced. Pre-existing gap, unmasked by the drawer rather than
+       caused by it. */
+    isolation: isolate;
     margin: 0;
     background: var(--paper);
-    border: 2px dashed var(--ocean-teal);
-    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
     padding: 16px 16px 34px;
 }
 .about-map__svg { display: block; width: 100%; height: auto; }
@@ -2144,10 +2228,23 @@ body.hero-page .site-header.scrolled {
 /* ---- Interactive region map --------------------------------------------
    Replaces the SVG locator that used to fill this figure. Leaflet needs an
    explicit height -- its container has no intrinsic size, so a percentage or
-   `auto` collapses it to zero and the tiles never appear. */
+   `auto` collapses it to zero and the tiles never appear.
+
+   aspect-ratio, not a fixed px height (or the old two-tier
+   height:420px/height:320px@800px breakpoint): it scales the map fluidly
+   with however wide its own grid column actually renders, at every
+   viewport from 320px to 1920px, rather than jumping between two fixed
+   numbers. min-height stops it going unusably short in a narrow column;
+   max-height stops it growing absurdly tall in a wide one. aspect-ratio
+   still resolves to a definite pixel height before Leaflet reads the
+   container's size, so L.map()'s zero-height-container failure mode (see
+   the comment above) does not apply here.
+*/
 .region-map {
-    height: 420px;
     width: 100%;
+    aspect-ratio: 4 / 3;
+    min-height: 280px;
+    max-height: 520px;
     border-radius: var(--radius-md);
     /* Sits under the popups and tooltips Leaflet appends, but above the figure
        background, which would otherwise show through the tile seams. */
@@ -2159,7 +2256,7 @@ body.hero-page .site-header.scrolled {
    is both unreadable and a licence notice that must stay legible. Put it back
    in flow for this variant and drop the padding that reserved the overlay
    space. */
-.about-map:has(.region-map) { padding: 12px; }
+.about-map:has(.region-map) { padding: 14px; }
 .about-map:has(.region-map) .about-map__caption {
     position: static;
     display: block;
@@ -2190,9 +2287,6 @@ body.hero-page .site-header.scrolled {
     color: var(--muted);
     line-height: 1.45;
 }
-@media (max-width: 800px) {
-    .region-map { height: 320px; }
-}
 .about-map__caption {
     position: absolute;
     right: 18px;
@@ -2201,6 +2295,11 @@ body.hero-page .site-header.scrolled {
     font-size: 1.1rem;
     line-height: 1;
 }
+/* The static, in-flow variant (.about-map:has(.region-map), above) is a
+   caption underneath a real product component now, not an overlay label on
+   top of decoration -- toned down a step so it reads as a caption rather
+   than repeating the section's own kicker at full volume. */
+.about-map:has(.region-map) .about-map__caption { font-size: .85rem; opacity: .85; }
 .about-map__labels text,
 .about-map__peaklabel,
 .about-map__compass-n {
@@ -2239,16 +2338,25 @@ body.hero-page .site-header.scrolled {
 .dyk-item p { margin: 0; font-size: .84rem; line-height: 1.55; color: rgba(255, 247, 233, .82); }
 .dyk-item strong { color: var(--paper); font-weight: 700; }
 
+@media (max-width: 1024px) {
+    /* Tablet: same two-column composition, just less generous about it --
+       the 96px section padding and 56px column gap are a desktop luxury a
+       1024px-and-under viewport doesn't have room for. */
+    .about-region { padding-block: 64px; }
+    .about-grid { gap: 36px; }
+}
 @media (max-width: 900px) {
     .about-grid { grid-template-columns: 1fr; gap: 32px; }
+    /* The column divider only makes sense between two side-by-side columns. */
+    .about-copy { border-right: none; padding-right: 0; }
     .dyk-items { grid-template-columns: repeat(2, 1fr); gap: 20px 0; }
     /* Left rule only makes sense between items on the same row. */
     .dyk-item:nth-child(odd) { border-left: none; padding-left: 0; }
 }
 @media (max-width: 560px) {
+    .about-region { padding-block: 48px; }
     .dyk-items { grid-template-columns: 1fr; gap: 16px; }
     .dyk-item { border-left: none; padding: 0; }
-    .about-map { padding: 12px 12px 30px; }
 }
 
 /* ---------- CTA banner ---------- */
