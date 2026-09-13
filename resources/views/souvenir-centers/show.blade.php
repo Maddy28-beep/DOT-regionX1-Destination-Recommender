@@ -60,6 +60,8 @@
                 @include('partials.check-in-button', ['type' => 'souvenir-centers', 'listing' => $souvenirCenter])
                 <x-save-heart type="souvenir-centers" :listing="$souvenirCenter" variant="button" class="mt-10" />
 
+                @include('partials.listing-external-links', ['listing' => $souvenirCenter])
+
                 @include('partials.map-embed', ['latitude' => $souvenirCenter->latitude, 'longitude' => $souvenirCenter->longitude, 'name' => $souvenirCenter->name])
             </div>
         </div>

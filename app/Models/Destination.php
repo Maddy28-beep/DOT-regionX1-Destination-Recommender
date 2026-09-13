@@ -22,6 +22,7 @@ class Destination extends Model
         'image_path', 'is_accredited', 'rating', 'review_count', 'price_tier',
         'entry_fee_min', 'entry_fee_max', 'distance_km', 'visit_duration',
         'best_time', 'hours', 'latitude', 'longitude', 'featured',
+        'website_url', 'facebook_url', 'instagram_url', 'tiktok_url',
     ];
 
     protected function casts(): array
