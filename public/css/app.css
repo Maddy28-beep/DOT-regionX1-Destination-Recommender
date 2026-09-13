@@ -724,6 +724,8 @@ a { color: inherit; text-decoration: none; }
 .badge-accredited { background: var(--primary-light); color: var(--primary-dark); }
 .badge-accredited img { width: 14px; height: 14px; border-radius: 50%; display: block; flex-shrink: 0; }
 .badge-rating { background: #fff3e0; color: #b5680a; }
+.badge-tone-good { background: var(--tone-success-bg); color: var(--tone-success-ink); }
+.badge-tone-low { background: var(--tone-danger-bg); color: var(--tone-danger-ink); }
 
 .promo-code {
     display: inline-block;
@@ -2566,6 +2568,40 @@ body.hero-page .site-header.scrolled {
 .dash-body { padding: 32px 0; }
 .dash-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 22px; }
 
+/* A .page-head instance with a trailing action button (Plan Your Trip's
+   "Saved Places" link) -- every other .page-head consumer is a plain
+   centered kicker/h1/p stack, so this stays a modifier rather than a change
+   to the shared rule. */
+.page-head--with-action .container { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
+.page-head--with-action .container > div:first-child { flex: 1 1 auto; min-width: 240px; }
+.page-head--with-action .btn { flex: none; }
+.page-head--with-action .btn svg { width: 15px; height: 15px; }
+
+/* Plan Your Trip survey: premium framing on top of the existing shared
+   .panel/.field/.chip-checkbox-grid system (those already match the poster
+   identity via .chip-checkbox-grid's pill treatment) -- this only adds the
+   page-level chrome (header, sectioning) that every catalog page already
+   has via .page-head, which the survey was missing entirely. */
+.plan-panel { border: none; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); overflow: hidden; }
+.plan-panel > .panel-head { background: var(--primary-light); }
+.plan-section { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border); }
+.plan-section:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+.plan-section__title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: 'Alfa Slab One', serif;
+    font-weight: 400;
+    font-size: 1.05rem;
+    color: var(--ocean-teal-dark);
+    margin: 0;
+}
+.plan-section__title svg { width: 18px; height: 18px; color: var(--primary); flex-shrink: 0; }
+.plan-submit { margin-top: 28px; }
+@media (max-width: 560px) {
+    .plan-submit { width: 100%; justify-content: center; }
+}
+
 .util-row { display: flex; gap: 10px; flex-wrap: wrap; }
 
 /* ---------- Catalog page (browse + filter) ---------- */
@@ -3210,6 +3246,25 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 .stat-card .stat-card-label { font-size: .8rem; color: var(--muted); margin-top: 2px; }
 .stat-card .stat-card-flag { font-size: .74rem; color: var(--accent-dark); font-weight: 700; margin-top: 6px; }
 @media (max-width: 900px) { .stat-cards { grid-template-columns: repeat(2, 1fr); } }
+
+/*
+ * Exit Survey Insights KPI row only -- scoped to .stat-cards--kpi rather than
+ * the base .stat-card rules above, which accreditation/overview/establishment
+ * overview also use for their own, unrelated stat cards. Grid's default
+ * align-items:stretch already equalizes height *within* a row; what it can't
+ * fix on its own is one row (a wrapped label) landing taller than the row
+ * below it. Reserving a fixed 2-line box for every label -- whether it wraps
+ * or not -- makes every card the same height everywhere, in every row, at
+ * every breakpoint, without a hardcoded card height that could clip content
+ * if a label ever needs a third line.
+ */
+.stat-cards--kpi .stat-card-val { line-height: 1.2; }
+.stat-cards--kpi .stat-card-val__suffix { font-size: 1rem; font-weight: 700; color: var(--muted); }
+.stat-cards--kpi .stat-card-label {
+    line-height: 1.4;
+    min-height: calc(1.4em * 2);
+    margin-top: 4px;
+}
 
 .panel { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); margin-bottom: 24px; }
 .panel-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
