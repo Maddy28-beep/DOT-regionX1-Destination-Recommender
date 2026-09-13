@@ -19,6 +19,7 @@ class Restaurant extends Model
         'slug', 'name', 'location', 'region_id', 'cuisine_type', 'description',
         'image_path', 'is_accredited', 'rating', 'review_count', 'price_tier',
         'opening_hours', 'contact_number', 'latitude', 'longitude',
+        'website_url', 'facebook_url', 'instagram_url', 'tiktok_url',
     ];
 
     protected function casts(): array
