@@ -162,6 +162,51 @@ document.addEventListener('DOMContentLoaded', function () {
         }, { passive: true });
     }
 
+    // Mobile navigation drawer: open/close, overlay click, Escape, and a
+    // background scroll lock while it's open. Guarded on #mobileMenu existing
+    // since app.js is also loaded by the admin/establishment layouts, which
+    // have their own separate mobile menu markup and never render this one.
+    (function () {
+        var toggle = document.getElementById('mobileMenuToggle');
+        var menu = document.getElementById('mobileMenu');
+        var overlay = document.getElementById('mobileMenuOverlay');
+        var closeBtn = document.getElementById('mobileMenuClose');
+        if (!toggle || !menu || !overlay) return;
+
+        var open = function () {
+            menu.classList.add('open');
+            overlay.classList.add('open');
+            document.body.classList.add('mobile-menu-open');
+            menu.removeAttribute('inert');
+            toggle.setAttribute('aria-expanded', 'true');
+        };
+
+        var close = function () {
+            menu.classList.remove('open');
+            overlay.classList.remove('open');
+            document.body.classList.remove('mobile-menu-open');
+            menu.setAttribute('inert', '');
+            toggle.setAttribute('aria-expanded', 'false');
+        };
+
+        toggle.addEventListener('click', function () {
+            if (menu.classList.contains('open')) close(); else open();
+        });
+        if (closeBtn) closeBtn.addEventListener('click', close);
+        overlay.addEventListener('click', close);
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && menu.classList.contains('open')) close();
+        });
+
+        // The nav collapses back to the full desktop bar above 1366px (see
+        // app.css) -- closing here if a resize crosses that boundary stops the
+        // drawer being left open, translated off-screen, behind a full-width
+        // desktop header with no way to reach the close button.
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 1366 && menu.classList.contains('open')) close();
+        });
+    })();
+
     // Card carousels: sync dot indicators to horizontal scroll position.
     document.querySelectorAll('[data-carousel]').forEach(function (root) {
         var track = root.querySelector('.carousel-track');
