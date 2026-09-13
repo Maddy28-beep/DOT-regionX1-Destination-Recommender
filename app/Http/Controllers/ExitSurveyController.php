@@ -26,6 +26,11 @@ class ExitSurveyController extends Controller
         'Leisure', 'Business', 'Visiting Friends/Family', 'Educational', 'Medical', 'Religious/Pilgrimage', 'Other',
     ];
 
+    /** Also reused by AdminDashboardController for the Exit Survey Insights filter dropdown. */
+    public const RESIDENCY_TYPES = ['Local Resident', 'Domestic Tourist', 'Foreign Tourist'];
+
+    public const VISITOR_TYPES = ['First-time Visitor', 'Returning Visitor', 'Regular / Local'];
+
     public const ACTIVITIES = [
         'Beach & Island', 'Nature & Adventure', 'Cultural Heritage', 'Wildlife',
         'Food Tourism', 'Shopping & Souvenirs', 'Hiking & Trekking', 'Relaxation & Wellness',
@@ -50,6 +55,30 @@ class ExitSurveyController extends Controller
         'package' => 'Tour Package',
         'souvenir_center' => 'Souvenir Center',
         'tour_operator' => 'Tour Operator',
+    ];
+
+    /**
+     * Total trip spend as a picked range rather than a typed exact figure --
+     * nobody remembers their trip cost to the peso, but everyone can place it
+     * in a bracket, which means more people answer and answer accurately.
+     * AdminDashboardController averages these using SPEND_BRACKET_MIDPOINTS,
+     * the paired representative value for each key here.
+     */
+    public const SPEND_BRACKETS = [
+        'under_10000' => '₱10,000 and below',
+        '10000_20000' => '₱10,000 – ₱20,000',
+        '20000_50000' => '₱20,000 – ₱50,000',
+        '50000_100000' => '₱50,000 – ₱100,000',
+        'over_100000' => 'Above ₱100,000',
+    ];
+
+    /** Representative peso value for each SPEND_BRACKETS key, used only to approximate an average -- never shown to a traveler. */
+    public const SPEND_BRACKET_MIDPOINTS = [
+        'under_10000' => 5000,
+        '10000_20000' => 15000,
+        '20000_50000' => 35000,
+        '50000_100000' => 75000,
+        'over_100000' => 125000,
     ];
 
     public function create(): View
@@ -94,6 +123,7 @@ class ExitSurveyController extends Controller
             'selectedPlaces' => old('places_visited', []),
             'travelPurposes' => self::TRAVEL_PURPOSES,
             'activityOptions' => self::ACTIVITIES,
+            'spendBrackets' => self::SPEND_BRACKETS,
         ]);
     }
 
@@ -127,12 +157,12 @@ class ExitSurveyController extends Controller
         $visitableKinds = implode('|', self::VISITABLE_KINDS);
 
         $data = $request->validate([
-            'residency_type' => ['nullable', 'in:Local Resident,Domestic Tourist,Foreign Tourist'],
-            'visitor_type' => ['nullable', 'in:First-time Visitor,Returning Visitor,Regular / Local'],
+            'residency_type' => ['nullable', 'in:'.implode(',', self::RESIDENCY_TYPES)],
+            'visitor_type' => ['nullable', 'in:'.implode(',', self::VISITOR_TYPES)],
             'origin' => ['nullable', 'string', 'max:150'],
             'travel_purpose' => ['nullable', 'in:'.implode(',', self::TRAVEL_PURPOSES)],
             'actual_days_stayed' => ['nullable', 'integer', 'min:1', 'max:365'],
-            'estimated_daily_spend' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'estimated_total_spend' => ['nullable', 'in:'.implode(',', array_keys(self::SPEND_BRACKETS))],
             'places_visited' => ['nullable', 'array', 'max:'.self::MAX_LIST_ITEMS],
             'places_visited.*' => ['string', 'regex:/^('.$visitableKinds.'):\d+$/'],
             'activities' => ['nullable', 'array', 'max:'.self::MAX_LIST_ITEMS],
