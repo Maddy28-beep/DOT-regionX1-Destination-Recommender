@@ -86,8 +86,26 @@ class AdminDashboardController extends Controller
         return view('admin.establishments', compact('establishments', 'status', 'listingOptions'));
     }
 
+    /**
+     * An approved account can sign in and edit its matched listing
+     * immediately -- so an approval with no matched_listing_id yet would
+     * let a partner log in to a dashboard with nothing to manage, and
+     * whichever listing gets linked *later* silently retroactively becomes
+     * "theirs" with no separate review step. Requiring the match first
+     * means Approve always means "this account may edit exactly the
+     * listing DOT just linked it to," not "we'll figure out which listing
+     * eventually." Rejecting an unlinked, unqualified registration is
+     * unaffected -- rejectEstablishment() has no such guard.
+     */
     public function approveEstablishment(Request $request, EstablishmentAccount $establishment)
     {
+        if (! $establishment->matched_listing_id) {
+            return back()->with(Toast::error(
+                'Establishment not linked',
+                'Link this establishment to an existing listing before approving.'
+            ));
+        }
+
         $establishment->update([
             'status' => 'approved',
             'reviewed_by' => $request->user('admin')->id,
@@ -417,9 +435,16 @@ class AdminDashboardController extends Controller
         ));
     }
 
+    /** Mirrors AprioriService::topRules()'s own defaults, named here so the page can display exactly the thresholds actually used to mine these rules. */
+    private const ASSOCIATION_RULE_LIMIT = 15;
+
+    private const ASSOCIATION_MIN_SUPPORT_COUNT = 2;
+
+    private const ASSOCIATION_MIN_CONFIDENCE = 0.15;
+
     public function associationRules(Request $request, AprioriService $apriori): View
     {
-        $rules = $apriori->topRules();
+        $rules = $apriori->topRules(self::ASSOCIATION_RULE_LIMIT, self::ASSOCIATION_MIN_SUPPORT_COUNT, self::ASSOCIATION_MIN_CONFIDENCE);
 
         // Whitelisted so a crafted ?sort= can't reach an arbitrary key.
         $sort = in_array($request->get('sort'), ['co_count', 'support', 'confidence'], true)
@@ -431,7 +456,26 @@ class AdminDashboardController extends Controller
             ? $rules->sortBy($sort)->values()
             : $rules->sortByDesc($sort)->values();
 
-        return view('admin.association-rules', compact('rules', 'sort', 'dir'));
+        $totalTransactions = ExitSurvey::count();
+
+        /*
+         * "Rules Found" reports every rule that actually clears both
+         * thresholds, not just the top self::ASSOCIATION_RULE_LIMIT shown in
+         * the table below -- those are two different, both-true numbers
+         * (found vs. displayed), and reporting the smaller one as "found"
+         * would understate what the algorithm actually surfaced. Uncapped by
+         * passing a limit far past anything this dataset could produce,
+         * rather than changing what topRules() returns for its one other
+         * caller (getAssociatedListings() has its own, separate limit).
+         */
+        $totalRulesFound = $apriori->topRules(PHP_INT_MAX, self::ASSOCIATION_MIN_SUPPORT_COUNT, self::ASSOCIATION_MIN_CONFIDENCE)->count();
+
+        $minSupportPct = $totalTransactions > 0 ? round(self::ASSOCIATION_MIN_SUPPORT_COUNT / $totalTransactions * 100, 1) : null;
+
+        return view('admin.association-rules', compact(
+            'rules', 'sort', 'dir', 'totalTransactions', 'totalRulesFound',
+            'minSupportPct'
+        ))->with('minConfidencePct', round(self::ASSOCIATION_MIN_CONFIDENCE * 100));
     }
 
     public function reports(Request $request): View
