@@ -747,7 +747,7 @@ a { color: inherit; text-decoration: none; }
     background: var(--white);
     border-bottom: 1px solid var(--border);
     box-shadow: 0 0 0 rgba(16,40,30,0);
-    transition: box-shadow .2s ease, border-color .2s ease;
+    transition: box-shadow .25s ease, border-color .25s ease, background-color .25s ease;
 }
 .site-header.scrolled {
     box-shadow: 0 2px 16px rgba(16,40,30,.10);
@@ -757,21 +757,65 @@ a { color: inherit; text-decoration: none; }
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 68px;
-    gap: 16px;
-    transition: height .2s ease;
+    height: 76px;
+    gap: 20px;
+    transition: height .25s ease;
 }
-.site-header.scrolled .bar { height: 58px; }
+.site-header.scrolled .bar { height: 64px; }
 .brand { display: flex; align-items: center; gap: 8px; font-size: 1.35rem; color: var(--primary-dark); transition: color .2s ease; }
 .brand .dot { color: var(--accent); }
 .brand-icon { width: 26px; height: 26px; flex-shrink: 0; }
 
+/*
+   Spacing here is deliberately close to the original 14px/8px, not because
+   "generous" wasn't wanted, but because this bar had ZERO width slack to
+   begin with -- see the "List your establishment" comment above, where one
+   extra link once overflowed the container by 127px at every desktop width.
+   Six nav links + Log in + Saved + Plan My Trip already filled a 1200px
+   container edge to edge before this redesign added the Saved heart icon,
+   which itself needs ~18px. Confirmed live: gap increases stacked on top of
+   that icon overflowed the .bar by 43px even at 1440px wide (invisible
+   there only because the centered 1200px container has enough outside
+   margin to absorb it at that width -- but it visibly clipped "Plan My
+   Trip" off the right edge at 1280px, a common laptop width, where that
+   margin is too small). Kept to a small, real width budget here instead of
+   relying on margin to hide an actual overflow.
+*/
 .main-nav { display: flex; align-items: center; gap: 14px; flex-wrap: nowrap; }
 .main-nav a { font-size: .88rem; font-weight: 600; color: var(--muted); transition: color .15s ease; white-space: nowrap; flex-shrink: 0; }
 .main-nav a:hover { color: var(--primary); }
 
-.header-actions { display: flex; align-items: center; gap: 8px; }
+.header-actions { display: flex; align-items: center; gap: 5px; }
 .header-actions .btn { white-space: nowrap; flex-shrink: 0; padding: 10px 16px; font-size: .88rem; }
+
+/* Header-only button treatment for "Plan My Trip" / "Saved" -- deliberately
+   scoped under .site-header rather than changed on .btn-primary/.btn-outline
+   themselves, since those two classes are reused across the whole site
+   (forms, portal, admin, footer CTAs) and this redesign is header-only.
+   Radius and a hover lift give the two nav actions their own identity;
+   horizontal padding is left at the original width to stay inside the
+   bar's real width budget (see comment above) -- only vertical padding
+   grows, which costs no width. */
+.site-header .btn-primary {
+    border-radius: 11px;
+    padding: 12px 16px;
+    box-shadow: 0 1px 2px rgba(8, 77, 57, .18);
+    transition: background .18s ease, box-shadow .18s ease, transform .15s ease;
+}
+.site-header .btn-primary:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 6px 18px rgba(8, 77, 57, .28);
+    transform: translateY(-1px);
+}
+.site-header .btn-outline {
+    border-radius: 11px;
+    padding: 10px 10px;
+    gap: 5px;
+    border-width: 1.5px;
+    transition: background .15s ease, border-color .15s ease, transform .15s ease;
+}
+.site-header .btn-outline:hover { transform: translateY(-1px); }
+.site-header .btn-outline svg { width: 13px; height: 13px; flex-shrink: 0; }
 
 .header-account-link { font-size: .85rem; font-weight: 600; color: var(--ink); white-space: nowrap; }
 .header-account-chip { display: flex; align-items: center; gap: 6px; font-size: .85rem; white-space: nowrap; }
@@ -791,7 +835,160 @@ a { color: inherit; text-decoration: none; }
 }
 .nav-toggle svg { width: 26px; height: 26px; }
 
-.mobile-menu { display: none; }
+/*
+   Premium slide-in drawer (right side, ~85vw), not a dropped-down flat list.
+   Structural rules live outside the collapse-to-hamburger media query on
+   purpose: .mobile-menu is fixed-position and off-screen (translateX(100%))
+   by default regardless of viewport, and the only way to open it is the
+   hamburger button, which is itself only shown below the media query's
+   breakpoint -- so defining it unconditionally costs nothing above that
+   breakpoint and keeps the drawer correct even if that ever changes.
+*/
+.mobile-menu-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 59;
+    background: rgba(10, 22, 17, .45);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .3s ease, visibility 0s linear .3s;
+}
+.mobile-menu-overlay.open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .3s ease, visibility 0s linear 0s;
+}
+
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 85vw;
+    max-width: 340px;
+    z-index: 60;
+    background: var(--paper);
+    box-shadow: -12px 0 32px rgba(16, 40, 30, .18);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform .32s cubic-bezier(.22, .61, .36, 1);
+}
+.mobile-menu.open { transform: translateX(0); }
+
+body.mobile-menu-open { overflow: hidden; }
+
+.mobile-menu__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 16px 18px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.mobile-menu__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-right: -10px;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background .15s ease;
+}
+.mobile-menu__close:hover { background: var(--primary-light); }
+.mobile-menu__close svg { width: 20px; height: 20px; }
+
+.mobile-menu__body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 8px 20px 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-menu__group { display: flex; flex-direction: column; padding: 14px 0 6px; }
+.mobile-menu__label {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+    padding-inline: 10px;
+}
+
+/* One shared row treatment for every tappable line in the drawer -- primary
+   catalogue links, Saved/Log in, and the smaller account/partner links --
+   so there is exactly one visual language, not several competing ones. A
+   comfortable >=44px tap target and a soft hover/tap fill stand in for the
+   old per-row border, which is what requirement 7 explicitly ruled out. */
+.mobile-menu__group a,
+.mobile-menu__utility {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding-inline: 10px;
+    margin-inline: -10px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+    transition: background .15s ease, color .15s ease;
+}
+.mobile-menu__group a:hover,
+.mobile-menu__group a:active,
+.mobile-menu__utility:hover,
+.mobile-menu__utility:active {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+}
+.mobile-menu__utility svg { width: 18px; height: 18px; flex-shrink: 0; }
+.mobile-menu__utility--btn {
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+}
+
+.mobile-menu__divider { height: 1px; background: var(--border); margin: 6px 10px; }
+
+.mobile-menu__group--plain { padding: 8px 0; }
+
+.mobile-menu__group--muted { padding: 8px 0 4px; }
+.mobile-menu__group--muted .mobile-menu__utility--small {
+    font-size: .88rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+.mobile-menu__account {
+    display: block;
+    padding: 4px 10px 2px;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.mobile-menu__foot {
+    flex-shrink: 0;
+    padding: 14px 20px 22px;
+    border-top: 1px solid var(--border);
+}
+.mobile-menu__foot .btn { padding: 14px 20px; font-size: 1rem; border-radius: 11px; }
+
+/* The chatbot launcher (partials/chatbot-widget.blade.php) sets its own
+   z-index: 200 inline, well above this drawer's 60, so it otherwise floats
+   on top of the drawer's content once open. #id beats .mobile-menu-open's
+   single class on specificity grounds alone, so this needs the id selector
+   to actually win against that inline stylesheet. */
+body.mobile-menu-open #chatbot-widget { display: none; }
 
 /* Transparent header floating over the poster hero (homepage only). Reverts
    to the normal solid white bar the moment app.js adds .scrolled, since the
@@ -804,49 +1001,55 @@ a { color: inherit; text-decoration: none; }
    shook when scrolling back toward the top. Staying fixed keeps the header out
    of flow at all times, so toggling .scrolled changes paint only, never
    layout. It still overlays the hero exactly as absolute did at scroll 0. */
+/* Two-state header over the poster hero (homepage only).
+   AT TOP: translucent warm-white + backdrop blur, NOT transparent-with-light
+   -text -- light nav text over a photographic hero cannot hold WCAG contrast
+   against the hero's own light sky/water areas, which is exactly what a
+   government-grade tourism platform can't afford to get wrong. Dark green
+   text over a blurred, ~80%-opaque warm-white plate reads at full contrast
+   regardless of what is directly behind it in the photo.
+   AFTER SCROLL: the blur/translucency resolves to the same solid warm-white
+   the rest of the site already uses, with the existing shadow. Both states
+   share one text/button treatment (dark green, solid green CTA) so nothing
+   changes color across the transition -- only the surface behind it does. */
 body.hero-page .site-header {
     position: fixed;
     top: 0; left: 0; right: 0;
-    background: transparent;
-    border-bottom-color: transparent;
+    background: rgba(255, 247, 233, .82);
+    backdrop-filter: blur(14px) saturate(1.05);
+    -webkit-backdrop-filter: blur(14px) saturate(1.05);
+    border-bottom: 1px solid rgba(11, 107, 79, .12);
+    transition: background-color .25s ease, backdrop-filter .25s ease, border-color .25s ease, box-shadow .25s ease;
 }
 body.hero-page .site-header .brand,
 body.hero-page .site-header .main-nav a,
-body.hero-page .site-header .nav-toggle { color: var(--paper); }
-body.hero-page .site-header .main-nav a:hover { color: var(--sun-glow); }
-body.hero-page .site-header .btn-outline { border-color: rgba(255, 247, 233, .7); color: var(--paper); }
-body.hero-page .site-header .btn-outline:hover { background: rgba(255, 247, 233, .15); }
-body.hero-page .site-header .btn-primary { background: var(--stamp-red); }
-body.hero-page .site-header .btn-primary:hover { background: var(--accent-dark); }
+body.hero-page .site-header .nav-toggle { color: var(--primary-dark); }
+body.hero-page .site-header .main-nav a:hover { color: var(--primary); }
+body.hero-page .site-header .btn-outline { border-color: var(--primary); color: var(--primary); background: transparent; }
+body.hero-page .site-header .btn-outline:hover { background: var(--primary-light); }
+body.hero-page .site-header .btn-primary { background: var(--primary); }
+body.hero-page .site-header .btn-primary:hover { background: var(--primary-dark); }
 
 body.hero-page .site-header.scrolled {
     /* position intentionally not changed here -- see the rule above. */
-    background: var(--white);
+    background: var(--paper);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom-color: transparent;
 }
-body.hero-page .site-header.scrolled .brand,
-body.hero-page .site-header.scrolled .nav-toggle { color: var(--primary-dark); }
-body.hero-page .site-header.scrolled .main-nav a { color: var(--muted); }
-body.hero-page .site-header.scrolled .main-nav a:hover { color: var(--primary); }
-body.hero-page .site-header.scrolled .btn-outline { border-color: var(--primary); color: var(--primary); }
-body.hero-page .site-header.scrolled .btn-outline:hover { background: var(--primary-light); }
-body.hero-page .site-header.scrolled .btn-primary { background: var(--primary); }
-body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--primary-dark); }
 
-@media (max-width: 1220px) {
+/*
+   Raised from 1220px: the wider spacing above plus the Saved heart icon
+   measured a confirmed 43px overflow at 1280px (a common laptop width) --
+   this bar had zero width slack even before that (see the "List your
+   establishment" comment near the nav markup), so the honest fix is to
+   collapse to the hamburger menu before the cramped zone starts, not to
+   fight for the last few pixels of a bar that was already full.
+*/
+@media (max-width: 1366px) {
     .main-nav { display: none; }
     .header-actions .btn-outline { display: none; }
     .nav-toggle { display: inline-flex; }
-    .mobile-menu {
-        display: none;
-        flex-direction: column;
-        gap: 4px;
-        padding: 12px 20px 20px;
-        border-top: 1px solid var(--border);
-        background: var(--white);
-    }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu a { padding: 10px 0; font-weight: 600; color: var(--ink); border-bottom: 1px solid var(--border); }
-    .mobile-menu .btn { margin-top: 10px; }
 }
 
 /* "Plan My Trip" + "Sign in" + the hamburger together no longer fit the header
