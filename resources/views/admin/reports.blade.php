@@ -23,6 +23,12 @@
 @endphp
 
 <div class="panel">
+    <div class="panel-head">
+        <div>
+            <h2>Report Filters</h2>
+            <p>Choose a date range and report type, then generate the results below.</p>
+        </div>
+    </div>
     <div class="panel-body">
         <div class="chip-row" style="margin-bottom:14px;">
             @foreach ($presets as $label => [$presetFrom, $presetTo])

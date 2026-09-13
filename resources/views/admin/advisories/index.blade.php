@@ -65,22 +65,6 @@
     </div>
 </div>
 
-<div class="pagination">
-    @if ($advisories->onFirstPage())
-        <span class="disabled">&laquo;</span>
-    @else
-        <a href="{{ $advisories->previousPageUrl() }}">&laquo;</a>
-    @endif
-
-    @foreach ($advisories->getUrlRange(1, $advisories->lastPage()) as $page => $url)
-        <span class="{{ $page === $advisories->currentPage() ? 'active' : '' }}"><a href="{{ $url }}">{{ $page }}</a></span>
-    @endforeach
-
-    @if ($advisories->hasMorePages())
-        <a href="{{ $advisories->nextPageUrl() }}">&raquo;</a>
-    @else
-        <span class="disabled">&raquo;</span>
-    @endif
-</div>
+<x-admin-pagination :paginator="$advisories" />
 
 @endsection
