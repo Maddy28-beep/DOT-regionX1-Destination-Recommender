@@ -10,14 +10,44 @@
     <div class="panel-head">
         <div>
             <h2>Support &amp; Confidence-Ranked Rules</h2>
-            <p>
-                Mined from historical tourist visitation records collected through exit surveys (Sec. 2.3.4,
-                Equations 8&ndash;9). Each completed exit survey is treated as one transaction; a rule
-                &ldquo;A &rarr; B&rdquo; means tourists who visited A frequently also visited B.
-            </p>
+            <p>Relationships between destinations and establishments that frequently appear together in visitor records.</p>
         </div>
     </div>
     <div class="panel-body">
+        <x-banner tone="info">
+            Mined from historical tourist visitation records collected through exit surveys (Sec. 2.3.4, Equations
+            8&ndash;9). A rule &ldquo;A &rarr; B&rdquo; means tourists who visited A frequently also visited B.
+            <strong>Support</strong> is how common that combination is across all transactions; <strong>confidence</strong>
+            is how often B appears whenever A does.
+        </x-banner>
+
+        @if ($totalTransactions > 0)
+            <div class="stat-cards">
+                <div class="stat-card">
+                    <div class="stat-card-val">{{ $totalRulesFound }}</div>
+                    <div class="stat-card-label">Rules Found</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-val">{{ $totalTransactions }}</div>
+                    <div class="stat-card-label">Transactions Analyzed</div>
+                </div>
+                <div class="stat-card" title="A rule needs at least 2 co-visits to qualify; shown here as the equivalent share of all transactions.">
+                    <div class="stat-card-val">{{ $minSupportPct }}%</div>
+                    <div class="stat-card-label">Minimum Support</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-val">{{ $minConfidencePct }}%</div>
+                    <div class="stat-card-label">Minimum Confidence</div>
+                </div>
+            </div>
+            <p style="color:var(--muted); font-size:.85rem; margin-top:-8px;">
+                Based on {{ $totalTransactions }} completed exit-survey transaction{{ $totalTransactions === 1 ? '' : 's' }}.
+                @if ($totalRulesFound > $rules->count())
+                    Showing the top {{ $rules->count() }} of {{ $totalRulesFound }} rules found, ranked by confidence.
+                @endif
+            </p>
+        @endif
+
         @if ($rules->isEmpty())
             <div class="empty-panel">
                 <div class="icon"><x-icon name="link" /></div>
@@ -29,6 +59,10 @@
                 </p>
             </div>
         @else
+            <p style="color:var(--muted); font-size:.83rem; margin-bottom:14px;">
+                Confidence should be interpreted alongside support and co-visit counts, especially when transaction
+                volume is limited.
+            </p>
             <div class="table-scroll">
                 <table class="data-table">
                     @php

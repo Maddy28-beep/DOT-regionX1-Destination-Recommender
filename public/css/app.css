@@ -142,6 +142,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .btn:active { transform: translateY(1px); }
+.btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
 
 .btn-primary { background: var(--primary); color: var(--white); }
@@ -164,6 +165,18 @@ a { color: inherit; text-decoration: none; }
 
 .btn-ghost { background: transparent; color: var(--ink); }
 .btn-ghost:hover { background: rgba(0,0,0,.05); }
+
+/* Restrained destructive-outline variant (Reject, and anything else that
+   needs to read as "the other option" next to a primary action without
+   looking as alarming as a filled .btn-danger). Same shape/weight as
+   .btn-outline -- only the color says "this one is different." */
+.btn-outline-danger { background: transparent; color: var(--stamp-red); border: 1.5px solid var(--stamp-red); }
+.btn-outline-danger:hover { background: var(--tone-danger-bg); }
+
+/* No pointer-events:none here -- disabled already blocks the click/submit
+   natively, and this specific disabled state needs its title tooltip
+   (explaining WHY it's disabled) to still appear on hover. */
+.btn:disabled { opacity: .5; cursor: not-allowed; }
 
 .btn-block { width: 100%; }
 .btn-lg { padding: 14px 24px; font-size: 1.05rem; }
@@ -2727,6 +2740,7 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 .pagination span.active a { background: var(--primary); border-color: var(--primary); color: var(--white); }
 .pagination span.active a { border: none; min-width: 0; height: auto; padding: 0; }
 .pagination .disabled { color: var(--border); }
+.pagination-ellipsis { min-width: auto; height: 38px; padding: 0 4px; border: none; background: none; color: var(--muted); }
 
 .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
 .empty-state__actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 18px; }
@@ -3076,12 +3090,23 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
     padding: 4px 14px 20px 0;
     min-height: 0;
 }
-.admin .admin-sidebar .group-label { padding: 6px 14px 10px; }
+/*
+ * Section rhythm: items within a group sit close together (10px padding,
+ * no inter-link margin -- an 20px text-to-text gap), while a new group's
+ * heading gets real top breathing room (20px) so a section boundary
+ * actually reads as one, rather than blending into the ordinary link-to-
+ * link gap above it. Before this, both gaps worked out to roughly the
+ * same size, so nothing visually separated one section from the next.
+ * The very first heading keeps its original small top offset, since nothing
+ * precedes it to separate from.
+ */
+.admin .admin-sidebar .group-label { padding: 20px 14px 8px; }
+.admin .admin-sidebar .group-label:first-child { padding-top: 6px; }
 .admin .admin-sidebar a {
     border-left: none;
     border-radius: var(--radius-md);
-    padding: 11px 16px;
-    margin-bottom: 2px;
+    padding: 10px 16px;
+    margin-bottom: 0;
     color: var(--ink);
 }
 .admin .admin-sidebar a:hover { background: rgba(11, 107, 79, .07); }
@@ -3368,6 +3393,94 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 .data-table th.col-check,
 .data-table td.col-check { width: 30px; padding-right: 0; }
 .data-table .col-check input { width: 14px; height: 14px; margin: 0; cursor: pointer; display: block; }
+
+/* ---------- Establishment Approvals table + its mobile card fallback ----------
+   Priority for space is Business, Contact, Matched Listing, then Actions --
+   Type/Submitted/Status/Claimed DOT# are real but secondary, so they get a
+   percentage cap instead of growing with their content. Scoped to
+   .establishments-table specifically: .data-table is shared with Manage
+   Listings and Accreditation, which have their own, different columns.
+
+   table-layout:fixed, not auto (the default): under auto layout, a column's
+   `width` is only a hint the browser's sizing algorithm can freely override
+   once any cell's content -- especially a nowrap header label like "Claimed
+   DOT #" -- needs more room, which is exactly why width alone left every
+   column at close to its original size. Fixed layout makes these the real,
+   binding widths; percentages (rather than px) so the same proportions hold
+   as the table's own width changes with the viewport. */
+/* Percentage widths give the ideal proportional layout when there's enough
+   room (no scroll at all from 1024px up), but table-layout:fixed only
+   honors `width` for column sizing -- a min-width on an individual cell is
+   silently ignored, so the real floor has to live on the TABLE itself.
+   1080px is the smallest table width at which every column's percentage
+   share still resolves to a readable minimum (Actions, the tightest one at
+   14%, needs ~150px, and 1080 * 0.14 ≈ 151); below that, .data-table's own
+   width:100% loses to this min-width and .table-scroll's contained overflow
+   takes over -- the "last resort" scroll, only once there genuinely isn't
+   room, never the default. */
+.establishments-table { table-layout: fixed; min-width: 1080px; }
+.establishments-table th:nth-child(1),
+.establishments-table td:nth-child(1) { width: 26%; }
+.establishments-table th:nth-child(2),
+.establishments-table td:nth-child(2) { width: 8%; }
+.establishments-table th:nth-child(3),
+.establishments-table td:nth-child(3) { width: 13%; }
+.establishments-table th:nth-child(4),
+.establishments-table td:nth-child(4) { width: 8%; }
+.establishments-table th:nth-child(5),
+.establishments-table td:nth-child(5) { width: 8%; }
+.establishments-table th:nth-child(6),
+.establishments-table td:nth-child(6) { width: 8%; }
+.establishments-table th:nth-child(7),
+.establishments-table td:nth-child(7) { width: 15%; }
+.establishments-table th:nth-child(8),
+.establishments-table td:nth-child(8) { width: 14%; }
+/* These four headers now sit in a column narrower than their own label --
+   nowrap (the shared .data-table th default) would force the column wider
+   again to fit it on one line, so it's turned back off exactly here. */
+.establishments-table th:nth-child(2),
+.establishments-table th:nth-child(4),
+.establishments-table th:nth-child(5),
+.establishments-table th:nth-child(6) { white-space: normal; }
+
+/* Selector and Save stacked as one workflow, not the side-by-side .util-row
+   every other inline form on this page uses -- narrower, and reads as a
+   single "pick, then save" action instead of two unrelated controls. */
+.matched-listing-form { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+.matched-listing-form select { width: 100%; font-size: .8rem; }
+
+/* Approve/Reject read as two outcomes of one decision, so they stay the same
+   size regardless of label length -- "Approve" and "Reject" would otherwise
+   render at two different widths under btn-xs's content-driven padding.
+   Equal flex, not a fixed min-width: identical to each other by construction
+   at any column width, rather than a minimum that could outgrow a narrow one. */
+.approval-actions form { flex: 1 1 0; min-width: 0; }
+.approval-actions .btn { width: 100%; }
+
+/* Table on desktop/tablet, cards from 900px down -- the same breakpoint the
+   admin sidebar already collapses at, so the whole console changes shape at
+   one consistent width rather than each component picking its own. */
+.establishment-cards { display: none; }
+
+@media (max-width: 900px) {
+    .establishments-table-view { display: none; }
+    .establishment-cards { display: flex; flex-direction: column; gap: 14px; }
+}
+
+.establishment-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; }
+.establishment-card__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 8px 12px; margin-bottom: 14px; }
+.establishment-card__head > div { flex: 1 1 auto; min-width: 0; overflow-wrap: break-word; }
+.establishment-card__head .status-pill { flex-shrink: 0; }
+.establishment-card__head strong { font-size: .95rem; }
+.establishment-card__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+.establishment-card__field { font-size: .86rem; }
+.establishment-card__field--full { grid-column: 1 / -1; margin-top: 14px; }
+.establishment-card__label { font-size: .72rem; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); font-weight: 700; margin-bottom: 3px; }
+/* Visible helper copy, not a title tooltip -- a card is the touch/mobile
+   layout, where nothing is hovered long enough to trigger one. */
+.establishment-card__hint { font-size: .78rem; color: var(--muted); margin: 0 0 8px; line-height: 1.4; }
+.approval-actions--card { display: flex; gap: 10px; margin-top: 14px; }
+.approval-actions--card form { flex: 1; }
 
 /* Sits directly above the table, replacing nothing -- it only appears once a
    row is checked, so it costs no vertical space at rest. */
