@@ -134,38 +134,41 @@ class ExitSurveyTest extends TestCase
         $this->assertSame(0, ExitSurveyVisit::count());
     }
 
-    public function test_a_daily_spend_amount_is_recorded(): void
+    public function test_a_total_spend_bracket_is_recorded(): void
     {
         $this->post(route('exit-survey.store'), $this->validPayload([
             'actual_days_stayed' => 3,
-            'estimated_daily_spend' => 1500,
+            'estimated_total_spend' => '10000_20000',
         ]))->assertRedirect(route('exit-survey.recap'));
 
         $survey = ExitSurvey::sole();
-        $this->assertEquals(1500, $survey->estimated_daily_spend);
+        $this->assertSame('10000_20000', $survey->estimated_total_spend);
     }
 
-    public function test_a_negative_spend_amount_is_rejected(): void
+    public function test_a_spend_value_outside_the_defined_brackets_is_rejected(): void
     {
         $response = $this->post(route('exit-survey.store'), $this->validPayload([
-            'estimated_daily_spend' => -50,
+            'estimated_total_spend' => '-50',
         ]));
 
-        $response->assertSessionHasErrors('estimated_daily_spend');
+        $response->assertSessionHasErrors('estimated_total_spend');
         $this->assertSame(0, ExitSurvey::count());
     }
 
     /**
-     * DOT asked for spending per day of the visit specifically, and it must
-     * stay optional like the rest of the survey -- most of the questions
-     * around it are, and forcing this one would be an inconsistent ask.
+     * DOT asked for a daily-spend statistic specifically, but a tourist
+     * reliably knows what the whole trip cost, not a mental average-per-day
+     * figure they never tracked while traveling -- so the survey asks for
+     * the trip total, and the admin dashboard derives the daily figure DOT
+     * wants (total ÷ days stayed) instead of the other way around. It must
+     * stay optional like the rest of the survey either way.
      */
     public function test_the_spend_field_is_optional(): void
     {
         $this->post(route('exit-survey.store'), $this->validPayload())
             ->assertRedirect(route('exit-survey.recap'));
 
-        $this->assertNull(ExitSurvey::sole()->estimated_daily_spend);
+        $this->assertNull(ExitSurvey::sole()->estimated_total_spend);
     }
 
     /**
@@ -297,11 +300,11 @@ class ExitSurveyTest extends TestCase
     {
         $this->post(route('exit-survey.store'), $this->validPayload([
             'origin' => 'Cebu City, Philippines',
-            'estimated_daily_spend' => 2000,
+            'estimated_total_spend' => '20000_50000',
         ]));
 
         $survey = ExitSurvey::sole();
         $this->assertSame('Cebu City, Philippines', $survey->origin);
-        $this->assertEquals(2000, $survey->estimated_daily_spend);
+        $this->assertSame('20000_50000', $survey->estimated_total_spend);
     }
 }

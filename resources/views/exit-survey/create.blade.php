@@ -78,11 +78,16 @@
                             <input type="number" id="actual_days_stayed" name="actual_days_stayed" min="1" max="365" value="{{ old('actual_days_stayed') }}" placeholder="e.g. 3">
                         </div>
                         <div class="field" style="flex:1; min-width:180px;">
-                            <label for="estimated_daily_spend">Spend per day (&#8369;)</label>
-                            <input type="number" id="estimated_daily_spend" name="estimated_daily_spend" min="0" step="0.01" value="{{ old('estimated_daily_spend') }}" placeholder="e.g. 1500">
+                            <label for="estimated_total_spend">Total amount spent (&#8369;)</label>
+                            <select id="estimated_total_spend" name="estimated_total_spend">
+                                <option value="">Prefer not to say</option>
+                                @foreach ($spendBrackets as $value => $label)
+                                    <option value="{{ $value }}" @selected(old('estimated_total_spend') === $value)>{{ $label }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
-                    <p class="field-hint">Daily spend includes food, transport, activities, and shopping &mdash; not accommodation, if you paid for that separately in advance.</p>
+                    <p class="field-hint">Your total spend for the whole trip &mdash; food, transport, activities, and shopping &mdash; not accommodation, if you paid for that separately in advance.</p>
                 </div>
             </div>
 
