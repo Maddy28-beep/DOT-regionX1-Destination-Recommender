@@ -58,6 +58,49 @@
                 </div>
             @endif
 
+            @if ($establishment->listing_kind === 'package')
+                <div class="field">
+                    <label for="duration_label">Duration label</label>
+                    <input type="text" id="duration_label" name="duration_label" placeholder="e.g. 3 Days, 2 Nights" value="{{ old('duration_label', $listing->duration_label) }}">
+                </div>
+
+                <div class="field">
+                    <label for="duration_days">Duration (days)</label>
+                    <input type="number" id="duration_days" name="duration_days" min="1" value="{{ old('duration_days', $listing->duration_days) }}">
+                </div>
+
+                <div class="field">
+                    <label for="inclusions">What's included (one per line)</label>
+                    <textarea id="inclusions" name="inclusions" rows="5" placeholder="e.g.&#10;Transportation&#10;Guide fee&#10;Lunch">{{ old('inclusions', $listing->inclusions->pluck('item')->implode("\n")) }}</textarea>
+                </div>
+            @endif
+
+            @if ($establishment->listing_kind === 'accommodation')
+                <div class="field">
+                    <label for="check_in">Check-in</label>
+                    <input type="time" id="check_in" name="check_in" value="{{ old('check_in', $listing->check_in) }}">
+                </div>
+
+                <div class="field">
+                    <label for="check_out">Check-out</label>
+                    <input type="time" id="check_out" name="check_out" value="{{ old('check_out', $listing->check_out) }}">
+                </div>
+            @endif
+
+            @if ($establishment->listing_kind === 'restaurant')
+                <div class="field">
+                    <label for="opening_hours">Opening hours</label>
+                    <input type="text" id="opening_hours" name="opening_hours" placeholder="e.g. 10:00 AM &ndash; 9:00 PM daily" value="{{ old('opening_hours', $listing->opening_hours) }}">
+                </div>
+            @endif
+
+            @if (in_array($establishment->listing_kind, ['restaurant', 'tour_operator']))
+                <div class="field">
+                    <label for="contact_number">Contact number</label>
+                    <input type="text" id="contact_number" name="contact_number" value="{{ old('contact_number', $listing->contact_number) }}">
+                </div>
+            @endif
+
             @include('partials.location-picker', ['listing' => $listing])
 
             <button type="submit" class="btn btn-primary" style="margin-top:20px;">Save Changes</button>

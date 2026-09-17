@@ -1,4 +1,4 @@
-@props(['name', 'label', 'items', 'kind' => null, 'placeholder' => 'Type to search…', 'selected' => []])
+@props(['name', 'label', 'items', 'kind' => null, 'placeholder' => 'Type to search…', 'selected' => [], 'max' => null, 'hideLabel' => false])
 
 {{--
     Searchable multi-select for a long list.
@@ -28,8 +28,9 @@
     $selectedValues = collect($selected)->all();
 @endphp
 
-<div class="tag-picker" id="{{ $id }}" data-tag-picker
+<div class="tag-picker {{ $hideLabel ? 'tag-picker--compact' : '' }}" id="{{ $id }}" data-tag-picker
      data-name="{{ $name }}" data-prefix="{{ $prefix }}"
+     @if ($max) data-max="{{ $max }}" @endif
      data-items="{{ json_encode(collect($items)->map(fn ($i) => [
          'id' => is_array($i) ? $i['id'] : $i->id,
          'name' => is_array($i) ? $i['name'] : $i->name,
@@ -37,7 +38,7 @@
      ])->values()) }}"
      data-selected="{{ json_encode($selectedValues) }}">
 
-    <label for="{{ $id }}-search">{{ $label }}</label>
+    <label for="{{ $id }}-search" @if ($hideLabel) class="sr-only" @endif>{{ $label }}</label>
 
     <div class="tag-picker__box">
         <div class="tag-picker__chips" data-chips></div>
