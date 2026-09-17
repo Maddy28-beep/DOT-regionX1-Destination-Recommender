@@ -59,4 +59,12 @@ class Advisory extends Model
     {
         return $query->where('listing_kind', $listingKind)->where('listing_id', $listingId);
     }
+
+    /** Most urgent first (danger, then warning, then info), ties broken by most recently updated. */
+    public function scopeUrgentFirst(Builder $query): Builder
+    {
+        return $query
+            ->orderByRaw("CASE severity WHEN 'danger' THEN 0 WHEN 'warning' THEN 1 ELSE 2 END")
+            ->orderByDesc('updated_at');
+    }
 }

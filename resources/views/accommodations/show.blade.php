@@ -20,7 +20,6 @@
         {{ $accommodation->name }}
     </nav>
 
-    <x-advisory-banner :advisories="\App\Models\Advisory::active()->forListing($accommodation->getMorphClass(), $accommodation->id)->latest()->get()" />
     <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($accommodation->getMorphClass(), $accommodation->id)->latest()->get()" />
 
     @include('partials.gallery-hero', [
