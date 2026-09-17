@@ -611,10 +611,32 @@
 
             <div class="cta-banner__copy">
                 <span class="poster-kicker">your move</span>
-                <h2 class="poster-title">Ready to explore the Davao Region?</h2>
-                <p>Answer a few questions and get a personalized day-by-day itinerary in minutes &mdash; no account needed.</p>
+                <h2 class="poster-title">Plan Your Davao Trip</h2>
+                <p>
+                    Two ways to get started &mdash; build a day-by-day plan around your own
+                    preferences, or pick a ready-made itinerary from a DOT-accredited tour operator.
+                </p>
+
+                {{--
+                    Two related but distinct actions, not one CTA with a second
+                    tacked on: each gets its own line of context so a tourist
+                    can tell at a glance which path fits them, rather than
+                    landing on "Plan My Trip" by default and discovering tour
+                    packages exist somewhere else entirely.
+                --}}
+                <div class="cta-banner__paths">
+                    <div class="cta-banner__path">
+                        <h3>Personalized Itinerary</h3>
+                        <p>Answer a few questions about your budget, duration and interests and get a custom day-by-day plan.</p>
+                        <a href="{{ route('plan.edit') }}" class="btn">Plan My Trip</a>
+                    </div>
+                    <div class="cta-banner__path">
+                        <h3>Tour Packages</h3>
+                        <p>Already know you want a guided trip? Browse ready-made itineraries offered by tour operators.</p>
+                        <a href="{{ route('packages.index') }}" class="btn btn-ghost">Browse Tour Packages</a>
+                    </div>
+                </div>
             </div>
-            <a href="{{ route('plan.edit') }}" class="btn btn-lg">Build My Itinerary</a>
         </div>
     </div>
 </section>

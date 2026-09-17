@@ -89,6 +89,14 @@ Route::get('/tour-operators/{tourOperator:slug}', [TourOperatorController::class
  * accessibility questions the itinerary takes into account, and gets a plan.
  * The plan lives in the session; see TripPlannerController.
  */
+/*
+ * Reached from the site-wide "Plan My Trip" button (header nav, mobile menu):
+ * asks which of the two trip-planning paths the tourist wants before
+ * committing to either one, rather than assuming the personalized survey.
+ * Both destinations below already exist; this adds no new planning logic.
+ */
+Route::get('/plan/start', [TripPlannerController::class, 'choose'])->name('plan.choose');
+
 Route::get('/plan', [TripPlannerController::class, 'edit'])->name('plan.edit');
 
 /*
