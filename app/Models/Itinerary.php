@@ -16,7 +16,7 @@ class Itinerary extends Model
     protected $fillable = [
         'preference_id', 'package_id', 'total_days', 'est_budget_total',
         'est_party_size', 'generated_at', 'range_tier_used', 'range_widened',
-        'tourist_account_id', 'title',
+        'tourist_account_id', 'title', 'ml_skeleton_applied',
     ];
 
     protected function casts(): array
@@ -24,6 +24,7 @@ class Itinerary extends Model
         return [
             'est_budget_total' => 'decimal:2',
             'range_widened' => 'boolean',
+            'ml_skeleton_applied' => 'boolean',
         ];
     }
 

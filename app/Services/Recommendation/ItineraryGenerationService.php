@@ -159,6 +159,11 @@ class ItineraryGenerationService
                 'generated_at' => now(),
                 'range_tier_used' => $rangeTierUsed,
                 'range_widened' => $rangeWidened,
+                // Whether the pretrained ML skeleton step actually contributed
+                // to this itinerary's day-grouping, or generation fell back to
+                // the Haversine/Nearest-Neighbor order on its own -- see
+                // ItinerarySkeletonMlService::proposeSkeleton()'s doc comment.
+                'ml_skeleton_applied' => $skeleton !== null,
             ]);
 
             // Table 8: full computed Destination Recommendation ranking, not just the stops used.

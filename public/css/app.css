@@ -413,6 +413,113 @@ a { color: inherit; text-decoration: none; }
 .pairing-why summary::-webkit-details-marker { display: none; }
 .pairing-why p { margin: 4px 0 0; font-size: .76rem; color: var(--muted); font-style: italic; }
 
+/* "How was this itinerary created?" -- a small trigger near the Day-by-Day
+   panel head, and the tourist-facing/technical explainer it opens. Hidden
+   until asked for, on the same reasoning as .pairing-why above: a curious
+   traveller (or a capstone panel) can go find it, but it never competes with
+   the itinerary itself for attention. */
+.itinerary-explainer-trigger {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 12px; padding: 4px 2px;
+    background: none; border: none; cursor: pointer;
+    font-size: .84rem; font-weight: 600; color: var(--primary-dark);
+    border-radius: var(--radius-sm);
+    transition: color .15s ease;
+}
+.itinerary-explainer-trigger:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 2px; }
+.itinerary-explainer-trigger:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.itinerary-explainer-trigger svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+.info-modal-overlay {
+    position: fixed; inset: 0; z-index: 69;
+    background: rgba(10, 22, 17, .45);
+    opacity: 0; visibility: hidden;
+    transition: opacity .2s ease, visibility 0s linear .2s;
+}
+.info-modal-overlay.open { opacity: 1; visibility: visible; transition: opacity .2s ease, visibility 0s linear 0s; }
+
+body.info-modal-open { overflow: hidden; }
+
+.info-modal {
+    position: fixed; inset: 0; z-index: 70;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; visibility: hidden;
+    transition: opacity .2s ease, visibility 0s linear .2s;
+}
+.info-modal.open { opacity: 1; visibility: visible; transition: opacity .2s ease, visibility 0s linear 0s; }
+
+.info-modal__card {
+    width: 100%; max-width: 560px; max-height: min(84vh, 720px);
+    background: var(--white); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    display: flex; flex-direction: column;
+    transform: translateY(8px) scale(.98);
+    transition: transform .2s ease;
+}
+.info-modal.open .info-modal__card { transform: translateY(0) scale(1); }
+
+.info-modal__head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.info-modal__head h3 { margin: 0; font-size: 1.05rem; color: var(--primary-dark); }
+.info-modal__close {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; margin-right: -8px; flex-shrink: 0;
+    background: none; border: none; border-radius: 50%;
+    color: var(--ink); cursor: pointer; transition: background .15s ease;
+}
+.info-modal__close:hover { background: var(--primary-light); }
+.info-modal__close:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.info-modal__close svg { width: 18px; height: 18px; }
+
+.info-modal__body { padding: 20px; overflow-y: auto; }
+.info-modal__body > p { margin: 0 0 16px; color: var(--muted); font-size: .92rem; }
+
+.explainer-list { list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.explainer-list li { display: flex; gap: 12px; align-items: flex-start; }
+.explainer-emoji { font-size: 1.2rem; line-height: 1.4; flex-shrink: 0; width: 26px; text-align: center; }
+.explainer-list strong { display: block; color: var(--ink); font-size: .92rem; }
+.explainer-list p { margin: 2px 0 0; font-size: .84rem; color: var(--muted); line-height: 1.45; }
+
+.explainer-technical { border-top: 1px solid var(--border); padding-top: 14px; }
+.explainer-technical summary {
+    cursor: pointer; list-style: none;
+    font-size: .85rem; font-weight: 600; color: var(--primary-dark);
+    text-decoration: underline; text-underline-offset: 2px;
+}
+.explainer-technical summary::-webkit-details-marker { display: none; }
+.explainer-technical summary:hover { color: var(--primary); }
+.explainer-technical summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+.explainer-technical__body { margin-top: 12px; }
+
+.explainer-technical-list { margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.explainer-technical-list dt {
+    font-weight: 700; font-size: .84rem; color: var(--ink);
+    display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+}
+.explainer-technical-list dd { margin: 3px 0 0; font-size: .8rem; color: var(--muted); line-height: 1.45; }
+
+.ml-status {
+    font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+    padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border);
+}
+.ml-status--applied { background: var(--primary-light); color: var(--primary-dark); border-color: transparent; }
+.ml-status--fallback { background: var(--bg); color: var(--muted); }
+.ml-status--unknown { background: var(--bg); color: var(--muted); font-style: italic; }
+
+.explainer-fallback-note {
+    margin: 14px 0 0; padding: 10px 12px;
+    background: var(--bg); border-radius: var(--radius-sm);
+    font-size: .78rem; color: var(--muted); line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+    .info-modal { padding: 0; align-items: flex-end; }
+    .info-modal__card { max-width: none; width: 100%; max-height: 88vh; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+}
+
 /* Rank list with a match-strength bar, replacing a bare number table so
    relative fit is visible at a glance. */
 .match-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
@@ -2429,10 +2536,12 @@ body.hero-page .site-header.scrolled {
 
 /* ---------- Footer ---------- */
 
-.site-footer { background: #0d221b; color: #cfe3da; padding: 48px 0 24px; margin-top: 40px; border-top: 3px solid var(--gold); }
-.footer-grid { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 28px; }
-.footer-grid h4 { color: var(--gold); font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 14px; }
-.footer-grid a, .footer-grid p { display: block; color: #a9c2b7; font-size: .88rem; margin-bottom: 8px; }
+.site-footer { background: #0d221b; color: #cfe3da; padding: 64px 0 28px; margin-top: 40px; border-top: 3px solid var(--gold); }
+.footer-grid { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 28px 44px; }
+.footer-grid h4 { color: var(--gold); font-weight: 700; font-size: .85rem; text-transform: uppercase; letter-spacing: .05em; margin: 0 0 18px; }
+.footer-grid a, .footer-grid p { display: block; font-size: .88rem; line-height: 1.55; margin-bottom: 10px; }
+.footer-grid p { color: #93ac9f; }
+.footer-grid a { color: #b7cec2; }
 /* Marks a link that leaves the site, so "List your establishment" reads as
    handing off to the national DOT portal rather than opening a page here. */
 .ext-link { display: inline-flex; align-items: center; gap: 5px; }
@@ -2447,28 +2556,49 @@ body.hero-page .site-header.scrolled {
 .field-hint .ext-link svg { display: inline-block; vertical-align: -2px; margin-left: 3px; }
 .ext-link svg { width: 12px; height: 12px; flex-shrink: 0; opacity: .7; }
 
-.footer-grid a { transition: color .15s ease; }
-.footer-grid a:hover { color: var(--white); }
-.footer-brand-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.footer-brand-icon { width: 26px; height: 26px; flex-shrink: 0; }
-.footer-brand { font-weight: 800; font-size: 1.15rem; color: var(--white); }
-.footer-contact { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.1); }
-.footer-contact p { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
-.footer-contact svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; opacity: .75; }
-.footer-contact a { display: inline; color: #a9c2b7; }
-.footer-contact a:hover { color: var(--white); }
+.footer-grid a { transition: color .15s ease, transform .15s ease; }
+.footer-grid a:hover { color: var(--white); transform: translateX(2px); }
+.footer-grid a:focus-visible,
+.footer-contact a:focus-visible,
+.footer-legal a:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+.footer-brand-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.footer-brand-icon { width: 32px; height: 32px; flex-shrink: 0; }
+.footer-brand { font-weight: 800; font-size: 1.3rem; color: var(--white); letter-spacing: .01em; }
+.footer-contact { margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.08); }
+.footer-contact p { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; color: #93ac9f; }
+.footer-contact svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; opacity: .8; }
+.footer-contact a { display: inline; color: #b7cec2; transition: color .15s ease, transform .15s ease; }
+.footer-contact a:hover { color: var(--white); transform: translateX(2px); }
 
-.footer-bottom { border-top: 1px solid rgba(255,255,255,.1); margin-top: 32px; padding-top: 18px; font-size: .8rem; color: #7f9c8f; text-align: center; }
-.footer-legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 20px; margin-bottom: 12px; }
-.footer-legal a { display: inline; color: #a9c2b7; font-size: .8rem; }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,.08); margin-top: 40px; padding-top: 22px; font-size: .8rem; color: #7f9c8f; text-align: center; }
+.footer-legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px; margin-bottom: 14px; }
+.footer-legal a { display: inline-block; padding: 2px; color: #b7cec2; font-size: .8rem; transition: color .15s ease; }
 .footer-legal a:hover { color: var(--gold); }
 .footer-copyright { margin: 0; }
 
+@media (max-width: 900px) {
+    /* The floating chatbot launcher (partials/chatbot-widget.blade.php) sits
+       fixed at right:20px, width 54px -- the rightmost ~84px of this
+       container -- and rises to bottom:92px below 900px to clear listing
+       pages' sticky CTA bar. Since it never scrolls away, whatever ends up
+       centered under that corner at full scroll would sit half-hidden
+       behind it; reserving that width on the right keeps the legal links
+       and copyright line clear of it without un-centering them from the
+       rest of the footer. */
+    .site-footer { padding-bottom: 76px; }
+    .footer-bottom { padding-right: 84px; }
+}
 @media (max-width: 800px) {
-    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px 28px; }
 }
 @media (max-width: 480px) {
-    .footer-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; gap: 34px; }
+    .site-footer { padding-bottom: 100px; }
+    .footer-legal { gap: 10px 20px; }
 }
 
 /* ---------- Auth pages ---------- */
