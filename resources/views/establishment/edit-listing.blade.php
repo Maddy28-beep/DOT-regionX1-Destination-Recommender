@@ -38,7 +38,7 @@
             DOT Region XI Admin and can't be edited here. Contact DOT Region XI if either needs correcting.
         </x-banner>
 
-        <form method="POST" action="{{ route('establishment.listing.update') }}">
+        <form method="POST" action="{{ route('establishment.listing.update') }}" id="listing-form">
             @csrf
             @method('PUT')
 
@@ -67,10 +67,41 @@
             @include('partials.location-picker', ['listing' => $listing])
 
             @if ($establishment->listing_kind === 'package')
-                <div class="field" style="margin-top:20px;">
-                    <label for="itinerary">Day-by-Day Itinerary</label>
-                    <textarea id="itinerary" name="itinerary" rows="6" placeholder="Day 1 title | Day 1 details (optional)&#10;Day 2 title | Day 2 details (optional)">{{ old('itinerary', $itineraryText) }}</textarea>
-                    <p class="field-hint">One day per line: a short title, then optionally a "|" and more detail. The day number comes from the line's order.</p>
+                <div class="field-group" style="margin-top:20px;">
+                    <label>Day-by-Day Itinerary</label>
+                    <p class="field-hint" style="margin-top:0;">
+                        Add one card per day of the trip, in order. A short title is enough &mdash; the
+                        detail underneath is optional.
+                    </p>
+
+                    {{--
+                        A plain "Title | Description" textarea (the previous version of this field)
+                        asked a non-technical tour operator to learn a delimiter convention with no
+                        visual feedback for getting it wrong. This keeps the exact same wire format --
+                        the hidden #itinerary textarea below still posts "Title | Description" one line
+                        per day, so EstablishmentDashboardController::syncItineraryDays() needs no
+                        changes at all -- it's purely a friendlier way to build that same string.
+                    --}}
+                    <div class="itinerary-editor" id="itinerary-editor"></div>
+
+                    <template id="itinerary-day-template">
+                        <div class="itinerary-day-card">
+                            <div class="itinerary-day-card__head">
+                                <span class="itinerary-day-card__label">Day <span data-day-number></span></span>
+                                <div class="itinerary-day-card__actions">
+                                    <button type="button" data-move-up aria-label="Move this day earlier" title="Move earlier">&#9650;</button>
+                                    <button type="button" data-move-down aria-label="Move this day later" title="Move later">&#9660;</button>
+                                    <button type="button" data-remove aria-label="Remove this day" title="Remove day">&#10005;</button>
+                                </div>
+                            </div>
+                            <input type="text" data-day-title placeholder="What happens this day? e.g. Arrival &amp; Camp 1">
+                            <textarea data-day-description rows="2" placeholder="More detail (optional)"></textarea>
+                        </div>
+                    </template>
+
+                    <button type="button" class="btn btn-outline btn-sm" id="itinerary-add-day" style="margin-top:4px;">+ Add another day</button>
+
+                    <textarea id="itinerary" name="itinerary" hidden>{{ old('itinerary', $itineraryText) }}</textarea>
                 </div>
             @endif
 
@@ -144,5 +175,93 @@
         @endif
     </div>
 </div>
+
+@if ($establishment->listing_kind === 'package')
+<script>
+    /*
+     * Day-by-day itinerary editor: builds the "Title | Description" text the
+     * server has always expected (EstablishmentDashboardController::
+     * syncItineraryDays()), but as individual day cards instead of a
+     * delimiter format the operator would otherwise have to learn. Nothing
+     * about the wire format or the backend changed -- #itinerary is still a
+     * plain textarea, just hidden and filled in right before submit.
+     */
+    (function () {
+        var editor = document.getElementById('itinerary-editor');
+        var template = document.getElementById('itinerary-day-template');
+        var addBtn = document.getElementById('itinerary-add-day');
+        var hidden = document.getElementById('itinerary');
+        var form = document.getElementById('listing-form');
+        if (!editor || !template || !addBtn || !hidden || !form) return;
+
+        function renumber() {
+            var cards = editor.querySelectorAll('.itinerary-day-card');
+            cards.forEach(function (card, index) {
+                card.querySelector('[data-day-number]').textContent = index + 1;
+                card.querySelector('[data-move-up]').disabled = index === 0;
+                card.querySelector('[data-move-down]').disabled = index === cards.length - 1;
+            });
+        }
+
+        function addCard(title, description) {
+            var card = template.content.firstElementChild.cloneNode(true);
+            card.querySelector('[data-day-title]').value = title || '';
+            card.querySelector('[data-day-description]').value = description || '';
+
+            card.querySelector('[data-remove]').addEventListener('click', function () {
+                card.remove();
+                renumber();
+            });
+            card.querySelector('[data-move-up]').addEventListener('click', function () {
+                var prev = card.previousElementSibling;
+                if (prev) editor.insertBefore(card, prev);
+                renumber();
+            });
+            card.querySelector('[data-move-down]').addEventListener('click', function () {
+                var next = card.nextElementSibling;
+                if (next) editor.insertBefore(next, card);
+                renumber();
+            });
+
+            editor.appendChild(card);
+            return card;
+        }
+
+        // Seed from whatever the hidden textarea already holds -- the last
+        // saved days, or old('itinerary') after a failed submit -- so
+        // re-opening this page always shows the same days it last posted.
+        var existingLines = hidden.value.split('\n').map(function (l) { return l.trim(); }).filter(Boolean);
+        if (existingLines.length) {
+            existingLines.forEach(function (line) {
+                var bar = line.indexOf('|');
+                if (bar === -1) {
+                    addCard(line, '');
+                } else {
+                    addCard(line.slice(0, bar).trim(), line.slice(bar + 1).trim());
+                }
+            });
+        } else {
+            addCard('', '');
+        }
+        renumber();
+
+        addBtn.addEventListener('click', function () {
+            addCard('', '');
+            renumber();
+        });
+
+        form.addEventListener('submit', function () {
+            var lines = [];
+            editor.querySelectorAll('.itinerary-day-card').forEach(function (card) {
+                var title = card.querySelector('[data-day-title]').value.trim();
+                var description = card.querySelector('[data-day-description]').value.trim();
+                if (!title) return; // an empty card is skipped, not saved as a blank day
+                lines.push(description ? title + ' | ' + description : title);
+            });
+            hidden.value = lines.join('\n');
+        });
+    })();
+</script>
+@endif
 
 @endsection

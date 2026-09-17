@@ -18,6 +18,13 @@
     $routeStops = $itinerary->routeStops();
 
     $rangeTierLabels = ['near' => 'Within the City', 'moderate' => 'Moderate distance', 'far' => 'Willing to travel farther'];
+
+    // Directions-only "Starting Point" widget below is package-specific and
+    // only makes sense once we actually know where the package is -- see the
+    // panel itself for why this doesn't fall back to a text-search guess.
+    $packageCoords = ($itinerary->package && $itinerary->package->latitude && $itinerary->package->longitude)
+        ? ['lat' => (float) $itinerary->package->latitude, 'lng' => (float) $itinerary->package->longitude]
+        : null;
 @endphp
 
 <div class="dash-shell">
@@ -51,7 +58,17 @@
                         <button type="submit" class="btn btn-outline">Save Itinerary</button>
                     </form>
                 @endif
-                <a href="{{ route('plan.edit') }}" class="btn btn-outline">Edit preferences</a>
+                {{--
+                    A package-adopted itinerary has no real preferences behind
+                    it to edit (see PackageController::planWith()) -- the
+                    correct way to move on from it is the "Start the trip
+                    planner" link in the panel below, which says plainly that
+                    it builds a fresh, different plan rather than implying
+                    there is something of the tourist's own to refine here.
+                --}}
+                @unless ($itinerary->package)
+                    <a href="{{ route('plan.edit') }}" class="btn btn-outline">Edit preferences</a>
+                @endunless
             </div>
         </div>
     </div>
@@ -272,6 +289,35 @@
                     @endif
                 </div>
             </div>
+
+            @if ($packageCoords)
+                {{--
+                    Directions only -- never reorders, reschedules, or
+                    resends this package through any recommendation or ML
+                    step. Gated on the package actually having coordinates
+                    (like every other proximity feature in this codebase,
+                    e.g. partials/map-embed) rather than guessing a location
+                    from its free-text region string.
+                --}}
+                <div class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <h2>Starting Point</h2>
+                            <p>Get directions to {{ $itinerary->package->name }} from wherever your trip begins. This only sets up navigation &mdash; it doesn't change the package's itinerary.</p>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="package-nav">
+                            <input type="text" id="package-nav-origin" class="package-nav__input"
+                                   placeholder="Hotel, airport, or address (optional)">
+                            <div class="package-nav__actions">
+                                <button type="button" class="btn btn-outline" id="package-nav-locate">Use my current location</button>
+                                <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary" id="package-nav-open">Open Navigation</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             @if ($itinerary->package)
             <div class="panel">
@@ -548,6 +594,69 @@
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && modal.classList.contains('open')) close();
         });
+    })();
+
+    /*
+     * "Starting Point" navigation widget for an adopted package (see the
+     * Starting Point panel above). Entirely client-side: nothing here reads
+     * from or writes to the package, the itinerary, or any server route --
+     * it only ever builds a Google Maps directions link, so there is no way
+     * for this to reorder, reschedule, or resend the package through the
+     * recommendation/ML pipeline. Guarded on the button existing since it
+     * only renders when the package has real coordinates.
+     */
+    (function () {
+        var openLink = document.getElementById('package-nav-open');
+        var locateBtn = document.getElementById('package-nav-locate');
+        var originInput = document.getElementById('package-nav-origin');
+        if (!openLink || !locateBtn || !originInput) return;
+
+        var destination = @json($packageCoords ? $packageCoords['lat'].','.$packageCoords['lng'] : null);
+        var originCoords = null;
+
+        function mapsUrl() {
+            var params = 'api=1&destination=' + encodeURIComponent(destination);
+            var typed = originInput.value.trim();
+            if (originCoords) {
+                params += '&origin=' + encodeURIComponent(originCoords);
+            } else if (typed) {
+                params += '&origin=' + encodeURIComponent(typed);
+            }
+            // No origin at all is intentional, not an oversight: Google Maps
+            // falls back to the visitor's current location on its own end.
+            return 'https://www.google.com/maps/dir/?' + params;
+        }
+
+        function refreshHref() {
+            openLink.href = mapsUrl();
+        }
+
+        originInput.addEventListener('input', function () {
+            originCoords = null;
+            refreshHref();
+        });
+
+        locateBtn.addEventListener('click', function () {
+            if (!navigator.geolocation) return;
+            locateBtn.disabled = true;
+            locateBtn.textContent = 'Locating…';
+            navigator.geolocation.getCurrentPosition(
+                function (pos) {
+                    originCoords = pos.coords.latitude + ',' + pos.coords.longitude;
+                    originInput.value = 'Your current location';
+                    locateBtn.disabled = false;
+                    locateBtn.textContent = 'Use my current location';
+                    refreshHref();
+                },
+                function () {
+                    locateBtn.disabled = false;
+                    locateBtn.textContent = 'Use my current location';
+                },
+                { timeout: 8000, maximumAge: 300000 }
+            );
+        });
+
+        refreshHref();
     })();
 </script>
 @endsection
