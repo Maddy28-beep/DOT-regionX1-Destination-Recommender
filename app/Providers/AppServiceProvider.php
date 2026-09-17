@@ -67,10 +67,37 @@ class AppServiceProvider extends ServiceProvider
             $view->with('navStatus', $establishment?->portalStatus());
         });
 
-        // Site-wide DOT advisories ("Mt. Apo closed this season" type notices
-        // not tied to one listing), shown on every public page below the header.
+        /*
+         * The single most urgent active advisory, shown as the site-wide
+         * sticky ribbon above the header on every public page. Prefers an
+         * advisory posted against whatever listing the current page happens
+         * to be showing (found generically via route-model binding -- no
+         * per-controller wiring needed) over a general, platform-wide one,
+         * so a traveler looking at Mt. Apo sees Mt. Apo's own closure notice
+         * first rather than an unrelated general notice burying it. Only
+         * ONE advisory is ever surfaced here; the rest remain reachable on
+         * the /advisories hub page.
+         */
         View::composer('partials.header', function ($view) {
-            $view->with('generalAdvisories', Advisory::active()->general()->latest()->get());
+            $listingAdvisory = null;
+
+            foreach (request()->route()?->parameters() ?? [] as $param) {
+                if (! $param instanceof \Illuminate\Database\Eloquent\Model) {
+                    continue;
+                }
+
+                $kind = array_search($param::class, Relation::morphMap(), true);
+                if ($kind === false) {
+                    continue;
+                }
+
+                $listingAdvisory = Advisory::active()->forListing($kind, $param->id)->urgentFirst()->first();
+                if ($listingAdvisory) {
+                    break;
+                }
+            }
+
+            $view->with('topAdvisory', $listingAdvisory ?? Advisory::active()->general()->urgentFirst()->first());
         });
     }
 }
