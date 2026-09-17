@@ -13,11 +13,10 @@ class Itinerary extends Model
 
     const CREATED_AT = 'generated_at';
 
-    const UPDATED_AT = null;
-
     protected $fillable = [
-        'preference_id', 'total_days', 'est_budget_total',
+        'preference_id', 'package_id', 'total_days', 'est_budget_total',
         'est_party_size', 'generated_at', 'range_tier_used', 'range_widened',
+        'tourist_account_id', 'title',
     ];
 
     protected function casts(): array
@@ -33,9 +32,44 @@ class Itinerary extends Model
         return $this->belongsTo(TouristPreference::class, 'preference_id');
     }
 
+    /** Set only when this plan was adopted whole from a tour operator's package rather than generated. */
+    public function package(): BelongsTo
+    {
+        return $this->belongsTo(Package::class);
+    }
+
+    /** Set only once a tourist has chosen to save this plan permanently to their optional account. */
+    public function touristAccount(): BelongsTo
+    {
+        return $this->belongsTo(TouristAccount::class);
+    }
+
     public function matches(): HasMany
     {
         return $this->hasMany(ItineraryMatch::class);
+    }
+
+    /**
+     * The top-ranked matches for display, one per real-world business.
+     *
+     * matches() intentionally keeps every scored candidate, branches of the
+     * same accredited business included (Table 8 is the full computed
+     * ranking, and a professor auditing it should be able to see that all
+     * three Elysia Wellness Spa branches were scored). But several branches
+     * of one business routinely tie on every scoring factor -- none of them
+     * have their own coordinates, rating, or tags -- and showing "Elysia
+     * Wellness Spa" in 1st, 2nd, and 3rd place is not three recommendations,
+     * it is one recommendation shown three times. This keeps only the
+     * best-ranked branch per business name before taking the top N, so the
+     * traveller-facing list is actually N distinct places.
+     */
+    public function distinctTopMatches(int $limit): \Illuminate\Support\Collection
+    {
+        return $this->matches
+            ->sortBy('rank')
+            ->unique(fn (ItineraryMatch $match) => mb_strtolower(trim($match->destination->name)))
+            ->take($limit)
+            ->values();
     }
 
     public function items(): HasMany

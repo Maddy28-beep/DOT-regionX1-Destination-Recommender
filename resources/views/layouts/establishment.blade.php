@@ -77,6 +77,7 @@
             <a href="{{ route('establishment.overview') }}" class="{{ request()->routeIs('establishment.overview') ? 'active' : '' }}">Overview</a>
             <a href="{{ route('establishment.listing.edit') }}" class="{{ request()->routeIs('establishment.listing.*') ? 'active' : '' }}">My Listing</a>
             <a href="{{ route('establishment.photos') }}" class="{{ request()->routeIs('establishment.photos') ? 'active' : '' }}">Photos</a>
+            <a href="{{ route('establishment.promotions') }}" class="{{ request()->routeIs('establishment.promotions') ? 'active' : '' }}">Promos &amp; Discounts</a>
             <a href="{{ route('establishment.reviews') }}" class="{{ request()->routeIs('establishment.reviews') ? 'active' : '' }}">
                 <span>Guest Reviews</span>
                 @if ($navUnrepliedCount > 0)

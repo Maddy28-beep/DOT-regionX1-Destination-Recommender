@@ -84,6 +84,25 @@ class RealAccreditedEstablishmentSeeder extends Seeder
         // up, so a hand-written destination keeps its description.
         $listing = $model::where('slug', $row['slug'])->first();
 
+        /*
+         * A repeated name with a DIFFERENT address (three Elysia Wellness Spa
+         * locations, two Rancho Palos Verdes venues) is a genuinely separate
+         * branch, and the sheet's pre-built slug already suffixes it (-2,
+         * -3, ...) to keep it that way. But an IDENTICAL name at the SAME
+         * address, as with two "Playa del Rosario Resort" rows sharing one
+         * Baganga address, is one physical business holding two distinct DOT
+         * accreditation numbers (DOT-R11-RES-01656-2025 as a Resort and
+         * DOT-R11-MAB-01510-2025 under the separate Mabuhay tier) -- not two
+         * businesses. Importing that as two listing rows double-counted it
+         * everywhere a listing count or a pick-one-establishment list is
+         * built. The second accreditation number still needs to attach
+         * somewhere, so it lands on the one real listing instead of minting
+         * a second one for it.
+         */
+        if (! $listing) {
+            $listing = $model::where('name', $row['name'])->where('location', $row['location'])->first();
+        }
+
         if (! $listing) {
             $listing = new $model();
             $listing->slug = $row['slug'];
@@ -109,7 +128,7 @@ class RealAccreditedEstablishmentSeeder extends Seeder
                 'price_tier' => $row['price_tier'] ?? null,
                 'cuisine_type' => $row['cuisine_type'] ?? null,
                 'specialization' => $row['specialization'] ?? null,
-                'contact_number' => $row['contact'] ?? null,
+                'contact_number' => $this->cleanContact($row['contact'] ?? null),
                 'distance_km' => $row['distance_km'] ?? null,
                 'dot_classification' => $kind === 'accommodation' ? 'DOT-Accredited' : null,
             ];
@@ -148,6 +167,26 @@ class RealAccreditedEstablishmentSeeder extends Seeder
         );
 
         return isset($this->columns[$table][$column]);
+    }
+
+    /**
+     * The sheet often lists two or three numbers separated by "/", ",", or
+     * "to" (e.g. "0915 0511123/ 296-4543"), and contact_number is
+     * VARCHAR(20) on every listing table -- inserting the raw string
+     * overflows it for a meaningful share of the 372 rows. Keep just the
+     * first number, then hard-cap as a last resort so a still-long single
+     * number can never fail the insert either.
+     */
+    private function cleanContact(?string $raw): ?string
+    {
+        if (! $raw) {
+            return null;
+        }
+
+        $first = preg_split('/[,\/;]|(?<=\d)\s+to\s+/', $raw)[0];
+        $first = trim(preg_replace('/\s+/', ' ', $first));
+
+        return $first !== '' ? mb_substr($first, 0, 20) : null;
     }
 
     private function describe(array $row, string $kind): string

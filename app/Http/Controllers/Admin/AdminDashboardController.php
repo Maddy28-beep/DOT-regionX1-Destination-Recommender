@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ExitSurveyController;
 use App\Models\AccreditationRecord;
 use App\Models\Accommodation;
 use App\Models\Destination;
@@ -44,7 +45,7 @@ class AdminDashboardController extends Controller
             // "2026-08-30" a toDateString() produces. A straight comparison
             // reads 0 forever. Same trap as CheckInController's dedupe.
             'checkins_today' => TouristVisit::whereDate('visit_date', now()->toDateString())->count(),
-            'total_accredited' => $this->totalAccreditedCount(),
+            'destinations' => Destination::where('is_accredited', true)->count(),
             'pending_establishments' => EstablishmentAccount::where('status', 'pending')->count(),
             'expiring_accreditations' => AccreditationRecord::where('status', 'Expiring Soon')->count(),
         ];
@@ -79,18 +80,32 @@ class AdminDashboardController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        // location rides along as the picker's meta line -- the only thing
-        // that tells "Davao Crocodile Park" apart from "Davao Crocodile Park
-        // Inc" in a search result.
         $listingOptions = collect(self::ESTABLISHMENT_LISTING_KINDS)
-            ->map(fn ($modelClass) => $modelClass::orderBy('name')->get(['id', 'name', 'location'])
-                ->map(fn ($row) => ['id' => $row->id, 'name' => $row->name, 'meta' => $row->location]));
+            ->map(fn ($modelClass) => $modelClass::orderBy('name')->get(['id', 'name']));
 
         return view('admin.establishments', compact('establishments', 'status', 'listingOptions'));
     }
 
+    /**
+     * An approved account can sign in and edit its matched listing
+     * immediately -- so an approval with no matched_listing_id yet would
+     * let a partner log in to a dashboard with nothing to manage, and
+     * whichever listing gets linked *later* silently retroactively becomes
+     * "theirs" with no separate review step. Requiring the match first
+     * means Approve always means "this account may edit exactly the
+     * listing DOT just linked it to," not "we'll figure out which listing
+     * eventually." Rejecting an unlinked, unqualified registration is
+     * unaffected -- rejectEstablishment() has no such guard.
+     */
     public function approveEstablishment(Request $request, EstablishmentAccount $establishment)
     {
+        if (! $establishment->matched_listing_id) {
+            return back()->with(Toast::error(
+                'Establishment not linked',
+                'Link this establishment to an existing listing before approving.'
+            ));
+        }
+
         $establishment->update([
             'status' => 'approved',
             'reviewed_by' => $request->user('admin')->id,
@@ -129,38 +144,11 @@ class AdminDashboardController extends Controller
 
         $establishment->update(['matched_listing_id' => $data['matched_listing_id'] ?? null]);
 
-        if (! $data['matched_listing_id']) {
-            return back()->with(Toast::success('Listing link cleared', "{$establishment->business_name} is no longer matched to a listing."));
-        }
+        $toast = $data['matched_listing_id']
+            ? Toast::success('Listing linked', "{$establishment->business_name} is now matched to its catalog listing.")
+            : Toast::success('Listing link cleared', "{$establishment->business_name} is no longer matched to a listing.");
 
-        $listingName = $modelClass::find($data['matched_listing_id'])->name;
-
-        /*
-         * Not a rejection -- the save above already happened. This only
-         * decides which toast the admin sees, so a mismatch never blocks a
-         * legitimate rename or typo, only flags an obviously wrong pairing.
-         * 40% was picked against real catalog names: near-duplicates like
-         * "Davao Crocodile Park" / "Davao Crocodile Park Inc" score 90%+,
-         * unrelated businesses score under 25%.
-         */
-        if (self::nameSimilarity($establishment->business_name, $listingName) < 40) {
-            return back()->with(Toast::error(
-                'Match saved, but check it',
-                "\"{$establishment->business_name}\" doesn't closely resemble \"{$listingName}\" — confirm this is the right listing before approving."
-            ));
-        }
-
-        return back()->with(Toast::success('Listing linked', "{$establishment->business_name} is now matched to its catalog listing."));
-    }
-
-    /** Percentage similarity, ignoring case and punctuation -- "X Inc" vs "X" should not read as unrelated. */
-    private static function nameSimilarity(string $a, string $b): float
-    {
-        $normalize = fn (string $s) => trim(preg_replace('/[^a-z0-9 ]/', ' ', strtolower($s)));
-
-        similar_text($normalize($a), $normalize($b), $percent);
-
-        return $percent;
+        return back()->with($toast);
     }
 
     public function accreditation(Request $request): View
@@ -253,17 +241,55 @@ class AdminDashboardController extends Controller
         ));
     }
 
-    public function exitSurveys(): View
-    {
-        $count = ExitSurvey::count();
+    /** How many rows the Most Visited Places panel shows -- raising this later is a one-line change. */
+    private const TOP_PLACES_LIMIT = 10;
 
-        // The survey is voluntary and fully anonymous -- there is no account
-        // and no link from a survey back to a specific visit, so this can
-        // only ever be an approximate, population-level response rate:
-        // distinct browsers known to have checked in somewhere, versus
-        // total surveys submitted. It is not a per-visitor completion rate.
-        $checkedInVisitors = TouristVisit::whereNotNull('visitor_token')->distinct('visitor_token')->count('visitor_token');
-        $responseRatePct = $checkedInVisitors > 0 ? round($count / $checkedInVisitors * 100, 1) : null;
+    /** How many distinct origin locations get their own bar before the rest fold into "Other". */
+    private const TOP_ORIGINS_LIMIT = 10;
+
+    public function exitSurveys(Request $request): View
+    {
+        $filters = [
+            'from' => $request->get('from') ?: null,
+            'to' => $request->get('to') ?: null,
+            'residency' => in_array($request->get('residency'), ExitSurveyController::RESIDENCY_TYPES, true) ? $request->get('residency') : null,
+            'visitor_type' => in_array($request->get('visitor_type'), ExitSurveyController::VISITOR_TYPES, true) ? $request->get('visitor_type') : null,
+            'purpose' => in_array($request->get('purpose'), ExitSurveyController::TRAVEL_PURPOSES, true) ? $request->get('purpose') : null,
+        ];
+        $hasActiveFilters = (bool) array_filter($filters);
+
+        // A closure factory, not a single built query: Eloquent builders are
+        // single-use, and every metric below needs its own fresh copy of the
+        // exact same filtered set so a date range or residency filter
+        // applies consistently across the whole page, not just the first
+        // number that reads it.
+        $filtered = function () use ($filters) {
+            return ExitSurvey::query()
+                ->when($filters['from'], fn ($q) => $q->whereDate('submitted_at', '>=', $filters['from']))
+                ->when($filters['to'], fn ($q) => $q->whereDate('submitted_at', '<=', $filters['to']))
+                ->when($filters['residency'], fn ($q) => $q->where('residency_type', $filters['residency']))
+                ->when($filters['visitor_type'], fn ($q) => $q->where('visitor_type', $filters['visitor_type']))
+                ->when($filters['purpose'], fn ($q) => $q->where('travel_purpose', $filters['purpose']));
+        };
+
+        $count = $filtered()->count();
+
+        /*
+         * Distinct Check-ins is reported alongside Exit Survey Responses as
+         * its own, separate metric -- not divided into a "Response Rate".
+         * The survey is voluntary, anonymous, and structurally unlinked from
+         * any specific check-in, so nothing on this page can say how many of
+         * those check-ins actually went on to answer the survey; 92 surveys
+         * against 79 known browsers can (and did) produce a nonsense 116.5%
+         * if treated as a completion rate. Filtered by the same date range
+         * as the surveys, when one is set, since visit_date and submitted_at
+         * are otherwise not comparable at all.
+         */
+        $checkedInVisitors = TouristVisit::whereNotNull('visitor_token')
+            ->when($filters['from'], fn ($q) => $q->whereDate('visit_date', '>=', $filters['from']))
+            ->when($filters['to'], fn ($q) => $q->whereDate('visit_date', '<=', $filters['to']))
+            ->distinct('visitor_token')
+            ->count('visitor_token');
 
         $avgRatings = collect([
             'Overall Satisfaction' => 'overall_rating',
@@ -272,58 +298,153 @@ class AdminDashboardController extends Controller
             'Attraction Quality' => 'attractions_quality',
             'Accommodation Experience' => 'accommodation_rating',
             'Transportation Experience' => 'transport_rating',
-        ])->map(fn ($column) => round((float) ExitSurvey::whereNotNull($column)->avg($column), 2));
+        ])->map(function ($column) use ($filtered) {
+            $avg = $filtered()->whereNotNull($column)->avg($column);
 
-        $recommendTotal = ExitSurvey::whereNotNull('would_recommend')->count();
+            return $avg !== null ? round((float) $avg, 2) : null;
+        });
+
+        $ratedCategories = $avgRatings->filter(fn ($v) => $v !== null);
+        $highestRatedCategory = $ratedCategories->isNotEmpty() ? $ratedCategories->sortDesc()->keys()->first() : null;
+        $lowestRatedCategory = $ratedCategories->isNotEmpty() ? $ratedCategories->sort()->keys()->first() : null;
+
+        $recommendTotal = $filtered()->whereNotNull('would_recommend')->count();
         $wouldRecommendPct = $recommendTotal > 0
-            ? round(ExitSurvey::where('would_recommend', 'Yes')->count() / $recommendTotal * 100)
+            ? round($filtered()->where('would_recommend', 'Yes')->count() / $recommendTotal * 100)
             : null;
 
-        $residencyBreakdown = ExitSurvey::whereNotNull('residency_type')
+        $residencyBreakdown = $filtered()->whereNotNull('residency_type')
             ->selectRaw('residency_type, count(*) as total')
             ->groupBy('residency_type')
             ->orderByDesc('total')
             ->pluck('total', 'residency_type');
 
-        $visitorTypeBreakdown = ExitSurvey::whereNotNull('visitor_type')
+        $visitorTypeBreakdown = $filtered()->whereNotNull('visitor_type')
             ->selectRaw('visitor_type, count(*) as total')
             ->groupBy('visitor_type')
             ->orderByDesc('total')
             ->pluck('total', 'visitor_type');
 
-        $travelPurposeBreakdown = ExitSurvey::whereNotNull('travel_purpose')
+        $travelPurposeBreakdown = $filtered()->whereNotNull('travel_purpose')
             ->selectRaw('travel_purpose, count(*) as total')
             ->groupBy('travel_purpose')
             ->orderByDesc('total')
             ->pluck('total', 'travel_purpose');
 
-        $avgDaysStayed = round((float) ExitSurvey::whereNotNull('actual_days_stayed')->avg('actual_days_stayed'), 1);
+        /*
+         * Visitor Origin (2.2.3.1.9): DOT specifically asked for place of
+         * origin as a first-class tourism statistic. `origin` is free text
+         * ("Cebu City", "Seoul, South Korea"), not a picked list, so it is
+         * grouped by a trimmed/case-folded key -- enough to stop "Cebu City"
+         * and "cebu city" splitting into two bars -- without rewriting what
+         * a respondent actually typed. The displayed label keeps its
+         * original casing from the first response seen for that key.
+         */
+        $originRows = $filtered()->whereNotNull('origin')->where('origin', '!=', '')->pluck('origin');
+        $originTotal = $originRows->count();
+        $originGrouped = $originRows
+            ->groupBy(fn ($origin) => Str::lower(trim($origin)))
+            ->map(fn ($group) => ['label' => trim($group->first()), 'total' => $group->count()])
+            ->sortByDesc('total')
+            ->values();
+        $originBreakdown = $originGrouped->take(self::TOP_ORIGINS_LIMIT);
+        $otherOriginsCount = $originGrouped->count() > self::TOP_ORIGINS_LIMIT
+            ? $originGrouped->slice(self::TOP_ORIGINS_LIMIT)->sum('total')
+            : 0;
+        $mostCommonOrigin = $originBreakdown->first()['label'] ?? null;
 
-        $topPlaces = ExitSurveyVisit::selectRaw('listing_kind, listing_id, count(*) as visits')
+        $avgDaysStayed = $filtered()->whereNotNull('actual_days_stayed')->avg('actual_days_stayed');
+        $avgDaysStayed = $avgDaysStayed !== null ? round((float) $avgDaysStayed, 1) : null;
+
+        /*
+         * DOT wants the overall money a visitor spends across their whole
+         * stay in Davao, not a per-day figure -- so this is a single trip
+         * total, collected as a picked range (see
+         * ExitSurveyController::SPEND_BRACKETS) rather than a typed exact
+         * amount: nobody remembers what they spent to the peso, but everyone
+         * can place their trip cost in a bracket. That range can't be
+         * averaged in SQL, so each response is resolved to its bracket's
+         * representative peso value (SPEND_BRACKET_MIDPOINTS) and averaged in
+         * PHP instead -- an approximation, but the same one behind every
+         * bracketed-income survey question.
+         */
+        $spendMidpoints = ExitSurveyController::SPEND_BRACKET_MIDPOINTS;
+
+        $spendRows = $filtered()->whereNotNull('estimated_total_spend')
+            ->get(['estimated_total_spend', 'residency_type'])
+            ->map(function ($s) use ($spendMidpoints) {
+                $s->spend_midpoint = $spendMidpoints[$s->estimated_total_spend] ?? null;
+
+                return $s;
+            })
+            ->filter(fn ($s) => $s->spend_midpoint !== null);
+
+        $spendRespondentCount = $spendRows->count();
+        $avgTotalSpend = $spendRespondentCount > 0 ? round($spendRows->avg('spend_midpoint'), 2) : null;
+
+        $spendByResidency = $spendRows->filter(fn ($s) => filled($s->residency_type))
+            ->groupBy('residency_type')
+            ->map(fn ($group) => round($group->avg('spend_midpoint'), 2))
+            ->sortDesc();
+
+        // Computed once and reused as a plain whereIn, rather than re-running
+        // $filtered() (and a whereHas subquery) once per panel below.
+        $filteredSurveyIds = $filtered()->pluck('id');
+
+        $topPlaces = ExitSurveyVisit::whereIn('exit_survey_id', $filteredSurveyIds)
+            ->selectRaw('listing_kind, listing_id, count(*) as visits')
             ->groupBy('listing_kind', 'listing_id')
             ->orderByDesc('visits')
-            ->take(6)
+            ->take(self::TOP_PLACES_LIMIT)
             ->get()
             ->map(fn ($row) => ['name' => $this->resolveListingName($row->listing_kind, $row->listing_id), 'kind' => $row->listing_kind, 'visits' => $row->visits])
             ->filter(fn ($row) => $row['name'] !== null)
             ->values();
 
-        $topActivities = ExitSurveyActivity::selectRaw('activity, count(*) as total')
+        $topActivities = ExitSurveyActivity::whereIn('exit_survey_id', $filteredSurveyIds)
+            ->selectRaw('activity, count(*) as total')
             ->groupBy('activity')
             ->orderByDesc('total')
-            ->take(6)
-            ->get();
+            ->take(10)
+            ->get()
+            ->map(fn ($row) => ['activity' => $row->activity, 'total' => $row->total, 'pct' => $count > 0 ? round($row->total / $count * 100) : null]);
+
+        // Dynamic, data-derived summary -- never hardcoded, and null (not a
+        // fabricated "N/A" example) when there is nothing to point to yet.
+        $insights = [
+            'highest_rated_category' => $highestRatedCategory,
+            'lowest_rated_category' => $lowestRatedCategory,
+            'most_common_origin' => $mostCommonOrigin,
+            'most_common_purpose' => $travelPurposeBreakdown->keys()->first(),
+            'most_visited_place' => $topPlaces->first()['name'] ?? null,
+            'most_popular_activity' => $topActivities->first()['activity'] ?? null,
+        ];
+
+        $residencyOptions = ExitSurveyController::RESIDENCY_TYPES;
+        $visitorTypeOptions = ExitSurveyController::VISITOR_TYPES;
+        $purposeOptions = ExitSurveyController::TRAVEL_PURPOSES;
 
         return view('admin.exit-surveys', compact(
-            'count', 'checkedInVisitors', 'responseRatePct', 'avgRatings', 'wouldRecommendPct',
+            'count', 'checkedInVisitors', 'avgRatings', 'wouldRecommendPct',
             'residencyBreakdown', 'visitorTypeBreakdown', 'travelPurposeBreakdown', 'avgDaysStayed',
-            'topPlaces', 'topActivities'
+            'originBreakdown', 'originTotal', 'otherOriginsCount',
+            'avgTotalSpend', 'spendByResidency', 'spendRespondentCount',
+            'topPlaces', 'topActivities', 'insights',
+            'filters', 'hasActiveFilters',
+            'residencyOptions', 'visitorTypeOptions', 'purposeOptions'
         ));
     }
 
+    /** Mirrors AprioriService::topRules()'s own defaults, named here so the page can display exactly the thresholds actually used to mine these rules. */
+    private const ASSOCIATION_RULE_LIMIT = 15;
+
+    private const ASSOCIATION_MIN_SUPPORT_COUNT = 2;
+
+    private const ASSOCIATION_MIN_CONFIDENCE = 0.15;
+
     public function associationRules(Request $request, AprioriService $apriori): View
     {
-        $rules = $apriori->topRules();
+        $rules = $apriori->topRules(self::ASSOCIATION_RULE_LIMIT, self::ASSOCIATION_MIN_SUPPORT_COUNT, self::ASSOCIATION_MIN_CONFIDENCE);
 
         // Whitelisted so a crafted ?sort= can't reach an arbitrary key.
         $sort = in_array($request->get('sort'), ['co_count', 'support', 'confidence'], true)
@@ -335,7 +456,26 @@ class AdminDashboardController extends Controller
             ? $rules->sortBy($sort)->values()
             : $rules->sortByDesc($sort)->values();
 
-        return view('admin.association-rules', compact('rules', 'sort', 'dir'));
+        $totalTransactions = ExitSurvey::count();
+
+        /*
+         * "Rules Found" reports every rule that actually clears both
+         * thresholds, not just the top self::ASSOCIATION_RULE_LIMIT shown in
+         * the table below -- those are two different, both-true numbers
+         * (found vs. displayed), and reporting the smaller one as "found"
+         * would understate what the algorithm actually surfaced. Uncapped by
+         * passing a limit far past anything this dataset could produce,
+         * rather than changing what topRules() returns for its one other
+         * caller (getAssociatedListings() has its own, separate limit).
+         */
+        $totalRulesFound = $apriori->topRules(PHP_INT_MAX, self::ASSOCIATION_MIN_SUPPORT_COUNT, self::ASSOCIATION_MIN_CONFIDENCE)->count();
+
+        $minSupportPct = $totalTransactions > 0 ? round(self::ASSOCIATION_MIN_SUPPORT_COUNT / $totalTransactions * 100, 1) : null;
+
+        return view('admin.association-rules', compact(
+            'rules', 'sort', 'dir', 'totalTransactions', 'totalRulesFound',
+            'minSupportPct'
+        ))->with('minConfidencePct', round(self::ASSOCIATION_MIN_CONFIDENCE * 100));
     }
 
     public function reports(Request $request): View
@@ -474,10 +614,11 @@ class AdminDashboardController extends Controller
         return [
             'summary' => $surveys->count().' exit survey response'.($surveys->count() === 1 ? '' : 's').' in the selected range'
                 .($avg ? ', averaging '.round($avg, 1).'/5 overall satisfaction.' : '.'),
-            'headers' => ['Submitted At', 'Residency', 'Visitor Type', 'Purpose', 'Days Stayed', 'Overall Rating', 'Would Recommend', 'Comments'],
+            'headers' => ['Submitted At', 'Origin', 'Residency', 'Visitor Type', 'Purpose', 'Days Stayed', 'Total Spend', 'Overall Rating', 'Would Recommend', 'Comments'],
             'rows' => $surveys->map(fn ($s) => [
-                $s->submitted_at->format('Y-m-d H:i'), $s->residency_type ?? '—', $s->visitor_type ?? '—',
+                $s->submitted_at->format('Y-m-d H:i'), $s->origin ?? '—', $s->residency_type ?? '—', $s->visitor_type ?? '—',
                 $s->travel_purpose ?? '—', $s->actual_days_stayed ?? '—',
+                ExitSurveyController::SPEND_BRACKETS[$s->estimated_total_spend] ?? '—',
                 $s->overall_rating ?? '—', $s->would_recommend ?? '—', $s->comments ?? '',
             ])->all(),
         ];
@@ -521,42 +662,6 @@ class AdminDashboardController extends Controller
             'headers' => ['Place', 'Type', 'Visits Reported'],
             'rows' => $rows->map(fn ($r) => [$r['name'], $r['kind'], $r['visits']])->all(),
         ];
-    }
-
-    /**
-     * How many listings across all six catalog types currently count as
-     * accredited for the Overview headline stat.
-     *
-     * is_accredited (the flag) and the matched AccreditationRecord's own
-     * status string are deliberately separate facts elsewhere in the app --
-     * see EstablishmentAccount::portalStatus() -- because a listing stays
-     * publicly visible for a grace period after its paperwork lapses. That
-     * distinction is right for an individual listing page, but wrong for a
-     * summary count: something whose accreditation has actually expired
-     * should not be counted among "currently accredited" here, even while
-     * DOT Region XI has not yet flipped is_accredited off for it.
-     */
-    private function totalAccreditedCount(): int
-    {
-        $kinds = [
-            'destination' => Destination::class,
-            'accommodation' => Accommodation::class,
-            'restaurant' => Restaurant::class,
-            'package' => Package::class,
-            'souvenir_center' => SouvenirCenter::class,
-            'tour_operator' => TourOperator::class,
-        ];
-
-        return collect($kinds)->map(function ($model, $kind) {
-            $accreditedIds = $model::where('is_accredited', true)->pluck('id');
-
-            $expiredCount = AccreditationRecord::where('listing_kind', $kind)
-                ->whereIn('listing_id', $accreditedIds)
-                ->where('status', 'Expired')
-                ->count();
-
-            return $accreditedIds->count() - $expiredCount;
-        })->sum();
     }
 
     private function resolveListingName(string $kind, int $id): ?string

@@ -18,8 +18,16 @@
             <h2>{{ $establishments->total() }} Result{{ $establishments->total() === 1 ? '' : 's' }}</h2>
         </div>
     </div>
-    <div class="table-scroll">
-        <table class="data-table">
+
+    {{-- Table on desktop/tablet; a stacked card per establishment below 900px
+         (the same breakpoint the sidebar already collapses at) -- an 8-column
+         table has no readable way to fit a narrow screen, and CSS alone can't
+         reshape a cell that holds a <select> and its own <form> the way a
+         plain data cell can. Both blocks render from the same query, so
+         there's exactly one source of truth for what an establishment shows;
+         only the layout differs. --}}
+    <div class="table-scroll establishments-table-view">
+        <table class="data-table establishments-table">
             <thead>
                 <tr>
                     <th>Business</th><th>Type</th><th>Contact</th><th>Claimed DOT #</th>
@@ -29,7 +37,7 @@
             <tbody>
                 @forelse ($establishments as $e)
                     <tr>
-                        <td>{{ $e->business_name }}</td>
+                        <td>{{ $e->business_name }}<br><span class="cell-muted">{{ $e->email }}</span></td>
                         <td class="cell-muted">{{ ucfirst(str_replace('_', ' ', $e->listing_kind)) }}</td>
                         <td class="cell-muted">{{ $e->contact_person }}<br>{{ $e->contact_number }}</td>
                         <td class="cell-muted">{{ $e->claimed_accreditation_number ?? '—' }}</td>
@@ -37,40 +45,35 @@
                         <td>
                             <span class="status-pill status-{{ $e->status }}">{{ ucfirst($e->status) }}</span>
                         </td>
-                        <td style="min-width:220px;">
-                            {{--
-                                Was a plain alphabetical <select> -- fine for a
-                                handful of souvenir centers, unworkable for the
-                                92 tour operators or ~90 restaurants admin has
-                                to scan one at a time. Same searchable picker
-                                the exit survey uses, single-select mode.
-                                Removing the chip and hitting Save clears the
-                                link, same as the old "Not linked" option did.
-                            --}}
-                            <form method="POST" action="{{ route('admin.establishments.match', $e) }}" class="util-row" style="align-items:flex-start;">
+                        <td>
+                            {{-- Selector and Save Match stacked as one workflow, not side by
+                                 side -- this also halves the column's own footprint versus
+                                 laying them out horizontally. --}}
+                            <form method="POST" action="{{ route('admin.establishments.match', $e) }}" class="matched-listing-form">
                                 @csrf
-                                @include('partials.tag-picker', [
-                                    'name' => 'matched_listing_id',
-                                    'label' => 'Matched listing for '.$e->id,
-                                    'hideLabel' => true,
-                                    'items' => $listingOptions[$e->listing_kind] ?? [],
-                                    'placeholder' => 'Search…',
-                                    'selected' => $e->matched_listing_id ? [$e->matched_listing_id] : [],
-                                    'max' => 1,
-                                ])
-                                <button type="submit" class="btn btn-outline" style="padding:6px 10px; font-size:.8rem;">Save</button>
+                                <select name="matched_listing_id" title="Select the existing ExploreDVO listing that belongs to this establishment.">
+                                    <option value="">Not linked</option>
+                                    @foreach ($listingOptions[$e->listing_kind] ?? [] as $listing)
+                                        <option value="{{ $listing->id }}" @selected($e->matched_listing_id === $listing->id)>{{ $listing->name }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="submit" class="btn btn-outline btn-xs">Save Match</button>
                             </form>
                         </td>
-                        <td style="white-space:nowrap;">
+                        <td>
                             @if ($e->status === 'pending')
-                                <div class="util-row" style="flex-wrap:nowrap;">
+                                <div class="util-row approval-actions">
                                     <form method="POST" action="{{ route('admin.establishments.approve', $e) }}">
                                         @csrf
-                                        <button type="submit" class="btn btn-primary" style="padding:6px 12px; font-size:.8rem; white-space:nowrap;">Approve</button>
+                                        <button type="submit" class="btn btn-primary btn-xs"
+                                                @disabled(! $e->matched_listing_id)
+                                                @if (! $e->matched_listing_id) title="Link this establishment to an existing listing before approving." @endif>
+                                            Approve
+                                        </button>
                                     </form>
                                     <form method="POST" action="{{ route('admin.establishments.reject', $e) }}">
                                         @csrf
-                                        <button type="submit" class="btn btn-outline" style="padding:6px 12px; font-size:.8rem; white-space:nowrap;">Reject</button>
+                                        <button type="submit" class="btn btn-outline-danger btn-xs">Reject</button>
                                     </form>
                                 </div>
                             @else
@@ -84,24 +87,80 @@
             </tbody>
         </table>
     </div>
+
+    <div class="establishment-cards">
+        @forelse ($establishments as $e)
+            <div class="establishment-card">
+                <div class="establishment-card__head">
+                    <div>
+                        <strong>{{ $e->business_name }}</strong>
+                        <div class="cell-muted">{{ $e->email }}</div>
+                    </div>
+                    <span class="status-pill status-{{ $e->status }}">{{ ucfirst($e->status) }}</span>
+                </div>
+
+                <div class="establishment-card__grid">
+                    <div class="establishment-card__field">
+                        <div class="establishment-card__label">Type</div>
+                        <div>{{ ucfirst(str_replace('_', ' ', $e->listing_kind)) }}</div>
+                    </div>
+                    <div class="establishment-card__field">
+                        <div class="establishment-card__label">Contact</div>
+                        <div>{{ $e->contact_person }}<br>{{ $e->contact_number }}</div>
+                    </div>
+                    <div class="establishment-card__field">
+                        <div class="establishment-card__label">Claimed DOT #</div>
+                        <div>{{ $e->claimed_accreditation_number ?? '—' }}</div>
+                    </div>
+                    <div class="establishment-card__field">
+                        <div class="establishment-card__label">Submitted</div>
+                        <div>{{ $e->submitted_at->format('M d, Y') }}</div>
+                    </div>
+                </div>
+
+                <div class="establishment-card__field establishment-card__field--full">
+                    <div class="establishment-card__label">Matched Listing</div>
+                    <p class="establishment-card__hint">Select the existing ExploreDVO listing that belongs to this establishment.</p>
+                    <form method="POST" action="{{ route('admin.establishments.match', $e) }}" class="matched-listing-form">
+                        @csrf
+                        <select name="matched_listing_id">
+                            <option value="">Not linked</option>
+                            @foreach ($listingOptions[$e->listing_kind] ?? [] as $listing)
+                                <option value="{{ $listing->id }}" @selected($e->matched_listing_id === $listing->id)>{{ $listing->name }}</option>
+                            @endforeach
+                        </select>
+                        <button type="submit" class="btn btn-outline btn-xs btn-block">Save Match</button>
+                    </form>
+                </div>
+
+                @if ($e->status === 'pending')
+                    <div class="approval-actions approval-actions--card">
+                        <form method="POST" action="{{ route('admin.establishments.approve', $e) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-primary btn-xs btn-block"
+                                    @disabled(! $e->matched_listing_id)
+                                    @if (! $e->matched_listing_id) title="Link this establishment to an existing listing before approving." @endif>
+                                Approve
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ route('admin.establishments.reject', $e) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-danger btn-xs btn-block">Reject</button>
+                        </form>
+                    </div>
+                    @if (! $e->matched_listing_id)
+                        <p class="establishment-card__hint" style="margin-top:6px;">Link this establishment to an existing listing before approving.</p>
+                    @endif
+                @else
+                    <p class="cell-muted" style="margin:10px 0 0;">{{ $e->review_note }}</p>
+                @endif
+            </div>
+        @empty
+            <p class="cell-muted">No establishments in this category.</p>
+        @endforelse
+    </div>
 </div>
 
-<div class="pagination">
-    @if ($establishments->onFirstPage())
-        <span class="disabled">&laquo;</span>
-    @else
-        <a href="{{ $establishments->previousPageUrl() }}">&laquo;</a>
-    @endif
-
-    @foreach ($establishments->getUrlRange(1, $establishments->lastPage()) as $page => $url)
-        <span class="{{ $page === $establishments->currentPage() ? 'active' : '' }}"><a href="{{ $url }}">{{ $page }}</a></span>
-    @endforeach
-
-    @if ($establishments->hasMorePages())
-        <a href="{{ $establishments->nextPageUrl() }}">&raquo;</a>
-    @else
-        <span class="disabled">&raquo;</span>
-    @endif
-</div>
+<x-admin-pagination :paginator="$establishments" />
 
 @endsection

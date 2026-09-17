@@ -20,6 +20,9 @@
         {{ $accommodation->name }}
     </nav>
 
+    <x-advisory-banner :advisories="\App\Models\Advisory::active()->forListing($accommodation->getMorphClass(), $accommodation->id)->latest()->get()" />
+    <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($accommodation->getMorphClass(), $accommodation->id)->latest()->get()" />
+
     @include('partials.gallery-hero', [
         'photos' => $accommodation->photos,
         'title' => $accommodation->name,
@@ -96,6 +99,8 @@
                 <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($accommodation->name.' '.$accommodation->location) }}" target="_blank" rel="noopener" class="btn btn-primary btn-block">Get Directions</a>
                 @include('partials.check-in-button', ['type' => 'accommodations', 'listing' => $accommodation])
                 <x-save-heart type="accommodations" :listing="$accommodation" variant="button" class="mt-10" />
+
+                @include('partials.listing-external-links', ['listing' => $accommodation])
 
                 @include('partials.map-embed', ['latitude' => $accommodation->latitude, 'longitude' => $accommodation->longitude, 'name' => $accommodation->name])
             </div>

@@ -11,6 +11,8 @@ use App\Models\Package;
 use App\Models\Restaurant;
 use App\Models\SouvenirCenter;
 use App\Models\TourOperator;
+use App\Models\TouristPreference;
+use App\Services\Recommendation\ContentBasedRecommendationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +25,11 @@ class ExitSurveyController extends Controller
     public const TRAVEL_PURPOSES = [
         'Leisure', 'Business', 'Visiting Friends/Family', 'Educational', 'Medical', 'Religious/Pilgrimage', 'Other',
     ];
+
+    /** Also reused by AdminDashboardController for the Exit Survey Insights filter dropdown. */
+    public const RESIDENCY_TYPES = ['Local Resident', 'Domestic Tourist', 'Foreign Tourist'];
+
+    public const VISITOR_TYPES = ['First-time Visitor', 'Returning Visitor', 'Regular / Local'];
 
     public const ACTIVITIES = [
         'Beach & Island', 'Nature & Adventure', 'Cultural Heritage', 'Wildlife',
@@ -40,41 +47,109 @@ class ExitSurveyController extends Controller
      *  request can't trigger thousands of one-row-at-a-time inserts. */
     private const MAX_LIST_ITEMS = 50;
 
+    /** listing_kind => the singular label appended to every option so a merged, cross-category list stays legible. */
+    private const PLACE_KIND_LABELS = [
+        'destination' => 'Destination',
+        'accommodation' => 'Accommodation',
+        'restaurant' => 'Restaurant',
+        'package' => 'Tour Package',
+        'souvenir_center' => 'Souvenir Center',
+        'tour_operator' => 'Tour Operator',
+    ];
+
+    /**
+     * Total trip spend as a picked range rather than a typed exact figure --
+     * nobody remembers their trip cost to the peso, but everyone can place it
+     * in a bracket, which means more people answer and answer accurately.
+     * AdminDashboardController averages these using SPEND_BRACKET_MIDPOINTS,
+     * the paired representative value for each key here.
+     */
+    public const SPEND_BRACKETS = [
+        'under_10000' => '₱10,000 and below',
+        '10000_20000' => '₱10,000 – ₱20,000',
+        '20000_50000' => '₱20,000 – ₱50,000',
+        '50000_100000' => '₱50,000 – ₱100,000',
+        'over_100000' => 'Above ₱100,000',
+    ];
+
+    /** Representative peso value for each SPEND_BRACKETS key, used only to approximate an average -- never shown to a traveler. */
+    public const SPEND_BRACKET_MIDPOINTS = [
+        'under_10000' => 5000,
+        '10000_20000' => 15000,
+        '20000_50000' => 35000,
+        '50000_100000' => 75000,
+        'over_100000' => 125000,
+    ];
+
     public function create(): View
     {
-        /*
-         * `location` is selected alongside the name because several accredited
-         * businesses run more than one branch and each branch is separately
-         * accredited -- Elysia Wellness Spa has three, Oh George Inn three,
-         * Rancho Palos Verdes two, each with its own DOT accreditation number
-         * and expiry. Rendered as bare names they looked like duplicated rows;
-         * with the address they are what they actually are, and a respondent
-         * can pick the branch they visited rather than guessing between three
-         * identical labels.
-         *
-         * Packages have no address of their own -- they are itineraries, not
-         * premises -- so the provider stands in.
-         */
-        $withAddress = fn ($model) => $model::publiclyVisible()->orderBy('name')
-            ->get(['id', 'name', 'location'])
-            ->map(fn ($row) => ['id' => $row->id, 'name' => $row->name, 'meta' => $row->location]);
-
-        $placeGroups = [
-            'destination' => ['label' => 'Destinations', 'items' => $withAddress(Destination::class)],
-            'accommodation' => ['label' => 'Accommodations', 'items' => $withAddress(Accommodation::class)],
-            'restaurant' => ['label' => 'Restaurants', 'items' => $withAddress(Restaurant::class)],
-            'package' => ['label' => 'Tour Packages', 'items' => Package::publiclyVisible()->orderBy('name')
-                ->get(['id', 'name', 'provider_name'])
-                ->map(fn ($row) => ['id' => $row->id, 'name' => $row->name, 'meta' => $row->provider_name])],
-            'souvenir_center' => ['label' => 'Souvenir Centers', 'items' => $withAddress(SouvenirCenter::class)],
-            'tour_operator' => ['label' => 'Tour Operators', 'items' => $withAddress(TourOperator::class)],
+        $placeModels = [
+            'destination' => Destination::class,
+            'accommodation' => Accommodation::class,
+            'restaurant' => Restaurant::class,
+            'package' => Package::class,
+            'souvenir_center' => SouvenirCenter::class,
+            'tour_operator' => TourOperator::class,
         ];
 
+        /*
+         * One searchable list across every kind, rather than six separate
+         * boxes -- a tourist does not think in database categories when
+         * asked "where did you go," and a wall of six near-identical search
+         * fields was a real completion-rate risk. The category is folded
+         * into each option's own label ("Eden Nature Park · Destination")
+         * instead of dropped, since a restaurant and a destination can
+         * plausibly share a name and the picker has no other way to tell
+         * them apart in one flat list.
+         *
+         * The value stays exactly "{kind}:{id}" -- store() and every
+         * downstream reader of ExitSurveyVisit (Apriori's transaction data,
+         * the Trip Recap, the admin "Most Visited Places" panel) parse that
+         * same format either way, so none of them needed to change.
+         */
+        $placeOptions = collect($placeModels)
+            ->flatMap(function (string $model, string $kind) {
+                $items = $this->labelDistinctly($model::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location']));
+
+                return $items->map(fn ($item) => [
+                    'value' => "{$kind}:{$item->id}",
+                    'label' => $item->display_label.' · '.self::PLACE_KIND_LABELS[$kind],
+                ]);
+            })
+            ->values();
+
         return view('exit-survey.create', [
-            'placeGroups' => $placeGroups,
+            'placeOptions' => $placeOptions,
+            'selectedPlaces' => old('places_visited', []),
             'travelPurposes' => self::TRAVEL_PURPOSES,
             'activityOptions' => self::ACTIVITIES,
+            'spendBrackets' => self::SPEND_BRACKETS,
         ]);
+    }
+
+    /**
+     * Appends the location to any listing whose name is shared by another
+     * listing of the same kind, so the picker itself says which one it is.
+     *
+     * DOT accreditation covers businesses with more than one branch (three
+     * Elysia Wellness Spa locations, two Rancho Palos Verdes venues), each a
+     * real, separately addressed listing a visitor can genuinely tell apart
+     * -- but "Elysia Wellness Spa" listed three times with no way to
+     * distinguish them left a visitor unable to say which one they actually
+     * went to. A listing with a name nobody else shares is left exactly as
+     * it was.
+     */
+    private function labelDistinctly(\Illuminate\Support\Collection $items): \Illuminate\Support\Collection
+    {
+        $nameCounts = $items->countBy(fn ($item) => $item->name);
+
+        return $items->map(function ($item) use ($nameCounts) {
+            $item->display_label = $nameCounts[$item->name] > 1 && filled($item->location)
+                ? "{$item->name} ({$item->location})"
+                : $item->name;
+
+            return $item;
+        });
     }
 
     public function store(Request $request): RedirectResponse
@@ -82,11 +157,12 @@ class ExitSurveyController extends Controller
         $visitableKinds = implode('|', self::VISITABLE_KINDS);
 
         $data = $request->validate([
-            'residency_type' => ['nullable', 'in:Local Resident,Domestic Tourist,Foreign Tourist'],
-            'visitor_type' => ['nullable', 'in:First-time Visitor,Returning Visitor,Regular / Local'],
+            'residency_type' => ['nullable', 'in:'.implode(',', self::RESIDENCY_TYPES)],
+            'visitor_type' => ['nullable', 'in:'.implode(',', self::VISITOR_TYPES)],
             'origin' => ['nullable', 'string', 'max:150'],
             'travel_purpose' => ['nullable', 'in:'.implode(',', self::TRAVEL_PURPOSES)],
             'actual_days_stayed' => ['nullable', 'integer', 'min:1', 'max:365'],
+            'estimated_total_spend' => ['nullable', 'in:'.implode(',', array_keys(self::SPEND_BRACKETS))],
             'places_visited' => ['nullable', 'array', 'max:'.self::MAX_LIST_ITEMS],
             'places_visited.*' => ['string', 'regex:/^('.$visitableKinds.'):\d+$/'],
             'activities' => ['nullable', 'array', 'max:'.self::MAX_LIST_ITEMS],
@@ -114,10 +190,20 @@ class ExitSurveyController extends Controller
          * Read straight from the session rather than required: the survey is
          * open to anyone, including a traveller who never made a plan, and it
          * must keep working for them.
+         *
+         * Existence is checked rather than trusted: the plan a long-lived
+         * session points to can since have been deleted (a re-plan, a stale
+         * cookie surviving past a reseed), and without this check that stale
+         * id hit the preference_id foreign key and crashed a survey that
+         * otherwise had nothing wrong with it.
          */
         $preferenceId = $request->session()->get(TripPlannerController::PREFERENCE_KEY);
 
-        DB::transaction(function () use ($data, $preferenceId) {
+        if ($preferenceId && ! TouristPreference::whereKey($preferenceId)->exists()) {
+            $preferenceId = null;
+        }
+
+        $survey = DB::transaction(function () use ($data, $preferenceId) {
             $survey = ExitSurvey::create(
                 collect($data)->except(['places_visited', 'activities'])
                     ->put('preference_id', $preferenceId)
@@ -132,8 +218,75 @@ class ExitSurveyController extends Controller
             foreach ($data['activities'] ?? [] as $activity) {
                 ExitSurveyActivity::create(['exit_survey_id' => $survey->id, 'activity' => $activity]);
             }
+
+            return $survey;
         });
 
-        return redirect()->route('exit-survey.create')->with(Toast::success('Thanks for your feedback', 'Your response helps DOT Region XI improve tourism services.'));
+        // Read back on the very next request by recap() -- a plain session
+        // value (not flash), so refreshing or briefly navigating away from
+        // the recap page doesn't lose it, the same durability the trip
+        // planner already gives guest_itinerary_id.
+        $request->session()->put('last_exit_survey_id', $survey->id);
+
+        return redirect()->route('exit-survey.recap')->with(Toast::success('Thanks for your feedback', 'Your response helps DOT Region XI improve tourism services.'));
+    }
+
+    /**
+     * The immediate payoff for finishing an anonymous survey: a recap of the
+     * trip itself, built entirely from what was just submitted, plus a few
+     * places not yet visited.
+     *
+     * The survey a submission actually reported visiting (ExitSurveyVisit) is
+     * used rather than TouristVisit (QR check-ins): check-ins are an
+     * unscoped running log per browser with no trip boundary, so "everything
+     * this token ever checked into" is not reliably "this trip" -- what the
+     * tourist just told the survey they visited already is.
+     */
+    public function recap(Request $request, ContentBasedRecommendationService $recommender): View|RedirectResponse
+    {
+        $surveyId = $request->session()->get('last_exit_survey_id');
+        $survey = $surveyId ? ExitSurvey::with(['visits.listing', 'preference'])->find($surveyId) : null;
+
+        if (! $survey) {
+            return redirect()->route('home')
+                ->with(Toast::success('Thanks for exploring Davao Region', null));
+        }
+
+        $visited = $survey->visits
+            ->unique(fn ($visit) => $visit->listing_kind.':'.$visit->listing_id)
+            ->map(fn ($visit) => $visit->listing)
+            ->filter()
+            ->values();
+
+        $visitedDestinationIds = $visited
+            ->filter(fn ($listing) => $listing instanceof Destination)
+            ->pluck('id');
+
+        $missed = collect();
+
+        if ($survey->preference) {
+            $missed = $recommender->rank($survey->preference)
+                ->pluck('destination')
+                ->reject(fn ($destination) => $visitedDestinationIds->contains($destination->id))
+                ->take(5)
+                ->values();
+        }
+
+        // No plan to personalize against, or nothing survived it -- fall back
+        // to a plainly "popular" list rather than pretending it's tailored.
+        if ($missed->isEmpty()) {
+            $missed = Destination::publiclyVisible()
+                ->whereNotIn('id', $visitedDestinationIds)
+                ->orderByWeightedRating()
+                ->take(5)
+                ->get();
+        }
+
+        return view('exit-survey.recap', [
+            'visited' => $visited,
+            'daysStayed' => $survey->actual_days_stayed,
+            'missed' => $missed,
+            'personalized' => (bool) $survey->preference,
+        ]);
     }
 }

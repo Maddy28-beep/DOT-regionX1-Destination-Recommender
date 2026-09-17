@@ -23,6 +23,9 @@
         {{ $tourOperator->name }}
     </nav>
 
+    <x-advisory-banner :advisories="\App\Models\Advisory::active()->forListing($tourOperator->getMorphClass(), $tourOperator->id)->latest()->get()" />
+    <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($tourOperator->getMorphClass(), $tourOperator->id)->latest()->get()" />
+
     @include('partials.gallery-hero', [
         'photos' => $tourOperator->photos,
         'title' => $tourOperator->name,
@@ -91,6 +94,8 @@
                 </p>
                 <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="btn btn-primary btn-block">Get Directions</a>
                 @include('partials.check-in-button', ['type' => 'tour-operators', 'listing' => $tourOperator])
+
+                @include('partials.listing-external-links', ['listing' => $tourOperator])
 
                 @include('partials.map-embed', ['latitude' => $tourOperator->latitude, 'longitude' => $tourOperator->longitude, 'name' => $tourOperator->name])
             </div>

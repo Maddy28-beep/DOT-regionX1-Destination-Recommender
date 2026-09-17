@@ -9,8 +9,12 @@
     // below -- a fixed take(5) let the day-by-day plan use a 6th (or later)
     // ranked destination that then never appeared in this summary table at
     // all, which read as the itinerary using a place it hadn't recommended.
+    // distinctTopMatches() additionally keeps only the best-scoring branch
+    // per business name, so a business with several accredited branches
+    // (Elysia Wellness Spa, Rancho Palos Verdes) doesn't occupy more than
+    // one of these slots.
     $scheduledDestinationCount = $itinerary->items->pluck('destination_id')->filter()->unique()->count();
-    $topMatches = $itinerary->matches->sortBy('rank')->take(max(5, $scheduledDestinationCount));
+    $topMatches = $itinerary->distinctTopMatches(max(5, $scheduledDestinationCount));
     $routeStops = $itinerary->routeStops();
 
     $rangeTierLabels = ['near' => 'Within the City', 'moderate' => 'Moderate distance', 'far' => 'Willing to travel farther'];
@@ -21,41 +25,70 @@
         <div class="container">
             <div>
                 <span class="poster-kicker" style="font-size:1.05rem;">ready to go</span>
-                <h1 class="page-title" style="font-size:1.9rem; margin:0;">My Itinerary</h1>
+                <h1 class="page-title" style="font-size:1.9rem; margin:0;">{{ $itinerary->title ?: 'My Itinerary' }}</h1>
                 <div class="sub">
                     Generated {{ $itinerary->generated_at->format('F j, Y g:i A') }}
                     &middot; {{ $itinerary->total_days }} day{{ $itinerary->total_days === 1 ? '' : 's' }}
-                    {{-- Say what the ordering was actually measured from, so a
-                         plan sequenced from the regional default is not mistaken
-                         for one sequenced from where the traveller is. --}}
-                    &middot; ordered from {{ $preference->origin_label ?: 'Davao City centre' }}
-                    @if ($preference->arrival_time)
-                        &middot; arriving {{ \Illuminate\Support\Carbon::parse($preference->arrival_time)->format('g:i A') }}
+                    @if ($itinerary->package)
+                        &middot; from the <a href="{{ route('packages.show', $itinerary->package) }}">{{ $itinerary->package->name }}</a> package
+                    @else
+                        {{-- Say what the ordering was actually measured from, so a
+                             plan sequenced from the regional default is not mistaken
+                             for one sequenced from where the traveller is. --}}
+                        &middot; ordered from {{ $preference->origin_label ?: 'Davao City centre' }}
+                        @if ($preference->arrival_time)
+                            &middot; arriving {{ \Illuminate\Support\Carbon::parse($preference->arrival_time)->format('g:i A') }}
+                        @endif
                     @endif
                 </div>
             </div>
-            <a href="{{ route('plan.edit') }}" class="btn btn-outline">Edit preferences</a>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                @if ($itinerary->tourist_account_id)
+                    <a href="{{ route('account.itineraries.show', $itinerary) }}" class="btn btn-outline">Saved to My Itineraries &check;</a>
+                @else
+                    <form method="POST" action="{{ route('plan.itinerary.save') }}">
+                        @csrf
+                        <button type="submit" class="btn btn-outline">Save Itinerary</button>
+                    </form>
+                @endif
+                <a href="{{ route('plan.edit') }}" class="btn btn-outline">Edit preferences</a>
+            </div>
         </div>
     </div>
 
     <div class="dash-body">
         <div class="container">
-            {{-- Set expectations honestly: there is no account to keep this
-                 in, by design. What a visitor CAN keep is the shortlist, so
-                 that is what the note points at. Cream + dashed gold rather
-                 than the internal console's blue x-banner, so a standing
-                 fact about this page reads in its own brand voice instead of
-                 an admin-console notice. --}}
+            @if (session('pending_save_itinerary'))
+                <div class="privacy-note" role="status">
+                    <x-icon name="shield-check" />
+                    <p>
+                        <strong>Save your itinerary.</strong> Your current itinerary can now be saved to your
+                        new account.
+                        <form method="POST" action="{{ route('plan.itinerary.save') }}" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-primary btn-xs" style="margin-left:6px;">Save Itinerary</button>
+                        </form>
+                    </p>
+                </div>
+            @endif
+
+            {{-- Set expectations honestly: no account is needed to plan or view
+                 a trip, by design -- this note is about what happens if you
+                 don't create the optional one. Cream + dashed gold rather than
+                 the internal console's blue x-banner, so a standing fact about
+                 this page reads in its own brand voice instead of an
+                 admin-console notice. --}}
             <div class="session-note" role="status">
                 <x-icon name="alert-triangle" />
                 <p>
                     This plan lives in your browser session, so it disappears when you close the tab
-                    &mdash; there are no traveler accounts.
-                    <a href="{{ route('saved.index') }}">Heart the places you like</a>
-                    and they will still be here when you come back.
+                    &mdash; unless you save it. <a href="{{ route('saved.index') }}">Heart the places you like</a>
+                    and they will still be here when you come back, or
+                    <a href="{{ route('account.register') }}">create a free account</a> to keep this whole itinerary.
                 </p>
             </div>
 
+            @unless ($itinerary->package)
             <div class="panel">
                 <div class="panel-head">
                     <div>
@@ -87,12 +120,19 @@
                     </ul>
                 </div>
             </div>
+            @endunless
 
             <div class="panel">
                 <div class="panel-head">
                     <div>
                         <h2>Day-by-Day Travel Plan</h2>
-                        <p>Sequenced by geographic proximity, with complementary stops surfaced from what past travelers tend to pair together.</p>
+                        <p>
+                            @if ($itinerary->package)
+                                As published by {{ $itinerary->package->provider_name ?? 'the provider' }} for this package.
+                            @else
+                                Sequenced by geographic proximity, with complementary stops surfaced from what past travelers tend to pair together.
+                            @endif
+                        </p>
                     </div>
                 </div>
                 <div class="panel-body">
@@ -170,6 +210,9 @@
                                             <div class="sub">
                                                 {{ $item->travelSummary() }}
                                             </div>
+                                            @if ($item->note)
+                                                <div class="sub">{{ $item->note }}</div>
+                                            @endif
                                             @if ($item->ruleExplanation())
                                                 <div>
                                                     <span class="pairing-tag">Popular pairing with {{ $item->rule_basis }}</span>
@@ -223,6 +266,29 @@
                 </div>
             </div>
 
+            @if ($itinerary->package)
+            <div class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h2>How This Plan Was Built</h2>
+                        <p>This one isn't generated.</p>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <p class="sub">
+                        This itinerary is the day-by-day schedule
+                        <a href="{{ route('packages.show', $itinerary->package) }}">{{ $itinerary->package->name }}</a>'s
+                        provider published for this package, copied here as-is &mdash; no recommendation
+                        algorithm ranked or reordered any of it. Want a plan built around your own
+                        preferences instead? <a href="{{ route('plan.edit') }}">Start the trip planner</a>.
+                    </p>
+                    <p class="sub" style="margin-top:14px;">
+                        This is a recommended plan, not a booking. It performs no reservation or payment,
+                        and it is yours to change to fit your time, budget and pace.
+                    </p>
+                </div>
+            </div>
+            @else
             <div class="panel">
                 <div class="panel-head">
                     <div>
@@ -285,6 +351,7 @@
                     </p>
                 </div>
             </div>
+            @endif
 
             <div class="panel">
                 <div class="panel-head">

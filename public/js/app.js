@@ -162,6 +162,51 @@ document.addEventListener('DOMContentLoaded', function () {
         }, { passive: true });
     }
 
+    // Mobile navigation drawer: open/close, overlay click, Escape, and a
+    // background scroll lock while it's open. Guarded on #mobileMenu existing
+    // since app.js is also loaded by the admin/establishment layouts, which
+    // have their own separate mobile menu markup and never render this one.
+    (function () {
+        var toggle = document.getElementById('mobileMenuToggle');
+        var menu = document.getElementById('mobileMenu');
+        var overlay = document.getElementById('mobileMenuOverlay');
+        var closeBtn = document.getElementById('mobileMenuClose');
+        if (!toggle || !menu || !overlay) return;
+
+        var open = function () {
+            menu.classList.add('open');
+            overlay.classList.add('open');
+            document.body.classList.add('mobile-menu-open');
+            menu.removeAttribute('inert');
+            toggle.setAttribute('aria-expanded', 'true');
+        };
+
+        var close = function () {
+            menu.classList.remove('open');
+            overlay.classList.remove('open');
+            document.body.classList.remove('mobile-menu-open');
+            menu.setAttribute('inert', '');
+            toggle.setAttribute('aria-expanded', 'false');
+        };
+
+        toggle.addEventListener('click', function () {
+            if (menu.classList.contains('open')) close(); else open();
+        });
+        if (closeBtn) closeBtn.addEventListener('click', close);
+        overlay.addEventListener('click', close);
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && menu.classList.contains('open')) close();
+        });
+
+        // The nav collapses back to the full desktop bar above 1366px (see
+        // app.css) -- closing here if a resize crosses that boundary stops the
+        // drawer being left open, translated off-screen, behind a full-width
+        // desktop header with no way to reach the close button.
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 1366 && menu.classList.contains('open')) close();
+        });
+    })();
+
     // Card carousels: sync dot indicators to horizontal scroll position.
     document.querySelectorAll('[data-carousel]').forEach(function (root) {
         var track = root.querySelector('.carousel-track');
@@ -507,186 +552,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     /*
-     * Tag picker -- searchable multi-select for long lists.
-     *
-     * Generic on purpose: it reads its options and its input name off the
-     * element, so it is not tied to establishments. See
-     * resources/views/partials/tag-picker.blade.php.
-     */
-    document.querySelectorAll('[data-tag-picker]').forEach(function (root) {
-        var items = JSON.parse(root.getAttribute('data-items') || '[]');
-        var name = root.getAttribute('data-name');
-        var prefix = root.getAttribute('data-prefix') || '';
-        var chips = root.querySelector('[data-chips]');
-        var search = root.querySelector('[data-search]');
-        var results = root.querySelector('[data-results]');
-        var count = root.querySelector('[data-count]');
-        var values = root.querySelector('[data-values]');
-        var MAX_RESULTS = 8;
-        // "Which one of these is it" is a pick-one question, not a
-        // multi-select -- data-max="1" swaps the chip on each new pick
-        // instead of requiring the previous one to be removed first.
-        var max = parseInt(root.getAttribute('data-max') || '0', 10) || Infinity;
-
-        var selected = (JSON.parse(root.getAttribute('data-selected') || '[]') || [])
-            .map(function (v) { return String(v).replace(prefix, ''); });
-        var active = -1;
-
-        function byId(id) {
-            for (var i = 0; i < items.length; i++) {
-                if (String(items[i].id) === String(id)) return items[i];
-            }
-            return null;
-        }
-
-        function render() {
-            chips.innerHTML = '';
-            values.innerHTML = '';
-            selected.forEach(function (id) {
-                var item = byId(id);
-                if (!item) return;
-
-                var chip = document.createElement('span');
-                chip.className = 'tag-chip';
-                chip.textContent = item.name;
-
-                var x = document.createElement('button');
-                x.type = 'button';           // inside a form, a bare button submits it
-                x.className = 'tag-chip__x';
-                x.setAttribute('aria-label', 'Remove ' + item.name);
-                x.innerHTML = '&times;';
-                x.addEventListener('click', function () {
-                    selected = selected.filter(function (s) { return s !== id; });
-                    render();
-                    search.focus();
-                });
-                chip.appendChild(x);
-                chips.appendChild(chip);
-
-                var hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = name;
-                hidden.value = prefix + id;
-                values.appendChild(hidden);
-            });
-
-            if (max === 1) {
-                /*
-                 * A single-pick field showing an open, empty search box right
-                 * beside an already-chosen chip reads as "add more of
-                 * these" -- reasonable for the exit survey's real multi-select
-                 * pickers, misleading here where only the last pick is ever
-                 * kept. Hiding the box once full removes that false
-                 * affordance; removing the chip's × brings it back.
-                 */
-                search.hidden = selected.length >= 1;
-                count.hidden = true;
-            } else {
-                count.textContent = selected.length === 0
-                    ? 'None selected'
-                    : selected.length + ' selected';
-            }
-        }
-
-        function close() {
-            results.hidden = true;
-            search.setAttribute('aria-expanded', 'false');
-            active = -1;
-        }
-
-        function open(matches) {
-            results.innerHTML = '';
-            matches.forEach(function (item, i) {
-                var li = document.createElement('li');
-                li.className = 'tag-picker__result';
-                li.setAttribute('role', 'option');
-                li.dataset.id = item.id;
-
-                var nameEl = document.createElement('span');
-                nameEl.className = 'tag-picker__result-name';
-                nameEl.textContent = item.name;
-                li.appendChild(nameEl);
-
-                /*
-                 * The address is what tells three separately accredited Elysia
-                 * Wellness Spa branches apart. Without it the list looks like
-                 * duplicated rows and the respondent is guessing.
-                 */
-                if (item.meta) {
-                    var metaEl = document.createElement('span');
-                    metaEl.className = 'tag-picker__result-meta';
-                    metaEl.textContent = item.meta;
-                    li.appendChild(metaEl);
-                }
-
-                li.addEventListener('mousedown', function (e) {
-                    e.preventDefault();      // keep focus so blur does not close first
-                    add(item.id);
-                });
-                results.appendChild(li);
-            });
-            results.hidden = matches.length === 0;
-            search.setAttribute('aria-expanded', String(matches.length > 0));
-        }
-
-        function add(id) {
-            if (max === 1) {
-                selected = [String(id)];
-            } else if (selected.indexOf(String(id)) === -1) {
-                selected.push(String(id));
-            }
-            render();
-            search.value = '';
-            close();
-            search.focus();
-        }
-
-        function filter() {
-            var q = search.value.trim().toLowerCase();
-            if (!q) return close();
-
-            var matches = [];
-            for (var i = 0; i < items.length && matches.length < MAX_RESULTS; i++) {
-                var it = items[i];
-                if (selected.indexOf(String(it.id)) !== -1) continue;
-                var hay = (it.name + ' ' + (it.meta || '')).toLowerCase();
-                if (hay.indexOf(q) !== -1) matches.push(it);
-            }
-            open(matches);
-        }
-
-        search.addEventListener('input', filter);
-        search.addEventListener('focus', filter);
-        search.addEventListener('blur', function () { setTimeout(close, 120); });
-
-        search.addEventListener('keydown', function (e) {
-            var opts = results.querySelectorAll('.tag-picker__result');
-            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-                if (!opts.length) return;
-                e.preventDefault();
-                active += (e.key === 'ArrowDown' ? 1 : -1);
-                if (active < 0) active = opts.length - 1;
-                if (active >= opts.length) active = 0;
-                opts.forEach(function (o, i) { o.classList.toggle('is-active', i === active); });
-            } else if (e.key === 'Enter') {
-                // Never let Enter submit the form from this field -- the user is
-                // choosing an option, not finishing the survey.
-                if (opts.length) {
-                    e.preventDefault();
-                    add(opts[active >= 0 ? active : 0].dataset.id);
-                }
-            } else if (e.key === 'Escape') {
-                close();
-            } else if (e.key === 'Backspace' && !search.value && selected.length) {
-                selected.pop();
-                render();
-            }
-        });
-
-        render();
-    });
-
-    /*
      * Password reveal.
      *
      * Progressive enhancement: the buttons are rendered hidden-capable but do
@@ -723,4 +588,207 @@ document.addEventListener('DOMContentLoaded', function () {
      * It now runs inline, immediately beneath the <video> element in
      * welcome.blade.php, so it starts during parsing instead.
      */
+
+    /*
+     * Tag search: replaces a static wall of checkboxes with a text field that
+     * filters a list as the user types and adds a removable chip on click.
+     *
+     * State per instance lives entirely in the DOM: the chip container holds
+     * one hidden <input> per selection (so the surrounding <form> submits
+     * them exactly as it always did -- no controller change needed) and the
+     * dropdown is rebuilt from the items/selected JSON embedded by the
+     * component on every keystroke. Rebuilding rather than diffing is fine
+     * at this scale (the largest list here is ~220 rows) and keeps the whole
+     * thing easy to reason about instead of tracking indices by hand.
+     */
+    document.querySelectorAll('[data-tag-search]').forEach(function (root) {
+        var box = root.querySelector('[data-tag-search-box]');
+        var chipsEl = root.querySelector('[data-tag-search-chips]');
+        var input = root.querySelector('[data-tag-search-input]');
+        var dropdown = root.querySelector('[data-tag-search-dropdown]');
+        var countEl = root.querySelector('[data-tag-search-count]');
+        var hiddenHost = root.querySelector('[data-tag-search-hidden-inputs]');
+        var fieldName = root.querySelector('[data-tag-search-name]').value;
+        var items = JSON.parse(root.querySelector('[data-tag-search-items]').textContent || '[]');
+        var selectedValues = JSON.parse(root.querySelector('[data-tag-search-selected]').textContent || '[]');
+
+        var byValue = {};
+        items.forEach(function (item) { byValue[item.value] = item; });
+
+        var MAX_RESULTS = 8;
+        var activeIndex = -1;
+
+        function isSelected(value) { return selectedValues.indexOf(value) !== -1; }
+
+        function updateCount() {
+            countEl.textContent = selectedValues.length + (selectedValues.length === 1 ? ' selected' : ' selected');
+        }
+
+        function addChip(value) {
+            var item = byValue[value];
+            if (!item || isSelected(value)) return;
+
+            selectedValues.push(value);
+
+            var chip = document.createElement('span');
+            chip.className = 'tag-search__chip';
+            chip.setAttribute('data-value', value);
+
+            var label = document.createElement('span');
+            label.className = 'tag-search__chip-label';
+            label.textContent = item.label;
+
+            var remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'tag-search__chip-remove';
+            remove.setAttribute('aria-label', 'Remove ' + item.label);
+            remove.textContent = '×';
+            remove.addEventListener('click', function () { removeChip(value, chip); });
+
+            chip.appendChild(label);
+            chip.appendChild(remove);
+            chipsEl.appendChild(chip);
+
+            var hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = fieldName;
+            hidden.value = value;
+            hidden.setAttribute('data-value', value);
+            hiddenHost.appendChild(hidden);
+
+            updateCount();
+        }
+
+        function removeChip(value, chipEl) {
+            selectedValues = selectedValues.filter(function (v) { return v !== value; });
+            chipEl.remove();
+            var hidden = hiddenHost.querySelector('[data-value="' + value.replace(/"/g, '\\"') + '"]');
+            if (hidden) hidden.remove();
+            updateCount();
+        }
+
+        function closeDropdown() {
+            dropdown.hidden = true;
+            dropdown.innerHTML = '';
+            input.setAttribute('aria-expanded', 'false');
+            activeIndex = -1;
+        }
+
+        function highlight(index) {
+            var options = dropdown.querySelectorAll('[data-option]');
+            options.forEach(function (opt, i) { opt.classList.toggle('is-active', i === index); });
+            activeIndex = index;
+        }
+
+        function renderDropdown() {
+            var query = input.value.trim().toLowerCase();
+            var matches = items.filter(function (item) {
+                return !isSelected(item.value) && (query === '' || item.label.toLowerCase().indexOf(query) !== -1);
+            }).slice(0, MAX_RESULTS);
+
+            if (matches.length === 0) {
+                closeDropdown();
+                return;
+            }
+
+            dropdown.innerHTML = '';
+            matches.forEach(function (item) {
+                var li = document.createElement('li');
+                li.setAttribute('data-option', '');
+                li.setAttribute('data-value', item.value);
+                li.setAttribute('role', 'option');
+                li.textContent = item.label;
+                li.addEventListener('mousedown', function (e) {
+                    // mousedown (not click) fires before the input's blur, so
+                    // the dropdown is still open when the value is read.
+                    e.preventDefault();
+                    addChip(item.value);
+                    input.value = '';
+                    renderDropdown();
+                    input.focus();
+                });
+                dropdown.appendChild(li);
+            });
+
+            dropdown.hidden = false;
+            input.setAttribute('aria-expanded', 'true');
+            highlight(-1);
+        }
+
+        // Existing selections (old() repopulation on a validation error)
+        // render their chips up front, in the order they were submitted.
+        selectedValues.slice().forEach(function (value) {
+            selectedValues = selectedValues.filter(function (v) { return v !== value; });
+            addChip(value);
+        });
+
+        input.addEventListener('input', renderDropdown);
+        input.addEventListener('focus', renderDropdown);
+
+        input.addEventListener('keydown', function (e) {
+            var options = dropdown.querySelectorAll('[data-option]');
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (dropdown.hidden) { renderDropdown(); return; }
+                highlight(Math.min(activeIndex + 1, options.length - 1));
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                highlight(Math.max(activeIndex - 1, 0));
+            } else if (e.key === 'Enter') {
+                if (!dropdown.hidden && activeIndex >= 0 && options[activeIndex]) {
+                    e.preventDefault();
+                    var value = options[activeIndex].getAttribute('data-value');
+                    addChip(value);
+                    input.value = '';
+                    renderDropdown();
+                }
+            } else if (e.key === 'Escape') {
+                closeDropdown();
+            } else if (e.key === 'Backspace' && input.value === '') {
+                // Backspace on an empty field removes the most recently added
+                // chip, matching the pattern most chip inputs already use.
+                var last = chipsEl.lastElementChild;
+                if (last) removeChip(last.getAttribute('data-value'), last);
+            }
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!box.contains(e.target) && !dropdown.contains(e.target)) {
+                closeDropdown();
+            }
+        });
+
+        updateCount();
+    });
+});
+
+/*
+ * Travel preference survey: "Where are you visiting from?" is required
+ * unless the traveller already said they're local (Regular / Local) --
+ * asking a resident where they're "visiting from" doesn't make sense. The
+ * server enforces this either way (required_unless in TripPlannerController);
+ * this only keeps the browser's own validation UI and hint text honest about
+ * the same rule as the visitor-type dropdown changes, instead of showing a
+ * red "required" outline on a field the server isn't actually going to
+ * require for this traveller.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    var toggle = document.querySelector('[data-local-toggle]');
+    var field = document.querySelector('[data-origin-field]');
+    if (!toggle || !field) return;
+
+    var input = field.querySelector('input');
+    var hint = field.querySelector('[data-origin-hint]');
+    var label = field.querySelector('[data-origin-label]');
+    var defaultHint = hint ? hint.textContent : '';
+
+    function sync() {
+        var isLocal = toggle.value === 'Regular / Local';
+        input.required = !isLocal;
+        if (label) label.textContent = isLocal ? 'Where are you visiting from? (optional)' : 'Where are you visiting from?';
+        if (hint) hint.textContent = isLocal ? "Optional since you're local." : defaultHint;
+    }
+
+    toggle.addEventListener('change', sync);
+    sync();
 });
