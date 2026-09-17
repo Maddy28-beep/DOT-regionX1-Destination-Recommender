@@ -875,6 +875,79 @@ body.info-modal-open { overflow: hidden; }
 .alert-warning { background: var(--tone-warn-bg); border-color: var(--tone-warn-line); color: var(--tone-warn-ink); }
 .alert-info { background: var(--tone-info-bg); border-color: var(--tone-info-line); color: var(--tone-info-ink); }
 
+/* /advisories hub page (resources/views/advisories/index.blade.php) -- full
+   detail cards, not the slim ribbon. Deliberately not reusing .alert: that
+   class is a form/system-message idiom (validation errors, toasts) and
+   every one of its severities defaults toward looking like something went
+   wrong, which is wrong for "Mt. Apo is closed this season" read by a
+   traveler planning a trip. */
+.advisory-list { display: flex; flex-direction: column; gap: 16px; }
+
+.advisory-list-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--tone-neutral-ink);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 20px 24px;
+}
+
+.advisory-list-card__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.advisory-list-card__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    padding: 3px 10px;
+    border-radius: 999px;
+}
+.advisory-list-card__badge svg { width: 13px; height: 13px; }
+
+.advisory-list-card__updated { font-size: .78rem; color: var(--muted); }
+
+.advisory-list-card__title { margin: 0 0 6px; font-size: 1.1rem; color: var(--ink); }
+.advisory-list-card__message { margin: 0 0 12px; font-size: .92rem; line-height: 1.6; color: var(--muted); }
+
+.advisory-list-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    font-size: .82rem;
+    color: var(--muted);
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+}
+.advisory-list-card__meta strong { color: var(--ink); font-weight: 700; }
+
+/* Severity variants -- each pairs a brand-consistent accent with an already
+   deliberately calm/warm/urgent tone token, per the info=green/
+   warning=gold/danger=red-only-when-it's-real brief. Matches the ribbon's
+   own severity treatment so the two feel like one system. */
+.advisory-list-card--info { border-left-color: var(--primary); }
+.advisory-list-card--info .advisory-list-card__badge { background: var(--primary-light); color: var(--primary-dark); }
+
+.advisory-list-card--warning { border-left-color: var(--gold); }
+.advisory-list-card--warning .advisory-list-card__badge { background: var(--tone-warn-bg); color: var(--tone-warn-ink); }
+
+.advisory-list-card--danger { border-left-color: var(--stamp-red); }
+.advisory-list-card--danger .advisory-list-card__badge { background: var(--tone-danger-bg); color: var(--tone-danger-ink); }
+
+@media (max-width: 480px) {
+    .advisory-list-card { padding: 16px 18px; }
+    .advisory-list-card__title { font-size: 1rem; }
+}
+
 .badge {
     display: inline-flex;
     align-items: center;
@@ -1203,6 +1276,125 @@ body.hero-page .site-header.scrolled {
     -webkit-backdrop-filter: none;
     border-bottom-color: transparent;
 }
+
+/*
+   .site-topbar owns the sticky/fixed positioning that used to live directly
+   on .site-header, so an advisory ribbon placed inside it (before <header>)
+   scrolls and sticks together with the header as one unit -- no dynamic
+   height math for the header to "leave room" for a ribbon that only
+   sometimes exists. This is also what fixed an earlier, related bug: a
+   general advisory rendered in normal flow right after the header used to
+   land almost entirely behind the homepage's position:fixed header, which
+   takes up no space in flow. Wrapping both in one positioned unit means
+   there is no separate flow position for the ribbon to fall into in the
+   first place.
+
+   .site-header keeps the exact class the admin console and partner portal
+   also use for their own, separately-declared headers (see .admin
+   .site-header / .portal .site-header below) -- position is neutralized
+   back to static only inside this wrapper, so it lives in exactly one place
+   at a time instead of competing with .site-topbar's.
+*/
+.site-topbar { position: sticky; top: 0; z-index: 50; }
+.site-topbar .site-header { position: static; }
+
+body.hero-page .site-topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 50; }
+body.hero-page .site-topbar .site-header { position: static; top: auto; left: auto; right: auto; }
+
+/* Site-wide advisory ribbon (components/advisory-ribbon.blade.php) -- a
+   slim, single-line strip, not a repeat of the compact card used to live on
+   individual pages. Severity sets the background directly (this is the one
+   advisory treatment saturated enough to read at a glance from anywhere on
+   the page), with warning using dark ink text since gold is too light for
+   white text to clear contrast. */
+/*
+   Noticed-on-arrival, not scrolling-ticker noticeable: a one-time slide-down
+   plays when the ribbon first appears, and the icon keeps a slow, gentle
+   pulse afterward. A continuously scrolling marquee was considered and
+   rejected -- WCAG 2.2.2 requires a pause/stop control for any moving text
+   that runs longer than 5 seconds, and a ticker risks scrolling the message
+   out of view before a traveler finishes reading it. Neither problem
+   applies here: the text itself never moves, only the (non-essential)
+   entrance and icon do, and both stop for prefers-reduced-motion.
+*/
+.advisory-ribbon {
+    color: var(--white);
+    font-size: .85rem;
+    animation: advisoryRibbonIn .4s cubic-bezier(.22, .61, .36, 1) both;
+}
+@keyframes advisoryRibbonIn {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+.advisory-ribbon__inner {
+    max-width: var(--container);
+    margin-inline: auto;
+    padding: 9px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.advisory-ribbon__icon { width: 18px; height: 18px; flex-shrink: 0; animation: advisoryPulse 2.2s ease-in-out .6s infinite; }
+@keyframes advisoryPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .55; transform: scale(.92); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .advisory-ribbon { animation: none; }
+    .advisory-ribbon__icon { animation: none; }
+}
+.advisory-ribbon__text {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.advisory-ribbon__link {
+    flex-shrink: 0;
+    color: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    white-space: nowrap;
+}
+.advisory-ribbon__close {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: inherit;
+    opacity: .85;
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+    border-radius: 50%;
+    transition: background .15s ease, opacity .15s ease;
+}
+.advisory-ribbon__close:hover { opacity: 1; background: rgba(255, 255, 255, .18); }
+.advisory-ribbon__close:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
+
+.advisory-ribbon--danger { background: var(--stamp-red); }
+.advisory-ribbon--warning { background: var(--gold); color: var(--ink); }
+.advisory-ribbon--info { background: var(--primary); }
+.advisory-ribbon--warning .advisory-ribbon__close:hover { background: rgba(0, 0, 0, .1); }
+
+@media (max-width: 640px) {
+    .advisory-ribbon__inner { padding: 8px 14px; gap: 8px; }
+    .advisory-ribbon__link span { display: none; }
+}
+
+/* Small "something needs your attention" dot next to the Advisories nav
+   link -- reuses the danger tone regardless of the active advisory's own
+   severity, matching how a browser tab's own unread dot doesn't change
+   colour by message type either. */
+.main-nav__advisories { position: relative; display: inline-flex; align-items: center; gap: 5px; }
+.main-nav__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--stamp-red); flex-shrink: 0; }
 
 /*
    Raised from 1220px: the wider spacing above plus the Saved heart icon

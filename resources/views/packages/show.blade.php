@@ -22,7 +22,6 @@
         {{ $package->name }}
     </nav>
 
-    <x-advisory-banner :advisories="\App\Models\Advisory::active()->forListing($package->getMorphClass(), $package->id)->latest()->get()" />
     <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($package->getMorphClass(), $package->id)->latest()->get()" />
 
     @include('partials.gallery-hero', [

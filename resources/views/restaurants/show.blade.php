@@ -23,7 +23,6 @@
         {{ $restaurant->name }}
     </nav>
 
-    <x-advisory-banner :advisories="\App\Models\Advisory::active()->forListing($restaurant->getMorphClass(), $restaurant->id)->latest()->get()" />
     <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($restaurant->getMorphClass(), $restaurant->id)->latest()->get()" />
 
     @include('partials.gallery-hero', [
