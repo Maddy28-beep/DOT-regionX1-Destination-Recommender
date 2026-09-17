@@ -317,6 +317,37 @@ a { color: inherit; text-decoration: none; }
    colour alone is not a distinguishing feature at that point. Matches the
    .auth-foot link treatment. */
 .field-hint a { color: var(--primary); font-weight: 600; }
+
+/* Partner-portal day-by-day itinerary editor (establishment/edit-listing) --
+   one card per day instead of a "Title | Description" delimiter format in a
+   plain textarea, which asked a non-technical tour operator to learn a
+   convention with no visual feedback for getting it wrong. */
+.itinerary-editor { display: flex; flex-direction: column; gap: 12px; margin-bottom: 10px; }
+.itinerary-day-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; }
+.itinerary-day-card__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.itinerary-day-card__label { font-weight: 700; font-size: .82rem; text-transform: uppercase; letter-spacing: .03em; color: var(--primary-dark); }
+.itinerary-day-card__actions { display: flex; gap: 2px; }
+.itinerary-day-card__actions button {
+    width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+    background: none; border: none; border-radius: 6px; color: var(--muted); font-size: .7rem; cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+}
+.itinerary-day-card__actions button:hover:not(:disabled) { background: var(--white); color: var(--ink); }
+.itinerary-day-card__actions button:disabled { opacity: .3; cursor: not-allowed; }
+.itinerary-day-card__actions button:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.itinerary-day-card input[type="text"],
+.itinerary-day-card textarea {
+    width: 100%; padding: var(--field-pad); border: var(--field-border);
+    border-radius: var(--field-radius); font-size: var(--field-size); font-family: inherit;
+    background: var(--white); color: var(--ink);
+}
+.itinerary-day-card input[type="text"] { margin-bottom: 8px; }
+.itinerary-day-card textarea { min-height: 60px; resize: vertical; }
+.itinerary-day-card input[type="text"]:focus,
+.itinerary-day-card textarea:focus {
+    outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light);
+}
+
 /* Apriori attribution under a schedule row */
 .sched-rule {
     display: block; margin-top: 3px;
@@ -392,6 +423,19 @@ a { color: inherit; text-decoration: none; }
 .day-actions { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px; margin-top: 12px; }
 .day-actions details { flex: 1 1 100%; }
 .day-unmapped { margin-top: 8px; font-style: italic; }
+
+/* Adopted-package "Starting Point" navigation widget -- directions only, so
+   it reuses the plain .field input look rather than the survey's full
+   address-autocomplete component, which persists to a preference row this
+   widget deliberately never touches. */
+.package-nav { display: flex; flex-direction: column; gap: 12px; max-width: 480px; }
+.package-nav__input {
+    width: 100%; padding: var(--field-pad); border: var(--field-border);
+    border-radius: var(--field-radius); font-size: var(--field-size); font-family: inherit;
+    background: var(--white); color: var(--ink);
+}
+.package-nav__input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+.package-nav__actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
 /* Friendly pairing caption replacing raw confidence/support/trip-count
    jargon, with the technical detail still available behind an expander
@@ -2216,6 +2260,15 @@ body.hero-page .site-header.scrolled {
 @media (max-width: 960px) { .feature-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .feature-grid { grid-template-columns: 1fr; } }
 
+/* The "Plan My Trip" vs "Tour Packages" fork (plan/choose.blade.php) --
+   two options, not four, so its own grid rather than reusing .feature-grid's
+   4-column default. Same card/stamp language as the feature grid above,
+   just wide enough for a button to sit under each one comfortably. */
+.plan-choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 8px; }
+.plan-choice-card { display: flex; flex-direction: column; align-items: flex-start; }
+.plan-choice-card p { margin-bottom: 18px; }
+@media (max-width: 640px) { .plan-choice-grid { grid-template-columns: 1fr; } }
+
 /* ---------- About the Region ---------- */
 /* Premium "Discover Davao Region" editorial section: intro copy, province
    links, and the interactive Leaflet locator. Every class here (.about-*) is
@@ -2509,10 +2562,10 @@ body.hero-page .site-header.scrolled {
     pointer-events: none;
 }
 .cta-banner > .halftone { z-index: 1; }
-.cta-banner__copy { position: relative; z-index: 2; max-width: 52ch; }
+.cta-banner__copy { position: relative; z-index: 2; max-width: 62ch; }
 .cta-banner .poster-kicker { display: block; color: var(--sun-glow); font-size: 1.15rem; }
 .cta-banner h2 { margin: 0 0 6px; font-size: clamp(1.5rem, 3vw, 2.1rem); line-height: 1.08; }
-.cta-banner p { margin: 0; color: rgba(255, 247, 233, .92); }
+.cta-banner > .cta-banner__copy > p { margin: 0; color: rgba(255, 247, 233, .92); }
 .cta-banner .btn {
     position: relative;
     z-index: 2;
@@ -2524,6 +2577,24 @@ body.hero-page .site-header.scrolled {
 }
 .cta-banner .btn:hover { background: var(--sun-glow); color: var(--ink); }
 
+/* The second, lower-emphasis path (Tour Packages) alongside the primary one
+   (Plan My Trip) -- same angled-cut shape so the two still read as one
+   family of actions, but outlined rather than solid-cream so the personalized
+   itinerary keeps the stronger visual pull. .btn-ghost elsewhere is dark ink
+   on transparent, which would vanish against this sunset gradient, hence the
+   scoped override (same pattern as .site-header .btn-outline). */
+.cta-banner .btn-ghost {
+    background: transparent;
+    color: var(--paper);
+    border: 1.5px solid rgba(255, 247, 233, .75);
+}
+.cta-banner .btn-ghost:hover { background: rgba(255, 247, 233, .14); color: var(--paper); border-color: var(--paper); }
+
+.cta-banner__paths { display: flex; gap: 32px; margin-top: 20px; flex-wrap: wrap; }
+.cta-banner__path { flex: 1 1 220px; min-width: 200px; }
+.cta-banner__path h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--paper); }
+.cta-banner__path p { margin: 0 0 12px; font-size: .85rem; line-height: 1.4; color: rgba(255, 247, 233, .85); }
+
 @media (max-width: 720px) {
     /* Once the banner stacks there is no clear right-hand column left, so the
        scene drops to a bottom band instead of washing out behind the copy.
@@ -2532,6 +2603,7 @@ body.hero-page .site-header.scrolled {
        wraps. xMidYMax slice already anchors the ridges to the bottom edge. */
     .cta-banner { padding-bottom: 104px; }
     .cta-banner__scene { width: 100%; height: 88px; top: auto; bottom: 0; opacity: .55; }
+    .cta-banner__paths { flex-direction: column; gap: 20px; }
 }
 
 /* ---------- Footer ---------- */
