@@ -85,6 +85,16 @@ class TripPlannerController extends Controller
             'travel_type' => ['required', 'string', 'max:20'],
             'travel_purpose' => ['nullable', 'string', 'max:30'],
             'visitor_type' => ['nullable', 'string', 'max:30'],
+            /*
+             * DOT Region XI asked for this specifically because the exit
+             * survey's own origin question only reaches whoever finishes that
+             * optional, post-trip survey. Required here so it lands for every
+             * itinerary generated, not just the minority who complete a
+             * survey afterward -- except for a traveller who already said
+             * they're local (Regular / Local), for whom "where are you
+             * visiting from" isn't a question that makes sense to force.
+             */
+            'place_of_origin' => ['nullable', 'string', 'max:150', 'required_unless:visitor_type,Regular / Local'],
             'budget' => ['required', 'string', 'max:20'],
             'accommodation_pref' => ['required', 'string', 'max:20'],
             'distance_pref' => ['required', 'in:near,moderate,far'],
@@ -177,6 +187,15 @@ class TripPlannerController extends Controller
         if (! $preference) {
             return redirect()->route('plan.edit')
                 ->with(Toast::success('Tell us about your trip', 'Answer a few questions and we will build your itinerary.'));
+        }
+
+        // A package-adopted itinerary is a fixed schedule the provider
+        // published, not something the recommender produced -- there is
+        // nothing here for it to regenerate. The button is hidden for this
+        // case; this guards the route itself against a direct POST.
+        if ($this->currentItinerary($request)?->package_id) {
+            return redirect()->route('plan.itinerary')
+                ->with(Toast::success('Nothing to regenerate', 'This itinerary comes from a package, not the trip planner.'));
         }
 
         $position = $request->validate([
@@ -304,7 +323,7 @@ class TripPlannerController extends Controller
         $id = $request->session()->get(self::ITINERARY_KEY);
 
         return $id
-            ? Itinerary::with(['matches.destination', 'items.destination', 'items.accommodation'])->find($id)
+            ? Itinerary::with(['matches.destination', 'items.destination', 'items.accommodation', 'package'])->find($id)
             : null;
     }
 }

@@ -21,6 +21,7 @@ class Accommodation extends Model
         'description', 'image_path', 'is_accredited', 'rating', 'review_count',
         'price_tier', 'price_per_night', 'check_in', 'check_out', 'distance_km',
         'featured', 'latitude', 'longitude',
+        'website_url', 'facebook_url', 'instagram_url', 'tiktok_url',
     ];
 
     protected function casts(): array

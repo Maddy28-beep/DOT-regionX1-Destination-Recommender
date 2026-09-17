@@ -53,7 +53,7 @@ class DestinationCategoryTagSeeder extends Seeder
         'elysia-wellness-spa-2' => ['Relaxation', 'Spa'],
         'elysia-wellness-spa-3' => ['Relaxation', 'Spa'],
 
-        'davao-crocodile-park-inc' => ['Wildlife', 'Conservation'],
+        'davao-crocodile-park-inc' => ['Wildlife', 'Conservation', 'Family Friendly'],
         'jkm-mini-zoo' => ['Wildlife', 'Family Friendly'],
     ];
 
@@ -75,5 +75,30 @@ class DestinationCategoryTagSeeder extends Seeder
                 $destination->tags()->create(['kind' => 'category', 'value' => $tag]);
             }
         }
+
+        $this->mergeRetiredCrocodileParkData($destinations->get('davao-crocodile-park-inc'));
+    }
+
+    /**
+     * Carries the coordinates and price range from the retired hand-seeded
+     * "Davao Crocodile Park" duplicate (see DestinationSeeder) onto the real
+     * accredited record, so removing that duplicate does not also remove the
+     * one thing it had that this record didn't: a real, surveyed position.
+     * Guarded on latitude so a second run (or a future real DOT coordinate)
+     * never overwrites it.
+     */
+    private function mergeRetiredCrocodileParkData(?Destination $destination): void
+    {
+        if (! $destination || $destination->latitude !== null) {
+            return;
+        }
+
+        $destination->update([
+            'latitude' => 7.1204,
+            'longitude' => 125.6461,
+            'price_tier' => $destination->price_tier ?? 'Mid-range',
+            'entry_fee_min' => $destination->entry_fee_min ?? 300,
+            'entry_fee_max' => $destination->entry_fee_max ?? 500,
+        ]);
     }
 }

@@ -12,8 +12,8 @@
         <div class="stat-card-label">QR Check-ins Today</div>
     </div>
     <div class="stat-card">
-        <div class="stat-card-val">{{ $stats['total_accredited'] }}</div>
-        <div class="stat-card-label">Total Accredited Listings</div>
+        <div class="stat-card-val">{{ $stats['destinations'] }}</div>
+        <div class="stat-card-label">Accredited Destinations</div>
     </div>
     <div class="stat-card">
         <div class="stat-card-val">{{ $stats['pending_establishments'] }}</div>

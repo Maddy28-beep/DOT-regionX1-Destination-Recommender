@@ -31,9 +31,9 @@
             <div class="panel">
                 <div class="panel-head"><div><h2>1. Travelers planning a trip</h2></div></div>
                 <div class="panel-body legal-content">
-                    <p><strong>There is no traveler account.</strong> You do not register, log in, or give
-                        us your name or email to plan a trip, browse listings, save places, check in with a
-                        QR code, or use the chatbot.</p>
+                    <p><strong>No account is needed.</strong> You do not register, log in, or give us your
+                        name or email to plan a trip, browse listings, save places, check in with a QR
+                        code, or use the chatbot.</p>
                     <p>What is collected instead:</p>
                     <ul>
                         <li><strong>Trip preferences</strong> &mdash; travel dates, budget, travel type,
@@ -62,6 +62,13 @@
                         can no longer get back to it. The underlying record may still exist in our database
                         for aggregate analytics, but because it carries no name, email, or other identifier,
                         it cannot be traced back to you to be individually deleted on request.</p>
+                    <p><strong>Optional traveler account:</strong> if you want an itinerary or saved places
+                        to survive past your browser session, you may create a free account using an alias
+                        and password &mdash; never your real name or email. It is used solely to keep the
+                        itineraries and places you explicitly save; it is never linked to your exit survey
+                        responses or your anonymous browser token, and health/accessibility answers are
+                        removed rather than kept when an itinerary is saved to it. Creating one is entirely
+                        optional and never required to plan or view a trip.</p>
                 </div>
             </div>
 
@@ -109,8 +116,10 @@
                 <div class="panel-body legal-content">
                     <p>This platform is designed around data minimization, a core principle of Republic
                         Act No. 10173 (the Data Privacy Act of 2012): the traveler-facing side of the site
-                        was deliberately built to need no traveler account and no traveler-identifying
-                        information at all, and any sensitive information a traveler does choose to share
+                        was deliberately built to need no account and no traveler-identifying information
+                        at all -- the one optional exception, a free alias-based account with no real
+                        identity, exists purely for a traveler's own convenience -- and any sensitive
+                        information a traveler does choose to share
                         (health or accessibility details) is collected only with consent, kept only for the
                         trip plan it was given with, and never linked to an identity.</p>
                     <p>Establishment partners and DOT staff accounts do involve personal and business data,

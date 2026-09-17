@@ -21,6 +21,7 @@ class Package extends Model
         'slug', 'name', 'location', 'region_id', 'duration_label', 'duration_days',
         'description', 'image_path', 'is_accredited', 'price_per_pax', 'price_tier',
         'rating', 'review_count', 'type', 'featured', 'provider_name', 'tour_operator_id', 'latitude', 'longitude',
+        'website_url', 'facebook_url', 'instagram_url', 'tiktok_url',
     ];
 
     protected function casts(): array
@@ -92,6 +93,11 @@ class Package extends Model
     public function inclusions(): HasMany
     {
         return $this->hasMany(PackageInclusion::class);
+    }
+
+    public function itineraryDays(): HasMany
+    {
+        return $this->hasMany(PackageItineraryDay::class)->orderBy('day_number');
     }
 
     public function reviews(): MorphMany

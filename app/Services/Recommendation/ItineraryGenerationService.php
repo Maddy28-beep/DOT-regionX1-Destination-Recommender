@@ -45,6 +45,7 @@ class ItineraryGenerationService
         private readonly ContentBasedRecommendationService $contentBased,
         private readonly AprioriService $apriori,
         private readonly ItineraryScheduleBuilder $schedule,
+        private readonly ItinerarySkeletonMlService $skeletonMl,
     ) {}
 
     /**
@@ -97,15 +98,60 @@ class ItineraryGenerationService
 
         $totalDays = max(1, (int) $preference->travel_days);
 
+        /*
+         * Several DOT-accredited destinations are different branches of the
+         * same business (three Elysia Wellness Spa locations, two Rancho
+         * Palos Verdes venues), imported as separate rows because they are
+         * genuinely separate addresses. None of them carry their own
+         * coordinates, rating, or tags, so they score identically and can
+         * sweep the top of the ranking together -- which turned "visit
+         * Elysia Wellness Spa" into three separate days of the same trip.
+         * $ranked keeps every branch, scored honestly, for the full
+         * Table 8 ranking persisted below; only the pool actually used to
+         * pick and schedule stops is thinned to one (the best-scoring)
+         * branch per business name.
+         */
+        $distinctRanked = $this->distinctByDestinationName($ranked);
+
         // Arrival day may hold fewer stops than a full day, so capacity has to
         // be summed per day rather than assumed uniform.
         $dayCapacities = $this->dayCapacities($preference, $totalDays);
-        $maxStops = min($ranked->count(), array_sum(array_map('count', $dayCapacities)));
-        $topRanked = $ranked->take($maxStops);
+        $maxStops = min($distinctRanked->count(), array_sum(array_map('count', $dayCapacities)));
+        $topRanked = $distinctRanked->take($maxStops);
 
         $sequence = $this->sequenceByNearestNeighbor($topRanked, $originLat, $originLng);
 
-        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened) {
+        /*
+         * Apriori accommodation pick moved here, ahead of the transaction: it
+         * only reads (co-visitation rules, then a catalogue query), never
+         * writes, so computing it now — instead of inside the transaction
+         * closure as before — is safe, and it lets the pretrained ML step
+         * below see the same accommodation hint the schedule will actually
+         * use, without querying for it twice.
+         */
+        $accommodationPick = $this->pickAccommodation($sequence, $preference);
+
+        /*
+         * Pretrained ML inference step (manuscript Sec. 2.3.4, "Pretrained ML
+         * Model"): Phi-4-mini-instruct, served locally via Ollama,
+         * inference-only. Proposes which day each already-ranked,
+         * already-sequenced stop belongs to. Returns null whenever the model
+         * is unconfigured, unreachable, or its output fails validation —
+         * ItineraryScheduleBuilder treats null exactly like "no skeleton was
+         * ever proposed" and uses $sequence's own Haversine/Nearest-Neighbor
+         * order unchanged, so this step can only ever refine the plan, never
+         * break it.
+         */
+        $skeleton = $this->skeletonMl->proposeSkeleton(
+            $sequence,
+            $dayCapacities,
+            $preference,
+            $accommodationPick && $accommodationPick['rule']
+                ? ['name' => $accommodationPick['listing']->name, 'apriori_confidence' => $accommodationPick['rule']['confidence']]
+                : null,
+        );
+
+        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $skeleton) {
             $itinerary = Itinerary::create([
                 'preference_id' => $preference->id,
                 'total_days' => $totalDays,
@@ -144,11 +190,31 @@ class ItineraryGenerationService
                 $preference,
                 $dayCapacities,
                 $origin,
-                $this->pickAccommodation($sequence, $preference),
+                $accommodationPick,
+                $skeleton,
             );
 
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);
         });
+    }
+
+    /**
+     * Keeps only the best-ranked row per distinct destination name.
+     *
+     * $ranked is already sorted highest DRS to lowest (with the deterministic
+     * tie-break already applied), so keeping the first occurrence of each
+     * name keeps the best-scoring branch and drops the rest -- no new
+     * comparison or randomness, just a name-based filter over an order that
+     * was already decided by Content-Based Recommendation.
+     *
+     * @param  Collection<int, array{destination: \App\Models\Destination, pm: float, rs: float, ps: float, ds: float, as: float, drs: float}>  $ranked
+     * @return Collection<int, array{destination: \App\Models\Destination, pm: float, rs: float, ps: float, ds: float, as: float, drs: float}>
+     */
+    private function distinctByDestinationName(\Illuminate\Support\Collection $ranked): \Illuminate\Support\Collection
+    {
+        return $ranked
+            ->unique(fn (array $row) => mb_strtolower(trim($row['destination']->name)))
+            ->values();
     }
 
     /**
@@ -335,20 +401,64 @@ class ItineraryGenerationService
         }
 
         /*
-         * Prefer a stay we can actually place on the map. Most of the
-         * catalogue has no coordinates (the accreditation import carried
-         * addresses, not positions), and picking one of those leaves every
-         * transfer to and from the hotel unmeasurable. Rating still decides
-         * among the ones we can locate, and an unlocatable stay is still
-         * offered rather than none at all.
+         * Prefer a stay we can actually place on the map, and place it to
+         * minimise the total distance back to it across the whole trip --
+         * not the distance to the average of the stops' coordinates. The
+         * two sound alike but are not the same thing: a single far-flung
+         * stop (a "willing to travel far" trip that includes Dahican Beach,
+         * ~68 km out on its own) drags a centroid out to a point that isn't
+         * actually near anything, and the accommodation nearest to *that*
+         * empty patch of map is not the one that minimises real travel. The
+         * sum of distances to every stop does not have this failure mode.
+         *
+         * Picking by rating alone here (every listing in this catalogue is
+         * tied at 0.0, so in practice "first matching row") could -- and
+         * did -- land on a stay across a strait from where the day's stops
+         * actually are: a traveller sequenced onto the mainland for the
+         * afternoon got booked back onto Samal Island for the night, adding
+         * a return ferry crossing nothing about the plan called for. Rating
+         * still breaks ties among stays at similar total distance; an
+         * unlocatable stay is still offered rather than none at all.
          */
-        $listing = (clone $query)->whereNotNull('latitude')->whereNotNull('longitude')
+        $mappedStops = $this->mappedStopCoordinates($dayStops);
+
+        $listing = $mappedStops->isNotEmpty()
+                ? (clone $query)->whereNotNull('latitude')->whereNotNull('longitude')->get()
+                    ->sortBy(function (Accommodation $a) use ($mappedStops) {
+                        return $mappedStops->sum(fn (array $stop) => $this->haversineKm(
+                            (float) $a->latitude, (float) $a->longitude, $stop['lat'], $stop['lng']
+                        ));
+                    })
+                    ->first()
+                : null;
+
+        $listing ??= (clone $query)->whereNotNull('latitude')->whereNotNull('longitude')
                 ->orderByDesc('rating')->first()
             ?? $query->orderByDesc('rating')->first()
             ?? Accommodation::where('is_accredited', true)->whereNull('archived_at')
                 ->orderByDesc('rating')->first();
 
         return $listing ? ['listing' => $listing, 'rule' => null] : null;
+    }
+
+    /**
+     * The coordinates of every stop that has them, or an empty collection
+     * when none do -- the same "unknown means unknown, not the equator"
+     * rule applied everywhere else a stop's position is needed.
+     *
+     * @param  array<int, array{row: array, distance_km: float|null}>  $dayStops
+     * @return \Illuminate\Support\Collection<int, array{lat: float, lng: float}>
+     */
+    private function mappedStopCoordinates(array $dayStops): \Illuminate\Support\Collection
+    {
+        $mapped = collect($dayStops)
+            ->map(fn (array $stop) => $stop['row']['destination'])
+            ->filter(fn ($destination) => $destination->latitude !== null && $destination->longitude !== null);
+
+        return $mapped->map(fn ($destination) => [
+            'lat' => (float) $destination->latitude,
+            'lng' => (float) $destination->longitude,
+        ]);
     }
 
     /**

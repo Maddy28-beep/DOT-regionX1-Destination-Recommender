@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Accommodation;
 use App\Models\AdminUser;
+use App\Models\Advisory;
 use App\Models\Destination;
 use App\Models\EstablishmentAccount;
 use App\Models\Package;
@@ -64,6 +65,12 @@ class AppServiceProvider extends ServiceProvider
              * a separate human-maintained field and can disagree.
              */
             $view->with('navStatus', $establishment?->portalStatus());
+        });
+
+        // Site-wide DOT advisories ("Mt. Apo closed this season" type notices
+        // not tied to one listing), shown on every public page below the header.
+        View::composer('partials.header', function ($view) {
+            $view->with('generalAdvisories', Advisory::active()->general()->latest()->get());
         });
     }
 }

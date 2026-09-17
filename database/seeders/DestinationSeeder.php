@@ -59,14 +59,17 @@ class DestinationSeeder extends Seeder
                 'tags' => ['Cultural Heritage', 'City Center'],
                 'description' => "A landscaped city-center park built around Mindanao's indigenous tribal heritage, with sculptures, fountains, and a resident collection of native birds. It's free to enter and an easy stop between other Davao City destinations, especially for a shaded break or a look at Mindanao's tribal art in an open-air setting.",
             ],
-            [
-                'name' => 'Davao Crocodile Park', 'region' => 'Davao City', 'type' => 'Wildlife',
-                'location' => 'Diversion Rd, Davao City',
-                'price_tier' => 'Mid-range', 'entry_fee_min' => 300, 'entry_fee_max' => 500,
-                'distance_km' => 15, 'latitude' => 7.1204, 'longitude' => 125.6461,
-                'tags' => ['Wildlife', 'Family Friendly'],
-                'description' => "Part zoo, part crocodile farm, this riverside park along the Davao Diversion Road houses hundreds of crocodiles alongside other native and exotic wildlife, with feeding shows and handling demonstrations. It's one of the region's most family-oriented wildlife stops, built around both education and up-close animal encounters.",
-            ],
+            /*
+             * Davao Crocodile Park was hand-seeded here before the real DOT
+             * accreditation list existed, at the same Diversion Road address
+             * the sheet later gave its own accredited record: "Davao
+             * Crocodile Park Inc" (DOT-R11-TRE-00081-2021). Duplicating a
+             * single business into two Destination rows double-counted it in
+             * any listing, count, or recommendation over the catalogue. This
+             * entry's coordinates, price range, and tags moved onto the real
+             * accredited record instead (see DestinationCategoryTagSeeder)
+             * and it is not re-created here.
+             */
             [
                 'name' => 'Malagos Garden Resort', 'region' => 'Davao City', 'type' => 'Nature & Leisure',
                 'location' => 'Malagos, Baguio District, Davao City',

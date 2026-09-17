@@ -17,6 +17,12 @@
         'package' => $listing->price_per_pax,
         default => null,
     };
+
+    // One line per day, "Title | Description", matching what the form
+    // posts back -- so re-editing shows exactly what was last saved.
+    $itineraryText = $establishment->listing_kind === 'package'
+        ? $listing->itineraryDays->map(fn ($day) => $day->description ? "{$day->title} | {$day->description}" : $day->title)->implode("\n")
+        : '';
 @endphp
 
 <div class="panel">
@@ -58,50 +64,40 @@
                 </div>
             @endif
 
-            @if ($establishment->listing_kind === 'package')
-                <div class="field">
-                    <label for="duration_label">Duration label</label>
-                    <input type="text" id="duration_label" name="duration_label" placeholder="e.g. 3 Days, 2 Nights" value="{{ old('duration_label', $listing->duration_label) }}">
-                </div>
-
-                <div class="field">
-                    <label for="duration_days">Duration (days)</label>
-                    <input type="number" id="duration_days" name="duration_days" min="1" value="{{ old('duration_days', $listing->duration_days) }}">
-                </div>
-
-                <div class="field">
-                    <label for="inclusions">What's included (one per line)</label>
-                    <textarea id="inclusions" name="inclusions" rows="5" placeholder="e.g.&#10;Transportation&#10;Guide fee&#10;Lunch">{{ old('inclusions', $listing->inclusions->pluck('item')->implode("\n")) }}</textarea>
-                </div>
-            @endif
-
-            @if ($establishment->listing_kind === 'accommodation')
-                <div class="field">
-                    <label for="check_in">Check-in</label>
-                    <input type="time" id="check_in" name="check_in" value="{{ old('check_in', $listing->check_in) }}">
-                </div>
-
-                <div class="field">
-                    <label for="check_out">Check-out</label>
-                    <input type="time" id="check_out" name="check_out" value="{{ old('check_out', $listing->check_out) }}">
-                </div>
-            @endif
-
-            @if ($establishment->listing_kind === 'restaurant')
-                <div class="field">
-                    <label for="opening_hours">Opening hours</label>
-                    <input type="text" id="opening_hours" name="opening_hours" placeholder="e.g. 10:00 AM &ndash; 9:00 PM daily" value="{{ old('opening_hours', $listing->opening_hours) }}">
-                </div>
-            @endif
-
-            @if (in_array($establishment->listing_kind, ['restaurant', 'tour_operator']))
-                <div class="field">
-                    <label for="contact_number">Contact number</label>
-                    <input type="text" id="contact_number" name="contact_number" value="{{ old('contact_number', $listing->contact_number) }}">
-                </div>
-            @endif
-
             @include('partials.location-picker', ['listing' => $listing])
+
+            @if ($establishment->listing_kind === 'package')
+                <div class="field" style="margin-top:20px;">
+                    <label for="itinerary">Day-by-Day Itinerary</label>
+                    <textarea id="itinerary" name="itinerary" rows="6" placeholder="Day 1 title | Day 1 details (optional)&#10;Day 2 title | Day 2 details (optional)">{{ old('itinerary', $itineraryText) }}</textarea>
+                    <p class="field-hint">One day per line: a short title, then optionally a "|" and more detail. The day number comes from the line's order.</p>
+                </div>
+            @endif
+
+            <div class="field-group" style="margin-top:24px;">
+                <h3 style="margin-bottom:4px;">Online Presence</h3>
+                <p class="field-hint" style="margin-top:0;">Optional. Add links so travelers can find you online &mdash; they'll appear on your public listing page automatically.</p>
+
+                <div class="field">
+                    <label for="website_url">Official Website</label>
+                    <input type="url" id="website_url" name="website_url" placeholder="https://www.yourbusiness.com" value="{{ old('website_url', $listing->website_url) }}">
+                </div>
+
+                <div class="field">
+                    <label for="facebook_url">Facebook Page</label>
+                    <input type="url" id="facebook_url" name="facebook_url" placeholder="https://facebook.com/yourbusiness" value="{{ old('facebook_url', $listing->facebook_url) }}">
+                </div>
+
+                <div class="field">
+                    <label for="instagram_url">Instagram (optional)</label>
+                    <input type="url" id="instagram_url" name="instagram_url" placeholder="https://instagram.com/yourbusiness" value="{{ old('instagram_url', $listing->instagram_url) }}">
+                </div>
+
+                <div class="field">
+                    <label for="tiktok_url">TikTok (optional)</label>
+                    <input type="url" id="tiktok_url" name="tiktok_url" placeholder="https://tiktok.com/@yourbusiness" value="{{ old('tiktok_url', $listing->tiktok_url) }}">
+                </div>
+            </div>
 
             <button type="submit" class="btn btn-primary" style="margin-top:20px;">Save Changes</button>
         </form>

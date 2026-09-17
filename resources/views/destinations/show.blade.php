@@ -16,6 +16,8 @@
         {{ $destination->name }}
     </nav>
 
+    <x-advisory-banner :advisories="\App\Models\Advisory::active()->forListing($destination->getMorphClass(), $destination->id)->latest()->get()" />
+
     {{--
         Always the illustrated poster hero here, matching Popular Destinations
         and Featured Packages -- not conditional on whether photos exist.
@@ -151,6 +153,8 @@
                 @include('partials.check-in-button', ['type' => 'destinations', 'listing' => $destination])
 
                 <x-save-heart type="destinations" :listing="$destination" variant="button" class="mt-10" />
+
+                @include('partials.listing-external-links', ['listing' => $destination])
 
                 @include('partials.map-embed', ['latitude' => $destination->latitude, 'longitude' => $destination->longitude, 'name' => $destination->name])
             </div>

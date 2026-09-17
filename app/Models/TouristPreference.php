@@ -17,7 +17,7 @@ class TouristPreference extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'travel_days', 'travel_type', 'travel_purpose', 'visitor_type', 'budget', 'accommodation_pref',
+        'travel_days', 'travel_type', 'travel_purpose', 'visitor_type', 'place_of_origin', 'budget', 'accommodation_pref',
         'distance_pref', 'accessibility_notes', 'start_date', 'arrival_time',
         'origin_lat', 'origin_lng', 'origin_label', 'variation',
     ];

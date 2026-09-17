@@ -142,6 +142,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .btn:active { transform: translateY(1px); }
+.btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
 
 .btn-primary { background: var(--primary); color: var(--white); }
@@ -164,6 +165,18 @@ a { color: inherit; text-decoration: none; }
 
 .btn-ghost { background: transparent; color: var(--ink); }
 .btn-ghost:hover { background: rgba(0,0,0,.05); }
+
+/* Restrained destructive-outline variant (Reject, and anything else that
+   needs to read as "the other option" next to a primary action without
+   looking as alarming as a filled .btn-danger). Same shape/weight as
+   .btn-outline -- only the color says "this one is different." */
+.btn-outline-danger { background: transparent; color: var(--stamp-red); border: 1.5px solid var(--stamp-red); }
+.btn-outline-danger:hover { background: var(--tone-danger-bg); }
+
+/* No pointer-events:none here -- disabled already blocks the click/submit
+   natively, and this specific disabled state needs its title tooltip
+   (explaining WHY it's disabled) to still appear on hover. */
+.btn:disabled { opacity: .5; cursor: not-allowed; }
 
 .btn-block { width: 100%; }
 .btn-lg { padding: 14px 24px; font-size: 1.05rem; }
@@ -508,10 +521,7 @@ a { color: inherit; text-decoration: none; }
 
 /* A single yes/no consent toggle -- a real custom checkbox, not the
    hide-the-input-and-repaint-the-label chip pattern above it, since this is
-   one consent decision rather than a tag being added to a set. Scoped to
-   .consent-check rather than restyling .field-check input globally: the
-   exit survey's checkboxes intentionally keep their plain browser look (see
-   the chip-checkbox-grid comment above). */
+   one consent decision rather than a tag being added to a set. */
 .consent-check { align-items: center; }
 /* Centring reads well against the one-line consent on Plan Your Trip, but the
    partner form's label is four lines of legal text and the box ends up
@@ -541,6 +551,120 @@ a { color: inherit; text-decoration: none; }
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
 }
 .consent-check input[type="checkbox"]:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* Custom radio: same hide-the-native-control, paint-the-state technique as
+   .consent-check above, but round and filled solid rather than checkmarked
+   -- a radio is one choice among several, a checkbox is a single on/off, and
+   the shape difference is the only thing that tells them apart at a glance. */
+.radio-check { align-items: center; cursor: pointer; }
+.radio-check input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    flex-shrink: 0;
+    border: 1.5px solid var(--muted);
+    border-radius: 50%;
+    background-color: var(--white);
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+    transition: border-color .15s ease;
+}
+.radio-check input[type="radio"]::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--primary);
+    transform: scale(0);
+    transition: transform .12s ease;
+}
+.radio-check input[type="radio"]:hover { border-color: var(--primary); }
+.radio-check input[type="radio"]:checked { border-color: var(--primary); }
+.radio-check input[type="radio"]:checked::after { transform: scale(1); }
+.radio-check input[type="radio"]:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* ---- Tag search ----------------------------------------------------------
+   Replaces a static checkbox wall with a type-to-filter input and removable
+   chips. See resources/views/components/tag-search.blade.php and the
+   `[data-tag-search]` handler in app.js for the behaviour this paints. */
+.tag-search { margin-top: 18px; }
+.tag-search__box {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    border: var(--field-border);
+    border-radius: var(--field-radius);
+    background: var(--white);
+    cursor: text;
+}
+.tag-search__box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+.tag-search__chips { display: contents; }
+.tag-search__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 6px 5px 12px;
+    border-radius: 999px;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    font-size: .82rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+.tag-search__chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+}
+.tag-search__chip-remove:hover { background: rgba(0,0,0,.08); }
+.tag-search__input {
+    flex: 1 1 140px;
+    min-width: 140px;
+    border: none;
+    outline: none;
+    padding: 6px 4px;
+    font-size: var(--field-size);
+    font-family: inherit;
+    background: transparent;
+    color: var(--ink);
+}
+.tag-search__dropdown {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 6px;
+    border: 1px solid var(--border);
+    border-radius: var(--field-radius);
+    background: var(--white);
+    box-shadow: 0 8px 24px rgba(0,0,0,.1);
+    max-height: 260px;
+    overflow-y: auto;
+    position: relative;
+    z-index: 5;
+}
+.tag-search__dropdown li {
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: .88rem;
+    color: var(--ink);
+    cursor: pointer;
+}
+.tag-search__dropdown li:hover,
+.tag-search__dropdown li.is-active { background: var(--bg); }
+.tag-search__count { margin: 6px 0 0; font-size: .78rem; color: var(--muted); }
 
 /* Privacy/reassurance callout: a quiet neutral inset rather than a coloured
    alert -- this is routine reassurance read on every visit, not a warning,
@@ -595,8 +719,10 @@ a { color: inherit; text-decoration: none; }
 .star-rating input:focus-visible ~ label { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .alert { border-radius: var(--radius-sm); border: 1px solid transparent; padding: 12px 16px; font-size: .88rem; margin-bottom: 16px; }
-.alert-error { background: var(--tone-danger-bg); border-color: var(--tone-danger-line); color: var(--tone-danger-ink); }
+.alert-error, .alert-danger { background: var(--tone-danger-bg); border-color: var(--tone-danger-line); color: var(--tone-danger-ink); }
 .alert-success { background: var(--tone-success-bg); border-color: var(--tone-success-line); color: var(--tone-success-ink); }
+.alert-warning { background: var(--tone-warn-bg); border-color: var(--tone-warn-line); color: var(--tone-warn-ink); }
+.alert-info { background: var(--tone-info-bg); border-color: var(--tone-info-line); color: var(--tone-info-ink); }
 
 .badge {
     display: inline-flex;
@@ -611,6 +737,21 @@ a { color: inherit; text-decoration: none; }
 .badge-accredited { background: var(--primary-light); color: var(--primary-dark); }
 .badge-accredited img { width: 14px; height: 14px; border-radius: 50%; display: block; flex-shrink: 0; }
 .badge-rating { background: #fff3e0; color: #b5680a; }
+.badge-tone-good { background: var(--tone-success-bg); color: var(--tone-success-ink); }
+.badge-tone-low { background: var(--tone-danger-bg); color: var(--tone-danger-ink); }
+
+.promo-code {
+    display: inline-block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-weight: 700;
+    letter-spacing: .03em;
+    background: var(--white);
+    border: 1px dashed var(--tone-success-line);
+    color: var(--tone-success-ink);
+    padding: 2px 8px;
+    border-radius: 6px;
+    margin-left: 8px;
+}
 
 /* ---------- Site header ---------- */
 
@@ -621,7 +762,7 @@ a { color: inherit; text-decoration: none; }
     background: var(--white);
     border-bottom: 1px solid var(--border);
     box-shadow: 0 0 0 rgba(16,40,30,0);
-    transition: box-shadow .2s ease, border-color .2s ease;
+    transition: box-shadow .25s ease, border-color .25s ease, background-color .25s ease;
 }
 .site-header.scrolled {
     box-shadow: 0 2px 16px rgba(16,40,30,.10);
@@ -631,21 +772,73 @@ a { color: inherit; text-decoration: none; }
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 68px;
-    gap: 16px;
-    transition: height .2s ease;
+    height: 76px;
+    gap: 20px;
+    transition: height .25s ease;
 }
-.site-header.scrolled .bar { height: 58px; }
+.site-header.scrolled .bar { height: 64px; }
 .brand { display: flex; align-items: center; gap: 8px; font-size: 1.35rem; color: var(--primary-dark); transition: color .2s ease; }
 .brand .dot { color: var(--accent); }
 .brand-icon { width: 26px; height: 26px; flex-shrink: 0; }
 
+/*
+   Spacing here is deliberately close to the original 14px/8px, not because
+   "generous" wasn't wanted, but because this bar had ZERO width slack to
+   begin with -- see the "List your establishment" comment above, where one
+   extra link once overflowed the container by 127px at every desktop width.
+   Six nav links + Log in + Saved + Plan My Trip already filled a 1200px
+   container edge to edge before this redesign added the Saved heart icon,
+   which itself needs ~18px. Confirmed live: gap increases stacked on top of
+   that icon overflowed the .bar by 43px even at 1440px wide (invisible
+   there only because the centered 1200px container has enough outside
+   margin to absorb it at that width -- but it visibly clipped "Plan My
+   Trip" off the right edge at 1280px, a common laptop width, where that
+   margin is too small). Kept to a small, real width budget here instead of
+   relying on margin to hide an actual overflow.
+*/
 .main-nav { display: flex; align-items: center; gap: 14px; flex-wrap: nowrap; }
 .main-nav a { font-size: .88rem; font-weight: 600; color: var(--muted); transition: color .15s ease; white-space: nowrap; flex-shrink: 0; }
 .main-nav a:hover { color: var(--primary); }
 
-.header-actions { display: flex; align-items: center; gap: 8px; }
+.header-actions { display: flex; align-items: center; gap: 5px; }
 .header-actions .btn { white-space: nowrap; flex-shrink: 0; padding: 10px 16px; font-size: .88rem; }
+
+/* Header-only button treatment for "Plan My Trip" / "Saved" -- deliberately
+   scoped under .site-header rather than changed on .btn-primary/.btn-outline
+   themselves, since those two classes are reused across the whole site
+   (forms, portal, admin, footer CTAs) and this redesign is header-only.
+   Radius and a hover lift give the two nav actions their own identity;
+   horizontal padding is left at the original width to stay inside the
+   bar's real width budget (see comment above) -- only vertical padding
+   grows, which costs no width. */
+.site-header .btn-primary {
+    border-radius: 11px;
+    padding: 12px 16px;
+    box-shadow: 0 1px 2px rgba(8, 77, 57, .18);
+    transition: background .18s ease, box-shadow .18s ease, transform .15s ease;
+}
+.site-header .btn-primary:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 6px 18px rgba(8, 77, 57, .28);
+    transform: translateY(-1px);
+}
+.site-header .btn-outline {
+    border-radius: 11px;
+    padding: 10px 10px;
+    gap: 5px;
+    border-width: 1.5px;
+    transition: background .15s ease, border-color .15s ease, transform .15s ease;
+}
+.site-header .btn-outline:hover { transform: translateY(-1px); }
+.site-header .btn-outline svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+.header-account-link { font-size: .85rem; font-weight: 600; color: var(--ink); white-space: nowrap; }
+.header-account-chip { display: flex; align-items: center; gap: 6px; font-size: .85rem; white-space: nowrap; }
+.header-account-chip a { font-weight: 600; color: var(--ink); }
+.header-account-chip__logout {
+    background: none; border: none; padding: 0; font: inherit;
+    color: var(--muted); text-decoration: underline; cursor: pointer;
+}
 
 .nav-toggle {
     display: none;
@@ -657,7 +850,160 @@ a { color: inherit; text-decoration: none; }
 }
 .nav-toggle svg { width: 26px; height: 26px; }
 
-.mobile-menu { display: none; }
+/*
+   Premium slide-in drawer (right side, ~85vw), not a dropped-down flat list.
+   Structural rules live outside the collapse-to-hamburger media query on
+   purpose: .mobile-menu is fixed-position and off-screen (translateX(100%))
+   by default regardless of viewport, and the only way to open it is the
+   hamburger button, which is itself only shown below the media query's
+   breakpoint -- so defining it unconditionally costs nothing above that
+   breakpoint and keeps the drawer correct even if that ever changes.
+*/
+.mobile-menu-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 59;
+    background: rgba(10, 22, 17, .45);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .3s ease, visibility 0s linear .3s;
+}
+.mobile-menu-overlay.open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .3s ease, visibility 0s linear 0s;
+}
+
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 85vw;
+    max-width: 340px;
+    z-index: 60;
+    background: var(--paper);
+    box-shadow: -12px 0 32px rgba(16, 40, 30, .18);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform .32s cubic-bezier(.22, .61, .36, 1);
+}
+.mobile-menu.open { transform: translateX(0); }
+
+body.mobile-menu-open { overflow: hidden; }
+
+.mobile-menu__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 16px 18px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.mobile-menu__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-right: -10px;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background .15s ease;
+}
+.mobile-menu__close:hover { background: var(--primary-light); }
+.mobile-menu__close svg { width: 20px; height: 20px; }
+
+.mobile-menu__body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 8px 20px 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-menu__group { display: flex; flex-direction: column; padding: 14px 0 6px; }
+.mobile-menu__label {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+    padding-inline: 10px;
+}
+
+/* One shared row treatment for every tappable line in the drawer -- primary
+   catalogue links, Saved/Log in, and the smaller account/partner links --
+   so there is exactly one visual language, not several competing ones. A
+   comfortable >=44px tap target and a soft hover/tap fill stand in for the
+   old per-row border, which is what requirement 7 explicitly ruled out. */
+.mobile-menu__group a,
+.mobile-menu__utility {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding-inline: 10px;
+    margin-inline: -10px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+    transition: background .15s ease, color .15s ease;
+}
+.mobile-menu__group a:hover,
+.mobile-menu__group a:active,
+.mobile-menu__utility:hover,
+.mobile-menu__utility:active {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+}
+.mobile-menu__utility svg { width: 18px; height: 18px; flex-shrink: 0; }
+.mobile-menu__utility--btn {
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+}
+
+.mobile-menu__divider { height: 1px; background: var(--border); margin: 6px 10px; }
+
+.mobile-menu__group--plain { padding: 8px 0; }
+
+.mobile-menu__group--muted { padding: 8px 0 4px; }
+.mobile-menu__group--muted .mobile-menu__utility--small {
+    font-size: .88rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+.mobile-menu__account {
+    display: block;
+    padding: 4px 10px 2px;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.mobile-menu__foot {
+    flex-shrink: 0;
+    padding: 14px 20px 22px;
+    border-top: 1px solid var(--border);
+}
+.mobile-menu__foot .btn { padding: 14px 20px; font-size: 1rem; border-radius: 11px; }
+
+/* The chatbot launcher (partials/chatbot-widget.blade.php) sets its own
+   z-index: 200 inline, well above this drawer's 60, so it otherwise floats
+   on top of the drawer's content once open. #id beats .mobile-menu-open's
+   single class on specificity grounds alone, so this needs the id selector
+   to actually win against that inline stylesheet. */
+body.mobile-menu-open #chatbot-widget { display: none; }
 
 /* Transparent header floating over the poster hero (homepage only). Reverts
    to the normal solid white bar the moment app.js adds .scrolled, since the
@@ -670,49 +1016,55 @@ a { color: inherit; text-decoration: none; }
    shook when scrolling back toward the top. Staying fixed keeps the header out
    of flow at all times, so toggling .scrolled changes paint only, never
    layout. It still overlays the hero exactly as absolute did at scroll 0. */
+/* Two-state header over the poster hero (homepage only).
+   AT TOP: translucent warm-white + backdrop blur, NOT transparent-with-light
+   -text -- light nav text over a photographic hero cannot hold WCAG contrast
+   against the hero's own light sky/water areas, which is exactly what a
+   government-grade tourism platform can't afford to get wrong. Dark green
+   text over a blurred, ~80%-opaque warm-white plate reads at full contrast
+   regardless of what is directly behind it in the photo.
+   AFTER SCROLL: the blur/translucency resolves to the same solid warm-white
+   the rest of the site already uses, with the existing shadow. Both states
+   share one text/button treatment (dark green, solid green CTA) so nothing
+   changes color across the transition -- only the surface behind it does. */
 body.hero-page .site-header {
     position: fixed;
     top: 0; left: 0; right: 0;
-    background: transparent;
-    border-bottom-color: transparent;
+    background: rgba(255, 247, 233, .82);
+    backdrop-filter: blur(14px) saturate(1.05);
+    -webkit-backdrop-filter: blur(14px) saturate(1.05);
+    border-bottom: 1px solid rgba(11, 107, 79, .12);
+    transition: background-color .25s ease, backdrop-filter .25s ease, border-color .25s ease, box-shadow .25s ease;
 }
 body.hero-page .site-header .brand,
 body.hero-page .site-header .main-nav a,
-body.hero-page .site-header .nav-toggle { color: var(--paper); }
-body.hero-page .site-header .main-nav a:hover { color: var(--sun-glow); }
-body.hero-page .site-header .btn-outline { border-color: rgba(255, 247, 233, .7); color: var(--paper); }
-body.hero-page .site-header .btn-outline:hover { background: rgba(255, 247, 233, .15); }
-body.hero-page .site-header .btn-primary { background: var(--stamp-red); }
-body.hero-page .site-header .btn-primary:hover { background: var(--accent-dark); }
+body.hero-page .site-header .nav-toggle { color: var(--primary-dark); }
+body.hero-page .site-header .main-nav a:hover { color: var(--primary); }
+body.hero-page .site-header .btn-outline { border-color: var(--primary); color: var(--primary); background: transparent; }
+body.hero-page .site-header .btn-outline:hover { background: var(--primary-light); }
+body.hero-page .site-header .btn-primary { background: var(--primary); }
+body.hero-page .site-header .btn-primary:hover { background: var(--primary-dark); }
 
 body.hero-page .site-header.scrolled {
     /* position intentionally not changed here -- see the rule above. */
-    background: var(--white);
+    background: var(--paper);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom-color: transparent;
 }
-body.hero-page .site-header.scrolled .brand,
-body.hero-page .site-header.scrolled .nav-toggle { color: var(--primary-dark); }
-body.hero-page .site-header.scrolled .main-nav a { color: var(--muted); }
-body.hero-page .site-header.scrolled .main-nav a:hover { color: var(--primary); }
-body.hero-page .site-header.scrolled .btn-outline { border-color: var(--primary); color: var(--primary); }
-body.hero-page .site-header.scrolled .btn-outline:hover { background: var(--primary-light); }
-body.hero-page .site-header.scrolled .btn-primary { background: var(--primary); }
-body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--primary-dark); }
 
-@media (max-width: 1220px) {
+/*
+   Raised from 1220px: the wider spacing above plus the Saved heart icon
+   measured a confirmed 43px overflow at 1280px (a common laptop width) --
+   this bar had zero width slack even before that (see the "List your
+   establishment" comment near the nav markup), so the honest fix is to
+   collapse to the hamburger menu before the cramped zone starts, not to
+   fight for the last few pixels of a bar that was already full.
+*/
+@media (max-width: 1366px) {
     .main-nav { display: none; }
     .header-actions .btn-outline { display: none; }
     .nav-toggle { display: inline-flex; }
-    .mobile-menu {
-        display: none;
-        flex-direction: column;
-        gap: 4px;
-        padding: 12px 20px 20px;
-        border-top: 1px solid var(--border);
-        background: var(--white);
-    }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu a { padding: 10px 0; font-weight: 600; color: var(--ink); border-bottom: 1px solid var(--border); }
-    .mobile-menu .btn { margin-top: 10px; }
 }
 
 /* "Plan My Trip" + "Sign in" + the hamburger together no longer fit the header
@@ -880,6 +1232,7 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     position: relative;
     overflow: hidden;
     min-height: 100vh;
+    min-height: 100svh;
     min-height: 100dvh;
     padding-top: clamp(130px, 20vh, 180px);
     padding-bottom: 28px;
@@ -1193,12 +1546,7 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 .postcard-card {
     position: relative;
     aspect-ratio: 16 / 9;
-    /* 16/9 of a wide window is taller than the window itself -- at 1280x720
-       the card came out 711px in a 720px viewport, so the category label
-       pinned to its bottom edge sat exactly at the fold and the slide read
-       as a full-bleed image with no caption. Capping against viewport
-       height keeps the whole postcard, label included, in one glance. */
-    max-height: min(780px, 72vh);
+    max-height: 780px;
     overflow: hidden;
 }
 .postcard-card__scene {
@@ -1762,16 +2110,54 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 @media (max-width: 560px) { .feature-grid { grid-template-columns: 1fr; } }
 
 /* ---------- About the Region ---------- */
+/* Premium "Discover Davao Region" editorial section: intro copy, province
+   links, and the interactive Leaflet locator. Every class here (.about-*) is
+   used exclusively in this one section of welcome.blade.php (confirmed via
+   a repo-wide search before touching any of it), so nothing here reaches
+   another page or another section. */
+
+.about-region {
+    /*
+       76px is .site-header's unscrolled height (its tallest state -- the
+       header is position:fixed on this page in both states, so the taller
+       figure is the safe one to clear), +32px of comfortable breathing room
+       once the section itself is in view. Nothing currently links to
+       #about-region, but the id has existed since the map was added and
+       costs nothing to make scroll-safe now rather than the next time
+       something anchors to it.
+    */
+    scroll-margin-top: 108px;
+    /* A soft wash, not a hard color block, so the section reads as its own
+       editorial "chapter" of the page without breaking the light palette
+       every section around it already uses. */
+    background: linear-gradient(180deg, var(--bg) 0%, var(--primary-light) 45%, var(--bg) 100%);
+    padding-block: 96px;
+}
+
+.about-region .section-head { max-width: 640px; margin-inline: 0; }
 
 .about-grid {
     display: grid;
     grid-template-columns: 1.05fr .95fr;
-    gap: 44px;
+    gap: 56px;
     align-items: start;
 }
 
-.about-copy p { margin: 0 0 16px; font-size: .96rem; line-height: 1.75; color: var(--ink); }
+.about-copy {
+    /* A divider between the two columns, not just a gap -- the classic
+       editorial magazine-column rule, sitting in the grid gutter rather than
+       consuming column width from either side. */
+    border-right: 1px solid var(--border);
+    padding-right: 56px;
+}
+.about-copy p { margin: 0 0 16px; line-height: 1.75; color: var(--ink); }
 .about-copy p:last-of-type { margin-bottom: 0; }
+/* Lead paragraph reads first and carries the most weight; the second
+   paragraph is supporting detail, sized down a notch -- the "body vs.
+   supporting text" hierarchy the redesign asked for, without cutting either
+   sentence of the original copy. */
+.about-copy p:first-of-type { font-size: 1.05rem; }
+.about-copy p:not(:first-of-type) { font-size: .92rem; color: var(--muted); }
 /* Editorial drop cap. Barabara is safe here despite having no lowercase --
    ::first-letter only ever receives the single opening capital. */
 .about-copy p:first-of-type::first-letter {
@@ -1783,27 +2169,73 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     color: var(--stamp-red);
 }
 
-.about-regions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+.about-regions-label {
+    display: block;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 30px 0 10px;
+}
+.about-regions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 0; }
+/*
+   Adopts the same outlined-default / solid-on-hover language as
+   .pill-toggle and .chip-row--poster .chip elsewhere in the app, for a
+   consistent "filter pill" feel -- even though these are plain navigation
+   links to a filtered listing page, not stateful toggles (there is no
+   "currently selected province" on the homepage to reflect; this is
+   deliberate, not an oversight -- see the chat message this was flagged in).
+   min-height guarantees a real ~44px tap target regardless of font metrics.
+*/
 .about-region-pill {
-    background: var(--primary);
-    color: var(--paper);
-    font-size: .73rem;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    background: var(--white);
+    color: var(--primary-dark);
+    border: 1.5px solid var(--primary);
+    font-size: .82rem;
     font-weight: 700;
     letter-spacing: .01em;
-    padding: 6px 14px;
+    padding: 0 18px;
     border-radius: 999px;
-    transition: background .15s ease, transform .12s ease;
+    transition: background .15s ease, color .15s ease, border-color .15s ease, transform .12s ease, box-shadow .15s ease;
 }
-.about-region-pill:hover { background: var(--ocean-teal-dark); transform: translateY(-1px); }
+.about-region-pill:hover {
+    background: var(--primary);
+    color: var(--paper);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+.about-region-pill:active { transform: translateY(0); box-shadow: none; }
+.about-region-pill:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
-/* Ticket/passport framing, same dashed language as the itinerary chip and the
-   fact-strip dividers. */
+/*
+   Was a 2px dashed "ticket/passport" border, matching the itinerary chip's
+   decorative language. Switched to a solid border + soft elevation so the
+   map reads as a premium product component rather than a scrapbook cutout
+   -- flagged to the user as a deliberate, reversible style call, not an
+   accident. Kept: rounded corners, the paper background, generous padding.
+*/
 .about-map {
     position: relative;
+    /* Leaflet's own panes/controls/popups carry z-index values from 400 up
+       to 1000+ (see .listing-map elsewhere in this file, which already
+       isolates for the same reason). Without isolation, position:relative
+       alone does not create a new stacking context, so those high z-index
+       values compete in the page's root stacking context instead of being
+       contained to this figure -- which is exactly what let the map render
+       on top of the z-index:60 mobile navigation drawer once that drawer
+       was introduced. Pre-existing gap, unmasked by the drawer rather than
+       caused by it. */
+    isolation: isolate;
     margin: 0;
     background: var(--paper);
-    border: 2px dashed var(--ocean-teal);
-    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
     padding: 16px 16px 34px;
 }
 .about-map__svg { display: block; width: 100%; height: auto; }
@@ -1811,20 +2243,27 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 /* ---- Interactive region map --------------------------------------------
    Replaces the SVG locator that used to fill this figure. Leaflet needs an
    explicit height -- its container has no intrinsic size, so a percentage or
-   `auto` collapses it to zero and the tiles never appear. */
+   `auto` collapses it to zero and the tiles never appear.
+
+   aspect-ratio, not a fixed px height (or the old two-tier
+   height:420px/height:320px@800px breakpoint): it scales the map fluidly
+   with however wide its own grid column actually renders, at every
+   viewport from 320px to 1920px, rather than jumping between two fixed
+   numbers. min-height stops it going unusably short in a narrow column;
+   max-height stops it growing absurdly tall in a wide one. aspect-ratio
+   still resolves to a definite pixel height before Leaflet reads the
+   container's size, so L.map()'s zero-height-container failure mode (see
+   the comment above) does not apply here.
+*/
 .region-map {
-    height: 420px;
     width: 100%;
+    aspect-ratio: 4 / 3;
+    min-height: 280px;
+    max-height: 520px;
     border-radius: var(--radius-md);
     /* Sits under the popups and tooltips Leaflet appends, but above the figure
        background, which would otherwise show through the tile seams. */
     background: var(--bg);
-    /* Same containment .listing-map needs, for the same reason: Leaflet's
-       panes run to z-index 700 and the site header is 50, so without a
-       stacking context of its own the map paints straight over the header
-       while you scroll past it. */
-    position: relative;
-    isolation: isolate;
 }
 .region-map__fallback { font-size: .85rem; color: var(--muted); margin: 10px 0 0; }
 /* The figure's caption is absolutely positioned so it could overlay the SVG
@@ -1832,7 +2271,7 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
    is both unreadable and a licence notice that must stay legible. Put it back
    in flow for this variant and drop the padding that reserved the overlay
    space. */
-.about-map:has(.region-map) { padding: 12px; }
+.about-map:has(.region-map) { padding: 14px; }
 .about-map:has(.region-map) .about-map__caption {
     position: static;
     display: block;
@@ -1863,9 +2302,6 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     color: var(--muted);
     line-height: 1.45;
 }
-@media (max-width: 800px) {
-    .region-map { height: 320px; }
-}
 .about-map__caption {
     position: absolute;
     right: 18px;
@@ -1874,6 +2310,11 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     font-size: 1.1rem;
     line-height: 1;
 }
+/* The static, in-flow variant (.about-map:has(.region-map), above) is a
+   caption underneath a real product component now, not an overlay label on
+   top of decoration -- toned down a step so it reads as a caption rather
+   than repeating the section's own kicker at full volume. */
+.about-map:has(.region-map) .about-map__caption { font-size: .85rem; opacity: .85; }
 .about-map__labels text,
 .about-map__peaklabel,
 .about-map__compass-n {
@@ -1912,16 +2353,25 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 .dyk-item p { margin: 0; font-size: .84rem; line-height: 1.55; color: rgba(255, 247, 233, .82); }
 .dyk-item strong { color: var(--paper); font-weight: 700; }
 
+@media (max-width: 1024px) {
+    /* Tablet: same two-column composition, just less generous about it --
+       the 96px section padding and 56px column gap are a desktop luxury a
+       1024px-and-under viewport doesn't have room for. */
+    .about-region { padding-block: 64px; }
+    .about-grid { gap: 36px; }
+}
 @media (max-width: 900px) {
     .about-grid { grid-template-columns: 1fr; gap: 32px; }
+    /* The column divider only makes sense between two side-by-side columns. */
+    .about-copy { border-right: none; padding-right: 0; }
     .dyk-items { grid-template-columns: repeat(2, 1fr); gap: 20px 0; }
     /* Left rule only makes sense between items on the same row. */
     .dyk-item:nth-child(odd) { border-left: none; padding-left: 0; }
 }
 @media (max-width: 560px) {
+    .about-region { padding-block: 48px; }
     .dyk-items { grid-template-columns: 1fr; gap: 16px; }
     .dyk-item { border-left: none; padding: 0; }
-    .about-map { padding: 12px 12px 30px; }
 }
 
 /* ---------- CTA banner ---------- */
@@ -2131,6 +2581,40 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 .dash-body { padding: 32px 0; }
 .dash-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 22px; }
 
+/* A .page-head instance with a trailing action button (Plan Your Trip's
+   "Saved Places" link) -- every other .page-head consumer is a plain
+   centered kicker/h1/p stack, so this stays a modifier rather than a change
+   to the shared rule. */
+.page-head--with-action .container { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
+.page-head--with-action .container > div:first-child { flex: 1 1 auto; min-width: 240px; }
+.page-head--with-action .btn { flex: none; }
+.page-head--with-action .btn svg { width: 15px; height: 15px; }
+
+/* Plan Your Trip survey: premium framing on top of the existing shared
+   .panel/.field/.chip-checkbox-grid system (those already match the poster
+   identity via .chip-checkbox-grid's pill treatment) -- this only adds the
+   page-level chrome (header, sectioning) that every catalog page already
+   has via .page-head, which the survey was missing entirely. */
+.plan-panel { border: none; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); overflow: hidden; }
+.plan-panel > .panel-head { background: var(--primary-light); }
+.plan-section { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border); }
+.plan-section:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+.plan-section__title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: 'Alfa Slab One', serif;
+    font-weight: 400;
+    font-size: 1.05rem;
+    color: var(--ocean-teal-dark);
+    margin: 0;
+}
+.plan-section__title svg { width: 18px; height: 18px; color: var(--primary); flex-shrink: 0; }
+.plan-submit { margin-top: 28px; }
+@media (max-width: 560px) {
+    .plan-submit { width: 100%; justify-content: center; }
+}
+
 .util-row { display: flex; gap: 10px; flex-wrap: wrap; }
 
 /* ---------- Catalog page (browse + filter) ---------- */
@@ -2143,7 +2627,26 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 .page-head h1 { margin: 0 0 6px; font-size: clamp(1.7rem, 4vw, 2.5rem); line-height: 1.06; color: var(--ocean-teal-dark); }
 .page-head p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
 
+/*
+   .page-head is shared by every catalog/listing page AND a few unrelated
+   ones (the exit survey, saved places) that also open with a page-head but
+   have no reason to trim the space below it. :has(.catalog-layout) scopes
+   this to pages that actually contain the filter-sidebar + card-grid
+   layout -- i.e. exactly destinations/accommodations/restaurants/packages
+   /souvenir-centers/tour-operators, all six of which share this identical
+   page-head -> chip-row -> catalog-layout structure -- without adding a
+   class to six separate Blade files or touching the exit-survey/saved
+   pages that reuse the same .page-head class for something else entirely.
+*/
+body:has(.catalog-layout) .page-head { padding: 16px 0 4px; }
+body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12px; }
+
 .catalog-layout { display: grid; grid-template-columns: 240px 1fr; gap: 28px; align-items: flex-start; }
+/* Grid tracks default to min-width:auto, not 0 -- meaning a track can refuse
+   to shrink below its content's intrinsic width and force the grid (and the
+   page) wider than intended. Nothing currently inside this column is that
+   wide, but this is the standard, cheap guard against it regressing. */
+.catalog-layout > * { min-width: 0; }
 
 .filter-toggle { display: none; }
 .filter-toggle svg { width: 16px; height: 16px; }
@@ -2198,6 +2701,25 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 .chip-row--poster .chip:hover:not(.active) { border-color: var(--primary-dark); background: var(--primary-light); }
 .chip-row--poster .chip.active { background: var(--primary); border-color: var(--primary); color: var(--paper); }
 
+/*
+   At desktop widths there is room to wrap the category row onto a second
+   line instead of scrolling it -- .chip-row's horizontal-scroll (above) was
+   built for narrow screens, but on a wide viewport it just left the last
+   category permanently half off-screen behind a scrollbar, which reads as
+   broken rather than intentional. Left as horizontal scroll below 1024px,
+   per the original design, since wrapping there would take up much more
+   vertical space than a single scrollable row (only the public poster
+   variant -- the admin console's plain .chip-row keeps its existing
+   scroll-only behavior at every width).
+*/
+@media (min-width: 1024px) {
+    .chip-row--poster {
+        flex-wrap: wrap;
+        overflow-x: visible;
+        padding-bottom: 0;
+    }
+}
+
 .results-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
 .results-count { font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
 
@@ -2218,6 +2740,7 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 .pagination span.active a { background: var(--primary); border-color: var(--primary); color: var(--white); }
 .pagination span.active a { border: none; min-width: 0; height: auto; padding: 0; }
 .pagination .disabled { color: var(--border); }
+.pagination-ellipsis { min-width: auto; height: 38px; padding: 0 4px; border: none; background: none; color: var(--muted); }
 
 .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
 .empty-state__actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 18px; }
@@ -2398,6 +2921,25 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 }
 .btn-poster-ghost:hover { background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--muted); }
 
+/* Establishment-managed external links (website/Facebook buttons + a small
+   Instagram/TikTok icon row). Website/Facebook reuse .btn-poster-ghost as-is
+   above; this only styles the compact secondary icon row. */
+.listing-links__social { display: flex; gap: 10px; margin-top: 10px; }
+.listing-links__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--ink);
+    box-shadow: inset 0 0 0 1.5px var(--border);
+    transition: background .15s ease, color .15s ease, box-shadow .15s ease;
+}
+.listing-links__icon:hover { background: var(--primary-dark); color: var(--paper); box-shadow: inset 0 0 0 1.5px var(--primary-dark); }
+.listing-links__icon svg { width: 18px; height: 18px; }
+
 /* Leaflet's internal panes/controls use their own z-index stack (up to
    ~700) that, without a contained stacking context, can paint over the
    site header (z-index 50) while scrolling past the map. isolation:isolate
@@ -2548,12 +3090,23 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     padding: 4px 14px 20px 0;
     min-height: 0;
 }
-.admin .admin-sidebar .group-label { padding: 6px 14px 10px; }
+/*
+ * Section rhythm: items within a group sit close together (10px padding,
+ * no inter-link margin -- an 20px text-to-text gap), while a new group's
+ * heading gets real top breathing room (20px) so a section boundary
+ * actually reads as one, rather than blending into the ordinary link-to-
+ * link gap above it. Before this, both gaps worked out to roughly the
+ * same size, so nothing visually separated one section from the next.
+ * The very first heading keeps its original small top offset, since nothing
+ * precedes it to separate from.
+ */
+.admin .admin-sidebar .group-label { padding: 20px 14px 8px; }
+.admin .admin-sidebar .group-label:first-child { padding-top: 6px; }
 .admin .admin-sidebar a {
     border-left: none;
     border-radius: var(--radius-md);
-    padding: 11px 16px;
-    margin-bottom: 2px;
+    padding: 10px 16px;
+    margin-bottom: 0;
     color: var(--ink);
 }
 .admin .admin-sidebar a:hover { background: rgba(11, 107, 79, .07); }
@@ -2719,6 +3272,25 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 .stat-card .stat-card-flag { font-size: .74rem; color: var(--accent-dark); font-weight: 700; margin-top: 6px; }
 @media (max-width: 900px) { .stat-cards { grid-template-columns: repeat(2, 1fr); } }
 
+/*
+ * Exit Survey Insights KPI row only -- scoped to .stat-cards--kpi rather than
+ * the base .stat-card rules above, which accreditation/overview/establishment
+ * overview also use for their own, unrelated stat cards. Grid's default
+ * align-items:stretch already equalizes height *within* a row; what it can't
+ * fix on its own is one row (a wrapped label) landing taller than the row
+ * below it. Reserving a fixed 2-line box for every label -- whether it wraps
+ * or not -- makes every card the same height everywhere, in every row, at
+ * every breakpoint, without a hardcoded card height that could clip content
+ * if a label ever needs a third line.
+ */
+.stat-cards--kpi .stat-card-val { line-height: 1.2; }
+.stat-cards--kpi .stat-card-val__suffix { font-size: 1rem; font-weight: 700; color: var(--muted); }
+.stat-cards--kpi .stat-card-label {
+    line-height: 1.4;
+    min-height: calc(1.4em * 2);
+    margin-top: 4px;
+}
+
 .panel { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); margin-bottom: 24px; }
 .panel-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .panel-head h2 { margin: 0; font-size: 1rem; }
@@ -2821,6 +3393,94 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 .data-table th.col-check,
 .data-table td.col-check { width: 30px; padding-right: 0; }
 .data-table .col-check input { width: 14px; height: 14px; margin: 0; cursor: pointer; display: block; }
+
+/* ---------- Establishment Approvals table + its mobile card fallback ----------
+   Priority for space is Business, Contact, Matched Listing, then Actions --
+   Type/Submitted/Status/Claimed DOT# are real but secondary, so they get a
+   percentage cap instead of growing with their content. Scoped to
+   .establishments-table specifically: .data-table is shared with Manage
+   Listings and Accreditation, which have their own, different columns.
+
+   table-layout:fixed, not auto (the default): under auto layout, a column's
+   `width` is only a hint the browser's sizing algorithm can freely override
+   once any cell's content -- especially a nowrap header label like "Claimed
+   DOT #" -- needs more room, which is exactly why width alone left every
+   column at close to its original size. Fixed layout makes these the real,
+   binding widths; percentages (rather than px) so the same proportions hold
+   as the table's own width changes with the viewport. */
+/* Percentage widths give the ideal proportional layout when there's enough
+   room (no scroll at all from 1024px up), but table-layout:fixed only
+   honors `width` for column sizing -- a min-width on an individual cell is
+   silently ignored, so the real floor has to live on the TABLE itself.
+   1080px is the smallest table width at which every column's percentage
+   share still resolves to a readable minimum (Actions, the tightest one at
+   14%, needs ~150px, and 1080 * 0.14 ≈ 151); below that, .data-table's own
+   width:100% loses to this min-width and .table-scroll's contained overflow
+   takes over -- the "last resort" scroll, only once there genuinely isn't
+   room, never the default. */
+.establishments-table { table-layout: fixed; min-width: 1080px; }
+.establishments-table th:nth-child(1),
+.establishments-table td:nth-child(1) { width: 26%; }
+.establishments-table th:nth-child(2),
+.establishments-table td:nth-child(2) { width: 8%; }
+.establishments-table th:nth-child(3),
+.establishments-table td:nth-child(3) { width: 13%; }
+.establishments-table th:nth-child(4),
+.establishments-table td:nth-child(4) { width: 8%; }
+.establishments-table th:nth-child(5),
+.establishments-table td:nth-child(5) { width: 8%; }
+.establishments-table th:nth-child(6),
+.establishments-table td:nth-child(6) { width: 8%; }
+.establishments-table th:nth-child(7),
+.establishments-table td:nth-child(7) { width: 15%; }
+.establishments-table th:nth-child(8),
+.establishments-table td:nth-child(8) { width: 14%; }
+/* These four headers now sit in a column narrower than their own label --
+   nowrap (the shared .data-table th default) would force the column wider
+   again to fit it on one line, so it's turned back off exactly here. */
+.establishments-table th:nth-child(2),
+.establishments-table th:nth-child(4),
+.establishments-table th:nth-child(5),
+.establishments-table th:nth-child(6) { white-space: normal; }
+
+/* Selector and Save stacked as one workflow, not the side-by-side .util-row
+   every other inline form on this page uses -- narrower, and reads as a
+   single "pick, then save" action instead of two unrelated controls. */
+.matched-listing-form { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+.matched-listing-form select { width: 100%; font-size: .8rem; }
+
+/* Approve/Reject read as two outcomes of one decision, so they stay the same
+   size regardless of label length -- "Approve" and "Reject" would otherwise
+   render at two different widths under btn-xs's content-driven padding.
+   Equal flex, not a fixed min-width: identical to each other by construction
+   at any column width, rather than a minimum that could outgrow a narrow one. */
+.approval-actions form { flex: 1 1 0; min-width: 0; }
+.approval-actions .btn { width: 100%; }
+
+/* Table on desktop/tablet, cards from 900px down -- the same breakpoint the
+   admin sidebar already collapses at, so the whole console changes shape at
+   one consistent width rather than each component picking its own. */
+.establishment-cards { display: none; }
+
+@media (max-width: 900px) {
+    .establishments-table-view { display: none; }
+    .establishment-cards { display: flex; flex-direction: column; gap: 14px; }
+}
+
+.establishment-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; }
+.establishment-card__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 8px 12px; margin-bottom: 14px; }
+.establishment-card__head > div { flex: 1 1 auto; min-width: 0; overflow-wrap: break-word; }
+.establishment-card__head .status-pill { flex-shrink: 0; }
+.establishment-card__head strong { font-size: .95rem; }
+.establishment-card__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+.establishment-card__field { font-size: .86rem; }
+.establishment-card__field--full { grid-column: 1 / -1; margin-top: 14px; }
+.establishment-card__label { font-size: .72rem; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); font-weight: 700; margin-bottom: 3px; }
+/* Visible helper copy, not a title tooltip -- a card is the touch/mobile
+   layout, where nothing is hovered long enough to trigger one. */
+.establishment-card__hint { font-size: .78rem; color: var(--muted); margin: 0 0 8px; line-height: 1.4; }
+.approval-actions--card { display: flex; gap: 10px; margin-top: 14px; }
+.approval-actions--card form { flex: 1; }
 
 /* Sits directly above the table, replacing nothing -- it only appears once a
    row is checked, so it costs no vertical space at rest. */
@@ -3277,152 +3937,3 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
        keeps animating -- it conveys information rather than decoration. */
     .toast, .toast.is-leaving { animation: none; }
 }
-
-/* ==========================================================================
-   Tag picker — searchable multi-select
-   --------------------------------------------------------------------------
-   Replaces checkbox walls. On the exit survey six of these stand in for 395
-   raw checkboxes; the component itself knows nothing about establishments, so
-   anywhere else that asks a person to pick a few rows out of hundreds can use
-   it as-is.
-   ========================================================================== */
-/* position: relative so .tag-picker__results below can float over whatever
-   comes after it instead of pushing it down the page -- critical once this
-   sits inside a table row, where every open search would otherwise shove
-   every row below it downward for as long as results were showing. */
-.tag-picker { margin-top: 16px; position: relative; }
-.tag-picker > label {
-    display: block;
-    font-size: .82rem;
-    font-weight: 700;
-    color: var(--ink);
-    margin-bottom: 6px;
-}
-/* Used with a hidden label (a single-pick field wedged into a table cell,
-   e.g. admin's establishment-match column) -- no label to reserve space
-   under, and the row should stay close to the compact height of its
-   neighbours rather than the full form-field spacing this gets elsewhere. */
-.tag-picker--compact { margin-top: 0; min-width: 200px; }
-/* The box mimics a text input so the control reads as one field rather than a
-   widget bolted beside one -- same border, radius and focus ring as .field
-   input, which it sits alongside. */
-.tag-picker__box {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 10px;
-    border: var(--field-border);
-    border-radius: var(--field-radius);
-    background: var(--white);
-    cursor: text;
-}
-.tag-picker__box:focus-within {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px var(--primary-light);
-}
-.tag-picker__chips { display: contents; }
-.tag-picker__search {
-    flex: 1;
-    min-width: 140px;
-    border: none;
-    outline: none;
-    padding: 4px 0;
-    font-size: var(--field-size);
-    font-family: inherit;
-    color: var(--ink);
-    background: transparent;
-}
-.tag-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--primary-light);
-    color: var(--primary-dark);
-    border-radius: 999px;
-    padding: 4px 6px 4px 11px;
-    font-size: .8rem;
-    font-weight: 600;
-    max-width: 100%;
-}
-.tag-chip__x {
-    border: none;
-    background: none;
-    padding: 0 2px;
-    cursor: pointer;
-    color: var(--primary-dark);
-    font-size: 1rem;
-    line-height: 1;
-    opacity: .65;
-    border-radius: 50%;
-}
-.tag-chip__x:hover { opacity: 1; }
-.tag-chip__x:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
-
-.tag-picker__results {
-    list-style: none;
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    right: 0;
-    z-index: 30;
-    margin: 0;
-    padding: 4px;
-    border: 1px solid var(--border);
-    border-radius: var(--field-radius);
-    background: var(--white);
-    box-shadow: var(--shadow-md);
-    max-height: 280px;
-    overflow-y: auto;
-}
-.tag-picker__result {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    padding: 8px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-.tag-picker__result:hover,
-.tag-picker__result.is-active { background: var(--bg); }
-.tag-picker__result-name { font-size: .86rem; font-weight: 600; color: var(--ink); }
-/* The address line. Several accredited businesses run multiple branches, each
-   separately accredited -- without this they read as duplicated rows. */
-.tag-picker__result-meta { font-size: .74rem; color: var(--muted); line-height: 1.35; }
-.tag-picker__count { font-size: .78rem; color: var(--muted); margin: 6px 0 0; }
-
-/* ---- Custom radio -------------------------------------------------------
-   The checkbox equivalent (.consent-check) was already custom; the radios on
-   the exit survey were still the OS control, so a form that looked considered
-   everywhere else fell back to the browser default at the last question. */
-.radio-check input[type="radio"] {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    margin: 0;
-    border: 2px solid var(--muted);
-    border-radius: 50%;
-    background: var(--white);
-    cursor: pointer;
-    display: grid;
-    place-content: center;
-    transition: border-color .12s ease, background .12s ease;
-}
-.radio-check input[type="radio"]::before {
-    content: '';
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    transform: scale(0);
-    background: var(--white);
-    transition: transform .12s ease;
-}
-.radio-check input[type="radio"]:hover { border-color: var(--primary); }
-.radio-check input[type="radio"]:checked {
-    background: var(--primary);
-    border-color: var(--primary);
-}
-.radio-check input[type="radio"]:checked::before { transform: scale(1); }
-.radio-check input[type="radio"]:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }

@@ -19,9 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         /*
-         * Every guarded route in this app is a portal route -- there are no
-         * traveler accounts -- so an unauthenticated hit belongs at the portal
-         * login screen.
+         * Most guarded routes in this app are portal routes (DOT Admin /
+         * establishment partner), so an unauthenticated hit belongs at the
+         * portal login screen by default. The one exception is the optional
+         * tourist account area under /account -- a guest bounced from there
+         * belongs at the tourist login, not the DOT/partner one.
          *
          * This has to be configured HERE, not from a service provider.
          * withMiddleware() installs the framework default,
@@ -34,7 +36,9 @@ return Application::configure(basePath: dirname(__DIR__))
          * "Route [login] not defined" instead of redirecting. Setting it in
          * this closure runs after the default and always wins.
          */
-        $middleware->redirectGuestsTo(fn (Request $request) => route('portal.login'));
+        $middleware->redirectGuestsTo(fn (Request $request) => $request->is('account/*')
+            ? route('account.login')
+            : route('portal.login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

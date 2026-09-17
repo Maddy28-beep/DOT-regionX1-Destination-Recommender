@@ -5,9 +5,9 @@
 @section('content')
 <div class="page-head">
     <div class="container">
-        <span class="poster-kicker">before you go</span>
-        <h1 class="page-title">Visitor Exit Survey</h1>
-        <p>Help DOT Region XI improve tourism services and destination management in the Davao Region.</p>
+        <span class="poster-kicker" style="font-size:1.05rem;">how was your trip?</span>
+        <h1 class="page-title" style="font-size:1.9rem; margin:0;">Visitor Exit Survey</h1>
+        <p>A short, anonymous survey to help DOT Region XI improve tourism services in the Davao Region.</p>
     </div>
 </div>
 
@@ -24,24 +24,13 @@
             </div>
         @endif
 
-        {{--
-            The .privacy-note callout Plan Your Trip already uses, rather than a
-            panel of plain prose -- this is guidance that must not be skimmed
-            past, and it should look the same everywhere it appears.
-
-            "not linked to your ExploreDVO profile if you have one" was removed:
-            there are no traveller profiles to link to. Offering the possibility
-            implies accounts exist and quietly weakens the actual claim, which is
-            stronger -- nothing here identifies anyone, because there is nothing
-            to identify them with.
-        --}}
-        <div class="privacy-note" style="margin-bottom:20px;">
+        <div class="privacy-note" style="margin-top:0;">
             <x-icon name="shield-check" />
             <p>
-                <strong>Your responses are anonymous.</strong> This survey collects no name, email
-                address or contact details, and ExploreDVO holds no traveller accounts to link them
-                to. Answers are handled under the Philippine Data Privacy Act of 2012 (RA 10173) and
-                used only for tourism analytics and service improvement by DOT Region XI.
+                Your responses are <strong>anonymous</strong>. This survey does not collect your name, email, or
+                account information, and is not linked to your ExploreDVO profile if you have one. Data is handled
+                per the Philippine Data Privacy Act of 2012 (RA 10173) and used only for tourism analytics and
+                service improvement.
             </p>
         </div>
 
@@ -51,39 +40,29 @@
             <div class="panel">
                 <div class="panel-head">
                     <div>
-                        <h2>About You</h2>
-                        <p>Help us understand who's visiting the Davao Region (optional).</p>
+                        <h2>About Your Trip</h2>
+                        <p>A few quick questions for DOT Region XI's tourism statistics.</p>
                     </div>
                 </div>
                 <div class="panel-body">
-                    <div class="filter-inline" style="align-items:start;">
-                        <div class="field" style="flex:1; min-width:200px;">
-                            <label for="residency_type">I am a:</label>
-                            <select id="residency_type" name="residency_type">
-                                <option value="">Prefer not to say</option>
-                                <option value="Local Resident" @selected(old('residency_type') === 'Local Resident')>Local Resident</option>
-                                <option value="Domestic Tourist" @selected(old('residency_type') === 'Domestic Tourist')>Domestic Tourist</option>
-                                <option value="Foreign Tourist" @selected(old('residency_type') === 'Foreign Tourist')>Foreign Tourist</option>
-                            </select>
-                        </div>
-                        <div class="field" style="flex:1; min-width:200px;">
-                            <label for="visitor_type">My visit type:</label>
-                            <select id="visitor_type" name="visitor_type">
-                                <option value="">Prefer not to say</option>
-                                <option value="First-time Visitor" @selected(old('visitor_type') === 'First-time Visitor')>First-time Visitor</option>
-                                <option value="Returning Visitor" @selected(old('visitor_type') === 'Returning Visitor')>Returning Visitor</option>
-                                <option value="Regular / Local" @selected(old('visitor_type') === 'Regular / Local')>Regular / Local</option>
-                            </select>
-                        </div>
-                        <div class="field" style="flex:1; min-width:200px;">
-                            <label for="origin">Place of origin (optional)</label>
-                            <input type="text" id="origin" name="origin" value="{{ old('origin') }}" placeholder="e.g. Cebu City, Philippines">
-                        </div>
+                    <div class="field">
+                        <label for="origin">Where are you visiting from?</label>
+                        <input type="text" id="origin" name="origin" value="{{ old('origin') }}" placeholder="e.g. Cebu City, Philippines">
+                        <p class="field-hint">Helps DOT Region XI understand where visitors are travelling from.</p>
                     </div>
 
                     <div class="filter-inline" style="align-items:start; margin-top:14px;">
-                        <div class="field" style="flex:1; min-width:200px;">
-                            <label for="travel_purpose">Purpose of this trip:</label>
+                        <div class="field" style="flex:1; min-width:180px;">
+                            <label for="residency_type">Visit type</label>
+                            <select id="residency_type" name="residency_type">
+                                <option value="">Prefer not to say</option>
+                                <option value="Local Resident" @selected(old('residency_type') === 'Local Resident')>Local</option>
+                                <option value="Domestic Tourist" @selected(old('residency_type') === 'Domestic Tourist')>Domestic</option>
+                                <option value="Foreign Tourist" @selected(old('residency_type') === 'Foreign Tourist')>International</option>
+                            </select>
+                        </div>
+                        <div class="field" style="flex:1; min-width:180px;">
+                            <label for="travel_purpose">Purpose of trip</label>
                             <select id="travel_purpose" name="travel_purpose">
                                 <option value="">Prefer not to say</option>
                                 @foreach ($travelPurposes as $purpose)
@@ -91,11 +70,24 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="field" style="flex:1; min-width:200px;">
-                            <label for="actual_days_stayed">How many days did you stay in Davao Region?</label>
+                    </div>
+
+                    <div class="filter-inline" style="align-items:start; margin-top:14px;">
+                        <div class="field" style="flex:1; min-width:180px;">
+                            <label for="actual_days_stayed">Days stayed</label>
                             <input type="number" id="actual_days_stayed" name="actual_days_stayed" min="1" max="365" value="{{ old('actual_days_stayed') }}" placeholder="e.g. 3">
                         </div>
+                        <div class="field" style="flex:1; min-width:180px;">
+                            <label for="estimated_total_spend">Total amount spent (&#8369;)</label>
+                            <select id="estimated_total_spend" name="estimated_total_spend">
+                                <option value="">Prefer not to say</option>
+                                @foreach ($spendBrackets as $value => $label)
+                                    <option value="{{ $value }}" @selected(old('estimated_total_spend') === $value)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
+                    <p class="field-hint">Your total spend for the whole trip &mdash; food, transport, activities, and shopping &mdash; not accommodation, if you paid for that separately in advance.</p>
                 </div>
             </div>
 
@@ -103,35 +95,21 @@
                 <div class="panel-head">
                     <div>
                         <h2>Your Visit</h2>
-                        <p>What did you experience during your trip? (optional &mdash; select all that apply)</p>
+                        <p>Optional &mdash; search and add the places you went.</p>
                     </div>
                 </div>
                 <div class="panel-body">
-                    {{--
-                        One searchable picker per category, replacing what were
-                        395 checkboxes across six alphabetical grids. A
-                        respondent visited two or three places; asking them to
-                        find those in an unfiltered wall is how you lose the
-                        response before the ratings section.
-                    --}}
-                    @foreach ($placeGroups as $kind => $group)
-                        @if (count($group['items']))
-                            @include('partials.tag-picker', [
-                                'name' => 'places_visited[]',
-                                'label' => $group['label'].' visited',
-                                'items' => $group['items'],
-                                'kind' => $kind,
-                                'placeholder' => 'Search '.strtolower($group['label']).'…',
-                                'selected' => collect(old('places_visited', []))
-                                    ->filter(fn ($v) => str_starts_with($v, $kind.':'))
-                                    ->all(),
-                            ])
-                        @endif
-                    @endforeach
+                    <x-tag-search
+                        name="places_visited[]"
+                        :items="$placeOptions"
+                        :selected="$selectedPlaces"
+                        label="Where did you go during your trip?"
+                        placeholder="Search places you visited…"
+                    />
 
-                    <div class="field" style="margin-top:18px;">
-                        <label>Activities you participated in</label>
-                        <div class="checkbox-grid">
+                    <div class="field" style="margin-top:22px;">
+                        <label>Activities you participated in (optional)</label>
+                        <div class="chip-checkbox-grid">
                             @foreach ($activityOptions as $activity)
                                 <label class="field-check">
                                     <input type="checkbox" name="activities[]" value="{{ $activity }}" @checked(in_array($activity, old('activities', [])))>
@@ -146,11 +124,15 @@
             <div class="panel">
                 <div class="panel-head">
                     <div>
-                        <h2>Rate Your Experience</h2>
-                        <p>How would you rate the following aspects of your trip? (optional)</p>
+                        <h2>Your Experience</h2>
+                        <p>How would you rate your trip? (optional, except overall satisfaction)</p>
                     </div>
                 </div>
                 <div class="panel-body">
+                    <div class="rating-row">
+                        <span class="rating-row-label"><strong>Overall satisfaction with your visit</strong></span>
+                        @include('partials.star-input', ['name' => 'overall_rating', 'required' => true])
+                    </div>
                     <div class="rating-row">
                         <span class="rating-row-label">Relevance of recommended destinations</span>
                         @include('partials.star-input', ['name' => 'destination_relevant'])
@@ -159,32 +141,15 @@
                         <span class="rating-row-label">Usefulness of the suggested itinerary</span>
                         @include('partials.star-input', ['name' => 'itinerary_useful'])
                     </div>
-                    <div class="rating-row">
-                        <span class="rating-row-label">Quality of attractions visited</span>
-                        @include('partials.star-input', ['name' => 'attractions_quality'])
-                    </div>
-                    <div class="rating-row">
-                        <span class="rating-row-label">Accommodation experience</span>
-                        @include('partials.star-input', ['name' => 'accommodation_rating'])
-                    </div>
-                    <div class="rating-row">
-                        <span class="rating-row-label">Transportation experience</span>
-                        @include('partials.star-input', ['name' => 'transport_rating'])
-                    </div>
-
-                    <div class="rating-row" style="margin-top:10px; border-top:2px solid var(--border); padding-top:16px;">
-                        <span class="rating-row-label"><strong>Overall satisfaction with your visit</strong></span>
-                        @include('partials.star-input', ['name' => 'overall_rating', 'required' => true])
-                    </div>
 
                     <div class="field" style="margin-top:22px;">
                         <label>Would you recommend the Davao Region to friends or family?</label>
                         <div style="display:flex; gap:20px; margin-top:8px;">
-                            <label class="field-check radio-check" style="margin-top:0; align-items:center;">
+                            <label class="field-check radio-check" style="margin-top:0;">
                                 <input type="radio" name="would_recommend" value="Yes" @checked(old('would_recommend') === 'Yes') required>
                                 <span>Yes, definitely</span>
                             </label>
-                            <label class="field-check radio-check" style="margin-top:0; align-items:center;">
+                            <label class="field-check radio-check" style="margin-top:0;">
                                 <input type="radio" name="would_recommend" value="No" @checked(old('would_recommend') === 'No')>
                                 <span>Probably not</span>
                             </label>
@@ -193,10 +158,10 @@
 
                     <div class="field" style="margin-top:18px;">
                         <label for="comments">Any comments or suggestions? (optional)</label>
-                        <textarea id="comments" name="comments" rows="3" placeholder="What did you love? What could DOT improve? Any specific attractions or experiences worth highlighting?">{{ old('comments') }}</textarea>
+                        <textarea id="comments" name="comments" rows="3" placeholder="What did you love? What could DOT improve?">{{ old('comments') }}</textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-accent btn-block" style="margin-top:20px;">Submit Survey &rarr;</button>
+                    <button type="submit" class="btn btn-accent btn-block" style="margin-top:20px;">Submit Survey</button>
                 </div>
             </div>
         </form>

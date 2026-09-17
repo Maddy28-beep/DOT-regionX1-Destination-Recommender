@@ -90,13 +90,6 @@ class EstablishmentDashboardController extends Controller
             'description' => ['nullable', 'string', 'max:1000'],
             'price_tier' => ['nullable', 'string', 'max:20'],
             'price_amount' => ['nullable', 'numeric', 'min:0'],
-            'check_in' => ['nullable', 'date_format:H:i'],
-            'check_out' => ['nullable', 'date_format:H:i'],
-            'opening_hours' => ['nullable', 'string', 'max:100'],
-            'contact_number' => ['nullable', 'string', 'max:20'],
-            'duration_label' => ['nullable', 'string', 'max:50'],
-            'duration_days' => ['nullable', 'integer', 'min:1'],
-            'inclusions' => ['nullable', 'string'],
             /*
              * Position, set by the establishment itself on the map.
              *
@@ -114,9 +107,18 @@ class EstablishmentDashboardController extends Controller
              */
             'latitude' => ['nullable', 'required_with:longitude', 'numeric', 'between:'.self::REGION_BOUNDS['lat'][0].','.self::REGION_BOUNDS['lat'][1]],
             'longitude' => ['nullable', 'required_with:latitude', 'numeric', 'between:'.self::REGION_BOUNDS['lng'][0].','.self::REGION_BOUNDS['lng'][1]],
+            'itinerary' => ['nullable', 'string', 'max:5000'],
+            'website_url' => ['nullable', 'url:http,https', 'max:255'],
+            'facebook_url' => ['nullable', 'url:http,https', 'max:255'],
+            'instagram_url' => ['nullable', 'url:http,https', 'max:255'],
+            'tiktok_url' => ['nullable', 'url:http,https', 'max:255'],
         ], [
             'latitude.between' => 'That point is outside the Davao Region. Drag the marker to your establishment.',
             'longitude.between' => 'That point is outside the Davao Region. Drag the marker to your establishment.',
+            'website_url.url' => 'Enter a full web address, starting with http:// or https://.',
+            'facebook_url.url' => 'Enter a full web address, starting with http:// or https://.',
+            'instagram_url.url' => 'Enter a full web address, starting with http:// or https://.',
+            'tiktok_url.url' => 'Enter a full web address, starting with http:// or https://.',
         ]);
 
         $listing->description = $data['description'] ?? null;
@@ -125,40 +127,51 @@ class EstablishmentDashboardController extends Controller
         // pin, because the recommender trusts a stored coordinate completely.
         $listing->latitude = $data['latitude'] ?? null;
         $listing->longitude = $data['longitude'] ?? null;
+        $listing->website_url = $data['website_url'] ?? null;
+        $listing->facebook_url = $data['facebook_url'] ?? null;
+        $listing->instagram_url = $data['instagram_url'] ?? null;
+        $listing->tiktok_url = $data['tiktok_url'] ?? null;
 
-        // Each kind's own operational fields -- the ones a business changes
-        // on its own schedule (seasonal hours, a new front-desk number), as
-        // opposed to the DOT-classification fields admin alone controls.
-        if ($establishment->listing_kind === 'accommodation') {
-            $listing->price_per_night = $data['price_amount'] ?? null;
-            $listing->check_in = $data['check_in'] ?? null;
-            $listing->check_out = $data['check_out'] ?? null;
-        } elseif ($establishment->listing_kind === 'package') {
-            $listing->price_per_pax = $data['price_amount'] ?? null;
-            $listing->duration_label = $data['duration_label'] ?? null;
-            $listing->duration_days = $data['duration_days'] ?? null;
-            $this->syncInclusions($listing, $data['inclusions'] ?? '');
-        } elseif ($establishment->listing_kind === 'restaurant') {
-            $listing->opening_hours = $data['opening_hours'] ?? null;
-            $listing->contact_number = $data['contact_number'] ?? null;
-        } elseif ($establishment->listing_kind === 'tour_operator') {
-            $listing->contact_number = $data['contact_number'] ?? null;
-        }
+        match ($establishment->listing_kind) {
+            'accommodation' => $listing->price_per_night = $data['price_amount'] ?? null,
+            'package' => $listing->price_per_pax = $data['price_amount'] ?? null,
+            default => null,
+        };
 
         $listing->save();
+
+        // Self-service, same as everything else on this page: no DOT
+        // approval step before a package's day-by-day breakdown goes live.
+        if ($establishment->listing_kind === 'package') {
+            $this->syncItineraryDays($listing, $data['itinerary'] ?? '');
+        }
 
         return redirect()->route('establishment.overview')->with(Toast::success('Listing updated', 'Your changes are now live on the public catalog.'));
     }
 
-    /** Mirrors Admin\AdminListingController::syncInclusions() -- one item per line. */
-    private function syncInclusions(Package $package, string $inclusions): void
+    /**
+     * One day per line, "Title | Description" -- the description half is
+     * optional (a bare title line is still a valid day). Day numbers are
+     * assigned by line order rather than typed by the operator, so removing
+     * or reordering a line can't leave a gap or a duplicate day number.
+     */
+    private function syncItineraryDays(Package $package, string $itinerary): void
     {
-        $package->inclusions()->delete();
+        $package->itineraryDays()->delete();
 
-        collect(explode("\n", $inclusions))
+        collect(explode("\n", $itinerary))
             ->map(fn ($line) => trim($line))
             ->filter()
-            ->each(fn ($item) => $package->inclusions()->create(['item' => $item]));
+            ->values()
+            ->each(function (string $line, int $index) use ($package) {
+                [$title, $description] = array_pad(explode('|', $line, 2), 2, null);
+
+                $package->itineraryDays()->create([
+                    'day_number' => $index + 1,
+                    'title' => trim($title),
+                    'description' => $description !== null ? trim($description) ?: null : null,
+                ]);
+            });
     }
 
     public function reviews(Request $request): View

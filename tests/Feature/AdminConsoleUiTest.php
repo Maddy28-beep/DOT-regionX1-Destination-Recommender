@@ -239,10 +239,15 @@ class AdminConsoleUiTest extends TestCase
      */
     /**
      * The exit survey is anonymous and voluntary, so there is no way to know
-     * exactly who did or didn't respond -- the best available signal is
-     * distinct browsers seen checking in anywhere, versus surveys submitted.
+     * exactly who did or didn't respond, and no way to link a survey back to
+     * a specific check-in. Exit Survey Responses and Distinct Check-ins are
+     * therefore reported as two separate counts, never divided into a
+     * "Response Rate" -- that number is meaningless here (92 surveys against
+     * 79 known browsers once produced a nonsense 116.5%) since a browser can
+     * check in without ever answering the survey, or in principle answer it
+     * without a recorded check-in at all.
      */
-    public function test_response_rate_compares_surveys_to_distinct_checked_in_browsers(): void
+    public function test_survey_responses_and_check_ins_are_reported_as_separate_counts(): void
     {
         [[$listing]] = $this->seedListings();
 
@@ -256,7 +261,7 @@ class AdminConsoleUiTest extends TestCase
             ]);
         }
 
-        // Same browser checking in twice must not inflate the denominator.
+        // Same browser checking in twice must not inflate the count.
         TouristVisit::create([
             'visitor_token' => 'browser-a',
             'listing_kind' => 'destination',
@@ -269,9 +274,41 @@ class AdminConsoleUiTest extends TestCase
 
         $html = $this->actingAs($this->admin(), 'admin')->get(route('admin.exit-surveys'))->getContent();
 
-        // 1 survey / 2 distinct browsers = 50%.
-        $this->assertStringContainsString('50%', $html);
-        $this->assertStringContainsString('Response Rate', $html);
+        $this->assertStringContainsString('Exit Survey Responses', $html);
+        $this->assertStringContainsString('Distinct Check-ins', $html);
+        $this->assertStringNotContainsString('Response Rate', $html);
+        $this->assertStringContainsString('not necessarily one-to-one', $html);
+    }
+
+    /**
+     * DOT asked for the overall money a visitor spends across their whole
+     * stay in Davao, not a per-day figure -- average per trip, and a
+     * breakdown by residency. The survey collects a picked spend bracket
+     * (see ExitSurveyController::SPEND_BRACKETS) rather than an exact
+     * figure, so these stats are approximated from each bracket's
+     * representative midpoint (SPEND_BRACKET_MIDPOINTS).
+     */
+    public function test_spending_statistics_are_computed_from_reported_answers_only(): void
+    {
+        ExitSurvey::create([
+            'overall_rating' => 5, 'would_recommend' => 'Yes',
+            'residency_type' => 'Domestic Tourist', 'actual_days_stayed' => 3, 'estimated_total_spend' => '10000_20000',
+        ]);
+        ExitSurvey::create([
+            'overall_rating' => 4, 'would_recommend' => 'Yes',
+            'residency_type' => 'Foreign Tourist', 'actual_days_stayed' => 5, 'estimated_total_spend' => '20000_50000',
+        ]);
+        // No spend reported: must not drag the averages toward zero.
+        ExitSurvey::create(['overall_rating' => 5, 'would_recommend' => 'Yes', 'residency_type' => 'Local Resident']);
+
+        $html = $this->actingAs($this->admin(), 'admin')->get(route('admin.exit-surveys'))->getContent();
+
+        // Midpoints: 15,000 and 35,000. Avg. per trip: (15000 + 35000) / 2 = 25000.
+        $this->assertStringContainsString('₱25,000.00', $html);
+        $this->assertStringContainsString('Avg. Spend per Trip', $html);
+        // By residency: Domestic Tourist = 15000, Foreign Tourist = 35000.
+        $this->assertStringContainsString('₱15,000.00', $html);
+        $this->assertStringContainsString('₱35,000.00', $html);
     }
 
     public function test_todays_check_in_count_is_not_stuck_at_zero(): void

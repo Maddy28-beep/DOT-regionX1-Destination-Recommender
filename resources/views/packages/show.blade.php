@@ -22,6 +22,9 @@
         {{ $package->name }}
     </nav>
 
+    <x-advisory-banner :advisories="\App\Models\Advisory::active()->forListing($package->getMorphClass(), $package->id)->latest()->get()" />
+    <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($package->getMorphClass(), $package->id)->latest()->get()" />
+
     @include('partials.gallery-hero', [
         'photos' => $package->photos,
         'title' => $package->name,
@@ -60,6 +63,27 @@
                 <p>{{ $package->description ?? 'No description available yet for this package.' }}</p>
             </div>
 
+            @if ($package->itineraryDays->isNotEmpty())
+                <div class="side-card">
+                    <h3 class="mt-0">Day-by-Day Itinerary</h3>
+                    @foreach ($package->itineraryDays as $day)
+                        <div class="itinerary-day">
+                            <h3>Day {{ $day->day_number }}</h3>
+                            <div class="day-timeline">
+                                <div class="itinerary-item">
+                                    <div class="itinerary-item__body">
+                                        <strong>{{ $day->title }}</strong>
+                                        @if ($day->description)
+                                            <div class="sub">{{ $day->description }}</div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
             @if ($package->inclusions->count())
                 <div class="side-card">
                     <h3 class="mt-0">What's included</h3>
@@ -90,8 +114,18 @@
                     Budget tier: {{ $package->price_tier ?? 'Not specified' }}<br>
                     Provided by: {{ $providerLabel ?? 'DOT-accredited operator' }}
                 </p>
-                <a href="{{ route('plan.edit') }}" class="btn btn-primary btn-block">Plan with this Package</a>
+                @if ($package->itineraryDays->isNotEmpty())
+                    <form method="POST" action="{{ route('packages.plan-with', $package) }}">
+                        @csrf
+                        <button type="submit" class="btn btn-primary btn-block">Plan with this Package</button>
+                    </form>
+                @else
+                    <a href="{{ route('plan.edit') }}" class="btn btn-primary btn-block">Plan My Trip</a>
+                    <p class="field-hint" style="margin-top:6px;">This provider hasn't published a day-by-day schedule for this package yet.</p>
+                @endif
                 @include('partials.check-in-button', ['type' => 'packages', 'listing' => $package])
+
+                @include('partials.listing-external-links', ['listing' => $package])
 
                 @include('partials.map-embed', ['latitude' => $package->latitude, 'longitude' => $package->longitude, 'name' => $package->name])
             </div>
@@ -113,6 +147,13 @@
 </div>
 
 <div class="sticky-cta">
-    <a href="{{ route('plan.edit') }}" class="btn btn-primary btn-block">Plan with this Package</a>
+    @if ($package->itineraryDays->isNotEmpty())
+        <form method="POST" action="{{ route('packages.plan-with', $package) }}">
+            @csrf
+            <button type="submit" class="btn btn-primary btn-block">Plan with this Package</button>
+        </form>
+    @else
+        <a href="{{ route('plan.edit') }}" class="btn btn-primary btn-block">Plan My Trip</a>
+    @endif
 </div>
 @endsection

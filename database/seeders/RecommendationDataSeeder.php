@@ -48,7 +48,7 @@ class RecommendationDataSeeder extends Seeder
             'Eden Nature Park' => ['Parking Area', 'Restaurant', 'Restroom', 'Air Conditioning'],
             'Philippine Eagle Center' => ['Parking Area', 'Restroom', 'Accessibility Ramp'],
             "People's Park" => ['Parking Area', 'Restroom', 'Wi-Fi', 'Accessibility Ramp'],
-            'Davao Crocodile Park' => ['Parking Area', 'Restaurant', 'Restroom'],
+            'Davao Crocodile Park Inc' => ['Parking Area', 'Restaurant', 'Restroom'],
             'Malagos Garden Resort' => ['Parking Area', 'Restaurant', 'Restroom', 'Wi-Fi'],
             'Mount Apo Natural Park' => ['Parking Area', 'Restroom'],
             'Dahican Beach' => ['Parking Area', 'Restaurant', 'Restroom'],
@@ -116,7 +116,7 @@ class RecommendationDataSeeder extends Seeder
                 'anchor_partner_chance' => 55,
                 'items' => [
                     $this->listing('destination', 'Philippine Eagle Center'),
-                    $this->listing('destination', 'Davao Crocodile Park'),
+                    $this->listing('destination', 'Davao Crocodile Park Inc'),
                     $this->listing('package', 'Eden Nature Park Day Adventure'),
                 ],
                 'activities' => ['Nature & Adventure', 'Wildlife'],

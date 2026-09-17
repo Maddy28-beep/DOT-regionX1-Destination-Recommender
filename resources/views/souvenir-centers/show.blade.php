@@ -21,6 +21,9 @@
         {{ $souvenirCenter->name }}
     </nav>
 
+    <x-advisory-banner :advisories="\App\Models\Advisory::active()->forListing($souvenirCenter->getMorphClass(), $souvenirCenter->id)->latest()->get()" />
+    <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($souvenirCenter->getMorphClass(), $souvenirCenter->id)->latest()->get()" />
+
     @include('partials.gallery-hero', [
         'photos' => $souvenirCenter->photos,
         'title' => $souvenirCenter->name,
@@ -56,6 +59,8 @@
                 <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="btn btn-primary btn-block">Get Directions</a>
                 @include('partials.check-in-button', ['type' => 'souvenir-centers', 'listing' => $souvenirCenter])
                 <x-save-heart type="souvenir-centers" :listing="$souvenirCenter" variant="button" class="mt-10" />
+
+                @include('partials.listing-external-links', ['listing' => $souvenirCenter])
 
                 @include('partials.map-embed', ['latitude' => $souvenirCenter->latitude, 'longitude' => $souvenirCenter->longitude, 'name' => $souvenirCenter->name])
             </div>

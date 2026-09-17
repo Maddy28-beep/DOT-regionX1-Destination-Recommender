@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Itinerary;
+use App\Models\ItineraryItem;
 use App\Models\Package;
 use App\Models\Region;
+use App\Models\TouristPreference;
 use App\Services\Recommendation\ContentBasedRecommendationService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use App\Support\Toast;
 
 class PackageController extends Controller
 {
@@ -89,7 +95,7 @@ class PackageController extends Controller
     {
         abort_if($package->archived_at || ! $package->is_accredited, 404);
 
-        $package->load(['region', 'inclusions', 'photos', 'tourOperator', 'reviews' => fn ($q) => $q->latest()->take(10)]);
+        $package->load(['region', 'inclusions', 'itineraryDays', 'photos', 'tourOperator', 'reviews' => fn ($q) => $q->latest()->take(10)]);
 
         $nearby = Package::publiclyVisible()->with('region', 'photos')
             ->where('region_id', $package->region_id)
@@ -99,5 +105,73 @@ class PackageController extends Controller
             ->get();
 
         return view('packages.show', compact('package', 'nearby'));
+    }
+
+    /**
+     * Adopt this package's day-by-day breakdown as the traveller's plan,
+     * skipping the preference survey and the recommender entirely.
+     *
+     * Reuses the ordinary Itinerary/ItineraryItem tables (and so the whole
+     * My Itinerary page, unchanged) rather than a separate display path --
+     * an ItineraryItem with no destination/accommodation/restaurant id
+     * already renders as plain text with no map link, which is exactly what
+     * a package day (a title and a description, not a real listing) is.
+     *
+     * A fresh TouristPreference is created each time rather than reusing
+     * whatever the session already had: this is a deliberate "give me this
+     * instead" action, not an edit to an existing custom plan, and the
+     * fields below exist only to satisfy the session-based plan machinery
+     * every other page reads -- they are never scored against anything.
+     */
+    public function planWith(Request $request, Package $package): RedirectResponse
+    {
+        abort_if($package->archived_at || ! $package->is_accredited, 404);
+
+        $package->loadMissing('itineraryDays');
+
+        if ($package->itineraryDays->isEmpty()) {
+            return back()->with(Toast::success(
+                'No itinerary yet',
+                'This provider hasn\'t published a day-by-day schedule for this package yet.'
+            ));
+        }
+
+        [$preference, $itinerary] = DB::transaction(function () use ($package) {
+            $preference = TouristPreference::create([
+                'travel_days' => $package->itineraryDays->max('day_number'),
+                'travel_type' => 'Solo',
+                'budget' => $package->price_tier ?? 'Mid-range',
+                'accommodation_pref' => 'Any',
+                'distance_pref' => 'moderate',
+            ]);
+
+            $itinerary = Itinerary::create([
+                'preference_id' => $preference->id,
+                'package_id' => $package->id,
+                'total_days' => $package->itineraryDays->max('day_number'),
+                'est_budget_total' => $package->price_per_pax,
+                'generated_at' => now(),
+            ]);
+
+            foreach ($package->itineraryDays as $day) {
+                ItineraryItem::create([
+                    'itinerary_id' => $itinerary->id,
+                    'day_number' => $day->day_number,
+                    'sort_order' => 0,
+                    'slot' => 'Full Day',
+                    'kind' => 'activity',
+                    'title' => $day->title,
+                    'note' => $day->description,
+                ]);
+            }
+
+            return [$preference, $itinerary];
+        });
+
+        $request->session()->put(TripPlannerController::PREFERENCE_KEY, $preference->id);
+        $request->session()->put(TripPlannerController::ITINERARY_KEY, $itinerary->id);
+
+        return redirect()->route('plan.itinerary')
+            ->with(Toast::success('Package added to your plan', "\"{$package->name}\" is now your itinerary below."));
     }
 }

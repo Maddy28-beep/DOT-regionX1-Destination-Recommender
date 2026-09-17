@@ -17,12 +17,27 @@
     // Blade component renders in its own scope, so a variable shared with the
     // page never reaches here. The lookup is memoized per request, so a grid
     // of cards still costs one query.
-    $kind = \App\Http\Controllers\SavedListingController::TYPES[$type]['kind'] ?? null;
-    $savedKeys = \App\Http\Controllers\SavedListingController::savedKeys(request());
+    //
+    // A logged-in tourist's heart checks/posts against their account-scoped
+    // list instead of the anonymous browser-token one, so the same control
+    // never shows two different "saved" states for the same listing. The
+    // anonymous path below is untouched when no tourist is signed in.
+    $isTourist = auth('tourist')->check();
+
+    if ($isTourist) {
+        $kind = \App\Http\Controllers\Tourist\TouristSavedDestinationController::TYPES[$type]['kind'] ?? null;
+        $savedKeys = \App\Http\Controllers\Tourist\TouristSavedDestinationController::savedKeys(request());
+        $toggleRoute = route('account.saved.toggle', [$type, $listing->id]);
+    } else {
+        $kind = \App\Http\Controllers\SavedListingController::TYPES[$type]['kind'] ?? null;
+        $savedKeys = \App\Http\Controllers\SavedListingController::savedKeys(request());
+        $toggleRoute = route('saved.toggle', [$type, $listing->id]);
+    }
+
     $isSaved = in_array($kind.':'.$listing->id, $savedKeys, true);
 @endphp
 
-<form method="POST" action="{{ route('saved.toggle', [$type, $listing->id]) }}"
+<form method="POST" action="{{ $toggleRoute }}"
       class="save-form save-form--{{ $variant }} {{ $class }}">
     @csrf
     @if ($variant === 'button')

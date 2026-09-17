@@ -23,6 +23,9 @@
         {{ $restaurant->name }}
     </nav>
 
+    <x-advisory-banner :advisories="\App\Models\Advisory::active()->forListing($restaurant->getMorphClass(), $restaurant->id)->latest()->get()" />
+    <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($restaurant->getMorphClass(), $restaurant->id)->latest()->get()" />
+
     @include('partials.gallery-hero', [
         'photos' => $restaurant->photos,
         'title' => $restaurant->name,
@@ -77,6 +80,8 @@
                 <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="btn btn-primary btn-block">Get Directions</a>
                 @include('partials.check-in-button', ['type' => 'restaurants', 'listing' => $restaurant])
                 <x-save-heart type="restaurants" :listing="$restaurant" variant="button" class="mt-10" />
+
+                @include('partials.listing-external-links', ['listing' => $restaurant])
 
                 @include('partials.map-embed', ['latitude' => $restaurant->latitude, 'longitude' => $restaurant->longitude, 'name' => $restaurant->name])
             </div>

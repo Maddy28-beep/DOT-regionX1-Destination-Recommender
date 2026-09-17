@@ -60,8 +60,9 @@ class TourOperatorSeeder extends Seeder
                 'specialization' => $o['specialization'],
                 'description' => $o['description'],
                 'is_accredited' => true,
-                'price_tier' => $o['price_tier'],
-                'contact_number' => $o['contact_number'],
+                // Neither is on file for any of these 5 operators yet.
+                'price_tier' => $o['price_tier'] ?? null,
+                'contact_number' => $o['contact_number'] ?? null,
                 'latitude' => $o['latitude'],
                 'longitude' => $o['longitude'],
             ]);

@@ -29,7 +29,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('exit_surveys', function (Blueprint $table) {
-            $table->foreignUuid('preference_id')->nullable()->after('id')
+            // tourist_preferences.id is a bigint auto-increment, not a UUID
+            // (only Itinerary uses HasUuids) -- foreignUuid() here produced a
+            // uuid column that Postgres refused to key against it.
+            $table->foreignId('preference_id')->nullable()->after('id')
                 ->constrained('tourist_preferences')->nullOnDelete();
         });
     }
