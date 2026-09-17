@@ -47,7 +47,16 @@
     @error('latitude') <div class="alert alert-error">{{ $message }}</div> @enderror
     @error('longitude') <div class="alert alert-error">{{ $message }}</div> @enderror
 
-    <div id="location-picker" style="height:320px; border-radius:var(--radius-sm); margin-top:10px;"></div>
+    {{--
+        .listing-map (public listing pages, map-embed.blade.php) already
+        carries isolation:isolate specifically because Leaflet's own panes
+        and controls use a z-index stack up to ~700, which -- without a
+        contained stacking context -- can paint over the site header
+        (z-index 50) while scrolling past the map. This picker never got
+        that same containment, so it had the identical failure mode; reusing
+        the class rather than duplicating the rule under a new name.
+    --}}
+    <div id="location-picker" class="listing-map" style="height:320px; border-radius:var(--radius-sm); margin-top:10px;"></div>
 
     <input type="hidden" name="latitude" id="picker-lat" value="{{ $hasPoint ? $lat : '' }}">
     <input type="hidden" name="longitude" id="picker-lng" value="{{ $hasPoint ? $lng : '' }}">
@@ -76,7 +85,11 @@
         var start = @json($hasPoint ? ['lat' => (float) $lat, 'lng' => (float) $lng] : $fallback);
         var placed = @json($hasPoint);
 
-        var map = L.map(el).setView([start.lat, start.lng], placed ? 16 : 11);
+        // scrollWheelZoom: false -- same reasoning as partials/map-embed.blade.php:
+        // without it, scrolling the page while the cursor happens to be over the
+        // map hijacks the scroll into a zoom instead, which can fling the view
+        // out to a whole different country in a couple of wheel ticks.
+        var map = L.map(el, { scrollWheelZoom: false }).setView([start.lat, start.lng], placed ? 16 : 11);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

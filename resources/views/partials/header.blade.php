@@ -49,7 +49,7 @@
                 <x-icon name="heart" />
                 Saved
             </a>
-            <a href="{{ route('plan.edit') }}" class="btn btn-primary">Plan My Trip</a>
+            <a href="{{ route('plan.choose') }}" class="btn btn-primary">Plan My Trip</a>
 
             <button type="button" class="nav-toggle" id="mobileMenuToggle" aria-label="Open menu" aria-haspopup="dialog" aria-expanded="false" aria-controls="mobileMenu">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -138,7 +138,7 @@
     </nav>
 
     <div class="mobile-menu__foot">
-        <a href="{{ route('plan.edit') }}" class="btn btn-primary btn-block">Plan My Trip</a>
+        <a href="{{ route('plan.choose') }}" class="btn btn-primary btn-block">Plan My Trip</a>
     </div>
 </div>
 
