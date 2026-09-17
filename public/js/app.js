@@ -523,6 +523,10 @@ document.addEventListener('DOMContentLoaded', function () {
         var count = root.querySelector('[data-count]');
         var values = root.querySelector('[data-values]');
         var MAX_RESULTS = 8;
+        // "Which one of these is it" is a pick-one question, not a
+        // multi-select -- data-max="1" swaps the chip on each new pick
+        // instead of requiring the previous one to be removed first.
+        var max = parseInt(root.getAttribute('data-max') || '0', 10) || Infinity;
 
         var selected = (JSON.parse(root.getAttribute('data-selected') || '[]') || [])
             .map(function (v) { return String(v).replace(prefix, ''); });
@@ -566,9 +570,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 values.appendChild(hidden);
             });
 
-            count.textContent = selected.length === 0
-                ? 'None selected'
-                : selected.length + ' selected';
+            if (max === 1) {
+                /*
+                 * A single-pick field showing an open, empty search box right
+                 * beside an already-chosen chip reads as "add more of
+                 * these" -- reasonable for the exit survey's real multi-select
+                 * pickers, misleading here where only the last pick is ever
+                 * kept. Hiding the box once full removes that false
+                 * affordance; removing the chip's × brings it back.
+                 */
+                search.hidden = selected.length >= 1;
+                count.hidden = true;
+            } else {
+                count.textContent = selected.length === 0
+                    ? 'None selected'
+                    : selected.length + ' selected';
+            }
         }
 
         function close() {
@@ -613,7 +630,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         function add(id) {
-            if (selected.indexOf(String(id)) === -1) selected.push(String(id));
+            if (max === 1) {
+                selected = [String(id)];
+            } else if (selected.indexOf(String(id)) === -1) {
+                selected.push(String(id));
+            }
             render();
             search.value = '';
             close();

@@ -44,7 +44,7 @@ class AdminDashboardController extends Controller
             // "2026-08-30" a toDateString() produces. A straight comparison
             // reads 0 forever. Same trap as CheckInController's dedupe.
             'checkins_today' => TouristVisit::whereDate('visit_date', now()->toDateString())->count(),
-            'destinations' => Destination::where('is_accredited', true)->count(),
+            'total_accredited' => $this->totalAccreditedCount(),
             'pending_establishments' => EstablishmentAccount::where('status', 'pending')->count(),
             'expiring_accreditations' => AccreditationRecord::where('status', 'Expiring Soon')->count(),
         ];
@@ -79,8 +79,12 @@ class AdminDashboardController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        // location rides along as the picker's meta line -- the only thing
+        // that tells "Davao Crocodile Park" apart from "Davao Crocodile Park
+        // Inc" in a search result.
         $listingOptions = collect(self::ESTABLISHMENT_LISTING_KINDS)
-            ->map(fn ($modelClass) => $modelClass::orderBy('name')->get(['id', 'name']));
+            ->map(fn ($modelClass) => $modelClass::orderBy('name')->get(['id', 'name', 'location'])
+                ->map(fn ($row) => ['id' => $row->id, 'name' => $row->name, 'meta' => $row->location]));
 
         return view('admin.establishments', compact('establishments', 'status', 'listingOptions'));
     }
@@ -125,11 +129,38 @@ class AdminDashboardController extends Controller
 
         $establishment->update(['matched_listing_id' => $data['matched_listing_id'] ?? null]);
 
-        $toast = $data['matched_listing_id']
-            ? Toast::success('Listing linked', "{$establishment->business_name} is now matched to its catalog listing.")
-            : Toast::success('Listing link cleared', "{$establishment->business_name} is no longer matched to a listing.");
+        if (! $data['matched_listing_id']) {
+            return back()->with(Toast::success('Listing link cleared', "{$establishment->business_name} is no longer matched to a listing."));
+        }
 
-        return back()->with($toast);
+        $listingName = $modelClass::find($data['matched_listing_id'])->name;
+
+        /*
+         * Not a rejection -- the save above already happened. This only
+         * decides which toast the admin sees, so a mismatch never blocks a
+         * legitimate rename or typo, only flags an obviously wrong pairing.
+         * 40% was picked against real catalog names: near-duplicates like
+         * "Davao Crocodile Park" / "Davao Crocodile Park Inc" score 90%+,
+         * unrelated businesses score under 25%.
+         */
+        if (self::nameSimilarity($establishment->business_name, $listingName) < 40) {
+            return back()->with(Toast::error(
+                'Match saved, but check it',
+                "\"{$establishment->business_name}\" doesn't closely resemble \"{$listingName}\" — confirm this is the right listing before approving."
+            ));
+        }
+
+        return back()->with(Toast::success('Listing linked', "{$establishment->business_name} is now matched to its catalog listing."));
+    }
+
+    /** Percentage similarity, ignoring case and punctuation -- "X Inc" vs "X" should not read as unrelated. */
+    private static function nameSimilarity(string $a, string $b): float
+    {
+        $normalize = fn (string $s) => trim(preg_replace('/[^a-z0-9 ]/', ' ', strtolower($s)));
+
+        similar_text($normalize($a), $normalize($b), $percent);
+
+        return $percent;
     }
 
     public function accreditation(Request $request): View
@@ -490,6 +521,42 @@ class AdminDashboardController extends Controller
             'headers' => ['Place', 'Type', 'Visits Reported'],
             'rows' => $rows->map(fn ($r) => [$r['name'], $r['kind'], $r['visits']])->all(),
         ];
+    }
+
+    /**
+     * How many listings across all six catalog types currently count as
+     * accredited for the Overview headline stat.
+     *
+     * is_accredited (the flag) and the matched AccreditationRecord's own
+     * status string are deliberately separate facts elsewhere in the app --
+     * see EstablishmentAccount::portalStatus() -- because a listing stays
+     * publicly visible for a grace period after its paperwork lapses. That
+     * distinction is right for an individual listing page, but wrong for a
+     * summary count: something whose accreditation has actually expired
+     * should not be counted among "currently accredited" here, even while
+     * DOT Region XI has not yet flipped is_accredited off for it.
+     */
+    private function totalAccreditedCount(): int
+    {
+        $kinds = [
+            'destination' => Destination::class,
+            'accommodation' => Accommodation::class,
+            'restaurant' => Restaurant::class,
+            'package' => Package::class,
+            'souvenir_center' => SouvenirCenter::class,
+            'tour_operator' => TourOperator::class,
+        ];
+
+        return collect($kinds)->map(function ($model, $kind) {
+            $accreditedIds = $model::where('is_accredited', true)->pluck('id');
+
+            $expiredCount = AccreditationRecord::where('listing_kind', $kind)
+                ->whereIn('listing_id', $accreditedIds)
+                ->where('status', 'Expired')
+                ->count();
+
+            return $accreditedIds->count() - $expiredCount;
+        })->sum();
     }
 
     private function resolveListingName(string $kind, int $id): ?string

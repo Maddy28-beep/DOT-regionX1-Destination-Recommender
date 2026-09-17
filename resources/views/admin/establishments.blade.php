@@ -29,7 +29,7 @@
             <tbody>
                 @forelse ($establishments as $e)
                     <tr>
-                        <td>{{ $e->business_name }}<br><span class="cell-muted">{{ $e->email }}</span></td>
+                        <td>{{ $e->business_name }}</td>
                         <td class="cell-muted">{{ ucfirst(str_replace('_', ' ', $e->listing_kind)) }}</td>
                         <td class="cell-muted">{{ $e->contact_person }}<br>{{ $e->contact_number }}</td>
                         <td class="cell-muted">{{ $e->claimed_accreditation_number ?? '—' }}</td>
@@ -37,28 +37,40 @@
                         <td>
                             <span class="status-pill status-{{ $e->status }}">{{ ucfirst($e->status) }}</span>
                         </td>
-                        <td>
-                            <form method="POST" action="{{ route('admin.establishments.match', $e) }}" class="util-row">
+                        <td style="min-width:220px;">
+                            {{--
+                                Was a plain alphabetical <select> -- fine for a
+                                handful of souvenir centers, unworkable for the
+                                92 tour operators or ~90 restaurants admin has
+                                to scan one at a time. Same searchable picker
+                                the exit survey uses, single-select mode.
+                                Removing the chip and hitting Save clears the
+                                link, same as the old "Not linked" option did.
+                            --}}
+                            <form method="POST" action="{{ route('admin.establishments.match', $e) }}" class="util-row" style="align-items:flex-start;">
                                 @csrf
-                                <select name="matched_listing_id" style="max-width:180px; font-size:.8rem;">
-                                    <option value="">Not linked</option>
-                                    @foreach ($listingOptions[$e->listing_kind] ?? [] as $listing)
-                                        <option value="{{ $listing->id }}" @selected($e->matched_listing_id === $listing->id)>{{ $listing->name }}</option>
-                                    @endforeach
-                                </select>
+                                @include('partials.tag-picker', [
+                                    'name' => 'matched_listing_id',
+                                    'label' => 'Matched listing for '.$e->id,
+                                    'hideLabel' => true,
+                                    'items' => $listingOptions[$e->listing_kind] ?? [],
+                                    'placeholder' => 'Search…',
+                                    'selected' => $e->matched_listing_id ? [$e->matched_listing_id] : [],
+                                    'max' => 1,
+                                ])
                                 <button type="submit" class="btn btn-outline" style="padding:6px 10px; font-size:.8rem;">Save</button>
                             </form>
                         </td>
-                        <td>
+                        <td style="white-space:nowrap;">
                             @if ($e->status === 'pending')
-                                <div class="util-row">
+                                <div class="util-row" style="flex-wrap:nowrap;">
                                     <form method="POST" action="{{ route('admin.establishments.approve', $e) }}">
                                         @csrf
-                                        <button type="submit" class="btn btn-primary" style="padding:6px 12px; font-size:.8rem;">Approve</button>
+                                        <button type="submit" class="btn btn-primary" style="padding:6px 12px; font-size:.8rem; white-space:nowrap;">Approve</button>
                                     </form>
                                     <form method="POST" action="{{ route('admin.establishments.reject', $e) }}">
                                         @csrf
-                                        <button type="submit" class="btn btn-outline" style="padding:6px 12px; font-size:.8rem;">Reject</button>
+                                        <button type="submit" class="btn btn-outline" style="padding:6px 12px; font-size:.8rem; white-space:nowrap;">Reject</button>
                                     </form>
                                 </div>
                             @else

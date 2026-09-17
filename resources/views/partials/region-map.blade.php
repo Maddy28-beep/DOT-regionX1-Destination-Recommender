@@ -41,7 +41,16 @@
                 var el = document.getElementById('region-map');
                 if (!el || !window.L) return;
 
-                var map = L.map(el, { scrollWheelZoom: false }).setView([7.1, 125.8], 8);
+                /*
+                 * dragging: false -- the map already fits every region in
+                 * view via fitBounds() below, so there is nothing to pan to.
+                 * Left on, a one-finger swipe that starts on the map pans it
+                 * instead of scrolling the page underneath it -- on a phone,
+                 * where this section fills most of the viewport, that reads
+                 * as the whole page being stuck. Pins still open on tap;
+                 * pinch and the +/- buttons still zoom.
+                 */
+                var map = L.map(el, { scrollWheelZoom: false, dragging: false }).setView([7.1, 125.8], 8);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     maxZoom: 18,
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

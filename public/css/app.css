@@ -1193,7 +1193,12 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 .postcard-card {
     position: relative;
     aspect-ratio: 16 / 9;
-    max-height: 780px;
+    /* 16/9 of a wide window is taller than the window itself -- at 1280x720
+       the card came out 711px in a 720px viewport, so the category label
+       pinned to its bottom edge sat exactly at the fold and the slide read
+       as a full-bleed image with no caption. Capping against viewport
+       height keeps the whole postcard, label included, in one glance. */
+    max-height: min(780px, 72vh);
     overflow: hidden;
 }
 .postcard-card__scene {
@@ -1814,6 +1819,12 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     /* Sits under the popups and tooltips Leaflet appends, but above the figure
        background, which would otherwise show through the tile seams. */
     background: var(--bg);
+    /* Same containment .listing-map needs, for the same reason: Leaflet's
+       panes run to z-index 700 and the site header is 50, so without a
+       stacking context of its own the map paints straight over the header
+       while you scroll past it. */
+    position: relative;
+    isolation: isolate;
 }
 .region-map__fallback { font-size: .85rem; color: var(--muted); margin: 10px 0 0; }
 /* The figure's caption is absolutely positioned so it could overlay the SVG
@@ -3275,7 +3286,11 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
    anywhere else that asks a person to pick a few rows out of hundreds can use
    it as-is.
    ========================================================================== */
-.tag-picker { margin-top: 16px; }
+/* position: relative so .tag-picker__results below can float over whatever
+   comes after it instead of pushing it down the page -- critical once this
+   sits inside a table row, where every open search would otherwise shove
+   every row below it downward for as long as results were showing. */
+.tag-picker { margin-top: 16px; position: relative; }
 .tag-picker > label {
     display: block;
     font-size: .82rem;
@@ -3283,6 +3298,11 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
     color: var(--ink);
     margin-bottom: 6px;
 }
+/* Used with a hidden label (a single-pick field wedged into a table cell,
+   e.g. admin's establishment-match column) -- no label to reserve space
+   under, and the row should stay close to the compact height of its
+   neighbours rather than the full form-field spacing this gets elsewhere. */
+.tag-picker--compact { margin-top: 0; min-width: 200px; }
 /* The box mimics a text input so the control reads as one field rather than a
    widget bolted beside one -- same border, radius and focus ring as .field
    input, which it sits alongside. */
@@ -3341,7 +3361,12 @@ body.hero-page .site-header.scrolled .btn-primary:hover { background: var(--prim
 
 .tag-picker__results {
     list-style: none;
-    margin: 4px 0 0;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 30;
+    margin: 0;
     padding: 4px;
     border: 1px solid var(--border);
     border-radius: var(--field-radius);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Establishment;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\QrCodeController;
+use App\Models\Package;
 use App\Models\Review;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -89,6 +90,13 @@ class EstablishmentDashboardController extends Controller
             'description' => ['nullable', 'string', 'max:1000'],
             'price_tier' => ['nullable', 'string', 'max:20'],
             'price_amount' => ['nullable', 'numeric', 'min:0'],
+            'check_in' => ['nullable', 'date_format:H:i'],
+            'check_out' => ['nullable', 'date_format:H:i'],
+            'opening_hours' => ['nullable', 'string', 'max:100'],
+            'contact_number' => ['nullable', 'string', 'max:20'],
+            'duration_label' => ['nullable', 'string', 'max:50'],
+            'duration_days' => ['nullable', 'integer', 'min:1'],
+            'inclusions' => ['nullable', 'string'],
             /*
              * Position, set by the establishment itself on the map.
              *
@@ -118,15 +126,39 @@ class EstablishmentDashboardController extends Controller
         $listing->latitude = $data['latitude'] ?? null;
         $listing->longitude = $data['longitude'] ?? null;
 
-        match ($establishment->listing_kind) {
-            'accommodation' => $listing->price_per_night = $data['price_amount'] ?? null,
-            'package' => $listing->price_per_pax = $data['price_amount'] ?? null,
-            default => null,
-        };
+        // Each kind's own operational fields -- the ones a business changes
+        // on its own schedule (seasonal hours, a new front-desk number), as
+        // opposed to the DOT-classification fields admin alone controls.
+        if ($establishment->listing_kind === 'accommodation') {
+            $listing->price_per_night = $data['price_amount'] ?? null;
+            $listing->check_in = $data['check_in'] ?? null;
+            $listing->check_out = $data['check_out'] ?? null;
+        } elseif ($establishment->listing_kind === 'package') {
+            $listing->price_per_pax = $data['price_amount'] ?? null;
+            $listing->duration_label = $data['duration_label'] ?? null;
+            $listing->duration_days = $data['duration_days'] ?? null;
+            $this->syncInclusions($listing, $data['inclusions'] ?? '');
+        } elseif ($establishment->listing_kind === 'restaurant') {
+            $listing->opening_hours = $data['opening_hours'] ?? null;
+            $listing->contact_number = $data['contact_number'] ?? null;
+        } elseif ($establishment->listing_kind === 'tour_operator') {
+            $listing->contact_number = $data['contact_number'] ?? null;
+        }
 
         $listing->save();
 
         return redirect()->route('establishment.overview')->with(Toast::success('Listing updated', 'Your changes are now live on the public catalog.'));
+    }
+
+    /** Mirrors Admin\AdminListingController::syncInclusions() -- one item per line. */
+    private function syncInclusions(Package $package, string $inclusions): void
+    {
+        $package->inclusions()->delete();
+
+        collect(explode("\n", $inclusions))
+            ->map(fn ($line) => trim($line))
+            ->filter()
+            ->each(fn ($item) => $package->inclusions()->create(['item' => $item]));
     }
 
     public function reviews(Request $request): View
