@@ -175,6 +175,10 @@ class TripPlannerController extends Controller
             'range_requested' => $preference->distance_pref,
             'range_tier_used' => $itinerary->range_tier_used,
             'range_widened' => $itinerary->range_widened,
+            // true/false once ItineraryGenerationService has actually recorded
+            // an outcome for this itinerary, or null if it predates that
+            // column -- never assumed from the itinerary merely existing.
+            'ml_applied' => $itinerary->ml_skeleton_applied,
         ];
 
         return view('plan.itinerary', compact('itinerary', 'preference', 'provenance'));

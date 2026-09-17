@@ -133,6 +133,13 @@
                                 Sequenced by geographic proximity, with complementary stops surfaced from what past travelers tend to pair together.
                             @endif
                         </p>
+                        @unless ($itinerary->package)
+                            <button type="button" class="itinerary-explainer-trigger" id="itineraryExplainerOpen"
+                                    aria-haspopup="dialog" aria-controls="itineraryExplainerModal" aria-expanded="false">
+                                <x-icon name="info" />
+                                How was this itinerary created?
+                            </button>
+                        @endunless
                     </div>
                 </div>
                 <div class="panel-body">
@@ -376,6 +383,109 @@
     </div>
 </div>
 
+@unless ($itinerary->package)
+    {{--
+        A hidden-by-default explainer, not a permanent panel: the tourist sees
+        the itinerary first, and only reaches this if they click "How was
+        this itinerary created?" above. Structurally a sibling of .dash-shell
+        (same reasoning as partials/header.blade.php's .mobile-menu) so it is
+        never clipped or repositioned by an ancestor's own layout.
+    --}}
+    <div class="info-modal-overlay" id="itineraryExplainerOverlay"></div>
+    <div class="info-modal" id="itineraryExplainerModal" role="dialog" aria-modal="true" aria-labelledby="itineraryExplainerTitle" inert>
+        <div class="info-modal__card">
+            <div class="info-modal__head">
+                <h3 id="itineraryExplainerTitle">How was your itinerary created?</h3>
+                <button type="button" class="info-modal__close" id="itineraryExplainerClose" aria-label="Close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="info-modal__body">
+                <p>Your itinerary is personalized using several recommendation and planning methods:</p>
+
+                <ul class="explainer-list">
+                    <li>
+                        <span class="explainer-emoji" aria-hidden="true">🎯</span>
+                        <div>
+                            <strong>Personalized recommendations</strong>
+                            <p>Destinations are ranked based on how well they match your travel preferences.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="explainer-emoji" aria-hidden="true">🔗</span>
+                        <div>
+                            <strong>Travel patterns</strong>
+                            <p>The system identifies destinations and establishments that travelers commonly visit together.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="explainer-emoji" aria-hidden="true">📍</span>
+                        <div>
+                            <strong>Route planning</strong>
+                            <p>Stops are arranged based on geographic proximity to create a practical travel sequence.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="explainer-emoji" aria-hidden="true">✨</span>
+                        <div>
+                            <strong>Smart day grouping</strong>
+                            <p>A pretrained machine learning model helps organize the selected stops across your available travel days.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="explainer-emoji" aria-hidden="true">🕐</span>
+                        <div>
+                            <strong>Schedule planning</strong>
+                            <p>The system assigns estimated travel, activity, meal, rest, and departure times to create your day-by-day schedule.</p>
+                        </div>
+                    </li>
+                </ul>
+
+                <details class="explainer-technical">
+                    <summary>View technical details</summary>
+                    <div class="explainer-technical__body">
+                        <dl class="explainer-technical-list">
+                            <div>
+                                <dt>Content-Based Recommendation</dt>
+                                <dd>Ranks destinations according to the tourist's stated preferences.</dd>
+                            </div>
+                            <div>
+                                <dt>Apriori Association Rules</dt>
+                                <dd>Identifies complementary destinations and establishments based on observed co-visitation patterns.</dd>
+                            </div>
+                            <div>
+                                <dt>Haversine Distance + Nearest-Neighbor Heuristic</dt>
+                                <dd>Creates the geographic travel sequence.</dd>
+                            </div>
+                            <div>
+                                <dt>
+                                    Pretrained ML &mdash; Phi-4-mini-instruct
+                                    @if ($provenance['ml_applied'] === true)
+                                        <span class="ml-status ml-status--applied">Status: Applied</span>
+                                    @elseif ($provenance['ml_applied'] === false)
+                                        <span class="ml-status ml-status--fallback">Status: Fallback used</span>
+                                    @else
+                                        <span class="ml-status ml-status--unknown">Status: Not recorded for this itinerary</span>
+                                    @endif
+                                </dt>
+                                <dd>Assists with grouping the already-ranked and already-sequenced destinations across the available itinerary days.</dd>
+                            </div>
+                            <div>
+                                <dt>Schedule Builder</dt>
+                                <dd>Converts the resulting itinerary structure into practical arrival, activity, meal, travel, rest, and departure times.</dd>
+                            </div>
+                        </dl>
+                        <p class="explainer-fallback-note">
+                            If the pretrained ML model cannot provide a valid result, the system uses its
+                            deterministic fallback logic so itinerary generation can still continue.
+                        </p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+@endunless
+
 <script>
     /*
      * Regenerating takes a fresh position if the traveller allows it, so a plan
@@ -400,5 +510,44 @@
             { timeout: 8000, maximumAge: 300000 }
         );
     });
+
+    /*
+     * "How was this itinerary created?" explainer -- same inert/overlay/Escape
+     * pattern as partials/header.blade.php's mobile menu, just a centered
+     * dialog instead of a slide-in drawer. Guarded on the trigger existing
+     * since a package itinerary renders none of this markup at all.
+     */
+    (function () {
+        var openBtn = document.getElementById('itineraryExplainerOpen');
+        var modal = document.getElementById('itineraryExplainerModal');
+        var overlay = document.getElementById('itineraryExplainerOverlay');
+        var closeBtn = document.getElementById('itineraryExplainerClose');
+        if (!openBtn || !modal || !overlay || !closeBtn) return;
+
+        var open = function () {
+            modal.classList.add('open');
+            overlay.classList.add('open');
+            document.body.classList.add('info-modal-open');
+            modal.removeAttribute('inert');
+            openBtn.setAttribute('aria-expanded', 'true');
+            closeBtn.focus();
+        };
+
+        var close = function () {
+            modal.classList.remove('open');
+            overlay.classList.remove('open');
+            document.body.classList.remove('info-modal-open');
+            modal.setAttribute('inert', '');
+            openBtn.setAttribute('aria-expanded', 'false');
+            openBtn.focus();
+        };
+
+        openBtn.addEventListener('click', open);
+        closeBtn.addEventListener('click', close);
+        overlay.addEventListener('click', close);
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.classList.contains('open')) close();
+        });
+    })();
 </script>
 @endsection
