@@ -41,9 +41,16 @@ use Illuminate\Database\Seeder;
  *
  * Ratings stay at 0 / review_count 0: these are real businesses with no real
  * review data behind them, so "Not yet rated" is the honest state. Fields the
- * sheet does not carry (cuisine type, price tier, coordinates) are left null
- * rather than guessed -- except for the 49 establishments that an earlier pass
- * geocoded and curated, whose values are preserved in the JSON.
+ * sheet does not carry (cuisine type, price tier) are left null rather than
+ * guessed.
+ *
+ * Coordinates come from the group's DOT coordinate sheet (as of 03 September
+ * 2026), and only for rows it marks Verified or Corrected at establishment,
+ * building or manually corrected precision. A row the sheet locates only to a
+ * street, barangay, city centre or nearby landmark was not imported: it keeps
+ * whatever it had before, which is null (so the recommender treats its
+ * distance as approximate) or, for 27 rows, a pin from an earlier automated
+ * geocoding pass that still needs checking.
  */
 class RealAccreditedEstablishmentSeeder extends Seeder
 {
@@ -142,6 +149,13 @@ class RealAccreditedEstablishmentSeeder extends Seeder
                 }
             }
 
+            $listing->save();
+        } elseif ($listing->latitude === null && ($row['latitude'] ?? null) !== null) {
+            // Coordinates added to the data file after this listing was first
+            // seeded reach it on the next run. A listing that already has a
+            // position keeps it: that may be a partner's own portal map pin.
+            $listing->latitude = $row['latitude'];
+            $listing->longitude = $row['longitude'];
             $listing->save();
         }
 
