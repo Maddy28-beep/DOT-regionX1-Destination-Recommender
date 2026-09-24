@@ -318,6 +318,27 @@ a { color: inherit; text-decoration: none; }
    .auth-foot link treatment. */
 .field-hint a { color: var(--primary); font-weight: 600; }
 
+/*
+ * Inline swap-in for .field-hint on a few of the trip-planner fields (plan/
+ * preferences.blade.php): a full sentence under every field pushed neighbours
+ * in the same row out of alignment, since rows share a height. This keeps the
+ * explanation one focus/hover away via the native title tooltip and an
+ * aria-label for screen readers, instead of reserving vertical space for it.
+ */
+.field-help {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    margin-left: 4px;
+    color: var(--muted);
+    cursor: help;
+    vertical-align: -2px;
+}
+.field-help svg { width: 14px; height: 14px; }
+.field-help:hover, .field-help:focus-visible { color: var(--primary); }
+
 /* Partner-portal day-by-day itinerary editor (establishment/edit-listing) --
    one card per day instead of a "Title | Description" delimiter format in a
    plain textarea, which asked a non-technical tour operator to learn a
@@ -1301,7 +1322,7 @@ body.hero-page .site-header .btn-primary:hover { background: var(--primary-dark)
 
 body.hero-page .site-header.scrolled {
     /* position intentionally not changed here -- see the rule above. */
-    background: var(--paper);
+    background: var(--white);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     border-bottom-color: transparent;
@@ -2005,6 +2026,23 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
 @media (max-width: 640px) {
     .postcard-card { aspect-ratio: 4 / 5; }
     .postcard-arrow { width: 36px; height: 36px; }
+}
+
+/*
+ * Landing-page scroll reveal (see the app.js block guarded on body.hero-page
+ * for what gets this class and how the stagger delay is set). Only elements
+ * that script actually assigns .reveal-on-scroll to are affected, so this is
+ * inert everywhere .postcard-card/.dpost-card-wrap/.feature-card are reused
+ * off the homepage.
+ */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .6s ease, transform .6s ease;
+}
+.reveal-on-scroll.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+    .reveal-on-scroll { opacity: 1; transform: none; transition: none; }
 }
 
 /* ---------- Popular Destinations (magazine spread) ---------- */

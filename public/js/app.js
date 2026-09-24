@@ -792,3 +792,49 @@ document.addEventListener('DOMContentLoaded', function () {
     toggle.addEventListener('change', sync);
     sync();
 });
+
+/*
+ * Landing-page card reveal: postcard, destination/package, and feature cards
+ * fade and slide up as they scroll into view, staggered within each grid so
+ * they don't all snap in at once. Scoped to body.hero-page, which only
+ * welcome.blade.php sets -- .postcard-card, .dpost-grid and .feature-card
+ * are reused by pages (destination detail's related strip, saved places,
+ * the exit survey recap) that should keep showing their cards immediately.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    if (!document.body.classList.contains('hero-page')) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var STEP_MS = 80;
+    var MAX_DELAY_MS = 400;
+
+    [
+        document.querySelectorAll('.postcard-track > .postcard-card'),
+        document.querySelectorAll('.dpost-grid > *'),
+        document.querySelectorAll('.feature-grid > .feature-card'),
+    ].forEach(function (group) {
+        group.forEach(function (el, index) {
+            el.classList.add('reveal-on-scroll');
+            el.style.transitionDelay = Math.min(index * STEP_MS, MAX_DELAY_MS) + 'ms';
+        });
+    });
+
+    var revealTargets = document.querySelectorAll('.reveal-on-scroll');
+
+    if (!('IntersectionObserver' in window)) {
+        // No observer support: show everything immediately rather than
+        // leaving cards stuck invisible.
+        revealTargets.forEach(function (el) { el.classList.add('is-visible'); });
+        return;
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+        });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    revealTargets.forEach(function (el) { observer.observe(el); });
+});
