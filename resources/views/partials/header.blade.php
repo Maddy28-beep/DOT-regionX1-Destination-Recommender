@@ -36,16 +36,26 @@
             --}}
             @auth('tourist')
                 <span class="header-account-chip">
-                    <a href="{{ route('account.itineraries') }}">Hi, {{ auth('tourist')->user()->alias }}</a>
-                    <form method="POST" action="{{ route('account.logout') }}" style="display:inline;">
+                    <a href="{{ route('account.itineraries') }}" class="header-account-chip__name">
+                        <x-icon name="user" />
+                        <span>{{ auth('tourist')->user()->alias }}</span>
+                    </a>
+                    <form method="POST" action="{{ route('account.logout') }}" class="header-account-chip__logout-form">
                         @csrf
-                        <button type="submit" class="header-account-chip__logout">Log out</button>
+                        <button type="submit" class="header-account-chip__logout" aria-label="Log out" title="Log out">
+                            <x-icon name="log-out" />
+                        </button>
                     </form>
                 </span>
             @else
                 <a href="{{ route('account.login') }}" class="header-account-link">Log in</a>
             @endauth
-            <a href="{{ route('saved.index') }}" class="btn btn-outline">
+            {{-- This used to always point at the anonymous, browser-only
+                 list, so a signed-in traveler's own "Saved" button opened
+                 someone else's list -- the session's, not their account's --
+                 even while logged in. The mobile menu below already branched
+                 on auth state; this one had not. --}}
+            <a href="{{ auth('tourist')->check() ? route('account.saved') : route('saved.index') }}" class="btn btn-outline">
                 <x-icon name="heart" />
                 Saved
             </a>

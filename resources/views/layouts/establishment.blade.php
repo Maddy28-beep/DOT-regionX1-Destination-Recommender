@@ -74,18 +74,26 @@
     <div class="admin-shell">
         <aside class="admin-sidebar" id="estSidebar">
             <div class="group-label">My Establishment</div>
-            <a href="{{ route('establishment.overview') }}" class="{{ request()->routeIs('establishment.overview') ? 'active' : '' }}">Overview</a>
-            <a href="{{ route('establishment.listing.edit') }}" class="{{ request()->routeIs('establishment.listing.*') ? 'active' : '' }}">My Listing</a>
-            <a href="{{ route('establishment.photos') }}" class="{{ request()->routeIs('establishment.photos') ? 'active' : '' }}">Photos</a>
-            <a href="{{ route('establishment.promotions') }}" class="{{ request()->routeIs('establishment.promotions') ? 'active' : '' }}">Promos &amp; Discounts</a>
+            <a href="{{ route('establishment.overview') }}" class="{{ request()->routeIs('establishment.overview') ? 'active' : '' }}">
+                <span class="nav-link-label"><x-icon name="target" /><span>Overview</span></span>
+            </a>
+            <a href="{{ route('establishment.listing.edit') }}" class="{{ request()->routeIs('establishment.listing.*') ? 'active' : '' }}">
+                <span class="nav-link-label"><x-icon name="building" /><span>My Listing</span></span>
+            </a>
+            <a href="{{ route('establishment.photos') }}" class="{{ request()->routeIs('establishment.photos') ? 'active' : '' }}">
+                <span class="nav-link-label"><x-icon name="camera" /><span>Photos</span></span>
+            </a>
+            <a href="{{ route('establishment.promotions') }}" class="{{ request()->routeIs('establishment.promotions') ? 'active' : '' }}">
+                <span class="nav-link-label"><x-icon name="star" /><span>Promos &amp; Discounts</span></span>
+            </a>
             <a href="{{ route('establishment.reviews') }}" class="{{ request()->routeIs('establishment.reviews') ? 'active' : '' }}">
-                <span>Guest Reviews</span>
+                <span class="nav-link-label"><x-icon name="chat" /><span>Guest Reviews</span></span>
                 @if ($navUnrepliedCount > 0)
                     <span class="nav-badge" title="{{ $navUnrepliedCount }} awaiting your reply">{{ $navUnrepliedCount }}</span>
                 @endif
             </a>
             <a href="{{ route('establishment.notifications') }}" class="{{ request()->routeIs('establishment.notifications') ? 'active' : '' }}">
-                <span>Notifications</span>
+                <span class="nav-link-label"><x-icon name="bell" /><span>Notifications</span></span>
                 @if ($navUnreadCount > 0)
                     <span class="nav-badge" title="{{ $navUnreadCount }} unread">{{ $navUnreadCount }}</span>
                 @endif

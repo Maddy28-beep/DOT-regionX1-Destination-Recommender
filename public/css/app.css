@@ -833,12 +833,42 @@ a { color: inherit; text-decoration: none; }
 .site-header .btn-outline svg { width: 13px; height: 13px; flex-shrink: 0; }
 
 .header-account-link { font-size: .85rem; font-weight: 600; color: var(--ink); white-space: nowrap; }
-.header-account-chip { display: flex; align-items: center; gap: 6px; font-size: .85rem; white-space: nowrap; }
-.header-account-chip a { font-weight: 600; color: var(--ink); }
-.header-account-chip__logout {
-    background: none; border: none; padding: 0; font: inherit;
-    color: var(--muted); text-decoration: underline; cursor: pointer;
+/*
+ * Was two loose pieces of plain text ("Hi, alias" + underlined "Log out")
+ * sitting between two proper buttons (Saved, Plan My Trip) -- the one part
+ * of the header that read as unstyled placeholder rather than a designed
+ * affordance. Now a single bordered pill matching the weight of .btn-outline
+ * beside it: a name link with an icon, and a small round icon-only logout
+ * button, instead of underlined text.
+ */
+.header-account-chip {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 6px 5px 12px;
+    white-space: nowrap;
 }
+.header-account-chip__name { display: flex; align-items: center; gap: 6px; font-size: .85rem; font-weight: 600; color: var(--ink); }
+.header-account-chip__name svg { width: 15px; height: 15px; color: var(--muted); flex-shrink: 0; }
+.header-account-chip__logout-form { display: flex; }
+.header-account-chip__logout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+}
+.header-account-chip__logout svg { width: 14px; height: 14px; }
+.header-account-chip__logout:hover { background: var(--bg); color: var(--stamp-red); }
 
 .nav-toggle {
     display: none;
@@ -1053,6 +1083,43 @@ body.hero-page .site-header.scrolled {
     border-bottom-color: transparent;
 }
 
+/* AT TOP, over the hero only: no plate at all, so the bar blends into the
+   footage instead of sitting on a cream band. Readability comes from a dark
+   gradient that fades to nothing by the bar's bottom edge, plus light text
+   -- dark text is what forced the plate above. Once scrolled, every rule
+   here stops matching and the solid cream bar with dark text returns. */
+body.hero-page .site-header:not(.scrolled) {
+    /* border-box + no-repeat: a gradient is sized to the padding box by
+       default but still painted under the 1px (transparent) bottom border,
+       where it tiles -- repeating its dark top edge as a visible line
+       across the bottom of the bar. */
+    background: linear-gradient(to bottom, rgba(6, 28, 20, .55) 0%, rgba(6, 28, 20, 0) 100%) border-box no-repeat;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom-color: transparent;
+}
+body.hero-page .site-header:not(.scrolled) .brand,
+body.hero-page .site-header:not(.scrolled) .main-nav a,
+body.hero-page .site-header:not(.scrolled) .nav-toggle,
+body.hero-page .site-header:not(.scrolled) .header-account-link,
+body.hero-page .site-header:not(.scrolled) .header-account-chip a,
+body.hero-page .site-header:not(.scrolled) .header-account-chip__logout {
+    color: var(--paper);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, .35);
+}
+body.hero-page .site-header:not(.scrolled) .main-nav a:hover { color: #fff; }
+body.hero-page .site-header:not(.scrolled) .btn-outline {
+    border-color: rgba(255, 247, 233, .85);
+    color: var(--paper);
+    background: rgba(255, 247, 233, .08);
+}
+body.hero-page .site-header:not(.scrolled) .btn-outline:hover { background: rgba(255, 247, 233, .18); }
+/* The pill's own border -- var(--border) is a pale grey meant for a white
+   background, invisible against a photo. Same treatment as .btn-outline
+   just above, so the two pills read as one family over the hero. */
+body.hero-page .site-header:not(.scrolled) .header-account-chip { border-color: rgba(255, 247, 233, .5); }
+body.hero-page .site-header:not(.scrolled) .header-account-chip__logout:hover { background: rgba(255, 247, 233, .18); color: var(--paper); }
+
 /*
    Raised from 1220px: the wider spacing above plus the Saved heart icon
    measured a confirmed 43px overflow at 1280px (a common laptop width) --
@@ -1064,6 +1131,13 @@ body.hero-page .site-header.scrolled {
 @media (max-width: 1366px) {
     .main-nav { display: none; }
     .header-actions .btn-outline { display: none; }
+    /* Same reasoning as .btn-outline above: this pill (name + logout) never
+       had a width budget here to begin with -- unlike that button, nothing
+       ever hid it, so at a 375px phone it ran past the header's right edge
+       and got visibly clipped mid-word. The mobile drawer already shows
+       "Signed in as {alias}" with its own Log out button, so nothing is
+       lost by dropping it from the bar. */
+    .header-actions .header-account-chip { display: none; }
     .nav-toggle { display: inline-flex; }
 }
 
@@ -3051,6 +3125,12 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 .admin-sidebar a:hover { background: var(--bg); color: var(--ink); }
 .admin-sidebar a.active { color: var(--primary-dark); border-left-color: var(--primary); background: var(--primary-light); }
 .admin-sidebar .group-label { padding: 16px 22px 6px; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 700; }
+/* Groups a link's icon + text as one flex item, separate from a trailing
+   count badge -- so a link with justify-content: space-between (the portal
+   sidebar's unreplied-review / unread-notification counts) pushes the badge
+   to the far edge instead of space-between prying the icon away from its
+   own label. */
+.admin-sidebar a .nav-link-label { display: flex; align-items: center; gap: 10px; }
 
 .admin-main { flex: 1; min-width: 0; padding: 28px 24px; }
 
@@ -3083,38 +3163,46 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 }
 .admin .admin-topbar .sub { font-size: .9rem; margin-top: 4px; }
 
+/*
+ * Card panel, not a transparent column: a white plate with its own border,
+ * radius and shadow so the nav reads as one distinct object sitting beside
+ * the page, the way the stat cards and panels below it already do -- rather
+ * than its links floating loose against the paper background with nothing
+ * marking where "sidebar" ends and "page" begins.
+ */
 .admin .admin-sidebar {
-    background: transparent;
-    border-right: none;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
     top: 88px;
-    padding: 4px 14px 20px 0;
+    margin: 26px 20px 32px 24px;
+    padding: 14px 10px;
     min-height: 0;
 }
 /*
- * Section rhythm: items within a group sit close together (10px padding,
- * no inter-link margin -- an 20px text-to-text gap), while a new group's
- * heading gets real top breathing room (20px) so a section boundary
- * actually reads as one, rather than blending into the ordinary link-to-
- * link gap above it. Before this, both gaps worked out to roughly the
- * same size, so nothing visually separated one section from the next.
- * The very first heading keeps its original small top offset, since nothing
- * precedes it to separate from.
+ * Section rhythm: items within a group sit close together (4px between
+ * links), while a new group's heading gets real top breathing room (22px)
+ * so a section boundary actually reads as one, rather than blending into
+ * the ordinary link-to-link gap above it. The very first heading keeps a
+ * small top offset, since nothing precedes it to separate from.
  */
-.admin .admin-sidebar .group-label { padding: 20px 14px 8px; }
-.admin .admin-sidebar .group-label:first-child { padding-top: 6px; }
+.admin .admin-sidebar .group-label { padding: 22px 12px 8px; }
+.admin .admin-sidebar .group-label:first-child { padding-top: 8px; }
 .admin .admin-sidebar a {
     border-left: none;
-    border-radius: var(--radius-md);
-    padding: 10px 16px;
-    margin-bottom: 0;
-    color: var(--ink);
+    border-radius: 999px;
+    padding: 10px 14px;
+    margin-bottom: 4px;
+    color: var(--muted);
 }
-.admin .admin-sidebar a:hover { background: rgba(11, 107, 79, .07); }
+.admin .admin-sidebar a svg { width: 18px; height: 18px; flex-shrink: 0; }
+.admin .admin-sidebar a:hover { background: var(--bg); color: var(--ink); }
 .admin .admin-sidebar a.active {
-    background: var(--tone-success-bg);
-    color: var(--primary-dark);
+    background: var(--primary-dark);
+    color: var(--paper);
     font-weight: 700;
-    box-shadow: inset 2px 0 0 var(--primary);
+    box-shadow: none;
 }
 
 .admin .admin-main { padding: 24px 24px 40px 10px; }
@@ -3155,28 +3243,38 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 }
 .portal .admin-topbar .sub { font-size: .9rem; margin-top: 4px; }
 
+/* Same card-panel + icon-led treatment as the DOT Admin console (see
+   .admin .admin-sidebar) so the two internal consoles share one visual
+   language, not just one CSS source. */
 .portal .admin-sidebar {
-    background: transparent;
-    border-right: none;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
     top: 88px;
-    padding: 4px 14px 20px 0;
+    margin: 26px 20px 32px 24px;
+    padding: 14px 10px;
     min-height: 0;
 }
-.portal .admin-sidebar .group-label { padding: 6px 14px 10px; }
+.portal .admin-sidebar .group-label { padding: 8px 12px 10px; }
 .portal .admin-sidebar a {
     justify-content: space-between;
     border-left: none;
-    border-radius: var(--radius-md);
-    padding: 11px 16px;
-    margin-bottom: 2px;
-    color: var(--ink);
+    border-radius: 999px;
+    padding: 10px 14px;
+    margin-bottom: 4px;
+    color: var(--muted);
 }
-.portal .admin-sidebar a:hover { background: rgba(11, 107, 79, .07); }
+.portal .admin-sidebar a svg { width: 18px; height: 18px; flex-shrink: 0; }
+.portal .admin-sidebar a:hover { background: var(--bg); color: var(--ink); }
 .portal .admin-sidebar a.active {
-    background: var(--tone-success-bg);
-    color: var(--primary-dark);
+    background: var(--primary-dark);
+    color: var(--paper);
     font-weight: 700;
 }
+/* The red count badge needs to stay legible sitting on the solid dark-green
+   active pill, not just on the plain white row. */
+.portal .admin-sidebar a.active .nav-badge { box-shadow: 0 0 0 1.5px var(--primary-dark); }
 /* Count badge for items needing attention (unreplied reviews, unread notices). */
 .nav-badge {
     min-width: 20px;
@@ -3259,8 +3357,14 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
         background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-sm);
         padding: 8px 12px; font-weight: 700; font-size: .82rem; cursor: pointer;
     }
-    .admin-sidebar { display: none; position: static; width: 100%; min-height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+    /* width: auto, not 100%: the desktop rule's fixed 240px otherwise wins
+       over .admin-shell's align-items: stretch below (a flex item's own
+       width beats parent stretch), and 100% plus the card's own left/right
+       margin overflowed the viewport instead of fitting inside it. */
+    .admin-sidebar { display: none; position: static; width: auto; min-height: auto; border-right: none; border-bottom: 1px solid var(--border); }
     .admin-sidebar.open { display: block; }
+    .admin .admin-sidebar,
+    .portal .admin-sidebar { margin: 16px 16px 20px; }
     .admin-shell { flex-direction: column; align-items: stretch; }
     .admin-main { padding: 20px 16px; }
 }
