@@ -1219,6 +1219,57 @@ class TripPlannerTest extends TestCase
         $this->assertSame('near', $service->lastRangeTierUsed);
     }
 
+    /**
+     * Most travellers skip the optional starting-point field. Ranking must
+     * still measure from the Davao City centre baseline the itinerary is
+     * sequenced from -- treating every distance as unknown let unmapped
+     * listings from other provinces through "Within the City", and scored a
+     * mapped listing with no stored distance figure as neutral.
+     */
+    public function test_a_traveller_with_no_starting_point_is_ranked_from_davao_city_centre(): void
+    {
+        $city = Region::create(['name' => 'Davao City']);
+        $norte = Region::create(['name' => 'Davao del Norte']);
+
+        // Mapped, ~5 km from the centre, but no stored distance_km figure.
+        Destination::create([
+            'slug' => 'mapped-near-park', 'name' => 'Mapped Near Park', 'location' => 'Davao City',
+            'region_id' => $city->id, 'type' => 'Nature & Leisure', 'is_accredited' => true,
+            'rating' => 3.5, 'review_count' => 2, 'price_tier' => 'Mid-range',
+            'latitude' => 7.10, 'longitude' => 125.65,
+        ]);
+        Destination::create([
+            'slug' => 'mapped-near-zoo', 'name' => 'Mapped Near Zoo', 'location' => 'Davao City',
+            'region_id' => $city->id, 'type' => 'Wildlife', 'is_accredited' => true,
+            'rating' => 3.5, 'review_count' => 2, 'price_tier' => 'Mid-range',
+            'latitude' => 7.09, 'longitude' => 125.63,
+        ]);
+
+        // Unmapped, in a province with no mapped listings of its own -- placed
+        // at its provincial centre (Tagum), ~47 km out.
+        Destination::create([
+            'slug' => 'unmapped-tagum-farm', 'name' => 'Unmapped Tagum Farm', 'location' => 'Tagum City',
+            'region_id' => $norte->id, 'type' => 'Farm Tourism', 'is_accredited' => true,
+            'rating' => 3.5, 'review_count' => 2, 'price_tier' => 'Mid-range',
+        ]);
+
+        $preference = TouristPreference::create([
+            'travel_days' => 1, 'travel_type' => 'Solo', 'budget' => 'Mid-range',
+            'accommodation_pref' => 'Any', 'distance_pref' => 'near',
+        ])->load('activities', 'amenities');
+
+        $this->assertNull($preference->origin(), 'This test is only meaningful with no starting point shared.');
+
+        $service = app(\App\Services\Recommendation\ContentBasedRecommendationService::class);
+        $ranked = $service->rank($preference);
+
+        $this->assertNotContains('Unmapped Tagum Farm', $ranked->pluck('destination.name')->all(),
+            'An unmapped listing ~47 km away must not pass "Within the City" just because no starting point was shared.');
+        $this->assertFalse($service->lastRangeWidened);
+        $this->assertEquals(5.0, $ranked->firstWhere('destination.name', 'Mapped Near Park')['ds'],
+            'A mapped listing ~5 km from the centre must score as near, not as an unknown distance.');
+    }
+
     /** The moderate tier reaches further than "within the city" but is still bounded. */
     public function test_moderate_range_includes_a_nearby_city_but_not_a_distant_one(): void
     {

@@ -20,12 +20,7 @@ use Illuminate\Support\Facades\DB;
  */
 class ItineraryGenerationService
 {
-    /** Fallback baseline when no live location is provided: Davao City center (matches "tourist's selected starting location"). */
-    private const DEFAULT_ORIGIN_LAT = 7.0731;
-
-    private const DEFAULT_ORIGIN_LNG = 125.6128;
-
-    /** What to call the fallback baseline on the schedule's arrival row. */
+    /** What to call the fallback baseline (TouristPreference::DEFAULT_ORIGIN) on the schedule's arrival row. */
     private const DEFAULT_ORIGIN_LABEL = 'Davao City centre';
 
     private const DESTINATIONS_PER_DAY = 2;
@@ -67,8 +62,8 @@ class ItineraryGenerationService
         $saved = $preference->origin();
         $shared = ($originLat !== null && $originLng !== null) || $saved !== null;
 
-        $originLat ??= $saved['lat'] ?? self::DEFAULT_ORIGIN_LAT;
-        $originLng ??= $saved['lng'] ?? self::DEFAULT_ORIGIN_LNG;
+        $originLat ??= $saved['lat'] ?? TouristPreference::DEFAULT_ORIGIN['lat'];
+        $originLng ??= $saved['lng'] ?? TouristPreference::DEFAULT_ORIGIN['lng'];
 
         /*
          * The schedule names this point on its first and last rows. Prefer what

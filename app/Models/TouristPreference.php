@@ -49,6 +49,25 @@ class TouristPreference extends Model
         return ['lat' => (float) $this->origin_lat, 'lng' => (float) $this->origin_lng];
     }
 
+    /**
+     * Davao City centre -- the baseline a trip is measured and sequenced from
+     * when the traveller doesn't share a starting point.
+     */
+    public const DEFAULT_ORIGIN = ['lat' => 7.0731, 'lng' => 125.6128];
+
+    /**
+     * The shared starting point, or the default baseline. Ranking and
+     * sequencing must both use this: when they disagreed, a traveller who
+     * skipped the optional starting-point field got a plan sequenced from
+     * Davao City centre but ranked as if every distance were unknown.
+     *
+     * @return array{lat: float, lng: float}
+     */
+    public function originOrDefault(): array
+    {
+        return $this->origin() ?? self::DEFAULT_ORIGIN;
+    }
+
     /** Health and accessibility needs stated while planning this trip, if any. */
     public function healthProfile(): HasOne
     {

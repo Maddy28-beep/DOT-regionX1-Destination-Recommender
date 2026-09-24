@@ -614,10 +614,19 @@ class ContentBasedRecommendationService
     /**
      * How far this destination is, and how much that figure can be trusted.
      *
-     * Preference order: a real Haversine distance from the position the
-     * traveller shared, then the listing's recorded distance-from-city-centre,
-     * then the centre of its region. The stored column is a fixed figure that
-     * cannot know where the traveller is, which is the whole point of asking.
+     * Preference order: a real Haversine distance from the trip's starting
+     * point, then the listing's recorded distance-from-city-centre, then the
+     * centre of its region. The stored column is a fixed figure that cannot
+     * know where the traveller is, which is the whole point of asking.
+     *
+     * The starting point is the one the traveller shared, or Davao City
+     * centre when they skipped that optional field -- the same baseline
+     * ItineraryGenerationService sequences the trip from. Measuring from
+     * nowhere instead made every unmapped listing "unknown" for the most
+     * common kind of traveller: unknown passes every range gate, so Davao del
+     * Norte and Davao del Sur listings ~40-47 km away got into "Within the
+     * City", and a mapped listing with no stored figure (Davao Crocodile Park)
+     * scored as neutral despite sitting 6 km from the centre.
      *
      * The `approximate` flag matters: a region centroid can be kilometres out
      * for a city the size of Davao, so a listing placed that way must not score
@@ -629,9 +638,9 @@ class ContentBasedRecommendationService
      */
     private function distanceKmFor(Destination $destination, TouristPreference $preference): ?array
     {
-        $origin = $preference->origin();
+        $origin = $preference->originOrDefault();
 
-        if ($origin && $destination->latitude !== null && $destination->longitude !== null) {
+        if ($destination->latitude !== null && $destination->longitude !== null) {
             return [
                 'km' => $this->haversineKm(
                     $origin['lat'],
@@ -656,7 +665,7 @@ class ContentBasedRecommendationService
          * used to place a listing in a near/moderate/far bucket, never to give
          * a figure to the traveller.
          */
-        if ($origin && $destination->region_id) {
+        if ($destination->region_id) {
             $centroid = $this->regionCentroid($destination->region_id);
 
             if ($centroid) {

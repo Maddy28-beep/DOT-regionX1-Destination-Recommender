@@ -63,6 +63,12 @@ return [
         // closed-set arrangement task, not open-ended generation, so sampling
         // randomness only costs correctness here.
         'temperature' => env('PHI4MINI_TEMPERATURE', 0.1),
+        // How long Ollama keeps the model loaded after a request. Ollama's own
+        // default is 5 minutes, and a cold load measured ~65s on this machine
+        // against a 0.4s warm answer -- so with the default, the first
+        // itinerary after any idle stretch always hit the 20s timeout and fell
+        // back. Only changes residency, not the prompt or validation.
+        'keep_alive' => env('PHI4MINI_KEEP_ALIVE', '2h'),
     ],
 
     /*

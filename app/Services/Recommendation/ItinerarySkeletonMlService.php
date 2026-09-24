@@ -117,6 +117,7 @@ class ItinerarySkeletonMlService
                     'prompt' => $this->buildPrompt($candidates, $plan, $preference, $accommodationHint),
                     'format' => $this->jsonSchema($plan, $candidateIds),
                     'stream' => false,
+                    'keep_alive' => config('services.phi4mini.keep_alive', '2h'),
                     // Low and close to deterministic: this is a closed-set
                     // arrangement task, not open-ended generation, so sampling
                     // randomness only costs correctness here and buys nothing.

@@ -264,6 +264,30 @@ class ItinerarySkeletonMlServiceTest extends TestCase
         $this->assertSame(0.1, $capturedOptions['temperature']);
     }
 
+    /**
+     * Ollama unloads a model after 5 idle minutes by default, and a cold load
+     * took ~65s here against a 20s timeout -- so without keep_alive the first
+     * itinerary after any idle stretch silently fell back every time.
+     */
+    public function test_the_request_asks_ollama_to_keep_the_model_loaded(): void
+    {
+        $this->configure();
+        config(['services.phi4mini.keep_alive' => '2h']);
+        [$a] = $this->makeDestinations(1);
+        $sequence = $this->sequenceFor([$a]);
+
+        $capturedKeepAlive = null;
+        Http::fake(function ($request) use (&$capturedKeepAlive, $a) {
+            $capturedKeepAlive = $request->data()['keep_alive'] ?? null;
+
+            return Http::response(['response' => json_encode(['day_1' => ['morning' => $a->id]])]);
+        });
+
+        (new ItinerarySkeletonMlService())->proposeSkeleton($sequence, [1 => ['Morning']], $this->preference(), null);
+
+        $this->assertSame('2h', $capturedKeepAlive);
+    }
+
     // ---- whole-number floats -------------------------------------------------
 
     /**
