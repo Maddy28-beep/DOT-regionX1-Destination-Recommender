@@ -3,6 +3,7 @@
 @section('title', 'My Itineraries — ExploreDVO')
 
 @section('content')
+@include('partials.account-nav')
 <div class="dash-shell">
     <div class="dash-header">
         <div class="container">

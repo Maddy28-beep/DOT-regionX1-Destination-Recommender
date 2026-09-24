@@ -3,6 +3,7 @@
 @section('title', 'Saved Places — My Account — ExploreDVO')
 
 @section('content')
+@include('partials.account-nav')
 <div class="page-head">
     <div class="container">
         <span class="poster-kicker">your account</span>
