@@ -317,6 +317,37 @@ a { color: inherit; text-decoration: none; }
    colour alone is not a distinguishing feature at that point. Matches the
    .auth-foot link treatment. */
 .field-hint a { color: var(--primary); font-weight: 600; }
+
+/* Partner-portal day-by-day itinerary editor (establishment/edit-listing) --
+   one card per day instead of a "Title | Description" delimiter format in a
+   plain textarea, which asked a non-technical tour operator to learn a
+   convention with no visual feedback for getting it wrong. */
+.itinerary-editor { display: flex; flex-direction: column; gap: 12px; margin-bottom: 10px; }
+.itinerary-day-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; }
+.itinerary-day-card__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.itinerary-day-card__label { font-weight: 700; font-size: .82rem; text-transform: uppercase; letter-spacing: .03em; color: var(--primary-dark); }
+.itinerary-day-card__actions { display: flex; gap: 2px; }
+.itinerary-day-card__actions button {
+    width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+    background: none; border: none; border-radius: 6px; color: var(--muted); font-size: .7rem; cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+}
+.itinerary-day-card__actions button:hover:not(:disabled) { background: var(--white); color: var(--ink); }
+.itinerary-day-card__actions button:disabled { opacity: .3; cursor: not-allowed; }
+.itinerary-day-card__actions button:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.itinerary-day-card input[type="text"],
+.itinerary-day-card textarea {
+    width: 100%; padding: var(--field-pad); border: var(--field-border);
+    border-radius: var(--field-radius); font-size: var(--field-size); font-family: inherit;
+    background: var(--white); color: var(--ink);
+}
+.itinerary-day-card input[type="text"] { margin-bottom: 8px; }
+.itinerary-day-card textarea { min-height: 60px; resize: vertical; }
+.itinerary-day-card input[type="text"]:focus,
+.itinerary-day-card textarea:focus {
+    outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light);
+}
+
 /* Apriori attribution under a schedule row */
 .sched-rule {
     display: block; margin-top: 3px;
@@ -393,6 +424,19 @@ a { color: inherit; text-decoration: none; }
 .day-actions details { flex: 1 1 100%; }
 .day-unmapped { margin-top: 8px; font-style: italic; }
 
+/* Adopted-package "Starting Point" navigation widget -- directions only, so
+   it reuses the plain .field input look rather than the survey's full
+   address-autocomplete component, which persists to a preference row this
+   widget deliberately never touches. */
+.package-nav { display: flex; flex-direction: column; gap: 12px; max-width: 480px; }
+.package-nav__input {
+    width: 100%; padding: var(--field-pad); border: var(--field-border);
+    border-radius: var(--field-radius); font-size: var(--field-size); font-family: inherit;
+    background: var(--white); color: var(--ink);
+}
+.package-nav__input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+.package-nav__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
 /* Friendly pairing caption replacing raw confidence/support/trip-count
    jargon, with the technical detail still available behind an expander
    rather than deleted -- a curious traveller (or a panel) can still see it. */
@@ -412,6 +456,113 @@ a { color: inherit; text-decoration: none; }
 }
 .pairing-why summary::-webkit-details-marker { display: none; }
 .pairing-why p { margin: 4px 0 0; font-size: .76rem; color: var(--muted); font-style: italic; }
+
+/* "How was this itinerary created?" -- a small trigger near the Day-by-Day
+   panel head, and the tourist-facing/technical explainer it opens. Hidden
+   until asked for, on the same reasoning as .pairing-why above: a curious
+   traveller (or a capstone panel) can go find it, but it never competes with
+   the itinerary itself for attention. */
+.itinerary-explainer-trigger {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 12px; padding: 4px 2px;
+    background: none; border: none; cursor: pointer;
+    font-size: .84rem; font-weight: 600; color: var(--primary-dark);
+    border-radius: var(--radius-sm);
+    transition: color .15s ease;
+}
+.itinerary-explainer-trigger:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 2px; }
+.itinerary-explainer-trigger:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.itinerary-explainer-trigger svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+.info-modal-overlay {
+    position: fixed; inset: 0; z-index: 69;
+    background: rgba(10, 22, 17, .45);
+    opacity: 0; visibility: hidden;
+    transition: opacity .2s ease, visibility 0s linear .2s;
+}
+.info-modal-overlay.open { opacity: 1; visibility: visible; transition: opacity .2s ease, visibility 0s linear 0s; }
+
+body.info-modal-open { overflow: hidden; }
+
+.info-modal {
+    position: fixed; inset: 0; z-index: 70;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; visibility: hidden;
+    transition: opacity .2s ease, visibility 0s linear .2s;
+}
+.info-modal.open { opacity: 1; visibility: visible; transition: opacity .2s ease, visibility 0s linear 0s; }
+
+.info-modal__card {
+    width: 100%; max-width: 560px; max-height: min(84vh, 720px);
+    background: var(--white); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    display: flex; flex-direction: column;
+    transform: translateY(8px) scale(.98);
+    transition: transform .2s ease;
+}
+.info-modal.open .info-modal__card { transform: translateY(0) scale(1); }
+
+.info-modal__head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.info-modal__head h3 { margin: 0; font-size: 1.05rem; color: var(--primary-dark); }
+.info-modal__close {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; margin-right: -8px; flex-shrink: 0;
+    background: none; border: none; border-radius: 50%;
+    color: var(--ink); cursor: pointer; transition: background .15s ease;
+}
+.info-modal__close:hover { background: var(--primary-light); }
+.info-modal__close:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.info-modal__close svg { width: 18px; height: 18px; }
+
+.info-modal__body { padding: 20px; overflow-y: auto; }
+.info-modal__body > p { margin: 0 0 16px; color: var(--muted); font-size: .92rem; }
+
+.explainer-list { list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.explainer-list li { display: flex; gap: 12px; align-items: flex-start; }
+.explainer-emoji { font-size: 1.2rem; line-height: 1.4; flex-shrink: 0; width: 26px; text-align: center; }
+.explainer-list strong { display: block; color: var(--ink); font-size: .92rem; }
+.explainer-list p { margin: 2px 0 0; font-size: .84rem; color: var(--muted); line-height: 1.45; }
+
+.explainer-technical { border-top: 1px solid var(--border); padding-top: 14px; }
+.explainer-technical summary {
+    cursor: pointer; list-style: none;
+    font-size: .85rem; font-weight: 600; color: var(--primary-dark);
+    text-decoration: underline; text-underline-offset: 2px;
+}
+.explainer-technical summary::-webkit-details-marker { display: none; }
+.explainer-technical summary:hover { color: var(--primary); }
+.explainer-technical summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+.explainer-technical__body { margin-top: 12px; }
+
+.explainer-technical-list { margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.explainer-technical-list dt {
+    font-weight: 700; font-size: .84rem; color: var(--ink);
+    display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+}
+.explainer-technical-list dd { margin: 3px 0 0; font-size: .8rem; color: var(--muted); line-height: 1.45; }
+
+.ml-status {
+    font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+    padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border);
+}
+.ml-status--applied { background: var(--primary-light); color: var(--primary-dark); border-color: transparent; }
+.ml-status--fallback { background: var(--bg); color: var(--muted); }
+.ml-status--unknown { background: var(--bg); color: var(--muted); font-style: italic; }
+
+.explainer-fallback-note {
+    margin: 14px 0 0; padding: 10px 12px;
+    background: var(--bg); border-radius: var(--radius-sm);
+    font-size: .78rem; color: var(--muted); line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+    .info-modal { padding: 0; align-items: flex-end; }
+    .info-modal__card { max-width: none; width: 100%; max-height: 88vh; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+}
 
 /* Rank list with a match-strength bar, replacing a bare number table so
    relative fit is visible at a glance. */
@@ -723,6 +874,79 @@ a { color: inherit; text-decoration: none; }
 .alert-success { background: var(--tone-success-bg); border-color: var(--tone-success-line); color: var(--tone-success-ink); }
 .alert-warning { background: var(--tone-warn-bg); border-color: var(--tone-warn-line); color: var(--tone-warn-ink); }
 .alert-info { background: var(--tone-info-bg); border-color: var(--tone-info-line); color: var(--tone-info-ink); }
+
+/* /advisories hub page (resources/views/advisories/index.blade.php) -- full
+   detail cards, not the slim ribbon. Deliberately not reusing .alert: that
+   class is a form/system-message idiom (validation errors, toasts) and
+   every one of its severities defaults toward looking like something went
+   wrong, which is wrong for "Mt. Apo is closed this season" read by a
+   traveler planning a trip. */
+.advisory-list { display: flex; flex-direction: column; gap: 16px; }
+
+.advisory-list-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--tone-neutral-ink);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 20px 24px;
+}
+
+.advisory-list-card__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.advisory-list-card__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    padding: 3px 10px;
+    border-radius: 999px;
+}
+.advisory-list-card__badge svg { width: 13px; height: 13px; }
+
+.advisory-list-card__updated { font-size: .78rem; color: var(--muted); }
+
+.advisory-list-card__title { margin: 0 0 6px; font-size: 1.1rem; color: var(--ink); }
+.advisory-list-card__message { margin: 0 0 12px; font-size: .92rem; line-height: 1.6; color: var(--muted); }
+
+.advisory-list-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    font-size: .82rem;
+    color: var(--muted);
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+}
+.advisory-list-card__meta strong { color: var(--ink); font-weight: 700; }
+
+/* Severity variants -- each pairs a brand-consistent accent with an already
+   deliberately calm/warm/urgent tone token, per the info=green/
+   warning=gold/danger=red-only-when-it's-real brief. Matches the ribbon's
+   own severity treatment so the two feel like one system. */
+.advisory-list-card--info { border-left-color: var(--primary); }
+.advisory-list-card--info .advisory-list-card__badge { background: var(--primary-light); color: var(--primary-dark); }
+
+.advisory-list-card--warning { border-left-color: var(--gold); }
+.advisory-list-card--warning .advisory-list-card__badge { background: var(--tone-warn-bg); color: var(--tone-warn-ink); }
+
+.advisory-list-card--danger { border-left-color: var(--stamp-red); }
+.advisory-list-card--danger .advisory-list-card__badge { background: var(--tone-danger-bg); color: var(--tone-danger-ink); }
+
+@media (max-width: 480px) {
+    .advisory-list-card { padding: 16px 18px; }
+    .advisory-list-card__title { font-size: 1rem; }
+}
 
 .badge {
     display: inline-flex;
@@ -1119,6 +1343,125 @@ body.hero-page .site-header:not(.scrolled) .btn-outline:hover { background: rgba
    just above, so the two pills read as one family over the hero. */
 body.hero-page .site-header:not(.scrolled) .header-account-chip { border-color: rgba(255, 247, 233, .5); }
 body.hero-page .site-header:not(.scrolled) .header-account-chip__logout:hover { background: rgba(255, 247, 233, .18); color: var(--paper); }
+
+/*
+   .site-topbar owns the sticky/fixed positioning that used to live directly
+   on .site-header, so an advisory ribbon placed inside it (before <header>)
+   scrolls and sticks together with the header as one unit -- no dynamic
+   height math for the header to "leave room" for a ribbon that only
+   sometimes exists. This is also what fixed an earlier, related bug: a
+   general advisory rendered in normal flow right after the header used to
+   land almost entirely behind the homepage's position:fixed header, which
+   takes up no space in flow. Wrapping both in one positioned unit means
+   there is no separate flow position for the ribbon to fall into in the
+   first place.
+
+   .site-header keeps the exact class the admin console and partner portal
+   also use for their own, separately-declared headers (see .admin
+   .site-header / .portal .site-header below) -- position is neutralized
+   back to static only inside this wrapper, so it lives in exactly one place
+   at a time instead of competing with .site-topbar's.
+*/
+.site-topbar { position: sticky; top: 0; z-index: 50; }
+.site-topbar .site-header { position: static; }
+
+body.hero-page .site-topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 50; }
+body.hero-page .site-topbar .site-header { position: static; top: auto; left: auto; right: auto; }
+
+/* Site-wide advisory ribbon (components/advisory-ribbon.blade.php) -- a
+   slim, single-line strip, not a repeat of the compact card used to live on
+   individual pages. Severity sets the background directly (this is the one
+   advisory treatment saturated enough to read at a glance from anywhere on
+   the page), with warning using dark ink text since gold is too light for
+   white text to clear contrast. */
+/*
+   Noticed-on-arrival, not scrolling-ticker noticeable: a one-time slide-down
+   plays when the ribbon first appears, and the icon keeps a slow, gentle
+   pulse afterward. A continuously scrolling marquee was considered and
+   rejected -- WCAG 2.2.2 requires a pause/stop control for any moving text
+   that runs longer than 5 seconds, and a ticker risks scrolling the message
+   out of view before a traveler finishes reading it. Neither problem
+   applies here: the text itself never moves, only the (non-essential)
+   entrance and icon do, and both stop for prefers-reduced-motion.
+*/
+.advisory-ribbon {
+    color: var(--white);
+    font-size: .85rem;
+    animation: advisoryRibbonIn .4s cubic-bezier(.22, .61, .36, 1) both;
+}
+@keyframes advisoryRibbonIn {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+.advisory-ribbon__inner {
+    max-width: var(--container);
+    margin-inline: auto;
+    padding: 9px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.advisory-ribbon__icon { width: 18px; height: 18px; flex-shrink: 0; animation: advisoryPulse 2.2s ease-in-out .6s infinite; }
+@keyframes advisoryPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .55; transform: scale(.92); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .advisory-ribbon { animation: none; }
+    .advisory-ribbon__icon { animation: none; }
+}
+.advisory-ribbon__text {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.advisory-ribbon__link {
+    flex-shrink: 0;
+    color: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    white-space: nowrap;
+}
+.advisory-ribbon__close {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: inherit;
+    opacity: .85;
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+    border-radius: 50%;
+    transition: background .15s ease, opacity .15s ease;
+}
+.advisory-ribbon__close:hover { opacity: 1; background: rgba(255, 255, 255, .18); }
+.advisory-ribbon__close:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
+
+.advisory-ribbon--danger { background: var(--stamp-red); }
+.advisory-ribbon--warning { background: var(--gold); color: var(--ink); }
+.advisory-ribbon--info { background: var(--primary); }
+.advisory-ribbon--warning .advisory-ribbon__close:hover { background: rgba(0, 0, 0, .1); }
+
+@media (max-width: 640px) {
+    .advisory-ribbon__inner { padding: 8px 14px; gap: 8px; }
+    .advisory-ribbon__link span { display: none; }
+}
+
+/* Small "something needs your attention" dot next to the Advisories nav
+   link -- reuses the danger tone regardless of the active advisory's own
+   severity, matching how a browser tab's own unread dot doesn't change
+   colour by message type either. */
+.main-nav__advisories { position: relative; display: inline-flex; align-items: center; gap: 5px; }
+.main-nav__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--stamp-red); flex-shrink: 0; }
 
 /*
    Raised from 1220px: the wider spacing above plus the Saved heart icon
@@ -2183,6 +2526,15 @@ body.hero-page .site-header:not(.scrolled) .header-account-chip__logout:hover { 
 @media (max-width: 960px) { .feature-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .feature-grid { grid-template-columns: 1fr; } }
 
+/* The "Plan My Trip" vs "Tour Packages" fork (plan/choose.blade.php) --
+   two options, not four, so its own grid rather than reusing .feature-grid's
+   4-column default. Same card/stamp language as the feature grid above,
+   just wide enough for a button to sit under each one comfortably. */
+.plan-choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 8px; }
+.plan-choice-card { display: flex; flex-direction: column; align-items: flex-start; }
+.plan-choice-card p { margin-bottom: 18px; }
+@media (max-width: 640px) { .plan-choice-grid { grid-template-columns: 1fr; } }
+
 /* ---------- About the Region ---------- */
 /* Premium "Discover Davao Region" editorial section: intro copy, province
    links, and the interactive Leaflet locator. Every class here (.about-*) is
@@ -2476,10 +2828,10 @@ body.hero-page .site-header:not(.scrolled) .header-account-chip__logout:hover { 
     pointer-events: none;
 }
 .cta-banner > .halftone { z-index: 1; }
-.cta-banner__copy { position: relative; z-index: 2; max-width: 52ch; }
+.cta-banner__copy { position: relative; z-index: 2; max-width: 62ch; }
 .cta-banner .poster-kicker { display: block; color: var(--sun-glow); font-size: 1.15rem; }
 .cta-banner h2 { margin: 0 0 6px; font-size: clamp(1.5rem, 3vw, 2.1rem); line-height: 1.08; }
-.cta-banner p { margin: 0; color: rgba(255, 247, 233, .92); }
+.cta-banner > .cta-banner__copy > p { margin: 0; color: rgba(255, 247, 233, .92); }
 .cta-banner .btn {
     position: relative;
     z-index: 2;
@@ -2491,6 +2843,24 @@ body.hero-page .site-header:not(.scrolled) .header-account-chip__logout:hover { 
 }
 .cta-banner .btn:hover { background: var(--sun-glow); color: var(--ink); }
 
+/* The second, lower-emphasis path (Tour Packages) alongside the primary one
+   (Plan My Trip) -- same angled-cut shape so the two still read as one
+   family of actions, but outlined rather than solid-cream so the personalized
+   itinerary keeps the stronger visual pull. .btn-ghost elsewhere is dark ink
+   on transparent, which would vanish against this sunset gradient, hence the
+   scoped override (same pattern as .site-header .btn-outline). */
+.cta-banner .btn-ghost {
+    background: transparent;
+    color: var(--paper);
+    border: 1.5px solid rgba(255, 247, 233, .75);
+}
+.cta-banner .btn-ghost:hover { background: rgba(255, 247, 233, .14); color: var(--paper); border-color: var(--paper); }
+
+.cta-banner__paths { display: flex; gap: 32px; margin-top: 20px; flex-wrap: wrap; }
+.cta-banner__path { flex: 1 1 220px; min-width: 200px; }
+.cta-banner__path h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--paper); }
+.cta-banner__path p { margin: 0 0 12px; font-size: .85rem; line-height: 1.4; color: rgba(255, 247, 233, .85); }
+
 @media (max-width: 720px) {
     /* Once the banner stacks there is no clear right-hand column left, so the
        scene drops to a bottom band instead of washing out behind the copy.
@@ -2499,14 +2869,17 @@ body.hero-page .site-header:not(.scrolled) .header-account-chip__logout:hover { 
        wraps. xMidYMax slice already anchors the ridges to the bottom edge. */
     .cta-banner { padding-bottom: 104px; }
     .cta-banner__scene { width: 100%; height: 88px; top: auto; bottom: 0; opacity: .55; }
+    .cta-banner__paths { flex-direction: column; gap: 20px; }
 }
 
 /* ---------- Footer ---------- */
 
-.site-footer { background: #0d221b; color: #cfe3da; padding: 48px 0 24px; margin-top: 40px; border-top: 3px solid var(--gold); }
-.footer-grid { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 28px; }
-.footer-grid h4 { color: var(--gold); font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 14px; }
-.footer-grid a, .footer-grid p { display: block; color: #a9c2b7; font-size: .88rem; margin-bottom: 8px; }
+.site-footer { background: #0d221b; color: #cfe3da; padding: 64px 0 28px; margin-top: 40px; border-top: 3px solid var(--gold); }
+.footer-grid { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 28px 44px; }
+.footer-grid h4 { color: var(--gold); font-weight: 700; font-size: .85rem; text-transform: uppercase; letter-spacing: .05em; margin: 0 0 18px; }
+.footer-grid a, .footer-grid p { display: block; font-size: .88rem; line-height: 1.55; margin-bottom: 10px; }
+.footer-grid p { color: #93ac9f; }
+.footer-grid a { color: #b7cec2; }
 /* Marks a link that leaves the site, so "List your establishment" reads as
    handing off to the national DOT portal rather than opening a page here. */
 .ext-link { display: inline-flex; align-items: center; gap: 5px; }
@@ -2521,28 +2894,49 @@ body.hero-page .site-header:not(.scrolled) .header-account-chip__logout:hover { 
 .field-hint .ext-link svg { display: inline-block; vertical-align: -2px; margin-left: 3px; }
 .ext-link svg { width: 12px; height: 12px; flex-shrink: 0; opacity: .7; }
 
-.footer-grid a { transition: color .15s ease; }
-.footer-grid a:hover { color: var(--white); }
-.footer-brand-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.footer-brand-icon { width: 26px; height: 26px; flex-shrink: 0; }
-.footer-brand { font-weight: 800; font-size: 1.15rem; color: var(--white); }
-.footer-contact { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.1); }
-.footer-contact p { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
-.footer-contact svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; opacity: .75; }
-.footer-contact a { display: inline; color: #a9c2b7; }
-.footer-contact a:hover { color: var(--white); }
+.footer-grid a { transition: color .15s ease, transform .15s ease; }
+.footer-grid a:hover { color: var(--white); transform: translateX(2px); }
+.footer-grid a:focus-visible,
+.footer-contact a:focus-visible,
+.footer-legal a:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+.footer-brand-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.footer-brand-icon { width: 32px; height: 32px; flex-shrink: 0; }
+.footer-brand { font-weight: 800; font-size: 1.3rem; color: var(--white); letter-spacing: .01em; }
+.footer-contact { margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.08); }
+.footer-contact p { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; color: #93ac9f; }
+.footer-contact svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; opacity: .8; }
+.footer-contact a { display: inline; color: #b7cec2; transition: color .15s ease, transform .15s ease; }
+.footer-contact a:hover { color: var(--white); transform: translateX(2px); }
 
-.footer-bottom { border-top: 1px solid rgba(255,255,255,.1); margin-top: 32px; padding-top: 18px; font-size: .8rem; color: #7f9c8f; text-align: center; }
-.footer-legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 20px; margin-bottom: 12px; }
-.footer-legal a { display: inline; color: #a9c2b7; font-size: .8rem; }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,.08); margin-top: 40px; padding-top: 22px; font-size: .8rem; color: #7f9c8f; text-align: center; }
+.footer-legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px; margin-bottom: 14px; }
+.footer-legal a { display: inline-block; padding: 2px; color: #b7cec2; font-size: .8rem; transition: color .15s ease; }
 .footer-legal a:hover { color: var(--gold); }
 .footer-copyright { margin: 0; }
 
+@media (max-width: 900px) {
+    /* The floating chatbot launcher (partials/chatbot-widget.blade.php) sits
+       fixed at right:20px, width 54px -- the rightmost ~84px of this
+       container -- and rises to bottom:92px below 900px to clear listing
+       pages' sticky CTA bar. Since it never scrolls away, whatever ends up
+       centered under that corner at full scroll would sit half-hidden
+       behind it; reserving that width on the right keeps the legal links
+       and copyright line clear of it without un-centering them from the
+       rest of the footer. */
+    .site-footer { padding-bottom: 76px; }
+    .footer-bottom { padding-right: 84px; }
+}
 @media (max-width: 800px) {
-    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px 28px; }
 }
 @media (max-width: 480px) {
-    .footer-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; gap: 34px; }
+    .site-footer { padding-bottom: 100px; }
+    .footer-legal { gap: 10px 20px; }
 }
 
 /* ---------- Auth pages ---------- */

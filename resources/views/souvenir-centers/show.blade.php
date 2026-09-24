@@ -21,7 +21,6 @@
         {{ $souvenirCenter->name }}
     </nav>
 
-    <x-advisory-banner :advisories="\App\Models\Advisory::active()->forListing($souvenirCenter->getMorphClass(), $souvenirCenter->id)->latest()->get()" />
     <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($souvenirCenter->getMorphClass(), $souvenirCenter->id)->latest()->get()" />
 
     @include('partials.gallery-hero', [

@@ -94,8 +94,11 @@ class DestinationCategoryTagSeeder extends Seeder
         }
 
         $destination->update([
-            'latitude' => 7.1204,
-            'longitude' => 125.6461,
+            // Riverfront Corporate City, Diversion Road, Ma-a, as manually
+            // corrected on the DOT coordinate sheet (as of 03 Sep 2026). The
+            // earlier 7.1204, 125.6461 sat in Lanang, about 5.8 km away.
+            'latitude' => 7.0974,
+            'longitude' => 125.599,
             'price_tier' => $destination->price_tier ?? 'Mid-range',
             'entry_fee_min' => $destination->entry_fee_min ?? 300,
             'entry_fee_max' => $destination->entry_fee_max ?? 500,

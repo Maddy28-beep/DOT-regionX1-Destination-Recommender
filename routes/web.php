@@ -5,6 +5,7 @@ use App\Http\Controllers\AddressSuggestionController;
 use App\Http\Controllers\Admin\AdminAdvisoryController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminListingController;
+use App\Http\Controllers\AdvisoryController;
 use App\Http\Controllers\Auth\EstablishmentRegistrationController;
 use App\Http\Controllers\Auth\PortalAuthController;
 use App\Http\Controllers\Auth\TouristAuthController;
@@ -58,6 +59,14 @@ Route::post('/reviews/{type}/{id}', [\App\Http\Controllers\ReviewController::cla
 Route::get('/search', \App\Http\Controllers\SearchController::class)->name('search');
 
 // Public destination catalog (2.2.1.3, Figure 12)
+/*
+ * Public hub for every currently-active advisory (general and per-listing
+ * alike) -- the ribbon shown site-wide only ever surfaces the single most
+ * urgent one; this is where the rest live. Read-only: posting/editing stays
+ * exclusively in the DOT Admin console (AdminAdvisoryController).
+ */
+Route::get('/advisories', [AdvisoryController::class, 'index'])->name('advisories.index');
+
 Route::get('/destinations', [DestinationController::class, 'index'])->name('destinations.index');
 Route::get('/destinations/{destination:slug}', [DestinationController::class, 'show'])->name('destinations.show');
 
@@ -89,6 +98,14 @@ Route::get('/tour-operators/{tourOperator:slug}', [TourOperatorController::class
  * accessibility questions the itinerary takes into account, and gets a plan.
  * The plan lives in the session; see TripPlannerController.
  */
+/*
+ * Reached from the site-wide "Plan My Trip" button (header nav, mobile menu):
+ * asks which of the two trip-planning paths the tourist wants before
+ * committing to either one, rather than assuming the personalized survey.
+ * Both destinations below already exist; this adds no new planning logic.
+ */
+Route::get('/plan/start', [TripPlannerController::class, 'choose'])->name('plan.choose');
+
 Route::get('/plan', [TripPlannerController::class, 'edit'])->name('plan.edit');
 
 /*

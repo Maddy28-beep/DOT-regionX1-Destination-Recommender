@@ -18,6 +18,13 @@
     $routeStops = $itinerary->routeStops();
 
     $rangeTierLabels = ['near' => 'Within the City', 'moderate' => 'Moderate distance', 'far' => 'Willing to travel farther'];
+
+    // Directions-only "Starting Point" widget below is package-specific and
+    // only makes sense once we actually know where the package is -- see the
+    // panel itself for why this doesn't fall back to a text-search guess.
+    $packageCoords = ($itinerary->package && $itinerary->package->latitude && $itinerary->package->longitude)
+        ? ['lat' => (float) $itinerary->package->latitude, 'lng' => (float) $itinerary->package->longitude]
+        : null;
 @endphp
 
 <div class="dash-shell">
@@ -51,7 +58,17 @@
                         <button type="submit" class="btn btn-outline">Save Itinerary</button>
                     </form>
                 @endif
-                <a href="{{ route('plan.edit') }}" class="btn btn-outline">Edit preferences</a>
+                {{--
+                    A package-adopted itinerary has no real preferences behind
+                    it to edit (see PackageController::planWith()) -- the
+                    correct way to move on from it is the "Start the trip
+                    planner" link in the panel below, which says plainly that
+                    it builds a fresh, different plan rather than implying
+                    there is something of the tourist's own to refine here.
+                --}}
+                @unless ($itinerary->package)
+                    <a href="{{ route('plan.edit') }}" class="btn btn-outline">Edit preferences</a>
+                @endunless
             </div>
         </div>
     </div>
@@ -133,6 +150,13 @@
                                 Sequenced by geographic proximity, with complementary stops surfaced from what past travelers tend to pair together.
                             @endif
                         </p>
+                        @unless ($itinerary->package)
+                            <button type="button" class="itinerary-explainer-trigger" id="itineraryExplainerOpen"
+                                    aria-haspopup="dialog" aria-controls="itineraryExplainerModal" aria-expanded="false">
+                                <x-icon name="info" />
+                                How was this itinerary created?
+                            </button>
+                        @endunless
                     </div>
                 </div>
                 <div class="panel-body">
@@ -266,6 +290,35 @@
                 </div>
             </div>
 
+            @if ($packageCoords)
+                {{--
+                    Directions only -- never reorders, reschedules, or
+                    resends this package through any recommendation or ML
+                    step. Gated on the package actually having coordinates
+                    (like every other proximity feature in this codebase,
+                    e.g. partials/map-embed) rather than guessing a location
+                    from its free-text region string.
+                --}}
+                <div class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <h2>Starting Point</h2>
+                            <p>Get directions to {{ $itinerary->package->name }} from wherever your trip begins. This only sets up navigation &mdash; it doesn't change the package's itinerary.</p>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="package-nav">
+                            <input type="text" id="package-nav-origin" class="package-nav__input"
+                                   placeholder="Hotel, airport, or address (optional)">
+                            <div class="package-nav__actions">
+                                <button type="button" class="btn btn-outline" id="package-nav-locate">Use my current location</button>
+                                <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary" id="package-nav-open">Open Navigation</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             @if ($itinerary->package)
             <div class="panel">
                 <div class="panel-head">
@@ -376,6 +429,109 @@
     </div>
 </div>
 
+@unless ($itinerary->package)
+    {{--
+        A hidden-by-default explainer, not a permanent panel: the tourist sees
+        the itinerary first, and only reaches this if they click "How was
+        this itinerary created?" above. Structurally a sibling of .dash-shell
+        (same reasoning as partials/header.blade.php's .mobile-menu) so it is
+        never clipped or repositioned by an ancestor's own layout.
+    --}}
+    <div class="info-modal-overlay" id="itineraryExplainerOverlay"></div>
+    <div class="info-modal" id="itineraryExplainerModal" role="dialog" aria-modal="true" aria-labelledby="itineraryExplainerTitle" inert>
+        <div class="info-modal__card">
+            <div class="info-modal__head">
+                <h3 id="itineraryExplainerTitle">How was your itinerary created?</h3>
+                <button type="button" class="info-modal__close" id="itineraryExplainerClose" aria-label="Close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="info-modal__body">
+                <p>Your itinerary is personalized using several recommendation and planning methods:</p>
+
+                <ul class="explainer-list">
+                    <li>
+                        <span class="explainer-emoji" aria-hidden="true">🎯</span>
+                        <div>
+                            <strong>Personalized recommendations</strong>
+                            <p>Destinations are ranked based on how well they match your travel preferences.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="explainer-emoji" aria-hidden="true">🔗</span>
+                        <div>
+                            <strong>Travel patterns</strong>
+                            <p>The system identifies destinations and establishments that travelers commonly visit together.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="explainer-emoji" aria-hidden="true">📍</span>
+                        <div>
+                            <strong>Route planning</strong>
+                            <p>Stops are arranged based on geographic proximity to create a practical travel sequence.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="explainer-emoji" aria-hidden="true">✨</span>
+                        <div>
+                            <strong>Smart day grouping</strong>
+                            <p>A pretrained machine learning model helps organize the selected stops across your available travel days.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="explainer-emoji" aria-hidden="true">🕐</span>
+                        <div>
+                            <strong>Schedule planning</strong>
+                            <p>The system assigns estimated travel, activity, meal, rest, and departure times to create your day-by-day schedule.</p>
+                        </div>
+                    </li>
+                </ul>
+
+                <details class="explainer-technical">
+                    <summary>View technical details</summary>
+                    <div class="explainer-technical__body">
+                        <dl class="explainer-technical-list">
+                            <div>
+                                <dt>Content-Based Recommendation</dt>
+                                <dd>Ranks destinations according to the tourist's stated preferences.</dd>
+                            </div>
+                            <div>
+                                <dt>Apriori Association Rules</dt>
+                                <dd>Identifies complementary destinations and establishments based on observed co-visitation patterns.</dd>
+                            </div>
+                            <div>
+                                <dt>Haversine Distance + Nearest-Neighbor Heuristic</dt>
+                                <dd>Creates the geographic travel sequence.</dd>
+                            </div>
+                            <div>
+                                <dt>
+                                    Pretrained ML &mdash; Phi-4-mini-instruct
+                                    @if ($provenance['ml_applied'] === true)
+                                        <span class="ml-status ml-status--applied">Status: Applied</span>
+                                    @elseif ($provenance['ml_applied'] === false)
+                                        <span class="ml-status ml-status--fallback">Status: Fallback used</span>
+                                    @else
+                                        <span class="ml-status ml-status--unknown">Status: Not recorded for this itinerary</span>
+                                    @endif
+                                </dt>
+                                <dd>Assists with grouping the already-ranked and already-sequenced destinations across the available itinerary days.</dd>
+                            </div>
+                            <div>
+                                <dt>Schedule Builder</dt>
+                                <dd>Converts the resulting itinerary structure into practical arrival, activity, meal, travel, rest, and departure times.</dd>
+                            </div>
+                        </dl>
+                        <p class="explainer-fallback-note">
+                            If the pretrained ML model cannot provide a valid result, the system uses its
+                            deterministic fallback logic so itinerary generation can still continue.
+                        </p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+@endunless
+
 <script>
     /*
      * Regenerating takes a fresh position if the traveller allows it, so a plan
@@ -400,5 +556,107 @@
             { timeout: 8000, maximumAge: 300000 }
         );
     });
+
+    /*
+     * "How was this itinerary created?" explainer -- same inert/overlay/Escape
+     * pattern as partials/header.blade.php's mobile menu, just a centered
+     * dialog instead of a slide-in drawer. Guarded on the trigger existing
+     * since a package itinerary renders none of this markup at all.
+     */
+    (function () {
+        var openBtn = document.getElementById('itineraryExplainerOpen');
+        var modal = document.getElementById('itineraryExplainerModal');
+        var overlay = document.getElementById('itineraryExplainerOverlay');
+        var closeBtn = document.getElementById('itineraryExplainerClose');
+        if (!openBtn || !modal || !overlay || !closeBtn) return;
+
+        var open = function () {
+            modal.classList.add('open');
+            overlay.classList.add('open');
+            document.body.classList.add('info-modal-open');
+            modal.removeAttribute('inert');
+            openBtn.setAttribute('aria-expanded', 'true');
+            closeBtn.focus();
+        };
+
+        var close = function () {
+            modal.classList.remove('open');
+            overlay.classList.remove('open');
+            document.body.classList.remove('info-modal-open');
+            modal.setAttribute('inert', '');
+            openBtn.setAttribute('aria-expanded', 'false');
+            openBtn.focus();
+        };
+
+        openBtn.addEventListener('click', open);
+        closeBtn.addEventListener('click', close);
+        overlay.addEventListener('click', close);
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.classList.contains('open')) close();
+        });
+    })();
+
+    /*
+     * "Starting Point" navigation widget for an adopted package (see the
+     * Starting Point panel above). Entirely client-side: nothing here reads
+     * from or writes to the package, the itinerary, or any server route --
+     * it only ever builds a Google Maps directions link, so there is no way
+     * for this to reorder, reschedule, or resend the package through the
+     * recommendation/ML pipeline. Guarded on the button existing since it
+     * only renders when the package has real coordinates.
+     */
+    (function () {
+        var openLink = document.getElementById('package-nav-open');
+        var locateBtn = document.getElementById('package-nav-locate');
+        var originInput = document.getElementById('package-nav-origin');
+        if (!openLink || !locateBtn || !originInput) return;
+
+        var destination = @json($packageCoords ? $packageCoords['lat'].','.$packageCoords['lng'] : null);
+        var originCoords = null;
+
+        function mapsUrl() {
+            var params = 'api=1&destination=' + encodeURIComponent(destination);
+            var typed = originInput.value.trim();
+            if (originCoords) {
+                params += '&origin=' + encodeURIComponent(originCoords);
+            } else if (typed) {
+                params += '&origin=' + encodeURIComponent(typed);
+            }
+            // No origin at all is intentional, not an oversight: Google Maps
+            // falls back to the visitor's current location on its own end.
+            return 'https://www.google.com/maps/dir/?' + params;
+        }
+
+        function refreshHref() {
+            openLink.href = mapsUrl();
+        }
+
+        originInput.addEventListener('input', function () {
+            originCoords = null;
+            refreshHref();
+        });
+
+        locateBtn.addEventListener('click', function () {
+            if (!navigator.geolocation) return;
+            locateBtn.disabled = true;
+            locateBtn.textContent = 'Locating…';
+            navigator.geolocation.getCurrentPosition(
+                function (pos) {
+                    originCoords = pos.coords.latitude + ',' + pos.coords.longitude;
+                    originInput.value = 'Your current location';
+                    locateBtn.disabled = false;
+                    locateBtn.textContent = 'Use my current location';
+                    refreshHref();
+                },
+                function () {
+                    locateBtn.disabled = false;
+                    locateBtn.textContent = 'Use my current location';
+                },
+                { timeout: 8000, maximumAge: 300000 }
+            );
+        });
+
+        refreshHref();
+    })();
 </script>
 @endsection

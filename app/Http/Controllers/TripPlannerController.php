@@ -57,9 +57,36 @@ class TripPlannerController extends Controller
         private readonly AddressSuggestionService $addresses,
     ) {}
 
+    /**
+     * The fork in the road the site-wide "Plan My Trip" button now leads to
+     * first: personalized survey, or a tour operator's predefined package.
+     * Pure presentation -- it reads nothing, writes nothing, and both links
+     * on it go to routes that already existed (plan.edit, packages.index).
+     */
+    public function choose(): View
+    {
+        return view('plan.choose');
+    }
+
     public function edit(Request $request): View
     {
-        $preference = $this->currentPreference($request) ?? new TouristPreference();
+        /*
+         * A package-adopted itinerary's TouristPreference is synthetic --
+         * PackageController::planWith() fabricates it purely to satisfy the
+         * session-based plan machinery every other page reads (a travel_days
+         * count, the package's own price tier standing in for "budget"), and
+         * per that method's own doc comment it is "never scored against
+         * anything." Pre-filling this survey from it would show the tourist
+         * answers they never actually gave -- Solo, the package's budget
+         * tier, "Any" accommodation -- as if editing their own real
+         * preferences, when submitting the form as shown would silently
+         * discard the package and replace it with a generated itinerary
+         * built from those fabricated values instead.
+         */
+        $preference = $this->currentItinerary($request)?->package_id
+            ? new TouristPreference()
+            : ($this->currentPreference($request) ?? new TouristPreference());
+
         $healthProfile = $preference->exists
             ? $preference->healthProfile()->with('conditions')->first()
             : null;
@@ -175,6 +202,10 @@ class TripPlannerController extends Controller
             'range_requested' => $preference->distance_pref,
             'range_tier_used' => $itinerary->range_tier_used,
             'range_widened' => $itinerary->range_widened,
+            // true/false once ItineraryGenerationService has actually recorded
+            // an outcome for this itinerary, or null if it predates that
+            // column -- never assumed from the itinerary merely existing.
+            'ml_applied' => $itinerary->ml_skeleton_applied,
         ];
 
         return view('plan.itinerary', compact('itinerary', 'preference', 'provenance'));
