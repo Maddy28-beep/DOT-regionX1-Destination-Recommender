@@ -1479,8 +1479,15 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
        ever hid it, so at a 375px phone it ran past the header's right edge
        and got visibly clipped mid-word. The mobile drawer already shows
        "Signed in as {alias}" with its own Log out button, so nothing is
-       lost by dropping it from the bar. */
-    .header-actions .header-account-chip { display: none; }
+       lost by dropping it from the bar.
+
+       Scoped away from .portal/.admin: the establishment and DOT Admin
+       topbars reuse this same chip markup for their business name/log-out,
+       but have no mobile drawer duplicating Log out elsewhere -- hiding it
+       there would leave partners and admin staff with no way to log out
+       below 1366px. Their own size-down rules further below keep it fitting
+       instead. */
+    body:not(.portal):not(.admin) .header-actions .header-account-chip { display: none; }
     .nav-toggle { display: inline-flex; }
 }
 
@@ -1502,6 +1509,11 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
    interior page, so it's redundant clutter to drop first at this width. */
 @media (max-width: 480px) {
     .admin-username { display: none; }
+    /* Same trim as .admin-username above, applied to the establishment
+       portal's chip-style equivalent: drop the business name text but keep
+       the icon + logout button, since the name is already shown on every
+       interior page. */
+    .portal .header-account-chip__name span { display: none; }
 }
 
 /* .header-actions .btn-outline { display: none } above is meant for the
@@ -3765,7 +3777,7 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 
 .stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
 .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px; min-width: 0; }
-.stat-card .stat-card-val { font-size: 1.6rem; font-weight: 800; color: var(--primary-dark); }
+.stat-card .stat-card-val { font-size: 1.6rem; font-weight: 800; color: var(--primary-dark); overflow-wrap: break-word; }
 .stat-card .stat-card-label { font-size: .8rem; color: var(--muted); margin-top: 2px; }
 .stat-card .stat-card-flag { font-size: .74rem; color: var(--accent-dark); font-weight: 700; margin-top: 6px; }
 @media (max-width: 900px) { .stat-cards { grid-template-columns: repeat(2, 1fr); } }

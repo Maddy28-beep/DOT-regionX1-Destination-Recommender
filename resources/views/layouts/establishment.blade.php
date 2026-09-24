@@ -33,11 +33,18 @@
                         <a href="{{ route('establishment.notifications') }}" class="notif-dropdown-footer">View All</a>
                     </div>
                 </div>
-                <span class="admin-username" style="font-size:.85rem; color:var(--muted); margin-right:6px;">{{ auth('establishment')->user()->business_name }}</span>
-                <form method="POST" action="{{ route('portal.logout') }}">
-                    @csrf
-                    <button type="submit" class="btn btn-outline logout-btn">Log out</button>
-                </form>
+                <span class="header-account-chip">
+                    <span class="header-account-chip__name">
+                        <x-icon name="building" />
+                        <span>{{ auth('establishment')->user()->business_name }}</span>
+                    </span>
+                    <form method="POST" action="{{ route('portal.logout') }}" class="header-account-chip__logout-form">
+                        @csrf
+                        <button type="submit" class="header-account-chip__logout" aria-label="Log out" title="Log out">
+                            <x-icon name="log-out" />
+                        </button>
+                    </form>
+                </span>
             </div>
         </div>
     </header>
