@@ -47,14 +47,14 @@ class ExitSurveyController extends Controller
      *  request can't trigger thousands of one-row-at-a-time inserts. */
     private const MAX_LIST_ITEMS = 50;
 
-    /** listing_kind => the singular label appended to every option so a merged, cross-category list stays legible. */
-    private const PLACE_KIND_LABELS = [
-        'destination' => 'Destination',
-        'accommodation' => 'Accommodation',
-        'restaurant' => 'Restaurant',
-        'package' => 'Tour Package',
-        'souvenir_center' => 'Souvenir Center',
-        'tour_operator' => 'Tour Operator',
+    /** listing_kind => the group heading the tag-search picker sorts options under, in PLACE_MODELS order. */
+    private const PLACE_KIND_GROUPS = [
+        'destination' => 'Destinations',
+        'accommodation' => 'Accommodations',
+        'restaurant' => 'Restaurants',
+        'package' => 'Tour Packages',
+        'souvenir_center' => 'Souvenir Centers',
+        'tour_operator' => 'Tour Operators',
     ];
 
     /**
@@ -96,11 +96,12 @@ class ExitSurveyController extends Controller
          * One searchable list across every kind, rather than six separate
          * boxes -- a tourist does not think in database categories when
          * asked "where did you go," and a wall of six near-identical search
-         * fields was a real completion-rate risk. The category is folded
-         * into each option's own label ("Eden Nature Park · Destination")
-         * instead of dropped, since a restaurant and a destination can
-         * plausibly share a name and the picker has no other way to tell
-         * them apart in one flat list.
+         * fields was a real completion-rate risk. The category still shows,
+         * as a group heading the tag-search picker sorts its dropdown and
+         * selected chips under (see PLACE_KIND_GROUPS and the `group` key
+         * below), rather than as inline label suffix text -- a restaurant
+         * and a destination can plausibly share a name, and grouping is what
+         * now tells them apart instead of the suffix.
          *
          * The value stays exactly "{kind}:{id}" -- store() and every
          * downstream reader of ExitSurveyVisit (Apriori's transaction data,
@@ -113,7 +114,8 @@ class ExitSurveyController extends Controller
 
                 return $items->map(fn ($item) => [
                     'value' => "{$kind}:{$item->id}",
-                    'label' => $item->display_label.' · '.self::PLACE_KIND_LABELS[$kind],
+                    'label' => $item->display_label,
+                    'group' => self::PLACE_KIND_GROUPS[$kind],
                 ]);
             })
             ->values();

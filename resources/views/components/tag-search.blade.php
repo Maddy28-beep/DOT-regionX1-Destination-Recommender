@@ -17,13 +17,17 @@
     alphabetical grid to find the two or three places they actually went --
     a real completion-rate risk on a form nobody is obligated to finish.
 
-    Deliberately generic: `items` is a plain [{value, label}, ...] list and
-    `selected` a plain array of already-chosen values, with no assumption
-    about what a "value" means. This is what lets the same component serve
-    six different establishment kinds here by pointing it at six different
-    lists, and what would let an admin bulk-selection screen reuse it later
-    for the same reason -- picking a handful of rows out of a few hundred is
-    the same interaction problem whether the picker is public-facing or not.
+    Deliberately generic: `items` is a plain [{value, label, group?}, ...]
+    list and `selected` a plain array of already-chosen values, with no
+    assumption about what a "value" means. `group` is optional -- when every
+    item carries one, the dropdown and the selected chips below the input
+    both sort into that many labelled sections instead of one flat list; a
+    caller with nothing to group by can simply omit it. This is what lets
+    the same component serve six different establishment kinds here (see
+    exit-survey/create.blade.php), and what would let an admin
+    bulk-selection screen reuse it later for the same reason -- picking a
+    handful of rows out of a few hundred is the same interaction problem
+    whether the picker is public-facing or not.
 
     All matching happens client-side against the `items` list this prop
     passes in (see the <script type="application/json"> below): the largest
@@ -40,7 +44,6 @@
     @endif
 
     <div class="tag-search__box" data-tag-search-box>
-        <div class="tag-search__chips" data-tag-search-chips></div>
         <input
             type="text"
             class="tag-search__input"
@@ -53,6 +56,11 @@
         >
     </div>
     <ul class="tag-search__dropdown" data-tag-search-dropdown hidden role="listbox"></ul>
+    {{-- Below the input, not inside it: grouped into one block per category
+         (see the `group` note above) so "which of these did I already add"
+         stays readable once a respondent has picked places across several
+         categories, instead of one long inline run of same-styled chips. --}}
+    <div class="tag-search__chips" data-tag-search-chips></div>
     <p class="tag-search__count" data-tag-search-count>0 selected</p>
 
     {{-- Hidden inputs are added/removed here as chips are added/removed;
