@@ -3875,7 +3875,11 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 
 .data-table { width: 100%; border-collapse: collapse; font-size: .86rem; }
 .data-table th { text-align: left; font-size: .74rem; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-.data-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+/* A long, unbroken token (an email address, a business name with no spaces)
+   has nowhere to wrap under normal white-space rules and bleeds visibly into
+   the next column instead -- seen on the Establishment Approvals table with
+   partner@davaoislandexplorers.com running into the Type column. */
+.data-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; overflow-wrap: break-word; }
 .data-table tr:last-child td { border-bottom: none; }
 .data-table .cell-muted { color: var(--muted); font-size: .82rem; }
 /* Only rendered for a name that collides with another row of the same
