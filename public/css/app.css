@@ -3878,6 +3878,11 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 .data-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 .data-table tr:last-child td { border-bottom: none; }
 .data-table .cell-muted { color: var(--muted); font-size: .82rem; }
+/* Only rendered for a name that collides with another row of the same
+   listing type (admin/listings/index.blade.php) -- the address is what
+   tells two same-named branches apart, so it needs to read as secondary to
+   the name, not compete with it. */
+.data-table .cell-sub { color: var(--muted); font-size: .76rem; margin-top: 2px; }
 /* Formatted dates ("Aug 07, 2025") read as one token -- letting them break
    after the comma costs a second line and makes the column scan badly.
    .table-scroll already handles any overflow this causes on narrow screens. */
