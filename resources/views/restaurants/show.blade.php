@@ -28,7 +28,7 @@
     @include('partials.gallery-hero', [
         'photos' => $restaurant->photos,
         'title' => $restaurant->name,
-        'subtitle' => $restaurant->location.($restaurant->region ? ' · '.$restaurant->region->name : ''),
+        'subtitle' => $restaurant->posterMeta(),
         'isAccredited' => $restaurant->is_accredited,
         'rating' => number_format($restaurant->rating, 1),
         'reviewCount' => $restaurant->review_count,
