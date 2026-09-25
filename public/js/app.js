@@ -838,3 +838,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
     revealTargets.forEach(function (el) { observer.observe(el); });
 });
+
+/*
+ * Admin/establishment data tables (.table-scroll, 8 pages) scroll
+ * horizontally on narrow screens but gave no visual hint they could --
+ * the last column just looked cut off. Toggles .has-overflow when the
+ * table is actually wider than its wrapper, and .is-at-end once scrolled
+ * to the last column, so the right-edge fade in app.css only shows while
+ * there's still more to reveal.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    var scrollers = document.querySelectorAll('.table-scroll');
+    if (!scrollers.length) return;
+
+    scrollers.forEach(function (el) {
+        function update() {
+            el.classList.toggle('has-overflow', el.scrollWidth > el.clientWidth + 1);
+            el.classList.toggle('is-at-end', el.scrollLeft + el.clientWidth >= el.scrollWidth - 2);
+        }
+
+        update();
+        el.addEventListener('scroll', update);
+        window.addEventListener('resize', update);
+    });
+});
