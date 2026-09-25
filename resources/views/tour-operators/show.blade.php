@@ -28,7 +28,7 @@
     @include('partials.gallery-hero', [
         'photos' => $tourOperator->photos,
         'title' => $tourOperator->name,
-        'subtitle' => $tourOperator->location.($tourOperator->region ? ' · '.$tourOperator->region->name : ''),
+        'subtitle' => $tourOperator->posterMeta(),
         'isAccredited' => $tourOperator->is_accredited,
         'rating' => number_format($tourOperator->rating, 1),
         'reviewCount' => $tourOperator->review_count,
