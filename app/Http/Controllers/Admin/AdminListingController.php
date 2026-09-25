@@ -48,12 +48,23 @@ class AdminListingController extends Controller
 
         $listings = $query->orderBy('name')->paginate(12)->withQueryString();
 
+        /*
+         * Counted across the whole type, not just this page or the current
+         * status/search filter -- so whether "Elysia Wellness Spa" (three
+         * real, separately addressed branches; see ExitSurveyController's
+         * labelDistinctly() for the same problem on the traveller-facing
+         * picker) reads as ambiguous doesn't flicker as an admin pages
+         * through the table or switches the Active/Archived/All tabs.
+         */
+        $nameCounts = $model::query()->pluck('name')->countBy();
+
         return view('admin.listings.index', [
             'type' => $type,
             'config' => $config,
             'types' => self::TYPES,
             'listings' => $listings,
             'status' => $status,
+            'nameCounts' => $nameCounts,
         ]);
     }
 

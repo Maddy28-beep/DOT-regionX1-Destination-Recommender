@@ -64,7 +64,18 @@
                         <td class="col-check">
                             <input type="checkbox" data-bulk-row value="{{ $listing->id }}" aria-label="Select {{ $listing->name }}">
                         </td>
-                        <td>{{ $listing->name }}</td>
+                        <td>
+                            {{ $listing->name }}
+                            {{-- Only when this name is genuinely ambiguous within
+                                 this listing type (see the controller's
+                                 $nameCounts) -- distinguishes "which Elysia
+                                 Wellness Spa is this row" without adding a
+                                 subline to every one of hundreds of rows that
+                                 don't need it. --}}
+                            @if (($nameCounts[$listing->name] ?? 0) > 1 && $listing->location)
+                                <div class="cell-sub">{{ $listing->location }}</div>
+                            @endif
+                        </td>
                         <td class="cell-muted">{{ $listing->region?->name ?? '—' }}</td>
                         <td class="cell-muted">{{ $listing->price_tier ?? '—' }}</td>
                         <td>
