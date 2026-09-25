@@ -26,7 +26,7 @@
     @include('partials.gallery-hero', [
         'photos' => $souvenirCenter->photos,
         'title' => $souvenirCenter->name,
-        'subtitle' => $souvenirCenter->location.($souvenirCenter->region ? ' · '.$souvenirCenter->region->name : ''),
+        'subtitle' => $souvenirCenter->posterMeta(),
         'isAccredited' => $souvenirCenter->is_accredited,
         'rating' => number_format($souvenirCenter->rating, 1),
         'reviewCount' => $souvenirCenter->review_count,
