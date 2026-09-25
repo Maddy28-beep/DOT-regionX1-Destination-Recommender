@@ -318,6 +318,27 @@ a { color: inherit; text-decoration: none; }
    .auth-foot link treatment. */
 .field-hint a { color: var(--primary); font-weight: 600; }
 
+/*
+ * Inline swap-in for .field-hint on a few of the trip-planner fields (plan/
+ * preferences.blade.php): a full sentence under every field pushed neighbours
+ * in the same row out of alignment, since rows share a height. This keeps the
+ * explanation one focus/hover away via the native title tooltip and an
+ * aria-label for screen readers, instead of reserving vertical space for it.
+ */
+.field-help {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    margin-left: 4px;
+    color: var(--muted);
+    cursor: help;
+    vertical-align: -2px;
+}
+.field-help svg { width: 14px; height: 14px; }
+.field-help:hover, .field-help:focus-visible { color: var(--primary); }
+
 /* Partner-portal day-by-day itinerary editor (establishment/edit-listing) --
    one card per day instead of a "Title | Description" delimiter format in a
    plain textarea, which asked a non-technical tour operator to learn a
@@ -754,7 +775,24 @@ body.info-modal-open { overflow: hidden; }
     cursor: text;
 }
 .tag-search__box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
-.tag-search__chips { display: contents; }
+/*
+ * Selected chips render below the input now, grouped into one section per
+ * `group` the items carry (exit-survey/create.blade.php: Destinations,
+ * Accommodations, Restaurants, ...) instead of inline inside the search box
+ * -- a flat run of same-styled chips across several categories gave no way
+ * to tell at a glance which places you'd already logged under which kind.
+ */
+.tag-search__chips:not(:empty) { margin-top: 10px; display: flex; flex-direction: column; gap: 10px; }
+.tag-search__chip-group-label {
+    display: block;
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+.tag-search__chip-items { display: flex; flex-wrap: wrap; gap: 6px; }
 .tag-search__chip {
     display: inline-flex;
     align-items: center;
@@ -815,6 +853,20 @@ body.info-modal-open { overflow: hidden; }
 }
 .tag-search__dropdown li:hover,
 .tag-search__dropdown li.is-active { background: var(--bg); }
+/* Non-interactive section heading between groups of matches -- not a
+   `cursor: pointer` result row, so it needs its own rule ahead of the
+   generic li above rather than inheriting its hover/pointer styling. */
+.tag-search__dropdown li.tag-search__group-label {
+    padding: 8px 10px 4px;
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--muted);
+    cursor: default;
+}
+.tag-search__dropdown li.tag-search__group-label:first-child { padding-top: 4px; }
+.tag-search__dropdown li.tag-search__group-label:hover { background: none; }
 .tag-search__count { margin: 6px 0 0; font-size: .78rem; color: var(--muted); }
 
 /* Privacy/reassurance callout: a quiet neutral inset rather than a coloured
@@ -1301,7 +1353,7 @@ body.hero-page .site-header .btn-primary:hover { background: var(--primary-dark)
 
 body.hero-page .site-header.scrolled {
     /* position intentionally not changed here -- see the rule above. */
-    background: var(--paper);
+    background: var(--white);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     border-bottom-color: transparent;
@@ -1479,8 +1531,15 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
        ever hid it, so at a 375px phone it ran past the header's right edge
        and got visibly clipped mid-word. The mobile drawer already shows
        "Signed in as {alias}" with its own Log out button, so nothing is
-       lost by dropping it from the bar. */
-    .header-actions .header-account-chip { display: none; }
+       lost by dropping it from the bar.
+
+       Scoped away from .portal/.admin: the establishment and DOT Admin
+       topbars reuse this same chip markup for their business name/log-out,
+       but have no mobile drawer duplicating Log out elsewhere -- hiding it
+       there would leave partners and admin staff with no way to log out
+       below 1366px. Their own size-down rules further below keep it fitting
+       instead. */
+    body:not(.portal):not(.admin) .header-actions .header-account-chip { display: none; }
     .nav-toggle { display: inline-flex; }
 }
 
@@ -1496,26 +1555,20 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
 
 /* The admin/establishment topbar (layouts/admin.blade.php,
    layouts/establishment.blade.php) packs a menu toggle, notification bell
-   (establishment only), the logged-in user's name, and a Log out button
-   into the same .header-actions bar -- more than "Plan My Trip" + hamburger
-   alone, so it needs a wider cutoff. The name is already shown on every
-   interior page, so it's redundant clutter to drop first at this width. */
+   (establishment only), the logged-in user's name/logout chip, and (for
+   establishment) a notification bell into the same .header-actions bar --
+   more than "Plan My Trip" + hamburger alone, so it needs a wider cutoff.
+   The name is already shown on every interior page, so it's redundant
+   clutter to drop first at this width. */
 @media (max-width: 480px) {
-    .admin-username { display: none; }
+    .portal .header-account-chip__name span,
+    .admin .header-account-chip__name span { display: none; }
 }
-
-/* .header-actions .btn-outline { display: none } above is meant for the
-   tourist header's "Sign in" link, which the mobile dropdown menu repeats.
-   The admin/establishment topbar reuses the same classes for its "Log out"
-   button, which has no such backup elsewhere -- without this override, DOT
-   staff and partners could not log out at all below 1220px wide (any
-   tablet or phone). */
-.header-actions .logout-btn { display: inline-flex; }
 
 /* Even with the name hidden (480px rule above), the admin/establishment
    topbar still packs a brand wordmark + role badge, a menu toggle, an
-   optional notification bell, and Log out into one bar -- more than a
-   320px phone can fit at full size. Trim the two biggest remaining
+   optional notification bell, and the account chip into one bar -- more
+   than a 320px phone can fit at full size. Trim the two biggest remaining
    contributors: the role badge next to the logo, and the "Menu" text
    label (the hamburger icon alone is a well-understood affordance). */
 @media (max-width: 400px) {
@@ -1523,7 +1576,6 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
     .menu-toggle-label { display: none; }
     .admin-menu-toggle { padding: 8px; }
     .header-actions { gap: 4px; }
-    .header-actions .logout-btn { padding: 8px; font-size: .8rem; }
     .site-header .container.bar { padding-inline: 12px; }
 }
 
@@ -1993,6 +2045,23 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
 @media (max-width: 640px) {
     .postcard-card { aspect-ratio: 4 / 5; }
     .postcard-arrow { width: 36px; height: 36px; }
+}
+
+/*
+ * Landing-page scroll reveal (see the app.js block guarded on body.hero-page
+ * for what gets this class and how the stagger delay is set). Only elements
+ * that script actually assigns .reveal-on-scroll to are affected, so this is
+ * inert everywhere .postcard-card/.dpost-card-wrap/.feature-card are reused
+ * off the homepage.
+ */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .6s ease, transform .6s ease;
+}
+.reveal-on-scroll.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+    .reveal-on-scroll { opacity: 1; transform: none; transition: none; }
 }
 
 /* ---------- Popular Destinations (magazine spread) ---------- */
@@ -3765,7 +3834,7 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 
 .stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
 .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px; min-width: 0; }
-.stat-card .stat-card-val { font-size: 1.6rem; font-weight: 800; color: var(--primary-dark); }
+.stat-card .stat-card-val { font-size: 1.6rem; font-weight: 800; color: var(--primary-dark); overflow-wrap: break-word; }
 .stat-card .stat-card-label { font-size: .8rem; color: var(--muted); margin-top: 2px; }
 .stat-card .stat-card-flag { font-size: .74rem; color: var(--accent-dark); font-weight: 700; margin-top: 6px; }
 @media (max-width: 900px) { .stat-cards { grid-template-columns: repeat(2, 1fr); } }
@@ -3813,7 +3882,23 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
    after the comma costs a second line and makes the column scan badly.
    .table-scroll already handles any overflow this causes on narrow screens. */
 .data-table .cell-date { white-space: nowrap; }
-.table-scroll { overflow-x: auto; }
+/*
+ * .has-overflow/.is-at-end are set by the app.js scroll-affordance block:
+ * a table wider than its wrapper scrolled with no visual hint that it could,
+ * so the Status/last column just looked cut off on a phone instead of one
+ * swipe away. The fade only shows while there's more to reveal.
+ */
+.table-scroll { overflow-x: auto; position: relative; }
+.table-scroll.has-overflow:not(.is-at-end)::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 32px;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), var(--white));
+    pointer-events: none;
+}
 
 /* ---------- DOT Admin console refinements -------------------------------
    Scoped to body.admin. Density is deliberately unchanged: td padding, font

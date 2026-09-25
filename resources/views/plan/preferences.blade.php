@@ -68,10 +68,11 @@
                                     <input type="date" id="start_date" name="start_date" value="{{ old('start_date', optional($preference->start_date)->format('Y-m-d')) }}">
                                 </div>
                                 <div class="field" style="flex:1; min-width:160px;">
-                                    <label for="arrival_time">Arrival time (optional)</label>
+                                    <label for="arrival_time">Arrival time (optional)
+                                        <span class="field-help" tabindex="0" title="We won't put a morning stop on your first day if you land in the afternoon." aria-label="We won't put a morning stop on your first day if you land in the afternoon."><x-icon name="info" /></span>
+                                    </label>
                                     <input type="time" id="arrival_time" name="arrival_time"
                                            value="{{ old('arrival_time', $preference->arrival_time ? substr((string) $preference->arrival_time, 0, 5) : '') }}">
-                                    <p class="field-hint">We won't put a morning stop on your first day if you land in the afternoon.</p>
                                 </div>
                             </div>
                         </div>
@@ -106,12 +107,13 @@
                                     </select>
                                 </div>
                                 <div class="field" style="flex:1; min-width:200px;" data-origin-field>
-                                    <label for="place_of_origin" data-origin-label>Where are you visiting from?</label>
+                                    <label for="place_of_origin"><span data-origin-label>Where are you visiting from?</span>
+                                        <span class="field-help" tabindex="0" title="Helps DOT understand where visitors are travelling from." aria-label="Helps DOT understand where visitors are travelling from."><x-icon name="info" /></span>
+                                    </label>
                                     <input type="text" id="place_of_origin" name="place_of_origin"
                                            value="{{ old('place_of_origin', $preference->place_of_origin) }}"
                                            placeholder="e.g. Manila, Cebu, South Korea"
                                            @unless(old('visitor_type', $preference->visitor_type) === 'Regular / Local') required @endunless>
-                                    <p class="field-hint" data-origin-hint>Helps DOT understand where visitors are travelling from.</p>
                                 </div>
                             </div>
                         </div>
@@ -136,7 +138,14 @@
                                     </select>
                                 </div>
                                 <div class="field" style="flex:1; min-width:180px;">
-                                    <label for="distance_pref">Preferred travel distance</label>
+                                    <label for="distance_pref">Preferred travel distance
+                                        {{-- "~" is doing real work: when a radius holds too few places
+                                             for the trip length the gate widens to the next tier rather
+                                             than returning a half-empty plan, and the itinerary says so
+                                             when it happens. Stating a hard figure here would promise a
+                                             ceiling the recommender is designed to break. --}}
+                                        <span class="field-help" tabindex="0" title="Measured from your starting point. If there aren't enough DOT-accredited places in range, we widen the search and tell you on the itinerary." aria-label="Measured from your starting point. If there aren't enough DOT-accredited places in range, we widen the search and tell you on the itinerary."><x-icon name="info" /></span>
+                                    </label>
                                     {{--
                                         The radius comes from the recommender's own gate
                                         (ContentBasedRecommendationService::RANGE_RADIUS_KM) rather
@@ -150,8 +159,7 @@
                                             'far' => 'Far / willing to travel',
                                         ];
                                     @endphp
-                                    <select id="distance_pref" name="distance_pref" class="form-select" required
-                                            aria-describedby="distance_pref_hint">
+                                    <select id="distance_pref" name="distance_pref" class="form-select" required>
                                         @foreach ($distanceNames as $value => $name)
                                             <option value="{{ $value }}" @selected(old('distance_pref', $preference->distance_pref) === $value)>
                                                 {{-- Kept terse deliberately. A closed <select> clips
@@ -168,16 +176,6 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                    {{-- "~" is doing real work: when a radius holds too few places for
-                                         the trip length the gate widens to the next tier rather than
-                                         returning a half-empty plan, and the itinerary says so when it
-                                         happens. Stating a hard figure here would promise a ceiling
-                                         the recommender is designed to break. --}}
-                                    <p class="field-hint" id="distance_pref_hint">
-                                        Measured from your starting point. If there aren't enough
-                                        DOT-accredited places in range, we widen the search and tell
-                                        you on the itinerary.
-                                    </p>
                                 </div>
                             </div>
                         </div>

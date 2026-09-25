@@ -615,7 +615,19 @@ document.addEventListener('DOMContentLoaded', function () {
         var byValue = {};
         items.forEach(function (item) { byValue[item.value] = item; });
 
+        // First-seen order in `items`, not alphabetical -- for the exit
+        // survey that's PLACE_KIND_GROUPS order (Destinations before
+        // Accommodations before Restaurants, ...), so the dropdown and the
+        // selected-chip sections land in the same order every time.
+        var groupOrder = [];
+        items.forEach(function (item) {
+            var group = item.group || '';
+            if (groupOrder.indexOf(group) === -1) groupOrder.push(group);
+        });
+        var grouped = groupOrder.length > 1 || (groupOrder.length === 1 && groupOrder[0] !== '');
+
         var MAX_RESULTS = 8;
+        var MAX_RESULTS_PER_GROUP = 4;
         var activeIndex = -1;
 
         function isSelected(value) { return selectedValues.indexOf(value) !== -1; }
@@ -624,46 +636,86 @@ document.addEventListener('DOMContentLoaded', function () {
             countEl.textContent = selectedValues.length + (selectedValues.length === 1 ? ' selected' : ' selected');
         }
 
+        // Rebuilds the whole selected-chips area from `selectedValues` on
+        // every add/remove -- same reasoning as renderDropdown() below:
+        // simpler to reason about than inserting one grouped chip into the
+        // correct section by hand, and cheap at the sizes these lists reach.
+        function renderChips() {
+            chipsEl.innerHTML = '';
+            hiddenHost.innerHTML = '';
+
+            function renderOne(value, container) {
+                var item = byValue[value];
+                if (!item) return;
+
+                var chip = document.createElement('span');
+                chip.className = 'tag-search__chip';
+                chip.setAttribute('data-value', value);
+
+                var label = document.createElement('span');
+                label.className = 'tag-search__chip-label';
+                label.textContent = item.label;
+
+                var remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'tag-search__chip-remove';
+                remove.setAttribute('aria-label', 'Remove ' + item.label);
+                remove.textContent = '×';
+                remove.addEventListener('click', function () { removeChip(value); });
+
+                chip.appendChild(label);
+                chip.appendChild(remove);
+                container.appendChild(chip);
+
+                var hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = fieldName;
+                hidden.value = value;
+                hiddenHost.appendChild(hidden);
+            }
+
+            if (!grouped) {
+                var flat = document.createElement('div');
+                flat.className = 'tag-search__chip-items';
+                selectedValues.forEach(function (value) { renderOne(value, flat); });
+                chipsEl.appendChild(flat);
+                return;
+            }
+
+            groupOrder.forEach(function (group) {
+                var valuesInGroup = selectedValues.filter(function (value) {
+                    var item = byValue[value];
+                    return item && (item.group || '') === group;
+                });
+                if (!valuesInGroup.length) return;
+
+                var section = document.createElement('div');
+                section.className = 'tag-search__chip-group';
+
+                var heading = document.createElement('span');
+                heading.className = 'tag-search__chip-group-label';
+                heading.textContent = group;
+                section.appendChild(heading);
+
+                var itemsEl = document.createElement('div');
+                itemsEl.className = 'tag-search__chip-items';
+                valuesInGroup.forEach(function (value) { renderOne(value, itemsEl); });
+                section.appendChild(itemsEl);
+
+                chipsEl.appendChild(section);
+            });
+        }
+
         function addChip(value) {
-            var item = byValue[value];
-            if (!item || isSelected(value)) return;
-
+            if (!byValue[value] || isSelected(value)) return;
             selectedValues.push(value);
-
-            var chip = document.createElement('span');
-            chip.className = 'tag-search__chip';
-            chip.setAttribute('data-value', value);
-
-            var label = document.createElement('span');
-            label.className = 'tag-search__chip-label';
-            label.textContent = item.label;
-
-            var remove = document.createElement('button');
-            remove.type = 'button';
-            remove.className = 'tag-search__chip-remove';
-            remove.setAttribute('aria-label', 'Remove ' + item.label);
-            remove.textContent = '×';
-            remove.addEventListener('click', function () { removeChip(value, chip); });
-
-            chip.appendChild(label);
-            chip.appendChild(remove);
-            chipsEl.appendChild(chip);
-
-            var hidden = document.createElement('input');
-            hidden.type = 'hidden';
-            hidden.name = fieldName;
-            hidden.value = value;
-            hidden.setAttribute('data-value', value);
-            hiddenHost.appendChild(hidden);
-
+            renderChips();
             updateCount();
         }
 
-        function removeChip(value, chipEl) {
+        function removeChip(value) {
             selectedValues = selectedValues.filter(function (v) { return v !== value; });
-            chipEl.remove();
-            var hidden = hiddenHost.querySelector('[data-value="' + value.replace(/"/g, '\\"') + '"]');
-            if (hidden) hidden.remove();
+            renderChips();
             updateCount();
         }
 
@@ -682,9 +734,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
         function renderDropdown() {
             var query = input.value.trim().toLowerCase();
-            var matches = items.filter(function (item) {
+            var candidates = items.filter(function (item) {
                 return !isSelected(item.value) && (query === '' || item.label.toLowerCase().indexOf(query) !== -1);
-            }).slice(0, MAX_RESULTS);
+            });
+
+            // Capped per group when grouped, not just overall -- otherwise a
+            // short or empty query lets one alphabetically-first, larger
+            // group (Destinations) fill the whole result list and the other
+            // categories never appear at all.
+            var matches = grouped
+                ? groupOrder.reduce(function (acc, group) {
+                    var inGroup = candidates.filter(function (item) { return (item.group || '') === group; });
+                    return acc.concat(inGroup.slice(0, MAX_RESULTS_PER_GROUP));
+                }, [])
+                : candidates.slice(0, MAX_RESULTS);
 
             if (matches.length === 0) {
                 closeDropdown();
@@ -692,7 +755,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             dropdown.innerHTML = '';
-            matches.forEach(function (item) {
+
+            function renderOption(item) {
                 var li = document.createElement('li');
                 li.setAttribute('data-option', '');
                 li.setAttribute('data-value', item.value);
@@ -708,7 +772,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     input.focus();
                 });
                 dropdown.appendChild(li);
-            });
+            }
+
+            if (!grouped) {
+                matches.forEach(renderOption);
+            } else {
+                groupOrder.forEach(function (group) {
+                    var matchesInGroup = matches.filter(function (item) { return (item.group || '') === group; });
+                    if (!matchesInGroup.length) return;
+
+                    var heading = document.createElement('li');
+                    heading.className = 'tag-search__group-label';
+                    heading.setAttribute('role', 'presentation');
+                    heading.textContent = group;
+                    dropdown.appendChild(heading);
+
+                    matchesInGroup.forEach(renderOption);
+                });
+            }
 
             dropdown.hidden = false;
             input.setAttribute('aria-expanded', 'true');
@@ -716,11 +797,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Existing selections (old() repopulation on a validation error)
-        // render their chips up front, in the order they were submitted.
-        selectedValues.slice().forEach(function (value) {
-            selectedValues = selectedValues.filter(function (v) { return v !== value; });
-            addChip(value);
-        });
+        // render up front, in the order they were submitted.
+        renderChips();
+        updateCount();
 
         input.addEventListener('input', renderDropdown);
         input.addEventListener('focus', renderDropdown);
@@ -746,9 +825,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 closeDropdown();
             } else if (e.key === 'Backspace' && input.value === '') {
                 // Backspace on an empty field removes the most recently added
-                // chip, matching the pattern most chip inputs already use.
-                var last = chipsEl.lastElementChild;
-                if (last) removeChip(last.getAttribute('data-value'), last);
+                // chip, matching the pattern most chip inputs already use --
+                // tracked via `selectedValues` order now, since the chips
+                // themselves are grouped into sections rather than one flat
+                // list a "last child" lookup could walk.
+                if (selectedValues.length) removeChip(selectedValues[selectedValues.length - 1]);
             }
         });
 
@@ -757,8 +838,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 closeDropdown();
             }
         });
-
-        updateCount();
     });
 });
 
@@ -791,4 +870,74 @@ document.addEventListener('DOMContentLoaded', function () {
 
     toggle.addEventListener('change', sync);
     sync();
+});
+
+/*
+ * Landing-page card reveal: postcard, destination/package, and feature cards
+ * fade and slide up as they scroll into view, staggered within each grid so
+ * they don't all snap in at once. Scoped to body.hero-page, which only
+ * welcome.blade.php sets -- .postcard-card, .dpost-grid and .feature-card
+ * are reused by pages (destination detail's related strip, saved places,
+ * the exit survey recap) that should keep showing their cards immediately.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    if (!document.body.classList.contains('hero-page')) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var STEP_MS = 80;
+    var MAX_DELAY_MS = 400;
+
+    [
+        document.querySelectorAll('.postcard-track > .postcard-card'),
+        document.querySelectorAll('.dpost-grid > *'),
+        document.querySelectorAll('.feature-grid > .feature-card'),
+    ].forEach(function (group) {
+        group.forEach(function (el, index) {
+            el.classList.add('reveal-on-scroll');
+            el.style.transitionDelay = Math.min(index * STEP_MS, MAX_DELAY_MS) + 'ms';
+        });
+    });
+
+    var revealTargets = document.querySelectorAll('.reveal-on-scroll');
+
+    if (!('IntersectionObserver' in window)) {
+        // No observer support: show everything immediately rather than
+        // leaving cards stuck invisible.
+        revealTargets.forEach(function (el) { el.classList.add('is-visible'); });
+        return;
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+        });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    revealTargets.forEach(function (el) { observer.observe(el); });
+});
+
+/*
+ * Admin/establishment data tables (.table-scroll, 8 pages) scroll
+ * horizontally on narrow screens but gave no visual hint they could --
+ * the last column just looked cut off. Toggles .has-overflow when the
+ * table is actually wider than its wrapper, and .is-at-end once scrolled
+ * to the last column, so the right-edge fade in app.css only shows while
+ * there's still more to reveal.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    var scrollers = document.querySelectorAll('.table-scroll');
+    if (!scrollers.length) return;
+
+    scrollers.forEach(function (el) {
+        function update() {
+            el.classList.toggle('has-overflow', el.scrollWidth > el.clientWidth + 1);
+            el.classList.toggle('is-at-end', el.scrollLeft + el.clientWidth >= el.scrollWidth - 2);
+        }
+
+        update();
+        el.addEventListener('scroll', update);
+        window.addEventListener('resize', update);
+    });
 });
