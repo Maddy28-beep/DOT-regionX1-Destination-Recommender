@@ -4515,6 +4515,25 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
        the title cramped against the edge on a 375px screen. */
     .toast-stack { top: 72px; left: 16px; right: 16px; max-width: none; }
 }
+
+/*
+ * .dash-header pages (My Itinerary, My Itineraries, plan/choose, the legal
+ * pages) put their own title + right-aligned action buttons in the same
+ * top-right band the toast stack always uses -- most visibly on My
+ * Itinerary, the page a "Preferences saved" toast lands on right after
+ * the trip planner submits, where it sat directly over "Save Itinerary"
+ * for the few seconds before it dismissed. Dropping the toast below the
+ * whole header block on these pages clears every dash-header layout at
+ * once rather than nudging this one page's buttons.
+ */
+body:has(.dash-header) .toast-stack { top: 226px; }
+@media (max-width: 560px) {
+    /* Taller still on a phone: the title, subtitle and action buttons stack
+       vertically here instead of sharing a row, measured to ~299px on My
+       Itinerary's two-line subtitle -- the tallest of the pages that use
+       .dash-header. */
+    body:has(.dash-header) .toast-stack { top: 310px; }
+}
 @media (prefers-reduced-motion: reduce) {
     /* The drain bar is the only remaining cue for how long is left, so it
        keeps animating -- it conveys information rather than decoration. */
