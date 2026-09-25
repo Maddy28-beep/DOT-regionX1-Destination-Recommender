@@ -1524,31 +1524,20 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
 
 /* The admin/establishment topbar (layouts/admin.blade.php,
    layouts/establishment.blade.php) packs a menu toggle, notification bell
-   (establishment only), the logged-in user's name, and a Log out button
-   into the same .header-actions bar -- more than "Plan My Trip" + hamburger
-   alone, so it needs a wider cutoff. The name is already shown on every
-   interior page, so it's redundant clutter to drop first at this width. */
+   (establishment only), the logged-in user's name/logout chip, and (for
+   establishment) a notification bell into the same .header-actions bar --
+   more than "Plan My Trip" + hamburger alone, so it needs a wider cutoff.
+   The name is already shown on every interior page, so it's redundant
+   clutter to drop first at this width. */
 @media (max-width: 480px) {
-    .admin-username { display: none; }
-    /* Same trim as .admin-username above, applied to the establishment
-       portal's chip-style equivalent: drop the business name text but keep
-       the icon + logout button, since the name is already shown on every
-       interior page. */
-    .portal .header-account-chip__name span { display: none; }
+    .portal .header-account-chip__name span,
+    .admin .header-account-chip__name span { display: none; }
 }
-
-/* .header-actions .btn-outline { display: none } above is meant for the
-   tourist header's "Sign in" link, which the mobile dropdown menu repeats.
-   The admin/establishment topbar reuses the same classes for its "Log out"
-   button, which has no such backup elsewhere -- without this override, DOT
-   staff and partners could not log out at all below 1220px wide (any
-   tablet or phone). */
-.header-actions .logout-btn { display: inline-flex; }
 
 /* Even with the name hidden (480px rule above), the admin/establishment
    topbar still packs a brand wordmark + role badge, a menu toggle, an
-   optional notification bell, and Log out into one bar -- more than a
-   320px phone can fit at full size. Trim the two biggest remaining
+   optional notification bell, and the account chip into one bar -- more
+   than a 320px phone can fit at full size. Trim the two biggest remaining
    contributors: the role badge next to the logo, and the "Menu" text
    label (the hamburger icon alone is a well-understood affordance). */
 @media (max-width: 400px) {
@@ -1556,7 +1545,6 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
     .menu-toggle-label { display: none; }
     .admin-menu-toggle { padding: 8px; }
     .header-actions { gap: 4px; }
-    .header-actions .logout-btn { padding: 8px; font-size: .8rem; }
     .site-header .container.bar { padding-inline: 12px; }
 }
 
@@ -3863,7 +3851,23 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
    after the comma costs a second line and makes the column scan badly.
    .table-scroll already handles any overflow this causes on narrow screens. */
 .data-table .cell-date { white-space: nowrap; }
-.table-scroll { overflow-x: auto; }
+/*
+ * .has-overflow/.is-at-end are set by the app.js scroll-affordance block:
+ * a table wider than its wrapper scrolled with no visual hint that it could,
+ * so the Status/last column just looked cut off on a phone instead of one
+ * swipe away. The fade only shows while there's more to reveal.
+ */
+.table-scroll { overflow-x: auto; position: relative; }
+.table-scroll.has-overflow:not(.is-at-end)::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 32px;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), var(--white));
+    pointer-events: none;
+}
 
 /* ---------- DOT Admin console refinements -------------------------------
    Scoped to body.admin. Density is deliberately unchanged: td padding, font
