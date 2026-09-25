@@ -27,7 +27,7 @@
     @include('partials.gallery-hero', [
         'photos' => $package->photos,
         'title' => $package->name,
-        'subtitle' => $package->duration_label.($package->region ? ' · '.$package->region->name : ''),
+        'subtitle' => $package->posterMeta(),
         'isAccredited' => $package->is_accredited,
         'rating' => number_format($package->rating, 1),
         'reviewCount' => $package->review_count,
