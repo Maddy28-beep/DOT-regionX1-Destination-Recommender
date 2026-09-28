@@ -9,6 +9,7 @@ use App\Models\Region;
 use App\Models\Restaurant;
 use App\Models\SouvenirCenter;
 use App\Models\TourOperator;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -134,6 +135,34 @@ class HomeController extends Controller
         })->filter()->values()->all();
     }
 
+    /**
+     * "Popular searches" chips under the hero search bar: real, clickable
+     * destinations rather than invented copy. Built from the same
+     * best-first ordering (featured, then weighted rating) the rest of the
+     * homepage already trusts for "what's worth surfacing" -- not a
+     * separate click-tracked "most viewed" table, which doesn't exist yet
+     * and would be a whole feature on its own.
+     *
+     * @param  \Illuminate\Support\Collection<int, Destination>  $destinations
+     * @return \Illuminate\Support\Collection<int, array{label: string, url: string}>
+     */
+    private function popularSearchChips(Collection $destinations): Collection
+    {
+        $chips = $destinations->take(3)->map(fn (Destination $d) => [
+            'label' => $d->name,
+            'url' => route('destinations.show', $d),
+        ]);
+
+        // A real filter link, not label text -- only offered when it would
+        // actually return something, so the chip never leads to an empty
+        // results page.
+        if (Destination::publiclyVisible()->where('price_tier', 'Free')->exists()) {
+            $chips->push(['label' => 'Free to visit', 'url' => route('destinations.index', ['price_tier' => 'Free'])]);
+        }
+
+        return $chips->values();
+    }
+
     public function index(): View
     {
         /*
@@ -177,7 +206,15 @@ class HomeController extends Controller
 
         $heroVideo = $this->heroVideo();
 
-        return view('welcome', compact('destinations', 'packages', 'stats', 'regions', 'heroVideo'))
+        // Reused rather than retyped, so the hero search's Interest options
+        // and the Plan Your Trip survey's activity checklist can't drift
+        // apart the way two independently-maintained copies of the same
+        // list eventually do.
+        $interestOptions = ExitSurveyController::ACTIVITIES;
+
+        $popularSearchChips = $this->popularSearchChips($destinations);
+
+        return view('welcome', compact('destinations', 'packages', 'stats', 'regions', 'heroVideo', 'interestOptions', 'popularSearchChips'))
             ->with('regionMap', $this->regionMap($regions));
     }
 }
