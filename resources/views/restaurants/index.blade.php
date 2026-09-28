@@ -3,23 +3,29 @@
 @section('title', 'Restaurants — ExploreDVO')
 
 @section('content')
-<div class="page-head">
+<header class="catalog-banner catalog-banner--restaurants">
     <div class="container">
-        <span class="poster-kicker">eat like a local</span>
-        <h1 class="poster-title">Restaurants in the Davao Region</h1>
-        <p>DOT-accredited dining spots &mdash; verified for quality, safety, and authentic local flavor.</p>
+        <h1 class="poster-title">Taste Davao</h1>
+        <p>Explore local flavors and fresh seafood.</p>
     </div>
-</div>
+</header>
 
 <div class="section-tight">
     <div class="container">
 
-        <div class="chip-row chip-row--poster">
-            <a href="{{ request()->fullUrlWithQuery(['cuisine_type' => null, 'page' => null]) }}" class="chip {{ request('cuisine_type') ? '' : 'active' }}">All Cuisines</a>
-            @foreach ($cuisineTypes as $c)
-                <a href="{{ request()->fullUrlWithQuery(['cuisine_type' => $c, 'page' => null]) }}" class="chip {{ request('cuisine_type') === $c ? 'active' : '' }}">{{ $c }}</a>
-            @endforeach
-        </div>
+        @php
+            $featuredTypes = collect(['Filipino', 'Seafood', 'Cafe', 'Japanese'])
+                ->filter(fn ($type) => $cuisineTypes->contains($type))
+                ->mapWithKeys(fn ($type) => [$type => $type]);
+            $moreTypes = $cuisineTypes->reject(fn ($type) => $featuredTypes->has($type));
+            $moreTypeSelected = $moreTypes->contains(request('cuisine_type'));
+        @endphp
+        @include('partials.catalog-categories', [
+            'categoryLabel' => 'Restaurant cuisines',
+            'categoryParam' => 'cuisine_type',
+            'allCategoriesLabel' => 'All Cuisines',
+            'moreCategoriesLabel' => 'More cuisines',
+        ])
 
         <button type="button" class="filter-toggle" onclick="document.getElementById('filterPanel').classList.toggle('open')">
             <x-icon name="filter" /> Filters

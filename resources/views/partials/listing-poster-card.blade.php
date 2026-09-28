@@ -105,6 +105,14 @@
                 @endif
             </div>
         @endif
+
+        {{-- The whole card is already the link (see the wrapping <a> above),
+             so this is a plain <span>, not a nested <a> -- invalid markup
+             aside, a second interactive element here would give the card two
+             different tab stops for one destination. Purely a visible
+             affordance for anyone who doesn't realize the card itself is
+             clickable, wording matched to advisory-ribbon's "View details". --}}
+        <span class="dpost-card__cta">View details <span aria-hidden="true">&rarr;</span></span>
     </div>
 </a>
 </div>

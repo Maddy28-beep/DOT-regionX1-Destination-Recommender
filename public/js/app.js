@@ -162,6 +162,40 @@ document.addEventListener('DOMContentLoaded', function () {
         }, { passive: true });
     }
 
+    // Disclosure navigation: ordinary links remain in the normal Tab order.
+    document.querySelectorAll('[data-nav-more]').forEach(function (root) {
+        var button = root.querySelector('button');
+        var links = root.querySelector('.nav-more__links');
+        function setOpen(open) {
+            button.setAttribute('aria-expanded', String(open));
+            links.hidden = !open;
+        }
+        button.addEventListener('click', function () {
+            setOpen(button.getAttribute('aria-expanded') !== 'true');
+        });
+        button.addEventListener('keydown', function (event) {
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                setOpen(true);
+                links.querySelector('a').focus();
+            }
+        });
+        root.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && !links.hidden) {
+                event.preventDefault();
+                event.stopPropagation();
+                setOpen(false);
+                button.focus();
+            }
+        });
+        root.addEventListener('focusout', function (event) {
+            if (!root.contains(event.relatedTarget)) setOpen(false);
+        });
+        document.addEventListener('click', function (event) {
+            if (!root.contains(event.target)) setOpen(false);
+        });
+    });
+
     // Mobile navigation drawer: open/close, overlay click, Escape, and a
     // background scroll lock while it's open. Guarded on #mobileMenu existing
     // since app.js is also loaded by the admin/establishment layouts, which
@@ -179,6 +213,8 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.classList.add('mobile-menu-open');
             menu.removeAttribute('inert');
             toggle.setAttribute('aria-expanded', 'true');
+            toggle.setAttribute('aria-label', 'Close menu');
+            if (closeBtn) closeBtn.focus();
         };
 
         var close = function () {
@@ -187,6 +223,12 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.classList.remove('mobile-menu-open');
             menu.setAttribute('inert', '');
             toggle.setAttribute('aria-expanded', 'false');
+            toggle.setAttribute('aria-label', 'Open menu');
+            menu.querySelectorAll('[data-nav-more]').forEach(function (root) {
+                root.querySelector('button').setAttribute('aria-expanded', 'false');
+                root.querySelector('.nav-more__links').hidden = true;
+            });
+            if (window.getComputedStyle(toggle).display !== 'none') toggle.focus();
         };
 
         toggle.addEventListener('click', function () {
@@ -195,7 +237,16 @@ document.addEventListener('DOMContentLoaded', function () {
         if (closeBtn) closeBtn.addEventListener('click', close);
         overlay.addEventListener('click', close);
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && menu.classList.contains('open')) close();
+            if (!menu.classList.contains('open')) return;
+            if (e.key === 'Escape') close();
+            if (e.key === 'Tab') {
+                var items = Array.from(menu.querySelectorAll('a[href], button, [tabindex="0"]')).filter(function (el) {
+                    return !el.disabled && el.getClientRects().length > 0;
+                });
+                var first = items[0], last = items[items.length - 1];
+                if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            }
         });
 
         // The nav collapses back to the full desktop bar above 1366px (see
@@ -516,6 +567,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (saved && isIconVariant && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             spawnHeartParticles(form);
+            flyHeartToSavedLink(button);
         }
     }
 
@@ -531,6 +583,60 @@ document.addEventListener('DOMContentLoaded', function () {
             form.appendChild(particle);
             particle.addEventListener('animationend', function () { particle.remove(); });
         });
+    }
+
+    /*
+     * Sends a heart arcing from the clicked card to the header's "Saved"
+     * link, using the Web Animations API rather than a CSS class so the
+     * per-click start/end coordinates (window.animate's keyframes) can be
+     * computed fresh each time instead of needing one fixed @keyframes path.
+     *
+     * Skipped outright when [data-saved-link] isn't actually on screen --
+     * .header-actions .btn-outline is display:none below the 1366px
+     * breakpoint, and a heart flying toward a spot with nothing visibly
+     * there to land on would read as a bug, not a flourish. The particle
+     * burst above already covers the "something happened" cue everywhere
+     * else.
+     */
+    function flyHeartToSavedLink(sourceButton) {
+        var target = document.querySelector('[data-saved-link]');
+        if (!target) return;
+
+        var targetRect = target.getBoundingClientRect();
+        if (targetRect.width === 0 || targetRect.height === 0) return;
+
+        var startRect = sourceButton.getBoundingClientRect();
+        var startX = startRect.left + startRect.width / 2;
+        var startY = startRect.top + startRect.height / 2;
+        var endX = targetRect.left + targetRect.width / 2;
+        var endY = targetRect.top + targetRect.height / 2;
+        var dx = endX - startX;
+        var dy = endY - startY;
+
+        var flyer = document.createElement('span');
+        flyer.className = 'save-heart-flyer';
+        flyer.style.left = startX + 'px';
+        flyer.style.top = startY + 'px';
+        flyer.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-10-9.3C.5 8 2 4 6 4c2 0 3.5 1.2 4.5 2.7C11.5 5.2 13 4 15 4c4 0 5.5 4 4 7.7C19.5 16.4 12 21 12 21z"/></svg>';
+        document.body.appendChild(flyer);
+
+        // -50%/-50% (relative to the flyer's own size) centers it on the
+        // fixed left/top set above; the +Npx on top of that is the actual
+        // travel distance. Midpoint lifted 70px above the straight line so
+        // the heart arcs upward toward the header rather than sliding in a
+        // flat line to a target that's usually below-right of the card.
+        var animation = flyer.animate([
+            { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0 },
+            { transform: 'translate(calc(-50% + ' + (dx * 0.5) + 'px), calc(-50% + ' + (dy * 0.5 - 70) + 'px)) scale(1.15)', opacity: 1, offset: 0.45 },
+            { transform: 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px)) scale(.25)', opacity: 0, offset: 1 },
+        ], { duration: 700, easing: 'cubic-bezier(.4, 0, .2, 1)' });
+
+        animation.onfinish = function () {
+            flyer.remove();
+            target.classList.remove('save-heart-flyer-landed');
+            void target.offsetWidth; // restart if another heart lands mid-pulse
+            target.classList.add('save-heart-flyer-landed');
+        };
     }
 
     // Trip planner pill-toggle chips (.chip-checkbox-grid): keeps a
@@ -549,6 +655,17 @@ document.addEventListener('DOMContentLoaded', function () {
         var sync = function () { label.classList.toggle('is-checked', input.checked); };
         sync();
         input.addEventListener('change', sync);
+    });
+
+    // Hero search bar (welcome.blade.php): Duration/Budget/Interest open on
+    // an empty "Any ..." value, which reads lighter/placeholder-style via
+    // .is-empty (app.css) instead of looking exactly as committed as a real
+    // choice would. Tracked on change rather than left to a :has() selector
+    // for the same reason as the chip-checkbox-grid sync just above.
+    document.querySelectorAll('[data-empty-select]').forEach(function (select) {
+        var sync = function () { select.classList.toggle('is-empty', select.value === ''); };
+        sync();
+        select.addEventListener('change', sync);
     });
 
     /*

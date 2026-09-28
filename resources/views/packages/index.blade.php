@@ -3,23 +3,24 @@
 @section('title', 'Tour Packages — ExploreDVO')
 
 @section('content')
-<div class="page-head">
+<header class="catalog-banner catalog-banner--packages">
     <div class="container">
-        <span class="poster-kicker">planned end to end</span>
-        <h1 class="poster-title">Curated Tour Packages</h1>
-        <p>DOT-accredited, all-inclusive experiences across the Davao Region.</p>
+        <h1 class="poster-title">Explore Davao Together</h1>
+        <p>Find your next adventure with local tour packages.</p>
     </div>
-</div>
+</header>
 
 <div class="section-tight">
     <div class="container">
 
-        <div class="chip-row chip-row--poster">
-            <a href="{{ request()->fullUrlWithQuery(['type' => null, 'page' => null]) }}" class="chip {{ request('type') ? '' : 'active' }}">All Types</a>
-            @foreach ($types as $t)
-                <a href="{{ request()->fullUrlWithQuery(['type' => $t, 'page' => null]) }}" class="chip {{ request('type') === $t ? 'active' : '' }}">{{ $t }}</a>
-            @endforeach
-        </div>
+        @php
+            $featuredTypes = collect(['Nature & Adventure', 'Beach & Island', 'Adventure & Hiking', 'Cultural Heritage'])
+                ->filter(fn ($type) => $types->contains($type))
+                ->mapWithKeys(fn ($type) => [$type => $type]);
+            $moreTypes = $types->reject(fn ($type) => $featuredTypes->has($type));
+            $moreTypeSelected = $moreTypes->contains(request('type'));
+        @endphp
+        @include('partials.catalog-categories', ['categoryLabel' => 'Tour package categories'])
 
         <button type="button" class="filter-toggle" onclick="document.getElementById('filterPanel').classList.toggle('open')">
             <x-icon name="filter" /> Filters
