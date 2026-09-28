@@ -3,23 +3,29 @@
 @section('title', 'Tour Operators — ExploreDVO')
 
 @section('content')
-<div class="page-head">
+<header class="catalog-banner catalog-banner--tour-operators">
     <div class="container">
-        <span class="poster-kicker">guided, if you'd rather</span>
-        <h1 class="poster-title">Tour Operators in the Davao Region</h1>
-        <p>DOT-accredited travel and tour operators &mdash; the businesses behind the guided tours and packages on ExploreDVO.</p>
+        <h1 class="poster-title">Davao, Locally Guided</h1>
+        <p>Find local tour operators for your next adventure.</p>
     </div>
-</div>
+</header>
 
 <div class="section-tight">
     <div class="container">
 
-        <div class="chip-row chip-row--poster">
-            <a href="{{ request()->fullUrlWithQuery(['specialization' => null, 'page' => null]) }}" class="chip {{ request('specialization') ? '' : 'active' }}">All Specializations</a>
-            @foreach ($specializations as $s)
-                <a href="{{ request()->fullUrlWithQuery(['specialization' => $s, 'page' => null]) }}" class="chip {{ request('specialization') === $s ? 'active' : '' }}">{{ $s }}</a>
-            @endforeach
-        </div>
+        @php
+            $featuredTypes = collect(['Nature & Adventure', 'Beach & Island', 'Adventure & Hiking', 'Cultural Heritage'])
+                ->filter(fn ($type) => $specializations->contains($type))
+                ->mapWithKeys(fn ($type) => [$type => $type]);
+            $moreTypes = $specializations->reject(fn ($type) => $featuredTypes->has($type));
+            $moreTypeSelected = $moreTypes->contains(request('specialization'));
+        @endphp
+        @include('partials.catalog-categories', [
+            'categoryLabel' => 'Tour operator specializations',
+            'categoryParam' => 'specialization',
+            'allCategoriesLabel' => 'All Specializations',
+            'moreCategoriesLabel' => 'More specializations',
+        ])
 
         <button type="button" class="filter-toggle" onclick="document.getElementById('filterPanel').classList.toggle('open')">
             <x-icon name="filter" /> Filters

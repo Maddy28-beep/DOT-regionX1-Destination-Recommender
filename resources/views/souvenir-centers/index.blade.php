@@ -3,13 +3,12 @@
 @section('title', 'Souvenir Centers — ExploreDVO')
 
 @section('content')
-<div class="page-head">
+<header class="catalog-banner catalog-banner--souvenir-centers">
     <div class="container">
-        <span class="poster-kicker">something to bring home</span>
-        <h1 class="poster-title">Souvenir Centers in the Davao Region</h1>
-        <p>DOT-accredited shops for authentic local crafts and memorabilia.</p>
+        <h1 class="poster-title">Bring Home Davao</h1>
+        <p>Find local crafts, keepsakes, and pasalubong.</p>
     </div>
-</div>
+</header>
 
 <div class="section-tight">
     <div class="container">
