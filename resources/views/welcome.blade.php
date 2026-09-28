@@ -204,20 +204,31 @@
         dash and all -- and anything reading it had to parse display text back
         into a number. The labels stay free to change without breaking the
         search.
+
+        Duration/Budget/Interest open on an empty "Any ..." value rather than
+        a pre-picked option: SearchController already treats an unfilled
+        field as "no opinion" via $request->filled(), so a default of
+        "1-2 days" or "Beach & Island" was filtering results the visitor
+        never actually chose. "I want to..." is the one exception -- it picks
+        which catalogue is searched at all, not a filter on it, so it keeps a
+        real default. data-empty-select marks which ones app.js should track
+        for the .is-empty placeholder styling.
     --}}
     <form class="ticket-search container" action="{{ route('search') }}" method="GET">
         <div class="field">
             <label for="purpose">I want to&hellip;</label>
             <select id="purpose" name="purpose">
                 <option value="destinations">Explore destinations</option>
-                <option value="accommodations">Book accommodations</option>
-                <option value="packages">Find tour packages</option>
-                <option value="restaurants">Try local restaurants</option>
+                <option value="accommodations">Find a place to stay</option>
+                <option value="restaurants">Find a place to eat</option>
+                <option value="packages">Browse tour packages</option>
+                <option value="souvenir_centers">Shop for souvenirs</option>
             </select>
         </div>
         <div class="field">
             <label for="duration">Duration</label>
-            <select id="duration" name="duration">
+            <select id="duration" name="duration" data-empty-select>
+                <option value="">Any length</option>
                 <option value="1-2">1&ndash;2 days</option>
                 <option value="3-4">3&ndash;4 days</option>
                 <option value="5-plus">5+ days</option>
@@ -225,7 +236,8 @@
         </div>
         <div class="field">
             <label for="budget">Budget</label>
-            <select id="budget" name="budget">
+            <select id="budget" name="budget" data-empty-select>
+                <option value="">Any budget</option>
                 <option value="Budget-Friendly">Budget-Friendly</option>
                 <option value="Mid-range">Mid-range</option>
                 <option value="Premium">Premium</option>
@@ -233,15 +245,27 @@
         </div>
         <div class="field">
             <label for="interest">Interest</label>
-            <select id="interest" name="interest">
-                <option value="Beach &amp; Island">Beach &amp; Island</option>
-                <option value="Nature &amp; Adventure">Nature &amp; Adventure</option>
-                <option value="Cultural Heritage">Cultural Heritage</option>
-                <option value="Wildlife">Wildlife</option>
+            {{-- Same list the Plan Your Trip survey uses (HomeController's
+                 $interestOptions, reused from ExitSurveyController::ACTIVITIES)
+                 so the two can't drift apart. --}}
+            <select id="interest" name="interest" data-empty-select>
+                <option value="">Any interest</option>
+                @foreach ($interestOptions as $interest)
+                    <option value="{{ $interest }}">{{ $interest }}</option>
+                @endforeach
             </select>
         </div>
         <button type="submit" class="btn btn-accent">Search &rarr;</button>
     </form>
+
+    @if ($popularSearchChips->isNotEmpty())
+        <div class="hero-popular-searches">
+            <span class="hero-popular-searches__label">Popular searches:</span>
+            @foreach ($popularSearchChips as $chip)
+                <a href="{{ $chip['url'] }}" class="hero-popular-searches__chip">{{ $chip['label'] }}</a>
+            @endforeach
+        </div>
+    @endif
 
     <div class="stats">
         <div class="stats-strip">
@@ -269,9 +293,14 @@
             @endif
         </div>
     </div>
+
+    <a href="#popular-right-now" class="hero-scroll-cue">
+        See what's popular
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </a>
 </section>
 
-<section class="postcard-section">
+<section class="postcard-section" id="popular-right-now">
         <div class="postcard-slider" data-autoslide>
         <div class="postcard-slider__heading">
             <h2 class="poster-title">Popular Right Now</h2>

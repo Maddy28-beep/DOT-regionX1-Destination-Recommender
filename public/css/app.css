@@ -159,6 +159,17 @@ a { color: inherit; text-decoration: none; }
     transform: translateZ(0);
 }
 .btn-accent:hover { background: var(--accent-dark); }
+/* .btn:focus-visible's outline (above) is clipped to the same angled polygon
+   as everything else on this element, which hides it on the cut corner --
+   dropping the clip-path and rounding the corners for the moment it's
+   focused trades the angled silhouette for a visible ring, rather than
+   leaving keyboard users with no focus indicator at all. */
+.btn-accent:focus-visible {
+    clip-path: none;
+    border-radius: var(--radius-sm);
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
 
 .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
 .btn-outline:hover { background: var(--primary-light); }
@@ -1703,8 +1714,8 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
     min-height: 100vh;
     min-height: 100svh;
     min-height: 100dvh;
-    padding-top: clamp(130px, 20vh, 180px);
-    padding-bottom: 28px;
+    padding-top: clamp(108px, 15vh, 160px);
+    padding-bottom: 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1789,7 +1800,7 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
     position: relative;
     z-index: 5;
     padding: 0 20px;
-    margin-bottom: 28px;
+    margin-bottom: 18px;
     max-width: 720px;
 }
 
@@ -1855,56 +1866,113 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
     margin: -8px auto 0;
     background: var(--paper);
     border-radius: var(--radius-md);
+    /* Fields are real <select>s stretched to fill each cell (see .ticket-search
+       .field select below), so a :focus-visible inset ring on one would
+       otherwise clip against this radius -- overflow stays visible instead
+       of hidden, and each field's own border-radius does the corner-masking
+       locally where it's needed (the two ends of the row). */
+    overflow: visible;
     box-shadow: var(--shadow-lg);
-    padding: 20px 28px;
+    padding: 8px;
     display: grid;
     grid-template-columns: repeat(4, 1fr) auto;
-    gap: 4px;
-    align-items: center;
+    align-items: stretch;
     text-align: left;
     color: var(--ink);
 }
 .ticket-search .field {
     margin-top: 0;
-    padding-left: 20px;
+    position: relative;
+    min-height: 76px;
     border-left: 1px solid var(--border);
 }
-.ticket-search .field:first-child { border-left: none; padding-left: 0; }
+.ticket-search .field:first-child { border-left: none; }
+/* Sits visually where it always did (a small kicker above the value), but
+   pointer-events: none hands its own area off to the select stacked behind
+   it -- so the label stays a real, associated <label> a screen reader
+   announces with the field, while the click target is the select's full box,
+   label included, not just the value line below it. */
 .ticket-search .field label {
+    position: absolute;
+    top: 14px; left: 20px; right: 34px;
+    z-index: 1;
+    pointer-events: none;
     font-size: .68rem;
     font-weight: 700;
     letter-spacing: .08em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 4px;
+    margin-bottom: 0;
 }
+/*
+ * The whole cell is the click target, not just the text: absolutely
+ * positioned over the field's full box (inset: 0) instead of sized to its
+ * own single line, so clicking anywhere in the card -- the label included --
+ * opens it. Chevron, weight and colour reuse the site's one custom-select
+ * treatment (.field select earlier in this file) rather than a second copy
+ * of it; only sizing/hover/focus are specific to this bar.
+ */
 .ticket-search .field select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     border: none;
-    padding: 0;
-    background: transparent;
+    border-radius: var(--radius-sm);
+    padding: 32px 34px 14px 20px;
+    background-color: transparent;
     font-size: 1rem;
     font-weight: 700;
     color: var(--ink);
+    transition: background-color .15s ease;
 }
-.ticket-search .field select:focus { outline: none; box-shadow: none; }
-.ticket-search .btn { height: 48px; white-space: nowrap; margin-left: 14px; background: var(--stamp-red); }
+.ticket-search .field select:hover { background-color: var(--bg); }
+/* box-shadow, not outline: .ticket-search itself has visible overflow (see
+   above) so this isn't clipped, but an inset shadow still reads as "this
+   field" rather than a ring floating outside a rounded corner. */
+.ticket-search .field select:focus-visible {
+    outline: none;
+    background-color: var(--bg);
+    box-shadow: inset 0 0 0 2px var(--primary);
+}
+/* Duration/Budget/Interest start on "Any ..." -- a filter that hasn't been
+   chosen yet, not a value -- so it reads lighter than a real selection
+   instead of looking exactly as committed as "1-2 days" would. Toggled via
+   .is-empty on change (app.js), since :has(option:checked[value=""]) isn't
+   reliably repainted after a programmatic value change in testing -- the
+   same reason the trip planner's chip-checkbox-grid tracks its own class
+   rather than trusting :has() alone. */
+.ticket-search .field select.is-empty { font-weight: 500; color: var(--muted); }
+
+.ticket-search .btn {
+    height: auto;
+    align-self: stretch;
+    white-space: nowrap;
+    margin: 0 0 0 8px;
+    background: var(--stamp-red);
+}
 .ticket-search .btn:hover { background: var(--accent-dark); }
 
 @media (max-width: 900px) {
-    .ticket-search { grid-template-columns: 1fr 1fr; margin-top: -4px; padding: 18px 22px; }
-    .ticket-search .field:nth-child(odd) { border-left: none; padding-left: 0; }
-    .ticket-search .btn { grid-column: 1 / -1; margin-left: 0; }
-}
-@media (max-width: 520px) {
-    .ticket-search { grid-template-columns: 1fr; }
-    .ticket-search .field { border-left: none !important; padding-left: 0 !important; }
+    /* 2x2, per spec, all the way down -- not a further collapse to one
+       column on a phone, so both rows keep two equally-sized tap targets
+       instead of a long single-file list. */
+    .ticket-search { grid-template-columns: 1fr 1fr; margin-top: -4px; gap: 2px; padding: 10px; }
+    .ticket-search .field:nth-child(odd) { border-left: none; }
+    .ticket-search .field:nth-child(n+3) { border-top: 1px solid var(--border); }
+    /* Two columns leave less room per field than the four-across desktop
+       row did -- "Explore destinations" is the longest option text and the
+       one most likely to get clipped by a native select's own single-line
+       rendering at the default size. */
+    .ticket-search .field select { font-size: .88rem; padding-right: 30px; }
+    .ticket-search .btn { grid-column: 1 / -1; margin: 8px 0 0; padding-block: 18px; }
 }
 
 /* ---------- Stats row (plain poster typography, no card chrome) ---------- */
 
 .stats {
     max-width: 780px;
-    margin: 28px auto 0;
+    margin: 14px auto 0;
     padding-inline: 20px;
 }
 .stats-strip {
@@ -1946,9 +2014,102 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
     .stats { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 }
 
+/* ---------- Hero: popular-search chips + scroll cue ---------- */
+
+/* Real destinations (and a real filtered link for "Free to visit"), built in
+   HomeController::popularSearchChips() -- not copy typed here, so a chip
+   never points at a results page that turns out to be empty. */
+.hero-popular-searches {
+    position: relative;
+    z-index: 6;
+    max-width: 780px;
+    margin: 12px auto 0;
+    padding: 0 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.hero-popular-searches__label {
+    color: rgba(255, 247, 233, .85);
+    font-size: .85rem;
+    font-weight: 600;
+}
+.hero-popular-searches__chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 16px;
+    border-radius: 999px;
+    border: 1.5px solid rgba(255, 247, 233, .55);
+    background: rgba(255, 247, 233, .08);
+    color: var(--paper);
+    font-size: .84rem;
+    font-weight: 600;
+    transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.hero-popular-searches__chip:hover {
+    background: var(--paper);
+    color: var(--primary-dark);
+    border-color: var(--paper);
+}
+.hero-popular-searches__chip:focus-visible {
+    outline: 2px solid var(--paper);
+    outline-offset: 2px;
+    background: var(--paper);
+    color: var(--primary-dark);
+    border-color: var(--paper);
+}
+
+/* Anchors to #popular-right-now (welcome.blade.php); scroll-margin-top on
+   that section (below) keeps the sticky header from covering its heading
+   when the jump lands.
+
+   Pinned to the hero's own bottom edge (.poster-hero is position: relative)
+   rather than left in normal flow after the stats row -- the hero is a
+   full 100vh and top-aligned (justify-content: flex-start), so flowing
+   this after the content left it sitting wherever the content happened to
+   end, with a gap of empty background beneath it instead of at the true
+   bottom of the screen where a "scroll down" cue belongs. */
+.hero-scroll-cue {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(20px, 4vh, 40px);
+    transform: translateX(-50%);
+    z-index: 6;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: rgba(255, 247, 233, .85);
+    font-size: .76rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    transition: color .15s ease;
+}
+.hero-scroll-cue:hover,
+.hero-scroll-cue:focus-visible { color: var(--paper); }
+.hero-scroll-cue:focus-visible { outline: 2px solid var(--paper); outline-offset: 4px; border-radius: 4px; }
+.hero-scroll-cue svg {
+    width: 20px;
+    height: 20px;
+    animation: hero-scroll-bounce 1.8s ease-in-out infinite;
+}
+@keyframes hero-scroll-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .hero-scroll-cue svg { animation: none; }
+}
+
 /* ---------- Popular Right Now (postcard grid) ---------- */
 
-.postcard-section { background: var(--primary-light); padding: 0; }
+/* scroll-margin-top: the site header is sticky, so a bare #hash jump from
+   the hero's scroll cue would otherwise land with its top few pixels tucked
+   under the header instead of fully in view. */
+.postcard-section { background: var(--primary-light); padding: 0; scroll-margin-top: 84px; }
 .postcard-slider { position: relative; }
 .postcard-slider__heading {
     position: absolute;
@@ -2105,6 +2266,16 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
     transition: background .15s ease, color .15s ease;
 }
 .dpost-cta:hover { background: var(--stamp-red); color: var(--paper); }
+/* Same clip-path-hides-the-outline problem as .btn-accent, and the same
+   fix: drop the clip and round the corners for the moment it's focused so
+   the ring (from .btn:focus-visible, since every .dpost-cta also carries
+   .btn) actually shows instead of being cut off on the angled corner. */
+.dpost-cta:focus-visible {
+    clip-path: none;
+    border-radius: var(--radius-sm);
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
 
 /* Featured banner */
 .dpost-banner {
@@ -2269,6 +2440,31 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
     0%   { transform: translate(0, 0) scale(.4); opacity: 1; }
     100% { transform: var(--particle-end, translate(0, -26px) scale(1)); opacity: 0; }
 }
+/*
+ * The heart that arcs from a saved card to the header's "Saved" link (see
+ * flyHeartToSavedLink() in app.js, which computes the per-click start/end
+ * keyframes and drives this element via the Web Animations API -- the CSS
+ * here only has to style the element itself and the landing pulse).
+ */
+.save-heart-flyer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 18px;
+    color: var(--stamp-red);
+    pointer-events: none;
+    z-index: 2000;
+}
+.save-heart-flyer svg { width: 100%; height: 100%; display: block; }
+@keyframes saved-link-land {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.35); }
+    100% { transform: scale(1); }
+}
+[data-saved-link].save-heart-flyer-landed svg {
+    animation: saved-link-land .4s ease;
+}
 @media (prefers-reduced-motion: reduce) {
     .save-form--pop .save-heart svg,
     .save-form--pop .btn-poster-ghost svg { animation: none; }
@@ -2344,7 +2540,24 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
     font-size: 1rem;
     text-shadow: 0 1px 4px rgba(0, 0, 0, .4);
 }
-.dpost-card__body { padding: 14px 16px 16px; flex: 1; }
+.dpost-card__body { padding: 14px 16px 16px; flex: 1; display: flex; flex-direction: column; }
+/* Sits at the bottom of the card regardless of how much the tags/price rows
+   above it take up, via margin-top: auto on .dpost-card__body's own flex
+   column -- so it lines up across a row of cards whose content heights
+   differ, the same problem .pkg-card__body's own footer already solved. */
+.dpost-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: auto;
+    padding-top: 10px;
+    font-size: .78rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+.dpost-card__cta span { transition: transform .15s ease; }
+.dpost-card:hover .dpost-card__cta { color: var(--primary); }
+.dpost-card:hover .dpost-card__cta span { transform: translateX(3px); }
 .dpost-loc { font-size: .8rem; color: var(--muted); margin-bottom: 8px; }
 .dpost-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
 .dpost-tag { background: var(--primary-light); color: var(--primary-dark); font-size: .7rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
@@ -3164,6 +3377,49 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
 .page-head h1 { margin: 0 0 6px; font-size: clamp(1.7rem, 4vw, 2.5rem); line-height: 1.06; color: var(--ocean-teal-dark); }
 .page-head p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
 
+/* Shared catalog landscape header; the image is decorative behind live text. */
+.catalog-banner {
+    display: flex;
+    align-items: center;
+    min-height: 260px;
+    padding-block: 36px;
+    color: #fff;
+    background-color: #16352d;
+    background-image:
+        linear-gradient(90deg, rgba(6, 24, 20, .62) 0%, rgba(6, 24, 20, .32) 52%, rgba(6, 24, 20, .06) 100%),
+        var(--catalog-banner-image, url('../images/davao-landscape-header.png'));
+    background-size: cover;
+    background-position: center 30%;
+    background-repeat: no-repeat;
+}
+.catalog-banner h1 {
+    margin: 0 0 12px;
+    font-size: 2.75rem;
+    line-height: 1.1;
+    text-wrap: balance;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, .2);
+}
+.catalog-banner p {
+    margin: 0;
+    max-width: 46ch;
+    font-size: 1rem;
+    line-height: 1.65;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, .3);
+}
+@media (max-width: 640px) {
+    .catalog-banner {
+        min-height: 220px;
+        padding-block: 28px;
+        background-position: 28% center;
+        background-image:
+            linear-gradient(90deg, rgba(6, 24, 20, .64), rgba(6, 24, 20, .28)),
+            var(--catalog-banner-image, url('../images/davao-landscape-header.png'));
+    }
+    .catalog-banner h1 {
+        font-size: 2rem;
+    }
+}
+
 /*
    .page-head is shared by every catalog/listing page AND a few unrelated
    ones (the exit survey, saved places) that also open with a page-head but
@@ -3177,6 +3433,26 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
 */
 body:has(.catalog-layout) .page-head { padding: 16px 0 4px; }
 body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12px; }
+
+.catalog-categories { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px; }
+.catalog-categories .chip { border-color: var(--primary); background: transparent; color: var(--primary-dark); padding: 9px 22px; }
+.catalog-categories .chip:hover:not(.active) { background: var(--primary-light); border-color: var(--primary-dark); }
+.catalog-categories .chip.active { background: var(--primary); color: #fff; }
+.catalog-categories__more { position: relative; }
+.catalog-categories__more summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+.catalog-categories__more summary::-webkit-details-marker { display: none; }
+.catalog-categories__more[open] summary svg { transform: rotate(180deg); }
+.catalog-categories__menu { position: absolute; top: calc(100% + 8px); right: 0; z-index: 20; width: 240px; max-width: calc(100vw - 40px); padding: 6px; border: 1px solid var(--border); border-radius: 12px; background: #fff; box-shadow: var(--shadow-md); }
+.catalog-categories__menu a { display: block; padding: 10px 12px; border-radius: 7px; font-size: .85rem; }
+.catalog-categories__menu a:hover, .catalog-categories__menu a[aria-current] { background: var(--primary-light); color: var(--primary-dark); }
+.catalog-categories a:focus-visible, .catalog-categories summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+@media (max-width: 640px) {
+    .catalog-categories { gap: 8px 6px; }
+    .catalog-categories .chip { padding: 8px 12px; font-size: .78rem; }
+    .catalog-categories__more { position: static; }
+    .catalog-categories { position: relative; }
+    .catalog-categories__menu { left: 0; right: auto; width: 100%; }
+}
 
 .catalog-layout { display: grid; grid-template-columns: 240px 1fr; gap: 28px; align-items: flex-start; }
 /* Grid tracks default to min-width:auto, not 0 -- meaning a track can refuse
@@ -4548,3 +4824,59 @@ body:has(.dash-header) .toast-stack { top: 226px; }
        keeps animating -- it conveys information rather than decoration. */
     .toast, .toast.is-leaving { animation: none; }
 }
+
+/* Accommodation artwork shares the compact catalog banner dimensions. */
+.catalog-banner--accommodations {
+    --catalog-banner-image: url('../images/davao-accommodations-header.png');
+    background-position: center 45%;
+}
+@media (max-width: 640px) {
+    .catalog-banner--accommodations { background-position: 25% center; }
+}
+
+/* Restaurant artwork keeps the dining scene and sunset in the banner crop. */
+.catalog-banner--restaurants {
+    --catalog-banner-image: url('../images/davao-restaurants-header.png');
+    background-position: center 55%;
+}
+@media (max-width: 640px) {
+    .catalog-banner--restaurants { background-position: 35% center; }
+}
+
+.catalog-banner--packages {
+    --catalog-banner-image: url('../images/davao-packages-header.png');
+    background-position: center 50%;
+}
+.catalog-banner--souvenir-centers {
+    --catalog-banner-image: url('../images/davao-souvenirs-header.png');
+    background-position: center 50%;
+}
+@media (max-width: 640px) {
+    .catalog-banner--packages { background-position: 40% center; }
+    .catalog-banner--souvenir-centers { background-position: 45% center; }
+}
+
+.catalog-banner--tour-operators {
+    --catalog-banner-image: url('../images/davao-tour-operators-header.png');
+    background-position: center 55%;
+}
+@media (max-width: 640px) {
+    .catalog-banner--tour-operators { background-position: 65% center; }
+}
+
+/* Shared public navigation: disclosure, active state and keyboard visibility. */
+.site-topbar .main-nav { gap: 16px; }
+.nav-more { position: relative; }
+.nav-more__toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0; border: 0; background: transparent; color: var(--primary-dark); font: inherit; font-size: .88rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.nav-more__toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.nav-more__links { position: absolute; top: 100%; left: -14px; min-width: 210px; padding: 8px; background: var(--paper); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-md); z-index: 65; }
+.nav-more__links[hidden] { display: none; }
+.site-topbar .nav-more__links a { display: block; padding: 12px; color: var(--primary-dark) !important; border-radius: 6px; }
+.site-topbar .nav-more__links a:hover { background: var(--primary-light); }
+.site-topbar a[aria-current="page"], .site-topbar .nav-more__toggle.is-active, .mobile-menu a[aria-current="page"], .mobile-menu .nav-more__toggle.is-active { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 7px; }
+.site-topbar a:focus-visible, .site-topbar button:focus-visible, .mobile-menu a:focus-visible, .mobile-menu button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 5px; }
+body.hero-page .site-header:not(.scrolled) .nav-more__toggle { color: var(--paper); }
+.mobile-menu .nav-more__toggle { width: 100%; justify-content: space-between; font-size: 1rem; }
+.mobile-menu .nav-more__links { position: static; min-width: 0; margin: 0 0 6px 12px; box-shadow: none; border: 0; border-left: 2px solid var(--primary); border-radius: 0; }
+.mobile-menu .mobile-menu__saved { border: 1px solid var(--primary); color: var(--primary-dark); margin: 8px 0 0; }
+.site-topbar .header-actions .btn-outline { background: transparent; box-shadow: none; }

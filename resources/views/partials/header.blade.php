@@ -19,33 +19,8 @@
                 Explore<span class="dot">DVO</span>
             </a>
 
-            <nav class="main-nav">
-                <a href="{{ route('destinations.index') }}">Destinations</a>
-                <a href="{{ route('accommodations.index') }}">Accommodations</a>
-                <a href="{{ route('restaurants.index') }}">Restaurants</a>
-                <a href="{{ route('packages.index') }}">Packages</a>
-                <a href="{{ route('souvenir-centers.index') }}">Souvenir Centers</a>
-                <a href="{{ route('tour-operators.index') }}">Tour Operators</a>
-                <a href="{{ route('advisories.index') }}" class="main-nav__advisories">
-                    Advisories
-                    @if ($topAdvisory ?? null)
-                        <span class="main-nav__dot" aria-hidden="true"></span>
-                        <span class="sr-only">(active advisory)</span>
-                    @endif
-                </a>
-                {{--
-                    "List your establishment" is deliberately not in this bar.
-                    .bar is a .container capped at 1200px (1160px inside padding),
-                    and with that link the nav measured 1274.9px -- 127px too wide
-                    at ANY viewport, which pushed the Sign in / Plan My Trip buttons
-                    past the container and gave the whole site a horizontal
-                    scrollbar on every screen narrower than ~1454px (so 1280, 1366
-                    and 1440 all showed it). Dropping it here recovers 180.7px.
-
-                    It is a partner-facing link on a tourist-facing bar, and it
-                    remains reachable from the footer and from the mobile menu
-                    below, so nothing is lost.
-                --}}
+            <nav class="main-nav" aria-label="Main navigation">
+                @include('partials.navigation-links', ['navId' => 'desktop'])
             </nav>
 
             <div class="header-actions">
@@ -57,7 +32,7 @@
                 --}}
                 @auth('tourist')
                     <span class="header-account-chip">
-                        <a href="{{ route('account.itineraries') }}" class="header-account-chip__name">
+                        <a href="{{ route('account.itineraries') }}" @if(request()->routeIs('account.itineraries')) aria-current="page" @endif class="header-account-chip__name">
                             <x-icon name="user" />
                             <span>{{ auth('tourist')->user()->alias }}</span>
                         </a>
@@ -69,18 +44,18 @@
                         </form>
                     </span>
                 @else
-                    <a href="{{ route('account.login') }}" class="header-account-link">Log in</a>
+                    <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="header-account-link">Log in</a>
                 @endauth
                 {{-- This used to always point at the anonymous, browser-only
                      list, so a signed-in traveler's own "Saved" button opened
                      someone else's list -- the session's, not their account's --
                      even while logged in. The mobile menu below already branched
                      on auth state; this one had not. --}}
-                <a href="{{ auth('tourist')->check() ? route('account.saved') : route('saved.index') }}" class="btn btn-outline">
+                <a href="{{ auth('tourist')->check() ? route('account.saved') : route('saved.index') }}" class="btn btn-outline" data-saved-link @if(request()->routeIs('saved.*', 'account.saved')) aria-current="page" @endif>
                     <x-icon name="heart" />
                     Saved
                 </a>
-                <a href="{{ route('plan.choose') }}" class="btn btn-primary">Plan My Trip</a>
+                <a href="{{ route('plan.choose') }}" @if(request()->routeIs('plan.*')) aria-current="page" @endif class="btn btn-primary">Plan My Trip</a>
 
                 <button type="button" class="nav-toggle" id="mobileMenuToggle" aria-label="Open menu" aria-haspopup="dialog" aria-expanded="false" aria-controls="mobileMenu">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -124,40 +99,24 @@
         </button>
     </div>
 
-    <nav class="mobile-menu__body">
+    <nav class="mobile-menu__body" aria-label="Mobile navigation">
         <div class="mobile-menu__group">
-            <div class="mobile-menu__label">Explore</div>
-            <a href="{{ route('destinations.index') }}">Destinations</a>
-            <a href="{{ route('accommodations.index') }}">Accommodations</a>
-            <a href="{{ route('restaurants.index') }}">Restaurants</a>
-        </div>
-
-        <div class="mobile-menu__group">
-            <div class="mobile-menu__label">Plan</div>
-            <a href="{{ route('packages.index') }}">Packages</a>
-            <a href="{{ route('tour-operators.index') }}">Tour Operators</a>
-            <a href="{{ route('souvenir-centers.index') }}">Souvenir Centers</a>
-            <a href="{{ route('advisories.index') }}" class="main-nav__advisories">
-                Advisories
-                @if ($topAdvisory ?? null)
-                    <span class="main-nav__dot" aria-hidden="true"></span>
-                    <span class="sr-only">(active advisory)</span>
-                @endif
-            </a>
+            @include('partials.navigation-links', ['navId' => 'mobile'])
         </div>
 
         <div class="mobile-menu__divider"></div>
 
         <div class="mobile-menu__group mobile-menu__group--plain">
-            <a href="{{ $isTouristAuthed ? route('account.saved') : route('saved.index') }}" class="mobile-menu__utility">
+            @if ($isTouristAuthed)
+                <a href="{{ route('account.itineraries') }}" @if(request()->routeIs('account.itineraries')) aria-current="page" @endif class="mobile-menu__utility">My Itineraries</a>
+            @else
+                <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="mobile-menu__utility">Log in</a>
+            @endif
+            <a href="{{ $isTouristAuthed ? route('account.saved') : route('saved.index') }}" class="mobile-menu__utility mobile-menu__saved" @if(request()->routeIs('saved.*', 'account.saved')) aria-current="page" @endif>
                 <x-icon name="heart" />
                 Saved
             </a>
-            @if ($isTouristAuthed)
-                <a href="{{ route('account.itineraries') }}" class="mobile-menu__utility">My Itineraries</a>
-            @else
-                <a href="{{ route('account.login') }}" class="mobile-menu__utility">Log in</a>
-            @endif
+
         </div>
 
         <div class="mobile-menu__divider"></div>
@@ -177,6 +136,6 @@
     </nav>
 
     <div class="mobile-menu__foot">
-        <a href="{{ route('plan.choose') }}" class="btn btn-primary btn-block">Plan My Trip</a>
+        <a href="{{ route('plan.choose') }}" @if(request()->routeIs('plan.*')) aria-current="page" @endif class="btn btn-primary btn-block">Plan My Trip</a>
     </div>
 </div>

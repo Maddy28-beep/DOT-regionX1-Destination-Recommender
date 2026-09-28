@@ -28,6 +28,7 @@ class SearchController extends Controller
         'accommodations' => 'accommodations.index',
         'packages' => 'packages.index',
         'restaurants' => 'restaurants.index',
+        'souvenir_centers' => 'souvenir-centers.index',
     ];
 
     /** Which catalogues can actually act on each of the other answers. */
