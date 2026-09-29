@@ -255,7 +255,7 @@
                 @endforeach
             </select>
         </div>
-        <button type="submit" class="btn btn-accent">Search &rarr;</button>
+        <button type="submit" class="btn btn-accent">Explore &rarr;</button>
     </form>
 
     @if ($popularSearchChips->isNotEmpty())
