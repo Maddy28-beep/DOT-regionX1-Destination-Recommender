@@ -1875,7 +1875,8 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
     box-shadow: var(--shadow-lg);
     padding: 8px;
     display: grid;
-    grid-template-columns: repeat(4, 1fr) auto;
+    /* Recover 22px from the former 110px action for the primary field. */
+    grid-template-columns: calc((100% - 118px) / 4 + 22px) repeat(3, minmax(0, 1fr)) 96px;
     align-items: stretch;
     text-align: left;
     color: var(--ink);
@@ -1945,6 +1946,10 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
 .ticket-search .field select.is-empty { font-weight: 500; color: var(--muted); }
 
 .ticket-search .btn {
+    min-width: 0;
+    padding-inline: 8px;
+    justify-content: center;
+    text-align: center;
     height: auto;
     align-self: stretch;
     white-space: nowrap;
