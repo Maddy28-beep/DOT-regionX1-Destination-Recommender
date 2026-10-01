@@ -1,0 +1,10 @@
+.destination-view-toggle { display:flex; gap:4px; border:1px solid #0b7058; border-radius:24px; padding:3px; }
+.destination-view-toggle[hidden], #destinationMapView[hidden] { display:none; }
+.destination-view-toggle button { border:0; background:transparent; color:#075343; border-radius:20px; padding:7px 18px; font:inherit; font-weight:600; cursor:pointer; }
+.destination-view-toggle button[aria-pressed="true"] { background:#0b7058; color:white; }
+.explorer-map { height:520px; border-radius:14px; border:1px solid #d5ded9; z-index:0; background:#e8efea; }
+.explorer-popup { display:grid; gap:10px; min-width:150px; }
+.destination-view-toggle button:focus-visible, .explorer-popup :focus-visible { outline:3px solid #ff693b; outline-offset:3px; }
+@media(max-width:1000px) { .explorer-map { height:360px; } }
+@media(max-width:600px) { .explorer-map { height:330px; } }
+.explorer-hint { font-size:13px; color:#566a62; margin:8px 0; }

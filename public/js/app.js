@@ -137,6 +137,17 @@ document.addEventListener('DOMContentLoaded', function () {
     // Reads are also deferred to rAF: scroll fires far more often than the page
     // paints, and measuring scrollY inside the handler forced a layout on every
     // one of those events.
+    // Reserve the full fixed topbar height, including the optional advisory.
+    var topbar = document.querySelector('.site-topbar');
+    if (topbar) {
+        var syncTopbarHeight = function () {
+            document.documentElement.style.setProperty('--site-topbar-height', topbar.getBoundingClientRect().height + 'px');
+        };
+        syncTopbarHeight();
+        if ('ResizeObserver' in window) new ResizeObserver(syncTopbarHeight).observe(topbar);
+        else window.addEventListener('resize', syncTopbarHeight);
+    }
+
     var header = document.querySelector('.site-header');
     if (header) {
         var ON_AT = 64;

@@ -105,7 +105,7 @@ class TripPlannerController extends Controller
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(Request $request): RedirectResponse|\Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
             'travel_days' => ['required', 'integer', 'min:1', 'max:30'],
@@ -170,6 +170,10 @@ class TripPlannerController extends Controller
 
         $request->session()->put(self::PREFERENCE_KEY, $preference->id);
         $request->session()->put(self::ITINERARY_KEY, $itinerary->id);
+
+        if ($request->expectsJson()) {
+            return response()->json(['redirect' => route('plan.itinerary')]);
+        }
 
         return redirect()->route('plan.itinerary')
             ->with(Toast::success('Preferences saved', 'Your itinerary is ready below.'));

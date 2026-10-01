@@ -15,13 +15,14 @@
     $visitorTypes = ['First-time Visitor', 'Returning Visitor', 'Regular / Local'];
 @endphp
 
-<div class="plan-shell">
+<link rel="stylesheet" href="{{ asset('css/plan-wizard.css') }}?v={{ filemtime(public_path('css/plan-wizard.css')) }}">
+<div class="plan-shell plan-wizard" id="planWizard">
     <div class="page-head page-head--with-action">
         <div class="container">
             <div>
-                <span class="poster-kicker">no sign-up needed</span>
-                <h1 class="page-title">Plan Your Trip</h1>
-                <p>Tell us how you like to travel and we'll build a day-by-day itinerary across DOT-accredited places &mdash; no account needed.</p>
+                <span class="poster-kicker">Your Davao adventure starts here</span>
+                <h1 class="page-title">Let's Plan Your Trip.</h1>
+                <p>A few preferences. A trip that feels like you. No sign-up needed.</p>
             </div>
             <a href="{{ route('saved.index') }}" class="btn btn-outline">
                 <x-icon name="heart" /> Saved Places
@@ -41,11 +42,16 @@
                 </div>
             @endif
 
+            <nav class="plan-wizard-steps" aria-label="Trip planning steps" hidden>
+                <button type="button" data-plan-step="0" aria-controls="plan-step-0">1 · Your trip</button>
+                <button type="button" data-plan-step="1" aria-controls="plan-step-1">2 · Your interests</button>
+                <button type="button" data-plan-step="2" aria-controls="plan-step-2">3 · Your comfort</button>
+            </nav>
             <div class="panel plan-panel">
                 <div class="panel-head">
                     <div>
-                        <h2>Your Travel Preference Survey</h2>
-                        <p>Answer these and your itinerary is generated straight away. No sign-up, and none of it is tied to your name.</p>
+                        <h2>Your travel preferences</h2>
+                        <p>Choose what works for you and we'll build your itinerary.</p>
                     </div>
                 </div>
                 <div class="panel-body">
@@ -53,7 +59,7 @@
                          was adapted from, submitting here creates a preference
                          and generates an itinerary rather than updating one
                          addressable resource. --}}
-                    <form method="POST" action="{{ route('plan.update') }}">
+                    <form method="POST" action="{{ route('plan.update') }}" id="planPreferencesForm">
                         @csrf
 
                         <div class="plan-section">
@@ -317,10 +323,25 @@
                             </label>
                         </div>
 
-                        <button type="submit" class="btn btn-accent btn-lg plan-submit">Build My Itinerary &rarr;</button>
+                        <div class="plan-wizard-actions">
+                            <button type="button" class="btn btn-outline" id="planBack" hidden>&larr; Back</button>
+                            <span id="planStepStatus" role="status" hidden></span>
+                            <button type="button" class="btn plan-next" id="planNext" hidden>Next: your interests &rarr;</button>
+                            <button type="submit" class="btn plan-next plan-submit">Create my itinerary &rarr;</button>
+                        </div>
                     </form>
                 </div>
             </div>
+            <section id="planLoading" class="plan-loading" role="status" aria-live="polite" aria-labelledby="planLoadingTitle" hidden tabindex="-1">
+                <span class="plan-loading-spinner" aria-hidden="true"></span>
+                <h2 id="planLoadingTitle">Building your itinerary</h2>
+                <p>Matching Davao Region destinations to what you told us.</p>
+                <ul class="plan-loading-workflow" aria-label="Itinerary preparation workflow">
+                    <li><span aria-hidden="true">·</span> Reading your preferences</li>
+                    <li><span aria-hidden="true">·</span> Scoring nearby destinations</li>
+                    <li><span aria-hidden="true">·</span> Sequencing your days</li>
+                </ul>
+            </section>
         </div>
     </div>
 </div>
@@ -514,5 +535,8 @@
         });
     })();
 </script>
+
+<script>window.planWizardErrors = {{ Illuminate\Support\Js::from($errors->keys()) }};</script>
+<script src="{{ asset('js/plan-wizard.js') }}?v={{ filemtime(public_path('js/plan-wizard.js')) }}" defer></script>
 
 @endsection
