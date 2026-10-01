@@ -33,6 +33,7 @@
             <aside class="filter-panel" id="filterPanel">
                 <h3>Filter results</h3>
                 <form method="GET" action="{{ route('destinations.index') }}">
+                    <input type="hidden" name="view" value="{{ request('view') === 'map' ? 'map' : 'grid' }}" id="destinationViewInput">
                     <input type="hidden" name="type" value="{{ request('type') }}">
 
                     <div class="field">
@@ -81,8 +82,14 @@
             <div>
                 <div class="results-bar">
                     <div class="results-count">{{ $destinations->total() }} destination{{ $destinations->total() === 1 ? '' : 's' }} found</div>
+                    <div class="destination-view-toggle" role="group" aria-label="Destination display" hidden>
+                        <button type="button" data-destination-view="grid" aria-pressed="true">Grid</button>
+                        <button type="button" data-destination-view="map" aria-pressed="false">Map</button>
+                    </div>
                 </div>
 
+                @include('destinations.map-explorer')
+                <div id="destinationListView">
                 @if ($destinations->count())
                     <div class="card-grid">
                         @foreach ($destinations as $destination)
@@ -114,6 +121,7 @@
                         <a href="{{ route('destinations.index') }}" class="btn btn-outline">Clear filters</a>
                     </div>
                 @endif
+                </div>
             </div>
         </div>
     </div>

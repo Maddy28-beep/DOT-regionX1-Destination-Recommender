@@ -67,6 +67,16 @@ class TripPlannerTest extends TestCase
         $this->get('/plan')->assertOk()->assertSee('travel_days', false);
     }
 
+    public function test_json_submission_confirms_completion_and_keeps_the_itinerary_in_session(): void
+    {
+        $this->seedDestinations();
+        $this->postJson('/plan', $this->surveyPayload())
+            ->assertOk()->assertJson(['redirect' => route('plan.itinerary')]);
+        $this->get('/plan/itinerary')->assertOk()->assertSee('Day-by-Day Travel Plan');
+        $this->postJson('/plan', $this->surveyPayload(['travel_days' => 0]))
+            ->assertUnprocessable()->assertJsonValidationErrors('travel_days');
+    }
+
     /**
      * Every field the controller requires has to actually exist in the
      * rendered form, under the name the controller expects.
@@ -647,12 +657,12 @@ class TripPlannerTest extends TestCase
             'This test needs a 6th scheduled destination to actually exercise the bug.');
 
         // Every destination name also appears in the day-by-day schedule
-        // text further down the same page, so a plain assertStringContains
+        // text on the same page, so a plain assertStringContains
         // against the whole page can never fail here even with the bug
         // present -- isolate just the Recommended Destinations table first.
-        $start = strpos($html, 'Recommended Destinations');
-        $end = strpos($html, 'Day-by-Day Travel Plan');
+        $start = strpos($html, '<ul class="match-list">');
         $this->assertNotFalse($start);
+        $end = strpos($html, '</ul>', $start);
         $this->assertNotFalse($end);
         $summaryTableHtml = substr($html, $start, $end - $start);
 
