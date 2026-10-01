@@ -27,7 +27,8 @@
         : null;
 @endphp
 
-<div class="dash-shell">
+<link rel="stylesheet" href="{{ asset('css/itinerary-page.css') }}?v={{ filemtime(public_path('css/itinerary-page.css')) }}">
+<div class="dash-shell itinerary-page">
     <div class="dash-header">
         <div class="container">
             <div>
@@ -55,7 +56,7 @@
                 @else
                     <form method="POST" action="{{ route('plan.itinerary.save') }}">
                         @csrf
-                        <button type="submit" class="btn btn-outline">Save Itinerary</button>
+                        <button type="submit" class="btn btn-primary">Save Itinerary</button>
                     </form>
                 @endif
                 {{--
@@ -105,39 +106,19 @@
                 </p>
             </div>
 
-            @unless ($itinerary->package)
-            <div class="panel">
-                <div class="panel-head">
-                    <div>
-                        <h2>Recommended Destinations</h2>
-                        <p>Ranked by how well each place matches your travel preferences.</p>
-                    </div>
-                    <form method="POST" action="{{ route('plan.regenerate') }}" id="regenerate-form">
-                        @csrf
-                        <input type="hidden" name="lat" id="regenerate-lat">
-                        <input type="hidden" name="lng" id="regenerate-lng">
-                        <button type="submit" class="btn btn-primary">Regenerate Itinerary</button>
-                    </form>
-                </div>
-                <div class="panel-body">
-                    <ul class="match-list">
-                        @foreach ($topMatches as $match)
-                            @php $tier = $match->match_score >= 3.5 ? 'strong' : 'fair'; @endphp
-                            <li class="match-row">
-                                <span class="match-rank">{{ $match->rank }}</span>
-                                <div class="match-info">
-                                    <a href="{{ route('destinations.show', $match->destination) }}">{{ $match->destination->name }}</a>
-                                    <div class="match-bar-track">
-                                        <div class="match-bar-fill match-bar-fill--{{ $tier }}" style="width: {{ min(100, max(0, $match->match_score / 5 * 100)) }}%;"></div>
-                                    </div>
-                                </div>
-                                <span class="match-score"><span class="sr-only">Match Score: </span>{{ number_format($match->match_score, 2) }} / 5.00</span>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
-            @endunless
+            @if ($itemsByDay->isNotEmpty())
+                <nav class="itinerary-day-nav" aria-label="Jump to a day">
+                    <span>Your schedule</span>
+                    @foreach ($itemsByDay as $day => $items)
+                        <a href="#itinerary-day-{{ $day }}">Day {{ $day }}</a>
+                    @endforeach
+                    @unless ($itinerary->package)
+                        <a href="#itinerary-recommendations" class="itinerary-match-link">Recommendations</a>
+                    @endunless
+                </nav>
+            @endif
+
+
 
             <div class="panel">
                 <div class="panel-head">
@@ -189,8 +170,11 @@
                                 $mapsUrl = \App\Models\Itinerary::googleMapsUrl($stops);
                             @endphp
 
-                            <div class="itinerary-day">
-                                <h3>Day {{ $day }}</h3>
+                            <section class="itinerary-day" id="itinerary-day-{{ $day }}" aria-labelledby="itinerary-day-title-{{ $day }}">
+                                <div class="itinerary-day-heading">
+                                    <h3 id="itinerary-day-title-{{ $day }}">Day {{ $day }}</h3>
+                                    <a href="#" class="itinerary-back-top">Back to top ↑</a>
+                                </div>
 
                                 <div class="day-timeline">
                                 @foreach ($items as $item)
@@ -284,11 +268,48 @@
                                         </p>
                                     @endif
                                 @endif
-                            </div>
+                            </section>
                         @endforeach
                     @endif
                 </div>
             </div>
+
+            @unless ($itinerary->package)
+            <div class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h2 id="itinerary-recommendations">Recommended Destinations</h2>
+                        <p>Ranked by how well each place matches your travel preferences.</p>
+                    </div>
+                    <form method="POST" action="{{ route('plan.regenerate') }}" id="regenerate-form">
+                        @csrf
+                        <input type="hidden" name="lat" id="regenerate-lat">
+                        <input type="hidden" name="lng" id="regenerate-lng">
+                        <button type="submit" class="btn btn-primary">Regenerate Itinerary</button>
+                    </form>
+                </div>
+                <div class="panel-body">
+                    <details class="itinerary-score-details">
+                    <summary>View destinations and match scores</summary>
+                    <ul class="match-list">
+                        @foreach ($topMatches as $match)
+                            @php $tier = $match->match_score >= 3.5 ? 'strong' : 'fair'; @endphp
+                            <li class="match-row">
+                                <span class="match-rank">{{ $match->rank }}</span>
+                                <div class="match-info">
+                                    <a href="{{ route('destinations.show', $match->destination) }}">{{ $match->destination->name }}</a>
+                                    <div class="match-bar-track">
+                                        <div class="match-bar-fill match-bar-fill--{{ $tier }}" style="width: {{ min(100, max(0, $match->match_score / 5 * 100)) }}%;"></div>
+                                    </div>
+                                </div>
+                                <span class="match-score"><span class="sr-only">Match Score: </span>{{ number_format($match->match_score, 2) }} / 5.00</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                    </details>
+                </div>
+            </div>
+            @endunless
 
             @if ($packageCoords)
                 {{--

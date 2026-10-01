@@ -1407,29 +1407,15 @@ body.hero-page .site-header:not(.scrolled) .btn-outline:hover { background: rgba
 body.hero-page .site-header:not(.scrolled) .header-account-chip { border-color: rgba(255, 247, 233, .5); }
 body.hero-page .site-header:not(.scrolled) .header-account-chip__logout:hover { background: rgba(255, 247, 233, .18); color: var(--paper); }
 
-/*
-   .site-topbar owns the sticky/fixed positioning that used to live directly
-   on .site-header, so an advisory ribbon placed inside it (before <header>)
-   scrolls and sticks together with the header as one unit -- no dynamic
-   height math for the header to "leave room" for a ribbon that only
-   sometimes exists. This is also what fixed an earlier, related bug: a
-   general advisory rendered in normal flow right after the header used to
-   land almost entirely behind the homepage's position:fixed header, which
-   takes up no space in flow. Wrapping both in one positioned unit means
-   there is no separate flow position for the ribbon to fall into in the
-   first place.
-
-   .site-header keeps the exact class the admin console and partner portal
-   also use for their own, separately-declared headers (see .admin
-   .site-header / .portal .site-header below) -- position is neutralized
-   back to static only inside this wrapper, so it lives in exactly one place
-   at a time instead of competing with .site-topbar's.
-*/
-.site-topbar { position: sticky; top: 0; z-index: 50; }
+/* Keep public navigation and its optional advisory ribbon fixed together.
+   The measured spacer prevents content overlap, including wrapped advisories. */
+.site-topbar { position: fixed; inset: 0 0 auto; z-index: 50; }
 .site-topbar .site-header { position: static; }
-
-body.hero-page .site-topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 50; }
+.site-topbar .site-header.scrolled .bar { height: 76px; }
+.site-topbar-spacer { height: var(--site-topbar-height, 77px); }
+body.hero-page .site-topbar-spacer { display: none; }
 body.hero-page .site-topbar .site-header { position: static; top: auto; left: auto; right: auto; }
+html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px) + 12px); }
 
 /* Site-wide advisory ribbon (components/advisory-ribbon.blade.php) -- a
    slim, single-line strip, not a repeat of the compact card used to live on
@@ -1955,8 +1941,18 @@ body.hero-page .site-topbar .site-header { position: static; top: auto; left: au
     white-space: nowrap;
     margin: 0 0 0 8px;
     background: var(--stamp-red);
+    border: 1px solid var(--stamp-red);
+    border-radius: 12px;
+    clip-path: none;
+    transform: none;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    box-shadow: 0 3px 8px rgba(153, 53, 28, .16);
+    transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
 }
-.ticket-search .btn:hover { background: var(--accent-dark); }
+.ticket-search .btn:hover { background: #bd3b24; border-color: #bd3b24; box-shadow: 0 4px 10px rgba(153, 53, 28, .22); }
+.ticket-search .btn:active { background: #a93320; box-shadow: none; }
+.ticket-search .btn:focus-visible { border-radius:12px; outline:3px solid var(--primary); outline-offset:3px; }
 
 @media (max-width: 900px) {
     /* 2x2, per spec, all the way down -- not a further collapse to one
@@ -4885,3 +4881,20 @@ body.hero-page .site-header:not(.scrolled) .nav-more__toggle { color: var(--pape
 .mobile-menu .nav-more__links { position: static; min-width: 0; margin: 0 0 6px 12px; box-shadow: none; border: 0; border-left: 2px solid var(--primary); border-radius: 0; }
 .mobile-menu .mobile-menu__saved { border: 1px solid var(--primary); color: var(--primary-dark); margin: 8px 0 0; }
 .site-topbar .header-actions .btn-outline { background: transparent; box-shadow: none; }
+
+/* A non-blocking survey invitation; page navigation remains available. */
+.survey-invite { position: fixed; bottom: 24px; left: 24px; z-index: 45; width: min(390px, calc(100vw - 48px)); padding: 26px; border: 1px solid var(--border); border-top: 4px solid var(--primary); border-radius: 16px; background: var(--paper); box-shadow: var(--shadow-lg); color: var(--ink); }
+.survey-invite[hidden] { display: none; }
+.survey-invite__kicker { display: block; padding-right: 24px; color: var(--stamp-red); font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.survey-invite h2 { margin: 10px 0; color: var(--primary-dark); font-size: 1.4rem; line-height: 1.25; }
+.survey-invite p { margin: 0 0 20px; font-size: .88rem; line-height: 1.65; color: var(--muted); }
+.survey-invite__close { position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; font-size: 1.6rem; color: var(--primary-dark); cursor: pointer; }
+.survey-invite__close:hover { background: var(--primary-light); }
+.survey-invite__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.survey-invite__actions .btn { font-size: .85rem; }
+.survey-invite :is(a, button):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+body.mobile-menu-open .survey-invite { visibility: hidden; }
+@media (max-width: 640px) {
+    .survey-invite { left: 12px; bottom: 88px; width: calc(100% - 24px); padding: 20px; max-height: calc(100dvh - 180px); overflow-y: auto; }
+    .survey-invite h2 { font-size: 1.25rem; }
+}

@@ -53,12 +53,22 @@ class DestinationController extends Controller
             default => $query->orderByDesc('featured')->orderByDesc('rating'),
         };
 
+        // Map results use the same filters, across all pages of the catalogue.
+        $mapDestinations = (clone $query)->get()->map(fn (Destination $destination) => [
+            'id' => $destination->id,
+            'name' => $destination->name,
+            'location' => $destination->location,
+            'type' => $destination->type,
+            'latitude' => $destination->latitude,
+            'longitude' => $destination->longitude,
+            'url' => route('destinations.show', $destination),
+        ]);
         $destinations = $query->paginate(9)->withQueryString();
 
         $regions = Region::orderBy('name')->get();
         $types = Destination::query()->whereNotNull('type')->distinct()->orderBy('type')->pluck('type');
 
-        return view('destinations.index', compact('destinations', 'regions', 'types'));
+        return view('destinations.index', compact('destinations', 'regions', 'types', 'mapDestinations'));
     }
 
     public function show(Destination $destination): View
