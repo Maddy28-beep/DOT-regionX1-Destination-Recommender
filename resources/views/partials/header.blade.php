@@ -1,12 +1,4 @@
-{{--
-    .site-topbar owns the sticky/fixed positioning and stacking (see
-    app.css) so the ribbon and the header scroll and stick together as one
-    unit -- no dynamic height math needed for the header to "leave room" for
-    a ribbon that only sometimes exists. .site-header keeps the exact same
-    class the admin console and partner portal also use for their own,
-    separately-declared headers; only inside this wrapper is its own
-    position neutralized back to static.
---}}
+{{-- The public topbar stays fixed; the spacer below reserves its measured height. --}}
 <div class="site-topbar">
     @if ($topAdvisory ?? null)
         <x-advisory-ribbon :advisory="$topAdvisory" />
@@ -65,6 +57,7 @@
 
     </header>
 </div>
+<div class="site-topbar-spacer" aria-hidden="true"></div>
 
 {{--
     Premium slide-in drawer, not a dropped-down list of links. Deliberately a

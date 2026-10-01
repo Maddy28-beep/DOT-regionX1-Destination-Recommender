@@ -15,6 +15,7 @@
 <body class="hero-page">
 
 @include('partials.header')
+@include('partials.survey-invite-banner')
 
 {{-- has-footage is set server-side so the painted horizon is never drawn in
      the first place when a clip is available. Waiting for JavaScript to hide
