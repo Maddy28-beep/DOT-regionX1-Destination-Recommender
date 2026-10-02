@@ -81,16 +81,26 @@
             <div>
                 <div class="results-bar">
                     <div class="results-count">{{ $tourOperators->total() }} tour operator{{ $tourOperators->total() === 1 ? '' : 's' }} found</div>
+                    @if ($tourOperators->count())
+                        <div class="view-toggle" role="group" aria-label="Switch between grid and map view">
+                            <button type="button" class="view-toggle__btn active" data-view="grid"><x-icon name="grid" /> Grid View</button>
+                            <button type="button" class="view-toggle__btn" data-view="map"><x-icon name="map" /> Map View</button>
+                        </div>
+                    @endif
                 </div>
 
                 @if ($tourOperators->count())
-                    <div class="card-grid">
+                    <div class="card-grid" data-view-panel="grid">
                         @foreach ($tourOperators as $tourOperator)
                             @include('partials.listing-poster-card', ['listing' => $tourOperator])
                         @endforeach
                     </div>
 
-                    <div class="pagination">
+                    <div class="results-map-panel" data-view-panel="map" hidden>
+                        @include('partials.listing-results-map', ['listings' => $tourOperators, 'id' => 'tour-operators-map'])
+                    </div>
+
+                    <div class="pagination" data-view-panel="grid">
                         @if ($tourOperators->onFirstPage())
                             <span class="disabled">&laquo;</span>
                         @else
