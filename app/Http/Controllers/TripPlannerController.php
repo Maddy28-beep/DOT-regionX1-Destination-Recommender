@@ -110,8 +110,22 @@ class TripPlannerController extends Controller
         $data = $request->validate([
             'travel_days' => ['required', 'integer', 'min:1', 'max:30'],
             'travel_type' => ['required', 'string', 'max:20'],
-            'travel_purpose' => ['nullable', 'string', 'max:30'],
-            'visitor_type' => ['nullable', 'string', 'max:30'],
+            /*
+             * Both required as of the forced-input pass: travel_purpose and
+             * visitor_type each feed a real, non-zero weight in
+             * ContentBasedRecommendationService::PM_WEIGHTS (15% and 5% of
+             * Preference Match respectively), but were previously skippable
+             * via a "Prefer not to say" option -- silently leaving every
+             * skipped traveller scored as a weak partial match (travel_purpose)
+             * or a neutral non-signal (visitor_type) instead of contributing
+             * real personalization. Health/accessibility stays optional
+             * and consent-gated; those are sensitive by nature, not merely
+             * skippable convenience fields, and forcing disclosure of them
+             * would undermine the RA 10173 consent design elsewhere in this
+             * form.
+             */
+            'travel_purpose' => ['required', 'string', 'max:30'],
+            'visitor_type' => ['required', 'string', 'max:30'],
             /*
              * DOT Region XI asked for this specifically because the exit
              * survey's own origin question only reaches whoever finishes that
@@ -133,9 +147,21 @@ class TripPlannerController extends Controller
             'origin_lng' => ['nullable', 'numeric', 'between:-180,180', 'required_with:origin_lat'],
             'origin_label' => ['nullable', 'string', 'max:200'],
             'accessibility_notes' => ['nullable', 'string', 'max:1000'],
-            'activities' => ['nullable', 'array'],
+            /*
+             * Both required: 'interest' alone is 30% of Preference Match --
+             * the single largest factor -- and an empty selection does not
+             * merely score low, it scores as a perfect match for everyone
+             * (interestSimilarity() returns 1.0 when $selectedActivities is
+             * empty), which silently defeated personalization rather than
+             * just weakening it. 'amenities' feeds its own 15% DRS factor
+             * the same way (amenitiesScore() returns 5.0, the max, when
+             * empty) -- not broken exactly, but a traveller who never
+             * states a preference can never actually be told apart from
+             * one who has none.
+             */
+            'activities' => ['required', 'array', 'min:1'],
             'activities.*' => ['string', 'max:30'],
-            'amenities' => ['nullable', 'array'],
+            'amenities' => ['required', 'array', 'min:1'],
             'amenities.*' => ['string', 'max:100'],
             'health_conditions' => ['nullable', 'array'],
             'health_conditions.*' => ['string', Rule::in(array_keys(self::HEALTH_CONDITIONS))],

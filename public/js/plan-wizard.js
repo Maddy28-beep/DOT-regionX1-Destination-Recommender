@@ -63,7 +63,11 @@
         steps[2].append(options);
         if ([...options.querySelectorAll('input,textarea')].some(el => el.type === 'checkbox' ? el.checked : el.value.trim())) options.open = true;
     }
-    optionalGroup('Preferred amenities · optional', [form.querySelector('[name="amenities[]"]').closest('.field')]);
+    // Amenities is no longer wrapped in its own optional accordion here: it
+    // became a required field (see TripPlannerController::update()) and
+    // already lives correctly inside `interests`, appended into steps[1]
+    // above -- collapsing a required field behind a closed "optional"
+    // disclosure would hide the very thing validation is about to demand.
     optionalGroup('Health, accessibility & other needs · optional', [health, form.querySelector('#accessibility_notes').closest('.field')]);
     sections.forEach(section => section.classList.add('plan-section-group'));
     // Move the original elements rather than cloning them: names, values,
