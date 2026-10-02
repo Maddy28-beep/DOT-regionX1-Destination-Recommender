@@ -350,6 +350,14 @@ a { color: inherit; text-decoration: none; }
 .field-help svg { width: 14px; height: 14px; }
 .field-help:hover, .field-help:focus-visible { color: var(--primary); }
 
+.field-required-hint {
+    margin-left: 6px;
+    font-size: .74rem;
+    font-weight: 500;
+    font-style: italic;
+    color: var(--muted);
+}
+
 /* Partner-portal day-by-day itinerary editor (establishment/edit-listing) --
    one card per day instead of a "Title | Description" delimiter format in a
    plain textarea, which asked a non-technical tour operator to learn a
