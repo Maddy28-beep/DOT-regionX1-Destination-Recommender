@@ -668,6 +668,29 @@ document.addEventListener('DOMContentLoaded', function () {
         input.addEventListener('change', sync);
     });
 
+    /*
+     * [data-checkbox-group]: enforces "at least one checked" on a group of
+     * same-named checkboxes (activities[], amenities[]) -- the `required`
+     * attribute has no native meaning across a checkbox group (set on every
+     * box it would demand ALL of them checked, not any one). Reporting the
+     * unmet constraint through the FIRST checkbox's own validity instead
+     * means it needs no bespoke submit handler: plan-wizard.js's existing
+     * step validator already walks every input/select/textarea via
+     * checkValidity()/reportValidity(), so a checkbox is exactly as capable
+     * of carrying this as a native `required` field already was.
+     */
+    document.querySelectorAll('[data-checkbox-group]').forEach(function (group) {
+        var boxes = Array.prototype.slice.call(group.querySelectorAll('input[type="checkbox"]'));
+        if (!boxes.length) return;
+
+        var sync = function () {
+            var anyChecked = boxes.some(function (box) { return box.checked; });
+            boxes[0].setCustomValidity(anyChecked ? '' : 'Select at least one option.');
+        };
+        sync();
+        boxes.forEach(function (box) { box.addEventListener('change', sync); });
+    });
+
     // Hero search bar (welcome.blade.php): Duration/Budget/Interest open on
     // an empty "Any ..." value, which reads lighter/placeholder-style via
     // .is-empty (app.css) instead of looking exactly as committed as a real

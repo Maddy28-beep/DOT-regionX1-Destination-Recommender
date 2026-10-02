@@ -96,8 +96,8 @@
                                 </div>
                                 <div class="field" style="flex:1; min-width:180px;">
                                     <label for="travel_purpose">Purpose of travel</label>
-                                    <select id="travel_purpose" name="travel_purpose" class="form-select">
-                                        <option value="">Prefer not to say</option>
+                                    <select id="travel_purpose" name="travel_purpose" class="form-select" required>
+                                        <option value="" disabled @selected(! old('travel_purpose', $preference->travel_purpose))>Select a purpose</option>
                                         @foreach ($travelPurposes as $purpose)
                                             <option value="{{ $purpose }}" @selected(old('travel_purpose', $preference->travel_purpose) === $purpose)>{{ $purpose }}</option>
                                         @endforeach
@@ -105,8 +105,8 @@
                                 </div>
                                 <div class="field" style="flex:1; min-width:180px;">
                                     <label for="visitor_type">Is this your first visit to Davao?</label>
-                                    <select id="visitor_type" name="visitor_type" class="form-select" data-local-toggle>
-                                        <option value="">Prefer not to say</option>
+                                    <select id="visitor_type" name="visitor_type" class="form-select" data-local-toggle required>
+                                        <option value="" disabled @selected(! old('visitor_type', $preference->visitor_type))>Select one</option>
                                         @foreach ($visitorTypes as $type)
                                             <option value="{{ $type }}" @selected(old('visitor_type', $preference->visitor_type) === $type)>{{ $type }}</option>
                                         @endforeach
@@ -189,8 +189,8 @@
                         <div class="plan-section">
                             <h3 class="plan-section__title"><x-icon name="star" /> Interests &amp; Amenities</h3>
 
-                            <div class="field" style="margin-top:0;">
-                                <label>Interests &amp; activities</label>
+                            <div class="field" style="margin-top:0;" data-checkbox-group="activities">
+                                <label>Interests &amp; activities <span class="field-required-hint">Select at least one</span></label>
                                 <div class="chip-checkbox-grid">
                                     @foreach ($activityOptions as $activity)
                                         <label class="field-check">
@@ -201,8 +201,8 @@
                                 </div>
                             </div>
 
-                            <div class="field" style="margin-top:18px;">
-                                <label>Preferred amenities</label>
+                            <div class="field" style="margin-top:18px;" data-checkbox-group="amenities">
+                                <label>Preferred amenities <span class="field-required-hint">Select at least one</span></label>
                                 <div class="chip-checkbox-grid">
                                     @foreach ($amenityOptions as $amenity)
                                         <label class="field-check">
