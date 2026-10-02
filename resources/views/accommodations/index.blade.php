@@ -78,16 +78,26 @@
             <div>
                 <div class="results-bar">
                     <div class="results-count">{{ $accommodations->total() }} accommodation{{ $accommodations->total() === 1 ? '' : 's' }} found</div>
+                    @if ($accommodations->count())
+                        <div class="view-toggle" role="group" aria-label="Switch between grid and map view">
+                            <button type="button" class="view-toggle__btn active" data-view="grid"><x-icon name="grid" /> Grid View</button>
+                            <button type="button" class="view-toggle__btn" data-view="map"><x-icon name="map" /> Map View</button>
+                        </div>
+                    @endif
                 </div>
 
                 @if ($accommodations->count())
-                    <div class="card-grid">
+                    <div class="card-grid" data-view-panel="grid">
                         @foreach ($accommodations as $accommodation)
                             @include('partials.listing-poster-card', ['listing' => $accommodation])
                         @endforeach
                     </div>
 
-                    <div class="pagination">
+                    <div class="results-map-panel" data-view-panel="map" hidden>
+                        @include('partials.listing-results-map', ['listings' => $accommodations, 'id' => 'accommodations-map'])
+                    </div>
+
+                    <div class="pagination" data-view-panel="grid">
                         @if ($accommodations->onFirstPage())
                             <span class="disabled">&laquo;</span>
                         @else

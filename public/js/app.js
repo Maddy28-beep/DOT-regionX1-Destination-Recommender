@@ -1069,3 +1069,28 @@ document.addEventListener('DOMContentLoaded', function () {
         window.addEventListener('resize', update);
     });
 });
+
+/*
+ * Grid View / Map View toggle for the listing pages that don't have their
+ * own bespoke explorer (Destinations' is destination-explorer.js). Both
+ * panels are server-rendered up front -- the map partial's own script runs
+ * on page load regardless of which panel starts visible -- so this only
+ * ever hides/shows what is already there, never fetches or builds anything
+ * on click.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.view-toggle').forEach(function (toggle) {
+        var buttons = Array.prototype.slice.call(toggle.querySelectorAll('.view-toggle__btn'));
+        var panels = document.querySelectorAll('[data-view-panel]');
+
+        buttons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var view = btn.getAttribute('data-view');
+                buttons.forEach(function (b) { b.classList.toggle('active', b === btn); });
+                panels.forEach(function (panel) {
+                    panel.hidden = panel.getAttribute('data-view-panel') !== view;
+                });
+            });
+        });
+    });
+});

@@ -3537,6 +3537,33 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 .results-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
 .results-count { font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
 
+.view-toggle { display: flex; gap: 6px; }
+.view-toggle__btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--white);
+    color: var(--muted);
+    font-size: .82rem; font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: background .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+.view-toggle__btn svg { width: 15px; height: 15px; }
+.view-toggle__btn:hover { border-color: var(--primary); color: var(--primary); }
+.view-toggle__btn.active { background: var(--primary); border-color: var(--primary); color: var(--white); box-shadow: var(--shadow-md); }
+
+.results-map { width: 100%; height: 520px; border-radius: var(--radius-lg); overflow: hidden; }
+.results-map__note { margin-top: 10px; font-size: .82rem; color: var(--muted); }
+/* Same fix destination-explorer.css applies to its own #destinationMapView:
+   .card-grid's own `display: grid` otherwise outranks the `hidden` attribute's
+   default `display: none`, since a class selector is never lower specificity
+   than the UA stylesheet -- scoped to [data-view-panel] rather than made
+   global, matching how that fix was kept scoped rather than applied to
+   every [hidden] element on the page. */
+[data-view-panel][hidden] { display: none; }
+
 .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 32px; flex-wrap: wrap; }
 .pagination a, .pagination span {
     min-width: 38px; height: 38px; padding: 0 10px;
