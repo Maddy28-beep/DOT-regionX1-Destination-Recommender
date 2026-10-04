@@ -2113,110 +2113,6 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
     .hero-scroll-cue svg { animation: none; }
 }
 
-/* ---------- Popular Right Now (postcard grid) ---------- */
-
-/* scroll-margin-top: the site header is sticky, so a bare #hash jump from
-   the hero's scroll cue would otherwise land with its top few pixels tucked
-   under the header instead of fully in view. */
-.postcard-section { background: var(--primary-light); padding: 0; scroll-margin-top: 84px; }
-.postcard-slider { position: relative; }
-.postcard-slider__heading {
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    z-index: 5;
-    padding: 32px 32px 60px;
-    background: linear-gradient(to bottom, rgba(11, 40, 30, .68) 0%, transparent 100%);
-    pointer-events: none;
-}
-.postcard-slider__heading h2 { font-size: clamp(1.5rem, 3.4vw, 2.1rem); color: var(--paper); margin: 0 0 4px; }
-.postcard-slider__heading p { color: rgba(255, 247, 233, .85); margin: 0; }
-.postcard-track {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-.postcard-track::-webkit-scrollbar { display: none; }
-.postcard-track .postcard-card {
-    flex: 0 0 100%;
-    scroll-snap-align: start;
-}
-.postcard-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 4;
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(11, 40, 30, .45);
-    color: var(--paper);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background .15s ease;
-}
-.postcard-arrow:hover { background: rgba(11, 40, 30, .7); }
-.postcard-arrow svg { width: 22px; height: 22px; }
-.postcard-arrow--prev { left: 16px; }
-.postcard-arrow--next { right: 16px; }
-.postcard-dots {
-    position: absolute;
-    bottom: 16px;
-    left: 0;
-    right: 0;
-    z-index: 5;
-    display: flex;
-    justify-content: center;
-    gap: 7px;
-}
-.postcard-dots .dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: rgba(255, 247, 233, .5);
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    transition: background .15s ease, transform .15s ease;
-}
-.postcard-dots .dot.active { background: var(--stamp-red); transform: scale(1.35); }
-.postcard-card {
-    position: relative;
-    aspect-ratio: 16 / 9;
-    max-height: 780px;
-    overflow: hidden;
-}
-.postcard-card__scene {
-    position: absolute;
-    inset: 0;
-}
-.postcard-card__scene svg,
-.postcard-card__scene img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.postcard-card__overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(11, 40, 30, .75) 0%, rgba(11, 40, 30, .18) 38%, transparent 60%);
-    pointer-events: none;
-}
-.postcard-card__label {
-    position: absolute;
-    left: 28px;
-    right: 28px;
-    bottom: 22px;
-    font-family: 'Caveat', cursive;
-    font-weight: 700;
-    font-size: 2.1rem;
-    color: var(--paper);
-    text-shadow: 0 2px 8px rgba(0, 0, 0, .35);
-}
-
-@media (max-width: 640px) {
-    .postcard-card { aspect-ratio: 4 / 5; }
-    .postcard-arrow { width: 36px; height: 36px; }
-}
-
 /*
  * Landing-page scroll reveal (see the app.js block guarded on body.hero-page
  * for what gets this class and how the stagger delay is set). Only elements
@@ -3102,27 +2998,42 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
     overflow: hidden;
     background: linear-gradient(120deg, var(--sunset-coral) 0%, var(--sunset-red) 60%, var(--accent-dark) 100%);
     color: var(--paper);
-    border-radius: var(--radius-lg);
-    padding: 44px 40px;
-    display: flex;
+    border-radius: 24px;
+    padding: 64px 60px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
     align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    flex-wrap: wrap;
+    gap: 56px;
 }
 .cta-banner__scene {
     position: absolute;
     inset: 0 0 0 auto;
-    width: min(62%, 620px);
+    width: min(70%, 760px);
     height: 100%;
     z-index: 0;
     pointer-events: none;
+    /* Fade is applied to the box, not just inside the artwork: the SVG slices
+       its viewBox, so its own mask can leave a hard vertical edge at the left. */
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 40%);
+    mask-image: linear-gradient(to right, transparent 0, #000 40%);
 }
 .cta-banner > .halftone { z-index: 1; }
 .cta-banner__copy { position: relative; z-index: 2; max-width: 62ch; }
-.cta-banner .poster-kicker { display: block; color: var(--sun-glow); font-size: 1.15rem; }
-.cta-banner h2 { margin: 0 0 6px; font-size: clamp(1.5rem, 3vw, 2.1rem); line-height: 1.08; }
-.cta-banner > .cta-banner__copy > p { margin: 0; color: rgba(255, 247, 233, .92); }
+.cta-banner .poster-kicker {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    color: var(--sun-glow);
+    font-family: inherit;
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+}
+.cta-banner .poster-kicker::before { content: ''; width: 30px; height: 2px; background: currentColor; }
+.cta-banner h2 { margin: 0 0 18px; font-size: clamp(2.4rem, 5vw, 3.6rem); line-height: .98; }
+.cta-banner > .cta-banner__copy > p { margin: 0; font-size: 1.1rem; line-height: 1.7; color: rgba(255, 247, 233, .95); }
 .cta-banner .btn {
     position: relative;
     z-index: 2;
@@ -3144,13 +3055,21 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
     background: transparent;
     color: var(--paper);
     border: 1.5px solid rgba(255, 247, 233, .75);
+    border-radius: 8px;
+    clip-path: none;
 }
 .cta-banner .btn-ghost:hover { background: rgba(255, 247, 233, .14); color: var(--paper); border-color: var(--paper); }
 
-.cta-banner__paths { display: flex; gap: 32px; margin-top: 20px; flex-wrap: wrap; }
-.cta-banner__path { flex: 1 1 220px; min-width: 200px; }
-.cta-banner__path h3 { margin: 0 0 4px; font-size: 1.05rem; color: var(--paper); }
-.cta-banner__path p { margin: 0 0 12px; font-size: .85rem; line-height: 1.4; color: rgba(255, 247, 233, .85); }
+/* The two paths sit in the right-hand column as frosted cards over the sun. */
+.cta-banner__paths { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 18px; }
+.cta-banner__path {
+    padding: 26px 28px;
+    border: 1px solid rgba(255, 247, 233, .38);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, .12);
+}
+.cta-banner__path h3 { margin: 0 0 6px; font-size: 1.2rem; color: var(--paper); }
+.cta-banner__path p { margin: 0 0 16px; font-size: .95rem; line-height: 1.5; color: rgba(255, 247, 233, .92); }
 
 @media (max-width: 720px) {
     /* Once the banner stacks there is no clear right-hand column left, so the
@@ -3158,9 +3077,8 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
        A fixed band plus matching bottom padding clears the copy at any text
        length -- a percentage height does not, since the copy grows as it
        wraps. xMidYMax slice already anchors the ridges to the bottom edge. */
-    .cta-banner { padding-bottom: 104px; }
+    .cta-banner { grid-template-columns: 1fr; gap: 32px; padding: 40px 24px 104px; }
     .cta-banner__scene { width: 100%; height: 88px; top: auto; bottom: 0; opacity: .55; }
-    .cta-banner__paths { flex-direction: column; gap: 20px; }
 }
 
 /* ---------- Footer ---------- */

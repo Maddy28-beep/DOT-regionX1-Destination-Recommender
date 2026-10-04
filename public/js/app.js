@@ -282,74 +282,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }, { passive: true });
     });
 
-    // Auto-advancing postcard slider (homepage "Popular Right Now"). Kept
-    // separate from [data-carousel] above -- those are per-listing photo
-    // galleries and should never autoplay while someone's scanning a grid
-    // of many cards at once.
-    document.querySelectorAll('[data-autoslide]').forEach(function (root) {
-        var track = root.querySelector('.postcard-track');
-        var cards = track ? Array.prototype.slice.call(track.querySelectorAll('.postcard-card')) : [];
-        var dots = root.querySelectorAll('.postcard-dots .dot');
-        if (!track || cards.length < 2) return;
-
-        var index = 0;
-        var timer = null;
-        var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        function setActiveDot(i) {
-            dots.forEach(function (dot, di) { dot.classList.toggle('active', di === i); });
-        }
-
-        function goTo(i) {
-            index = (i + cards.length) % cards.length;
-            // Each card is exactly 100% of the track's width (see .postcard-track
-            // .postcard-card), so index * clientWidth is always its scroll target.
-            // offsetLeft would be wrong here -- it's relative to the nearest
-            // positioned ancestor (.postcard-slider), not the scrolling track.
-            track.scrollTo({ left: index * track.clientWidth, behavior: 'smooth' });
-            setActiveDot(index);
-        }
-
-        function stop() {
-            if (timer) { clearInterval(timer); timer = null; }
-        }
-
-        function start() {
-            if (prefersReducedMotion) return;
-            stop();
-            timer = setInterval(function () { goTo(index + 1); }, 3500);
-        }
-
-        dots.forEach(function (dot, i) {
-            dot.addEventListener('click', function () {
-                goTo(i);
-                start();
-            });
-        });
-
-        var prevBtn = root.querySelector('[data-prev]');
-        var nextBtn = root.querySelector('[data-next]');
-        if (prevBtn) prevBtn.addEventListener('click', function () { goTo(index - 1); start(); });
-        if (nextBtn) nextBtn.addEventListener('click', function () { goTo(index + 1); start(); });
-
-        // Manual swipe/scroll should also move the dots and reset the timer,
-        // so autoplay picks back up from wherever the visitor left it.
-        var scrollTimeout = null;
-        track.addEventListener('scroll', function () {
-            var i = Math.max(0, Math.min(cards.length - 1, Math.round(track.scrollLeft / track.clientWidth)));
-            index = i;
-            setActiveDot(i);
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(start, 1500);
-        }, { passive: true });
-
-        root.addEventListener('mouseenter', stop);
-        root.addEventListener('mouseleave', start);
-        root.addEventListener('touchstart', stop, { passive: true });
-
-        start();
-    });
-
     // Detail-page gallery + lightbox.
     document.querySelectorAll('[data-gallery]').forEach(function (root) {
         var photos;
@@ -1024,10 +956,10 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /*
- * Landing-page card reveal: postcard, destination/package, and feature cards
+ * Landing-page card reveal: destination/package and feature cards
  * fade and slide up as they scroll into view, staggered within each grid so
  * they don't all snap in at once. Scoped to body.hero-page, which only
- * welcome.blade.php sets -- .postcard-card, .dpost-grid and .feature-card
+ * welcome.blade.php sets -- .dpost-grid and .feature-card
  * are reused by pages (destination detail's related strip, saved places,
  * the exit survey recap) that should keep showing their cards immediately.
  */
@@ -1039,7 +971,6 @@ document.addEventListener('DOMContentLoaded', function () {
     var MAX_DELAY_MS = 400;
 
     [
-        document.querySelectorAll('.postcard-track > .postcard-card'),
         document.querySelectorAll('.dpost-grid > *'),
         document.querySelectorAll('.feature-grid > .feature-card'),
     ].forEach(function (group) {
