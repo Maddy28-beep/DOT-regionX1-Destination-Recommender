@@ -12,6 +12,7 @@ use App\Models\SouvenirCenter;
 use App\Models\TourOperator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use App\Support\Toast;
@@ -85,6 +86,7 @@ class AdminListingController extends Controller
     {
         $config = $this->config($type);
         $data = $request->validate($this->rules($type));
+        $data = $this->withoutBlankRole($data);
 
         $data['slug'] = $this->uniqueSlug($config['model'], $data['name']);
 
@@ -136,6 +138,7 @@ class AdminListingController extends Controller
         $listing = $config['model']::findOrFail($id);
 
         $data = $request->validate($this->rules($type, $listing->id));
+        $data = $this->withoutBlankRole($data);
 
         foreach (['is_accredited', 'featured'] as $flag) {
             if (array_key_exists($flag, $data)) {
@@ -263,6 +266,16 @@ class AdminListingController extends Controller
             });
     }
 
+    /** A blank role means "leave it as it is" (the column is never null). */
+    private function withoutBlankRole(array $data): array
+    {
+        if (array_key_exists('itinerary_role', $data) && blank($data['itinerary_role'])) {
+            unset($data['itinerary_role']);
+        }
+
+        return $data;
+    }
+
     private function rules(string $type, ?int $ignoreId = null): array
     {
         $common = [
@@ -275,6 +288,7 @@ class AdminListingController extends Controller
 
         return match ($type) {
             'destinations' => array_merge($common, [
+                'itinerary_role' => ['nullable', Rule::in(array_keys(Destination::ITINERARY_ROLES))],
                 'type' => ['nullable', 'string', 'max:80'],
                 'price_tier' => ['nullable', 'string', 'max:20'],
                 'entry_fee_min' => ['nullable', 'numeric', 'min:0'],

@@ -21,6 +21,39 @@ use Illuminate\Support\Collection;
 class AprioriService
 {
     /**
+     * Which transaction sources feed the mining: any of 'real' (tourist
+     * surveys), 'itinerary' (baskets coded from published itineraries) and
+     * 'demo' (simulated). Null means every source except trial ('test') rows,
+     * which no query ever sees. Set through onlySources() so a caller can ask
+     * "what do real surveys alone say?" without changing anyone else's result.
+     *
+     * @var array<int, string>|null
+     */
+    private ?array $sources = null;
+
+    /** A copy of this service that mines only the given sources. */
+    public function onlySources(?array $sources): static
+    {
+        $copy = clone $this;
+        $copy->sources = $sources ?: null;
+
+        return $copy;
+    }
+
+    private function surveys(): \Illuminate\Database\Eloquent\Builder
+    {
+        return ExitSurvey::query()->when($this->sources, fn ($q) => $q->whereIn('data_source', $this->sources));
+    }
+
+    private function visits(): \Illuminate\Database\Eloquent\Builder
+    {
+        return ExitSurveyVisit::query()->when($this->sources, fn ($q) => $q->whereIn(
+            'exit_survey_id',
+            ExitSurvey::query()->select('id')->whereIn('data_source', $this->sources)
+        ));
+    }
+
+    /**
      * Complementary listings frequently co-visited with a given listing, ranked by confidence.
      *
      * @return Collection<int, array{listing_kind: string, listing_id: int, co_count: int, support: float, confidence: float}>
@@ -32,18 +65,18 @@ class AprioriService
         float $minConfidence = 0.1,
         int $minSupportCount = 2
     ): Collection {
-        $surveyIdsWithA = ExitSurveyVisit::where('listing_kind', $listingKind)
+        $surveyIdsWithA = $this->visits()->where('listing_kind', $listingKind)
             ->where('listing_id', $listingId)
             ->pluck('exit_survey_id');
 
         $countA = $surveyIdsWithA->count();
-        $totalTransactions = ExitSurvey::count();
+        $totalTransactions = $this->surveys()->count();
 
         if ($countA === 0 || $totalTransactions === 0) {
             return collect();
         }
 
-        $coOccurrences = ExitSurveyVisit::whereIn('exit_survey_id', $surveyIdsWithA)
+        $coOccurrences = $this->visits()->whereIn('exit_survey_id', $surveyIdsWithA)
             ->where(function ($q) use ($listingKind, $listingId) {
                 $q->where('listing_kind', '!=', $listingKind)
                     ->orWhere('listing_id', '!=', $listingId);
@@ -119,12 +152,12 @@ class AprioriService
      */
     public function topRules(int $limit = 15, int $minSupportCount = 2, float $minConfidence = 0.15): Collection
     {
-        $totalTransactions = ExitSurvey::count();
+        $totalTransactions = $this->surveys()->count();
         if ($totalTransactions === 0) {
             return collect();
         }
 
-        $visitsByTransaction = ExitSurveyVisit::query()
+        $visitsByTransaction = $this->visits()
             ->select('exit_survey_id', 'listing_kind', 'listing_id')
             ->get()
             ->groupBy('exit_survey_id');

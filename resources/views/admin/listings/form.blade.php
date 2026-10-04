@@ -103,6 +103,19 @@
                             <input type="number" step="0.0000001" id="longitude" name="longitude" value="{{ old('longitude', $listing->longitude) }}">
                         </div>
                     </div>
+                    <div class="field" style="margin-top:14px; max-width:420px;">
+                        <label for="itinerary_role">Use in generated itineraries</label>
+                        <select id="itinerary_role" name="itinerary_role">
+                            @foreach (\App\Models\Destination::ITINERARY_ROLES as $role => [$roleLabel, $roleHelp])
+                                <option value="{{ $role }}" @selected(old('itinerary_role', $listing->itinerary_role ?? 'sightseeing') === $role)>{{ $roleLabel }}</option>
+                            @endforeach
+                        </select>
+                        <p class="field-hint">
+                            @foreach (\App\Models\Destination::ITINERARY_ROLES as $role => [$roleLabel, $roleHelp])
+                                <strong>{{ $roleLabel }}:</strong> {{ $roleHelp }}<br>
+                            @endforeach
+                        </p>
+                    </div>
                     <label class="field-check">
                         <input type="checkbox" name="featured" value="1" @checked(old('featured', $listing->featured))>
                         <span>Feature on homepage</span>
