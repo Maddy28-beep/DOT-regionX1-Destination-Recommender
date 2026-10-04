@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>ExploreDVO — Discover the Wonders of Davao Region</title>
     @include('partials.head-assets')
+    <link rel="stylesheet" href="{{ asset('css/landing-sections.css') }}?v={{ filemtime(public_path('css/landing-sections.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/postcard-carousel.css') }}?v={{ filemtime(public_path('css/postcard-carousel.css')) }}">
     @if ($heroVideo && $heroVideo['poster'])
         {{-- Fetched in parallel with the stylesheet so the hero's ground is
              ready at first paint, rather than arriving after it. --}}
@@ -301,55 +303,7 @@
     </a>
 </section>
 
-<section class="postcard-section" id="popular-right-now">
-        <div class="postcard-slider" data-autoslide>
-        <div class="postcard-slider__heading">
-            <h2 class="poster-title">Popular Right Now</h2>
-            <p>A quick postcard tour of what Region XI is known for.</p>
-        </div>
-        <button type="button" class="postcard-arrow postcard-arrow--prev" data-prev aria-label="Previous slide"><x-icon name="chevron-left" /></button>
-        <button type="button" class="postcard-arrow postcard-arrow--next" data-next aria-label="Next slide"><x-icon name="chevron-right" /></button>
-        <div class="postcard-track">
-            <div class="postcard-card">
-                <div class="postcard-card__scene">
-                    <img src="{{ asset('images/postcards/cultural-heritage.jpg') }}" alt="T'boli performer in traditional dress playing a kudyapi in front of a native hut" loading="eager">
-                </div>
-                <div class="postcard-card__overlay"></div>
-                <span class="postcard-card__label">Cultural Heritage</span>
-            </div>
-
-            <div class="postcard-card">
-                <div class="postcard-card__scene">
-                    <img src="{{ asset('images/postcards/mountain-peak.jpg') }}" alt="Mount Apo summit rising above the Davao Region foothills" loading="lazy">
-                </div>
-                <div class="postcard-card__overlay"></div>
-                <span class="postcard-card__label">Mountain Peak</span>
-            </div>
-
-            <div class="postcard-card">
-                <div class="postcard-card__scene">
-                    <img src="{{ asset('images/postcards/wildlife.jpg') }}" alt="Aerial view of a forested bay and coastline in Davao Region" loading="lazy">
-                </div>
-                <div class="postcard-card__overlay"></div>
-                <span class="postcard-card__label">Wildlife</span>
-            </div>
-
-            <div class="postcard-card">
-                <div class="postcard-card__scene">
-                    <img src="{{ asset('images/postcards/island-beach.jpg') }}" alt="Aerial view of a turquoise island coastline in Davao Region" loading="lazy">
-                </div>
-                <div class="postcard-card__overlay"></div>
-                <span class="postcard-card__label">Island Beach</span>
-            </div>
-        </div>
-        <div class="postcard-dots">
-            <button type="button" class="dot active" aria-label="Go to slide 1"></button>
-            <button type="button" class="dot" aria-label="Go to slide 2"></button>
-            <button type="button" class="dot" aria-label="Go to slide 3"></button>
-            <button type="button" class="dot" aria-label="Go to slide 4"></button>
-        </div>
-        </div>
-</section>
+@include('partials.postcard-carousel')
 
 @php
     // Scene mapping now lives on Destination::illustrationScene() -- reused
@@ -360,7 +314,7 @@
         : $destinations;
 @endphp
 
-<section class="section dpost-section" id="destinations">
+<section class="section dpost-section landing-section landing-section--white" id="destinations">
     <div class="container">
         <div class="dpost-head">
             <div>
@@ -432,7 +386,7 @@
         // actual popularity signal would.
         $mostPopularPackage = $packages->sortByDesc('review_count')->first();
     @endphp
-<section class="section">
+<section class="section landing-section landing-section--tint">
     <div class="container">
         <div class="dpost-head">
             <div>
@@ -455,7 +409,9 @@
 </section>
 @endif
 
-<section class="section section-alt" id="experiences">
+@include('partials.happening-soon')
+
+<section class="section section-alt landing-section" id="experiences">
     <div class="container">
         <div class="section-head">
             <div>
@@ -520,7 +476,7 @@
     </div>
 </section>
 
-<section class="section about-region" id="about-region">
+<section class="section about-region landing-section" id="about-region">
     <div class="container">
         <div class="section-head">
             <div>
@@ -606,7 +562,7 @@
     </div>
 </section>
 
-<section class="section">
+<section class="section landing-section landing-section--cream">
     <div class="container">
         <div class="cta-banner">
             {{--
@@ -646,25 +602,25 @@
                     Two ways to get started &mdash; build a day-by-day plan around your own
                     preferences, or pick a ready-made itinerary from a DOT-accredited tour operator.
                 </p>
+            </div>
 
-                {{--
-                    Two related but distinct actions, not one CTA with a second
-                    tacked on: each gets its own line of context so a tourist
-                    can tell at a glance which path fits them, rather than
-                    landing on "Plan My Trip" by default and discovering tour
-                    packages exist somewhere else entirely.
-                --}}
-                <div class="cta-banner__paths">
-                    <div class="cta-banner__path">
-                        <h3>Personalized Itinerary</h3>
-                        <p>Answer a few questions about your budget, duration and interests and get a custom day-by-day plan.</p>
-                        <a href="{{ route('plan.edit') }}" class="btn">Plan My Trip</a>
-                    </div>
-                    <div class="cta-banner__path">
-                        <h3>Tour Packages</h3>
-                        <p>Already know you want a guided trip? Browse ready-made itineraries offered by tour operators.</p>
-                        <a href="{{ route('packages.index') }}" class="btn btn-ghost">Browse Tour Packages</a>
-                    </div>
+            {{--
+                Two related but distinct actions, not one CTA with a second
+                tacked on: each gets its own line of context so a tourist
+                can tell at a glance which path fits them, rather than
+                landing on "Plan My Trip" by default and discovering tour
+                packages exist somewhere else entirely.
+            --}}
+            <div class="cta-banner__paths">
+                <div class="cta-banner__path">
+                    <h3>Personalized itinerary</h3>
+                    <p>Answer a few questions about your budget, duration and interests and get a custom day-by-day plan.</p>
+                    <a href="{{ route('plan.edit') }}" class="btn">Plan my trip &rarr;</a>
+                </div>
+                <div class="cta-banner__path">
+                    <h3>Tour packages</h3>
+                    <p>Already know you want a guided trip? Browse ready-made itineraries offered by tour operators.</p>
+                    <a href="{{ route('packages.index') }}" class="btn btn-ghost">Browse tour packages</a>
                 </div>
             </div>
         </div>
@@ -675,5 +631,6 @@
 @include('partials.chatbot-widget')
 
 <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
+<script src="{{ asset('js/postcard-carousel.js') }}?v={{ filemtime(public_path('js/postcard-carousel.js')) }}" defer></script>
 </body>
 </html>
