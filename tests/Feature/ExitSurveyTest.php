@@ -45,6 +45,18 @@ class ExitSurveyTest extends TestCase
         ], $overrides);
     }
 
+    public function test_not_applicable_ratings_are_saved_as_unanswered(): void
+    {
+        $this->post(route('exit-survey.store'), $this->validPayload([
+            'destination_relevant' => '',
+            'itinerary_useful' => '',
+        ]))->assertRedirect(route('exit-survey.recap'));
+
+        $survey = ExitSurvey::firstOrFail();
+        $this->assertNull($survey->destination_relevant);
+        $this->assertNull($survey->itinerary_useful);
+    }
+
     public function test_a_submission_needs_no_account_or_session_link(): void
     {
         $destination = $this->destination();

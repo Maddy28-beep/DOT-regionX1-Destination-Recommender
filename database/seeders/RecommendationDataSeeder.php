@@ -32,7 +32,8 @@ class RecommendationDataSeeder extends Seeder
 
         $this->seedTripPlans(40);
         $this->seedVisits(40, $clusters);
-        $this->seedExitSurveys(90, $clusters);
+        // Exit surveys (the Apriori transactions) have their own, PSA-informed, demo-labelled seeder.
+        $this->call(DemoExitSurveySeeder::class);
         $this->seedDestinationAmenities();
     }
 
@@ -271,58 +272,6 @@ class RecommendationDataSeeder extends Seeder
                     'visit_date' => $date,
                     'source' => 'qr_scan',
                 ]);
-            }
-        }
-    }
-
-    private function seedExitSurveys(int $count, array $clusters): void
-    {
-        $residencyTypes = ['Local Resident', 'Domestic Tourist', 'Domestic Tourist', 'Foreign Tourist'];
-        $visitorTypes = ['First-time Visitor', 'First-time Visitor', 'Returning Visitor', 'Regular / Local'];
-        $travelPurposes = ['Leisure', 'Leisure', 'Leisure', 'Business', 'Visiting Friends/Family', 'Educational'];
-        $origins = ['Metro Manila', 'Cebu City', 'General Santos', 'Cagayan de Oro', 'Zamboanga City', 'Iloilo City', 'Quezon City', 'Tokyo, Japan', 'Seoul, South Korea', 'Sydney, Australia', 'Singapore', 'Davao City (local)'];
-        $comments = [
-            'Wonderful trip overall, the itinerary suggestions matched what we wanted to do.',
-            'Great destinations, would visit again with family.',
-            'Enjoyed the beach hopping, though transport between spots could be smoother.',
-            'The recommended spots were spot-on for our interests.',
-            'Good value for the price, staff at the accredited establishments were friendly.',
-            'Loved the nature spots, very relaxing experience.',
-            'Would recommend to friends looking for a Davao itinerary.',
-            null, null,
-        ];
-
-        for ($i = 0; $i < $count; $i++) {
-            $cluster = $this->pickCluster($clusters);
-            $items = $this->drawFromCluster($cluster);
-
-            $survey = ExitSurvey::create([
-                'submitted_at' => now()->subDays(mt_rand(1, 210)),
-                'residency_type' => $residencyTypes[array_rand($residencyTypes)],
-                'visitor_type' => $visitorTypes[array_rand($visitorTypes)],
-                'origin' => $origins[array_rand($origins)],
-                'travel_purpose' => $travelPurposes[array_rand($travelPurposes)],
-                'actual_days_stayed' => mt_rand(1, 7),
-                'overall_rating' => mt_rand(3, 5),
-                'destination_relevant' => mt_rand(3, 5),
-                'itinerary_useful' => mt_rand(3, 5),
-                'attractions_quality' => mt_rand(3, 5),
-                'accommodation_rating' => mt_rand(3, 5),
-                'transport_rating' => mt_rand(2, 5),
-                'would_recommend' => mt_rand(1, 100) <= 85 ? 'Yes' : 'No',
-                'comments' => $comments[array_rand($comments)],
-            ]);
-
-            foreach ($items as $item) {
-                $survey->visits()->create([
-                    'listing_kind' => $item['listing_kind'],
-                    'listing_id' => $item['listing_id'],
-                ]);
-            }
-
-            $activities = collect($cluster['activities'])->shuffle()->take(mt_rand(1, 2));
-            foreach ($activities as $activity) {
-                $survey->activities()->create(['activity' => $activity]);
             }
         }
     }

@@ -11,6 +11,7 @@ use App\Models\EstablishmentAccount;
 use App\Models\ExitSurvey;
 use App\Models\ExitSurveyActivity;
 use App\Models\ExitSurveyVisit;
+use App\Models\Itinerary;
 use App\Models\Notification;
 use App\Models\Package;
 use App\Models\Restaurant;
@@ -19,6 +20,8 @@ use App\Models\TourOperator;
 use App\Models\TouristPreference;
 use App\Models\TouristVisit;
 use App\Services\Recommendation\AprioriService;
+use App\Services\Recommendation\ItinerarySkeletonMlService;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -67,7 +70,50 @@ class AdminDashboardController extends Controller
         $pendingEstablishments = EstablishmentAccount::where('status', 'pending')->latest('submitted_at')->take(5)->get();
         $expiring = AccreditationRecord::whereIn('status', ['Expiring Soon', 'Expired'])->orderBy('expiration_date')->take(5)->get();
 
-        return view('admin.overview', compact('stats', 'recentVisits', 'pendingEstablishments', 'expiring'));
+        return view('admin.overview', compact('stats', 'recentVisits', 'pendingEstablishments', 'expiring'))
+            ->with('ai', $this->aiUsage());
+    }
+
+    /**
+     * How the pre-trained model step is doing: how many generated plans it grouped,
+     * how often its answer needed repair, how long it takes, and whether the
+     * service answers right now.
+     *
+     * Counted over itineraries with a recorded outcome only. Package itineraries
+     * and plans from before the column existed are "not recorded", not "standard".
+     *
+     * @return array<string, mixed>
+     */
+    private function aiUsage(): array
+    {
+        $recorded = Itinerary::whereNotNull('ml_skeleton_applied');
+        $total = (clone $recorded)->count();
+        $applied = (clone $recorded)->where('ml_skeleton_applied', true)->count();
+
+        $ml = app(ItinerarySkeletonMlService::class);
+        $status = 'not_configured';
+
+        if ($ml->isConfigured()) {
+            try {
+                // A short probe: the overview must not hang when the model service is down.
+                $status = Http::timeout(1)->get(rtrim(config('services.phi4mini.url'), '/').'/api/tags')->successful()
+                    ? 'reachable' : 'unreachable';
+            } catch (\Throwable) {
+                $status = 'unreachable';
+            }
+        }
+
+        return [
+            'total' => $total,
+            'applied' => $applied,
+            'standard' => $total - $applied,
+            'percent' => $total > 0 ? round($applied / $total * 100) : null,
+            'repaired' => (clone $recorded)->where('ml_skeleton_applied', true)->where('ml_skeleton_repaired', true)->count(),
+            'avg_seconds' => ($avg = (clone $recorded)->where('ml_skeleton_applied', true)->whereNotNull('ml_skeleton_seconds')->avg('ml_skeleton_seconds')) !== null ? round((float) $avg, 1) : null,
+            'last_applied' => (clone $recorded)->where('ml_skeleton_applied', true)->max('generated_at'),
+            'model' => config('services.phi4mini.model', 'phi4-mini'),
+            'status' => $status,
+        ];
     }
 
     public function establishments(Request $request): View
@@ -264,7 +310,7 @@ class AdminDashboardController extends Controller
         // applies consistently across the whole page, not just the first
         // number that reads it.
         $filtered = function () use ($filters) {
-            return ExitSurvey::query()
+            return ExitSurvey::respondents()
                 ->when($filters['from'], fn ($q) => $q->whereDate('submitted_at', '>=', $filters['from']))
                 ->when($filters['to'], fn ($q) => $q->whereDate('submitted_at', '<=', $filters['to']))
                 ->when($filters['residency'], fn ($q) => $q->where('residency_type', $filters['residency']))
@@ -273,6 +319,16 @@ class AdminDashboardController extends Controller
         };
 
         $count = $filtered()->count();
+
+        /*
+         * What Apriori can actually use. A rule "A -> B" needs both places in
+         * the same survey, so a response with fewer than two places adds
+         * nothing to the rules however complete the rest of it is. Counted
+         * for real responses separately, because the demo rows are numerous
+         * and would otherwise hide how much genuine evidence there is.
+         */
+        $realCount = $filtered()->where('data_source', 'real')->count();
+        $realUsableForRules = $filtered()->where('data_source', 'real')->has('visits', '>=', 2)->count();
 
         /*
          * Distinct Check-ins is reported alongside Exit Survey Responses as
@@ -425,7 +481,7 @@ class AdminDashboardController extends Controller
         $purposeOptions = ExitSurveyController::TRAVEL_PURPOSES;
 
         return view('admin.exit-surveys', compact(
-            'count', 'checkedInVisitors', 'avgRatings', 'wouldRecommendPct',
+            'count', 'realCount', 'realUsableForRules', 'checkedInVisitors', 'avgRatings', 'wouldRecommendPct',
             'residencyBreakdown', 'visitorTypeBreakdown', 'travelPurposeBreakdown', 'avgDaysStayed',
             'originBreakdown', 'originTotal', 'otherOriginsCount',
             'avgTotalSpend', 'spendByResidency', 'spendRespondentCount',
@@ -444,6 +500,13 @@ class AdminDashboardController extends Controller
 
     public function associationRules(Request $request, AprioriService $apriori): View
     {
+        // Which transaction sources to mine: everything, or one kind on its own.
+        $source = in_array($request->get('source'), ['real', 'itinerary', 'demo'], true) ? $request->get('source') : 'all';
+        $apriori = $apriori->onlySources($source === 'all' ? null : [$source]);
+
+        $sourceCounts = ExitSurvey::query()
+            ->selectRaw('data_source, count(*) as total')->groupBy('data_source')->pluck('total', 'data_source');
+
         $rules = $apriori->topRules(self::ASSOCIATION_RULE_LIMIT, self::ASSOCIATION_MIN_SUPPORT_COUNT, self::ASSOCIATION_MIN_CONFIDENCE);
 
         // Whitelisted so a crafted ?sort= can't reach an arbitrary key.
@@ -456,7 +519,8 @@ class AdminDashboardController extends Controller
             ? $rules->sortBy($sort)->values()
             : $rules->sortByDesc($sort)->values();
 
-        $totalTransactions = ExitSurvey::count();
+        $totalTransactions = $source === 'all' ? $sourceCounts->sum() : (int) ($sourceCounts[$source] ?? 0);
+        $demoTransactions = (int) ($sourceCounts['demo'] ?? 0);
 
         /*
          * "Rules Found" reports every rule that actually clears both
@@ -473,7 +537,7 @@ class AdminDashboardController extends Controller
         $minSupportPct = $totalTransactions > 0 ? round(self::ASSOCIATION_MIN_SUPPORT_COUNT / $totalTransactions * 100, 1) : null;
 
         return view('admin.association-rules', compact(
-            'rules', 'sort', 'dir', 'totalTransactions', 'totalRulesFound',
+            'rules', 'sort', 'dir', 'totalTransactions', 'demoTransactions', 'sourceCounts', 'source', 'totalRulesFound',
             'minSupportPct'
         ))->with('minConfidencePct', round(self::ASSOCIATION_MIN_CONFIDENCE * 100));
     }
@@ -608,7 +672,7 @@ class AdminDashboardController extends Controller
 
     private function exitSurveyReport(string $from, string $rangeEnd): array
     {
-        $surveys = ExitSurvey::whereBetween('submitted_at', [$from, $rangeEnd])->orderBy('submitted_at')->get();
+        $surveys = ExitSurvey::respondents()->whereBetween('submitted_at', [$from, $rangeEnd])->orderBy('submitted_at')->get();
         $avg = $surveys->whereNotNull('overall_rating')->avg('overall_rating');
 
         return [
@@ -645,6 +709,7 @@ class AdminDashboardController extends Controller
     {
         $rows = ExitSurveyVisit::join('exit_surveys', 'exit_surveys.id', '=', 'exit_survey_visits.exit_survey_id')
             ->whereBetween('exit_surveys.submitted_at', [$from, $rangeEnd])
+            ->whereIn('exit_surveys.data_source', ExitSurvey::RESPONDENT_SOURCES)
             ->selectRaw('exit_survey_visits.listing_kind, exit_survey_visits.listing_id, count(*) as visits')
             ->groupBy('exit_survey_visits.listing_kind', 'exit_survey_visits.listing_id')
             ->orderByDesc('visits')
