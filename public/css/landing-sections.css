@@ -1,0 +1,35 @@
+/* Landing page section boundaries.
+
+   Destinations, packages and events had no background of their own, so they ran
+   together as one long block. Sections now alternate between the page tint and
+   white, and each is a rounded "sheet" that slides over the bottom of the one
+   before it, with a soft shadow along its top edge. The overlap comes out of the
+   previous section's own bottom padding, so no content moves and spacing inside
+   each section is unchanged. */
+
+:root { --sheet-radius: 32px; }
+
+.landing-section {
+    position: relative;
+    margin-top: calc(var(--sheet-radius) * -1);
+    border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
+    box-shadow: 0 -14px 32px rgba(16, 40, 30, .07);
+}
+
+.landing-section--tint { background: var(--bg); }
+.landing-section--white { background: var(--white); }
+
+/* The first section after the hero or the carousel starts on a straight edge: the
+   carousel ends in a solid caption bar that a sheet must not slide over. */
+.poster-hero + .landing-section,
+#popular-right-now + .landing-section {
+    margin-top: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+@media (max-width: 640px) {
+    :root { --sheet-radius: 22px; }
+}
+
+.landing-section--cream { background: #f7f1e8; }

@@ -35,6 +35,7 @@
                 <a href="{{ route('tour-operators.index') }}">Browse tour operators</a>
                 <a href="{{ route('exit-survey.create') }}">Share your feedback</a>
                 <a href="{{ route('saved.index') }}">Saved places</a>
+                <a href="{{ route('events.index') }}">Browse events</a>
             </div>
             <div>
                 <h4>For Partners</h4>

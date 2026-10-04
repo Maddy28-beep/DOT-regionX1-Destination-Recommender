@@ -5,6 +5,7 @@ use App\Http\Controllers\AddressSuggestionController;
 use App\Http\Controllers\Admin\AdminAdvisoryController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminListingController;
+use App\Http\Controllers\Admin\AdminPostcardSlideController;
 use App\Http\Controllers\AdvisoryController;
 use App\Http\Controllers\Auth\EstablishmentRegistrationController;
 use App\Http\Controllers\Auth\PortalAuthController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\Establishment\EstablishmentDashboardController;
 use App\Http\Controllers\Establishment\EstablishmentPhotoController;
 use App\Http\Controllers\Establishment\EstablishmentPromotionController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\ExitSurveyController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PackageController;
@@ -66,6 +68,7 @@ Route::get('/search', \App\Http\Controllers\SearchController::class)->name('sear
  * exclusively in the DOT Admin console (AdminAdvisoryController).
  */
 Route::get('/advisories', [AdvisoryController::class, 'index'])->name('advisories.index');
+Route::get('/events', [EventController::class, 'index'])->name('events.index');
 
 Route::get('/destinations', [DestinationController::class, 'index'])->name('destinations.index');
 Route::get('/destinations/{destination:slug}', [DestinationController::class, 'show'])->name('destinations.show');
@@ -216,6 +219,12 @@ Route::prefix('portal/admin')->name('admin.')->middleware('auth:admin')->group(f
         Route::post('/{id}/unarchive', [AdminListingController::class, 'unarchive'])->name('unarchive');
         Route::get('/{id}/qr-code', [QrCodeController::class, 'admin'])->name('qr-code');
     });
+
+    // Homepage "Popular Right Now" carousel slides
+    Route::resource('postcard-slides', AdminPostcardSlideController::class)
+        ->except('show')
+        ->parameters(['postcard-slides' => 'postcardSlide'])
+        ->names('postcard-slides');
 
     // Advisories (2.2.3.1.5) -- DOT-authored notices, per-listing or general
     Route::prefix('advisories')->name('advisories.')->group(function () {
