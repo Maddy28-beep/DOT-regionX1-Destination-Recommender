@@ -1,7 +1,7 @@
 {{-- The public topbar stays fixed; the spacer below reserves its measured height. --}}
 <div class="site-topbar">
-    @if ($topAdvisory ?? null)
-        <x-advisory-ribbon :advisory="$topAdvisory" />
+    @if (($ribbonAdvisories ?? collect())->isNotEmpty())
+        <x-advisory-ribbon :advisories="$ribbonAdvisories" />
     @endif
 
     <header class="site-header">
@@ -23,18 +23,40 @@
                     above), so a second header-actions button would repeat that.
                 --}}
                 @auth('tourist')
-                    <span class="header-account-chip">
-                        <a href="{{ route('account.itineraries') }}" @if(request()->routeIs('account.itineraries')) aria-current="page" @endif class="header-account-chip__name">
-                            <x-icon name="user" />
-                            <span>{{ auth('tourist')->user()->alias }}</span>
-                        </a>
-                        <form method="POST" action="{{ route('account.logout') }}" class="header-account-chip__logout-form">
-                            @csrf
-                            <button type="submit" class="header-account-chip__logout" aria-label="Log out" title="Log out">
-                                <x-icon name="log-out" />
-                            </button>
-                        </form>
-                    </span>
+                    {{-- One control instead of a name link plus a log-out icon the thumb could hit by
+                         accident. Log out now sits at the bottom of the menu. The menu is hidden with
+                         the rest of the bar below 1366px, where the drawer carries the same links. --}}
+                    @php $alias = auth('tourist')->user()->alias; @endphp
+                    <div class="account-menu" data-nav-more>
+                        <button type="button" class="account-menu__toggle {{ request()->routeIs('account.itineraries*', 'account.saved') ? 'is-active' : '' }}" aria-expanded="false" aria-controls="accountMenuPanel" aria-label="Account menu for {{ $alias }}">
+                            <span class="account-menu__avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr($alias, 0, 1)) }}</span>
+                            <span class="account-menu__name">{{ $alias }}</span>
+                            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 7.5 5 5 5-5" /></svg>
+                        </button>
+                        <div class="account-menu__panel" id="accountMenuPanel" hidden>
+                            <div class="account-menu__who">
+                                <strong>{{ $alias }}</strong>
+                                <span>Traveler account</span>
+                            </div>
+                            <a href="{{ route('account.itineraries') }}" @if(request()->routeIs('account.itineraries*')) aria-current="page" @endif>
+                                <x-icon name="compass" />
+                                My itineraries
+                                <small>{{ $accountItineraryCount ?? 0 }}</small>
+                            </a>
+                            <a href="{{ route('account.saved') }}" @if(request()->routeIs('account.saved')) aria-current="page" @endif>
+                                <x-icon name="heart" />
+                                Saved places
+                                <small>{{ $savedCount ?? 0 }}</small>
+                            </a>
+                            <form method="POST" action="{{ route('account.logout') }}">
+                                @csrf
+                                <button type="submit" class="account-menu__logout">
+                                    <x-icon name="log-out" />
+                                    Log out
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 @else
                     <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="header-account-link">Log in</a>
                 @endauth
@@ -43,11 +65,15 @@
                      someone else's list -- the session's, not their account's --
                      even while logged in. The mobile menu below already branched
                      on auth state; this one had not. --}}
-                <a href="{{ auth('tourist')->check() ? route('account.saved') : route('saved.index') }}" class="btn btn-outline" data-saved-link @if(request()->routeIs('saved.*', 'account.saved')) aria-current="page" @endif>
+                {{-- Icon-only so it costs 38px of the bar instead of a labelled button, with the number
+                     of saved places on it. The label stays for screen readers and as a tooltip. --}}
+                <a href="{{ auth('tourist')->check() ? route('account.saved') : route('saved.index') }}" class="header-saved" data-saved-link
+                   aria-label="Saved places{{ ($savedCount ?? 0) > 0 ? ', '.$savedCount.' saved' : '' }}" title="Saved places"
+                   @if(request()->routeIs('saved.*', 'account.saved')) aria-current="page" @endif>
                     <x-icon name="heart" />
-                    Saved
+                    <span class="header-saved__count" data-saved-count @if(($savedCount ?? 0) < 1) hidden @endif>{{ $savedCount ?? 0 }}</span>
                 </a>
-                <a href="{{ route('plan.choose') }}" @if(request()->routeIs('plan.*')) aria-current="page" @endif class="btn btn-primary">Plan My Trip</a>
+                <a href="{{ route('plan.choose') }}" @if(request()->routeIs('plan.*')) aria-current="page" @endif class="btn btn-primary header-plan">Plan My Trip <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
 
                 <button type="button" class="nav-toggle" id="mobileMenuToggle" aria-label="Open menu" aria-haspopup="dialog" aria-expanded="false" aria-controls="mobileMenu">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
