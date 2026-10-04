@@ -3,27 +3,37 @@
 @section('title', 'My Itineraries — ExploreDVO')
 
 @section('content')
-@include('partials.account-nav')
 <div class="dash-shell">
     <div class="dash-header">
         <div class="container">
             <div>
                 <span class="poster-kicker" style="font-size:1.05rem;">your account</span>
                 <h1 class="page-title" style="font-size:1.9rem; margin:0;">My Itineraries</h1>
-                <div class="sub">Saved to your account &mdash; open one to keep viewing or customizing it.</div>
+                <div class="sub">Trips you've saved to your account. Open one to keep viewing or customizing it.</div>
             </div>
-            <a href="{{ route('plan.edit') }}" class="btn btn-outline">Plan a New Trip</a>
+            @unless ($itineraries->isEmpty())
+                <a href="{{ route('plan.edit') }}" class="btn btn-outline">Plan a new trip</a>
+            @endunless
         </div>
     </div>
+
+    @include('partials.account-nav')
 
     <div class="dash-body">
         <div class="container">
             @if ($itineraries->isEmpty())
-                <div class="panel">
-                    <div class="empty-panel">
-                        <div class="icon"><x-icon name="compass" /></div>
-                        <h3>No saved itineraries yet</h3>
-                        <p>Generate a trip plan, then choose "Save Itinerary" to keep it here.</p>
+                <div class="account-empty">
+                    <div class="account-empty__icon"><x-icon name="compass" /></div>
+                    <h2>Start your first trip</h2>
+                    <p>Plan a Davao itinerary in about 2 minutes, then save it here to come back to it anytime.</p>
+                    <ol class="account-empty__steps">
+                        <li><span>1</span> Pick your interests</li>
+                        <li><span>2</span> Set budget and days</li>
+                        <li><span>3</span> Save the plan</li>
+                    </ol>
+                    <div class="account-empty__actions">
+                        <a href="{{ route('plan.edit') }}" class="btn btn-primary">Plan my trip</a>
+                        <a href="{{ route('packages.index') }}" class="btn btn-outline">Browse tour packages</a>
                     </div>
                 </div>
             @else

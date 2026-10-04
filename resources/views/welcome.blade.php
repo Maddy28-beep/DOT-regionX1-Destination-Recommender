@@ -180,8 +180,10 @@
         </script>
     @endif
 
-    <div class="stamp-badge">
-        <span class="stamp-badge__text"><strong>Official</strong><span>DOT Region XI</span><span>Philippines</span></span>
+    <div class="hero-tourism-brands" aria-label="Tourism logos">
+        <img src="{{ asset('images/tourism-logos/davao.png') }}" alt="Davao" class="hero-tourism-brands__davao">
+        <img src="{{ asset('images/tourism-logos/dot.png') }}" alt="Department of Tourism Philippines" class="hero-tourism-brands__dot">
+        <img src="{{ asset('images/tourism-logos/love-philippines.png') }}" alt="Love the Philippines" class="hero-tourism-brands__love">
     </div>
 
     <svg class="poster-hero__horizon" viewBox="0 0 1200 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -260,6 +262,8 @@
         </div>
         <button type="submit" class="btn btn-accent">Explore &rarr;</button>
     </form>
+
+
 
     @if ($popularSearchChips->isNotEmpty())
         <div class="hero-popular-searches">
