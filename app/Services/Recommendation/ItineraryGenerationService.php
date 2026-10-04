@@ -151,7 +151,12 @@ class ItineraryGenerationService
                 : null,
         );
 
-        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $skeleton) {
+        // What the model step reported, read now: the service instance is shared, so a later
+        // request could overwrite it. Null when the step never reached the model.
+        $mlRepaired = $this->skeletonMl->lastDiagnostics['repaired'] ?? null;
+        $mlSeconds = $this->skeletonMl->lastResponseSeconds !== null ? round($this->skeletonMl->lastResponseSeconds, 2) : null;
+
+        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $skeleton, $mlRepaired, $mlSeconds) {
             $itinerary = Itinerary::create([
                 'preference_id' => $preference->id,
                 'total_days' => $totalDays,
@@ -164,6 +169,9 @@ class ItineraryGenerationService
                 // the Haversine/Nearest-Neighbor order on its own -- see
                 // ItinerarySkeletonMlService::proposeSkeleton()'s doc comment.
                 'ml_skeleton_applied' => $skeleton !== null,
+                // Whether the model's answer needed the duplicate/missing-id repair, and how long it took.
+                'ml_skeleton_repaired' => $skeleton !== null ? $mlRepaired : null,
+                'ml_skeleton_seconds' => $mlSeconds,
             ]);
 
             // Table 8: full computed Destination Recommendation ranking, not just the stops used.

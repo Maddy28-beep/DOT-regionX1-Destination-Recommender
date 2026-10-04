@@ -12,6 +12,7 @@ use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\SvgWriter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\View\View;
 use Illuminate\Support\Str;
 
 class QrCodeController extends Controller
@@ -50,6 +51,40 @@ class QrCodeController extends Controller
         $listing = $config['model']::findOrFail($id);
 
         return $this->render($listing, $type);
+    }
+
+    /**
+     * Printable poster for the public exit survey.
+     *
+     * The code encodes the survey's own URL, built from the address this page
+     * was opened at, so printing it from the live site yields the live address
+     * with nothing to edit by hand. A code printed from localhost would work on
+     * no visitor's phone, so the page says so rather than letting that go to
+     * print unnoticed.
+     */
+    public function exitSurveyPoster(): View
+    {
+        $url = route('exit-survey.create');
+
+        return view('admin.exit-survey-qr', [
+            'url' => $url,
+            'qr' => $this->surveyQr($url)->getDataUri(),
+            'isLocal' => in_array(parse_url($url, PHP_URL_HOST), ['localhost', '127.0.0.1', '::1'], true),
+        ]);
+    }
+
+    /** The same code as a standalone SVG, for dropping into a flyer or slide. */
+    public function exitSurveyImage(): Response
+    {
+        return response($this->surveyQr(route('exit-survey.create'))->getString(), 200, [
+            'Content-Type' => 'image/svg+xml',
+            'Content-Disposition' => 'inline; filename="exit-survey-qr-code.svg"',
+        ]);
+    }
+
+    private function surveyQr(string $url): \Endroid\QrCode\Writer\Result\ResultInterface
+    {
+        return (new Builder(writer: new SvgWriter(), data: $url, size: 520, margin: 10))->build();
     }
 
     public function establishment(Request $request): Response

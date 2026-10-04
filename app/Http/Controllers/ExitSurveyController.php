@@ -121,6 +121,7 @@ class ExitSurveyController extends Controller
             ->values();
 
         return view('exit-survey.create', [
+            'isTest' => request()->boolean('test'),
             'placeOptions' => $placeOptions,
             'selectedPlaces' => old('places_visited', []),
             'travelPurposes' => self::TRAVEL_PURPOSES,
@@ -177,6 +178,7 @@ class ExitSurveyController extends Controller
             'transport_rating' => ['nullable', 'integer', 'min:1', 'max:5'],
             'would_recommend' => ['required', 'in:Yes,No'],
             'comments' => ['nullable', 'string', 'max:500'],
+            'test' => ['nullable', 'boolean'],
         ]);
 
         /*
@@ -205,10 +207,14 @@ class ExitSurveyController extends Controller
             $preferenceId = null;
         }
 
-        $survey = DB::transaction(function () use ($data, $preferenceId) {
+        $isTest = $request->boolean('test');
+
+        $survey = DB::transaction(function () use ($data, $preferenceId, $isTest) {
             $survey = ExitSurvey::create(
-                collect($data)->except(['places_visited', 'activities'])
+                collect($data)->except(['places_visited', 'activities', 'test'])
                     ->put('preference_id', $preferenceId)
+                    // A trial run from /exit-survey?test=1 is kept apart from real responses.
+                    ->put('data_source', $isTest ? 'test' : 'real')
                     ->all()
             );
 
@@ -247,7 +253,10 @@ class ExitSurveyController extends Controller
     public function recap(Request $request, ContentBasedRecommendationService $recommender): View|RedirectResponse
     {
         $surveyId = $request->session()->get('last_exit_survey_id');
-        $survey = $surveyId ? ExitSurvey::with(['visits.listing', 'preference'])->find($surveyId) : null;
+        // Scopes lifted so the visitor who just submitted a trial (test) survey still sees their own recap.
+        $survey = $surveyId
+            ? ExitSurvey::withoutGlobalScopes()->with(['visits' => fn ($q) => $q->withoutGlobalScopes(), 'visits.listing', 'preference'])->find($surveyId)
+            : null;
 
         if (! $survey) {
             return redirect()->route('home')

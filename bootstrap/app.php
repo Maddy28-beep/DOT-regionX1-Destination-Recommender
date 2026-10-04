@@ -18,6 +18,14 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\EnsureVisitorToken::class,
         ]);
 
+        // Global and first, so a request through a public tunnel is turned away before
+        // any route middleware (such as the admin login redirect) can answer it.
+        $middleware->prepend(\App\Http\Middleware\RestrictTunnelToSurvey::class);
+
+        // A tunnel client (cloudflared, ngrok) connects from this machine and forwards
+        // the original scheme, so generated links stay https instead of http.
+        $middleware->trustProxies(at: ['127.0.0.1', '::1']);
+
         /*
          * Most guarded routes in this app are portal routes (DOT Admin /
          * establishment partner), so an unauthenticated hit belongs at the

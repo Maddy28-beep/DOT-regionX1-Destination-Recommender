@@ -3,19 +3,21 @@
 @section('title', 'Exit Survey — ExploreDVO')
 
 @section('content')
+<link rel="stylesheet" href="{{ asset('css/exit-survey.css') }}?v={{ filemtime(public_path('css/exit-survey.css')) }}">
+<div class="exit-survey-page">
 <div class="page-head">
     <div class="container">
         <span class="poster-kicker" style="font-size:1.05rem;">how was your trip?</span>
         <h1 class="page-title" style="font-size:1.9rem; margin:0;">Visitor Exit Survey</h1>
-        <p>A short, anonymous survey to help DOT Region XI improve tourism services in the Davao Region.</p>
+        <p>Finished your trip? Tell us how it went and help improve tourism in Davao.</p>
     </div>
 </div>
 
 <div class="section-tight">
-    <div class="container" style="max-width:720px;">
+    <div class="container survey-container">
 
         @if ($errors->any())
-            <div class="alert alert-error">
+            <div class="alert alert-error" role="alert">
                 <ul style="margin:0; padding-left:18px;">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -36,18 +38,26 @@
 
         <form method="POST" action="{{ route('exit-survey.store') }}">
             @csrf
+            @if ($isTest ?? false)
+                <input type="hidden" name="test" value="1">
+                <div class="alert alert-error" role="note" style="margin-bottom:18px;">
+                    <strong>Test mode.</strong> Responses sent from this page are kept separate and are not counted in any
+                    results or in the association rules.
+                </div>
+            @endif
 
             <div class="panel">
                 <div class="panel-head">
                     <div>
+                        <span class="survey-step">01 · Trip details</span>
                         <h2>About Your Trip</h2>
-                        <p>A few quick questions for DOT Region XI's tourism statistics.</p>
+                        <p>These details are optional. Share what you’re comfortable answering.</p>
                     </div>
                 </div>
                 <div class="panel-body">
                     <div class="field">
                         <label for="origin">Where are you visiting from?</label>
-                        <input type="text" id="origin" name="origin" value="{{ old('origin') }}" placeholder="e.g. Cebu City, Philippines">
+                        <input type="text" id="origin" name="origin" maxlength="150" value="{{ old('origin') }}" placeholder="e.g. Cebu City, Philippines">
                         <p class="field-hint">Helps DOT Region XI understand where visitors are travelling from.</p>
                     </div>
 
@@ -94,8 +104,10 @@
             <div class="panel">
                 <div class="panel-head">
                     <div>
+                        <span class="survey-step">02 · Places & activities</span>
                         <h2>Your Visit</h2>
-                        <p>Optional &mdash; search and add the places you went.</p>
+                        <p>Optional &mdash; add only places you actually visited, even if your plans changed.</p>
+                        <p class="field-hint" style="margin-top:6px;"><strong>Tip:</strong> adding two or more places helps us learn which places go well together.</p>
                     </div>
                 </div>
                 <div class="panel-body">
@@ -124,27 +136,18 @@
             <div class="panel">
                 <div class="panel-head">
                     <div>
+                        <span class="survey-step">03 · Your feedback</span>
                         <h2>Your Experience</h2>
-                        <p>How would you rate your trip? (optional, except overall satisfaction)</p>
+                        <p>Only your overall rating and recommendation answer are required.</p>
                     </div>
                 </div>
                 <div class="panel-body">
-                    <div class="rating-row">
-                        <span class="rating-row-label"><strong>Overall satisfaction with your visit</strong></span>
-                        @include('partials.star-input', ['name' => 'overall_rating', 'required' => true])
-                    </div>
-                    <div class="rating-row">
-                        <span class="rating-row-label">Relevance of recommended destinations</span>
-                        @include('partials.star-input', ['name' => 'destination_relevant'])
-                    </div>
-                    <div class="rating-row">
-                        <span class="rating-row-label">Usefulness of the suggested itinerary</span>
-                        @include('partials.star-input', ['name' => 'itinerary_useful'])
-                    </div>
+                    @include('partials.survey-rating', ['name' => 'overall_rating', 'label' => 'Overall satisfaction with your visit', 'required' => true])
 
                     <div class="field" style="margin-top:22px;">
-                        <label>Would you recommend the Davao Region to friends or family?</label>
-                        <div style="display:flex; gap:20px; margin-top:8px;">
+                        <fieldset class="survey-recommend">
+                        <legend>Would you recommend Davao to friends or family? <span>(required)</span></legend>
+                        <div class="survey-recommend-options">
                             <label class="field-check radio-check" style="margin-top:0;">
                                 <input type="radio" name="would_recommend" value="Yes" @checked(old('would_recommend') === 'Yes') required>
                                 <span>Yes, definitely</span>
@@ -154,17 +157,26 @@
                                 <span>Probably not</span>
                             </label>
                         </div>
+                        </fieldset>
                     </div>
 
+                    <details class="survey-more" @if(old('destination_relevant') !== null || old('itinerary_useful') !== null || old('comments') || $errors->hasAny(['destination_relevant', 'itinerary_useful', 'comments'])) open @endif>
+                        <summary>More about your experience <span>· optional</span></summary>
+                        <p class="field-hint">If you didn’t use the recommendations or itinerary, choose “Not applicable”.</p>
+                        @include('partials.survey-rating', ['name' => 'destination_relevant', 'label' => 'Relevance of recommended destinations', 'required' => false])
+                        @include('partials.survey-rating', ['name' => 'itinerary_useful', 'label' => 'Usefulness of the suggested itinerary', 'required' => false])
                     <div class="field" style="margin-top:18px;">
                         <label for="comments">Any comments or suggestions? (optional)</label>
-                        <textarea id="comments" name="comments" rows="3" placeholder="What did you love? What could DOT improve?">{{ old('comments') }}</textarea>
+                        <textarea id="comments" name="comments" rows="3" maxlength="500" placeholder="What did you love? What could DOT improve?">{{ old('comments') }}</textarea>
+                        <p class="field-hint">Up to 500 characters. Please leave out names and contact details.</p>
                     </div>
+                    </details>
 
-                    <button type="submit" class="btn btn-accent btn-block" style="margin-top:20px;">Submit Survey</button>
+                    <button type="submit" class="btn survey-submit">Submit feedback &rarr;</button>
                 </div>
             </div>
         </form>
     </div>
+</div>
 </div>
 @endsection
