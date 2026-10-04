@@ -34,6 +34,15 @@
             <div>
                 <span class="poster-kicker" style="font-size:1.05rem;">ready to go</span>
                 <h1 class="page-title" style="font-size:1.9rem; margin:0;">{{ $itinerary->title ?: 'My Itinerary' }}</h1>
+                @if ($itinerary->ml_skeleton_applied !== null)
+                    {{-- Only where an outcome was actually recorded: a package itinerary or one generated
+                         before the column existed shows nothing rather than a guess. --}}
+                    @if ($itinerary->ml_skeleton_applied)
+                        <span class="plan-badge plan-badge--ai" title="A pre-trained language model (Phi-4-mini) grouped the already-chosen stops into days. It did not choose the places.">&#10024; AI-assisted</span>
+                    @else
+                        <span class="plan-badge" title="The days follow the nearest-neighbour route order. The AI step was unavailable or its answer could not be used.">Standard order</span>
+                    @endif
+                @endif
                 <div class="sub">
                     Generated {{ $itinerary->generated_at->format('F j, Y g:i A') }}
                     &middot; {{ $itinerary->total_days }} day{{ $itinerary->total_days === 1 ? '' : 's' }}

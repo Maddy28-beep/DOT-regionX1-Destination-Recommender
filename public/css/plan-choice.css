@@ -1,0 +1,92 @@
+/* "How would you like to plan your trip?": two paths, each saying how long it
+   takes, what you get and who it suits, plus a small helper for the undecided. */
+
+.pc-steps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; padding: 0; list-style: none; }
+.pc-steps li {
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    font-size: .78rem;
+    font-weight: 600;
+}
+
+.pcx-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 14px; }
+
+.pcx-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 26px 24px 22px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    transition: transform .15s ease;
+}
+.pcx-card:hover { transform: translateY(-3px); }
+.pcx-card--rec { border-color: var(--primary); }
+
+.pcx-badge {
+    position: absolute;
+    top: -12px;
+    left: 22px;
+    padding: 3px 12px;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.pcx-card h3 { margin: 4px 0 6px; font-size: 1.3rem; color: var(--ocean-teal-dark); }
+.pcx-lead { margin: 0 0 14px; color: var(--muted); font-size: .92rem; line-height: 1.55; }
+
+.pcx-meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; padding: 0; list-style: none; }
+.pcx-meta li {
+    padding: 3px 10px;
+    border: 1.5px solid #d9cfba;
+    border-radius: 8px;
+    background: var(--white);
+    font-size: .78rem;
+    font-weight: 600;
+}
+
+.pcx-get { margin: 0 0 14px; padding: 0; list-style: none; font-size: .9rem; line-height: 1.5; }
+.pcx-get li { display: flex; gap: 9px; margin-bottom: 6px; }
+.pcx-get svg { flex: 0 0 auto; width: 16px; height: 16px; margin-top: 3px; color: var(--primary); }
+
+.pcx-best { margin: 0 0 16px; color: var(--muted); font-size: .85rem; }
+.pcx-best strong { color: var(--ink); }
+.pcx-card .btn { margin-top: auto; align-self: stretch; text-align: center; justify-content: center; }
+
+.pcx-help {
+    margin-top: 28px;
+    padding: 16px 20px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+.pcx-help h2 { margin: 0 0 10px; font-size: 1rem; }
+.pcx-help__options { display: flex; flex-wrap: wrap; gap: 8px; }
+.pcx-help__options button {
+    padding: 8px 14px;
+    border: 1.5px solid #d9cfba;
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+    font-size: .85rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+.pcx-help__options button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.pcx-help__answer { margin: 12px 0 0; padding: 10px 14px; border-radius: 10px; background: var(--primary-light); color: var(--primary-dark); font-size: .88rem; font-weight: 500; }
+
+.pcx-trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 26px; margin: 24px 0 8px; padding: 0; list-style: none; color: var(--muted); font-size: .82rem; }
+.pcx-trust li { display: inline-flex; align-items: center; gap: 7px; }
+.pcx-trust svg { width: 16px; height: 16px; }
+
+@media (max-width: 640px) { .pcx-grid { grid-template-columns: 1fr; } }

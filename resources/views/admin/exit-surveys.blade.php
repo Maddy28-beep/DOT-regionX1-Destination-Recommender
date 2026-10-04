@@ -8,6 +8,10 @@
 
 <div class="panel">
     <div class="panel-body">
+        <p style="margin:0 0 14px; font-size:.9rem;">
+            Collecting more responses?
+            <a href="{{ route('admin.exit-survey-qr') }}" class="btn btn-outline btn-xs">Printable survey QR code</a>
+        </p>
         <form method="GET" class="filter-inline">
             <div class="field">
                 <label for="from">From date</label>
@@ -71,6 +75,10 @@
         <div class="stat-card">
             <div class="stat-card-val">{{ $count }}</div>
             <div class="stat-card-label">Exit Survey Responses</div>
+        </div>
+        <div class="stat-card" title="A rule needs two places in the same survey, so only real responses that list two or more places count towards Apriori. Simulated demo rows are not included.">
+            <div class="stat-card-val">{{ $realUsableForRules }}<span class="stat-card-val__suffix"> of {{ $realCount }}</span></div>
+            <div class="stat-card-label">Real Surveys Usable for Rules</div>
         </div>
         <div class="stat-card">
             <div class="stat-card-val">{{ $checkedInVisitors }}</div>

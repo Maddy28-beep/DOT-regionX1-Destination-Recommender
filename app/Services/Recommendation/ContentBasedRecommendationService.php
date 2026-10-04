@@ -282,6 +282,13 @@ class ContentBasedRecommendationService
             return collect();
         }
 
+        // Before anything is scored: drop what is not somewhere to sightsee.
+        $candidates = $this->sightseeingCandidates($candidates, $preference);
+
+        if ($candidates->isEmpty()) {
+            return collect();
+        }
+
         // STAGE 1: where can this trip go, before asking what it should
         // contain. See candidatesWithinRange().
         $candidates = $this->candidatesWithinRange($candidates, $preference);
@@ -321,6 +328,13 @@ class ContentBasedRecommendationService
                     + ($as * self::DRS_WEIGHTS['as']);
 
                 return [
+                    // How well this place fits the interests the traveller picked (1 when none were
+                    // picked). Not part of the DRS; it orders the ranking, see the sort below.
+                    'interest_fit' => $this->interestSimilarity(
+                        $destination->tags->where('kind', 'category')->pluck('value')->map(fn ($v) => strtolower($v))->all(),
+                        $selectedActivities,
+                        $destination->type,
+                    ),
                     'destination' => $destination,
                     'pm' => round($pm, 2),
                     'rs' => round($rs, 2),
@@ -342,11 +356,43 @@ class ContentBasedRecommendationService
              * a plan is still reproducible.
              */
             ->sortBy([
+                /*
+                 * What the traveller asked for comes first. A ten-point distance
+                 * score is worth more than any interest match in the DRS, so a
+                 * nearby nature park outranked the beach a traveller had picked
+                 * (Samal Island scored 4.25 on preference match against Eden's
+                 * 3.5, and still finished below it). Ordering by interest fit
+                 * first, then by DRS, puts places that fit the chosen interests
+                 * ahead of those that do not, and DRS still decides the order
+                 * within each group. With no interests picked every place fits
+                 * equally, so this changes nothing.
+                 */
+                fn (array $a, array $b) => $b['interest_fit'] <=> $a['interest_fit'],
                 fn (array $a, array $b) => $b['drs'] <=> $a['drs'],
                 fn (array $a, array $b) => $this->tieBreak($a['destination'], $preference)
                     <=> $this->tieBreak($b['destination'], $preference),
             ])
             ->values();
+    }
+
+    /**
+     * Keeps the destinations a generated plan may offer as a stop.
+     *
+     * 'excluded' (event venues, members' clubs) is never offered. 'optional'
+     * (spas) is offered only when the traveller picked the interest the
+     * listing's type implies, so a day spa is a stop for someone who asked for
+     * relaxation and not for someone who asked for the beach. Everything else
+     * is a sightseeing attraction.
+     */
+    private function sightseeingCandidates(Collection $candidates, TouristPreference $preference): Collection
+    {
+        $selected = $preference->activities->pluck('activity')->all();
+
+        return $candidates->filter(fn (Destination $d) => match ($d->itinerary_role ?? 'sightseeing') {
+            'excluded' => false,
+            'optional' => in_array(self::TYPE_TO_INTEREST[$d->type] ?? null, $selected, true),
+            default => true,
+        })->values();
     }
 
     /** Equation 1-2: weighted Preference Match, scaled to 1-5. */
@@ -464,9 +510,18 @@ class ContentBasedRecommendationService
         if (empty($categoryTags)) {
             $implied = self::TYPE_TO_INTEREST[$type] ?? null;
 
+            /*
+             * A type we know and that does not fit what was asked for is a
+             * mismatch, not a shrug. It used to score the neutral 0.5, which
+             * let a nearby nature park outrank a beach for someone who picked
+             * Beach & Island once the distance factor tipped the balance, and
+             * it was inconsistent with the tagged path below, where a place
+             * matching none of the interests scores 0. Only a type we cannot
+             * place stays neutral.
+             */
             return $implied === null
                 ? self::NEUTRAL_SIMILARITY
-                : (in_array($implied, $selectedActivities, true) ? 1.0 : self::NEUTRAL_SIMILARITY);
+                : (in_array($implied, $selectedActivities, true) ? 1.0 : 0.0);
         }
 
         $matched = 0;

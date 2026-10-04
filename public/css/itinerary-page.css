@@ -58,3 +58,18 @@
     .itinerary-day-nav .itinerary-match-link { margin-left:0; }
     .itinerary-page .day-actions > a, .itinerary-page .day-actions summary { width:100%; white-space:normal; }
 }
+
+/* Says up front whether the pre-trained model grouped this plan's days. */
+.plan-badge {
+    display: inline-block;
+    margin: 8px 0 0;
+    padding: 3px 12px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--muted);
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+}
+.plan-badge--ai { background: var(--primary-light); border-color: var(--primary); color: var(--primary-dark); }

@@ -17,8 +17,18 @@ class Destination extends Model
 
     const UPDATED_AT = null;
 
+    /**
+     * How a destination may be used in a generated plan (see the
+     * add_itinerary_role migration): role => [label, what it means].
+     */
+    public const ITINERARY_ROLES = [
+        'sightseeing' => ['Sightseeing attraction', 'Offered to every traveller who fits it.'],
+        'optional' => ['Optional (only if the traveller asks)', 'Offered only when the traveller picked the matching interest, for example a spa for "Relaxation & Wellness".'],
+        'excluded' => ['Not a sightseeing stop', 'Never offered in a generated itinerary. Use it for event venues and members\' clubs. The listing stays public.'],
+    ];
+
     protected $fillable = [
-        'slug', 'name', 'location', 'region_id', 'type', 'description',
+        'slug', 'name', 'location', 'region_id', 'type', 'itinerary_role', 'description',
         'image_path', 'is_accredited', 'rating', 'review_count', 'price_tier',
         'entry_fee_min', 'entry_fee_max', 'distance_km', 'visit_duration',
         'best_time', 'hours', 'latitude', 'longitude', 'featured',

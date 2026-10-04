@@ -202,6 +202,8 @@ Route::prefix('portal/admin')->name('admin.')->middleware('auth:admin')->group(f
     Route::post('/accreditation/{accreditation}/renew', [AdminDashboardController::class, 'renewAccreditation'])->name('accreditation.renew');
     Route::post('/accreditation/bulk-renew', [AdminDashboardController::class, 'bulkRenewAccreditation'])->name('accreditation.bulk-renew');
     Route::get('/exit-surveys', [AdminDashboardController::class, 'exitSurveys'])->name('exit-surveys');
+    Route::get('/exit-surveys/qr', [QrCodeController::class, 'exitSurveyPoster'])->name('exit-survey-qr');
+    Route::get('/exit-surveys/qr.svg', [QrCodeController::class, 'exitSurveyImage'])->name('exit-survey-qr.svg');
     Route::get('/association-rules', [AdminDashboardController::class, 'associationRules'])->name('association-rules');
     Route::get('/reports', [AdminDashboardController::class, 'reports'])->name('reports');
     Route::get('/reports/export.csv', [AdminDashboardController::class, 'exportCsv'])->name('reports.export-csv');

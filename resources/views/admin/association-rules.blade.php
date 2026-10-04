@@ -21,6 +21,34 @@
             is how often B appears whenever A does.
         </x-banner>
 
+        @php
+            $real = (int) ($sourceCounts['real'] ?? 0);
+            $itineraries = (int) ($sourceCounts['itinerary'] ?? 0);
+            $all = (int) $sourceCounts->sum();
+        @endphp
+
+        <div class="chip-row" style="margin-bottom:12px;">
+            @foreach (['all' => 'All sources ('.$all.')', 'real' => 'Tourist surveys ('.$real.')', 'itinerary' => 'Published itineraries ('.$itineraries.')', 'demo' => 'Simulated demo ('.$demoTransactions.')'] as $key => $label)
+                <a href="{{ route('admin.association-rules', ['source' => $key]) }}" class="chip {{ $source === $key ? 'active' : '' }}">{{ $label }}</a>
+            @endforeach
+        </div>
+
+        @if ($source === 'all' && ($demoTransactions > 0 || $itineraries > 0))
+            <x-banner tone="warn">
+                <strong>These rules mix three kinds of transaction:</strong>
+                {{ $real }} tourist {{ \Illuminate\Support\Str::plural('survey', $real) }},
+                {{ $itineraries }} {{ \Illuminate\Support\Str::plural('basket', $itineraries) }} coded from published itineraries
+                (expert planning, not tourist behaviour) and {{ $demoTransactions }} simulated demo
+                {{ \Illuminate\Support\Str::plural('survey', $demoTransactions) }} (informed by the PSA Household Survey on
+                Domestic Visitors 2022). Pick a source above to see what each says on its own; only tourist surveys are
+                evidence of what visitors actually do.
+            </x-banner>
+        @elseif ($source === 'demo')
+            <x-banner tone="warn">These {{ $demoTransactions }} transactions are simulated. They show how the algorithm works and are not evidence of what visitors do.</x-banner>
+        @elseif ($source === 'itinerary')
+            <x-banner tone="info">These transactions are days from published itineraries, coded by hand. They show which places experts plan together, not what tourists chose.</x-banner>
+        @endif
+
         @if ($totalTransactions > 0)
             <div class="stat-cards">
                 <div class="stat-card">
