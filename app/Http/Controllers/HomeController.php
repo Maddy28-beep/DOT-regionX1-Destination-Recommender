@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Accommodation;
 use App\Models\Destination;
+use App\Models\Event;
 use App\Models\Package;
+use App\Models\PostcardSlide;
 use App\Models\Region;
 use App\Models\Restaurant;
 use App\Models\SouvenirCenter;
@@ -214,7 +216,11 @@ class HomeController extends Controller
 
         $popularSearchChips = $this->popularSearchChips($destinations);
 
-        return view('welcome', compact('destinations', 'packages', 'stats', 'regions', 'heroVideo', 'interestOptions', 'popularSearchChips'))
+        $upcomingEvents = Event::published()->upcoming()->chronological()->take(3)->get();
+
+        $postcardSlides = PostcardSlide::active()->ordered()->get();
+
+        return view('welcome', compact('destinations', 'packages', 'stats', 'regions', 'heroVideo', 'interestOptions', 'popularSearchChips', 'upcomingEvents', 'postcardSlides'))
             ->with('regionMap', $this->regionMap($regions));
     }
 }

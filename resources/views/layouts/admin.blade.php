@@ -47,6 +47,8 @@
 
             <a href="{{ route('admin.advisories.index') }}" class="{{ request()->routeIs('admin.advisories.*') ? 'active' : '' }}"><x-icon name="alert-triangle" /><span>Advisories</span></a>
 
+            <a href="{{ route('admin.postcard-slides.index') }}" class="{{ request()->routeIs('admin.postcard-slides.*') ? 'active' : '' }}"><x-icon name="camera" /><span>Homepage carousel</span></a>
+
             <div class="group-label">Monitoring</div>
             <a href="{{ route('admin.overview') }}" class="{{ request()->routeIs('admin.overview') ? 'active' : '' }}"><x-icon name="target" /><span>Overview</span></a>
             <a href="{{ route('admin.exit-surveys') }}" class="{{ request()->routeIs('admin.exit-surveys') ? 'active' : '' }}"><x-icon name="chat" /><span>Exit Survey Insights</span></a>

@@ -1,0 +1,244 @@
+/* Events & Festivals: the calendar page and the homepage "Happening soon"
+   strip. Category colours are set once on --ev so the stub, the calendar bar
+   and the filter dot always agree. */
+.event-card--festival, .cal-bar--festival, .chip__dot--festival { --ev: #7a4fa0; }
+.event-card--cultural, .cal-bar--cultural, .chip__dot--cultural { --ev: #c23d25; }
+.event-card--food, .cal-bar--food, .chip__dot--food { --ev: #e8632b; }
+.event-card--sports, .cal-bar--sports, .chip__dot--sports { --ev: #0e6a80; }
+.event-card--nature, .cal-bar--nature, .chip__dot--nature { --ev: #1e5c43; }
+
+/* ---------- Ticket card ---------- */
+.event-card {
+    display: flex;
+    height: 100%;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+.event-card__stub {
+    position: relative;
+    flex: 0 0 96px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 14px 14px 14px 8px;
+    background: var(--ev, var(--accent));
+    color: #fff;
+    text-align: center;
+}
+.event-card__stub::after {          /* the perforation */
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 22%;
+    bottom: 22%;
+    width: 1px;
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, .7) 50%, transparent 50%);
+    background-size: 1px 6px;
+}
+.event-card__stub::before {         /* the notch */
+    content: '';
+    position: absolute;
+    right: -6px;
+    bottom: -6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    z-index: 1;
+}
+.event-card__month { font-size: .7rem; font-weight: 700; letter-spacing: .14em; }
+.event-card__day { font-family: 'Barabara', 'Alfa Slab One', serif; font-size: 2.6rem; line-height: 1; }
+.event-card__foot { font-size: .72rem; font-weight: 700; }
+
+.event-card__body { flex: 1; min-width: 0; padding: 14px 16px; }
+.event-card__top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.event-card__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ev, var(--accent-dark));
+}
+.event-card__when { font-size: .75rem; font-weight: 700; color: var(--ev, var(--muted)); white-space: nowrap; }
+.event-card__title { margin: 6px 0 8px; font-size: 1.05rem; line-height: 1.25; color: var(--ink); }
+.event-card__meta { display: flex; align-items: center; gap: 7px; margin: 3px 0; font-size: .88rem; color: var(--muted); }
+.event-card__meta svg { flex-shrink: 0; }
+.event-card__desc { margin: 8px 0 0; font-size: .88rem; line-height: 1.5; color: var(--ink); }
+.event-card__add {
+    margin-top: 12px;
+    padding: 6px 14px;
+    border: 1.5px solid var(--ink);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.event-card__add:hover { background: var(--ink); color: var(--white); }
+.event-card__add:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- Homepage strip ---------- */
+.happening-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+/* ---------- Filter chips ---------- */
+#eventCategoryChips .chip { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.chip__dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ev); }
+.chip__count { font-size: .75rem; opacity: .75; }
+#eventCategoryChips .chip.is-empty { opacity: .45; }
+
+/* ---------- Calendar ---------- */
+.events-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    gap: 24px;
+    margin-top: 18px;
+    align-items: start;
+}
+
+.events-calendar { padding: 0; overflow: hidden; }
+.events-calendar__bar { display: flex; align-items: center; gap: 8px; padding: 18px 20px; }
+.events-calendar__month { flex: 1; margin: 0; font-size: 1.35rem; }
+.events-calendar__nav,
+.events-calendar__today {
+    height: 38px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+.events-calendar__nav { width: 40px; font-size: 1.4rem; line-height: 1; }
+.events-calendar__today { padding: 0 16px; }
+.events-calendar__nav:hover, .events-calendar__today:hover { border-color: var(--accent); color: var(--accent-dark); }
+
+.events-calendar__dow {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    padding: 10px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: #faf7f0;
+}
+.events-calendar__dow span {
+    text-align: center;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.cal-week {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-rows: 32px repeat(3, 26px) 20px;
+    row-gap: 2px;
+    border-bottom: 1px solid var(--border);
+}
+.cal-week:last-child { border-bottom: 0; }
+.cal-week__bg {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.cal-cell {
+    border: 0;
+    border-left: 1px solid var(--border);
+    background: var(--white);
+    cursor: pointer;
+}
+.cal-cell:first-child { border-left: 0; }
+.cal-cell.is-outside { background: #f7f4ec; }
+.cal-cell:hover { background: #fff6ef; }
+.cal-cell.is-selected { background: #fff0e4; box-shadow: inset 0 0 0 2px var(--accent); }
+.cal-cell:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; position: relative; z-index: 2; }
+
+.cal-num {
+    grid-row: 1;
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+    padding: 6px 0 0 10px;
+    font-size: .88rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+.cal-num.is-outside { color: #a8aea9; font-weight: 500; }
+.cal-num span {
+    display: inline-grid;
+    place-items: center;
+    min-width: 26px;
+    height: 26px;
+    margin: -3px 0 0 -6px;
+    border-radius: 50%;
+}
+.cal-num.is-today span { background: var(--stamp-red); color: #fff; }
+
+.cal-bar {
+    position: relative;
+    z-index: 1;
+    margin: 0 4px;
+    padding: 0 8px;
+    border-radius: 6px;
+    background: var(--ev);
+    color: #fff;
+    font-size: .74rem;
+    font-weight: 600;
+    line-height: 26px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+}
+.cal-bar--from-before { margin-left: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.cal-bar--runs-on { margin-right: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.cal-more {
+    grid-row: 5;
+    z-index: 1;
+    padding-left: 10px;
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--muted);
+    pointer-events: none;
+}
+
+/* ---------- Side panel ---------- */
+.events-layout .panel { margin-bottom: 0; }
+.events-detail { padding: 22px 20px 8px; max-height: 780px; overflow-y: auto; position: sticky; top: 90px; }
+.events-detail__head { margin-bottom: 14px; }
+.events-detail__title { margin: 0; font-size: 1.25rem; }
+.events-detail__sub { margin: 2px 0 0; font-size: .85rem; color: var(--muted); }
+.events-detail .event-card { height: auto; margin-bottom: 14px; }
+.events-empty { margin: 0 0 14px; color: var(--muted); }
+
+@media (max-width: 860px) {
+    .events-layout { grid-template-columns: 1fr; }
+    .events-detail { position: static; max-height: none; }
+    .happening-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+    .cal-week { grid-template-rows: 30px repeat(3, 10px) 16px; }
+    /* Too narrow for titles: bars become thin colour lines and the panel carries the text. */
+    .cal-bar { font-size: 0; line-height: 0; border-radius: 3px; }
+    .cal-num { padding-left: 4px; font-size: .8rem; }
+    .event-card__stub { flex-basis: 78px; }
+    .event-card__day { font-size: 2.1rem; }
+}
