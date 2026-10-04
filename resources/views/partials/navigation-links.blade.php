@@ -12,9 +12,9 @@
     </div>
 </div>
 <a href="{{ route('advisories.index') }}" class="main-nav__advisories" @if(request()->routeIs('advisories.*')) aria-current="page" @endif>
-    Advisories
-    @if ($topAdvisory ?? null)
-        <span class="main-nav__dot" aria-hidden="true"></span>
-        <span class="sr-only">(active advisory)</span>
+    <span class="main-nav__label">Advisories</span>
+    @if (($activeAdvisoryCount ?? 0) > 0)
+        <span class="main-nav__dot main-nav__dot--count" aria-hidden="true">{{ $activeAdvisoryCount > 9 ? '9+' : $activeAdvisoryCount }}</span>
+        <span class="sr-only">({{ $activeAdvisoryCount }} active {{ \Illuminate\Support\Str::plural('advisory', $activeAdvisoryCount) }})</span>
     @endif
 </a>

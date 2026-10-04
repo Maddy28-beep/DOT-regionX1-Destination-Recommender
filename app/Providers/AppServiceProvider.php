@@ -4,13 +4,17 @@ namespace App\Providers;
 
 use App\Models\Accommodation;
 use App\Models\AdminUser;
+use App\Http\Middleware\EnsureVisitorToken;
 use App\Models\Advisory;
+use App\Models\Itinerary;
 use App\Models\Destination;
 use App\Models\EstablishmentAccount;
 use App\Models\Package;
 use App\Models\Restaurant;
+use App\Models\SavedListing;
 use App\Models\SouvenirCenter;
 use App\Models\TourOperator;
+use App\Models\TouristSavedDestination;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
@@ -97,7 +101,23 @@ class AppServiceProvider extends ServiceProvider
                 }
             }
 
-            $view->with('topAdvisory', $listingAdvisory ?? Advisory::active()->general()->urgentFirst()->first());
+            $general = Advisory::active()->general()->urgentFirst()->take(5)->get();
+            $view->with('topAdvisory', $listingAdvisory ?? $general->first());
+
+            // The strip lets a traveller step through what is active: this page's own notice first,
+            // then the general ones, most urgent first. The nav dot carries the count of everything live.
+            $view->with('ribbonAdvisories', collect([$listingAdvisory])->filter()->merge($general)->unique('id')->take(5)->values());
+            $view->with('activeAdvisoryCount', Advisory::active()->count());
+
+            // The number on the header's heart: the signed-in traveller's own list, otherwise this
+            // browser's. Nothing is counted for a first-time visitor who has no token yet.
+            $token = request()->cookie(EnsureVisitorToken::COOKIE);
+            $view->with('accountItineraryCount', Auth::guard('tourist')->check()
+                ? Itinerary::where('tourist_account_id', Auth::guard('tourist')->id())->count()
+                : 0);
+            $view->with('savedCount', Auth::guard('tourist')->check()
+                ? TouristSavedDestination::where('tourist_account_id', Auth::guard('tourist')->id())->count()
+                : (is_string($token) ? SavedListing::where('visitor_token', $token)->count() : 0));
         });
     }
 }
