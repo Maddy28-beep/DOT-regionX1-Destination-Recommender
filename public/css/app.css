@@ -1119,7 +1119,65 @@ body.info-modal-open { overflow: hidden; }
 .site-header .btn-outline:hover { transform: translateY(-1px); }
 .site-header .btn-outline svg { width: 13px; height: 13px; flex-shrink: 0; }
 
-.header-account-link { font-size: .85rem; font-weight: 600; color: var(--ink); white-space: nowrap; }
+.header-account-link {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    height: 42px;
+    padding: 0 16px;
+    border: 1.5px solid var(--primary);
+    border-radius: 11px;
+    background: transparent;
+    color: var(--primary);
+    font-size: .88rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background .15s ease, color .15s ease, transform .15s ease;
+}
+.header-account-link:hover { background: var(--primary-light); color: var(--primary-dark); transform: translateY(-1px); }
+
+/* The three actions share one height and sit a little further apart, so they read as a set. */
+body:not(.portal):not(.admin) .header-actions { gap: 10px; }
+
+/* Saved: a round heart with the count on it. One quiet control between the Log in link and the
+   one solid button, instead of a second outlined button of the same weight. */
+.header-saved {
+    position: relative;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--border);
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--primary);
+    transition: border-color .15s ease, color .15s ease, transform .15s ease;
+}
+.header-saved:hover { border-color: var(--stamp-red); color: var(--stamp-red); transform: translateY(-1px); }
+.header-saved svg { width: 17px; height: 17px; }
+.header-saved__count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--white);
+    border-radius: 999px;
+    background: var(--stamp-red);
+    color: #fff;
+    font-size: .64rem;
+    font-weight: 700;
+    line-height: 1;
+}
+.header-saved__count[hidden] { display: none; }
+.site-header .header-plan { display: inline-flex; align-items: center; min-height: 42px; padding-top: 0; padding-bottom: 0; }
+.header-plan svg { width: 14px; height: 14px; margin-left: 6px; vertical-align: -2px; }
 /*
  * Was two loose pieces of plain text ("Hi, alias" + underlined "Log out")
  * sitting between two proper buttons (Saved, Plan My Trip) -- the one part
@@ -1156,6 +1214,91 @@ body.info-modal-open { overflow: hidden; }
 }
 .header-account-chip__logout svg { width: 14px; height: 14px; }
 .header-account-chip__logout:hover { background: var(--bg); color: var(--stamp-red); }
+
+.account-menu { position: relative; }
+.account-menu__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 0 12px 0 6px;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--ink);
+    font: inherit;
+    font-size: .85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+}
+.account-menu__toggle:hover, .account-menu__toggle.is-active, .account-menu__toggle[aria-expanded="true"] { border-color: var(--primary); }
+.account-menu__toggle svg { color: var(--muted); transition: transform .15s ease; }
+.account-menu__toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.account-menu__avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary);
+    color: #fff;
+    font-size: .8rem;
+    font-weight: 700;
+}
+.account-menu__name { max-width: 110px; overflow: hidden; text-overflow: ellipsis; }
+.account-menu__panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 232px;
+    padding: 6px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    z-index: 65;
+}
+.account-menu__panel[hidden] { display: none; }
+.account-menu__who { display: flex; flex-direction: column; padding: 10px 10px 9px; margin-bottom: 4px; border-bottom: 1px solid var(--border); }
+.account-menu__who strong { font-size: .92rem; color: var(--ink); overflow: hidden; text-overflow: ellipsis; }
+.account-menu__who span { font-size: .75rem; color: var(--muted); }
+.site-topbar .account-menu__panel a,
+.account-menu__logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: var(--primary-dark) !important;
+    font: inherit;
+    font-size: .9rem;
+    font-weight: 600;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+.account-menu__panel svg { width: 17px; height: 17px; flex-shrink: 0; color: var(--primary); }
+.account-menu__panel small { margin-left: auto; padding: 1px 8px; border-radius: 999px; background: var(--bg); color: var(--muted); font-size: .72rem; font-weight: 600; }
+.site-topbar .account-menu__panel a:hover, .account-menu__logout:hover { background: var(--primary-light); }
+.site-topbar .account-menu__panel a[aria-current="page"] { background: var(--primary-light); text-decoration: none; }
+.account-menu__panel form { margin: 4px 0 0; padding-top: 4px; border-top: 1px solid var(--border); }
+.account-menu__logout:hover { color: var(--stamp-red) !important; }
+.account-menu__logout:hover svg { color: var(--stamp-red); }
+body.hero-page .site-header:not(.scrolled) .account-menu__toggle {
+    border-color: rgba(255, 247, 233, .85);
+    background: rgba(255, 247, 233, .08);
+    color: var(--paper);
+}
+body.hero-page .site-header:not(.scrolled) .account-menu__toggle svg { color: var(--paper); }
+body.hero-page .site-header:not(.scrolled) .account-menu__avatar { background: var(--paper); color: var(--primary-dark); }
+body:not(.portal):not(.admin) .header-actions .account-menu { display: none; }
+@media (min-width: 1367px) { body:not(.portal):not(.admin) .header-actions .account-menu { display: block; } }
 
 .nav-toggle {
     display: none;
@@ -1401,6 +1544,17 @@ body.hero-page .site-header:not(.scrolled) .btn-outline {
     background: rgba(255, 247, 233, .08);
 }
 body.hero-page .site-header:not(.scrolled) .btn-outline:hover { background: rgba(255, 247, 233, .18); }
+body.hero-page .site-header:not(.scrolled) .header-account-link {
+    border-color: rgba(255, 247, 233, .85);
+    background: rgba(255, 247, 233, .08);
+}
+body.hero-page .site-header:not(.scrolled) .header-account-link:hover { background: rgba(255, 247, 233, .18); }
+body.hero-page .site-header:not(.scrolled) .header-saved {
+    border-color: rgba(255, 247, 233, .85);
+    color: var(--paper);
+    background: rgba(255, 247, 233, .08);
+}
+body.hero-page .site-header:not(.scrolled) .header-saved:hover { background: rgba(255, 247, 233, .18); }
 /* The pill's own border -- var(--border) is a pale grey meant for a white
    background, invisible against a photo. Same treatment as .btn-outline
    just above, so the two pills read as one family over the hero. */
@@ -1495,6 +1649,31 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
 .advisory-ribbon__close:hover { opacity: 1; background: rgba(255, 255, 255, .18); }
 .advisory-ribbon__close:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
 
+/* Several advisories: one shows at a time, stepped by hand. Nothing rotates by itself. */
+.advisory-ribbon__items { flex: 1 1 auto; min-width: 0; }
+.advisory-ribbon__item { display: flex; align-items: center; gap: 10px; }
+.advisory-ribbon__item[hidden] { display: none; }
+.advisory-ribbon__pager { flex-shrink: 0; display: inline-flex; align-items: center; gap: 2px; font-size: .78rem; font-weight: 600; white-space: nowrap; }
+.advisory-ribbon__pager[hidden] { display: none; }
+.advisory-ribbon__step {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1.05rem;
+    line-height: 1;
+    opacity: .9;
+}
+.advisory-ribbon__step:hover { background: rgba(255, 255, 255, .18); opacity: 1; }
+.advisory-ribbon__step:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
+.advisory-ribbon--warning .advisory-ribbon__step:hover { background: rgba(0, 0, 0, .1); }
+
 .advisory-ribbon--danger { background: var(--stamp-red); }
 .advisory-ribbon--warning { background: var(--gold); color: var(--ink); }
 .advisory-ribbon--info { background: var(--primary); }
@@ -1510,7 +1689,25 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
    severity, matching how a browser tab's own unread dot doesn't change
    colour by message type either. */
 .main-nav__advisories { position: relative; display: inline-flex; align-items: center; gap: 5px; }
+/* The active-page underline belongs under the word only, not through the count beside it. */
+.site-topbar a.main-nav__advisories[aria-current="page"],
+.mobile-menu a.main-nav__advisories[aria-current="page"] { text-decoration: none; }
+.main-nav__advisories[aria-current="page"] .main-nav__label { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 7px; }
 .main-nav__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--stamp-red); flex-shrink: 0; }
+.main-nav__dot--count {
+    width: auto;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    color: #fff;
+    font-size: .64rem;
+    font-weight: 700;
+    line-height: 1;
+}
 
 /*
    Raised from 1220px: the wider spacing above plus the Saved heart icon
@@ -1546,7 +1743,11 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
    still ran 26.5px past the edge. 430px covers the common phone widths
    (390/414/428) with room to spare. The mobile dropdown repeats both buttons
    full-width, so nothing is lost by dropping them from the bar here. */
-@media (max-width: 430px) {
+@media (max-width: 640px) {
+    /* The heart now stays in the bar on phones, so the Log in button steps aside first; the drawer has it. */
+    .header-actions .header-account-link { display: none; }
+}
+@media (max-width: 480px) {
     .header-actions .btn-primary { display: none; }
 }
 
@@ -3213,6 +3414,26 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
 .password-toggle.is-revealed .icon-show { display: none; }
 .password-toggle.is-revealed .icon-hide { display: block; }
 .auth-card h1 { font-size: 1.4rem; margin: 0 0 4px; }
+.auth-card button[type="submit"].btn {
+    min-height: 48px;
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    clip-path: none;
+    transform: none;
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(11, 40, 30, .1);
+    transition: background .15s ease, box-shadow .15s ease;
+}
+.auth-card button[type="submit"].btn:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    box-shadow: 0 3px 8px rgba(11, 40, 30, .16);
+}
+.auth-card button[type="submit"].btn:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+}
 /* The lockup from the site header, re-laid-out for a centred card: the header
    sits it in a horizontal bar, here it stacks above the kicker. */
 .auth-brand { justify-content: center; margin-bottom: 18px; }
@@ -4788,15 +5009,23 @@ body:has(.dash-header) .toast-stack { top: 226px; }
 .nav-more { position: relative; }
 .nav-more__toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0; border: 0; background: transparent; color: var(--primary-dark); font: inherit; font-size: .88rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .nav-more__toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
-.nav-more__links { position: absolute; top: 100%; left: -14px; min-width: 210px; padding: 8px; background: var(--paper); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-md); z-index: 65; }
+.nav-more__links { position: absolute; top: 100%; left: -14px; min-width: 210px; padding: 8px; background: var(--white); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-md); z-index: 65; }
 .nav-more__links[hidden] { display: none; }
 .site-topbar .nav-more__links a { display: block; padding: 12px; color: var(--primary-dark) !important; border-radius: 6px; }
 .site-topbar .nav-more__links a:hover { background: var(--primary-light); }
 .site-topbar a[aria-current="page"], .site-topbar .nav-more__toggle.is-active, .mobile-menu a[aria-current="page"], .mobile-menu .nav-more__toggle.is-active { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 7px; }
+/* The underline marks the current page for TEXT links. The header's buttons (Log in, the Saved heart,
+   Plan My Trip, and the drawer's Plan button) keep their look on every page: an underlined word
+   inside a button reads as a mistake. aria-current stays in the markup, so a screen reader still
+   announces the current page. */
+.site-topbar a.header-account-link[aria-current="page"],
+.site-topbar a.header-saved[aria-current="page"],
+.site-topbar a.header-plan[aria-current="page"],
+.mobile-menu a.btn[aria-current="page"] { text-decoration: none; }
 .site-topbar a:focus-visible, .site-topbar button:focus-visible, .mobile-menu a:focus-visible, .mobile-menu button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 5px; }
 body.hero-page .site-header:not(.scrolled) .nav-more__toggle { color: var(--paper); }
 .mobile-menu .nav-more__toggle { width: 100%; justify-content: space-between; font-size: 1rem; }
-.mobile-menu .nav-more__links { position: static; min-width: 0; margin: 0 0 6px 12px; box-shadow: none; border: 0; border-left: 2px solid var(--primary); border-radius: 0; }
+.mobile-menu .nav-more__links { background: transparent; position: static; min-width: 0; margin: 0 0 6px 12px; box-shadow: none; border: 0; border-left: 2px solid var(--primary); border-radius: 0; }
 .mobile-menu .mobile-menu__saved { border: 1px solid var(--primary); color: var(--primary-dark); margin: 8px 0 0; }
 .site-topbar .header-actions .btn-outline { background: transparent; box-shadow: none; }
 
@@ -4816,3 +5045,22 @@ body.mobile-menu-open .survey-invite { visibility: hidden; }
     .survey-invite { left: 12px; bottom: 88px; width: calc(100% - 24px); padding: 20px; max-height: calc(100dvh - 180px); overflow-y: auto; }
     .survey-invite h2 { font-size: 1.25rem; }
 }
+
+/* Account pages: tabs under the heading, and the empty My itineraries state. */
+.account-tabs { background: var(--white); border-bottom: 1px solid var(--border); }
+.account-tabs .container { display: flex; gap: 26px; }
+.account-tabs__tab { display: inline-flex; align-items: center; gap: 7px; padding: 14px 0 12px; border-bottom: 2px solid transparent; color: var(--muted); font-size: .92rem; font-weight: 600; text-decoration: none !important; }
+.account-tabs__tab span { padding: 0 8px; border-radius: 999px; background: var(--bg); font-size: .72rem; }
+.account-tabs__tab:hover { color: var(--primary-dark); }
+.account-tabs__tab.is-active { color: var(--primary); border-bottom-color: var(--primary); }
+.account-tabs__tab.is-active span { background: var(--primary-light); color: var(--primary-dark); }
+
+.account-empty { max-width: 640px; margin: 8px auto; padding: 40px 24px; text-align: center; background: var(--white); border: 1.5px dashed var(--border-strong, var(--border)); border-radius: 14px; }
+.account-empty__icon { width: 56px; height: 56px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--primary-light); color: var(--primary); }
+.account-empty__icon svg { width: 28px; height: 28px; }
+.account-empty h2 { margin: 0 0 6px; font-size: 1.3rem; color: var(--ink); }
+.account-empty p { max-width: 400px; margin: 0 auto; color: var(--muted); }
+.account-empty__steps { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 18px; margin: 18px 0 22px; padding: 0; list-style: none; font-size: .85rem; color: var(--muted); }
+.account-empty__steps li { display: inline-flex; align-items: center; gap: 7px; }
+.account-empty__steps span { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--primary); color: #fff; font-size: .72rem; font-weight: 700; }
+.account-empty__actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }

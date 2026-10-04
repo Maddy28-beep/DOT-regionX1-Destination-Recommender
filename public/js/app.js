@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Disclosure navigation: ordinary links remain in the normal Tab order.
     document.querySelectorAll('[data-nav-more]').forEach(function (root) {
         var button = root.querySelector('button');
-        var links = root.querySelector('.nav-more__links');
+        var links = root.querySelector('.nav-more__links, .account-menu__panel');
         function setOpen(open) {
             button.setAttribute('aria-expanded', String(open));
             links.hidden = !open;
@@ -464,6 +464,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(function (data) {
                 applySavedState(form, button, data.saved);
+                updateSavedBadge(data.saved ? 1 : -1);
                 // Without this the JS path succeeded silently while the no-JS
                 // path got a flash message -- the same action confirming itself
                 // only when JavaScript was off. The server sends the identical
@@ -541,6 +542,19 @@ document.addEventListener('DOMContentLoaded', function () {
      * burst above already covers the "something happened" cue everywhere
      * else.
      */
+    // The number on the header's heart follows what was just saved or removed.
+    function updateSavedBadge(delta) {
+        var badge = document.querySelector('[data-saved-count]');
+        if (!badge) return;
+
+        var next = Math.max(0, (parseInt(badge.textContent, 10) || 0) + delta);
+        badge.textContent = String(next);
+        badge.hidden = next < 1;
+
+        var link = badge.closest('[data-saved-link]');
+        if (link) link.setAttribute('aria-label', 'Saved places' + (next > 0 ? ', ' + next + ' saved' : ''));
+    }
+
     function flyHeartToSavedLink(sourceButton) {
         var target = document.querySelector('[data-saved-link]');
         if (!target) return;

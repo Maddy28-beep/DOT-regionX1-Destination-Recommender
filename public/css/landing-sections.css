@@ -33,3 +33,39 @@
 }
 
 .landing-section--cream { background: #f7f1e8; }
+
+/* Tourism marks replace the former orange official badge. */
+.hero-tourism-brands {
+    position: relative;
+    z-index: 6;
+    width: 270px;
+    margin: 0 auto 20px;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: transparent;
+}
+.hero-tourism-brands img { display: block; object-fit: contain; width: 100%; height: auto; }
+.hero-tourism-brands .hero-tourism-brands__davao { width: 96px; }
+.hero-tourism-brands .hero-tourism-brands__dot { width: 46px; }
+.hero-tourism-brands .hero-tourism-brands__love { width: 104px; }
+@media (max-width: 1100px) {
+    .hero-tourism-brands {
+        position: relative;
+        top: auto;
+        right: auto;
+        align-self: center;
+        flex-direction: row;
+        justify-content: center;
+        width: min(320px, calc(100% - 40px));
+        margin: 0 auto 18px;
+        padding: 0;
+        gap: 18px;
+    }
+    .hero-tourism-brands .hero-tourism-brands__davao { width: 90px; }
+    .hero-tourism-brands .hero-tourism-brands__dot { width: 42px; }
+    .hero-tourism-brands .hero-tourism-brands__love { width: 100px; }
+}
