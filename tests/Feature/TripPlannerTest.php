@@ -50,6 +50,8 @@ class TripPlannerTest extends TestCase
         return $overrides + [
             'travel_days' => 3,
             'travel_type' => 'Family',
+            'travel_purpose' => 'Leisure',
+            'visitor_type' => 'First-time visitor',
             'budget' => 'Mid-range',
             'accommodation_pref' => 'Hotel',
             'distance_pref' => 'moderate',
@@ -387,6 +389,7 @@ class TripPlannerTest extends TestCase
             $preference = TouristPreference::create([
                 'travel_days' => 2, 'travel_type' => 'Family', 'budget' => 'Mid-range',
                 'accommodation_pref' => 'Hotel', 'distance_pref' => 'moderate',
+                'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor',
                 'origin_lat' => $lat, 'origin_lng' => $lng,
             ])->load('activities', 'amenities');
 
@@ -948,6 +951,7 @@ class TripPlannerTest extends TestCase
         $preference = TouristPreference::create([
             'travel_days' => 2, 'travel_type' => 'Family', 'budget' => 'Mid-range',
             'accommodation_pref' => 'Hotel', 'distance_pref' => 'moderate',
+            'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor',
         ])->load('activities', 'amenities');
 
         $ranked = app(\App\Services\Recommendation\ContentBasedRecommendationService::class)->rank($preference);
@@ -982,6 +986,7 @@ class TripPlannerTest extends TestCase
             $preference = TouristPreference::create([
                 'travel_days' => 2, 'travel_type' => 'Solo', 'budget' => 'Mid-range',
                 'accommodation_pref' => 'Any', 'distance_pref' => 'near',
+                'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor',
                 'origin_lat' => $lat, 'origin_lng' => 125.60,
             ])->load('activities', 'amenities');
 
@@ -1022,6 +1027,7 @@ class TripPlannerTest extends TestCase
             $preference = TouristPreference::create([
                 'travel_days' => 2, 'travel_type' => 'Solo', 'budget' => 'Mid-range',
                 'accommodation_pref' => 'Any', 'distance_pref' => 'moderate',
+                'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor',
                 'variation' => $variation,
             ])->load('activities', 'amenities');
 
@@ -1214,6 +1220,7 @@ class TripPlannerTest extends TestCase
         $preference = TouristPreference::create([
             'travel_days' => 1, 'travel_type' => 'Solo', 'budget' => 'Mid-range',
             'accommodation_pref' => 'Any', 'distance_pref' => 'near',
+            'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor',
             'origin_lat' => 7.0731, 'origin_lng' => 125.6128,
         ])->load('activities', 'amenities');
 
@@ -1260,6 +1267,7 @@ class TripPlannerTest extends TestCase
         $preference = TouristPreference::create([
             'travel_days' => 1, 'travel_type' => 'Solo', 'budget' => 'Mid-range',
             'accommodation_pref' => 'Any', 'distance_pref' => 'moderate',
+            'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor',
             'origin_lat' => 7.0731, 'origin_lng' => 125.6128,
         ])->load('activities', 'amenities');
 
@@ -1293,6 +1301,7 @@ class TripPlannerTest extends TestCase
         $preference = TouristPreference::create([
             'travel_days' => 1, 'travel_type' => 'Solo', 'budget' => 'Mid-range',
             'accommodation_pref' => 'Any', 'distance_pref' => 'far',
+            'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor',
             'origin_lat' => 7.0731, 'origin_lng' => 125.6128,
         ])->load('activities', 'amenities');
 
@@ -1336,6 +1345,7 @@ class TripPlannerTest extends TestCase
         $preference = TouristPreference::create([
             'travel_days' => 2, 'travel_type' => 'Family', 'budget' => 'Mid-range',
             'accommodation_pref' => 'Any', 'distance_pref' => 'near',
+            'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor',
             'origin_lat' => 6.9521657, 'origin_lng' => 126.2166758,
             'origin_label' => 'Mati City, Davao Oriental, Philippines',
         ])->load('activities', 'amenities');
@@ -1439,6 +1449,7 @@ class TripPlannerTest extends TestCase
         $preference = TouristPreference::create([
             'travel_days' => 1, 'travel_type' => 'Solo', 'budget' => 'Mid-range',
             'accommodation_pref' => 'Any', 'distance_pref' => 'near',
+            'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor',
             'origin_lat' => 6.9521657, 'origin_lng' => 126.2166758,
             'origin_label' => 'Mati City, Davao Oriental, Philippines',
         ])->load('activities', 'amenities');
@@ -1490,6 +1501,7 @@ class TripPlannerTest extends TestCase
         $preference = TouristPreference::create([
             'travel_days' => 1, 'travel_type' => 'Solo', 'budget' => 'Mid-range',
             'accommodation_pref' => 'Any', 'distance_pref' => 'near',
+            'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor',
             // A baseline where Davao City is close (~1-2 km) and the real
             // Davao del Norte reference point (Tagum, ~7.45,125.81) is
             // genuinely far -- ~40+ km, outside the 25 km "near" tier.

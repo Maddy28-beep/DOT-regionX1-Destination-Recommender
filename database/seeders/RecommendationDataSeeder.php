@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Accommodation;
 use App\Models\Destination;
 use App\Models\DestinationTag;
-use App\Models\ExitSurvey;
 use App\Models\Package;
 use App\Models\Restaurant;
 use App\Models\SouvenirCenter;

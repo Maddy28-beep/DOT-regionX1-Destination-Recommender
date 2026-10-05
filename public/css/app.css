@@ -190,7 +190,6 @@ a { color: inherit; text-decoration: none; }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
 
 .btn-block { width: 100%; }
-.btn-lg { padding: 14px 24px; font-size: 1.05rem; }
 
 .field { margin-top: 14px; }
 .field label {
@@ -388,12 +387,6 @@ a { color: inherit; text-decoration: none; }
     outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light);
 }
 
-/* Apriori attribution under a schedule row */
-.sched-rule {
-    display: block; margin-top: 3px;
-    font-size: .76rem; color: var(--muted); font-style: italic;
-}
-
 /* "How this plan was built" */
 .provenance { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
 .provenance li { display: flex; gap: 12px; align-items: flex-start; line-height: 1.6; font-size: .9rem; }
@@ -456,7 +449,6 @@ a { color: inherit; text-decoration: none; }
 .itinerary-item--travel { opacity: .82; }
 .itinerary-item__body { flex: 1; min-width: 0; }
 .itinerary-item__body .sub { margin-top: 2px; }
-.itinerary-item__rule { font-style: italic; }
 .itinerary-item--travel .itinerary-item__body strong { font-weight: 400; color: var(--muted); }
 .itinerary-item--baseline .itinerary-item__body strong,
 .itinerary-item--departure .itinerary-item__body strong { color: var(--primary-dark); }
@@ -929,17 +921,6 @@ body.info-modal-open { overflow: hidden; }
 .session-note p { margin: 0; font-size: .86rem; color: var(--ink); line-height: 1.6; }
 .session-note a { font-weight: 700; }
 
-.rating-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
-.rating-row:last-child { border-bottom: none; }
-.rating-row-label { font-size: .88rem; color: var(--ink); }
-.star-rating { display: flex; flex-direction: row-reverse; gap: 2px; }
-.star-rating input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.star-rating label { cursor: pointer; color: var(--border); font-size: 1.5rem; line-height: 1; transition: color .12s; }
-.star-rating label:hover,
-.star-rating label:hover ~ label,
-.star-rating input:checked ~ label { color: var(--gold); }
-.star-rating input:focus-visible ~ label { outline: 2px solid var(--primary); outline-offset: 2px; }
-
 .alert { border-radius: var(--radius-sm); border: 1px solid transparent; padding: 12px 16px; font-size: .88rem; margin-bottom: 16px; }
 .alert-error, .alert-danger { background: var(--tone-danger-bg); border-color: var(--tone-danger-line); color: var(--tone-danger-ink); }
 .alert-success { background: var(--tone-success-bg); border-color: var(--tone-success-line); color: var(--tone-success-ink); }
@@ -954,69 +935,68 @@ body.info-modal-open { overflow: hidden; }
    traveler planning a trip. */
 .advisory-list { display: flex; flex-direction: column; gap: 16px; }
 
-.advisory-list-card {
+/* Level tiles: counts that double as filters. A level with nothing posted stays visible, dimmed. */
+.advisory-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.advisory-tile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--ink);
+    text-decoration: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+.advisory-tile:hover { border-color: var(--border-strong, var(--primary)); }
+.advisory-tile.is-selected { border-color: var(--primary); box-shadow: 0 0 0 1.5px var(--primary); }
+.advisory-tile.is-empty { opacity: .6; }
+.advisory-tile__icon { width: 38px; height: 38px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+.advisory-tile__icon svg { width: 18px; height: 18px; }
+.advisory-tile__count { display: block; font-size: 1.5rem; font-weight: 700; line-height: 1.1; }
+.advisory-tile__label { display: block; font-size: .8rem; color: var(--muted); }
+.advisory-tile--danger .advisory-tile__icon { background: var(--tone-danger-bg); color: var(--tone-danger-ink); }
+.advisory-tile--warning .advisory-tile__icon { background: var(--tone-warn-bg); color: var(--tone-warn-ink); }
+.advisory-tile--info .advisory-tile__icon { background: var(--primary-light); color: var(--primary-dark); }
+.advisory-tiles__hint { margin: 10px 0 18px; font-size: .82rem; color: var(--muted); }
+
+/* Cards: a coloured band carries the level, the body carries the message, pills carry the facts. */
+.advisory-card {
     background: var(--white);
     border: 1px solid var(--border);
-    border-left: 4px solid var(--tone-neutral-ink);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
-    padding: 20px 24px;
+    overflow: hidden;
 }
+.advisory-card__band { display: flex; align-items: center; gap: 8px; padding: 9px 20px; font-size: .8rem; font-weight: 700; }
+.advisory-card__band svg { width: 16px; height: 16px; flex-shrink: 0; }
+.advisory-card__band time { margin-left: auto; font-weight: 500; opacity: .92; }
+.advisory-card--danger .advisory-card__band { background: var(--stamp-red); color: #fff; }
+.advisory-card--warning .advisory-card__band { background: var(--gold); color: var(--ink); }
+.advisory-card--info .advisory-card__band { background: var(--primary); color: #fff; }
+.advisory-card__body { padding: 18px 20px 16px; }
+.advisory-card__title { margin: 0 0 6px; font-size: 1.15rem; color: var(--ink); }
+.advisory-card__message { margin: 0 0 14px; font-size: .94rem; line-height: 1.6; color: var(--muted); }
+.advisory-card__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 12px; border-top: 1px solid var(--border); }
+.advisory-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border: 1px solid var(--border); border-radius: 999px; background: var(--bg); color: var(--muted); font-size: .78rem; }
+.advisory-pill svg { width: 14px; height: 14px; color: var(--primary); }
+.advisory-card__link { margin-left: auto; font-size: .82rem; font-weight: 700; color: var(--primary); }
 
-.advisory-list-card__head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 10px;
-}
+.advisory-clear { max-width: 560px; margin: 8px auto; padding: 36px 24px; text-align: center; background: var(--white); border: 1.5px dashed var(--border); border-radius: 14px; }
+.advisory-clear__icon { width: 52px; height: 52px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--primary-light); color: var(--primary); }
+.advisory-clear__icon svg { width: 26px; height: 26px; }
+.advisory-clear h3 { margin: 0 0 6px; color: var(--ink); }
+.advisory-clear p { max-width: 380px; margin: 0 auto; color: var(--muted); }
 
-.advisory-list-card__badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: .72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    padding: 3px 10px;
-    border-radius: 999px;
-}
-.advisory-list-card__badge svg { width: 13px; height: 13px; }
-
-.advisory-list-card__updated { font-size: .78rem; color: var(--muted); }
-
-.advisory-list-card__title { margin: 0 0 6px; font-size: 1.1rem; color: var(--ink); }
-.advisory-list-card__message { margin: 0 0 12px; font-size: .92rem; line-height: 1.6; color: var(--muted); }
-
-.advisory-list-card__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 20px;
-    font-size: .82rem;
-    color: var(--muted);
-    padding-top: 10px;
-    border-top: 1px solid var(--border);
-}
-.advisory-list-card__meta strong { color: var(--ink); font-weight: 700; }
-
-/* Severity variants -- each pairs a brand-consistent accent with an already
-   deliberately calm/warm/urgent tone token, per the info=green/
-   warning=gold/danger=red-only-when-it's-real brief. Matches the ribbon's
-   own severity treatment so the two feel like one system. */
-.advisory-list-card--info { border-left-color: var(--primary); }
-.advisory-list-card--info .advisory-list-card__badge { background: var(--primary-light); color: var(--primary-dark); }
-
-.advisory-list-card--warning { border-left-color: var(--gold); }
-.advisory-list-card--warning .advisory-list-card__badge { background: var(--tone-warn-bg); color: var(--tone-warn-ink); }
-
-.advisory-list-card--danger { border-left-color: var(--stamp-red); }
-.advisory-list-card--danger .advisory-list-card__badge { background: var(--tone-danger-bg); color: var(--tone-danger-ink); }
-
-@media (max-width: 480px) {
-    .advisory-list-card { padding: 16px 18px; }
-    .advisory-list-card__title { font-size: 1rem; }
+@media (max-width: 640px) {
+    .advisory-tiles { gap: 8px; }
+    .advisory-tile { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
+    .advisory-card__band { padding: 8px 14px; }
+    .advisory-card__band time { font-size: .72rem; }
+    .advisory-card__body { padding: 16px 14px 14px; }
+    .advisory-card__title { font-size: 1.02rem; }
+    .advisory-card__link { margin-left: 0; width: 100%; }
 }
 
 .badge {
@@ -1395,15 +1375,6 @@ body.mobile-menu-open { overflow: hidden; }
 }
 
 .mobile-menu__group { display: flex; flex-direction: column; padding: 14px 0 6px; }
-.mobile-menu__label {
-    font-size: .72rem;
-    font-weight: 700;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 4px;
-    padding-inline: 10px;
-}
 
 /* One shared row treatment for every tappable line in the drawer -- primary
    catalogue links, Saved/Log in, and the smaller account/partner links --
@@ -2020,35 +1991,6 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
     max-width: 520px;
     margin: 0 auto;
     line-height: 1.5;
-}
-
-/* Official seal, top corner — a jagged starburst rosette, not a pill. */
-.stamp-badge {
-    position: absolute;
-    top: 128px;
-    right: 32px;
-    z-index: 6;
-    width: clamp(110px, 12vw, 150px);
-    height: clamp(110px, 12vw, 150px);
-    background: var(--stamp-red);
-    clip-path: var(--clip-stamp);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    filter: drop-shadow(0 4px 8px rgba(11, 40, 30, .3));
-}
-.stamp-badge__text {
-    color: var(--paper);
-    font-family: 'Poppins', sans-serif;
-    line-height: 1.35;
-    max-width: 74%;
-}
-.stamp-badge__text strong { display: block; font-size: .78rem; font-weight: 800; letter-spacing: .04em; }
-.stamp-badge__text span { display: block; font-size: .58rem; font-weight: 700; letter-spacing: .05em; opacity: .92; }
-
-@media (max-width: 640px) {
-    .stamp-badge { top: 96px; right: 16px; }
 }
 
 /* ---------- Boarding-pass search bar ---------- */
@@ -2821,53 +2763,8 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
        so the whole page of results is one consistent card size. */
     grid-auto-rows: 1fr;
 }
-
-.dest-card {
-    background: var(--white);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border);
-    transition: box-shadow .18s ease, transform .18s ease;
-    display: flex;
-    flex-direction: column;
-}
-.dest-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
-
-.dest-media, .dest-media-carousel {
-    position: relative;
-    aspect-ratio: 4 / 3;
-    overflow: hidden;
-    color: var(--white);
-    font-weight: 700;
-}
-.dest-media { display: flex; align-items: flex-end; padding: 12px; }
-.dest-media .badge-accredited,
-.dest-media-carousel .badge-accredited {
-    position: absolute; top: 10px; left: 10px; z-index: 3; background: rgba(255,255,255,.92);
-}
-.rating-pill {
-    display: inline-flex; align-items: center;
-    background: rgba(15, 30, 24, .55);
-    color: var(--white);
-    font-size: .78rem; font-weight: 700;
-    padding: 3px 9px; border-radius: 999px;
-}
-.dest-media .rating-pill,
-.dest-media-carousel .rating-pill {
-    position: absolute; top: 10px; right: 10px; z-index: 3;
-}
-.dest-media-name { font-size: 1.05rem; text-shadow: 0 2px 10px rgba(0,0,0,.35); }
-.dest-media-carousel .dest-media-name {
-    position: absolute; left: 12px; bottom: 12px; right: 12px; z-index: 3;
-    pointer-events: none;
-}
-
-.dest-body { padding: 14px 16px 18px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
-.dest-loc { font-size: .82rem; color: var(--muted); }
 .dest-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
 .dest-tag { font-size: .72rem; background: var(--bg); color: var(--muted); padding: 3px 8px; border-radius: 999px; }
-.dest-price { margin-top: auto; padding-top: 10px; font-weight: 700; color: var(--primary-dark); font-size: .9rem; }
 
 /* ---------- Feature grid ---------- */
 
@@ -2918,10 +2815,6 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
    two options, not four, so its own grid rather than reusing .feature-grid's
    4-column default. Same card/stamp language as the feature grid above,
    just wide enough for a button to sit under each one comfortably. */
-.plan-choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 8px; }
-.plan-choice-card { display: flex; flex-direction: column; align-items: flex-start; }
-.plan-choice-card p { margin-bottom: 18px; }
-@media (max-width: 640px) { .plan-choice-grid { grid-template-columns: 1fr; } }
 
 /* ---------- About the Region ---------- */
 /* Premium "Discover Davao Region" editorial section: intro copy, province
@@ -3052,7 +2945,6 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
     box-shadow: var(--shadow-md);
     padding: 16px 16px 34px;
 }
-.about-map__svg { display: block; width: 100%; height: auto; }
 
 /* ---- Interactive region map --------------------------------------------
    Replaces the SVG locator that used to fill this figure. Leaflet needs an
@@ -3129,19 +3021,6 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
    top of decoration -- toned down a step so it reads as a caption rather
    than repeating the section's own kicker at full volume. */
 .about-map:has(.region-map) .about-map__caption { font-size: .85rem; opacity: .85; }
-.about-map__labels text,
-.about-map__peaklabel,
-.about-map__compass-n {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    fill: var(--paper);
-}
-.about-map__labels text { font-size: 11px; letter-spacing: .01em; }
-/* IGACOS sits on the pale shelf colour, so cream-on-cream would vanish, and
-   its island is the smallest piece -- one notch down so the word fits on it. */
-.about-map__labels .about-map__label--dark { fill: var(--ocean-teal-dark); font-size: 9px; }
-.about-map__peaklabel { font-size: 10px; fill: var(--ink); }
-.about-map__compass-n { font-size: 10px; fill: var(--ocean-teal-dark); }
 
 /* Postcard captions, not a stat block: dashed rules between, star per line,
    key phrase carrying the weight. */
@@ -3477,7 +3356,6 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
 .dash-header h1 { margin: 0; font-size: 1.3rem; }
 .dash-header .sub { color: var(--muted); font-size: .85rem; margin-top: 2px; }
 .dash-body { padding: 32px 0; }
-.dash-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 22px; }
 
 /* A .page-head instance with a trailing action button (Plan Your Trip's
    "Saved Places" link) -- every other .page-head consumer is a plain
@@ -4716,8 +4594,6 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 .photo-tile-actions button.danger { color: var(--danger); }
 
 /* ---------- Card image carousel (Airbnb-style swipe) ---------- */
-/* .dest-media-carousel sizing/positioning is defined alongside .dest-media above */
-
 .carousel-track {
     display: flex;
     height: 100%;
@@ -4848,8 +4724,6 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 .error-shell .util-row { justify-content: center; }
 
 /* ---------- Utilities ---------- */
-
-.text-center { text-align: center; }
 .mt-0 { margin-top: 0; }
 
 /* ==========================================================================
