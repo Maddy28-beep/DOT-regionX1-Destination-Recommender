@@ -35,12 +35,15 @@ class AdvisoryController extends Controller
         // set rather than guessed from the (possibly already-filtered) list
         // above -- so "Critical (1)" stays accurate while "Advisory" is the
         // one currently selected.
-        $countsBySeverity = Advisory::active()->get()->countBy('severity');
+        $allActive = Advisory::active()->get();
+        $countsBySeverity = $allActive->countBy('severity');
 
         return view('advisories.index', [
             'advisories' => $advisories,
             'activeSeverity' => $severity,
             'countsBySeverity' => $countsBySeverity,
+            'totalActive' => $allActive->count(),
+            'lastUpdated' => $allActive->max('updated_at'),
         ]);
     }
 }
