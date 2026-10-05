@@ -46,6 +46,7 @@ class TouristItineraryTest extends TestCase
         return $overrides + [
             'travel_days' => 2, 'travel_type' => 'Solo', 'budget' => 'Mid-range',
             'accommodation_pref' => 'Any', 'distance_pref' => 'moderate', 'place_of_origin' => 'Cebu City',
+            'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor', 'activities' => ['Nature'], 'amenities' => ['Parking Area'],
         ];
     }
 
