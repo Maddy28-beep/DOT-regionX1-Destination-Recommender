@@ -108,7 +108,7 @@ class AdminConsoleUiTest extends TestCase
         $sidebar = $m[0] ?? '';
         $this->assertNotSame('', $sidebar, 'Could not locate the admin sidebar.');
 
-        $this->assertSame(1, substr_count($sidebar, '>Manage Listings</a>'));
+        $this->assertSame(1, substr_count($sidebar, '<span>Manage Listings</span></a>'));
         $this->assertStringNotContainsString('Souvenir Centers', $sidebar);
         $this->assertStringNotContainsString('Tour Operators', $sidebar);
 

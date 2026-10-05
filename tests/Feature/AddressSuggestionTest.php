@@ -214,6 +214,7 @@ class AddressSuggestionTest extends TestCase
         $this->post('/plan', [
             'travel_days' => 2, 'travel_type' => 'Solo', 'budget' => 'Mid-range',
             'accommodation_pref' => 'Any', 'distance_pref' => 'near',
+            'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor', 'activities' => ['Nature'], 'amenities' => ['Parking Area'],
             'origin_label' => 'Toril, Davao City', 'place_of_origin' => 'Cebu City',
         ])->assertRedirect(route('plan.itinerary'));
 
@@ -233,6 +234,7 @@ class AddressSuggestionTest extends TestCase
         $this->post('/plan', [
             'travel_days' => 2, 'travel_type' => 'Solo', 'budget' => 'Mid-range',
             'accommodation_pref' => 'Any', 'distance_pref' => 'near',
+            'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor', 'activities' => ['Nature'], 'amenities' => ['Parking Area'],
             'origin_label' => 'Francisco Bangoy International Airport',
             'origin_lat' => 7.1255, 'origin_lng' => 125.6456, 'place_of_origin' => 'Cebu City',
         ])->assertRedirect(route('plan.itinerary'));
@@ -253,6 +255,7 @@ class AddressSuggestionTest extends TestCase
         $this->post('/plan', [
             'travel_days' => 2, 'travel_type' => 'Solo', 'budget' => 'Mid-range',
             'accommodation_pref' => 'Any', 'distance_pref' => 'near',
+            'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor', 'activities' => ['Nature'], 'amenities' => ['Parking Area'],
             'origin_label' => 'somewhere that does not exist', 'place_of_origin' => 'Cebu City',
         ])->assertRedirect(route('plan.itinerary'));
 
@@ -273,6 +276,7 @@ class AddressSuggestionTest extends TestCase
         $payload = [
             'travel_days' => 2, 'travel_type' => 'Solo', 'budget' => 'Mid-range',
             'accommodation_pref' => 'Any', 'distance_pref' => 'near', 'place_of_origin' => 'Cebu City',
+            'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor', 'activities' => ['Nature'], 'amenities' => ['Parking Area'],
         ];
 
         $this->post('/plan', $payload + ['origin_lat' => 7.07, 'origin_lng' => 125.61, 'origin_label' => 'Somewhere']);
