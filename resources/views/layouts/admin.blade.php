@@ -47,6 +47,8 @@
 
             <a href="{{ route('admin.advisories.index') }}" class="{{ request()->routeIs('admin.advisories.*') ? 'active' : '' }}"><x-icon name="alert-triangle" /><span>Advisories</span></a>
 
+            <a href="{{ route('admin.events.index') }}" class="{{ request()->routeIs('admin.events.*') ? 'active' : '' }}"><x-icon name="calendar" /><span>Events</span></a>
+
             <a href="{{ route('admin.postcard-slides.index') }}" class="{{ request()->routeIs('admin.postcard-slides.*') ? 'active' : '' }}"><x-icon name="camera" /><span>Homepage carousel</span></a>
 
             <div class="group-label">Monitoring</div>

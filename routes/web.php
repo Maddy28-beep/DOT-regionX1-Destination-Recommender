@@ -4,6 +4,7 @@ use App\Http\Controllers\AccommodationController;
 use App\Http\Controllers\AddressSuggestionController;
 use App\Http\Controllers\Admin\AdminAdvisoryController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminEventController;
 use App\Http\Controllers\Admin\AdminListingController;
 use App\Http\Controllers\Admin\AdminPostcardSlideController;
 use App\Http\Controllers\AdvisoryController;
@@ -227,6 +228,17 @@ Route::prefix('portal/admin')->name('admin.')->middleware('auth:admin')->group(f
         ->except('show')
         ->parameters(['postcard-slides' => 'postcardSlide'])
         ->names('postcard-slides');
+
+    // Events calendar entries
+    Route::prefix('events')->name('events.')->group(function () {
+        Route::get('/', [AdminEventController::class, 'index'])->name('index');
+        Route::get('/create', [AdminEventController::class, 'create'])->name('create');
+        Route::post('/', [AdminEventController::class, 'store'])->name('store');
+        Route::get('/{event}/edit', [AdminEventController::class, 'edit'])->name('edit');
+        Route::put('/{event}', [AdminEventController::class, 'update'])->name('update');
+        Route::post('/{event}/archive', [AdminEventController::class, 'archive'])->name('archive');
+        Route::post('/{event}/unarchive', [AdminEventController::class, 'unarchive'])->name('unarchive');
+    });
 
     // Advisories (2.2.3.1.5) -- DOT-authored notices, per-listing or general
     Route::prefix('advisories')->name('advisories.')->group(function () {
