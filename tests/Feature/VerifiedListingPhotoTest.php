@@ -12,7 +12,7 @@ class VerifiedListingPhotoTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** The photo files are not in git, so these tests only run where they were copied in. */
+    /** These tests need the committed photo files from database/data/listing-photos. */
     private function requirePhotoFiles(): void
     {
         if (! is_file(database_path('data/listing-photos/destination-2.jpg'))) {

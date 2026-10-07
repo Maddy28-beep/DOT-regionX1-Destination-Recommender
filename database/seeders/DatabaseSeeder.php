@@ -33,6 +33,8 @@ class DatabaseSeeder extends Seeder
             AccreditationSeeder::class,
             EstablishmentSeeder::class,
             ListingPhotoSeeder::class,
+            VerifiedListingPhotoSeeder::class,
+            SampleListingPhotoSeeder::class,
             RecommendationDataSeeder::class,
         ]);
     }
