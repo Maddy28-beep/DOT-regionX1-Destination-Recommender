@@ -6,6 +6,7 @@ use App\Models\Advisory;
 use App\Models\Destination;
 use App\Models\DestinationEmbedding;
 use App\Models\Itinerary;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 /**
@@ -17,7 +18,8 @@ use Illuminate\Support\Collection;
  * is a fair substitute is ordinary, checkable code:
  *   - it must be a public, accredited, non-archived sightseeing destination;
  *   - it must not already be in the trip;
- *   - it must not be under an active danger advisory (a closure or safety notice);
+ *   - it must be open on the traveller's dates: not closed by its own operating
+ *     status and not under an active danger advisory (HasOperatingStatus);
  *   - when both places have coordinates it must be within MAX_DISTANCE_KM of
  *     the stop it replaces, so a swap never sends the traveller across the region.
  */
@@ -26,9 +28,6 @@ class SimilarDestinationService
     /** Furthest a substitute may be from the stop it replaces. */
     public const MAX_DISTANCE_KM = 60.0;
 
-    /** Advisory severity that counts as "do not offer this place". */
-    public const CLOSING_SEVERITY = 'danger';
-
     /** True once at least one destination has a stored vector. */
     public function isAvailable(): bool
     {
@@ -36,31 +35,55 @@ class SimilarDestinationService
     }
 
     /**
-     * Destination ids that are under an active danger advisory right now.
+     * The traveller's dates for this itinerary: its preference's travel window,
+     * or just today when the preference is gone.
      *
-     * @return array<int, int>
+     * @return array{0: Carbon, 1: Carbon}
      */
-    public function closedDestinationIds(): array
+    public function windowFor(Itinerary $itinerary): array
     {
-        return Advisory::active()
-            ->where('listing_kind', 'destination')
-            ->where('severity', self::CLOSING_SEVERITY)
-            ->pluck('listing_id')
-            ->map(fn ($id) => (int) $id)
-            ->unique()
-            ->values()
-            ->all();
+        return $itinerary->preference?->travelWindow() ?? [now()->startOfDay(), now()->startOfDay()];
     }
 
-    /** The first active danger advisory on one destination, for display. */
-    public function closingAdvisory(int $destinationId): ?Advisory
+    /**
+     * Destination ids that cannot be visited on these dates.
+     *
+     * @param  array{0: Carbon, 1: Carbon}  $window
+     * @return array<int, int>
+     */
+    public function unavailableDestinationIds(array $window): array
     {
-        return Advisory::active()
+        $open = Destination::query()->availableDuring(...$window)->pluck('id');
+
+        return Destination::query()->whereNotIn('id', $open)->pluck('id')->map(fn ($id) => (int) $id)->all();
+    }
+
+    /**
+     * Why this place cannot be visited on these dates, or null when it can.
+     *
+     * @param  array{0: Carbon, 1: Carbon}  $window
+     * @return array{reason: string, source: string}|null  source is 'advisory' or 'status'
+     */
+    public function closure(Destination $destination, array $window): ?array
+    {
+        $advisory = Advisory::active()
             ->where('listing_kind', 'destination')
-            ->where('listing_id', $destinationId)
-            ->where('severity', self::CLOSING_SEVERITY)
+            ->where('listing_id', $destination->id)
+            ->where('severity', Destination::CLOSING_ADVISORY_SEVERITY)
+            ->where(fn ($q) => $q->whereNull('starts_at')->orWhereDate('starts_at', '<=', $window[1]->toDateString()))
+            ->where(fn ($q) => $q->whereNull('ends_at')->orWhereDate('ends_at', '>=', $window[0]->toDateString()))
             ->urgentFirst()
             ->first();
+
+        if ($advisory) {
+            return ['reason' => $advisory->title, 'source' => 'advisory'];
+        }
+
+        if ($destination->isClosedByStatus($window[0])) {
+            return ['reason' => $destination->operatingNotice() ?? 'Closed', 'source' => 'status'];
+        }
+
+        return null;
     }
 
     /**
@@ -78,11 +101,11 @@ class SimilarDestinationService
 
         $inTrip = $itinerary->items()->whereNotNull('destination_id')->pluck('destination_id')
             ->map(fn ($id) => (int) $id)->all();
-        $excluded = array_merge($inTrip, [$original->id], $this->closedDestinationIds());
 
         $candidates = Destination::publiclyVisible()
+            ->availableDuring(...$this->windowFor($itinerary))
             ->where(fn ($q) => $q->whereNull('itinerary_role')->orWhere('itinerary_role', 'sightseeing'))
-            ->whereNotIn('id', $excluded)
+            ->whereNotIn('id', array_merge($inTrip, [$original->id]))
             ->get()
             ->keyBy('id');
 

@@ -556,12 +556,13 @@ class ItineraryScheduleBuilder
         }
 
         if ($here['lat'] === null || $here['lng'] === null) {
-            $listing = \App\Models\SouvenirCenter::publiclyVisible()->orderByDesc('rating')->first();
+            $listing = \App\Models\SouvenirCenter::publiclyVisible()->availableForTrip()->orderByDesc('rating')->first();
 
             return $listing ? ['listing' => $listing, 'rule' => null] : null;
         }
 
         $listing = \App\Models\SouvenirCenter::publiclyVisible()
+            ->availableForTrip()
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->get()

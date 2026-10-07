@@ -325,6 +325,10 @@
                     @break
             @endswitch
 
+            @if (in_array($type, ['destinations', 'accommodations', 'restaurants', 'souvenir-centers', 'souvenir_centers'], true))
+                @include('partials.operating-status-fields', ['listing' => $listing])
+            @endif
+
             <label class="field-check">
                 <input type="checkbox" name="is_accredited" value="1" @checked(old('is_accredited', $listing->is_accredited))>
                 <span>DOT Accredited</span>

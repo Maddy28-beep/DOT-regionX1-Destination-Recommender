@@ -385,7 +385,8 @@ class TripPlannerController extends Controller
         }
 
         $swap['available'] = true;
-        $closedIds = $similar->closedDestinationIds();
+        $window = $similar->windowFor($itinerary);
+        $closedIds = $similar->unavailableDestinationIds($window);
 
         foreach ($itinerary->items->pluck('destination_id')->filter()->unique() as $destinationId) {
             if (! in_array((int) $destinationId, $closedIds, true)) {
@@ -393,11 +394,11 @@ class TripPlannerController extends Controller
             }
 
             $destination = Destination::find($destinationId);
-            $advisory = $similar->closingAdvisory((int) $destinationId);
+            $closure = $destination ? $similar->closure($destination, $window) : null;
             $best = $destination ? $similar->alternatives($destination, $itinerary, 1)->first() : null;
 
             $swap['closed'][(int) $destinationId] = [
-                'advisory' => $advisory?->title ?? 'Advisory in effect',
+                'advisory' => $closure['reason'] ?? 'Not available on your dates',
                 'substitute' => $best ? [
                     'id' => $best['destination']->id,
                     'name' => $best['destination']->name,

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasArchiving;
+use App\Models\Concerns\HasOperatingStatus;
 use App\Models\Concerns\HasListingPhotos;
 use App\Models\Concerns\PresentsAsPosterCard;
 use App\Models\Concerns\RanksByRating;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Destination extends Model
 {
-    use HasListingPhotos, HasArchiving, PresentsAsPosterCard, RanksByRating;
+    use HasListingPhotos, HasArchiving, HasOperatingStatus, PresentsAsPosterCard, RanksByRating;
 
     const UPDATED_AT = null;
 

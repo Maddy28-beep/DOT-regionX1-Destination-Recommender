@@ -130,6 +130,10 @@
                 </div>
             </div>
 
+            @if (method_exists($listing, 'operatingNotice'))
+                @include('partials.operating-status-fields', ['listing' => $listing])
+            @endif
+
             <button type="submit" class="btn btn-primary" style="margin-top:20px;">Save Changes</button>
         </form>
     </div>

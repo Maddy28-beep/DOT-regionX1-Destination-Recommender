@@ -59,6 +59,13 @@ as_www php artisan view:cache
 as_www php artisan cache:clear
 systemctl reload php8.3-fpm
 
+# Laravel's scheduler (daily accreditation-expiry sync, so expired places stop being recommended).
+# One line in /etc/cron.d; rewritten every deploy so it can never go missing.
+cat > /etc/cron.d/exploredvo-schedule <<'CRON'
+* * * * * www-data cd /var/www/exploredvo && php artisan schedule:run >> /dev/null 2>&1
+CRON
+chmod 644 /etc/cron.d/exploredvo-schedule
+
 echo "[8/8] Checking the site"
 BAD=0
 for p in / /destinations /accommodations /plan/start /advisories /portal/login; do
