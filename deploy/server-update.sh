@@ -45,6 +45,13 @@ chmod -R ug+rwX "$APP/storage" "$APP/bootstrap/cache"
 echo "[6/8] Database migrations (only adds new tables/columns)"
 as_www php artisan migrate --force
 
+# Similar-place swaps: load the stored embedding vectors (a shipped JSON file).
+# Needs no Ollama or model on the server. Skipped on older code that predates the feature.
+if as_www php artisan list --raw | grep -q '^embeddings:import'; then
+  echo "      loading similar-place vectors"
+  as_www php artisan embeddings:import
+fi
+
 echo "[7/8] Rebuilding caches and reloading PHP"
 as_www php artisan config:cache
 as_www php artisan route:cache
