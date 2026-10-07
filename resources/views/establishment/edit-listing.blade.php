@@ -42,6 +42,10 @@
             @csrf
             @method('PUT')
 
+            @if (method_exists($listing, 'operatingNotice'))
+                @include('partials.operating-status-fields', ['listing' => $listing])
+            @endif
+
             <div class="field">
                 <label for="description">Description</label>
                 <textarea id="description" name="description" rows="5">{{ old('description', $listing->description) }}</textarea>
@@ -129,10 +133,6 @@
                     <input type="url" id="tiktok_url" name="tiktok_url" placeholder="https://tiktok.com/@yourbusiness" value="{{ old('tiktok_url', $listing->tiktok_url) }}">
                 </div>
             </div>
-
-            @if (method_exists($listing, 'operatingNotice'))
-                @include('partials.operating-status-fields', ['listing' => $listing])
-            @endif
 
             <button type="submit" class="btn btn-primary" style="margin-top:20px;">Save Changes</button>
         </form>
