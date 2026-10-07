@@ -34,45 +34,6 @@
 <div class="panel">
     <div class="panel-head">
         <div>
-            <h2>Itinerary day grouping: pre-trained model</h2>
-            <p>How often the {{ $ai['model'] }} step grouped a generated plan's days, against the standard nearest-neighbour order.</p>
-        </div>
-        <span class="status-pill {{ $ai['status'] === 'reachable' ? 'status-active' : 'status-expired' }}">
-            {{ ['reachable' => 'Model service reachable', 'unreachable' => 'Model service not reachable', 'not_configured' => 'Model service not configured'][$ai['status']] }}
-        </span>
-    </div>
-    <div class="panel-body">
-        @if ($ai['total'] === 0)
-            <p class="cell-muted" style="margin:0;">No generated plans have a recorded outcome yet.</p>
-        @else
-            <div class="stat-cards stat-cards--kpi">
-                <div class="stat-card">
-                    <div class="stat-card-val">{{ $ai['applied'] }}<span class="stat-card-val__suffix"> of {{ $ai['total'] }}</span></div>
-                    <div class="stat-card-label">Plans AI-assisted{{ $ai['percent'] !== null ? ' ('.$ai['percent'].'%)' : '' }}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-val">{{ $ai['standard'] }}</div>
-                    <div class="stat-card-label">Plans on the standard order</div>
-                </div>
-                <div class="stat-card" title="The model repeated or dropped a place and the deterministic repair fixed it.">
-                    <div class="stat-card-val">{{ $ai['repaired'] }}</div>
-                    <div class="stat-card-label">AI answers that needed repair</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-val">{{ $ai['avg_seconds'] !== null ? $ai['avg_seconds'].'s' : '—' }}</div>
-                    <div class="stat-card-label">Average model response</div>
-                </div>
-            </div>
-            @if ($ai['applied'] === 0)
-                <p class="cell-muted" style="margin:10px 0 0; font-size:.88rem;">The model has not contributed to any plan yet. It needs a running Ollama server with {{ $ai['model'] }}; until then every plan uses the standard order.</p>
-            @endif
-        @endif
-    </div>
-</div>
-
-<div class="panel">
-    <div class="panel-head">
-        <div>
             <h2>Pending Establishment Requests</h2>
             <p>Newly submitted partner accounts awaiting verification.</p>
         </div>
