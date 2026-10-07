@@ -28,6 +28,7 @@ use App\Http\Controllers\SouvenirCenterController;
 use App\Http\Controllers\TourOperatorController;
 use App\Http\Controllers\Tourist\TouristItineraryController;
 use App\Http\Controllers\Tourist\TouristSavedDestinationController;
+use App\Http\Controllers\ItinerarySwapController;
 use App\Http\Controllers\TripPlannerController;
 use Illuminate\Support\Facades\Route;
 
@@ -123,6 +124,12 @@ Route::get('/plan/address-suggest', AddressSuggestionController::class)
 Route::post('/plan', [TripPlannerController::class, 'update'])->name('plan.update');
 Route::get('/plan/itinerary', [TripPlannerController::class, 'itinerary'])->name('plan.itinerary');
 Route::post('/plan/itinerary/regenerate', [TripPlannerController::class, 'regenerate'])->name('plan.regenerate');
+
+// Similar-place swaps (pretrained embeddings): suggestions for one stop, and the swap itself.
+Route::get('/plan/itinerary/alternatives/{destinationId}', [ItinerarySwapController::class, 'alternatives'])
+    ->whereNumber('destinationId')
+    ->name('plan.alternatives');
+Route::post('/plan/itinerary/swap', [ItinerarySwapController::class, 'swap'])->name('plan.swap');
 // Claims the session's current itinerary onto an optional tourist account. Not
 // gated by auth:tourist -- a guest must be able to hit this, get sent to
 // register, and land back here to finish. See TouristItineraryController.

@@ -230,6 +230,33 @@
                                                     </details>
                                                 </div>
                                             @endif
+                                            @if (($swap['available'] ?? false) && $item->kind === 'activity' && $item->destination_id)
+                                                @php $closed = $swap['closed'][$item->destination_id] ?? null; @endphp
+                                                <div class="swap" data-swap
+                                                     data-destination="{{ $item->destination_id }}"
+                                                     data-url="{{ route('plan.alternatives', $item->destination_id) }}"
+                                                     data-swap-url="{{ route('plan.swap') }}"
+                                                     data-token="{{ csrf_token() }}">
+                                                    @if ($closed)
+                                                        <div class="swap-notice" role="alert">
+                                                            <strong>Advisory:</strong> {{ $closed['advisory'] }}.
+                                                            @if ($closed['substitute'])
+                                                                Closest open substitute:
+                                                                <strong>{{ $closed['substitute']['name'] }}</strong>
+                                                                ({{ $closed['substitute']['similarity'] }}% similar{{ $closed['substitute']['distance_km'] !== null ? ', '.$closed['substitute']['distance_km'].' km away' : '' }}).
+                                                                <form method="POST" action="{{ route('plan.swap') }}" class="swap-inline">
+                                                                    @csrf
+                                                                    <input type="hidden" name="original_id" value="{{ $item->destination_id }}">
+                                                                    <input type="hidden" name="replacement_id" value="{{ $closed['substitute']['id'] }}">
+                                                                    <button type="submit" class="btn btn-primary swap-use">Use {{ $closed['substitute']['name'] }} instead</button>
+                                                                </form>
+                                                            @endif
+                                                        </div>
+                                                    @endif
+                                                    <button type="button" class="swap-toggle" data-swap-toggle aria-expanded="false">Swap this stop</button>
+                                                    <div class="swap-panel" data-swap-panel hidden></div>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 @endforeach
@@ -529,6 +556,7 @@
     </div>
 @endunless
 
+<script src="{{ asset('js/itinerary-swap.js') }}?v={{ filemtime(public_path('js/itinerary-swap.js')) }}" defer></script>
 <script>
     /*
      * Regenerating takes a fresh position if the traveller allows it, so a plan
