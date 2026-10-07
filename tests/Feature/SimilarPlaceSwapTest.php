@@ -129,8 +129,10 @@ class SimilarPlaceSwapTest extends TestCase
 
         $service = app(SimilarDestinationService::class);
 
-        $this->assertSame([], $service->closedDestinationIds());
-        $this->assertCount(1, $service->alternatives($stop, $this->tripWith($stop), 3));
+        $trip = $this->tripWith($stop);
+
+        $this->assertNotContains($warned->id, $service->unavailableDestinationIds($service->windowFor($trip)));
+        $this->assertCount(1, $service->alternatives($stop, $trip, 3));
     }
 
     public function test_the_alternatives_endpoint_lists_the_closest_places_for_a_stop_in_the_trip(): void

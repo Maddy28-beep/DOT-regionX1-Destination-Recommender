@@ -15,6 +15,7 @@
 @endphp
 
 <div class="container">
+    @include('partials.operating-status-notice', ['listing' => $souvenirCenter])
     <nav class="breadcrumb">
         <a href="{{ route('home') }}">Home</a> /
         <a href="{{ route('souvenir-centers.index') }}">Souvenir Centers</a> /

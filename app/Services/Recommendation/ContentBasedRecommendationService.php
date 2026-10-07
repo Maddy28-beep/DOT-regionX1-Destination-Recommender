@@ -272,9 +272,12 @@ class ContentBasedRecommendationService
      */
     public function rank(TouristPreference $preference, ?Collection $candidates = null): Collection
     {
+        // Places closed on the traveller's dates (their own status, or a danger
+        // advisory) are not candidates at all: a closed place must not be recommended.
         $candidates ??= Destination::query()
             ->where('is_accredited', true)
             ->whereNull('archived_at')
+            ->availableDuring(...$preference->travelWindow())
             ->with('tags')
             ->get();
 
