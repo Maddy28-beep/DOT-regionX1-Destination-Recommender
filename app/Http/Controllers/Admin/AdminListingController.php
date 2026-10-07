@@ -86,7 +86,7 @@ class AdminListingController extends Controller
     {
         $config = $this->config($type);
         $data = $request->validate($this->rules($type));
-        $data = $this->withoutBlankRole($data);
+        $data = $this->withNormalisedStatus($this->withoutBlankRole($data));
 
         $data['slug'] = $this->uniqueSlug($config['model'], $data['name']);
 
@@ -138,7 +138,7 @@ class AdminListingController extends Controller
         $listing = $config['model']::findOrFail($id);
 
         $data = $request->validate($this->rules($type, $listing->id));
-        $data = $this->withoutBlankRole($data);
+        $data = $this->withNormalisedStatus($this->withoutBlankRole($data));
 
         foreach (['is_accredited', 'featured'] as $flag) {
             if (array_key_exists($flag, $data)) {
@@ -276,7 +276,43 @@ class AdminListingController extends Controller
         return $data;
     }
 
+    /** Operating status is only tracked for the listing types an itinerary can contain. */
+    private const STATUS_TYPES = ['destinations', 'accommodations', 'restaurants', 'souvenir-centers', 'souvenir_centers'];
+
     private function rules(string $type, ?int $ignoreId = null): array
+    {
+        $rules = $this->baseRules($type, $ignoreId);
+
+        return in_array($type, self::STATUS_TYPES, true)
+            ? array_merge($rules, [
+                'operating_status' => ['nullable', Rule::in(array_keys(Destination::OPERATING_STATUSES))],
+                'closure_reason' => ['nullable', 'string', 'max:255'],
+                'reopens_on' => ['nullable', 'date'],
+            ])
+            : $rules;
+    }
+
+    /** A place that is open (or closed for good) carries no reopening date or temporary-closure reason. */
+    private function withNormalisedStatus(array $data): array
+    {
+        if (! array_key_exists('operating_status', $data)) {
+            return $data;
+        }
+
+        $status = $data['operating_status'] ?: Destination::STATUS_OPEN;
+        $data['operating_status'] = $status;
+
+        if ($status === Destination::STATUS_OPEN) {
+            $data['closure_reason'] = null;
+            $data['reopens_on'] = null;
+        } elseif ($status === Destination::STATUS_CLOSED) {
+            $data['reopens_on'] = null;
+        }
+
+        return $data;
+    }
+
+    private function baseRules(string $type, ?int $ignoreId = null): array
     {
         $common = [
             'name' => ['required', 'string', 'max:150'],

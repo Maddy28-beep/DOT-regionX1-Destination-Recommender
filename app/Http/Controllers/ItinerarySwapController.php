@@ -40,11 +40,11 @@ class ItinerarySwapController extends Controller
 
         abort_if($original === null, 404);
 
-        $advisory = $this->similar->closingAdvisory($original->id);
+        $closure = $this->similar->closure($original, $this->similar->windowFor($itinerary));
 
         return response()->json([
             'original' => ['id' => $original->id, 'name' => $original->name],
-            'advisory' => $advisory ? ['title' => $advisory->title, 'message' => $advisory->message] : null,
+            'advisory' => $closure ? ['title' => $closure['reason'], 'message' => $closure['reason']] : null,
             'alternatives' => $this->similar->alternatives($original, $itinerary, self::OFFER)
                 ->map(fn (array $row) => $this->present($row))
                 ->all(),

@@ -239,7 +239,7 @@
                                                      data-token="{{ csrf_token() }}">
                                                     @if ($closed)
                                                         <div class="swap-notice" role="alert">
-                                                            <strong>Advisory:</strong> {{ $closed['advisory'] }}.
+                                                            <strong>Not available on your dates:</strong> {{ $closed['advisory'] }}.
                                                             @if ($closed['substitute'])
                                                                 Closest open substitute:
                                                                 <strong>{{ $closed['substitute']['name'] }}</strong>
