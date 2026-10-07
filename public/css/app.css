@@ -2426,6 +2426,10 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
  * staying behind while the card moves.
  */
 .dpost-card-wrap { position: relative; height: 100%; }
+.dpost-card-wrap:has(.listing-photo-credit) { height: auto; display: flex; flex-direction: column; }
+.dpost-card-wrap:has(.listing-photo-credit) > .dpost-card { height: auto; flex: 1; }
+.listing-photo-credit { display: block; padding: 6px 2px; color: var(--muted); font-size: .68rem; }
+.listing-photo-credit a { text-decoration: underline; text-underline-offset: 2px; }
 .dpost-card-wrap:hover .dpost-card { transform: translateY(-5px); box-shadow: var(--shadow-md); }
 .save-form--icon {
     position: absolute;
@@ -2531,6 +2535,8 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
    crops rather than distorts, so a portrait phone snap from an establishment
    sits in the grid without stretching anyone's building sideways. */
 .dpost-card__photo { display: block; width: 100%; height: 100%; object-fit: cover; }
+.dpost-card__art:has(.dpost-card__photo) > .halftone,
+.dest-detail-hero:has(> img) > .halftone { display: none; }
 .dpost-card__scrim {
     position: absolute;
     inset: 0;

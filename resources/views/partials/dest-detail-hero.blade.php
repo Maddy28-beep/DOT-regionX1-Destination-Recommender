@@ -10,7 +10,12 @@
 @php $scene = \App\Models\Destination::illustrationScene($destination->name); @endphp
 
 <div class="dest-detail-hero">
-    @include('partials.poster-illustration', ['scene' => $scene])
+    @php $photo = $destination->coverPhoto(); @endphp
+    @if ($photo && ! str_ends_with(strtolower($photo->path), '.svg'))
+        <img src="{{ $photo->url() }}" alt="{{ $destination->name }}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+    @else
+        @include('partials.poster-illustration', ['scene' => $scene])
+    @endif
     <div class="halftone"></div>
     <div class="dpost-card__scrim"></div>
 

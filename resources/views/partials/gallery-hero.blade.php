@@ -1,5 +1,13 @@
 @php
+    // Seeded SVG placeholders should not appear beside verified photographs.
+    if ($photos->contains(fn ($photo) => ! str_ends_with(strtolower($photo->path), '.svg'))) {
+        $photos = $photos->reject(fn ($photo) => str_ends_with(strtolower($photo->path), '.svg'))->values();
+    }
     $total = $photos->count();
+    if ($photos->contains(fn ($photo) => $photo->category !== 'Sample image' && ! str_ends_with(strtolower($photo->path), '.svg'))) {
+        $photos = $photos->reject(fn ($photo) => $photo->category === 'Sample image')->values();
+        $total = $photos->count();
+    }
 @endphp
 
 @if ($total > 0)
