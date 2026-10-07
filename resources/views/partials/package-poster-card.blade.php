@@ -2,7 +2,11 @@
 
 <a href="{{ route('packages.show', $package) }}" class="dpost-card pkg-card">
     <div class="dpost-card__art{{ $mostPopular ? ' has-ribbon' : '' }}">
-        @include('partials.poster-illustration', ['scene' => $scene])
+        @if ($photo = $package->coverPhoto())
+            <img src="{{ $photo->url() }}" alt="" class="dpost-card__photo" loading="lazy" decoding="async">
+        @else
+            @include('partials.poster-illustration', ['scene' => $scene])
+        @endif
         <div class="halftone"></div>
         <div class="dpost-card__scrim"></div>
 

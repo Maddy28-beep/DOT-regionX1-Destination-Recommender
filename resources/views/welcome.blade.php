@@ -349,7 +349,11 @@
             @php $featuredScene = \App\Models\Destination::illustrationScene($featuredDestination->name); @endphp
             <a href="{{ route('destinations.show', $featuredDestination) }}" class="dpost-banner">
                 <div class="dpost-banner__art">
-                    @include('partials.poster-illustration', ['scene' => $featuredScene])
+                    @if ($featuredPhoto = $featuredDestination->coverPhoto())
+                        <img src="{{ $featuredPhoto->url() }}" alt="" class="dpost-card__photo" loading="lazy">
+                    @else
+                        @include('partials.poster-illustration', ['scene' => $featuredScene])
+                    @endif
                     <div class="halftone"></div>
                     @if ($stats['avg_rating'])
                         <span class="dpost-ribbon">Top Rated</span>
