@@ -47,6 +47,19 @@ return [
     ],
 
     /*
+     * Pretrained text-embedding model for the "similar-place swap" feature
+     * (nomic-embed-text, served locally by Ollama, inference only). It is only
+     * needed to build destination vectors (php artisan embeddings:build); the
+     * vectors ship in database/data/destination-embeddings.json, so a server
+     * without Ollama still ranks swap suggestions from the stored numbers.
+     */
+    'embeddings' => [
+        'url' => env('EMBEDDINGS_URL', 'http://localhost:11434'),
+        'model' => env('EMBEDDINGS_MODEL', 'nomic-embed-text'),
+        'timeout' => env('EMBEDDINGS_TIMEOUT', 120),
+    ],
+
+    /*
      * Address autocomplete for the trip planner's starting-point field.
      *
      * Geoapify has a free tier and, unlike Google Places, does not require a
