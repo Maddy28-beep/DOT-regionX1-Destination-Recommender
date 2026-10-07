@@ -2119,6 +2119,16 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
     .ticket-search .field select { font-size: .88rem; padding-right: 30px; }
     .ticket-search .btn { grid-column: 1 / -1; margin: 8px 0 0; padding-block: 18px; }
 }
+@media (max-width: 520px) {
+    /* "Explore destinations" was clipped to "Explore destinc" in a half-width cell. Give it a full row, and
+       the last field a full row too, so the middle two share one and nothing is left stranded on its own. */
+    .ticket-search .field:first-child,
+    .ticket-search .field:nth-child(4) { grid-column: 1 / -1; }
+    .ticket-search .field:nth-child(n+2) { border-top: 1px solid var(--border); }
+    .ticket-search .field:nth-child(2),
+    .ticket-search .field:nth-child(4) { border-left: none; }
+    .ticket-search .field:nth-child(3) { border-left: 1px solid var(--border); }
+}
 
 /* ---------- Stats row (plain poster typography, no card chrome) ---------- */
 
@@ -3060,7 +3070,10 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
     .about-grid { gap: 36px; }
 }
 @media (max-width: 900px) {
-    .about-grid { grid-template-columns: 1fr; gap: 32px; }
+    /* minmax(0, 1fr), not 1fr: a bare 1fr track refuses to shrink below its widest child (the map and
+       the province chips), which pushed the whole page 47px wider than a 375px phone. */
+    .about-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+    .about-copy, .about-map { min-width: 0; }
     /* The column divider only makes sense between two side-by-side columns. */
     .about-copy { border-right: none; padding-right: 0; }
     .dyk-items { grid-template-columns: repeat(2, 1fr); gap: 20px 0; }
@@ -3723,6 +3736,19 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
    ship the glyph and is the closest weight match on the site. */
 .fact .fact-val .currency { font-family: 'Barabara', 'Alfa Slab One', serif; font-size: .8em; }
 .fact .fact-label { font-size: .68rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-top: 4px; }
+
+@media (max-width: 520px) {
+    /* A 21:9 hero is ~140px tall on a phone: the title and the location ran into each other and the
+       photo was a thin strip. Give it real height and keep the text clear of the badges above it. */
+    .dest-detail-hero { aspect-ratio: auto; min-height: 250px; }
+    .dest-detail-hero__content { padding: 18px; }
+    .dest-detail-hero__content h1 { font-size: 1.7rem; line-height: 1.1; }
+    /* Three facts in a row, each with room for only ~100px: shrink the values so "Mid-range" and a
+       price range stay on one line each instead of wrapping into a tower. */
+    .fact { padding: 12px 6px; min-width: 0; }
+    .fact .fact-val { font-size: .98rem; flex-wrap: wrap; }
+    .fact .fact-label { font-size: .62rem; }
+}
 
 .side-card { background: var(--paper); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; }
 .side-card + .side-card { margin-top: 18px; }

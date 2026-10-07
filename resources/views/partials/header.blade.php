@@ -127,9 +127,9 @@
 
         <div class="mobile-menu__group mobile-menu__group--plain">
             @if ($isTouristAuthed)
-                <a href="{{ route('account.itineraries') }}" @if(request()->routeIs('account.itineraries')) aria-current="page" @endif class="mobile-menu__utility">My Itineraries</a>
+                <a href="{{ route('account.itineraries') }}" @if(request()->routeIs('account.itineraries')) aria-current="page" @endif class="mobile-menu__utility mobile-menu__saved">My Itineraries</a>
             @else
-                <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="mobile-menu__utility">Log in</a>
+                <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="mobile-menu__utility mobile-menu__saved">Log in</a>
             @endif
             <a href="{{ $isTouristAuthed ? route('account.saved') : route('saved.index') }}" class="mobile-menu__utility mobile-menu__saved" @if(request()->routeIs('saved.*', 'account.saved')) aria-current="page" @endif>
                 <x-icon name="heart" />
