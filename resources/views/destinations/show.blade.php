@@ -17,17 +17,6 @@
     </nav>
 
 
-    {{--
-        Always the illustrated poster hero here, matching Popular Destinations
-        and Featured Packages -- not conditional on whether photos exist.
-        The seeded "photos" on a couple of destinations (Samal Island, Eden
-        Nature Park) are auto-generated placeholder gradients with a text
-        label baked in (see ListingPhotoSeeder), not real photography, so
-        treating them as a real-photo gallery misrepresented them as content
-        and broke the one-visual-language goal. Real uploaded photos, once
-        establishments add them, still belong in a proper gallery -- just
-        not as this hero.
-    --}}
     @include('partials.dest-detail-hero', ['destination' => $destination])
 
     <div class="detail-layout">

@@ -10,7 +10,7 @@ class ListingPhoto extends Model
 {
     const UPDATED_AT = null;
 
-    protected $fillable = ['listing_kind', 'listing_id', 'path', 'category', 'sort_order', 'is_primary'];
+    protected $fillable = ['listing_kind', 'listing_id', 'path', 'category', 'sort_order', 'is_primary', 'source_url', 'source_name'];
 
     protected function casts(): array
     {
