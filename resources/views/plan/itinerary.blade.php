@@ -34,6 +34,9 @@
             <div>
                 <span class="poster-kicker" style="font-size:1.05rem;">ready to go</span>
                 <h1 class="page-title" style="font-size:1.9rem; margin:0;">{{ $itinerary->title ?: 'My Itinerary' }}</h1>
+                @if (data_get($itinerary->day_themes, 'summary.regrouped'))
+                    <span class="plan-badge plan-badge--ai" title="A pretrained embedding model grouped similar places into the same day, without adding more than a quarter to the travelling.">&#10024; Days grouped by theme</span>
+                @endif
                 <div class="sub">
                     Generated {{ $itinerary->generated_at->format('F j, Y g:i A') }}
                     &middot; {{ $itinerary->total_days }} day{{ $itinerary->total_days === 1 ? '' : 's' }}
@@ -175,6 +178,10 @@
                                     <h3 id="itinerary-day-title-{{ $day }}">Day {{ $day }}</h3>
                                     <a href="#" class="itinerary-back-top">Back to top ↑</a>
                                 </div>
+                                @php $theme = data_get($itinerary->day_themes, 'days.'.$day); @endphp
+                                @if ($theme && $theme['label'])
+                                    <p class="day-theme"><strong>{{ $theme['label'] }}</strong>@if ($theme['similarity'] !== null) &middot; these places are {{ $theme['similarity'] }}% alike @endif</p>
+                                @endif
 
                                 <div class="day-timeline">
                                 @foreach ($items as $item)
@@ -427,6 +434,23 @@
                                 estimates, not routed directions.
                             </div>
                         </li>
+                        @if (data_get($itinerary->day_themes, 'summary'))
+                            <li>
+                                <span class="provenance-step">Themes</span>
+                                <div>
+                                    A <strong>pretrained embedding model</strong> compared what each place is about and
+                                    @if (data_get($itinerary->day_themes, 'summary.regrouped'))
+                                        grouped alike places into the same day (average similarity within a day
+                                        {{ data_get($itinerary->day_themes, 'summary.mean_similarity_before') }}%
+                                        &rarr; {{ data_get($itinerary->day_themes, 'summary.mean_similarity_after') }}%,
+                                        travelling {{ data_get($itinerary->day_themes, 'summary.distance_before_km') }} km
+                                        &rarr; {{ data_get($itinerary->day_themes, 'summary.distance_after_km') }} km, never more than 25% extra).
+                                    @else
+                                        found that the route order already put alike places together, so the days were left as they were.
+                                    @endif
+                                </div>
+                            </li>
+                        @endif
                         <li>
                             <span class="provenance-step">Companions</span>
                             <div>
