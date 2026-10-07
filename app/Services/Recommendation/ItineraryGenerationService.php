@@ -45,7 +45,6 @@ class ItineraryGenerationService
         private readonly ContentBasedRecommendationService $contentBased,
         private readonly AprioriService $apriori,
         private readonly ItineraryScheduleBuilder $schedule,
-        private readonly ItinerarySkeletonMlService $skeletonMl,
     ) {}
 
     /**
@@ -131,32 +130,7 @@ class ItineraryGenerationService
          */
         $accommodationPick = $this->pickAccommodation($sequence, $preference);
 
-        /*
-         * Pretrained ML inference step (manuscript Sec. 2.3.4, "Pretrained ML
-         * Model"): Phi-4-mini-instruct, served locally via Ollama,
-         * inference-only. Proposes which day each already-ranked,
-         * already-sequenced stop belongs to. Returns null whenever the model
-         * is unconfigured, unreachable, or its output fails validation —
-         * ItineraryScheduleBuilder treats null exactly like "no skeleton was
-         * ever proposed" and uses $sequence's own Haversine/Nearest-Neighbor
-         * order unchanged, so this step can only ever refine the plan, never
-         * break it.
-         */
-        $skeleton = $this->skeletonMl->proposeSkeleton(
-            $sequence,
-            $dayCapacities,
-            $preference,
-            $accommodationPick && $accommodationPick['rule']
-                ? ['name' => $accommodationPick['listing']->name, 'apriori_confidence' => $accommodationPick['rule']['confidence']]
-                : null,
-        );
-
-        // What the model step reported, read now: the service instance is shared, so a later
-        // request could overwrite it. Null when the step never reached the model.
-        $mlRepaired = $this->skeletonMl->lastDiagnostics['repaired'] ?? null;
-        $mlSeconds = $this->skeletonMl->lastResponseSeconds !== null ? round($this->skeletonMl->lastResponseSeconds, 2) : null;
-
-        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $skeleton, $mlRepaired, $mlSeconds) {
+        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick) {
             $itinerary = Itinerary::create([
                 'preference_id' => $preference->id,
                 'total_days' => $totalDays,
@@ -164,14 +138,6 @@ class ItineraryGenerationService
                 'generated_at' => now(),
                 'range_tier_used' => $rangeTierUsed,
                 'range_widened' => $rangeWidened,
-                // Whether the pretrained ML skeleton step actually contributed
-                // to this itinerary's day-grouping, or generation fell back to
-                // the Haversine/Nearest-Neighbor order on its own -- see
-                // ItinerarySkeletonMlService::proposeSkeleton()'s doc comment.
-                'ml_skeleton_applied' => $skeleton !== null,
-                // Whether the model's answer needed the duplicate/missing-id repair, and how long it took.
-                'ml_skeleton_repaired' => $skeleton !== null ? $mlRepaired : null,
-                'ml_skeleton_seconds' => $mlSeconds,
             ]);
 
             // Table 8: full computed Destination Recommendation ranking, not just the stops used.
@@ -204,7 +170,6 @@ class ItineraryGenerationService
                 $dayCapacities,
                 $origin,
                 $accommodationPick,
-                $skeleton,
             );
 
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);
