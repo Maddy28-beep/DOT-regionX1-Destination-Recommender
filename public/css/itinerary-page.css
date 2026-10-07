@@ -89,3 +89,7 @@
 .swap-use { padding: 6px 12px; font-size: .85rem; }
 .swap-notice { margin-bottom: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid #e0b4a8; background: #fdf0ec; color: #7a2a14; font-size: .92rem; }
 .swap-inline { display: block; margin-top: 8px; }
+
+/* Theme-based days */
+.day-theme { margin: 4px 0 12px; font-size: .92rem; color: var(--text-muted); }
+.day-theme strong { color: var(--primary); }
