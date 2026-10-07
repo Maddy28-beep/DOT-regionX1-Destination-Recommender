@@ -126,14 +126,19 @@ class ThemeDayGrouper
 
         $after = $this->score($groups, $sim);
         $pairs = max(1, $this->pairCount($groups));
+        $meanBefore = (int) round($before / $pairs * 100);
+        $meanAfter = (int) round($after / $pairs * 100);
 
         return [
             'sequence' => $reordered,
             'days' => $dayInfo,
             'summary' => [
-                'regrouped' => $reordered !== array_values($sequence) && $after > $before + 1e-9,
-                'mean_similarity_before' => (int) round($before / $pairs * 100),
-                'mean_similarity_after' => (int) round($after / $pairs * 100),
+                // "Regrouped" is only claimed when the days really did change AND the page can show
+                // a visible gain; a swap that moves the average by less than a whole percentage point
+                // is not worth announcing, so the page says the route order was already good.
+                'regrouped' => $reordered !== array_values($sequence) && $meanAfter > $meanBefore,
+                'mean_similarity_before' => $meanBefore,
+                'mean_similarity_after' => $meanAfter,
                 'distance_before_km' => round($distanceBefore, 1),
                 'distance_after_km' => round($this->totalDistance($groups, $sequence, $origin), 1),
             ],
