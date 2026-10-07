@@ -107,6 +107,10 @@
                 // since the markup shipped without it.
                 var fallBack = function () {
                     hero.classList.remove('has-footage', 'has-video');
+                    // The poster still is set inline for the footage path. Without the scrim that only
+                    // comes with .has-footage it is a bright photo behind cream text, so on phones the
+                    // title and subhead were unreadable. Clearing the inline style lets the painted hero's own dark gradient show.
+                    hero.style.backgroundImage = '';
                 };
 
                 if (refuse) {

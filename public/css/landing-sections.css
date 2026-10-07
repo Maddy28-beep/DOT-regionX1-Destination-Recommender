@@ -69,3 +69,18 @@
     .hero-tourism-brands .hero-tourism-brands__dot { width: 42px; }
     .hero-tourism-brands .hero-tourism-brands__love { width: 100px; }
 }
+@media (max-width: 640px) {
+    /* The Davao and Love the Philippines marks are dark and colourful; straight on the green hero they
+       nearly vanish. A soft cream plate keeps them legible on a phone. */
+    .hero-tourism-brands {
+        width: fit-content;
+        max-width: calc(100% - 40px);
+        padding: 8px 16px;
+        gap: 14px;
+        background: rgba(255, 247, 233, .94);
+        border-radius: 14px;
+    }
+    .hero-tourism-brands .hero-tourism-brands__davao { width: 78px; }
+    .hero-tourism-brands .hero-tourism-brands__dot { width: 38px; }
+    .hero-tourism-brands .hero-tourism-brands__love { width: 84px; }
+}
