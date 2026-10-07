@@ -6,6 +6,7 @@ use App\Models\Accommodation;
 use App\Models\Destination;
 use App\Models\Itinerary;
 use App\Models\TouristPreference;
+use App\Support\TravelWindow;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -55,6 +56,18 @@ class ItineraryGenerationService
      * and the view reads them back) and reached through the session.
      */
     public function generate(TouristPreference $preference, ?float $originLat = null, ?float $originLng = null, array $swaps = []): Itinerary
+    {
+        // Every place picked below is checked against the traveller's own dates.
+        TravelWindow::set(...$preference->travelWindow());
+
+        try {
+            return $this->generateWithinWindow($preference, $originLat, $originLng, $swaps);
+        } finally {
+            TravelWindow::clear();
+        }
+    }
+
+    private function generateWithinWindow(TouristPreference $preference, ?float $originLat, ?float $originLng, array $swaps): Itinerary
     {
         /*
          * Origin precedence: an explicitly passed position (a fresh reading
@@ -217,7 +230,7 @@ class ItineraryGenerationService
             if (in_array($original, $inTrip, true)
                 && ! in_array($replacement, $inTrip, true)
                 && ! in_array($replacement, $valid, true)
-                && Destination::publiclyVisible()->whereKey($replacement)->exists()) {
+                && Destination::publiclyVisible()->availableForTrip()->whereKey($replacement)->exists()) {
                 $valid[$original] = $replacement;
             }
         }
@@ -422,7 +435,7 @@ class ItineraryGenerationService
             }
         }
 
-        $query = Accommodation::where('is_accredited', true)->whereNull('archived_at');
+        $query = Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip();
         if ($wanted !== null) {
             $query->where('type', $wanted);
         }
@@ -462,7 +475,7 @@ class ItineraryGenerationService
         $listing ??= (clone $query)->whereNotNull('latitude')->whereNotNull('longitude')
                 ->orderByDesc('rating')->first()
             ?? $query->orderByDesc('rating')->first()
-            ?? Accommodation::where('is_accredited', true)->whereNull('archived_at')
+            ?? Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip()
                 ->orderByDesc('rating')->first();
 
         return $listing ? ['listing' => $listing, 'rule' => null] : null;

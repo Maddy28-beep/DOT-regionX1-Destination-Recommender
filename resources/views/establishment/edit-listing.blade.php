@@ -42,6 +42,10 @@
             @csrf
             @method('PUT')
 
+            @if (method_exists($listing, 'operatingNotice'))
+                @include('partials.operating-status-fields', ['listing' => $listing])
+            @endif
+
             <div class="field">
                 <label for="description">Description</label>
                 <textarea id="description" name="description" rows="5">{{ old('description', $listing->description) }}</textarea>

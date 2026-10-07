@@ -8,6 +8,23 @@
 
 @php $portalStatus = $establishment->portalStatus(); @endphp
 
+@if ($listing && method_exists($listing, 'operatingNotice'))
+    @php $closedNotice = $listing->operatingNotice(); @endphp
+    <div class="panel" style="margin-bottom:18px;">
+        <div class="panel-head">
+            <div>
+                <h2>Operating status</h2>
+                <p>Tell travelers when your place is closed. Closed places are not recommended in trip plans.</p>
+            </div>
+            <span class="status-pill {{ $closedNotice ? 'status-expired' : 'status-active' }}">{{ $closedNotice ? 'Closed' : 'Open' }}</span>
+        </div>
+        <div class="panel-body">
+            <p style="margin:0 0 12px;">{{ $closedNotice ?? 'Your place is shown to travelers as open.' }}</p>
+            <a href="{{ route('establishment.listing.edit') }}#operating-status" class="btn btn-primary">Change operating status</a>
+        </div>
+    </div>
+@endif
+
 <div class="stat-cards">
     {{--
         One effective status, from EstablishmentAccount::portalStatus(). It

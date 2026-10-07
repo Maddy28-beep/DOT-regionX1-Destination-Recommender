@@ -69,4 +69,19 @@ class TouristPreference extends Model
     {
         return $this->hasMany(Itinerary::class, 'preference_id');
     }
+
+    /**
+     * The dates this trip covers: the start date the traveller gave (today if
+     * none) through the last travel day. Used to skip places that are closed
+     * on those dates.
+     *
+     * @return array{0: \Carbon\Carbon, 1: \Carbon\Carbon}
+     */
+    public function travelWindow(): array
+    {
+        $from = ($this->start_date ?? now())->copy()->startOfDay();
+        $days = max(1, (int) $this->travel_days);
+
+        return [$from, $from->copy()->addDays($days - 1)];
+    }
 }

@@ -10,6 +10,7 @@
 @endphp
 
 <div class="container">
+    @include('partials.operating-status-notice', ['listing' => $destination])
     <nav class="breadcrumb">
         <a href="{{ route('home') }}">Home</a> /
         <a href="{{ route('destinations.index') }}">Destinations</a> /

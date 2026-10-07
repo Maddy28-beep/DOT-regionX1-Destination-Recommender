@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Establishment;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\QrCodeController;
+use App\Models\Destination;
 use App\Models\Package;
 use App\Models\Review;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use App\Support\Toast;
 
@@ -86,10 +88,18 @@ class EstablishmentDashboardController extends Controller
 
         abort_if(! $listing, 404);
 
+        // Stays, restaurants, souvenir centers and destinations can say they are closed.
+        $tracksStatus = method_exists($listing, 'operatingNotice');
+
         $data = $request->validate([
             'description' => ['nullable', 'string', 'max:1000'],
             'price_tier' => ['nullable', 'string', 'max:20'],
             'price_amount' => ['nullable', 'numeric', 'min:0'],
+            ...($tracksStatus ? [
+                'operating_status' => ['nullable', Rule::in(array_keys(Destination::OPERATING_STATUSES))],
+                'closure_reason' => ['nullable', 'string', 'max:255'],
+                'reopens_on' => ['nullable', 'date'],
+            ] : []),
             /*
              * Position, set by the establishment itself on the map.
              *
@@ -131,6 +141,13 @@ class EstablishmentDashboardController extends Controller
         $listing->facebook_url = $data['facebook_url'] ?? null;
         $listing->instagram_url = $data['instagram_url'] ?? null;
         $listing->tiktok_url = $data['tiktok_url'] ?? null;
+
+        if ($tracksStatus) {
+            $status = $data['operating_status'] ?? Destination::STATUS_OPEN;
+            $listing->operating_status = $status;
+            $listing->closure_reason = $status === Destination::STATUS_OPEN ? null : ($data['closure_reason'] ?? null);
+            $listing->reopens_on = $status === Destination::STATUS_TEMPORARILY_CLOSED ? ($data['reopens_on'] ?? null) : null;
+        }
 
         match ($establishment->listing_kind) {
             'accommodation' => $listing->price_per_night = $data['price_amount'] ?? null,

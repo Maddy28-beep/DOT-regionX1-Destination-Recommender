@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasArchiving;
+use App\Models\Concerns\HasOperatingStatus;
 use App\Models\Concerns\HasListingPhotos;
 use App\Models\Concerns\PresentsAsPosterCard;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Accommodation extends Model
 {
-    use HasListingPhotos, HasArchiving, PresentsAsPosterCard;
+    use HasListingPhotos, HasArchiving, HasOperatingStatus, PresentsAsPosterCard;
 
     const UPDATED_AT = null;
 

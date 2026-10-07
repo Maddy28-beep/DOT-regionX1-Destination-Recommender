@@ -124,6 +124,12 @@ class AprioriService
                     $query->publiclyVisible();
                 }
 
+                // While a trip is being planned, a suggested restaurant, stay or
+                // souvenir stop that is closed on the traveller's dates is dropped.
+                if ($query && method_exists($modelClass, 'scopeAvailableForTrip')) {
+                    $query->availableForTrip();
+                }
+
                 $rule['listing'] = $query?->find($rule['listing_id']);
 
                 return $rule;
