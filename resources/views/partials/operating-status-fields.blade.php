@@ -1,6 +1,6 @@
 {{-- Operating status fields, shared by the DOT admin listing form and the partner portal.
      Expects $listing. Trip plans skip a place while it is closed on the traveller's dates. --}}
-<fieldset class="field" style="border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin:18px 0;">
+<fieldset class="field" id="operating-status" style="border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin:18px 0;">
     <legend style="padding:0 6px; font-weight:600;">Operating status</legend>
     <div class="field">
         <label for="operating_status">Is this place operating?</label>

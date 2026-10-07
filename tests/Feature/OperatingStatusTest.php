@@ -219,4 +219,38 @@ class OperatingStatusTest extends TestCase
 
         $this->assertNull($place->operatingNotice());
     }
+
+    private function partnerFor(Accommodation $listing): \App\Models\EstablishmentAccount
+    {
+        return \App\Models\EstablishmentAccount::create([
+            'business_name' => $listing->name, 'listing_kind' => 'accommodation', 'matched_listing_id' => $listing->id,
+            'portal_key' => (string) \Illuminate\Support\Str::uuid(), 'email' => 'owner@test.example.com',
+            'password_hash' => Hash::make('x'), 'contact_person' => 'Owner', 'contact_number' => '09170000000',
+            'status' => 'approved', 'submitted_at' => now(),
+        ]);
+    }
+
+    public function test_a_partner_sees_the_status_card_and_can_close_their_own_place(): void
+    {
+        $stay = Accommodation::create([
+            'slug' => 'my-resort', 'name' => 'My Resort', 'location' => 'Davao City', 'region_id' => $this->region->id,
+            'type' => 'Hotel', 'is_accredited' => true, 'rating' => 4.0, 'price_tier' => 'Mid-range', 'price_per_night' => 3000,
+        ]);
+        $partner = $this->partnerFor($stay);
+
+        $this->actingAs($partner, 'establishment')->get('/portal/establishment')
+            ->assertOk()->assertSee('Operating status')->assertSee('Change operating status');
+
+        $this->actingAs($partner, 'establishment')->get('/portal/establishment/listing')
+            ->assertOk()->assertSee('id="operating-status"', false)->assertSee('Is this place operating?');
+
+        $this->actingAs($partner, 'establishment')->put('/portal/establishment/listing', [
+            'operating_status' => 'temporarily_closed', 'reopens_on' => '2026-11-20', 'closure_reason' => 'Renovation',
+        ])->assertRedirect();
+
+        $stay->refresh();
+        $this->assertSame('temporarily_closed', $stay->operating_status);
+        $this->assertSame('Temporarily closed until November 20: Renovation', $stay->operatingNotice());
+        $this->get(route('accommodations.show', $stay))->assertOk()->assertSee('Temporarily closed until November 20');
+    }
 }
