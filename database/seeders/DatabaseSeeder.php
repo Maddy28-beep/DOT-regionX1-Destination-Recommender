@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
             VerifiedListingPhotoSeeder::class,
             SampleListingPhotoSeeder::class,
             RecommendationDataSeeder::class,
+            DestinationEmbeddingSeeder::class,
         ]);
     }
 }

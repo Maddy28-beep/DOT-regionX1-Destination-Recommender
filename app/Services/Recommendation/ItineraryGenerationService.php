@@ -3,6 +3,7 @@
 namespace App\Services\Recommendation;
 
 use App\Models\Accommodation;
+use App\Models\Destination;
 use App\Models\Itinerary;
 use App\Models\TouristPreference;
 use Illuminate\Support\Facades\DB;
@@ -53,7 +54,7 @@ class ItineraryGenerationService
      * (the algorithm below writes the full ranking and the day-by-day items,
      * and the view reads them back) and reached through the session.
      */
-    public function generate(TouristPreference $preference, ?float $originLat = null, ?float $originLng = null): Itinerary
+    public function generate(TouristPreference $preference, ?float $originLat = null, ?float $originLng = null, array $swaps = []): Itinerary
     {
         /*
          * Origin precedence: an explicitly passed position (a fresh reading
@@ -121,6 +122,24 @@ class ItineraryGenerationService
         $sequence = $this->sequenceByNearestNeighbor($topRanked, $originLat, $originLng);
 
         /*
+         * Similar-place swaps: stops the traveller replaced with a similar place
+         * (original destination id => replacement id). The replacement takes the
+         * original's position in the sequence and the schedule is built from it,
+         * so every journey time, meal and Apriori pick below follows the new place
+         * instead of being patched afterwards.
+         */
+        $swaps = $this->applicableSwaps($swaps, $sequence);
+        if ($swaps !== []) {
+            $replacements = Destination::whereIn('id', array_values($swaps))->get()->keyBy('id');
+            foreach ($sequence as $i => $entry) {
+                $replacement = $replacements->get($swaps[$entry['row']['destination']->id] ?? 0);
+                if ($replacement) {
+                    $sequence[$i]['row']['destination'] = $replacement;
+                }
+            }
+        }
+
+        /*
          * Apriori accommodation pick moved here, ahead of the transaction: it
          * only reads (co-visitation rules, then a catalogue query), never
          * writes, so computing it now — instead of inside the transaction
@@ -130,7 +149,7 @@ class ItineraryGenerationService
          */
         $accommodationPick = $this->pickAccommodation($sequence, $preference);
 
-        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick) {
+        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps) {
             $itinerary = Itinerary::create([
                 'preference_id' => $preference->id,
                 'total_days' => $totalDays,
@@ -138,6 +157,7 @@ class ItineraryGenerationService
                 'generated_at' => now(),
                 'range_tier_used' => $rangeTierUsed,
                 'range_widened' => $rangeWidened,
+                'swaps' => $swaps !== [] ? $swaps : null,
             ]);
 
             // Table 8: full computed Destination Recommendation ranking, not just the stops used.
@@ -174,6 +194,35 @@ class ItineraryGenerationService
 
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);
         });
+    }
+
+    /**
+     * Keeps only swaps that still make sense for this sequence: the original is
+     * in the trip, and the replacement exists, is not already in the trip, and
+     * is not being used for another swap.
+     *
+     * @param  array<int|string, int|string>  $swaps
+     * @param  array<int, array{row: array, distance_km: float|null}>  $sequence
+     * @return array<int, int>
+     */
+    private function applicableSwaps(array $swaps, array $sequence): array
+    {
+        $inTrip = array_map(fn (array $e) => $e['row']['destination']->id, $sequence);
+        $valid = [];
+
+        foreach ($swaps as $original => $replacement) {
+            $original = (int) $original;
+            $replacement = (int) $replacement;
+
+            if (in_array($original, $inTrip, true)
+                && ! in_array($replacement, $inTrip, true)
+                && ! in_array($replacement, $valid, true)
+                && Destination::publiclyVisible()->whereKey($replacement)->exists()) {
+                $valid[$original] = $replacement;
+            }
+        }
+
+        return $valid;
     }
 
     /**

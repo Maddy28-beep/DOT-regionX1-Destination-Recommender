@@ -11,6 +11,7 @@ use App\Models\TouristHealthCondition;
 use App\Models\TouristHealthProfile;
 use App\Models\TouristPreference;
 use App\Services\Geocoding\AddressSuggestionService;
+use App\Services\Embeddings\SimilarDestinationService;
 use App\Services\Recommendation\ContentBasedRecommendationService;
 use App\Services\Recommendation\ItineraryGenerationService;
 use Illuminate\Http\RedirectResponse;
@@ -234,7 +235,9 @@ class TripPlannerController extends Controller
             'range_widened' => $itinerary->range_widened,
         ];
 
-        return view('plan.itinerary', compact('itinerary', 'preference', 'provenance'));
+        $swap = $this->swapData($itinerary);
+
+        return view('plan.itinerary', compact('itinerary', 'preference', 'provenance', 'swap'));
     }
 
     public function regenerate(Request $request): RedirectResponse
@@ -363,6 +366,48 @@ class TripPlannerController extends Controller
         foreach ($conditions as $condition) {
             TouristHealthCondition::create(['health_profile_id' => $profile->id, 'condition' => $condition]);
         }
+    }
+
+    /**
+     * What the itinerary page needs for similar-place swaps: whether to show
+     * the Swap buttons, and for any stop under a closing advisory, the notice
+     * plus the closest open substitute (so the page can offer it straight away).
+     *
+     * @return array{available: bool, closed: array<int, array{advisory: string, substitute: ?array}>}
+     */
+    private function swapData(Itinerary $itinerary): array
+    {
+        $similar = app(SimilarDestinationService::class);
+        $swap = ['available' => false, 'closed' => []];
+
+        if ($itinerary->package_id || ! $similar->isAvailable()) {
+            return $swap;
+        }
+
+        $swap['available'] = true;
+        $closedIds = $similar->closedDestinationIds();
+
+        foreach ($itinerary->items->pluck('destination_id')->filter()->unique() as $destinationId) {
+            if (! in_array((int) $destinationId, $closedIds, true)) {
+                continue;
+            }
+
+            $destination = Destination::find($destinationId);
+            $advisory = $similar->closingAdvisory((int) $destinationId);
+            $best = $destination ? $similar->alternatives($destination, $itinerary, 1)->first() : null;
+
+            $swap['closed'][(int) $destinationId] = [
+                'advisory' => $advisory?->title ?? 'Advisory in effect',
+                'substitute' => $best ? [
+                    'id' => $best['destination']->id,
+                    'name' => $best['destination']->name,
+                    'similarity' => (int) round($best['similarity'] * 100),
+                    'distance_km' => $best['distance_km'],
+                ] : null,
+            ];
+        }
+
+        return $swap;
     }
 
     /** The preference this browser's session points at. */
