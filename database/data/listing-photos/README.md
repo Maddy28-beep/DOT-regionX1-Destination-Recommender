@@ -32,6 +32,6 @@ Source attribution is stored with each imported photo for internal reference.
 Public availability and attribution do not establish a reuse license; no license
 claim is made for these source images.
 
-## Image files are not in git
+## Included in the repository
 
-The photographs themselves (`*.jpg`, `*.jpeg`, `*.png`, `*.webp` in this folder) are git-ignored, because there is no licence to redistribute them. `manifest.json`, `needs-verified-photo.csv` and this README are tracked. A clone without the image files simply skips those rows when the seeder runs, and `VerifiedListingPhotoTest` skips its photo tests. No source credit is shown on the public pages.
+The photographs in this folder are committed, so a fresh clone can run `php artisan migrate --seed` and get them. `DatabaseSeeder` runs `VerifiedListingPhotoSeeder` first and then `SampleListingPhotoSeeder`, which fills only the listings that still have no real photo. Run `php artisan storage:link` once so the copied files are served. No source credit is shown on the public pages.

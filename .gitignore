@@ -25,13 +25,6 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 
-# Listing photographs sourced from other websites: no licence to redistribute them, so they stay
-# on the machine that has them. manifest.json, the README and the CSV are tracked.
-/database/data/listing-photos/*.jpg
-/database/data/listing-photos/*.jpeg
-/database/data/listing-photos/*.png
-/database/data/listing-photos/*.webp
-
 # Seeded local database — contains real email addresses and password hashes.
 # Regenerate with: php artisan migrate --seed
 /database/*.sqlite
