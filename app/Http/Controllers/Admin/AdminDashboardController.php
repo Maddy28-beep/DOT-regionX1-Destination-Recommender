@@ -20,7 +20,6 @@ use App\Models\TourOperator;
 use App\Models\TouristPreference;
 use App\Models\TouristVisit;
 use App\Services\Recommendation\AprioriService;
-use App\Services\Recommendation\ItinerarySkeletonMlService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -70,50 +69,7 @@ class AdminDashboardController extends Controller
         $pendingEstablishments = EstablishmentAccount::where('status', 'pending')->latest('submitted_at')->take(5)->get();
         $expiring = AccreditationRecord::whereIn('status', ['Expiring Soon', 'Expired'])->orderBy('expiration_date')->take(5)->get();
 
-        return view('admin.overview', compact('stats', 'recentVisits', 'pendingEstablishments', 'expiring'))
-            ->with('ai', $this->aiUsage());
-    }
-
-    /**
-     * How the pre-trained model step is doing: how many generated plans it grouped,
-     * how often its answer needed repair, how long it takes, and whether the
-     * service answers right now.
-     *
-     * Counted over itineraries with a recorded outcome only. Package itineraries
-     * and plans from before the column existed are "not recorded", not "standard".
-     *
-     * @return array<string, mixed>
-     */
-    private function aiUsage(): array
-    {
-        $recorded = Itinerary::whereNotNull('ml_skeleton_applied');
-        $total = (clone $recorded)->count();
-        $applied = (clone $recorded)->where('ml_skeleton_applied', true)->count();
-
-        $ml = app(ItinerarySkeletonMlService::class);
-        $status = 'not_configured';
-
-        if ($ml->isConfigured()) {
-            try {
-                // A short probe: the overview must not hang when the model service is down.
-                $status = Http::timeout(1)->get(rtrim(config('services.phi4mini.url'), '/').'/api/tags')->successful()
-                    ? 'reachable' : 'unreachable';
-            } catch (\Throwable) {
-                $status = 'unreachable';
-            }
-        }
-
-        return [
-            'total' => $total,
-            'applied' => $applied,
-            'standard' => $total - $applied,
-            'percent' => $total > 0 ? round($applied / $total * 100) : null,
-            'repaired' => (clone $recorded)->where('ml_skeleton_applied', true)->where('ml_skeleton_repaired', true)->count(),
-            'avg_seconds' => ($avg = (clone $recorded)->where('ml_skeleton_applied', true)->whereNotNull('ml_skeleton_seconds')->avg('ml_skeleton_seconds')) !== null ? round((float) $avg, 1) : null,
-            'last_applied' => (clone $recorded)->where('ml_skeleton_applied', true)->max('generated_at'),
-            'model' => config('services.phi4mini.model', 'phi4-mini'),
-            'status' => $status,
-        ];
+        return view('admin.overview', compact('stats', 'recentVisits', 'pendingEstablishments', 'expiring'));
     }
 
     public function establishments(Request $request): View
