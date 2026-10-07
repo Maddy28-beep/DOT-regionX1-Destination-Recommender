@@ -34,15 +34,6 @@
             <div>
                 <span class="poster-kicker" style="font-size:1.05rem;">ready to go</span>
                 <h1 class="page-title" style="font-size:1.9rem; margin:0;">{{ $itinerary->title ?: 'My Itinerary' }}</h1>
-                @if ($itinerary->ml_skeleton_applied !== null)
-                    {{-- Only where an outcome was actually recorded: a package itinerary or one generated
-                         before the column existed shows nothing rather than a guess. --}}
-                    @if ($itinerary->ml_skeleton_applied)
-                        <span class="plan-badge plan-badge--ai" title="A pre-trained language model (Phi-4-mini) grouped the already-chosen stops into days. It did not choose the places.">&#10024; AI-assisted</span>
-                    @else
-                        <span class="plan-badge" title="The days follow the nearest-neighbour route order. The AI step was unavailable or its answer could not be used.">Standard order</span>
-                    @endif
-                @endif
                 <div class="sub">
                     Generated {{ $itinerary->generated_at->format('F j, Y g:i A') }}
                     &middot; {{ $itinerary->total_days }} day{{ $itinerary->total_days === 1 ? '' : 's' }}
@@ -502,13 +493,6 @@
                         </div>
                     </li>
                     <li>
-                        <span class="explainer-emoji" aria-hidden="true">✨</span>
-                        <div>
-                            <strong>Smart day grouping</strong>
-                            <p>A pretrained machine learning model helps organize the selected stops across your available travel days.</p>
-                        </div>
-                    </li>
-                    <li>
                         <span class="explainer-emoji" aria-hidden="true">🕐</span>
                         <div>
                             <strong>Schedule planning</strong>
@@ -534,27 +518,10 @@
                                 <dd>Creates the geographic travel sequence.</dd>
                             </div>
                             <div>
-                                <dt>
-                                    Pretrained ML &mdash; Phi-4-mini-instruct
-                                    @if ($provenance['ml_applied'] === true)
-                                        <span class="ml-status ml-status--applied">Status: Applied</span>
-                                    @elseif ($provenance['ml_applied'] === false)
-                                        <span class="ml-status ml-status--fallback">Status: Fallback used</span>
-                                    @else
-                                        <span class="ml-status ml-status--unknown">Status: Not recorded for this itinerary</span>
-                                    @endif
-                                </dt>
-                                <dd>Assists with grouping the already-ranked and already-sequenced destinations across the available itinerary days.</dd>
-                            </div>
-                            <div>
                                 <dt>Schedule Builder</dt>
                                 <dd>Converts the resulting itinerary structure into practical arrival, activity, meal, travel, rest, and departure times.</dd>
                             </div>
                         </dl>
-                        <p class="explainer-fallback-note">
-                            If the pretrained ML model cannot provide a valid result, the system uses its
-                            deterministic fallback logic so itinerary generation can still continue.
-                        </p>
                     </div>
                 </details>
             </div>
