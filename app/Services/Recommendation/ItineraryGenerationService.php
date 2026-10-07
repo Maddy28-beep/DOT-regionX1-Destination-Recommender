@@ -47,6 +47,7 @@ class ItineraryGenerationService
         private readonly ContentBasedRecommendationService $contentBased,
         private readonly AprioriService $apriori,
         private readonly ItineraryScheduleBuilder $schedule,
+        private readonly ThemeDayGrouper $themeDays,
     ) {}
 
     /**
@@ -153,6 +154,17 @@ class ItineraryGenerationService
         }
 
         /*
+         * Theme-based days (pretrained embeddings): decide which stops share a day
+         * so that a day's places are alike, within a travelling limit. The stops
+         * themselves are untouched; only their grouping into days can change.
+         * Returns null (plain route order kept) when any stop has no stored vector.
+         */
+        $themes = $this->themeDays->group($sequence, $dayCapacities, $origin);
+        if ($themes !== null) {
+            $sequence = $themes['sequence'];
+        }
+
+        /*
          * Apriori accommodation pick moved here, ahead of the transaction: it
          * only reads (co-visitation rules, then a catalogue query), never
          * writes, so computing it now — instead of inside the transaction
@@ -162,7 +174,7 @@ class ItineraryGenerationService
          */
         $accommodationPick = $this->pickAccommodation($sequence, $preference);
 
-        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps) {
+        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes) {
             $itinerary = Itinerary::create([
                 'preference_id' => $preference->id,
                 'total_days' => $totalDays,
@@ -171,6 +183,7 @@ class ItineraryGenerationService
                 'range_tier_used' => $rangeTierUsed,
                 'range_widened' => $rangeWidened,
                 'swaps' => $swaps !== [] ? $swaps : null,
+                'day_themes' => $themes !== null ? ['days' => $themes['days'], 'summary' => $themes['summary']] : null,
             ]);
 
             // Table 8: full computed Destination Recommendation ranking, not just the stops used.
