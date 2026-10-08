@@ -131,10 +131,6 @@
 
         <div>
             @include('partials.plan-visit-card', ['destination' => $destination, 'mapUrl' => $mapUrl])
-
-            <div class="side-card side-card--map">
-                @include('partials.map-embed', ['latitude' => $destination->latitude, 'longitude' => $destination->longitude, 'name' => $destination->name])
-            </div>
         </div>
     </div>
 

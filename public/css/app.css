@@ -5141,7 +5141,17 @@ body.mobile-menu-open .survey-invite { visibility: hidden; }
 .visit-card__guide strong { display: block; font-size: 1rem; color: var(--primary-dark); }
 .visit-card__guide svg { flex: none; width: 20px; height: 20px; color: var(--primary-dark); }
 .visit-card__guide:hover strong { text-decoration: underline; }
-.side-card--map { margin-top: 18px; padding: 0; overflow: hidden; border-radius: 18px; }
+.visit-card__map {
+    height: 180px;
+    margin: 4px 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--primary-light);
+}
+.visit-card__map .listing-map { height: 100%; width: 100%; margin: 0; border-radius: 0; }
+.visit-card__address { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 16px; font-size: .88rem; color: var(--muted); line-height: 1.4; }
+.visit-card__address svg { flex: none; width: 16px; height: 16px; margin-top: 1px; color: var(--primary); }
 
 @media (max-width: 480px) {
     /* A phone gives each tile about 140px: drop the corner arrow and tighten, so "Instagram" is not cut off. */

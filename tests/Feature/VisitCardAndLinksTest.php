@@ -198,6 +198,32 @@ class VisitCardAndLinksTest extends TestCase
         $this->assertNull($place->fresh()->facebook_url);
     }
 
+    public function test_the_map_and_address_sit_inside_the_card_between_the_facts_and_the_directions(): void
+    {
+        $place = $this->place(['latitude' => 7.03, 'longitude' => 125.37]);
+
+        $html = $this->get(route('destinations.show', $place))->assertOk()->getContent();
+
+        $this->assertSame(1, substr_count($html, 'class="listing-map"'), 'One map, not a second card.');
+        $this->assertStringContainsString('visit-card__map', $html);
+        $this->assertStringContainsString('Toril, Davao City', $html);
+
+        $card = substr($html, strpos($html, 'class="visit-card"'));
+        $this->assertLessThan(strpos($card, 'visit-card__map'), strpos($card, 'Plan to spend'));
+        $this->assertLessThan(strpos($card, 'visit-card__address'), strpos($card, 'visit-card__map'));
+        $this->assertLessThan(strpos($card, 'Get Directions'), strpos($card, 'visit-card__address'));
+    }
+
+    public function test_a_place_without_coordinates_has_no_map_but_still_shows_its_address(): void
+    {
+        $place = $this->place();
+
+        $html = $this->get(route('destinations.show', $place))->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('visit-card__map', $html);
+        $this->assertStringContainsString('visit-card__address', $html);
+    }
+
     public function test_the_save_heart_stays_a_single_form_on_the_card(): void
     {
         $place = $this->place();
