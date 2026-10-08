@@ -5308,3 +5308,47 @@ body.mobile-menu-open .survey-invite { visibility: hidden; }
 button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: pointer; }
 .visit-card__hint { margin: -8px 0 18px; font-size: .84rem; color: var(--muted); line-height: 1.45; }
 .visit-card__value a { color: var(--primary-dark); text-decoration: underline; }
+
+/* ---- Destination card: photo on top, details underneath (name no longer sits on the photo) ---- */
+.dcard__art { aspect-ratio: 16 / 10; }
+.dcard__new {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 3;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: var(--paper);
+    color: var(--stamp-red);
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+.dcard__body { flex: 1; display: flex; flex-direction: column; padding: 12px 16px 14px; }
+.dcard__top { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 18px; margin-bottom: 6px; }
+.dcard__dot { display: inline-flex; align-items: center; gap: 5px; font-size: .72rem; font-weight: 700; color: var(--primary-dark); }
+.dcard__dot svg { width: 13px; height: 13px; flex: none; }
+.dcard__rating { display: inline-flex; align-items: center; gap: 4px; font-size: .78rem; color: var(--muted); }
+.dcard__rating svg { width: 13px; height: 13px; color: var(--gold); }
+.dcard__rating strong { color: var(--ink); }
+.dcard__name { margin: 0 0 6px; font-family: 'Poppins', sans-serif; font-size: 1.08rem; font-weight: 700; line-height: 1.25; color: var(--ink); }
+.dcard__loc { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 10px; font-size: .84rem; color: var(--muted); line-height: 1.35; }
+.dcard__loc svg { flex: none; width: 14px; height: 14px; margin-top: 2px; }
+.dcard__tags { margin-bottom: 12px; }
+.dcard__foot {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1.5px dotted var(--border);
+}
+.dcard__price strong { font-size: 1.05rem; font-weight: 800; color: var(--primary-dark); }
+.dcard__price small { font-size: .8rem; color: var(--muted); }
+.dcard__band { font-size: .95rem; letter-spacing: .04em; }
+.dcard__band span { color: var(--border); }
+.dcard__band span.is-on { color: var(--stamp-red); }
+.dcard__dist { display: inline-flex; align-items: center; gap: 5px; font-size: .8rem; color: var(--muted); white-space: nowrap; }
+.dcard__dist svg { width: 14px; height: 14px; }
