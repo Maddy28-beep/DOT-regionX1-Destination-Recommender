@@ -11,7 +11,9 @@
         'linear-gradient(135deg,#1d6fa5,#0b4d75)',
     ];
     $gradient = $gradients[$souvenirCenter->id % count($gradients)];
-    $mapUrl = 'https://www.google.com/maps/search/?api=1&query='.urlencode($souvenirCenter->name.' '.$souvenirCenter->location);
+    $mapUrl = $souvenirCenter->latitude && $souvenirCenter->longitude
+        ? "https://www.google.com/maps/search/?api=1&query={$souvenirCenter->latitude},{$souvenirCenter->longitude}"
+        : 'https://www.google.com/maps/search/?api=1&query='.urlencode($souvenirCenter->name.' '.$souvenirCenter->location);
 @endphp
 
 <div class="container">
@@ -36,23 +38,20 @@
 
     <div class="detail-layout">
         <div>
-            <div class="side-card">
-                <h3 class="mt-0">About {{ $souvenirCenter->name }}</h3>
-                <p>{{ $souvenirCenter->description ?? 'No description available yet for this souvenir center.' }}</p>
-            </div>
+            @include('partials.listing-about-card', ['listing' => $souvenirCenter, 'noun' => 'souvenir center', 'groups' => []])
 
             @include('partials.reviews-section', ['listing' => $souvenirCenter, 'type' => 'souvenir-centers', 'kind' => 'souvenir_center'])
         </div>
 
         <div>
-            <div class="side-card">
-                <h3 class="mt-0">Plan your visit</h3>
-                <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="btn btn-primary btn-block">Get Directions</a>
-                @include('partials.find-them-online', ['listing' => $souvenirCenter])
-                <x-save-heart type="souvenir-centers" :listing="$souvenirCenter" variant="button" class="mt-10" />
-
-                @include('partials.map-embed', ['latitude' => $souvenirCenter->latitude, 'longitude' => $souvenirCenter->longitude, 'name' => $souvenirCenter->name])
-            </div>
+            @include('partials.listing-visit-card', [
+                'listing' => $souvenirCenter,
+                'type' => 'souvenir-centers',
+                'mapUrl' => $mapUrl,
+                'kicker' => 'Before you go',
+                'title' => 'Plan your visit',
+                'rows' => [],
+            ])
         </div>
     </div>
 

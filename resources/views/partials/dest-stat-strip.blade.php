@@ -13,73 +13,32 @@
         null, '' => null,
         default => $destination->price_tier,
     };
-    $tierLevel = $destination->posterTier();
 
     $min = $destination->entry_fee_min;
     $max = $destination->entry_fee_max;
-    $fee = null;
-    $feeIsFree = false;
+    $fee = '—';
+    $feePeso = false;
 
     if ($min !== null || $max !== null) {
         $lo = (float) ($min ?? 0);
-        $hi = (float) ($max ?? $min ?? 0);
-        $hi = max($lo, $hi);
+        $hi = max($lo, (float) ($max ?? $min ?? 0));
+        $feePeso = $hi > 0;
 
-        if ($hi <= 0) {
-            $feeIsFree = true;
-        } elseif ($lo <= 0) {
-            $fee = 'Up to '.number_format($hi);
-        } elseif ($lo === $hi) {
-            $fee = number_format($lo);
-        } else {
-            $fee = number_format($lo).'–'.number_format($hi);
-        }
+        $fee = match (true) {
+            $hi <= 0 => 'Free',
+            $lo <= 0 => 'Up to '.number_format($hi),
+            $lo === $hi => number_format($lo),
+            default => number_format($lo).'–'.number_format($hi),
+        };
     }
 
     $distance = $destination->distance_km
         ? rtrim(rtrim(number_format((float) $destination->distance_km, 1), '0'), '.').' km'
-        : null;
+        : '—';
 @endphp
 
-<div class="stat-strip">
-    <div class="stat-strip__item">
-        <span class="stat-strip__icon"><x-icon name="tag" /></span>
-        <div>
-            <span class="stat-strip__label">Price tier</span>
-            <span class="stat-strip__value">
-                <span class="stat-strip__text">{{ $tierLabel ?? '—' }}</span>
-                @if ($tierLevel !== null && $tierLevel > 0)
-                    <span class="stat-strip__meter" aria-hidden="true">
-                        @for ($i = 1; $i <= 3; $i++)<span class="{{ $i <= $tierLevel ? 'is-on' : '' }}">&#8369;</span>@endfor
-                    </span>
-                @endif
-            </span>
-        </div>
-    </div>
-
-    <div class="stat-strip__item">
-        <span class="stat-strip__icon"><x-icon name="ticket" /></span>
-        <div>
-            <span class="stat-strip__label">Entry fee</span>
-            <span class="stat-strip__value">
-                <span class="stat-strip__text">
-                    @if ($feeIsFree)
-                        Free
-                    @elseif ($fee)
-                        <span class="currency">&#8369;</span>{{ $fee }}
-                    @else
-                        —
-                    @endif
-                </span>
-            </span>
-        </div>
-    </div>
-
-    <div class="stat-strip__item">
-        <span class="stat-strip__icon"><x-icon name="map-pin" /></span>
-        <div>
-            <span class="stat-strip__label">From city center</span>
-            <span class="stat-strip__value"><span class="stat-strip__text">{{ $distance ?? '—' }}</span></span>
-        </div>
-    </div>
-</div>
+@include('partials.stat-strip', ['items' => [
+    ['icon' => 'tag', 'label' => 'Price tier', 'text' => $tierLabel ?? '—', 'meter' => $destination->posterTier()],
+    ['icon' => 'ticket', 'label' => 'Entry fee', 'text' => $fee, 'peso' => $feePeso],
+    ['icon' => 'map-pin', 'label' => 'From city center', 'text' => $distance],
+]])
