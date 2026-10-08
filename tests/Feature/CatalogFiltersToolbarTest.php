@@ -43,7 +43,13 @@ class CatalogFiltersToolbarTest extends TestCase
             $this->assertStringNotContainsString('Apply Filters', $html, $name);
             $this->assertStringNotContainsString('Filter results', $html, $name);
 
-            $this->assertSame($tiers ? 3 : 0, substr_count($html, 'name="price_tier"'), "$name budget tiles");
+            $this->assertSame($tiers ? 4 : 0, substr_count($html, 'name="price_tier"'), "$name budget tiles: Any budget + three tiers");
+            if ($tiers) {
+                foreach (['Any budget', 'Budget-Friendly', 'Mid-range', 'Premium'] as $label) {
+                    $this->assertStringContainsString($label, $html, "$name tile $label");
+                }
+                $this->assertMatchesRegularExpression('/value="" checked/', $html, "$name starts on Any budget");
+            }
             $this->assertStringNotContainsString('value="Free"', $html, "$name has no Free tile (that is a destinations thing)");
             if ($category) {
                 $this->assertStringContainsString('name="'.$category.'"', $html, $name);

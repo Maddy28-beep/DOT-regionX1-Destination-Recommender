@@ -39,7 +39,8 @@
                 'placeholder' => 'e.g. Marina Tuna',
                 'regions' => $regions,
                 'activeFilters' => $activeFilters,
-                'tiers' => [['Budget-Friendly', 'Budget', '₱'], ['Mid-range', 'Mid-range', '₱₱'], ['Premium', 'Premium', '₱₱₱']],
+                'tiers' => [['Budget-Friendly', 'Budget-Friendly', '₱'], ['Mid-range', 'Mid-range', '₱₱'], ['Premium', 'Premium', '₱₱₱']],
+                'anyBudget' => true,
                 'categoryParam' => 'cuisine_type',
             ])
 
