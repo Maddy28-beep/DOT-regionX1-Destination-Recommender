@@ -18,50 +18,23 @@
         </button>
 
         <div class="catalog-layout">
-            <aside class="filter-panel" id="filterPanel">
-                <h3>Filter results</h3>
-                <form method="GET" action="{{ route('souvenir-centers.index') }}">
-                    <div class="field">
-                        <label for="q">Search by name</label>
-                        <input type="text" id="q" name="q" value="{{ request('q') }}" placeholder="e.g. Aldevinco">
-                    </div>
+            @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, null); @endphp
 
-                    <div class="field">
-                        <label for="region_id">Province / City</label>
-                        <select id="region_id" name="region_id">
-                            <option value="">All regions</option>
-                            @foreach ($regions as $region)
-                                <option value="{{ $region->id }}" @selected(request('region_id') == $region->id)>{{ $region->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label for="sort">Sort by</label>
-                        <select id="sort" name="sort">
-                            <option value="recommended" @selected(request('sort', 'recommended') === 'recommended')>Recommended</option>
-                            <option value="rating" @selected(request('sort') === 'rating')>Highest Rated</option>
-                            <option value="name" @selected(request('sort') === 'name')>Name (A&ndash;Z)</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" class="btn btn-poster-primary btn-block">Apply Filters</button>
-                    @if (request()->anyFilled(['q', 'region_id']))
-                        <a href="{{ route('souvenir-centers.index') }}" class="btn btn-poster-ghost btn-block" style="margin-top:8px;">Clear all</a>
-                    @endif
-                </form>
-            </aside>
+            @include('partials.catalog-filters', [
+                'route' => 'souvenir-centers.index',
+                'placeholder' => 'e.g. Aldevinco',
+                'regions' => $regions,
+                'activeFilters' => $activeFilters,
+            ])
 
             <div>
-                <div class="results-bar">
-                    <div class="results-count">{{ $souvenirCenters->total() }} souvenir center{{ $souvenirCenters->total() === 1 ? '' : 's' }} found</div>
-                    @if ($souvenirCenters->count())
-                        <div class="view-toggle" role="group" aria-label="Switch between grid and map view">
-                            <button type="button" class="view-toggle__btn active" data-view="grid"><x-icon name="grid" /> Grid View</button>
-                            <button type="button" class="view-toggle__btn" data-view="map"><x-icon name="map" /> Map View</button>
-                        </div>
-                    @endif
-                </div>
+                @include('partials.catalog-toolbar', [
+                    'results' => $souvenirCenters,
+                    'noun' => 'souvenir center',
+                    'sortOptions' => ['recommended' => 'Recommended', 'rating' => 'Highest Rated', 'name' => 'Name (A–Z)'],
+                    'activeFilters' => $activeFilters,
+                    'viewToggle' => 'grid-map',
+                ])
 
                 @if ($souvenirCenters->count())
                     <div class="card-grid" data-view-panel="grid">

@@ -5434,3 +5434,13 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
     text-decoration: none;
 }
 .filter-chip:hover { background: var(--primary-light); }
+
+/* Shared catalog filters: three budget tiles in a row, and the grid/map switch in the same pill style */
+.filter-panel--v2 .budget-tiles.budget-tiles--3 { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.filter-panel--v2 .budget-tiles--3 .budget-tile { padding: 8px 2px; min-width: 0; }
+.filter-panel--v2 .budget-tiles--3 .budget-tile__name { font-size: .7rem; white-space: nowrap; }
+.results-toolbar .view-toggle { gap: 4px; padding: 3px; border: 1px solid var(--primary); border-radius: 24px; }
+.results-toolbar .view-toggle__btn { padding: 7px 18px; border: 0; border-radius: 20px; background: transparent; box-shadow: none; color: var(--primary-dark); font-size: .95rem; font-weight: 600; }
+.results-toolbar .view-toggle__btn:hover { background: var(--primary-light); color: var(--primary-dark); border-color: transparent; }
+.results-toolbar .view-toggle__btn.active { background: var(--primary); color: var(--white); box-shadow: none; }
+.results-toolbar .view-toggle__btn svg { width: 15px; height: 15px; }
