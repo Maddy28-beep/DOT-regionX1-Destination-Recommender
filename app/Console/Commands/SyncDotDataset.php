@@ -27,6 +27,7 @@ class SyncDotDataset extends Command
 {
     protected $signature = 'dot:sync-dataset
         {--file=database/data/dot-dataset-2026-09-23.json : Dataset to read}
+        {--add-missing : Also add establishments that are on the DOT list but not on the site yet}
         {--apply : Write the changes (default is a report only)}';
 
     protected $description = 'Update listing coordinates and renewed accreditation dates from the DOT working dataset.';
@@ -122,11 +123,33 @@ class SyncDotDataset extends Command
         $this->info(($apply ? 'APPLIED' : 'DRY RUN (nothing written)').' -- from '.count($rows).' dataset rows');
         $this->table(['What', 'Count'], collect($stat)->map(fn ($v, $k) => [str_replace('_', ' ', $k), $v])->values()->all());
 
+        if ($this->option('add-missing')) {
+            $this->addMissing($apply);
+        }
+
         if ($apply) {
             $this->call('accreditation:sync-status');
         }
 
         return self::SUCCESS;
+    }
+
+    private function addMissing(bool $apply): void
+    {
+        $path = database_path('data/dot-accredited-additions-2026-09-23.json');
+        $data = json_decode(file_get_contents($path), true)['listings'] ?? [];
+        $rows = collect($data)->flatten(1);
+        $new = $rows->reject(fn ($r) => AccreditationRecord::where('accreditation_number', $r['accno'])->exists());
+
+        $this->newLine();
+        $this->info(($apply ? 'Adding ' : 'Would add ').$new->count().' of '.$rows->count().' new establishments ('.($rows->count() - $new->count()).' already present):');
+        foreach ($new as $r) {
+            $this->line("add     {$r['accno']} {$r['name']}".($r['latitude'] ? ' [pinned]' : ' [no pin yet]'));
+        }
+
+        if ($apply) {
+            (new \Database\Seeders\RealAccreditedEstablishmentSeeder())->seedFile($path);
+        }
     }
 
     /** True when $b is $a with day and month exchanged (e.g. 2027-06-01 vs 2027-01-06). */
