@@ -58,16 +58,7 @@
                 <p>{{ $restaurant->description ?? 'No description available yet for this restaurant.' }}</p>
             </div>
 
-            <div class="side-card">
-                <h3 class="mt-0">Traveler Reviews ({{ $restaurant->reviews->count() }})</h3>
-                @forelse ($restaurant->reviews as $review)
-                    @include('partials.review-item')
-                @empty
-                    <p style="color:var(--muted);">No reviews yet. Be the first to dine and share your experience.</p>
-                @endforelse
-
-                @include("partials.review-form", ["listing" => $restaurant, "type" => "restaurants", "kind" => "restaurant"])
-            </div>
+            @include('partials.reviews-section', ['listing' => $restaurant, 'type' => 'restaurants', 'kind' => 'restaurant', 'emptyHint' => 'Be the first to dine and share your experience.'])
         </div>
 
         <div>
