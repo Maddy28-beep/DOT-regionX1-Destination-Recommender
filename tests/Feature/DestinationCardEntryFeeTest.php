@@ -39,9 +39,9 @@ class DestinationCardEntryFeeTest extends TestCase
     {
         $this->destination('Eden Nature Park', 150, 450);
 
-        $this->get('/destinations')->assertOk()
-            ->assertSee('150–450 / person')
-            ->assertSee('dpost-price__amount', false);
+        $html = $this->get('/destinations')->assertOk()->getContent();
+
+        $this->assertMatchesRegularExpression('/dcard__price">\s*<strong><span class="currency">&#8369;<\/span>150–450<\/strong>\s*<small>\/ person<\/small>/', $html);
     }
 
     public function test_a_free_place_still_says_free_entry_and_an_unknown_fee_keeps_the_meter(): void
@@ -52,6 +52,6 @@ class DestinationCardEntryFeeTest extends TestCase
         $html = $this->get('/destinations')->assertOk()->assertSee('Free entry')->getContent();
 
         $this->assertStringNotContainsString('/ person', $html);
-        $this->assertStringContainsString('dpost-price', $html);
+        $this->assertStringContainsString('dcard__band', $html, 'A place with no fee on record keeps the price band.');
     }
 }

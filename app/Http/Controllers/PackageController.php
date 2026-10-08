@@ -34,7 +34,7 @@ class PackageController extends Controller
 
     public function index(Request $request): View
     {
-        $query = Package::publiclyVisible()->with('region', 'photos')->withCount('reviews');
+        $query = Package::publiclyVisible()->with('region', 'photos', 'tourOperator')->withCount('reviews');
 
         if ($request->filled('q')) {
             $query->where('name', 'like', '%'.$request->string('q').'%');
@@ -97,7 +97,7 @@ class PackageController extends Controller
 
         $package->load(['region', 'inclusions', 'itineraryDays', 'photos', 'tourOperator', 'reviews' => fn ($q) => $q->latest()->take(10)]);
 
-        $nearby = Package::publiclyVisible()->with('region', 'photos')
+        $nearby = Package::publiclyVisible()->with('region', 'photos', 'tourOperator')
             ->where('region_id', $package->region_id)
             ->where('id', '!=', $package->id)
             ->orderByDesc('rating')

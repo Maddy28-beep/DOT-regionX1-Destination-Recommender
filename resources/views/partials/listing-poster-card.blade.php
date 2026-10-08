@@ -39,6 +39,9 @@
     $closedBadge = method_exists($listing, 'operatingBadge') ? $listing->operatingBadge() : null;
 @endphp
 
+@if ($listing instanceof \App\Models\Destination || $listing instanceof \App\Models\Accommodation || $listing instanceof \App\Models\Package || $listing instanceof \App\Models\SouvenirCenter || $listing instanceof \App\Models\TourOperator)
+    @include('partials.listing-card', ['listing' => $listing])
+@else
 <div class="dpost-card-wrap">
 @if ($saveSegment)
     <x-save-heart :type="$saveSegment" :listing="$listing" />
@@ -119,3 +122,4 @@
     </div>
 </a>
 </div>
+@endif
