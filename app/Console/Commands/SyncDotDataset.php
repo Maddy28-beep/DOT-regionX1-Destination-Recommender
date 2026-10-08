@@ -11,11 +11,11 @@ use Illuminate\Console\Command;
  *
  * Deliberately conservative -- it only does what the dataset can prove:
  *
- *  - Coordinates: set only from rows the dataset marks Verified/Corrected at establishment,
- *    building or manually-corrected precision (same rule as RealAccreditedEstablishmentSeeder).
- *    Street / barangay / city-centre / nearby-landmark pins are never imported, and never
- *    replace a better pin already stored. A listing run by an approved partner account is
- *    skipped, because its pin may be the owner's own.
+ *  - Coordinates: a listing with no pin takes the dataset's point, whatever its precision (an
+ *    approximate pin is better than none). A pin already stored is replaced only by a row marked
+ *    Verified/Corrected at establishment, building or manually-corrected precision, so an
+ *    approximate point never overwrites a better one. A listing run by an approved partner
+ *    account is skipped, because its pin may be the owner's own.
  *  - Expiry dates: only ever EXTENDED (a renewal). A day/month swap of the stored date is
  *    ignored -- the dataset's date cells were mis-read by Excel for days 1-12, so a swapped
  *    pair means the stored value (from the original DOT list) is the right one.
@@ -27,6 +27,7 @@ class SyncDotDataset extends Command
 {
     protected $signature = 'dot:sync-dataset
         {--file=database/data/dot-dataset-2026-09-23.json : Dataset to read}
+        {--add-missing : Also add establishments that are on the DOT list but not on the site yet}
         {--apply : Write the changes (default is a report only)}';
 
     protected $description = 'Update listing coordinates and renewed accreditation dates from the DOT working dataset.';
@@ -91,18 +92,23 @@ class SyncDotDataset extends Command
             if ($row['lat'] === null || $row['lng'] === null) {
                 continue;
             }
-            if (! in_array([$row['check'], $row['precision']], self::STRONG, true)) {
-                $stat['weak_skipped']++;
-
-                continue;
-            }
             if (isset($partnerOwned[$record->listing_kind.':'.$record->listing_id])) {
                 $stat['partner_skipped']++;
 
                 continue;
             }
 
+            // The dataset gives every establishment a point, so a listing with NO pin takes it whatever
+            // its precision (an approximate pin is better than none -- the planner can then route to it).
+            // A pin already stored is only replaced by a Verified/Corrected one.
             $has = $listing->latitude !== null && $listing->longitude !== null;
+            $strong = in_array([$row['check'], $row['precision']], self::STRONG, true);
+            if ($has && ! $strong) {
+                $stat['weak_skipped']++;
+
+                continue;
+            }
+
             $km = $has ? $this->km((float) $listing->latitude, (float) $listing->longitude, $row['lat'], $row['lng']) : null;
             if ($has && $km < 0.05) {
                 continue;
@@ -122,11 +128,33 @@ class SyncDotDataset extends Command
         $this->info(($apply ? 'APPLIED' : 'DRY RUN (nothing written)').' -- from '.count($rows).' dataset rows');
         $this->table(['What', 'Count'], collect($stat)->map(fn ($v, $k) => [str_replace('_', ' ', $k), $v])->values()->all());
 
+        if ($this->option('add-missing')) {
+            $this->addMissing($apply);
+        }
+
         if ($apply) {
             $this->call('accreditation:sync-status');
         }
 
         return self::SUCCESS;
+    }
+
+    private function addMissing(bool $apply): void
+    {
+        $path = database_path('data/dot-accredited-additions-2026-09-23.json');
+        $data = json_decode(file_get_contents($path), true)['listings'] ?? [];
+        $rows = collect($data)->flatten(1);
+        $new = $rows->reject(fn ($r) => AccreditationRecord::where('accreditation_number', $r['accno'])->exists());
+
+        $this->newLine();
+        $this->info(($apply ? 'Adding ' : 'Would add ').$new->count().' of '.$rows->count().' new establishments ('.($rows->count() - $new->count()).' already present):');
+        foreach ($new as $r) {
+            $this->line("add     {$r['accno']} {$r['name']}".($r['latitude'] ? ' [pinned]' : ' [no pin yet]'));
+        }
+
+        if ($apply) {
+            (new \Database\Seeders\RealAccreditedEstablishmentSeeder())->seedFile($path);
+        }
     }
 
     /** True when $b is $a with day and month exchanged (e.g. 2027-06-01 vs 2027-01-06). */
