@@ -5,7 +5,8 @@
 
     The pill appears only when the hours are a plain daily schedule we can read (see OpeningHours); for
     anything else ("Mon-Sat ...", "By arrangement") the text is shown without claiming open or closed.
-    A place marked closed in the admin always reads Closed.
+    A place marked closed in the admin always reads Closed. The map and address sit between the facts
+    and the directions button; a place with no coordinates simply has no map.
 
     $destination, $mapUrl
 --}}
@@ -15,6 +16,13 @@
     $openNow = \App\Support\OpeningHours::isOpenNow($hoursText);
     $pill = $closedByStatus ? 'closed' : ($openNow === true ? 'open' : ($openNow === false ? 'closed' : null));
     $spend = \App\Support\OpeningHours::spendLabel($destination->visit_duration) ?? 'Half day';
+
+    // The address line: where it is, with the region added unless the location already names it.
+    $address = trim((string) $destination->location);
+    $regionName = $destination->region?->name;
+    if ($address !== '' && $regionName && ! \Illuminate\Support\Str::contains($address, $regionName)) {
+        $address .= ', '.$regionName;
+    }
 @endphp
 
 <div class="visit-card">
@@ -49,6 +57,16 @@
             </div>
         </div>
     </div>
+
+    @if ($destination->latitude && $destination->longitude)
+        <div class="visit-card__map">
+            @include('partials.map-embed', ['latitude' => $destination->latitude, 'longitude' => $destination->longitude, 'name' => $destination->name])
+        </div>
+    @endif
+
+    @if ($address !== '')
+        <p class="visit-card__address"><x-icon name="map-pin" /> <span>{{ $address }}</span></p>
+    @endif
 
     <div class="visit-card__actions">
         <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="visit-card__go"><x-icon name="send" /> Get Directions</a>
