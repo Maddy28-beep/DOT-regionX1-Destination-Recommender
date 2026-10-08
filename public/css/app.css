@@ -5352,3 +5352,24 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
 .dcard__band span.is-on { color: var(--stamp-red); }
 .dcard__dist { display: inline-flex; align-items: center; gap: 5px; font-size: .8rem; color: var(--muted); white-space: nowrap; }
 .dcard__dist svg { width: 14px; height: 14px; }
+
+/* Listing card, shared by stays, packages, souvenir centers and tour operators */
+.dcard__loc > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dcard__loc { align-items: center; }
+.dcard__loc svg { margin-top: 0; }
+.dcard__from { font-size: .8rem; color: var(--muted); }
+.dcard__count { font-size: .92rem; color: var(--ink); }
+.dcard__monogram { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--primary-dark); }
+.dcard__monogram span {
+    width: 78px;
+    height: 78px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    background: var(--paper);
+    color: var(--primary-dark);
+    font-family: 'Barabara', 'Alfa Slab One', serif;
+    font-size: 2rem;
+    letter-spacing: .02em;
+}
