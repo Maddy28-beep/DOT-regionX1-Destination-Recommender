@@ -55,6 +55,7 @@
             <a href="{{ route('admin.overview') }}" class="{{ request()->routeIs('admin.overview') ? 'active' : '' }}"><x-icon name="target" /><span>Overview</span></a>
             <a href="{{ route('admin.exit-surveys') }}" class="{{ request()->routeIs('admin.exit-surveys') ? 'active' : '' }}"><x-icon name="chat" /><span>Exit Survey Insights</span></a>
             <a href="{{ route('admin.association-rules') }}" class="{{ request()->routeIs('admin.association-rules') ? 'active' : '' }}"><x-icon name="link" /><span>Association Rules</span></a>
+            <a href="{{ route('admin.audit-log') }}" class="{{ request()->routeIs('admin.audit-log') ? 'active' : '' }}"><x-icon name="shield-check" /><span>Audit Log</span></a>
 
             <div class="group-label">Accreditation</div>
             <a href="{{ route('admin.establishments') }}" class="{{ request()->routeIs('admin.establishments') ? 'active' : '' }}"><x-icon name="shield-check" /><span>Establishment Approvals</span></a>

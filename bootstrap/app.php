@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // and saved places remembered without collecting anything personal.
         $middleware->web(append: [
             \App\Http\Middleware\EnsureVisitorToken::class,
+            \App\Http\Middleware\SecurityHeaders::class,
         ]);
 
         // Global and first, so a request through a public tunnel is turned away before
