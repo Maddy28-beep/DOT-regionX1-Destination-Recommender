@@ -16,6 +16,11 @@ use App\Models\SouvenirCenter;
 use App\Models\TourOperator;
 use App\Models\TouristSavedDestination;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use App\Support\Toast;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Http\Request;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -35,6 +40,41 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        /*
+         * Rate limits. Without them anyone could try thousands of passwords a minute
+         * against the admin or partner login, or hammer the trip builder (each call
+         * runs the whole recommendation pipeline) until a small server stops answering.
+         * Limits are per visitor address and deliberately generous: a DOT event kiosk or
+         * a school network can put many real tourists behind one address.
+         *
+         * Over the limit, a browser gets a plain "wait a moment" message on the page it
+         * came from; a script gets a 429 with Retry-After.
+         */
+        $tooMany = function (Request $request, array $headers) {
+            $seconds = (int) ($headers['Retry-After'] ?? 60);
+            $detail = 'Too many tries in a short time. Please wait '.max(1, $seconds).' seconds and try again.';
+
+            return $request->expectsJson()
+                ? response()->json(['message' => $detail], 429, $headers)
+                : back()->withInput($request->except(['password', 'password_confirmation']))
+                    ->with(Toast::error('Please slow down', $detail));
+        };
+
+        // Sign-in: 5 tries a minute for one account from one address, 30 a minute from one address in total.
+        RateLimiter::for('login', fn (Request $request) => [
+            Limit::perMinute(5)->by('login:'.$request->ip().'|'.Str::lower((string) ($request->input('identifier') ?? $request->input('alias') ?? $request->input('email') ?? '')))->response($tooMany),
+            Limit::perMinute(30)->by('login-ip:'.$request->ip())->response($tooMany),
+        ]);
+
+        // New accounts: 10 an hour from one address.
+        RateLimiter::for('register', fn (Request $request) => Limit::perHour(10)->by('register:'.$request->ip())->response($tooMany));
+
+        // Anything that runs the recommendation pipeline (build, regenerate, swap, save).
+        RateLimiter::for('trip-build', fn (Request $request) => Limit::perMinute(30)->by('trip:'.$request->ip())->response($tooMany));
+
+        // Heart / unheart buttons.
+        RateLimiter::for('toggle', fn (Request $request) => Limit::perMinute(60)->by('toggle:'.$request->ip())->response($tooMany));
+
         // listing_kind values used by accreditation_records, reviews,
         // tourist_visits, establishment_accounts.matched_listing_id
         // user_type values used by notifications

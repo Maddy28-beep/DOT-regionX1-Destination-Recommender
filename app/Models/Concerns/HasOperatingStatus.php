@@ -125,6 +125,29 @@ trait HasOperatingStatus
             .$reason;
     }
 
+    /**
+     * A very short label for the corner of a listing card: null while the place is
+     * open ("Closed", "Closed until Oct 20", "Temporarily closed").
+     */
+    public function operatingBadge(): ?string
+    {
+        $status = $this->operating_status ?? self::STATUS_OPEN;
+
+        if ($status === self::STATUS_CLOSED) {
+            return 'Closed';
+        }
+
+        if ($status !== self::STATUS_TEMPORARILY_CLOSED) {
+            return null;
+        }
+
+        if ($this->reopens_on === null) {
+            return 'Temporarily closed';
+        }
+
+        return $this->reopens_on->isPast() ? null : 'Closed until '.$this->reopens_on->format('M j');
+    }
+
     /** The key Advisory rows use for this model (listing_kind), from the morph map. */
     public function advisoryKind(): string
     {

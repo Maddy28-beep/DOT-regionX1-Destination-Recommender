@@ -82,7 +82,7 @@ Route::get('/accommodations/{accommodation:slug}', [AccommodationController::cla
 // Public tour packages catalog
 Route::get('/packages', [PackageController::class, 'index'])->name('packages.index');
 Route::get('/packages/{package:slug}', [PackageController::class, 'show'])->name('packages.show');
-Route::post('/packages/{package:slug}/plan-with', [PackageController::class, 'planWith'])->name('packages.plan-with');
+Route::post('/packages/{package:slug}/plan-with', [PackageController::class, 'planWith'])->middleware('throttle:trip-build')->name('packages.plan-with');
 
 // Public restaurants catalog (2.2.1.3)
 Route::get('/restaurants', [RestaurantController::class, 'index'])->name('restaurants.index');
@@ -121,19 +121,19 @@ Route::get('/plan', [TripPlannerController::class, 'edit'])->name('plan.edit');
 Route::get('/plan/address-suggest', AddressSuggestionController::class)
     ->middleware('throttle:40,1')
     ->name('plan.address-suggest');
-Route::post('/plan', [TripPlannerController::class, 'update'])->name('plan.update');
+Route::post('/plan', [TripPlannerController::class, 'update'])->middleware('throttle:trip-build')->name('plan.update');
 Route::get('/plan/itinerary', [TripPlannerController::class, 'itinerary'])->name('plan.itinerary');
-Route::post('/plan/itinerary/regenerate', [TripPlannerController::class, 'regenerate'])->name('plan.regenerate');
+Route::post('/plan/itinerary/regenerate', [TripPlannerController::class, 'regenerate'])->middleware('throttle:trip-build')->name('plan.regenerate');
 
 // Similar-place swaps (pretrained embeddings): suggestions for one stop, and the swap itself.
 Route::get('/plan/itinerary/alternatives/{destinationId}', [ItinerarySwapController::class, 'alternatives'])
     ->whereNumber('destinationId')
     ->name('plan.alternatives');
-Route::post('/plan/itinerary/swap', [ItinerarySwapController::class, 'swap'])->name('plan.swap');
+Route::post('/plan/itinerary/swap', [ItinerarySwapController::class, 'swap'])->middleware('throttle:trip-build')->name('plan.swap');
 // Claims the session's current itinerary onto an optional tourist account. Not
 // gated by auth:tourist -- a guest must be able to hit this, get sent to
 // register, and land back here to finish. See TouristItineraryController.
-Route::post('/plan/itinerary/save', [TouristItineraryController::class, 'store'])->name('plan.itinerary.save');
+Route::post('/plan/itinerary/save', [TouristItineraryController::class, 'store'])->middleware('throttle:trip-build')->name('plan.itinerary.save');
 
 // Exit survey (2.2.1.7, Figures 13-15) — anonymous by design, no login required
 Route::get('/exit-survey', [ExitSurveyController::class, 'create'])->name('exit-survey.create');
@@ -159,7 +159,7 @@ Route::post('/chatbot/message', [ChatbotController::class, 'respond'])
  * browser can optionally create the separate account below instead.
  */
 Route::get('/saved', [SavedListingController::class, 'index'])->name('saved.index');
-Route::post('/saved/{type}/{id}', [SavedListingController::class, 'toggle'])->name('saved.toggle');
+Route::post('/saved/{type}/{id}', [SavedListingController::class, 'toggle'])->middleware('throttle:toggle')->name('saved.toggle');
 
 /*
  * Optional tourist account (alias + password, no real identity) -- purely a
@@ -169,9 +169,9 @@ Route::post('/saved/{type}/{id}', [SavedListingController::class, 'toggle'])->na
  */
 Route::prefix('account')->name('account.')->group(function () {
     Route::get('/register', [TouristAuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [TouristAuthController::class, 'register']);
+    Route::post('/register', [TouristAuthController::class, 'register'])->middleware('throttle:register');
     Route::get('/login', [TouristAuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [TouristAuthController::class, 'login']);
+    Route::post('/login', [TouristAuthController::class, 'login'])->middleware('throttle:login');
     Route::post('/logout', [TouristAuthController::class, 'logout'])->name('logout');
 });
 
@@ -184,17 +184,17 @@ Route::prefix('account')->name('account.')->middleware('auth:tourist')->group(fu
     Route::delete('/itineraries/{itinerary}', [TouristItineraryController::class, 'destroy'])->name('itineraries.destroy');
 
     Route::get('/saved', [TouristSavedDestinationController::class, 'index'])->name('saved');
-    Route::post('/saved/{type}/{id}', [TouristSavedDestinationController::class, 'toggle'])->name('saved.toggle');
+    Route::post('/saved/{type}/{id}', [TouristSavedDestinationController::class, 'toggle'])->middleware('throttle:toggle')->name('saved.toggle');
 });
 
 // Partner Portal (2.3.2 Tourism Administrator + DOT-Accredited Establishment, Figure 7)
 Route::prefix('portal')->name('portal.')->group(function () {
     Route::get('/login', [PortalAuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [PortalAuthController::class, 'login']);
+    Route::post('/login', [PortalAuthController::class, 'login'])->middleware('throttle:login');
     Route::post('/logout', [PortalAuthController::class, 'logout'])->name('logout');
 
     Route::get('/register', [EstablishmentRegistrationController::class, 'showRegister'])->name('establishment.register');
-    Route::post('/register', [EstablishmentRegistrationController::class, 'register']);
+    Route::post('/register', [EstablishmentRegistrationController::class, 'register'])->middleware('throttle:register');
 });
 
 // DOT Admin console (2.3.2 Tourism Administrator, Figures 16-21)
