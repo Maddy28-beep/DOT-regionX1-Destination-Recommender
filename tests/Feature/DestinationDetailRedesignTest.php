@@ -329,4 +329,38 @@ class DestinationDetailRedesignTest extends TestCase
         $this->assertSame(1, substr_count($html, 'save-form--square'));
         $this->assertStringContainsString('reviews-card', $html);
     }
+
+    // ---- the destination card
+
+    public function test_a_new_destination_card_has_a_new_tag_and_no_rating_row(): void
+    {
+        $this->place(['distance_km' => 28, 'entry_fee_min' => 150, 'entry_fee_max' => 150]);
+
+        $html = $this->get('/destinations')->assertOk()->getContent();
+
+        $this->assertStringContainsString('<span class="dcard__new">New</span>', $html);
+        $this->assertStringNotContainsString('dcard__rating', $html);
+        $this->assertStringContainsString('28 km from city', $html);
+        $this->assertStringContainsString('DOT accredited', $html);
+    }
+
+    public function test_a_reviewed_destination_card_shows_rating_and_count_instead_of_the_new_tag(): void
+    {
+        $this->place(['rating' => 4.8, 'review_count' => 23]);
+
+        $html = $this->get('/destinations')->assertOk()->getContent();
+
+        $this->assertStringContainsString('<strong>4.8</strong>', $html);
+        $this->assertStringContainsString('<span>(23)</span>', $html);
+        $this->assertStringNotContainsString('dcard__new', $html);
+    }
+
+    public function test_the_card_does_not_repeat_the_region_when_the_location_already_names_it(): void
+    {
+        $this->place(['location' => 'Malagos, Baguio District, Davao City']);
+
+        $html = $this->get('/destinations')->assertOk()->getContent();
+
+        $this->assertStringContainsString('<span>Malagos, Baguio District, Davao City</span>', $html);
+    }
 }
