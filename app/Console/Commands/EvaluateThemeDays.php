@@ -67,13 +67,18 @@ class EvaluateThemeDays extends Command
         $regrouped = count(array_filter($rows, fn ($r) => $r['regrouped']));
         $meanBefore = array_sum(array_column($rows, 'mean_similarity_before')) / $n;
         $meanAfter = array_sum(array_column($rows, 'mean_similarity_after')) / $n;
+        $typesBefore = array_sum(array_column($rows, 'types_per_day_before')) / $n;
+        $typesAfter = array_sum(array_column($rows, 'types_per_day_after')) / $n;
+        $guarded = count(array_filter($rows, fn ($r) => ! empty($r['guard'])));
         $kmBefore = array_sum(array_column($rows, 'distance_before_km'));
         $kmAfter = array_sum(array_column($rows, 'distance_after_km'));
         $worst = max(array_map(fn ($r) => $r['distance_before_km'] > 0 ? $r['distance_after_km'] / $r['distance_before_km'] : 1.0, $rows));
 
-        $this->info("Trips evaluated: {$n}");
+        $this->info("Trips evaluated: {$n} of {$trips} generated (the rest had too few stops or days to regroup, or no stored vectors)");
         $this->line(sprintf('Trips whose days were regrouped: %d of %d (%.1f%%)', $regrouped, $n, $regrouped / $n * 100));
         $this->line(sprintf('Average similarity of places sharing a day: %.1f%% -> %.1f%% (+%.1f points)', $meanBefore, $meanAfter, $meanAfter - $meanBefore));
+        $this->line(sprintf('Independent check (place types per day, lower = more alike, not using the vectors): %.2f -> %.2f', $typesBefore, $typesAfter));
+        $this->line(sprintf('Trips where regrouping was undone because it would have placed fewer stops: %d', $guarded));
         $this->line(sprintf('Total travelling across all trips: %.0f km -> %.0f km (%+.1f%%)', $kmBefore, $kmAfter, ($kmAfter / max(1, $kmBefore) - 1) * 100));
         $this->line(sprintf('Largest single-trip increase in travelling: %+.1f%% (limit +25%% plus %.0f km allowance)', ($worst - 1) * 100, \App\Services\Recommendation\ThemeDayGrouper::DISTANCE_ALLOWANCE_KM));
 
