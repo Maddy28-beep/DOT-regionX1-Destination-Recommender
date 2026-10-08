@@ -1,0 +1,3528 @@
+{
+ "source": "listings-source-reviewed-ampm.xlsx",
+ "scope": "hours, fees, visit duration, best time, price tier; accommodation check-in, check-out and rate",
+ "entries": [
+  {
+   "table": "destinations",
+   "id": 17,
+   "name": "Apo Golf and Country Club",
+   "fields": {
+    "hours": "6:00 AM–6:00 PM",
+    "entry_fee_min": 1500.0,
+    "entry_fee_max": 3500.0,
+    "visit_duration": "240 minutes",
+    "best_time": "Early morning",
+    "price_tier": "Premium"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 9,
+   "name": "Belviz Farm",
+   "fields": {
+    "hours": "8:00 AM–5:00 PM",
+    "entry_fee_min": 100.0,
+    "entry_fee_max": 300.0,
+    "visit_duration": "120 minutes",
+    "best_time": "Morning",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 10,
+   "name": "Bemwa Farm Fresh Inc.",
+   "fields": {
+    "hours": "8:00 AM–5:00 PM",
+    "entry_fee_min": 100.0,
+    "entry_fee_max": 300.0,
+    "visit_duration": "120 minutes",
+    "best_time": "Morning",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 11,
+   "name": "Bukid Amara Tourism Agriventures Corporation",
+   "fields": {
+    "hours": "8:00 AM–5:00 PM",
+    "entry_fee_min": 100.0,
+    "entry_fee_max": 300.0,
+    "visit_duration": "120 minutes",
+    "best_time": "Morning",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 7,
+   "name": "Dahican Beach",
+   "fields": {
+    "hours": "6:00 AM–6:00 PM",
+    "entry_fee_min": 0.0,
+    "entry_fee_max": 50.0,
+    "visit_duration": "180 minutes",
+    "best_time": "Morning; check tides and local surf conditions",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 12,
+   "name": "Damosa Land Inc. / Agriya Naturetainment",
+   "fields": {
+    "hours": "8:00 AM–5:00 PM",
+    "entry_fee_min": 100.0,
+    "entry_fee_max": 300.0,
+    "visit_duration": "120 minutes",
+    "best_time": "Morning",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 15,
+   "name": "Davao Crocodile Park Inc",
+   "fields": {
+    "hours": "8:00 AM–7:00 PM",
+    "entry_fee_min": 200.0,
+    "entry_fee_max": 450.0,
+    "visit_duration": "120 minutes",
+    "best_time": "Morning",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Published — operator/government"
+  },
+  {
+   "table": "destinations",
+   "id": 2,
+   "name": "Eden Nature Park",
+   "fields": {
+    "hours": "9:00 AM–5:00 PM",
+    "entry_fee_min": 150.0,
+    "entry_fee_max": 450.0,
+    "visit_duration": "240 minutes",
+    "best_time": "Morning",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — operator/government"
+  },
+  {
+   "table": "destinations",
+   "id": 22,
+   "name": "Elysia Wellness Spa",
+   "fields": {
+    "hours": "10:00 AM–9:00 PM",
+    "entry_fee_min": 500.0,
+    "entry_fee_max": 1500.0,
+    "visit_duration": "90 minutes",
+    "best_time": "Late afternoon",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 24,
+   "name": "Elysia Wellness Spa",
+   "fields": {
+    "hours": "10:00 AM–9:00 PM",
+    "entry_fee_min": 500.0,
+    "entry_fee_max": 1500.0,
+    "visit_duration": "90 minutes",
+    "best_time": "Late afternoon",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 23,
+   "name": "Elysia Wellness Spa",
+   "fields": {
+    "hours": "10:00 AM–9:00 PM",
+    "entry_fee_min": 500.0,
+    "entry_fee_max": 1500.0,
+    "visit_duration": "90 minutes",
+    "best_time": "Late afternoon",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 21,
+   "name": "IMIN The Philippine-Japan Historical Museum",
+   "fields": {
+    "hours": "Mon–Sat 8:00 AM–12:00 PM; 1:00 PM–5:00 PM; Sun by booking",
+    "entry_fee_min": 100.0,
+    "entry_fee_max": 100.0,
+    "visit_duration": "90 minutes",
+    "best_time": "Morning",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Dated source — reconfirm"
+  },
+  {
+   "table": "destinations",
+   "id": 13,
+   "name": "Isla- Agri Ventures Inc",
+   "fields": {
+    "hours": "8:00 AM–5:00 PM",
+    "entry_fee_min": 100.0,
+    "entry_fee_max": 300.0,
+    "visit_duration": "120 minutes",
+    "best_time": "Morning",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 16,
+   "name": "JKM Mini Zoo",
+   "fields": {
+    "hours": "8:00 AM–5:00 PM",
+    "entry_fee_min": 200.0,
+    "entry_fee_max": 450.0,
+    "visit_duration": "120 minutes",
+    "best_time": "Morning",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 14,
+   "name": "Lao Integrated Farms",
+   "fields": {
+    "hours": "8:00 AM–5:00 PM",
+    "entry_fee_min": 100.0,
+    "entry_fee_max": 300.0,
+    "visit_duration": "120 minutes",
+    "best_time": "Morning",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 5,
+   "name": "Malagos Garden Resort",
+   "fields": {
+    "hours": "8:00 AM–5:00 PM",
+    "entry_fee_min": 100.0,
+    "entry_fee_max": 350.0,
+    "visit_duration": "240 minutes",
+    "best_time": "Morning",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 6,
+   "name": "Mount Apo Natural Park",
+   "fields": {
+    "hours": "Permit / guide schedule; assumed hiking 5:00 AM–5:00 PM",
+    "entry_fee_min": 500.0,
+    "entry_fee_max": 1500.0,
+    "visit_duration": "2 days / 1 night",
+    "best_time": "Permitted departure; suitable weather only",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 4,
+   "name": "People's Park",
+   "fields": {
+    "hours": "1:00 PM–10:00 PM",
+    "entry_fee_min": 0.0,
+    "entry_fee_max": 0.0,
+    "visit_duration": "90 minutes",
+    "best_time": "Late afternoon",
+    "price_tier": "Free"
+   },
+   "evidence": "Published — operator/government"
+  },
+  {
+   "table": "destinations",
+   "id": 3,
+   "name": "Philippine Eagle Center",
+   "fields": {
+    "hours": "8:00 AM–5:00 PM",
+    "entry_fee_min": 150.0,
+    "entry_fee_max": 150.0,
+    "visit_duration": "120 minutes",
+    "best_time": "Morning",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 18,
+   "name": "Rancho Palos Verdes Golf & Sports Club Inc.",
+   "fields": {
+    "hours": "6:00 AM–6:00 PM",
+    "entry_fee_min": 1500.0,
+    "entry_fee_max": 3500.0,
+    "visit_duration": "240 minutes",
+    "best_time": "Early morning",
+    "price_tier": "Premium"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 19,
+   "name": "Rancho Palos Verdes Golf & Sports Club Inc.",
+   "fields": {
+    "hours": "6:00 AM–6:00 PM",
+    "entry_fee_min": 1500.0,
+    "entry_fee_max": 3500.0,
+    "visit_duration": "240 minutes",
+    "best_time": "Early morning",
+    "price_tier": "Premium"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "destinations",
+   "id": 8,
+   "name": "SMX Convention Center Davao",
+   "fields": {
+    "hours": "Event-dependent; assumed window 9:00 AM–6:00 PM",
+    "entry_fee_min": 0.0,
+    "entry_fee_max": 1000.0,
+    "visit_duration": "180 minutes",
+    "best_time": "According to event schedule",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "destinations",
+   "id": 1,
+   "name": "Samal Island",
+   "fields": {
+    "hours": "6:00 AM–6:00 PM",
+    "entry_fee_min": 100.0,
+    "entry_fee_max": 500.0,
+    "visit_duration": "360 minutes",
+    "best_time": "Morning; check weather and ferry schedule",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "destinations",
+   "id": 20,
+   "name": "South Pacific Davao Country Club Inc.",
+   "fields": {
+    "hours": "6:00 AM–6:00 PM",
+    "entry_fee_min": 1500.0,
+    "entry_fee_max": 3500.0,
+    "visit_duration": "240 minutes",
+    "best_time": "Early morning",
+    "price_tier": "Premium"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "restaurants",
+   "id": 4,
+   "name": "Arvie's Cafe",
+   "fields": {
+    "opening_hours": "8:00 AM–8:00 PM",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 5,
+   "name": "Axl Dave Bibingka Food Corporation",
+   "fields": {
+    "opening_hours": "6:00 AM–6:00 PM",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 6,
+   "name": "Balik Bukid Farm and Kitchen",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "restaurants",
+   "id": 7,
+   "name": "BigFat Tummy's Steak and Seafood Restaurant",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "restaurants",
+   "id": 3,
+   "name": "Blue Post Boiling Crabs & Shrimp",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 8,
+   "name": "Braytside Cakes Catering Services",
+   "fields": {
+    "opening_hours": "By arrangement; assumed inquiry window 9:00 AM–5:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 9,
+   "name": "Chow2 Restaurant & Catering Services",
+   "fields": {
+    "opening_hours": "By arrangement; assumed inquiry window 9:00 AM–5:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 10,
+   "name": "ClareBites Cafe",
+   "fields": {
+    "opening_hours": "8:00 AM–8:00 PM",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 11,
+   "name": "Delmor's Grill House",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 12,
+   "name": "Diskanso Cafe",
+   "fields": {
+    "opening_hours": "8:00 AM–8:00 PM",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 13,
+   "name": "Dongturks Catering Services",
+   "fields": {
+    "opening_hours": "By arrangement; assumed inquiry window 9:00 AM–5:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 14,
+   "name": "Garden By The Bay Corporation",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "restaurants",
+   "id": 15,
+   "name": "Garden Oases Restaurant",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 16,
+   "name": "George BBQ",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 17,
+   "name": "Hillside 88 Bar and Restaurant",
+   "fields": {
+    "opening_hours": "4:00 PM–11:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 18,
+   "name": "Hugo - Montevista Branch",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 19,
+   "name": "Hugo's Pizza",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 20,
+   "name": "Ibing's Cafe",
+   "fields": {
+    "opening_hours": "8:00 AM–8:00 PM",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 21,
+   "name": "Jack's Ridge Resort and Restaurant",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "restaurants",
+   "id": 22,
+   "name": "Jenniel's Caf",
+   "fields": {
+    "opening_hours": "8:00 AM–8:00 PM",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 23,
+   "name": "Kapehan sa Tambacan",
+   "fields": {
+    "opening_hours": "8:00 AM–8:00 PM",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 2,
+   "name": "Kublai Khan Mongolian Restaurant",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 24,
+   "name": "Kusina Kabacan",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 25,
+   "name": "Kusina Kabacan",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 26,
+   "name": "Leonora's Restaurant",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 1,
+   "name": "Marina Tuna Restaurant",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "restaurants",
+   "id": 27,
+   "name": "Marinatuna",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "restaurants",
+   "id": 45,
+   "name": "Matina Swiss Deli and Restaurant",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "restaurants",
+   "id": 28,
+   "name": "New Davao Famous Restaurant Corp",
+   "fields": {
+    "opening_hours": "7:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — operator/government"
+  },
+  {
+   "table": "restaurants",
+   "id": 29,
+   "name": "Nonki Japanese Restaurant",
+   "fields": {
+    "opening_hours": "11:00 AM–2:00 PM; 4:30 PM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — operator/government"
+  },
+  {
+   "table": "restaurants",
+   "id": 30,
+   "name": "Parola-Baywalk Restaurant",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 31,
+   "name": "Pizzakaya - Maco",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 32,
+   "name": "PortSide Grill House Food Corporation",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 33,
+   "name": "Qan's Bibingka and Eatery",
+   "fields": {
+    "opening_hours": "6:00 AM–6:00 PM",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 34,
+   "name": "Rekado Filipino Cuisine",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "restaurants",
+   "id": 35,
+   "name": "Sabor Elas Cafe",
+   "fields": {
+    "opening_hours": "8:00 AM–8:00 PM",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 36,
+   "name": "Skyway21 Nature Park",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "restaurants",
+   "id": 37,
+   "name": "The Swiss Deli Restaurant",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "restaurants",
+   "id": 38,
+   "name": "Tsuru",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "restaurants",
+   "id": 39,
+   "name": "Tsuru Incorporated(Camus)",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "restaurants",
+   "id": 41,
+   "name": "Tsuru Japanese Restaurant & Sushi Bar",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "restaurants",
+   "id": 42,
+   "name": "Tsuru Japanese Restaurant & Sushi Bar",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "restaurants",
+   "id": 40,
+   "name": "Tsuru Japanese Restaurant & Sushi Bar",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "restaurants",
+   "id": 43,
+   "name": "Vikings",
+   "fields": {
+    "opening_hours": "10:00 AM–9:00 PM",
+    "price_tier": "Premium"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "restaurants",
+   "id": 44,
+   "name": "Zorbox Cafe",
+   "fields": {
+    "opening_hours": "8:00 AM–8:00 PM",
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 66,
+   "name": "3Kings Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 4,
+   "name": "Acacia Hotel Davao",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — operator/government"
+  },
+  {
+   "table": "accommodations",
+   "id": 67,
+   "name": "Adecor Garden Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 5,
+   "name": "Adelina Hotel and Suites",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 68,
+   "name": "Aguakan Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 69,
+   "name": "Aikiko House",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 70,
+   "name": "Altavista Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 71,
+   "name": "Alu Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — booking platform"
+  },
+  {
+   "table": "accommodations",
+   "id": 72,
+   "name": "Amaranta Suites",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 1500.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 73,
+   "name": "Amaya Waterfront Villa",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 223,
+   "name": "Amigotel Inn and Bloom (Boracay)",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 74,
+   "name": "Anrana Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 6,
+   "name": "Apo View Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — booking platform"
+  },
+  {
+   "table": "accommodations",
+   "id": 222,
+   "name": "Aria Hotel & Residences",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 75,
+   "name": "Asrodel Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 1500.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Published — booking platform"
+  },
+  {
+   "table": "accommodations",
+   "id": 76,
+   "name": "Aundanao Oasis Beach",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 77,
+   "name": "Ayuste Highland Mountain Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 78,
+   "name": "Baculin Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 79,
+   "name": "Bagobo Cultural Village",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 1500.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 80,
+   "name": "Bajada Suites OPC",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 7,
+   "name": "Big 8 Corporate Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "accommodations",
+   "id": 8,
+   "name": "Big 8 Corporate Hotel Digos",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 9,
+   "name": "Blue Lotus Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2900.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — operator/government"
+  },
+  {
+   "table": "accommodations",
+   "id": 37,
+   "name": "Buenavista Island Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 81,
+   "name": "Bungalow Vacation Rentals",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 38,
+   "name": "Camp Holiday Resort and Recreation Area",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 82,
+   "name": "Canibad Secret Paradise",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 83,
+   "name": "Casa Julieta",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "accommodations",
+   "id": 84,
+   "name": "Casa Leticia Boutique Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 1500.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Published — booking platform"
+  },
+  {
+   "table": "accommodations",
+   "id": 85,
+   "name": "Casa Leticia Business Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 86,
+   "name": "Casa-Tanaw Inland Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 39,
+   "name": "Catigan Mountain Breeze Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 87,
+   "name": "Cavanico IL Mare Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 88,
+   "name": "Central District Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "accommodations",
+   "id": 40,
+   "name": "Chema's by the Sea",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "accommodations",
+   "id": 89,
+   "name": "Citistar Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 90,
+   "name": "Citistyle Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 41,
+   "name": "Club Samal Resorts Development Inc.",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "accommodations",
+   "id": 91,
+   "name": "Coral Dive beach resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 42,
+   "name": "Costa Azalea",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 43,
+   "name": "Costa Marina Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 208,
+   "name": "Cosy Nook Condotel",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 2000.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 92,
+   "name": "Courtside Princess Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 93,
+   "name": "Cozy Quartelle Rooms & Suites",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 94,
+   "name": "Cris Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 95,
+   "name": "Cris Inn Tagum",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 96,
+   "name": "Crown Regency Residences Davao",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 97,
+   "name": "D' Garden Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 44,
+   "name": "D' Leonor Inland Resort & Adventure Park",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 102,
+   "name": "D'Japanese Tunnel Family Resort and Restaurant",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 10,
+   "name": "D'Leonor Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 101,
+   "name": "DGLM Inland Leisure Center",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 45,
+   "name": "Dahican Beach Resort and Spa",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 98,
+   "name": "Davao Airport View Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — booking platform"
+  },
+  {
+   "table": "accommodations",
+   "id": 99,
+   "name": "Davao Bamboo Sanctuary and Ecological Park",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 224,
+   "name": "Davao HUB DORMITELLE",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 46,
+   "name": "Daya Adventure Resort Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 100,
+   "name": "Debonaires Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 47,
+   "name": "Discovery Samal",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "accommodations",
+   "id": 103,
+   "name": "Domicilio Lorenzo",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "accommodations",
+   "id": 104,
+   "name": "Drive Park Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 11,
+   "name": "Dusit D2 Davao",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 6000.0,
+    "price_tier": "Premium"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "accommodations",
+   "id": 48,
+   "name": "Dusit Thani Lubi Plantation Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 6000.0,
+    "price_tier": "Premium"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "accommodations",
+   "id": 225,
+   "name": "Eagles' Nest Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 105,
+   "name": "Eco Green Boutique Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 106,
+   "name": "Edar's Place",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 49,
+   "name": "Eden Mountain Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 4640.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — operator/government"
+  },
+  {
+   "table": "accommodations",
+   "id": 107,
+   "name": "Emma Victoria's Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 108,
+   "name": "Espacio de Clarita Hometel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 109,
+   "name": "Estella Beach'n Star Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 64,
+   "name": "Executive Tulip Apartelle",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2200.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 110,
+   "name": "First Pacific Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 111,
+   "name": "Frances Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 112,
+   "name": "Funventure Talicud Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 113,
+   "name": "Georgia's Samal Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 12,
+   "name": "GoHotels Davao",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — operator/government"
+  },
+  {
+   "table": "accommodations",
+   "id": 114,
+   "name": "Golden Palace Hotel Corporation",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 115,
+   "name": "Gov Gen Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 116,
+   "name": "Grand Amber Country Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 13,
+   "name": "Grand Men Seng Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 14,
+   "name": "Grand Palm Villas and Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 15,
+   "name": "Grand Regal Hotel Davao",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — booking platform"
+  },
+  {
+   "table": "accommodations",
+   "id": 117,
+   "name": "Grand8 Guesthouse",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 1200.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 16,
+   "name": "Green Banana Business Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 118,
+   "name": "Greenwindows Dormitel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 50,
+   "name": "Haven's Dew Resort, OPC",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 119,
+   "name": "Heavenly Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 120,
+   "name": "Heroben Hometel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 51,
+   "name": "Hidden Gardens Resort, Davao",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 121,
+   "name": "Hijo Resorts Davao",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 52,
+   "name": "Hof Gorei Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — booking platform"
+  },
+  {
+   "table": "accommodations",
+   "id": 53,
+   "name": "Holiday Oceanview Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 17,
+   "name": "Home Crest Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — booking platform"
+  },
+  {
+   "table": "accommodations",
+   "id": 122,
+   "name": "Honey's Hotel and Restaurant",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 123,
+   "name": "Hop Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "accommodations",
+   "id": 124,
+   "name": "Hostel 153",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 125,
+   "name": "Hotel Cabaguio",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 126,
+   "name": "Hotel Esse",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 127,
+   "name": "Hotel Midori",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 128,
+   "name": "Hotel San Marco",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 129,
+   "name": "Hotel Sogo",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 19,
+   "name": "Hotel Tropika Davao",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — booking platform"
+  },
+  {
+   "table": "accommodations",
+   "id": 130,
+   "name": "Hotel Uno",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 18,
+   "name": "Hotel de Crisbelle",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 131,
+   "name": "Humberto's Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 132,
+   "name": "Inside Room Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 133,
+   "name": "Island Garden Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 210,
+   "name": "JHS Condo Unit Rental",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 2000.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 139,
+   "name": "JJK Realty & Commercial Corp. (Faircrown Suites)",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 134,
+   "name": "Jack's In The Sky Mountain Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 135,
+   "name": "Jade Dragon Suites",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 136,
+   "name": "Jardin De Seorita",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 137,
+   "name": "Jardin De Ysabelle Eco Park",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 209,
+   "name": "Jazzhy Condo Unit Rental",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 2000.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 138,
+   "name": "Jillux Lodging Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 140,
+   "name": "Jotel Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 141,
+   "name": "Kojo Hotel and Suites Inc.",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 149,
+   "name": "LYR Beach Resort Corporation",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 142,
+   "name": "La Anclar Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 143,
+   "name": "La Vida Hostel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 144,
+   "name": "La-Florenda Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 229,
+   "name": "Lanante Condo Unit Rental",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 2000.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 145,
+   "name": "Langoyon Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 211,
+   "name": "Leo's Condo Unit Rental",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 2000.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 54,
+   "name": "Leticia by the Sea",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 146,
+   "name": "Lispher Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 147,
+   "name": "Loleng's Mountain Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 148,
+   "name": "Luxebridge Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 155,
+   "name": "MGL Resthouse and Foodhouse",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 20,
+   "name": "Madayaw Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 150,
+   "name": "Madonna Hometel & Suites New Pandan",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 55,
+   "name": "Magnaga Waters Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 151,
+   "name": "Magooz Homestay",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 1200.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 152,
+   "name": "Mahan Garden Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 56,
+   "name": "Malagos Garden Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — operator/government"
+  },
+  {
+   "table": "accommodations",
+   "id": 226,
+   "name": "Matanao Travellers Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 153,
+   "name": "Maxze B & B Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 154,
+   "name": "Mergrande Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 21,
+   "name": "Microtel by Wyndham - Davao",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "accommodations",
+   "id": 156,
+   "name": "Midori Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 157,
+   "name": "Molave Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 57,
+   "name": "Montefrio Garden Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 158,
+   "name": "Moonlit Baganga Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 159,
+   "name": "Muland Leisure Park",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 160,
+   "name": "Nacyl-V Transient House",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 161,
+   "name": "Napsule Suites",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 162,
+   "name": "Nath Fen Suites Inc",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 212,
+   "name": "Nomad Escapes & Sanctuaries OPC",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 2000.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 213,
+   "name": "Notre Maison Property Leasing",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 2000.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 163,
+   "name": "Oceano Con Vista Highland Events Place Rental",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 164,
+   "name": "Odyson's Mountain Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 166,
+   "name": "Oh George Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 165,
+   "name": "Oh George Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 167,
+   "name": "Oh George Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 168,
+   "name": "Optimum Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 169,
+   "name": "Orange Grove Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 170,
+   "name": "Pacific Palm Suites",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 22,
+   "name": "Panorama Summit Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — operator/government"
+  },
+  {
+   "table": "accommodations",
+   "id": 3,
+   "name": "Paradise Island Park & Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 7000.0,
+    "price_tier": "Premium"
+   },
+   "evidence": "Published — operator/government"
+  },
+  {
+   "table": "accommodations",
+   "id": 58,
+   "name": "Paradise Island Park and Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 7000.0,
+    "price_tier": "Premium"
+   },
+   "evidence": "Published — operator/government"
+  },
+  {
+   "table": "accommodations",
+   "id": 171,
+   "name": "Park Avenue Residence Inn & Suites",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 23,
+   "name": "Park Inn by Radisson Davao",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 6000.0,
+    "price_tier": "Premium"
+   },
+   "evidence": "Published — operator/government"
+  },
+  {
+   "table": "accommodations",
+   "id": 2,
+   "name": "Pearl Farm Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 8500.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — operator/government"
+  },
+  {
+   "table": "accommodations",
+   "id": 59,
+   "name": "Playa del Rosario Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 172,
+   "name": "Praia Vista",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 173,
+   "name": "Praia Vista inc",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 174,
+   "name": "Primo Whitesand Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 175,
+   "name": "Princess Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 176,
+   "name": "Princess Perrine Suites",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 177,
+   "name": "Punta de Gloria Villas",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 178,
+   "name": "Qanaq Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 179,
+   "name": "Qi Xiang Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 216,
+   "name": "RK Condo Unit Rental",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 2000.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 217,
+   "name": "RL Condo Unit Rental",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 2000.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 227,
+   "name": "RLG Swimming Pool",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 183,
+   "name": "RMPC Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 180,
+   "name": "Rainbow Breeze Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 181,
+   "name": "Red Barn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 65,
+   "name": "Red Knight Gardens",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2200.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — booking platform"
+  },
+  {
+   "table": "accommodations",
+   "id": 24,
+   "name": "Red Planet Davao",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "accommodations",
+   "id": 182,
+   "name": "RedDoorz - 100 Roxas Avenue",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 215,
+   "name": "Reeka-Hometel",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 2000.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 214,
+   "name": "Reeka-Hometel",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 2000.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 184,
+   "name": "Roadway Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 25,
+   "name": "Rogen Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "accommodations",
+   "id": 185,
+   "name": "Ruemango Apartelle and Suites",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 218,
+   "name": "Russ Condo Unit Rental",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 2000.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 60,
+   "name": "Rustic Lounge Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 192,
+   "name": "SWISSFINITY BEACH RESORT",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 61,
+   "name": "Seashell Island Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 26,
+   "name": "Seda Abreeza Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 6000.0,
+    "price_tier": "Premium"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "accommodations",
+   "id": 186,
+   "name": "Sequioa Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 219,
+   "name": "Sha Condo Unit Rental",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 2000.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 27,
+   "name": "Shine Boutique Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 187,
+   "name": "Snooze Inn & Suites",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 188,
+   "name": "Sonreir Apartelle and Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 28,
+   "name": "Sotogrande Hotel Davao",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — operator/government"
+  },
+  {
+   "table": "accommodations",
+   "id": 189,
+   "name": "South Point Beach House",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 29,
+   "name": "Star Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 62,
+   "name": "Stream Valley Nature's Park",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 190,
+   "name": "Sumo Asia Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:30:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — booking platform"
+  },
+  {
+   "table": "accommodations",
+   "id": 191,
+   "name": "Sun My Hotel Corporation",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 30,
+   "name": "Sunny Point Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 200,
+   "name": "TLSY Beach Front Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 193,
+   "name": "The Big House, A Heritage Home",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 31,
+   "name": "The Lanang Suites",
+   "fields": {
+    "check_in": "13:30:00",
+    "check_out": "13:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — booking platform"
+  },
+  {
+   "table": "accommodations",
+   "id": 194,
+   "name": "The Lucky 9 Budget Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 195,
+   "name": "The Manor Hotel Davao",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 32,
+   "name": "The Pinnacle Hotel and Suites",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "accommodations",
+   "id": 33,
+   "name": "The Ritz Hotel at Garden Oases",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Published — booking platform"
+  },
+  {
+   "table": "accommodations",
+   "id": 34,
+   "name": "The Royal Mandaya Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 6000.0,
+    "price_tier": "Premium"
+   },
+   "evidence": "Published — booking platform"
+  },
+  {
+   "table": "accommodations",
+   "id": 196,
+   "name": "The Royale House Hotel & Dormitel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 197,
+   "name": "The Strand Suites And Dormitel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 35,
+   "name": "The World Palace Business Center",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Checked — unresolved"
+  },
+  {
+   "table": "accommodations",
+   "id": 198,
+   "name": "Thirty Eight Hampton Suites",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 199,
+   "name": "Tinhat Company",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 201,
+   "name": "Top Star Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 202,
+   "name": "Tower Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 228,
+   "name": "Traveler's Inn",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 203,
+   "name": "Twin Mountain View Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 204,
+   "name": "Vafi Hills Homestay",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 1200.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 63,
+   "name": "Villa Amparo Garden Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 205,
+   "name": "Villa Carmelita Inland Resort and Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 221,
+   "name": "WGK Condotel",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 2000.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 220,
+   "name": "WL Condominium Unit Rental",
+   "fields": {
+    "check_in": "15:00:00",
+    "check_out": "11:00:00",
+    "price_per_night": 2000.0,
+    "price_tier": "Budget-Friendly"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 36,
+   "name": "Waterfront Insular Hotel Davao",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 6000.0,
+    "price_tier": "Premium"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 206,
+   "name": "Wind and Waves Beach Resort",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 3000.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  },
+  {
+   "table": "accommodations",
+   "id": 207,
+   "name": "YKG Hotel",
+   "fields": {
+    "check_in": "14:00:00",
+    "check_out": "12:00:00",
+    "price_per_night": 2800.0,
+    "price_tier": "Mid-range"
+   },
+   "evidence": "Not individually checked"
+  }
+ ]
+}
