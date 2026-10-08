@@ -11,7 +11,7 @@ class TourOperatorController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = TourOperator::publiclyVisible()->with('region', 'photos')->withCount('reviews');
+        $query = TourOperator::publiclyVisible()->with('region', 'photos')->withCount('reviews')->withCount(['packages' => fn ($q) => $q->whereNull('archived_at')->where('is_accredited', true)]);
 
         if ($request->filled('q')) {
             $query->where('name', 'like', '%'.$request->string('q').'%');
@@ -49,7 +49,7 @@ class TourOperatorController extends Controller
 
         $tourOperator->load(['region', 'photos', 'reviews' => fn ($q) => $q->latest()->take(10), 'packages' => fn ($q) => $q->whereNull('archived_at')->where('is_accredited', true)]);
 
-        $nearby = TourOperator::publiclyVisible()->with('region', 'photos')
+        $nearby = TourOperator::publiclyVisible()->with('region', 'photos')->withCount(['packages' => fn ($q) => $q->whereNull('archived_at')->where('is_accredited', true)])
             ->where('region_id', $tourOperator->region_id)
             ->where('id', '!=', $tourOperator->id)
             ->orderByDesc('rating')
