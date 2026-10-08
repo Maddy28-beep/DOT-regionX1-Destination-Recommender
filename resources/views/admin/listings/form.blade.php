@@ -325,6 +325,8 @@
                     @break
             @endswitch
 
+            @include('admin.listings.online-presence', ['listing' => $listing])
+
             @if (in_array($type, ['destinations', 'accommodations', 'restaurants', 'souvenir-centers', 'souvenir_centers'], true))
                 @include('partials.operating-status-fields', ['listing' => $listing])
             @endif

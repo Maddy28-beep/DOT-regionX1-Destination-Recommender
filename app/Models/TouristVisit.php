@@ -29,9 +29,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  *  2. THE TRAVELER SCANS IT AT THE VENUE.
  *     Scanning opens that check-in URL. No login, no app, no account -- the
  *     route is public (routes/web.php), because traveler accounts were removed
- *     for Data Privacy Act compliance. A traveler without a working camera can
- *     press "Check In Here" on the listing page instead; it is the same URL
- *     either way (partials/check-in-button).
+ *     for Data Privacy Act compliance. There is deliberately no check-in button on
+ *     the listing page: anyone can press a button from anywhere, so only the code
+ *     physically displayed at the venue counts as evidence of a visit.
  *
  *  3. CheckInController RECORDS THE VISIT.
  *     It refuses listings that are archived or no longer accredited (a stale

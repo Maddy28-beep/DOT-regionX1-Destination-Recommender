@@ -486,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (svg) svg.setAttribute('fill', saved ? 'currentColor' : 'none');
 
         var isIconVariant = form.classList.contains('save-form--icon');
-        if (isIconVariant) {
+        if (isIconVariant || form.classList.contains('save-form--square')) {
             button.title = saved ? 'Remove from saved' : 'Save this place';
         } else {
             Array.prototype.forEach.call(button.childNodes, function (node) {

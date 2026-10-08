@@ -130,23 +130,7 @@
         </div>
 
         <div>
-            <div class="side-card">
-                <h3 class="mt-0">Plan your visit</h3>
-                <p class="visit-meta">
-                    <strong>Best time to visit:</strong> {{ $destination->best_time ?? 'Year-round' }}<br>
-                    <strong>Hours:</strong> {{ $destination->hours ?? 'Contact establishment' }}<br>
-                    <strong>Suggested duration:</strong> {{ $destination->visit_duration ?? 'Half day' }}
-                </p>
-
-                <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="btn btn-poster-primary btn-block">Get Directions</a>
-                @include('partials.check-in-button', ['type' => 'destinations', 'listing' => $destination])
-
-                <x-save-heart type="destinations" :listing="$destination" variant="button" class="mt-10" />
-
-                @include('partials.listing-external-links', ['listing' => $destination])
-
-                @include('partials.map-embed', ['latitude' => $destination->latitude, 'longitude' => $destination->longitude, 'name' => $destination->name])
-            </div>
+            @include('partials.plan-visit-card', ['destination' => $destination, 'mapUrl' => $mapUrl])
         </div>
     </div>
 

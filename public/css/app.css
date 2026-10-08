@@ -3700,7 +3700,7 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 }
 .dest-detail-hero__content .loc { font-size: .95rem; opacity: .95; }
 
-.detail-layout { display: grid; grid-template-columns: 1fr 320px; gap: 32px; margin-top: 28px; align-items: flex-start; }
+.detail-layout { display: grid; grid-template-columns: minmax(0, 1fr) 390px; gap: 32px; margin-top: 28px; align-items: flex-start; }
 
 /* Single dashed-divider strip, not three separate boxed cards -- matches
    the stat-strip pattern used on the homepage hero. Shared with the
@@ -3819,24 +3819,6 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 }
 .btn-poster-ghost:hover { background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--muted); }
 
-/* Establishment-managed external links (website/Facebook buttons + a small
-   Instagram/TikTok icon row). Website/Facebook reuse .btn-poster-ghost as-is
-   above; this only styles the compact secondary icon row. */
-.listing-links__social { display: flex; gap: 10px; margin-top: 10px; }
-.listing-links__icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--bg);
-    color: var(--ink);
-    box-shadow: inset 0 0 0 1.5px var(--border);
-    transition: background .15s ease, color .15s ease, box-shadow .15s ease;
-}
-.listing-links__icon:hover { background: var(--primary-dark); color: var(--paper); box-shadow: inset 0 0 0 1.5px var(--primary-dark); }
-.listing-links__icon svg { width: 18px; height: 18px; }
 
 /* Leaflet's internal panes/controls use their own z-index stack (up to
    ~700) that, without a contained stacking context, can paint over the
@@ -5028,4 +5010,153 @@ body.mobile-menu-open .survey-invite { visibility: hidden; }
     letter-spacing: .04em;
     text-transform: uppercase;
     pointer-events: none;
+}
+
+/* ---- "Plan your visit" card on destination pages, and the shared "Find them online" tiles ---- */
+.visit-card {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 26px 24px 22px;
+}
+.visit-card__kicker { font-size: .72rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--stamp-red); }
+.visit-card__title {
+    margin: 4px 0 0;
+    padding-bottom: 14px;
+    font-family: 'Barabara', 'Alfa Slab One', serif;
+    font-size: 2rem;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--primary);
+    border-bottom: 3px double var(--border);
+}
+.visit-card__rows { margin: 4px 0 18px; }
+.visit-card__row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px dashed var(--border); }
+.visit-card__row:last-child { border-bottom: 0; }
+.visit-card__icon {
+    flex: none;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: var(--primary-light);
+    color: var(--primary);
+}
+.visit-card__icon svg { width: 20px; height: 20px; }
+.visit-card__text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.visit-card__label { font-size: .68rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.visit-card__value { font-size: 1.05rem; font-weight: 600; color: var(--ink); line-height: 1.3; }
+.visit-card__pill {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border: 1.5px solid currentColor;
+    border-radius: 999px;
+    font-size: .78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.visit-card__pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.visit-card__pill--open { color: var(--primary); }
+.visit-card__pill--closed { color: var(--stamp-red); }
+
+.visit-card__actions { display: flex; gap: 10px; margin-bottom: 20px; }
+.visit-card__go {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 54px;
+    padding: 0 18px;
+    border-radius: 14px;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.02rem;
+    text-decoration: none;
+    transition: background .15s ease;
+}
+.visit-card__go:hover { background: var(--primary-dark); }
+.visit-card__go svg { width: 19px; height: 19px; }
+.save-form--square { display: flex; }
+.save-square {
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--white);
+    color: var(--ink);
+    cursor: pointer;
+    transition: color .15s ease, border-color .15s ease;
+}
+.save-square svg { width: 22px; height: 22px; }
+.save-square:hover { color: var(--stamp-red); border-color: var(--stamp-red); }
+.save-square.is-saved { color: var(--stamp-red); }
+.save-form--pop .save-square svg { animation: heart-pop .5s cubic-bezier(.17, .89, .32, 1.49); }
+
+.find-online { margin: 0 0 18px; }
+.find-online__label { margin-bottom: 10px; font-size: .7rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.find-online__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.find-online__grid.is-single { grid-template-columns: 1fr; }
+.find-online__grid > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+.find-online__link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 50px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--white);
+    color: var(--ink);
+    font-weight: 600;
+    font-size: .95rem;
+    text-decoration: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+.find-online__link:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(15, 90, 62, .12); }
+.find-online__icon { flex: none; width: 20px; height: 20px; color: var(--primary); }
+.find-online__link > span:not(.sr-only) { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.find-online__out { flex: none; width: 14px; height: 14px; color: var(--muted); }
+
+.visit-card__guide {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 3px double var(--border);
+    color: var(--ink);
+    text-decoration: none;
+}
+.visit-card__guide small { display: block; font-size: .85rem; color: var(--muted); }
+.visit-card__guide strong { display: block; font-size: 1rem; color: var(--primary-dark); }
+.visit-card__guide svg { flex: none; width: 20px; height: 20px; color: var(--primary-dark); }
+.visit-card__guide:hover strong { text-decoration: underline; }
+.visit-card__map {
+    height: 180px;
+    margin: 4px 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--primary-light);
+}
+.visit-card__map .listing-map { height: 100%; width: 100%; margin: 0; border-radius: 0; }
+.visit-card__address { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 16px; font-size: .88rem; color: var(--muted); line-height: 1.4; }
+.visit-card__address svg { flex: none; width: 16px; height: 16px; margin-top: 1px; color: var(--primary); }
+
+@media (max-width: 480px) {
+    /* A phone gives each tile about 140px: drop the corner arrow and tighten, so "Instagram" is not cut off. */
+    .visit-card { padding: 22px 18px 18px; }
+    .visit-card__title { font-size: 1.8rem; }
+    .find-online__link { padding: 0 11px; gap: 8px; font-size: .9rem; }
+    .find-online__out { display: none; }
 }
