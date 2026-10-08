@@ -13,6 +13,12 @@
     $gradient = $gradients[$package->id % count($gradients)];
     $operatorLinkable = $package->tourOperator && $package->tourOperator->is_accredited && ! $package->tourOperator->archived_at;
     $providerLabel = $package->tourOperator->name ?? $package->provider_name;
+    $tierLabel = match ($package->price_tier) {
+        'Budget-Friendly' => 'Budget',
+        null, '' => null,
+        default => $package->price_tier,
+    };
+    $hasSchedule = $package->itineraryDays->isNotEmpty();
 @endphp
 
 <div class="container">
@@ -36,31 +42,17 @@
 
     <div class="detail-layout">
         <div>
-            <div class="fact-grid">
-                <div class="fact">
-                    <div class="fact-val">&#8369;{{ number_format($package->price_per_pax ?? 0) }}</div>
-                    <div class="fact-label">Per Person</div>
-                </div>
-                <div class="fact">
-                    <div class="fact-val">{{ $package->duration_label ?? '—' }}</div>
-                    <div class="fact-label">Duration</div>
-                </div>
-                <div class="fact">
-                    <div class="fact-val">
-                        @if ($operatorLinkable)
-                            <a href="{{ route('tour-operators.show', $package->tourOperator) }}">{{ $providerLabel }}</a>
-                        @else
-                            {{ $providerLabel ?? '—' }}
-                        @endif
-                    </div>
-                    <div class="fact-label">Provider</div>
-                </div>
-            </div>
+            @include('partials.stat-strip', ['items' => [
+                ['icon' => 'tag', 'label' => 'Price tier', 'text' => $tierLabel ?? '—', 'meter' => $package->posterTier()],
+                ['icon' => 'ticket', 'label' => 'Per person', 'text' => $package->price_per_pax ? number_format($package->price_per_pax) : '—', 'peso' => (bool) $package->price_per_pax],
+                ['icon' => 'timer', 'label' => 'Duration', 'text' => $package->duration_label ?: '—', 'wrap' => true],
+            ]])
 
-            <div class="side-card">
-                <h3 class="mt-0">About this package</h3>
-                <p>{{ $package->description ?? 'No description available yet for this package.' }}</p>
-            </div>
+            @include('partials.listing-about-card', [
+                'listing' => $package,
+                'noun' => 'package',
+                'groups' => ['Package type' => [$package->type]],
+            ])
 
             @if ($package->itineraryDays->isNotEmpty())
                 <div class="side-card">
@@ -98,25 +90,18 @@
         </div>
 
         <div>
-            <div class="side-card">
-                <h3 class="mt-0">Plan this package</h3>
-                <p style="font-size:.85rem; color:var(--muted); margin-top:0;">
-                    Budget tier: {{ $package->price_tier ?? 'Not specified' }}<br>
-                    Provided by: {{ $providerLabel ?? 'DOT-accredited operator' }}
-                </p>
-                @if ($package->itineraryDays->isNotEmpty())
-                    <form method="POST" action="{{ route('packages.plan-with', $package) }}">
-                        @csrf
-                        <button type="submit" class="btn btn-primary btn-block">Plan with this Package</button>
-                    </form>
-                @else
-                    <a href="{{ route('plan.edit') }}" class="btn btn-primary btn-block">Plan My Trip</a>
-                    <p class="field-hint" style="margin-top:6px;">This provider hasn't published a day-by-day schedule for this package yet.</p>
-                @endif
-                @include('partials.find-them-online', ['listing' => $package])
-
-                @include('partials.map-embed', ['latitude' => $package->latitude, 'longitude' => $package->longitude, 'name' => $package->name])
-            </div>
+            @include('partials.listing-visit-card', [
+                'listing' => $package,
+                'mapUrl' => null,
+                'kicker' => 'Before you book',
+                'title' => 'Plan this package',
+                'rows' => [
+                    ['icon' => 'building', 'label' => 'Provided by', 'value' => $providerLabel ?? 'DOT-accredited operator', 'href' => $operatorLinkable ? route('tour-operators.show', $package->tourOperator) : null],
+                ],
+                'primary' => $hasSchedule
+                    ? ['label' => 'Plan with this Package', 'icon' => 'compass', 'post' => route('packages.plan-with', $package)]
+                    : ['label' => 'Plan My Trip', 'icon' => 'compass', 'href' => route('plan.edit'), 'hint' => "This provider hasn't published a day-by-day schedule for this package yet."],
+            ])
         </div>
     </div>
 

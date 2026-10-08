@@ -11,6 +11,15 @@
         'linear-gradient(135deg,#7a4fc9,#4f2f96)',
     ];
     $gradient = $gradients[$accommodation->id % count($gradients)];
+    $mapUrl = $accommodation->latitude && $accommodation->longitude
+        ? "https://www.google.com/maps/search/?api=1&query={$accommodation->latitude},{$accommodation->longitude}"
+        : 'https://www.google.com/maps/search/?api=1&query='.urlencode($accommodation->name.' '.$accommodation->location);
+
+    $tierLabel = match ($accommodation->price_tier) {
+        'Budget-Friendly' => 'Budget',
+        null, '' => null,
+        default => $accommodation->price_tier,
+    };
 @endphp
 
 <div class="container">
@@ -35,29 +44,17 @@
 
     <div class="detail-layout">
         <div>
-            <div class="fact-grid">
-                <div class="fact">
-                    <div class="fact-val">{{ $accommodation->price_per_night ? '₱'.number_format($accommodation->price_per_night) : '—' }}</div>
-                    <div class="fact-label">Per Night</div>
-                </div>
-                <div class="fact">
-                    <div class="fact-val">{{ $accommodation->check_in ?? '2:00 PM' }}</div>
-                    <div class="fact-label">Check-in</div>
-                </div>
-                <div class="fact">
-                    <div class="fact-val">{{ $accommodation->check_out ?? '12:00 PM' }}</div>
-                    <div class="fact-label">Check-out</div>
-                </div>
-            </div>
+            @include('partials.stat-strip', ['items' => [
+                ['icon' => 'tag', 'label' => 'Price tier', 'text' => $tierLabel ?? '—', 'meter' => $accommodation->posterTier()],
+                ['icon' => 'ticket', 'label' => 'Per night', 'text' => $accommodation->price_per_night ? number_format($accommodation->price_per_night) : '—', 'peso' => (bool) $accommodation->price_per_night],
+                ['icon' => 'map-pin', 'label' => 'From city center', 'text' => $accommodation->distance_km ? rtrim(rtrim(number_format((float) $accommodation->distance_km, 1), '0'), '.').' km' : '—'],
+            ]])
 
-            <div class="side-card">
-                <h3 class="mt-0">About {{ $accommodation->name }}</h3>
-                <p>{{ $accommodation->description ?? 'No description available yet for this accommodation.' }}</p>
-                <div class="dest-tags" style="margin-top:14px;">
-                    @if ($accommodation->type)<span class="dest-tag">{{ $accommodation->type }}</span>@endif
-                    @if ($accommodation->dot_classification)<span class="dest-tag">{{ $accommodation->dot_classification }} Classification</span>@endif
-                </div>
-            </div>
+            @include('partials.listing-about-card', [
+                'listing' => $accommodation,
+                'noun' => 'accommodation',
+                'groups' => ['Property type' => [$accommodation->type], 'DOT classification' => [$accommodation->dot_classification]],
+            ])
 
             @if ($accommodation->roomTypes->count())
                 <div class="side-card">
@@ -81,18 +78,17 @@
         </div>
 
         <div>
-            <div class="side-card">
-                <h3 class="mt-0">Plan your stay</h3>
-                <p style="font-size:.85rem; color:var(--muted); margin-top:0;">
-                    Budget tier: {{ $accommodation->price_tier ?? 'Not specified' }}<br>
-                    Distance from city center: {{ $accommodation->distance_km ? number_format($accommodation->distance_km, 1).' km' : 'N/A' }}
-                </p>
-                <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($accommodation->name.' '.$accommodation->location) }}" target="_blank" rel="noopener" class="btn btn-primary btn-block">Get Directions</a>
-                @include('partials.find-them-online', ['listing' => $accommodation])
-                <x-save-heart type="accommodations" :listing="$accommodation" variant="button" class="mt-10" />
-
-                @include('partials.map-embed', ['latitude' => $accommodation->latitude, 'longitude' => $accommodation->longitude, 'name' => $accommodation->name])
-            </div>
+            @include('partials.listing-visit-card', [
+                'listing' => $accommodation,
+                'type' => 'accommodations',
+                'mapUrl' => $mapUrl,
+                'kicker' => 'Before you book',
+                'title' => 'Plan your stay',
+                'rows' => [
+                    ['icon' => 'log-in', 'label' => 'Check-in', 'value' => $accommodation->check_in ?: 'Not listed'],
+                    ['icon' => 'log-out', 'label' => 'Check-out', 'value' => $accommodation->check_out ?: 'Not listed'],
+                ],
+            ])
         </div>
     </div>
 
@@ -111,7 +107,7 @@
 </div>
 
 <div class="sticky-cta">
-    <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($accommodation->name.' '.$accommodation->location) }}" target="_blank" rel="noopener" class="btn btn-primary btn-block">Get Directions</a>
+    <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="btn btn-primary btn-block">Get Directions</a>
     <x-save-heart type="accommodations" :listing="$accommodation" variant="button" class="cta-half" />
 </div>
 @endsection
