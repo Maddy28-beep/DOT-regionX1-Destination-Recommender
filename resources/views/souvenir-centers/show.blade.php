@@ -57,7 +57,7 @@
             <div class="side-card">
                 <h3 class="mt-0">Plan your visit</h3>
                 <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="btn btn-primary btn-block">Get Directions</a>
-                @include('partials.listing-external-links', ['listing' => $souvenirCenter])
+                @include('partials.find-them-online', ['listing' => $souvenirCenter])
                 <x-save-heart type="souvenir-centers" :listing="$souvenirCenter" variant="button" class="mt-10" />
 
                 @include('partials.map-embed', ['latitude' => $souvenirCenter->latitude, 'longitude' => $souvenirCenter->longitude, 'name' => $souvenirCenter->name])
