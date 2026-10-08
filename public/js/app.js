@@ -1093,3 +1093,53 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+/*
+ * Destinations filter panel: the budget tiles are radio buttons, so a second click on the chosen one
+ * clears it (a plain radio cannot be switched off), and the button counts the filters that are set --
+ * "Show results (2 filters)" -- as they change, matching what the server renders after a search.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    var form = document.querySelector('[data-filter-form]');
+    if (!form) { return; }
+
+    var submit = form.querySelector('[data-filter-submit]');
+
+    function count() {
+        var set = 0;
+        var seenRadio = {};
+        form.querySelectorAll('[data-filter-count]').forEach(function (field) {
+            if (field.type === 'radio') {
+                if (field.checked && !seenRadio[field.name]) { seenRadio[field.name] = true; set++; }
+                return;
+            }
+            if (field.value.trim() !== '') { set++; }
+        });
+        return set;
+    }
+
+    function refresh() {
+        if (!submit) { return; }
+        var n = count();
+        submit.textContent = 'Show results' + (n ? ' (' + n + ' ' + (n === 1 ? 'filter' : 'filters') + ')' : '');
+    }
+
+    form.querySelectorAll('.budget-tile input').forEach(function (radio) {
+        // The state before this click, so a click on the tile that was already chosen can undo it.
+        radio.addEventListener('click', function () {
+            if (radio.dataset.was === '1') {
+                radio.checked = false;
+                radio.dataset.was = '0';
+            } else {
+                form.querySelectorAll('.budget-tile input').forEach(function (other) { other.dataset.was = '0'; });
+                radio.dataset.was = '1';
+            }
+            refresh();
+        });
+        if (radio.checked) { radio.dataset.was = '1'; }
+    });
+
+    form.addEventListener('input', refresh);
+    form.addEventListener('change', refresh);
+    refresh();
+});
