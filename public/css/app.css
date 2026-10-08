@@ -5302,3 +5302,9 @@ body.mobile-menu-open .survey-invite { visibility: hidden; }
 
 .stat-strip__item > div { min-width: 0; }
 .stat-strip__text--wrap { white-space: normal; overflow-wrap: anywhere; }
+
+/* Visit card extras for listings with their own main action (plan with a package) or linked facts */
+.visit-card__form { flex: 1; display: flex; margin: 0; }
+button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: pointer; }
+.visit-card__hint { margin: -8px 0 18px; font-size: .84rem; color: var(--muted); line-height: 1.45; }
+.visit-card__value a { color: var(--primary-dark); text-decoration: underline; }

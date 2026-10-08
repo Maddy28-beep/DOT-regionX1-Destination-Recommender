@@ -234,7 +234,8 @@ class DestinationDetailRedesignTest extends TestCase
         $this->assertStringContainsString('(082) 123 4567', $html);
         $this->assertStringContainsString('Plan your visit', $html);
         $this->assertStringContainsString('Open now', $html);
-        $this->assertStringContainsString('<span class="good-for__chip">Filipino Seafood</span>', $html);
+        $this->assertStringContainsString('Filipino Seafood', $html);
+        $this->assertStringNotContainsString('good-for__chip', $html, 'Cuisine is in the strip; it is not repeated as a chip.');
     }
 
     public function test_a_restaurant_without_a_phone_number_has_no_contact_tile(): void
@@ -250,5 +251,82 @@ class DestinationDetailRedesignTest extends TestCase
         $this->assertStringNotContainsString('stat-strip__label">Contact', $html);
         $this->assertStringNotContainsString('Open now', $html);
         $this->assertStringNotContainsString('Closed now', $html);
+    }
+
+    // ---- packages, tour operators and souvenir centers
+
+    private function region(): int
+    {
+        return Region::firstOrCreate(['name' => 'Davao City'])->id;
+    }
+
+    public function test_a_package_with_a_schedule_offers_to_plan_with_it_and_links_its_provider(): void
+    {
+        $operator = \App\Models\TourOperator::create([
+            'slug' => 'op', 'name' => 'Island Explorers', 'location' => 'Samal', 'region_id' => $this->region(),
+            'is_accredited' => true, 'rating' => 0, 'review_count' => 0,
+        ]);
+        $package = \App\Models\Package::create([
+            'slug' => 'trek', 'name' => 'Summit Trek', 'location' => 'Davao del Sur', 'region_id' => $this->region(),
+            'is_accredited' => true, 'rating' => 0, 'review_count' => 0, 'price_per_pax' => 6500,
+            'duration_label' => '3 Days, 2 Nights', 'price_tier' => 'Premium', 'type' => 'Adventure',
+            'tour_operator_id' => $operator->id,
+        ]);
+        $package->itineraryDays()->create(['day_number' => 1, 'title' => 'Trailhead']);
+
+        $html = $this->get(route('packages.show', $package))->assertOk()->getContent();
+
+        $this->assertStringContainsString('6,500', $html);
+        $this->assertStringContainsString('3 Days, 2 Nights', $html);
+        $this->assertStringContainsString('Plan this package', $html);
+        $this->assertStringContainsString('Plan with this Package', $html);
+        $this->assertStringContainsString(route('packages.plan-with', $package), $html);
+        $this->assertStringContainsString('href="'.route('tour-operators.show', $operator).'"', $html);
+        $this->assertStringNotContainsString('save-form--square', $html, 'Packages are booked, not saved.');
+    }
+
+    public function test_a_package_without_a_schedule_says_so_and_points_to_plan_my_trip(): void
+    {
+        $package = \App\Models\Package::create([
+            'slug' => 'trek', 'name' => 'Summit Trek', 'location' => 'Davao del Sur', 'region_id' => $this->region(),
+            'is_accredited' => true, 'rating' => 0, 'review_count' => 0, 'provider_name' => 'Local guides',
+        ]);
+
+        $html = $this->get(route('packages.show', $package))->assertOk()->getContent();
+
+        $this->assertStringContainsString("hasn't published a day-by-day schedule", str_replace('&#039;', "'", $html));
+        $this->assertStringContainsString(route('plan.edit'), $html);
+        $this->assertStringContainsString('Local guides', $html);
+    }
+
+    public function test_a_tour_operator_shows_its_package_count_and_a_tap_to_call_number(): void
+    {
+        $operator = \App\Models\TourOperator::create([
+            'slug' => 'op', 'name' => 'Island Explorers', 'location' => 'Samal', 'region_id' => $this->region(),
+            'is_accredited' => true, 'rating' => 0, 'review_count' => 0, 'specialization' => 'Beach & Island',
+            'contact_number' => '0917-555-0101',
+        ]);
+
+        $html = $this->get(route('tour-operators.show', $operator))->assertOk()->getContent();
+
+        $this->assertStringContainsString('0 packages', $html);
+        $this->assertStringContainsString('Get in touch', $html);
+        $this->assertStringContainsString('href="tel:09175550101"', $html);
+        $this->assertStringNotContainsString('save-form--square', $html);
+    }
+
+    public function test_a_souvenir_center_gets_the_visit_card_with_a_save_heart(): void
+    {
+        $shop = \App\Models\SouvenirCenter::create([
+            'slug' => 'shop', 'name' => 'Local Products', 'location' => 'Davao City', 'region_id' => $this->region(),
+            'is_accredited' => true, 'rating' => 0, 'review_count' => 0,
+        ]);
+
+        $html = $this->get(route('souvenir-centers.show', $shop))->assertOk()->getContent();
+
+        $this->assertStringContainsString('Plan your visit', $html);
+        $this->assertStringContainsString('Get Directions', $html);
+        $this->assertSame(1, substr_count($html, 'save-form--square'));
+        $this->assertStringContainsString('reviews-card', $html);
     }
 }

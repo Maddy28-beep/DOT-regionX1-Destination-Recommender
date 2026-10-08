@@ -6,8 +6,11 @@
     Each page decides which facts matter (a destination has a best time, a stay has check-in and
     check-out, a restaurant has hours); this partial only lays them out.
 
-    $listing, $type (URL segment for the save heart), $mapUrl, $kicker, $title,
-    $rows: list of ['icon', 'label', 'value', 'pill' => 'open'|'closed'|null],
+    $listing, $kicker, $title, $mapUrl (used by the default Get Directions button),
+    $rows: list of ['icon', 'label', 'value', 'pill' => 'open'|'closed'|null, 'href' => link for the value],
+    $type (URL segment for the save heart; leave out for listings that are not saveable),
+    $primary (optional, replaces Get Directions with the page's own main action):
+        ['label', 'icon', 'href' => url] or ['label', 'icon', 'post' => url], plus an optional 'hint',
     $guide (bool, default false)
 --}}
 @php
@@ -30,7 +33,9 @@
                     <span class="visit-card__icon"><x-icon :name="$row['icon']" /></span>
                     <div class="visit-card__text">
                         <span class="visit-card__label">{{ $row['label'] }}</span>
-                        <span class="visit-card__value">{{ $row['value'] }}</span>
+                        <span class="visit-card__value">
+                            @if (! empty($row['href']))<a href="{{ $row['href'] }}">{{ $row['value'] }}</a>@else{{ $row['value'] }}@endif
+                        </span>
                     </div>
                     @if (! empty($row['pill']))
                         <span class="visit-card__pill visit-card__pill--{{ $row['pill'] }}">{{ $row['pill'] === 'open' ? 'Open now' : 'Closed now' }}</span>
@@ -50,10 +55,28 @@
         <p class="visit-card__address"><x-icon name="map-pin" /> <span>{{ $address }}</span></p>
     @endif
 
-    <div class="visit-card__actions">
-        <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="visit-card__go"><x-icon name="send" /> Get Directions</a>
-        <x-save-heart :type="$type" :listing="$listing" variant="square" />
-    </div>
+    @if (! empty($primary))
+        <div class="visit-card__actions">
+            @if (! empty($primary['post']))
+                <form method="POST" action="{{ $primary['post'] }}" class="visit-card__form">
+                    @csrf
+                    <button type="submit" class="visit-card__go"><x-icon :name="$primary['icon'] ?? 'arrow-right'" /> {{ $primary['label'] }}</button>
+                </form>
+            @else
+                <a href="{{ $primary['href'] }}" class="visit-card__go"><x-icon :name="$primary['icon'] ?? 'arrow-right'" /> {{ $primary['label'] }}</a>
+            @endif
+        </div>
+        @if (! empty($primary['hint']))
+            <p class="visit-card__hint">{{ $primary['hint'] }}</p>
+        @endif
+    @else
+        <div class="visit-card__actions">
+            <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="visit-card__go"><x-icon name="send" /> Get Directions</a>
+            @if (! empty($type))
+                <x-save-heart :type="$type" :listing="$listing" variant="square" />
+            @endif
+        </div>
+    @endif
 
     @include('partials.find-them-online', ['listing' => $listing])
 

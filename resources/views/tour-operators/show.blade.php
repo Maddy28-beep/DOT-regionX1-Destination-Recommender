@@ -14,6 +14,13 @@
     $mapUrl = $tourOperator->latitude && $tourOperator->longitude
         ? "https://www.google.com/maps/search/?api=1&query={$tourOperator->latitude},{$tourOperator->longitude}"
         : 'https://www.google.com/maps/search/?api=1&query='.urlencode($tourOperator->name.' '.$tourOperator->location);
+    $tierLabel = match ($tourOperator->price_tier) {
+        'Budget-Friendly' => 'Budget',
+        null, '' => null,
+        default => $tourOperator->price_tier,
+    };
+    $packageCount = $tourOperator->packages->count();
+    $phone = $tourOperator->contact_number ?: null;
 @endphp
 
 <div class="container">
@@ -37,25 +44,17 @@
 
     <div class="detail-layout">
         <div>
-            <div class="fact-grid">
-                <div class="fact">
-                    <div class="fact-val">{{ $tourOperator->price_tier ?? '—' }}</div>
-                    <div class="fact-label">Budget Tier</div>
-                </div>
-                <div class="fact">
-                    <div class="fact-val">{{ $tourOperator->specialization ?? '—' }}</div>
-                    <div class="fact-label">Specialization</div>
-                </div>
-                <div class="fact">
-                    <div class="fact-val">{{ $tourOperator->contact_number ?? '—' }}</div>
-                    <div class="fact-label">Contact</div>
-                </div>
-            </div>
+            @include('partials.stat-strip', ['items' => [
+                ['icon' => 'tag', 'label' => 'Price tier', 'text' => $tierLabel ?? '—', 'meter' => $tourOperator->posterTier()],
+                ['icon' => 'compass', 'label' => 'Specialization', 'text' => $tourOperator->specialization ?: '—', 'wrap' => true],
+                ['icon' => 'grid', 'label' => 'Tour packages', 'text' => $packageCount.' '.\Illuminate\Support\Str::plural('package', $packageCount)],
+            ]])
 
-            <div class="side-card">
-                <h3 class="mt-0">About {{ $tourOperator->name }}</h3>
-                <p>{{ $tourOperator->description ?? 'No description available yet for this tour operator.' }}</p>
-            </div>
+            @include('partials.listing-about-card', [
+                'listing' => $tourOperator,
+                'noun' => 'tour operator',
+                'groups' => [],
+            ])
 
             @if ($tourOperator->packages->isNotEmpty())
                 <div class="side-card">
@@ -76,17 +75,15 @@
         </div>
 
         <div>
-            <div class="side-card">
-                <h3 class="mt-0">Get in touch</h3>
-                <p style="font-size:.85rem; color:var(--muted); margin-top:0;">
-                    Contact: {{ $tourOperator->contact_number ?? 'Not provided' }}<br>
-                    Budget tier: {{ $tourOperator->price_tier ?? 'Not specified' }}
-                </p>
-                <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="btn btn-primary btn-block">Get Directions</a>
-                @include('partials.find-them-online', ['listing' => $tourOperator])
-
-                @include('partials.map-embed', ['latitude' => $tourOperator->latitude, 'longitude' => $tourOperator->longitude, 'name' => $tourOperator->name])
-            </div>
+            @include('partials.listing-visit-card', [
+                'listing' => $tourOperator,
+                'mapUrl' => $mapUrl,
+                'kicker' => 'Before you book',
+                'title' => 'Get in touch',
+                'rows' => [
+                    ['icon' => 'phone', 'label' => 'Contact', 'value' => $phone ?? 'Not provided', 'href' => $phone ? 'tel:'.preg_replace('/[^\d+]/', '', $phone) : null],
+                ],
+            ])
         </div>
     </div>
 
