@@ -153,4 +153,20 @@ class DestinationDetailRedesignTest extends TestCase
         $this->assertStringContainsString('0 reviews', $html);
         $this->assertStringContainsString('Scan the DOT QR code', $html);
     }
+
+    public function test_other_listing_pages_put_the_title_on_the_photo_not_under_it(): void
+    {
+        $stay = Accommodation::create([
+            'slug' => 'a-hotel', 'name' => 'A Hotel', 'location' => 'Davao City',
+            'region_id' => Region::firstOrCreate(['name' => 'Davao City'])->id,
+            'type' => 'Hotel', 'is_accredited' => true, 'rating' => 0, 'review_count' => 0,
+        ]);
+        $stay->photos()->create(['path' => 'hotel.jpg', 'category' => 'Exterior', 'is_primary' => true]);
+
+        $html = $this->get(route('accommodations.show', $stay))->assertOk()->getContent();
+
+        $this->assertSame(2, substr_count($html, 'class="gallery-hero__title"'), 'Once for the desktop grid and once for the phone carousel.');
+        $this->assertSame(2, substr_count($html, '<h1>A Hotel</h1>'));
+        $this->assertStringNotContainsString('class="poster-title" style="margin:20px 0 4px', $html);
+    }
 }
