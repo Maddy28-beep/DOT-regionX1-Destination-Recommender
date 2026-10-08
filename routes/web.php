@@ -198,7 +198,7 @@ Route::prefix('portal')->name('portal.')->group(function () {
 });
 
 // DOT Admin console (2.3.2 Tourism Administrator, Figures 16-21)
-Route::prefix('portal/admin')->name('admin.')->middleware('auth:admin')->group(function () {
+Route::prefix('portal/admin')->name('admin.')->middleware(['auth:admin', \App\Http\Middleware\AuditAdminActions::class])->group(function () {
     Route::get('/', [AdminDashboardController::class, 'overview'])->name('overview');
 
     Route::get('/establishments', [AdminDashboardController::class, 'establishments'])->name('establishments');
@@ -213,6 +213,7 @@ Route::prefix('portal/admin')->name('admin.')->middleware('auth:admin')->group(f
     Route::get('/exit-surveys/qr', [QrCodeController::class, 'exitSurveyPoster'])->name('exit-survey-qr');
     Route::get('/exit-surveys/qr.svg', [QrCodeController::class, 'exitSurveyImage'])->name('exit-survey-qr.svg');
     Route::get('/association-rules', [AdminDashboardController::class, 'associationRules'])->name('association-rules');
+    Route::get('/audit-log', [\App\Http\Controllers\Admin\AdminAuditLogController::class, 'index'])->name('audit-log');
     Route::get('/reports', [AdminDashboardController::class, 'reports'])->name('reports');
     Route::get('/reports/export.csv', [AdminDashboardController::class, 'exportCsv'])->name('reports.export-csv');
     Route::get('/reports/print', [AdminDashboardController::class, 'printReport'])->name('reports.print');
