@@ -16,6 +16,11 @@ use App\Models\SouvenirCenter;
 use App\Models\TourOperator;
 use App\Models\TouristSavedDestination;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use App\Services\Audit\AuditLogger;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Failed;
 use App\Support\Toast;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\RateLimiter;
@@ -40,6 +45,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Audit trail for the DOT Admin console: who signed in, who tried and failed, who signed out.
+        $audit = function (string $adminId, string $action) {
+            try {
+                app(AuditLogger::class)->record($adminId, $action, 'admin_users', $adminId, 'from '.request()->ip());
+            } catch (\Throwable $e) {
+                report($e); // never let the log stop a sign-in
+            }
+        };
+        Event::listen(Login::class, fn (Login $e) => $e->guard === 'admin' ? $audit((string) $e->user->getAuthIdentifier(), 'login') : null);
+        Event::listen(Logout::class, fn (Logout $e) => $e->guard === 'admin' && $e->user ? $audit((string) $e->user->getAuthIdentifier(), 'logout') : null);
+        // A wrong password for a real admin account (nothing is recorded for an unknown email: there is no admin to attach it to).
+        Event::listen(Failed::class, fn (Failed $e) => $e->guard === 'admin' && $e->user ? $audit((string) $e->user->getAuthIdentifier(), 'login_failed') : null);
+
         /*
          * Rate limits. Without them anyone could try thousands of passwords a minute
          * against the admin or partner login, or hammer the trip builder (each call
