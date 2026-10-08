@@ -4653,7 +4653,7 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 .gallery-hero .g-thumb { cursor: pointer; position: relative; }
 .gallery-hero .g-thumb.g-thumb-span { grid-row: 1 / 3; }
 .gallery-hero.single { grid-template-columns: 1fr; }
-.gallery-hero.single .g-main { grid-row: auto; }
+.gallery-hero.single .g-main { grid-row: 1 / 3; }
 .gallery-hero .g-main img, .gallery-hero .g-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s ease; }
 .gallery-hero a:hover img { transform: scale(1.03); }
 .gallery-hero .g-more-overlay {
@@ -5262,4 +5262,38 @@ body.mobile-menu-open .survey-invite { visibility: hidden; }
     .stat-strip__item { border-left: 0; border-top: 1.5px dashed var(--border); padding: 12px 16px; }
     .stat-strip__item:first-child { border-top: 0; }
     .star-input label svg { width: 40px; height: 40px; }
+}
+
+/* Title and location sit on the photo (same look as the destination hero), over a dark fade so they
+   stay readable on bright pictures. The overlay ignores the pointer so a click still opens the lightbox. */
+.gallery-hero__title {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    padding: 64px 28px 26px;
+    color: var(--paper);
+    background: linear-gradient(to top, rgba(10, 20, 16, .78), rgba(10, 20, 16, 0));
+    pointer-events: none;
+}
+.gallery-hero__title h1 {
+    margin: 0 0 6px;
+    max-width: 66%;
+    font-family: 'Barabara', 'Alfa Slab One', serif;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    line-height: 1.1;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, .35);
+}
+.gallery-hero__title .loc { max-width: 66%; font-size: .95rem; opacity: .95; }
+.gallery-hero.single .gallery-hero__title h1,
+.gallery-hero.single .gallery-hero__title .loc { max-width: none; }
+
+@media (max-width: 720px) {
+    .gallery-hero-mobile .gallery-hero__title { padding: 56px 18px 36px; }
+    .gallery-hero-mobile .gallery-hero__title h1,
+    .gallery-hero-mobile .gallery-hero__title .loc { max-width: none; }
+    .gallery-hero-mobile .gallery-hero__title h1 { font-size: 1.7rem; }
 }
