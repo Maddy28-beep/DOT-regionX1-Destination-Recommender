@@ -5009,3 +5009,23 @@ body.mobile-menu-open .survey-invite { visibility: hidden; }
 /* Operating status notice on a listing page */
 .operating-notice { margin: 16px 0; padding: 12px 16px; border-radius: 10px; border: 1px solid #e0b4a8; background: #fdf0ec; color: #7a2a14; display: grid; gap: 2px; }
 .operating-notice span { font-size: .9rem; opacity: .85; }
+
+/* A closed place stays visible but is clearly marked: muted artwork and a band across the middle. */
+.dpost-card__art.is-closed > img,
+.dpost-card__art.is-closed > svg { filter: grayscale(.75) brightness(.8); }
+.dpost-card__art.is-closed::after {
+    content: attr(data-closed);
+    position: absolute;
+    left: 0; right: 0; top: 50%;
+    transform: translateY(-50%);
+    z-index: 4;
+    padding: 7px 10px;
+    text-align: center;
+    background: rgba(122, 42, 20, .9);
+    color: #fff;
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    pointer-events: none;
+}
