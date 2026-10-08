@@ -5254,6 +5254,7 @@ body.mobile-menu-open .survey-invite { visibility: hidden; }
 .star-input__word { display: block; margin-top: 6px; font-size: .84rem; font-weight: 600; color: var(--muted); }
 .review-form__meta { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .review-form__counter { flex: none; margin-top: 2px; font-size: .78rem; color: var(--muted); }
+.review-form__actions { display: flex; justify-content: flex-end; }
 .review-form__submit:disabled { opacity: .5; cursor: not-allowed; }
 
 @media (max-width: 520px) {

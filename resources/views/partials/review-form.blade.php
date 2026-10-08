@@ -72,6 +72,8 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-accent review-form__submit">Post my review &rarr;</button>
+        <div class="review-form__actions">
+            <button type="submit" class="btn btn-accent review-form__submit">Post my review &rarr;</button>
+        </div>
     </form>
 @endif
