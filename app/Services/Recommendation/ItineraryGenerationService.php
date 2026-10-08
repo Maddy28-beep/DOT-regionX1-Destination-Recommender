@@ -159,7 +159,9 @@ class ItineraryGenerationService
          * themselves are untouched; only their grouping into days can change.
          * Returns null (plain route order kept) when any stop has no stored vector.
          */
+        $routeSequence = $sequence;
         $themes = $this->themeDays->group($sequence, $dayCapacities, $origin);
+        $themedSequence = ($themes !== null && $themes['sequence'] !== $routeSequence) ? $themes['sequence'] : null;
         if ($themes !== null) {
             $sequence = $themes['sequence'];
         }
@@ -174,7 +176,7 @@ class ItineraryGenerationService
          */
         $accommodationPick = $this->pickAccommodation($sequence, $preference);
 
-        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes) {
+        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
             $itinerary = Itinerary::create([
                 'preference_id' => $preference->id,
                 'total_days' => $totalDays,
@@ -209,14 +211,48 @@ class ItineraryGenerationService
              * builder's job. Keeping that separate stops this method from
              * owning both "which places" and "at what o'clock".
              */
-            $this->schedule->build(
+            $build = fn (array $stops) => $this->schedule->build(
                 $itinerary,
-                $sequence,
+                $stops,
                 $preference,
                 $dayCapacities,
                 $origin,
                 $accommodationPick,
             );
+
+            if ($themedSequence === null) {
+                $build($sequence);
+            } else {
+                /*
+                 * Regrouping must never cost the traveller a stop. The schedule builder refuses a day
+                 * that cannot finish by its cutoff and drops what no longer fits, and the grouper only
+                 * limits total travelling, not each day's feasibility. So build the plain route order
+                 * first to learn how many stops it places, then the themed order, and keep the themed
+                 * plan only if it places at least as many.
+                 */
+                $placed = fn (): int => $itinerary->items()->whereNotNull('destination_id')->distinct()->count('destination_id');
+
+                $build($routeSequence);
+                $routePlaced = $placed();
+                $itinerary->items()->delete();
+                $itinerary->unsetRelation('items');
+
+                $build($themedSequence);
+
+                if ($placed() < $routePlaced) {
+                    $itinerary->items()->delete();
+                    $itinerary->unsetRelation('items');
+                    $build($routeSequence);
+
+                    $summary = $themes['summary'];
+                    $summary['regrouped'] = false;
+                    $summary['guard'] = true;
+                    $summary['mean_similarity_after'] = $summary['mean_similarity_before'];
+                    $summary['distance_after_km'] = $summary['distance_before_km'];
+                    $summary['types_per_day_after'] = $summary['types_per_day_before'] ?? null;
+                    $itinerary->update(['day_themes' => ['days' => [], 'summary' => $summary]]);
+                }
+            }
 
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);
         });

@@ -445,6 +445,8 @@
                                         &rarr; {{ data_get($itinerary->day_themes, 'summary.mean_similarity_after') }}%,
                                         travelling {{ data_get($itinerary->day_themes, 'summary.distance_before_km') }} km
                                         &rarr; {{ data_get($itinerary->day_themes, 'summary.distance_after_km') }} km, never more than 25% extra).
+                                    @elseif (data_get($itinerary->day_themes, 'summary.guard'))
+                                        tried grouping alike places into the same day, but that would have left a stop out of the plan, so the route order was kept.
                                     @else
                                         found that the route order already put alike places together, so the days were left as they were.
                                     @endif
