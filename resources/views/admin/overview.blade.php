@@ -6,6 +6,21 @@
 
 @section('content')
 
+@if ($accreditationAlert['expired'] > 0 || $accreditationAlert['expiring'] > 0)
+    <div class="accreditation-alert" role="alert" style="display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; padding:14px 16px; margin-bottom:16px; border:1px solid #f0b429; border-left-width:4px; border-radius:10px; background:#fff8e6; color:#5c4300;">
+        <div>
+            <strong>Accreditation needs attention.</strong>
+            @if ($accreditationAlert['expired'] > 0)
+                {{ $accreditationAlert['expired'] }} {{ \Illuminate\Support\Str::plural('record', $accreditationAlert['expired']) }} expired, so those places are hidden from tourists until renewed.
+            @endif
+            @if ($accreditationAlert['expiring'] > 0)
+                {{ $accreditationAlert['expiring'] }} {{ $accreditationAlert['expiring'] === 1 ? 'expires' : 'expire' }} within 30 days{{ $accreditationAlert['within_week'] > 0 ? ' ('.$accreditationAlert['within_week'].' within 7 days)' : '' }}.
+            @endif
+        </div>
+        <a href="{{ route('admin.accreditation', ['status' => $accreditationAlert['expired'] > 0 ? 'Expired' : 'Expiring Soon']) }}" class="btn btn-outline">Review &amp; renew</a>
+    </div>
+@endif
+
 <div class="stat-cards">
     <div class="stat-card">
         <div class="stat-card-val">{{ $stats['checkins_today'] }}</div>
@@ -65,20 +80,20 @@
     <div class="panel-head">
         <div>
             <h2>Accreditation Watchlist</h2>
-            <p>Records expiring soon or already expired.</p>
+            <p>Records expiring within 30 days or already expired, soonest first.</p>
         </div>
         <a href="{{ route('admin.accreditation') }}" class="btn btn-outline">View all</a>
     </div>
     <div class="table-scroll">
         <table class="data-table">
             <thead>
-                <tr><th>Accreditation #</th><th>Type</th><th>Expires</th><th>Status</th></tr>
+                <tr><th>Establishment</th><th>Accreditation #</th><th>Expires</th><th>Status</th></tr>
             </thead>
             <tbody>
                 @forelse ($expiring as $r)
                     <tr>
-                        <td>{{ $r->accreditation_number }}</td>
-                        <td class="cell-muted">{{ ucfirst(str_replace('_', ' ', $r->listing_kind)) }}</td>
+                        <td>{{ $r->listing?->name ?? 'Listing removed' }}<div class="cell-muted" style="font-size:.78rem;">{{ ucfirst(str_replace('_', ' ', $r->listing_kind)) }}</div></td>
+                        <td class="cell-muted">{{ $r->accreditation_number }}</td>
                         <td class="cell-muted cell-date">{{ $r->expiration_date->format('M d, Y') }}</td>
                         <td>
                             @if ($r->status === 'Expired')
