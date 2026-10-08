@@ -1,6 +1,7 @@
 .destination-view-toggle { display:flex; gap:4px; border:1px solid #0b7058; border-radius:24px; padding:3px; }
 .destination-view-toggle[hidden], #destinationMapView[hidden] { display:none; }
-.destination-view-toggle button { border:0; background:transparent; color:#075343; border-radius:20px; padding:7px 18px; font:inherit; font-weight:600; cursor:pointer; }
+.destination-view-toggle button { display:inline-flex; align-items:center; gap:7px; border:0; background:transparent; color:#075343; border-radius:20px; padding:7px 18px; font:inherit; font-weight:600; cursor:pointer; }
+.destination-view-toggle button svg { width:15px; height:15px; }
 .destination-view-toggle button[aria-pressed="true"] { background:#0b7058; color:white; }
 .explorer-map { height:520px; border-radius:14px; border:1px solid #d5ded9; z-index:0; background:#e8efea; }
 .explorer-popup { display:grid; gap:10px; min-width:150px; }

@@ -43,7 +43,7 @@
         document.querySelectorAll('[data-destination-view]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.destinationView === view)));
         const url = new URL(location.href); url.searchParams.set('view',view); history.replaceState(null,'',url);
         // Category links retain the selected display when applying another filter.
-        document.querySelectorAll('.catalog-categories a, #destinationListView .pagination a').forEach(link => {
+        document.querySelectorAll('.catalog-categories a, #destinationListView .pagination a, .active-filters a, .filter-panel__clear').forEach(link => {
             const target = new URL(link.href); target.searchParams.set('view',view); link.href = target;
         });
         if (isMap) initMap();
