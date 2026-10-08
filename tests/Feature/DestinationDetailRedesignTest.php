@@ -329,4 +329,110 @@ class DestinationDetailRedesignTest extends TestCase
         $this->assertSame(1, substr_count($html, 'save-form--square'));
         $this->assertStringContainsString('reviews-card', $html);
     }
+
+    // ---- the destination card
+
+    public function test_a_new_destination_card_has_a_new_tag_and_no_rating_row(): void
+    {
+        $this->place(['distance_km' => 28, 'entry_fee_min' => 150, 'entry_fee_max' => 150]);
+
+        $html = $this->get('/destinations')->assertOk()->getContent();
+
+        $this->assertStringContainsString('<span class="dcard__new">New</span>', $html);
+        $this->assertStringNotContainsString('dcard__rating', $html);
+        $this->assertStringContainsString('28 km from city', $html);
+        $this->assertStringContainsString('DOT accredited', $html);
+    }
+
+    public function test_a_reviewed_destination_card_shows_rating_and_count_instead_of_the_new_tag(): void
+    {
+        $this->place(['rating' => 4.8, 'review_count' => 23]);
+
+        $html = $this->get('/destinations')->assertOk()->getContent();
+
+        $this->assertStringContainsString('<strong>4.8</strong>', $html);
+        $this->assertStringContainsString('<span>(23)</span>', $html);
+        $this->assertStringNotContainsString('dcard__new', $html);
+    }
+
+    public function test_the_card_does_not_repeat_the_region_when_the_location_already_names_it(): void
+    {
+        $this->place(['location' => 'Malagos, Baguio District, Davao City']);
+
+        $html = $this->get('/destinations')->assertOk()->getContent();
+
+        $this->assertStringContainsString('>Malagos, Baguio District, Davao City</span>', $html);
+        $this->assertStringNotContainsString('Davao City, Davao City', $html);
+    }
+
+    // ---- the same card for the other listing types
+
+    public function test_a_stay_card_shows_from_price_per_night_type_and_rating(): void
+    {
+        $this->stay(['price_per_night' => 2800, 'rating' => 4.6, 'review_count' => 112]);
+
+        $html = $this->get('/accommodations')->assertOk()->getContent();
+
+        $this->assertStringContainsString('<small class="dcard__from">from</small>', $html);
+        $this->assertStringContainsString('2,800', $html);
+        $this->assertStringContainsString('<small>/ night</small>', $html);
+        $this->assertStringContainsString('<span class="dpost-tag">Hotel</span>', $html);
+        $this->assertStringContainsString('<strong>4.6</strong>', $html);
+        $this->assertStringContainsString('<span>(112)</span>', $html);
+        $this->assertStringNotContainsString('dcard__new', $html);
+    }
+
+    public function test_a_package_card_leads_with_the_provider_and_shows_price_and_duration(): void
+    {
+        \App\Models\Package::create([
+            'slug' => 'day-tour', 'name' => 'Eden Day Adventure', 'location' => 'Davao City', 'region_id' => $this->region(),
+            'is_accredited' => true, 'rating' => 0, 'review_count' => 0, 'price_per_pax' => 1200,
+            'duration_label' => '1 day', 'type' => 'Nature & Adventure', 'provider_name' => 'Highland Trails Davao',
+        ]);
+
+        $html = $this->get('/packages')->assertOk()->getContent();
+
+        $this->assertStringContainsString('by Highland Trails Davao', $html);
+        $this->assertStringContainsString('1,200', $html);
+        $this->assertStringContainsString('<small>/ person</small>', $html);
+        $this->assertStringContainsString('1 day', $html);
+        $this->assertStringContainsString('<span class="dcard__new">New</span>', $html);
+        $this->assertSame(1, substr_count($html, 'class="dpost-tag"'), 'The provider is in the sub-line, not a chip.');
+        $this->assertStringNotContainsString('save-form--icon', $html, 'Packages are booked, not saved.');
+    }
+
+    public function test_a_tour_operator_card_shows_its_package_count_and_initials_without_a_photo(): void
+    {
+        $operator = \App\Models\TourOperator::create([
+            'slug' => 'aries', 'name' => 'Aries Travel and Tours Corporation', 'location' => 'Davao City', 'region_id' => $this->region(),
+            'is_accredited' => true, 'rating' => 4.9, 'review_count' => 41, 'specialization' => 'General Travel & Tours',
+        ]);
+        foreach (['A', 'B', 'C'] as $n) {
+            \App\Models\Package::create([
+                'slug' => 'p'.$n, 'name' => 'Pkg '.$n, 'location' => 'Davao City', 'region_id' => $this->region(),
+                'is_accredited' => true, 'rating' => 0, 'review_count' => 0, 'tour_operator_id' => $operator->id,
+            ]);
+        }
+
+        $html = $this->get('/tour-operators')->assertOk()->getContent();
+
+        $this->assertStringContainsString('3 tour packages', $html);
+        $this->assertStringContainsString('<div class="dcard__monogram"><span>AT</span></div>', $html);
+        $this->assertStringContainsString('<strong>4.9</strong>', $html);
+        $this->assertStringContainsString('General Travel &amp; Tours', $html);
+    }
+
+    public function test_a_souvenir_center_card_has_no_footer_when_there_is_nothing_to_put_in_it(): void
+    {
+        \App\Models\SouvenirCenter::create([
+            'slug' => 'shop', 'name' => 'Local Products', 'location' => 'Davao City', 'region_id' => $this->region(),
+            'is_accredited' => true, 'rating' => 0, 'review_count' => 0,
+        ]);
+
+        $html = $this->get('/souvenir-centers')->assertOk()->getContent();
+
+        $this->assertStringContainsString('Local Products', $html);
+        $this->assertStringContainsString('<span class="dcard__new">New</span>', $html);
+        $this->assertStringNotContainsString('dcard__foot', $html);
+    }
 }
