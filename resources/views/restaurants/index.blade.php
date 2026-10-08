@@ -32,62 +32,26 @@
         </button>
 
         <div class="catalog-layout">
-            <aside class="filter-panel" id="filterPanel">
-                <h3>Filter results</h3>
-                <form method="GET" action="{{ route('restaurants.index') }}">
-                    <input type="hidden" name="cuisine_type" value="{{ request('cuisine_type') }}">
+            @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, 'cuisine_type'); @endphp
 
-                    <div class="field">
-                        <label for="q">Search by name</label>
-                        <input type="text" id="q" name="q" value="{{ request('q') }}" placeholder="e.g. Marina Tuna">
-                    </div>
-
-                    <div class="field">
-                        <label for="region_id">Province / City</label>
-                        <select id="region_id" name="region_id">
-                            <option value="">All regions</option>
-                            @foreach ($regions as $region)
-                                <option value="{{ $region->id }}" @selected(request('region_id') == $region->id)>{{ $region->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label for="price_tier">Budget</label>
-                        <select id="price_tier" name="price_tier">
-                            <option value="">Any budget</option>
-                            <option value="Budget-Friendly" @selected(request('price_tier') === 'Budget-Friendly')>Budget-Friendly</option>
-                            <option value="Mid-range" @selected(request('price_tier') === 'Mid-range')>Mid-range</option>
-                            <option value="Premium" @selected(request('price_tier') === 'Premium')>Premium</option>
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label for="sort">Sort by</label>
-                        <select id="sort" name="sort">
-                            <option value="recommended" @selected(request('sort', 'recommended') === 'recommended')>Recommended</option>
-                            <option value="rating" @selected(request('sort') === 'rating')>Highest Rated</option>
-                            <option value="name" @selected(request('sort') === 'name')>Name (A&ndash;Z)</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" class="btn btn-poster-primary btn-block">Apply Filters</button>
-                    @if (request()->anyFilled(['q', 'region_id', 'price_tier', 'cuisine_type']))
-                        <a href="{{ route('restaurants.index') }}" class="btn btn-poster-ghost btn-block" style="margin-top:8px;">Clear all</a>
-                    @endif
-                </form>
-            </aside>
+            @include('partials.catalog-filters', [
+                'route' => 'restaurants.index',
+                'placeholder' => 'e.g. Marina Tuna',
+                'regions' => $regions,
+                'activeFilters' => $activeFilters,
+                'tiers' => [['Budget-Friendly', 'Budget-Friendly', '₱'], ['Mid-range', 'Mid-range', '₱₱'], ['Premium', 'Premium', '₱₱₱']],
+                'anyBudget' => true,
+                'categoryParam' => 'cuisine_type',
+            ])
 
             <div>
-                <div class="results-bar">
-                    <div class="results-count">{{ $restaurants->total() }} restaurant{{ $restaurants->total() === 1 ? '' : 's' }} found</div>
-                    @if ($restaurants->count())
-                        <div class="view-toggle" role="group" aria-label="Switch between grid and map view">
-                            <button type="button" class="view-toggle__btn active" data-view="grid"><x-icon name="grid" /> Grid View</button>
-                            <button type="button" class="view-toggle__btn" data-view="map"><x-icon name="map" /> Map View</button>
-                        </div>
-                    @endif
-                </div>
+                @include('partials.catalog-toolbar', [
+                    'results' => $restaurants,
+                    'noun' => 'restaurant',
+                    'sortOptions' => ['recommended' => 'Recommended', 'rating' => 'Highest Rated', 'name' => 'Name (A–Z)'],
+                    'activeFilters' => $activeFilters,
+                    'viewToggle' => 'grid-map',
+                ])
 
                 @if ($restaurants->count())
                     <div class="card-grid" data-view-panel="grid">
