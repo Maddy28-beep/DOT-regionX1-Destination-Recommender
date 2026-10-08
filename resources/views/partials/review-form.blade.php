@@ -15,6 +15,8 @@
     $token = \App\Http\Middleware\EnsureVisitorToken::get(request());
     $checkedIn = \App\Http\Controllers\ReviewController::hasCheckedIn($token, $kind, $listing->id);
     $alreadyReviewed = $checkedIn && \App\Http\Controllers\ReviewController::hasReviewed($token, $kind, $listing->id);
+    $ratingWords = [1 => 'Very poor', 2 => 'Poor', 3 => 'Fair', 4 => 'Very good', 5 => 'Excellent'];
+    $chosen = (int) old('rating', 0);
 @endphp
 
 @if ($alreadyReviewed)
@@ -32,33 +34,46 @@
         </p>
     </div>
 @else
-    <form method="POST" action="{{ route('reviews.store', ['type' => $type, 'id' => $listing->id]) }}" class="review-form">
+    <form method="POST" action="{{ route('reviews.store', ['type' => $type, 'id' => $listing->id]) }}" class="review-form" data-review-form>
         @csrf
+
+        <h4 class="review-form__title">Leave a review</h4>
 
         @error('rating')
             <div class="alert alert-error">{{ $message }}</div>
         @enderror
 
-        <div class="field">
-            <label for="rating-{{ $listing->id }}">Your rating of {{ $listing->name }}</label>
-            {{-- A plain select rather than a star widget: it is keyboard and
-                 screen-reader usable as-is, and needs no JavaScript to submit. --}}
-            <select id="rating-{{ $listing->id }}" name="rating" class="form-select" required>
-                <option value="5">5 &mdash; Excellent</option>
-                <option value="4">4 &mdash; Very good</option>
-                <option value="3">3 &mdash; Fair</option>
-                <option value="2">2 &mdash; Poor</option>
-                <option value="1">1 &mdash; Very poor</option>
-            </select>
-        </div>
+        <fieldset class="review-form__rating">
+            <legend>Your rating of {{ $listing->name }}</legend>
+
+            {{-- Real radio inputs, so the stars work with a keyboard and a screen reader and the form
+                 still submits without JavaScript. Listed 5 to 1 and laid out in reverse so a CSS-only
+                 "highlight every star up to the one chosen" works. --}}
+            <div class="star-input" data-star-input>
+                @foreach ([5, 4, 3, 2, 1] as $value)
+                    <input type="radio" name="rating" id="rating-{{ $listing->id }}-{{ $value }}" value="{{ $value }}"
+                           @checked($chosen === $value) required>
+                    <label for="rating-{{ $listing->id }}-{{ $value }}" title="{{ $value }} &mdash; {{ $ratingWords[$value] }}">
+                        <x-icon name="star" />
+                        <span class="sr-only">{{ $value }} &mdash; {{ $ratingWords[$value] }}</span>
+                    </label>
+                @endforeach
+            </div>
+            <span class="star-input__word" data-star-word data-words='@json($ratingWords)'>{{ $ratingWords[$chosen] ?? 'Tap a star to rate' }}</span>
+        </fieldset>
 
         <div class="field">
             <label for="comment-{{ $listing->id }}">Anything you would tell another traveler? (optional)</label>
             <textarea id="comment-{{ $listing->id }}" name="comment" rows="3" maxlength="500"
-                      placeholder="What was it like?">{{ old('comment') }}</textarea>
-            <p class="field-hint">Posted as &ldquo;Verified visitor&rdquo;. We never ask for your name.</p>
+                      placeholder="What was it like?" data-review-comment>{{ old('comment') }}</textarea>
+            <div class="review-form__meta">
+                <p class="field-hint">Posted as &ldquo;Verified visitor&rdquo;. We never ask for your name.</p>
+                <span class="review-form__counter" data-review-counter>{{ mb_strlen((string) old('comment')) }}/500</span>
+            </div>
         </div>
 
-        <button type="submit" class="btn btn-accent">Post my review &rarr;</button>
+        <div class="review-form__actions">
+            <button type="submit" class="btn btn-accent review-form__submit">Post my review &rarr;</button>
+        </div>
     </form>
 @endif

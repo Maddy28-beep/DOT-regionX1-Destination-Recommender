@@ -77,16 +77,7 @@
                 </div>
             @endif
 
-            <div class="side-card">
-                <h3 class="mt-0">Traveler Reviews ({{ $accommodation->reviews->count() }})</h3>
-                @forelse ($accommodation->reviews as $review)
-                    @include('partials.review-item')
-                @empty
-                    <p style="color:var(--muted);">No reviews yet.</p>
-                @endforelse
-
-                @include("partials.review-form", ["listing" => $accommodation, "type" => "accommodations", "kind" => "accommodation"])
-            </div>
+            @include('partials.reviews-section', ['listing' => $accommodation, 'type' => 'accommodations', 'kind' => 'accommodation', 'emptyHint' => 'Be the first to stay and share your experience.'])
         </div>
 
         <div>
