@@ -122,8 +122,6 @@
                     <a href="{{ route('plan.edit') }}" class="btn btn-primary btn-block">Plan My Trip</a>
                     <p class="field-hint" style="margin-top:6px;">This provider hasn't published a day-by-day schedule for this package yet.</p>
                 @endif
-                @include('partials.check-in-button', ['type' => 'packages', 'listing' => $package])
-
                 @include('partials.listing-external-links', ['listing' => $package])
 
                 @include('partials.map-embed', ['latitude' => $package->latitude, 'longitude' => $package->longitude, 'name' => $package->name])
