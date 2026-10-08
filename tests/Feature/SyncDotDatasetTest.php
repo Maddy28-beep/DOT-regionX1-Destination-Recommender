@@ -68,7 +68,11 @@ class SyncDotDatasetTest extends TestCase
         $this->assertEqualsWithDelta(7.5, (float) $pin->fresh()->latitude, 0.0001);
         $this->assertSame('2028-10-31', AccreditationRecord::where('accreditation_number', 'A-RENEW')->first()->expiration_date->toDateString());
         $this->assertSame('2027-06-01', AccreditationRecord::where('accreditation_number', 'A-SWAP')->first()->expiration_date->toDateString(), 'a day/month swap is not a renewal');
-        $this->assertNull($weak->fresh()->latitude, 'street-level pins are not imported');
+        $this->assertEqualsWithDelta(7.7, (float) $weak->fresh()->latitude, 0.0001, 'an empty listing takes even an approximate point');
+        $kept = $this->listing('A-KEEP', '2027-06-01', 7.1, 125.1);
+        $this->dataset([$this->row('A-KEEP', '2027-06-01', 7.9, 125.9, 'Approximate', 'Street')]);
+        $this->artisan('dot:sync-dataset', ['--file' => 'storage/framework/testing/dot-dataset-test.json', '--apply' => true])->assertExitCode(0);
+        $this->assertEqualsWithDelta(7.1, (float) $kept->fresh()->latitude, 0.0001, 'an approximate point never replaces a stored pin');
         $this->assertSame('2028-06-30', AccreditationRecord::where('accreditation_number', 'A-SHORT')->first()->expiration_date->toDateString(), 'dates are never shortened');
     }
 

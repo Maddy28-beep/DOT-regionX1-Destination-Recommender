@@ -11,8 +11,8 @@
     "issued": null,
     "expiry": "2028-10-31",
     "contact": "082 298 8888",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 7.09251,
+    "longitude": 125.61164,
     "type": "Hotel",
     "rooms": 174
    },
@@ -25,8 +25,8 @@
     "issued": null,
     "expiry": "2027-10-31",
     "contact": "0917 7190794",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 7.0719285,
+    "longitude": 125.6060627,
     "type": "Mabuhay Accommodation",
     "rooms": 82
    },
@@ -39,8 +39,8 @@
     "issued": null,
     "expiry": "2027-10-31",
     "contact": "0920 9254699",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 7.0715208374665,
+    "longitude": 125.605567040004,
     "type": "Mabuhay Accommodation",
     "rooms": 13
    },
@@ -67,8 +67,8 @@
     "issued": null,
     "expiry": "2027-10-31",
     "contact": "0927 1533857",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 6.70909276676854,
+    "longitude": 125.215641165141,
     "type": "Mabuhay Accommodation",
     "rooms": 4
    },
@@ -95,8 +95,8 @@
     "issued": null,
     "expiry": "2027-10-31",
     "contact": "0951 1972785",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 7.09654574549812,
+    "longitude": 125.619484474551,
     "type": "Mabuhay Accommodation",
     "rooms": 60
    },
@@ -109,8 +109,8 @@
     "issued": null,
     "expiry": "2027-10-31",
     "contact": "0995 6682916",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 7.06795152394885,
+    "longitude": 125.591618547139,
     "type": "Condominium Unit",
     "rooms": 1
    }
@@ -139,8 +139,8 @@
     "issued": null,
     "expiry": "2027-06-30",
     "contact": "(082) 2274528",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 7.07299583678495,
+    "longitude": 125.611913007473,
     "specialization": "General Travel & Tours"
    },
    {
@@ -152,8 +152,8 @@
     "issued": null,
     "expiry": "2027-06-30",
     "contact": "0976 6488734",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 7.309464,
+    "longitude": 125.700191,
     "specialization": "General Travel & Tours"
    },
    {
@@ -178,8 +178,8 @@
     "issued": null,
     "expiry": "2028-06-30",
     "contact": "0966 3068668",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 7.44808821216426,
+    "longitude": 125.814233643703,
     "specialization": "General Travel & Tours"
    },
    {
@@ -204,8 +204,8 @@
     "issued": null,
     "expiry": "2028-06-30",
     "contact": "(082) 227 1030",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 7.07452657188013,
+    "longitude": 125.618902340004,
     "specialization": "General Travel & Tours"
    },
    {
@@ -217,8 +217,8 @@
     "issued": null,
     "expiry": "2028-06-30",
     "contact": "0933 8501721",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 7.06911118043501,
+    "longitude": 125.605374255346,
     "specialization": "General Travel & Tours"
    },
    {
@@ -243,8 +243,8 @@
     "issued": null,
     "expiry": "2028-06-30",
     "contact": "082 327 7467",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 7.07697723494458,
+    "longitude": 125.610515938157,
     "specialization": "General Travel & Tours"
    },
    {
@@ -256,8 +256,8 @@
     "issued": null,
     "expiry": "2027-06-30",
     "contact": "0927 0314812",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 7.07685975614627,
+    "longitude": 125.606778756743,
     "specialization": "General Travel & Tours"
    },
    {
@@ -269,8 +269,8 @@
     "issued": null,
     "expiry": "2028-06-30",
     "contact": "0916 2610035",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 7.073765,
+    "longitude": 125.612,
     "specialization": "General Travel & Tours"
    },
    {
@@ -282,8 +282,8 @@
     "issued": null,
     "expiry": "2028-06-30",
     "contact": "0919 3741863",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 7.08331586071818,
+    "longitude": 125.581916409321,
     "specialization": "General Travel & Tours"
    },
    {
@@ -308,8 +308,8 @@
     "issued": null,
     "expiry": "2028-04-30",
     "contact": "0916 3124548",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 6.96608,
+    "longitude": 125.72462,
     "specialization": "Island Cruises"
    },
    {
@@ -321,8 +321,8 @@
     "issued": null,
     "expiry": "2028-06-30",
     "contact": "0917 7049985",
-    "latitude": null,
-    "longitude": null,
+    "latitude": 7.1161425,
+    "longitude": 125.644512,
     "specialization": "MICE Organizer"
    }
   ],
