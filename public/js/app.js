@@ -1110,7 +1110,8 @@ document.addEventListener('DOMContentLoaded', function () {
         var seenRadio = {};
         form.querySelectorAll('[data-filter-count]').forEach(function (field) {
             if (field.type === 'radio') {
-                if (field.checked && !seenRadio[field.name]) { seenRadio[field.name] = true; set++; }
+                // The "Any budget" tile means no budget filter, so it is not counted.
+                if (field.checked && field.value !== '' && !seenRadio[field.name]) { seenRadio[field.name] = true; set++; }
                 return;
             }
             if (field.value.trim() !== '') { set++; }
@@ -1127,9 +1128,12 @@ document.addEventListener('DOMContentLoaded', function () {
     form.querySelectorAll('.budget-tile input').forEach(function (radio) {
         // The state before this click, so a click on the tile that was already chosen can undo it.
         radio.addEventListener('click', function () {
-            if (radio.dataset.was === '1') {
+            var any = form.querySelector('.budget-tile input[data-any]');
+            if (radio.dataset.was === '1' && radio !== any) {
+                // Clicking the chosen tile again clears it: back to "Any budget" where there is one.
                 radio.checked = false;
                 radio.dataset.was = '0';
+                if (any) { any.checked = true; any.dataset.was = '1'; }
             } else {
                 form.querySelectorAll('.budget-tile input').forEach(function (other) { other.dataset.was = '0'; });
                 radio.dataset.was = '1';

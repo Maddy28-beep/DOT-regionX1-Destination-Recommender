@@ -9,6 +9,7 @@
     $regions          collection of Region
     $activeFilters    from App\Support\ActiveFilters::from()
     $tiers            optional list of [value, name, sub]; leave out for listings with no budget filter
+    $anyBudget        optional; put an "Any budget" tile first (selected while no budget is chosen)
     $categoryParam    optional name of the page's category filter ("type", "cuisine_type"); it is carried as a
                       hidden field because the category chips above the grid set it
     $hidden           optional extra hidden fields: list of ['name', 'value', 'id' => optional]
@@ -17,6 +18,9 @@
 --}}
 @php
     $tiers = $tiers ?? [];
+    if (! empty($anyBudget) && $tiers) {
+        array_unshift($tiers, ['', 'Any budget', 'All']);
+    }
     $hidden = $hidden ?? [];
     $formId = $formId ?? 'catalogFilters';
     $clearParams = $clearParams ?? [];
@@ -60,10 +64,10 @@
         @if ($tiers)
             <fieldset class="field budget-field">
                 <legend>Budget</legend>
-                <div class="budget-tiles {{ count($tiers) === 3 ? 'budget-tiles--3' : '' }}">
+                <div class="budget-tiles">
                     @foreach ($tiers as [$value, $name, $sub])
                         <label class="budget-tile">
-                            <input type="radio" name="price_tier" value="{{ $value }}" @checked(request('price_tier') === $value) data-filter-count>
+                            <input type="radio" name="price_tier" value="{{ $value }}" @checked($value === '' ? ! request()->filled('price_tier') : request('price_tier') === $value) data-filter-count @if ($value === '') data-any @endif>
                             <span class="budget-tile__name">{{ $name }}</span>
                             <span class="budget-tile__sub">{{ $sub }}</span>
                         </label>
