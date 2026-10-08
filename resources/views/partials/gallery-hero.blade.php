@@ -38,6 +38,10 @@
                 @if ($reviewCount > 0) {{ $rating }} &middot; {{ $reviewCount }} reviews @else New @endif
             </span>
             </div>
+            <div class="gallery-hero__title">
+                <h1>{{ $title }}</h1>
+                <div class="loc">{{ $subtitle }}</div>
+            </div>
             @if ($total > 1)
                 <div class="carousel-dots">
                     @foreach ($photos as $i => $photo)
@@ -79,6 +83,10 @@
                 @if ($reviewCount > 0) {{ $rating }} &middot; {{ $reviewCount }} reviews @else New @endif
             </span>
             </div>
+            <div class="gallery-hero__title">
+                <h1>{{ $title }}</h1>
+                <div class="loc">{{ $subtitle }}</div>
+            </div>
         </div>
 
         @php $categories = $photos->groupBy('category'); @endphp
@@ -98,9 +106,6 @@
             <div class="lb-meta"></div>
         </div>
     </div>
-
-    <h1 class="poster-title" style="margin:20px 0 4px; font-size:clamp(1.6rem, 4vw, 2.2rem); color:var(--ocean-teal-dark);">{{ $title }}</h1>
-    <div style="color:var(--muted); font-size:.95rem;">{{ $subtitle }}</div>
 @else
     <div class="detail-hero" style="background:{{ $fallbackGradient }}">
         <div class="badges">
