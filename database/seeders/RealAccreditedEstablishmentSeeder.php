@@ -63,10 +63,22 @@ class RealAccreditedEstablishmentSeeder extends Seeder
         'destination' => [Destination::class, 'destination'],
     ];
 
+    /** Files read in order: the 18 August list, then rows added by the 23 September list. */
+    public const DATA_FILES = [
+        'data/dot-accredited-establishments.json',
+        'data/dot-accredited-additions-2026-09-23.json',
+    ];
+
     public function run(): void
     {
-        $path = database_path('data/dot-accredited-establishments.json');
+        foreach (self::DATA_FILES as $file) {
+            $this->seedFile(database_path($file));
+        }
+    }
 
+    /** Seeds one data file; also used by `dot:sync-dataset --add-missing` for the additions file only. */
+    public function seedFile(string $path): void
+    {
         if (! is_file($path)) {
             $this->command?->warn("DOT establishment data not found at {$path}; skipping.");
 
