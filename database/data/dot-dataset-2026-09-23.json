@@ -1,0 +1,3578 @@
+{
+"source": "davao-destination-working-dataset.xlsx, sheet ESTABLISHMENTS, DOT list as of 23 September 2026",
+"rows": [
+{
+"accno": "DOT-R11-HTL-00112-2021",
+"name": "Acacia Hotel Davao",
+"expiry": "2026-10-31",
+"lat": 7.099341,
+"lng": 125.6281678,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-01049-2024",
+"name": "Adelina Hotel and Suites",
+"expiry": "2026-10-31",
+"lat": 6.897715,
+"lng": 126.149901,
+"check": "Verified",
+"precision": "Named place"
+},
+{
+"accno": "DOT-R11-HTL-01326-2024",
+"name": "Apo View Hotel",
+"expiry": "2026-10-31",
+"lat": 7.069467,
+"lng": 125.6078386,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-01935-2026",
+"name": "Aria Hotel & Residences",
+"expiry": "2028-10-31",
+"lat": 7.09251,
+"lng": 125.61164,
+"check": "Verified",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-HTL-00021-2020",
+"name": "Big 8 Corporate Hotel",
+"expiry": "2026-10-31",
+"lat": 7.4415475,
+"lng": 125.8059502,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-00742-2023",
+"name": "Big 8 Corporate Hotel Digos",
+"expiry": "2026-10-31",
+"lat": 6.7566028,
+"lng": 125.3529988,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-00057-2021",
+"name": "Blue Lotus Hotel",
+"expiry": "2026-10-31",
+"lat": 7.0571407,
+"lng": 125.6001949,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-01769-2026",
+"name": "D'Leonor Hotel",
+"expiry": "2026-10-31",
+"lat": 7.0840257,
+"lng": 125.611727,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-00625-2023",
+"name": "Dusit D2 Davao",
+"expiry": "2026-10-31",
+"lat": 7.1190572,
+"lng": 125.6486787,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-HTL-00484-2022",
+"name": "GoHotels Davao",
+"expiry": "2026-10-31",
+"lat": 7.10233,
+"lng": 125.63932,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-HTL-00062-2021",
+"name": "Grand Men Seng Hotel",
+"expiry": "2026-10-31",
+"lat": 7.06446,
+"lng": 125.6065085,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-01680-2026",
+"name": "Grand Palm Villas and Hotel",
+"expiry": "2026-10-31",
+"lat": 7.4489,
+"lng": 125.8083,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-HTL-00080-2021",
+"name": "Grand Regal Hotel Davao",
+"expiry": "2026-10-31",
+"lat": 7.10399,
+"lng": 125.6409,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-00457-2022",
+"name": "Green Banana Business Hotel",
+"expiry": "2026-10-31",
+"lat": 7.0840654,
+"lng": 125.6109766,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-01707-2026",
+"name": "Home Crest Hotel",
+"expiry": "2026-10-31",
+"lat": 7.0497554,
+"lng": 125.590659,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-00032-2020",
+"name": "Hotel de Crisbelle",
+"expiry": "2026-10-31",
+"lat": 6.7374513,
+"lng": 125.3550189,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-00026-2020",
+"name": "Hotel Tropika Davao",
+"expiry": "2026-10-31",
+"lat": 7.1048708,
+"lng": 125.642611,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-01714-2026",
+"name": "Madayaw Hotel",
+"expiry": "2026-10-31",
+"lat": 7.4463302,
+"lng": 125.8143288,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-00029-2020",
+"name": "Microtel by Wyndham - Davao",
+"expiry": "2026-10-31",
+"lat": 7.102542,
+"lng": 125.632575,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-00755-2024",
+"name": "Panorama Summit Hotel",
+"expiry": "2026-10-31",
+"lat": 7.1162,
+"lng": 125.6029,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-HTL-00118-2021",
+"name": "Park Inn by Radisson Davao",
+"expiry": "2028-10-31",
+"lat": 7.09739,
+"lng": 125.63059,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-00001-2020",
+"name": "Red Planet Davao",
+"expiry": "2026-10-31",
+"lat": 7.0988201,
+"lng": 125.6229812,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-00383-2022",
+"name": "Rogen Inn",
+"expiry": "2028-10-31",
+"lat": 7.0731829,
+"lng": 125.6044565,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-00545-2023",
+"name": "Seda Abreeza Hotel",
+"expiry": "2026-10-31",
+"lat": 7.0895309,
+"lng": 125.6105508,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-01134-2024",
+"name": "Shine Boutique Hotel",
+"expiry": "2026-10-31",
+"lat": 7.4583,
+"lng": 125.8125,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-HTL-01035-2024",
+"name": "Sotogrande Hotel Davao",
+"expiry": "2026-10-31",
+"lat": 7.0993285,
+"lng": 125.5971002,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-00004-2020",
+"name": "Star Hotel",
+"expiry": "2026-10-31",
+"lat": 7.0782298,
+"lng": 125.6052191,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-00562-2023",
+"name": "Sunny Point Hotel",
+"expiry": "2026-10-31",
+"lat": 7.094325,
+"lng": 125.5797837,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-00027-2020",
+"name": "The Lanang Suites",
+"expiry": "2026-10-31",
+"lat": 7.1039,
+"lng": 125.6345,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-HTL-00033-2020",
+"name": "The Pinnacle Hotel and Suites",
+"expiry": "2026-10-31",
+"lat": 7.0760075,
+"lng": 125.6151636,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-00751-2023",
+"name": "The Ritz Hotel at Garden Oases",
+"expiry": "2026-10-31",
+"lat": 7.0815902,
+"lng": 125.6174669,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-HTL-00512-2022",
+"name": "The Royal Mandaya Hotel",
+"expiry": "2026-10-31",
+"lat": 7.069597,
+"lng": 125.6105941,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-HTL-00266-2021",
+"name": "The World Palace Business Center",
+"expiry": "2026-10-31",
+"lat": 7.05491,
+"lng": 125.59829,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-HTL-00047-2021",
+"name": "Waterfront Insular Hotel Davao",
+"expiry": "2028-10-31",
+"lat": 7.1061793,
+"lng": 125.6504982,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RES-00011-2020",
+"name": "Buenavista Island Resort",
+"expiry": "2026-10-31",
+"lat": 7.1916967,
+"lng": 125.773347,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RES-00314-2022",
+"name": "Camp Holiday Resort and Recreation Area",
+"expiry": "2026-10-31",
+"lat": 7.12139,
+"lng": 125.674,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-RES-00746-2023",
+"name": "Catigan Mountain Breeze Resort",
+"expiry": "2026-10-31",
+"lat": 7.0134,
+"lng": 125.4666,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-RES-01480-2025",
+"name": "Chema's by the Sea",
+"expiry": "2026-10-31",
+"lat": 6.993989,
+"lng": 125.732002,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-RES-00061-2021",
+"name": "Club Samal Resorts Development Inc.",
+"expiry": "2026-10-31",
+"lat": 7.11004,
+"lng": 125.671809,
+"check": "Verified",
+"precision": "Named place"
+},
+{
+"accno": "DOT-R11-RES-01462-2025",
+"name": "Costa Azalea",
+"expiry": "2026-10-31",
+"lat": 7.0873351,
+"lng": 125.6672081,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RES-00017-2020",
+"name": "Costa Marina Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.097744,
+"lng": 125.6646051,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RES-01097-2024",
+"name": "D' Leonor Inland Resort & Adventure Park",
+"expiry": "2026-10-31",
+"lat": 7.150936,
+"lng": 125.623666,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RES-01749-2026",
+"name": "Dahican Beach Resort and Spa",
+"expiry": "2026-10-31",
+"lat": 6.8932582,
+"lng": 126.3007379,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-RES-01833-2026",
+"name": "Daya Adventure Resort Hotel",
+"expiry": "2026-10-31",
+"lat": 6.9167,
+"lng": 126.0167,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-RES-01420-2025",
+"name": "Discovery Samal",
+"expiry": "2026-10-31",
+"lat": 7.0933896,
+"lng": 125.666313,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RES-01511-2025",
+"name": "Dusit Thani Lubi Plantation Resort",
+"expiry": "2026-10-31",
+"lat": 7.27817,
+"lng": 125.83274,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-RES-00003-2020",
+"name": "Eden Mountain Resort",
+"expiry": "2026-10-31",
+"lat": 7.0464,
+"lng": 125.3948,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-RES-01629-2025",
+"name": "Haven's Dew Resort, OPC",
+"expiry": "2026-10-31",
+"lat": 6.91477,
+"lng": 125.27251,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-RES-01709-2026",
+"name": "Hidden Gardens Resort, Davao",
+"expiry": "2026-10-31",
+"lat": 7.024511,
+"lng": 125.414072,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RES-00012-2020",
+"name": "Hof Gorei Beach Resort",
+"expiry": "2026-10-31",
+"lat": 6.99392,
+"lng": 125.72789,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-RES-01052-2024",
+"name": "Holiday Oceanview Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.1954285,
+"lng": 125.7098101,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RES-00265-2021",
+"name": "Leticia by the Sea",
+"expiry": "2026-10-31",
+"lat": 7.00841,
+"lng": 125.67376,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-RES-01814-2026",
+"name": "Magnaga Waters Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.1557089,
+"lng": 125.8916256,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RES-00461-2022",
+"name": "Malagos Garden Resort",
+"expiry": "2026-10-31",
+"lat": 7.1910411,
+"lng": 125.4276581,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RES-00662-2023",
+"name": "Montefrio Garden Resort",
+"expiry": "2026-10-31",
+"lat": 6.916706,
+"lng": 125.26978,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-RES-00015-2020",
+"name": "Paradise Island Park and Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.11004,
+"lng": 125.671809,
+"check": "Verified",
+"precision": "Named place"
+},
+{
+"accno": "DOT-R11-RES-00268-2021",
+"name": "Pearl Farm Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.0049986,
+"lng": 125.7276718,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RES-01656-2025",
+"name": "Playa del Rosario Resort",
+"expiry": "2026-10-31",
+"lat": 7.533328,
+"lng": 126.5875842,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RES-01637-2025",
+"name": "Rustic Lounge Resort",
+"expiry": "2026-10-31",
+"lat": 7.09546,
+"lng": 126.024,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-RES-01674-2026",
+"name": "Seashell Island Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.101475,
+"lng": 125.66421,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RES-01497-2025",
+"name": "Stream Valley Nature's Park",
+"expiry": "2026-10-31",
+"lat": 7.095,
+"lng": 125.745,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-RES-00307-2022",
+"name": "Villa Amparo Garden Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.1939127,
+"lng": 125.7185174,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-APT-01376-2024",
+"name": "Executive Tulip Apartelle",
+"expiry": "2026-10-31",
+"lat": 7.05888,
+"lng": 125.58825,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-APT-00694-2023",
+"name": "Red Knight Gardens",
+"expiry": "2026-10-31",
+"lat": 7.10571,
+"lng": 125.63708,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-01724-2026",
+"name": "3’Kings Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.0898,
+"lng": 125.7887,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-01602-2025",
+"name": "Adecor Garden Resort",
+"expiry": "2026-10-31",
+"lat": 7.0198,
+"lng": 125.7265,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-01891-2026",
+"name": "Aguakan Resort",
+"expiry": "2026-10-31",
+"lat": 7.325778,
+"lng": 126.128073,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01879-2026",
+"name": "Aikiko House",
+"expiry": "2026-10-31",
+"lat": 7.0680345,
+"lng": 125.6082148,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01343-2024",
+"name": "Altavista Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.11004,
+"lng": 125.671809,
+"check": "Verified",
+"precision": "Named place"
+},
+{
+"accno": "DOT-R11-MAB-00704-2023",
+"name": "Alu Hotel",
+"expiry": "2026-10-31",
+"lat": 7.06815,
+"lng": 125.61526,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00125-2021",
+"name": "Amaranta Suites",
+"expiry": "2026-10-31",
+"lat": 7.0855748,
+"lng": 125.6080743,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-01242-2024",
+"name": "Amaya Waterfront Villa",
+"expiry": "2026-10-31",
+"lat": 6.3564367,
+"lng": 126.1990216,
+"check": "Approximate",
+"precision": "Nearby landmark: Lanca Integrated School"
+},
+{
+"accno": "DOT-R11-MAB-01943-2026",
+"name": "Amigotel Inn and Bloom (Boracay)",
+"expiry": "2027-10-31",
+"lat": 7.0719285,
+"lng": 125.6060627,
+"check": "Verified",
+"precision": null
+},
+{
+"accno": "DOT-R11-MAB-01776-2026",
+"name": "Anrana Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.736001,
+"lng": 126.494878,
+"check": "Verified",
+"precision": "Named place"
+},
+{
+"accno": "DOT-R11-MAB-00013-2020",
+"name": "Asrodel Hotel",
+"expiry": "2026-10-31",
+"lat": 7.0677022,
+"lng": 125.6135696,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01347-2024",
+"name": "Aundanao Oasis Beach",
+"expiry": "2026-10-31",
+"lat": 7.0898,
+"lng": 125.7887,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-01875-2026",
+"name": "Ayuste Highland Mountain Resort",
+"expiry": "2026-10-31",
+"lat": 7.3176458,
+"lng": 126.1226535,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-MAB-01606-2025",
+"name": "Baculin Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.4625617,
+"lng": 126.5942544,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01610-2025",
+"name": "Bagobo Cultural Village",
+"expiry": "2026-10-31",
+"lat": 6.951632,
+"lng": 125.383165,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-01521-2025",
+"name": "Bajada Suites OPC",
+"expiry": "2026-10-31",
+"lat": 7.0835656,
+"lng": 125.6126754,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01659-2025",
+"name": "Bungalow Vacation Rentals",
+"expiry": "2026-10-31",
+"lat": 6.9466732,
+"lng": 126.2603384,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-RES-00050-2021",
+"name": "Canibad Secret Paradise",
+"expiry": "2026-10-31",
+"lat": 7.0902992,
+"lng": 125.7827977,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01592-2025",
+"name": "Casa Julieta",
+"expiry": "2026-10-31",
+"lat": 7.0568174,
+"lng": 125.5895092,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-01393-2024",
+"name": "Casa Leticia Boutique Hotel",
+"expiry": "2026-10-31",
+"lat": 7.07039,
+"lng": 125.60758,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-00091-2021",
+"name": "Casa Leticia Business Inn",
+"expiry": "2026-10-31",
+"lat": 7.05429,
+"lng": 125.59954,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-01721-2026",
+"name": "Casa-Tanaw Inland Resort",
+"expiry": "2026-10-31",
+"lat": 7.095,
+"lng": 125.745,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-01575-2025",
+"name": "Cavanico IL Mare Resort",
+"expiry": "2026-10-31",
+"lat": 7.1782826,
+"lng": 125.6931795,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00590-2023",
+"name": "Central District Hotel",
+"expiry": "2026-10-31",
+"lat": 7.0687566,
+"lng": 125.6113508,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01484-2025",
+"name": "Citistar Hotel",
+"expiry": "2026-10-31",
+"lat": 7.5326129,
+"lng": 125.6111255,
+"check": "Approximate",
+"precision": "Nearby landmark: Tibal-og Creek"
+},
+{
+"accno": "DOT-R11-MAB-01514-2025",
+"name": "Citistyle Inn",
+"expiry": "2026-10-31",
+"lat": 7.0951901,
+"lng": 125.6356208,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01548-2025",
+"name": "Coral Dive beach resort",
+"expiry": "2026-10-31",
+"lat": 7.3084474,
+"lng": 125.8534216,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-MAB-01273-2024",
+"name": "Courtside Princess Inn",
+"expiry": "2026-10-31",
+"lat": 7.0909471,
+"lng": 125.6237715,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00720-2023",
+"name": "Cozy Quartelle Rooms & Suites",
+"expiry": "2026-10-31",
+"lat": 7.60778,
+"lng": 125.96639,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-MAB-00623-2023",
+"name": "Cris Inn",
+"expiry": "2026-10-31",
+"lat": 7.0728925,
+"lng": 125.7095291,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-MAB-01015-2024",
+"name": "Cris Inn Tagum",
+"expiry": "2026-10-31",
+"lat": 7.4413289,
+"lng": 125.8171623,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-00270-2021",
+"name": "D' Garden Inn",
+"expiry": "2026-10-31",
+"lat": 7.0372781,
+"lng": 125.5230438,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00282-2021",
+"name": "Davao Airport View Hotel",
+"expiry": "2026-10-31",
+"lat": 7.1299143,
+"lng": 125.6385253,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00376-2022",
+"name": "Davao Bamboo Sanctuary and Ecological Park",
+"expiry": "2026-10-31",
+"lat": 7.1899975,
+"lng": 125.4324031,
+"check": "Approximate",
+"precision": "Nearby landmark: Malagos Barangay Hall"
+},
+{
+"accno": "DOT-R11-MAB-01557-2025",
+"name": "Davao HUB DORMITELLE",
+"expiry": "2027-10-31",
+"lat": 7.0715208374665,
+"lng": 125.605567040004,
+"check": "User supplied",
+"precision": "Point precision unverified"
+},
+{
+"accno": "DOT-R11-MAB-01800-2026",
+"name": "Debonaires Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.6111272,
+"lng": 126.5651419,
+"check": "Approximate",
+"precision": "Nearby landmark: Lambajon Central Elementary School Sped Center"
+},
+{
+"accno": "DOT-R11-MAB-01051-2024",
+"name": "DGLM Inland Leisure Center",
+"expiry": "2026-10-31",
+"lat": 7.435,
+"lng": 125.806,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-00406-2022",
+"name": "D'Japanese Tunnel Family Resort and Restaurant",
+"expiry": "2026-10-31",
+"lat": 7.0630419,
+"lng": 125.5654979,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-00031-2020",
+"name": "Domicilio Lorenzo",
+"expiry": "2026-10-31",
+"lat": 7.061472,
+"lng": 125.595717,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-01274-2024",
+"name": "Drive Park Inn",
+"expiry": "2026-10-31",
+"lat": 7.0412495,
+"lng": 125.5741278,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-MAB-01571-2025",
+"name": "Eagles' Nest Beach Resort",
+"expiry": "2027-10-31",
+"lat": 7.1917,
+"lng": 125.7733,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-00005-2020",
+"name": "Eco Green Boutique Hotel",
+"expiry": "2026-10-31",
+"lat": 7.0565384,
+"lng": 125.6011358,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01641-2025",
+"name": "Edar's Place",
+"expiry": "2026-10-31",
+"lat": 7.7915312,
+"lng": 126.451503,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-01686-2026",
+"name": "Emma Victoria's Inn",
+"expiry": "2026-10-31",
+"lat": 7.044689,
+"lng": 125.56336,
+"check": "Approximate",
+"precision": "Named place"
+},
+{
+"accno": "DOT-R11-MAB-01280-2024",
+"name": "Espacio de Clarita Hometel",
+"expiry": "2026-10-31",
+"lat": 7.0180871,
+"lng": 125.4973854,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-01481-2025",
+"name": "Estella Beach'n Star Resort",
+"expiry": "2026-10-31",
+"lat": 7.4670085,
+"lng": 126.5950388,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00071-2021",
+"name": "First Pacific Inn",
+"expiry": "2026-10-31",
+"lat": 7.0727412,
+"lng": 125.6078649,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01512-2025",
+"name": "Frances Inn",
+"expiry": "2026-10-31",
+"lat": 7.0563113,
+"lng": 125.6005364,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00653-2023",
+"name": "Fuente Triangle Development Corporation (Crown Regency Residences Davao)",
+"expiry": "2027-10-31",
+"lat": 7.0915967,
+"lng": 125.6238582,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01725-2026",
+"name": "Funventure Talicud Beach Resort",
+"expiry": "2027-10-31",
+"lat": 6.9497237,
+"lng": 125.7104118,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00660-2023",
+"name": "Georgia's Samal Resort",
+"expiry": "2026-10-31",
+"lat": 7.105,
+"lng": 125.68,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-00079-2021",
+"name": "Golden Palace Hotel Corporation",
+"expiry": "2026-10-31",
+"lat": 7.463935,
+"lng": 125.8113531,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01782-2026",
+"name": "Gov Gen Beach Resort",
+"expiry": "2026-10-31",
+"lat": 6.5807842,
+"lng": 126.0975736,
+"check": "Approximate",
+"precision": "Nearby landmark: Tamban Public Cemetery"
+},
+{
+"accno": "DOT-R11-MAB-00283-2021",
+"name": "Grand Amber Country Inn",
+"expiry": "2026-10-31",
+"lat": 7.1047954,
+"lng": 125.6401818,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-00686-2023",
+"name": "Grand8 Guesthouse",
+"expiry": "2026-10-31",
+"lat": 7.1177619,
+"lng": 125.6721199,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-00599-2023",
+"name": "Greenwindows Dormitel",
+"expiry": "2026-10-31",
+"lat": 7.301734,
+"lng": 125.41138,
+"check": "Approximate",
+"precision": "Province only"
+},
+{
+"accno": "DOT-R11-MAB-01743-2026",
+"name": "Heavenly Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.197105,
+"lng": 125.7076423,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00221-2021",
+"name": "Heroben Hometel",
+"expiry": "2026-10-31",
+"lat": 7.4560192,
+"lng": 125.8049931,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01460-2025",
+"name": "Hijo Resorts Davao",
+"expiry": "2026-10-31",
+"lat": 7.3630461,
+"lng": 125.7868979,
+"check": "Approximate",
+"precision": "Nearby landmark: Madaum River"
+},
+{
+"accno": "DOT-R11-MAB-00445-2022",
+"name": "Honey's Hotel and Restaurant",
+"expiry": "2026-10-31",
+"lat": 6.95508,
+"lng": 126.21655,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-MAB-01298-2024",
+"name": "Hop Inn",
+"expiry": "2026-10-31",
+"lat": 7.0987967,
+"lng": 125.62507,
+"check": "Verified",
+"precision": "Exact building"
+},
+{
+"accno": "DOT-R11-MAB-00411-2022",
+"name": "Hostel 153",
+"expiry": "2026-10-31",
+"lat": 7.0740914,
+"lng": 125.6081466,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00230-2021",
+"name": "Hotel Cabaguio",
+"expiry": "2026-10-31",
+"lat": 7.09667,
+"lng": 125.61806,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01467-2025",
+"name": "Hotel Esse",
+"expiry": "2026-10-31",
+"lat": 7.0766567,
+"lng": 125.6048882,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00310-2022",
+"name": "Hotel Midori",
+"expiry": "2026-10-31",
+"lat": 7.0686336,
+"lng": 125.6062322,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01053-2024",
+"name": "Hotel San Marco",
+"expiry": "2026-10-31",
+"lat": 7.0567,
+"lng": 125.5933,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-00726-2023",
+"name": "Hotel Sogo",
+"expiry": "2026-10-31",
+"lat": 7.0961842,
+"lng": 125.6163517,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00515-2022",
+"name": "Hotel Uno",
+"expiry": "2026-10-31",
+"lat": 7.0695491,
+"lng": 125.6111525,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00286-2021",
+"name": "Humberto's Hotel",
+"expiry": "2026-10-31",
+"lat": 7.068363,
+"lng": 125.6125485,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01392-2024",
+"name": "Inside Room Inn",
+"expiry": "2026-10-31",
+"lat": 7.4560334,
+"lng": 125.7938256,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-RES-00030-2020",
+"name": "Island Garden Beach Resort",
+"expiry": "2026-10-31",
+"lat": 6.9341912,
+"lng": 125.787825,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01141-2024",
+"name": "Jack's In The Sky Mountain Resort",
+"expiry": "2026-10-31",
+"lat": 7.4573,
+"lng": 125.2541,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-00024-2020",
+"name": "Jade Dragon Suites",
+"expiry": "2026-10-31",
+"lat": 7.0678991,
+"lng": 125.6168681,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01478-2025",
+"name": "Jardin De Señorita",
+"expiry": "2026-10-31",
+"lat": 6.9302658,
+"lng": 125.3304084,
+"check": "Approximate",
+"precision": "Nearby landmark: Kapatagan Fire Sub-Station Digos City"
+},
+{
+"accno": "DOT-R11-MAB-00379-2022",
+"name": "Jardin De Ysabelle Eco Park",
+"expiry": "2026-10-31",
+"lat": 7.09302,
+"lng": 125.76275,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-01539-2025",
+"name": "Jillux Lodging Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.6111272,
+"lng": 126.5651419,
+"check": "Approximate",
+"precision": "Nearby landmark: Lambajon Central Elementary School Sped Center"
+},
+{
+"accno": "DOT-R11-MAB-00269-2021",
+"name": "JJK Realty & Commercial Corp. (Faircrown Suites)",
+"expiry": "2026-10-31",
+"lat": 7.1521555,
+"lng": 125.6019506,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-00360-2022",
+"name": "Jotel Inn",
+"expiry": "2026-10-31",
+"lat": 7.074452,
+"lng": 125.6089547,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00570-2023",
+"name": "Kojo Hotel and Suites Inc.",
+"expiry": "2026-10-31",
+"lat": 7.4472333,
+"lng": 125.8043897,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-MAB-00486-2022",
+"name": "La Anclar Hotel",
+"expiry": "2026-10-31",
+"lat": 7.0674486,
+"lng": 125.6118196,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00051-2021",
+"name": "La Vida Hostel",
+"expiry": "2026-10-31",
+"lat": 7.069161,
+"lng": 125.688536,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-00180-2021",
+"name": "La-Florenda Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.1965762,
+"lng": 125.7022076,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00213-2021",
+"name": "Langoyon Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.4779697,
+"lng": 126.5950007,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01468-2025",
+"name": "Lispher Inn",
+"expiry": "2026-10-31",
+"lat": 7.06025,
+"lng": 125.59383,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-01517-2025",
+"name": "Loleng's Mountain Resort",
+"expiry": "2026-10-31",
+"lat": 7.0210575,
+"lng": 125.4167297,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01469-2025",
+"name": "Luxebridge Hotel",
+"expiry": "2026-10-31",
+"lat": 7.0798716,
+"lng": 125.5538614,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-MAB-01355-2024",
+"name": "LYR Beach Resort Corporation",
+"expiry": "2026-10-31",
+"lat": 7.018,
+"lng": 125.726,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-01513-2025",
+"name": "Madonna Hometel & Suites New Pandan",
+"expiry": "2026-10-31",
+"lat": 7.29987,
+"lng": 125.6807086,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-MAB-01038-2024",
+"name": "Magooz Homestay",
+"expiry": "2026-10-31",
+"lat": 7.104038,
+"lng": 125.6673479,
+"check": "Approximate",
+"precision": "Nearby landmark: Samal Island-Davao City Connector Project"
+},
+{
+"accno": "DOT-R11-MAB-01915-2026",
+"name": "Mahan Garden Resort",
+"expiry": "2026-10-31",
+"lat": 7.1177619,
+"lng": 125.6721199,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01945-2026",
+"name": "Matanao Travellers Inn",
+"expiry": "2027-10-31",
+"lat": 6.70909276676854,
+"lng": 125.215641165141,
+"check": "User supplied",
+"precision": "Point precision unverified"
+},
+{
+"accno": "DOT-R11-MAB-01617-2025",
+"name": "Maxze B & B Inn",
+"expiry": "2026-10-31",
+"lat": 7.118246,
+"lng": 125.63394,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-01588-2025",
+"name": "Mergrande Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.032152,
+"lng": 125.529048,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00640-2023",
+"name": "MGL Resthouse and Foodhouse",
+"expiry": "2026-10-31",
+"lat": 6.8336118,
+"lng": 125.4152375,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-MAB-00101-2021",
+"name": "Midori Inn",
+"expiry": "2026-10-31",
+"lat": 7.0724,
+"lng": 125.607,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-00220-2021",
+"name": "Molave Hotel",
+"expiry": "2026-10-31",
+"lat": 7.4419619,
+"lng": 125.8043466,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01538-2025",
+"name": "Moonlit Baganga Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.5747096,
+"lng": 126.5616073,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01630-2025",
+"name": "Muland Leisure Park",
+"expiry": "2026-10-31",
+"lat": 7.0315771,
+"lng": 125.5127322,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-MAB-00560-2023",
+"name": "Nacyl-V Transient House",
+"expiry": "2026-10-31",
+"lat": 7.106584,
+"lng": 125.69366,
+"check": "Verified",
+"precision": "Named place"
+},
+{
+"accno": "DOT-R11-MAB-01041-2024",
+"name": "Napsule Suites",
+"expiry": "2026-10-31",
+"lat": 7.080886,
+"lng": 125.612677,
+"check": "Approximate",
+"precision": "Nearby landmark: J.P. Laurel Elementary School"
+},
+{
+"accno": "DOT-R11-MAB-00344-2022",
+"name": "Nath Fen Suites Inc",
+"expiry": "2026-10-31",
+"lat": 7.076755,
+"lng": 125.5445584,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-00532-2022",
+"name": "Oceano Con Vista Highland Events Place Rental",
+"expiry": "2026-10-31",
+"lat": 7.0304319,
+"lng": 125.7622483,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-MAB-01918-2026",
+"name": "Odyson's Mountain Resort",
+"expiry": "2026-10-31",
+"lat": 7.3256459,
+"lng": 126.0998951,
+"check": "Approximate",
+"precision": "Nearby landmark: Magcagong Elementary School"
+},
+{
+"accno": "DOT-R11-MAB-00187-2021",
+"name": "Oh George Inn",
+"expiry": "2026-10-31",
+"lat": 7.084,
+"lng": 125.595,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-01257-2024",
+"name": "Oh George Inn",
+"expiry": "2026-10-31",
+"lat": 7.1182,
+"lng": 125.6339,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-01249-2024",
+"name": "Oh George Inn",
+"expiry": "2026-10-31",
+"lat": 7.055,
+"lng": 125.597,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-01880-2026",
+"name": "Optimum Inn",
+"expiry": "2026-10-31",
+"lat": 7.0796314,
+"lng": 125.5446466,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01380-2024",
+"name": "Orange Grove Hotel",
+"expiry": "2026-10-31",
+"lat": 7.1085642,
+"lng": 125.6137566,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00237-2021",
+"name": "Pacific Palm Suites",
+"expiry": "2026-10-31",
+"lat": 7.1075016,
+"lng": 125.6326187,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00447-2022",
+"name": "Park Avenue Residence Inn & Suites",
+"expiry": "2026-10-31",
+"lat": 7.0985632,
+"lng": 125.6250644,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01510-2025",
+"name": "Playa del Rosario Resort",
+"expiry": "2026-10-31",
+"lat": 7.533328,
+"lng": 126.5875842,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01664-2026",
+"name": "Praia Vista",
+"expiry": "2026-10-31",
+"lat": 6.867324,
+"lng": 126.326645,
+"check": "Approximate",
+"precision": "Nearby landmark: Bobon Elementary School"
+},
+{
+"accno": "DOT-R11-MAB-01660-2025",
+"name": "Praia Vista inc",
+"expiry": "2026-10-31",
+"lat": 6.867324,
+"lng": 126.326645,
+"check": "Approximate",
+"precision": "Nearby landmark: Bobon Elementary School"
+},
+{
+"accno": "DOT-R11-MAB-01055-2024",
+"name": "Primo Whitesand Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.6111272,
+"lng": 126.5651419,
+"check": "Approximate",
+"precision": "Nearby landmark: Lambajon Central Elementary School Sped Center"
+},
+{
+"accno": "DOT-R11-MAB-01704-2026",
+"name": "Princess Inn",
+"expiry": "2026-10-31",
+"lat": 7.0894,
+"lng": 125.6194,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-01609-2025",
+"name": "Princess Perrine Suites",
+"expiry": "2026-10-31",
+"lat": 7.0481018,
+"lng": 125.5376399,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01464-2025",
+"name": "Punta de Gloria Villas",
+"expiry": "2026-10-31",
+"lat": 7.195436,
+"lng": 125.712645,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00028-2020",
+"name": "Qanaq Hotel",
+"expiry": "2026-10-31",
+"lat": 7.0576,
+"lng": 125.591,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-00661-2023",
+"name": "Qi Xiang Hotel",
+"expiry": "2026-10-31",
+"lat": 7.6010668,
+"lng": 125.9632874,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00741-2023",
+"name": "Rainbow Breeze Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.1114536,
+"lng": 125.6687259,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01912-2026",
+"name": "Red Barn",
+"expiry": "2026-10-31",
+"lat": 7.02435,
+"lng": 125.3996259,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01912-2026",
+"name": "Red Barn",
+"expiry": "2027-10-31",
+"lat": 7.02435,
+"lng": 125.3996259,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00240-2021",
+"name": "RedDoorz - 100 Roxas Avenue",
+"expiry": "2028-10-31",
+"lat": 7.0689,
+"lng": 125.6151,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-00459-2022",
+"name": "RLG Swimming Pool",
+"expiry": "2026-10-31",
+"lat": 7.0070815,
+"lng": 125.5034774,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00328-2022",
+"name": "RMPC Beach Resort",
+"expiry": "2026-10-31",
+"lat": 7.1877538,
+"lng": 125.6946364,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00075-2021",
+"name": "Roadway Inn",
+"expiry": "2026-10-31",
+"lat": 7.0938233,
+"lng": 125.6135468,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01338-2024",
+"name": "Ruemango Apartelle and Suites",
+"expiry": "2026-10-31",
+"lat": 7.05853,
+"lng": 125.59549,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-00728-2023",
+"name": "Sequioa Inn",
+"expiry": "2026-10-31",
+"lat": 7.0758226,
+"lng": 125.6210891,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01509-2025",
+"name": "Snooze Inn & Suites",
+"expiry": "2026-10-31",
+"lat": 7.05567,
+"lng": 125.57526,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-00295-2021",
+"name": "Sonreir Apartelle and Inn",
+"expiry": "2026-10-31",
+"lat": 7.176,
+"lng": 125.4693,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-01341-2024",
+"name": "South Point Beach House",
+"expiry": "2026-10-31",
+"lat": 6.3390523,
+"lng": 126.1971236,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-00009-2020",
+"name": "Sumo Asia Hotel",
+"expiry": "2026-10-31",
+"lat": 7.1044473,
+"lng": 125.6323743,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00258-2021",
+"name": "Sun My Hotel Corporation",
+"expiry": "2026-10-31",
+"lat": 7.0867681,
+"lng": 125.6211425,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01708-2026",
+"name": "SWISSFINITY BEACH RESORT",
+"expiry": "2026-10-31",
+"lat": 6.9367624,
+"lng": 125.7904426,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00018-2020",
+"name": "The Big House, A Heritage Home",
+"expiry": "2026-10-31",
+"lat": 7.0603478,
+"lng": 125.5936177,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-00016-2020",
+"name": "The Lucky 9 Budget Hotel",
+"expiry": "2026-10-31",
+"lat": 7.382145,
+"lng": 125.801665,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-MAB-00250-2021",
+"name": "The Manor Hotel Davao",
+"expiry": "2026-10-31",
+"lat": 7.0689,
+"lng": 125.60208,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00470-2022",
+"name": "The Royale House Hotel & Dormitel",
+"expiry": "2026-10-31",
+"lat": 7.452,
+"lng": 125.812,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-00325-2022",
+"name": "The Strand Suites And Dormitel",
+"expiry": "2026-10-31",
+"lat": 7.084496,
+"lng": 125.608824,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-00294-2021",
+"name": "Thirty Eight Hampton Suites",
+"expiry": "2026-10-31",
+"lat": 7.0829803,
+"lng": 125.6241165,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-01357-2024",
+"name": "Tinhat Company",
+"expiry": "2026-10-31",
+"lat": 7.0655368,
+"lng": 125.6136025,
+"check": "Verified",
+"precision": "Exact building"
+},
+{
+"accno": "DOT-R11-MAB-01402-2025",
+"name": "TLSY Beach Front Resort",
+"expiry": "2026-10-31",
+"lat": 7.1833,
+"lng": 125.7,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-00306-2022",
+"name": "Top Star Hotel",
+"expiry": "2026-10-31",
+"lat": 7.4440403,
+"lng": 125.8023737,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01516-2025",
+"name": "Tower Inn",
+"expiry": "2026-10-31",
+"lat": 7.0706406,
+"lng": 125.6053521,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01200-2024",
+"name": "Traveler's Inn",
+"expiry": "2027-10-31",
+"lat": 7.09654574549812,
+"lng": 125.619484474551,
+"check": "User supplied",
+"precision": "Point precision unverified"
+},
+{
+"accno": "DOT-R11-MAB-01162-2024",
+"name": "Twin Mountain View Resort",
+"expiry": "2026-10-31",
+"lat": 6.9100691,
+"lng": 125.2699424,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01703-2026",
+"name": "Vafi Hills Homestay",
+"expiry": "2026-10-31",
+"lat": 7.0833,
+"lng": 125.75,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MAB-01269-2024",
+"name": "Villa Carmelita Inland Resort and Hotel",
+"expiry": "2026-10-31",
+"lat": 7.0245514,
+"lng": 125.5040382,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01018-2024",
+"name": "Wind and Waves Beach Resort",
+"expiry": "2026-10-31",
+"lat": 6.8828377,
+"lng": 126.3171061,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-00313-2022",
+"name": "YKG Hotel",
+"expiry": "2026-10-31",
+"lat": 6.9436493,
+"lng": 126.2412526,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-MAB-01692-2026",
+"name": "Cosy Nook Condotel",
+"expiry": "2026-10-31",
+"lat": 7.0615465,
+"lng": 125.6100782,
+"check": "Approximate",
+"precision": "Nearby landmark: Barangay 39-D Health Center"
+},
+{
+"accno": "DOT-R11-MAB-01594-2025",
+"name": "Jazzhy Condo Unit Rental",
+"expiry": "2026-10-31",
+"lat": 7.053937,
+"lng": 125.602006,
+"check": "Approximate",
+"precision": "Nearby landmark: Traffic Enforcement Unit"
+},
+{
+"accno": "DOT-R11-MAB-01701-2026",
+"name": "JHS Condo Unit Rental",
+"expiry": "2026-10-31",
+"lat": 7.0670505,
+"lng": 125.60984,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-01536-2025",
+"name": "Lanante Condo Unit Rental",
+"expiry": "2027-10-31",
+"lat": 7.06795152394885,
+"lng": 125.591618547139,
+"check": "User supplied",
+"precision": "Point precision unverified"
+},
+{
+"accno": "DOT-R11-MAB-01598-2025",
+"name": "Leo's Condo Unit Rental",
+"expiry": "2026-10-31",
+"lat": 7.0686263,
+"lng": 125.5925859,
+"check": "Verified",
+"precision": "Exact building"
+},
+{
+"accno": "DOT-R11-MAB-01495-2025",
+"name": "Nomad Escapes & Sanctuaries OPC",
+"expiry": "2026-10-31",
+"lat": 7.0868032,
+"lng": 125.5114635,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-MAB-01526-2025",
+"name": "Notre Maison Property Leasing",
+"expiry": "2026-10-31",
+"lat": 7.080459,
+"lng": 125.613718,
+"check": "Approximate",
+"precision": "Nearby landmark: Brgy. 13-B Health Center"
+},
+{
+"accno": "DOT-R11-MAB-01425-2025",
+"name": "Reeka-Hometel",
+"expiry": "2026-10-31",
+"lat": 7.046743,
+"lng": 125.592115,
+"check": "Approximate",
+"precision": "Nearby landmark: Oh George! Drive Inn"
+},
+{
+"accno": "DOT-R11-MAB-01491-2025",
+"name": "Reeka-Hometel",
+"expiry": "2026-10-31",
+"lat": 7.0599524,
+"lng": 125.6120622,
+"check": "Approximate",
+"precision": "Nearby landmark: Bucana Covered Court"
+},
+{
+"accno": "DOT-R11-MAB-01424-2025",
+"name": "RK Condo Unit Rental",
+"expiry": "2026-10-31",
+"lat": 7.0803774,
+"lng": 125.5923459,
+"check": "Approximate",
+"precision": "Exact building"
+},
+{
+"accno": "DOT-R11-MAB-01496-2025",
+"name": "RL Condo Unit Rental",
+"expiry": "2026-10-31",
+"lat": 7.080459,
+"lng": 125.613718,
+"check": "Approximate",
+"precision": "Nearby landmark: Brgy. 13-B Health Center"
+},
+{
+"accno": "DOT-R11-MAB-01783-2026",
+"name": "Russ Condo Unit Rental",
+"expiry": "2026-10-31",
+"lat": 7.068805,
+"lng": 125.592428,
+"check": "Approximate",
+"precision": "Named place"
+},
+{
+"accno": "DOT-R11-MAB-01434-2025",
+"name": "Sha Condo Unit Rental",
+"expiry": "2026-10-31",
+"lat": 7.0616563,
+"lng": 125.6101619,
+"check": "Approximate",
+"precision": "Nearby landmark: Barangay 39 - D Day Care Center"
+},
+{
+"accno": "DOT-R11-MAB-01422-2025",
+"name": "WL Condominium Unit Rental",
+"expiry": "2026-10-31",
+"lat": 7.073765,
+"lng": 125.612,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-MAB-01691-2026",
+"name": "WGK Condotel",
+"expiry": "2026-10-31",
+"lat": 7.057904,
+"lng": 125.604865,
+"check": "Approximate",
+"precision": "Named place"
+},
+{
+"accno": "DOT-R11-TRA-00706-2023",
+"name": "Airdoods Ticket Depot Company",
+"expiry": "2027-06-30",
+"lat": 7.1441195,
+"lng": 125.6498404,
+"check": "Verified",
+"precision": "Exact building"
+},
+{
+"accno": "DOT-R11-TRA-00342-2022",
+"name": "Aquagem Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.0851448,
+"lng": 125.6143472,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-TRA-01222-2024",
+"name": "Aries Travel and Tours Corporation",
+"expiry": "2028-06-30",
+"lat": 7.0738632,
+"lng": 125.6173365,
+"check": "Verified",
+"precision": "Exact building"
+},
+{
+"accno": "DOT-R11-TRA-01595-2025",
+"name": "Charming Wanders Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.0622281,
+"lng": 125.6070841,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-TRA-00460-2022",
+"name": "Cyrus Travel Services",
+"expiry": "2028-06-30",
+"lat": 7.0180871,
+"lng": 125.4973854,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TRA-00040-2020",
+"name": "CM Tan Travel & Tours",
+"expiry": "2028-06-30",
+"lat": 7.1038865,
+"lng": 125.6478793,
+"check": "Approximate",
+"precision": "Nearby landmark: Samal Island-Davao City Connector Project"
+},
+{
+"accno": "DOT-R11-TTA-01044-2024",
+"name": "Davao Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.0733,
+"lng": 125.6097,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TRA-00463-2022",
+"name": "Discovery Tour, Inc.",
+"expiry": "2028-06-30",
+"lat": 7.0519,
+"lng": 125.5906,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TRA-01553-2025",
+"name": "FastPass Travel and Tours",
+"expiry": "2027-06-30",
+"lat": 7.080459,
+"lng": 125.613718,
+"check": "Approximate",
+"precision": "Nearby landmark: Brgy. 13-B Health Center"
+},
+{
+"accno": "DOT-R11-TRA-01640-2025",
+"name": "Gluck Seven Travel Agency",
+"expiry": "2028-06-30",
+"lat": 7.118158,
+"lng": 125.645744,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TRA-00245-2021",
+"name": "GMC Travelmakers (GMC TM TRAVEL AGENCY)",
+"expiry": "2028-06-30",
+"lat": 7.0897247,
+"lng": 125.6054568,
+"check": "Approximate",
+"precision": "Nearby landmark: Sr. San Vicente Ferrer Chapel"
+},
+{
+"accno": "DOT-R11-TRA-00719-2023",
+"name": "Greta Lakwatsera Travel & Tours",
+"expiry": "2028-06-30",
+"lat": 7.4422335,
+"lng": 125.8056869,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TRA-01821-2026",
+"name": "Hello World Tour, Inc.",
+"expiry": "2028-06-30",
+"lat": 7.1092019,
+"lng": 125.6323605,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TRA-01836-2026",
+"name": "John Gold Travel and Tour Services Corp.",
+"expiry": "2027-06-30",
+"lat": 7.1317309,
+"lng": 125.663388,
+"check": "Approximate",
+"precision": "Nearby landmark: Sasa"
+},
+{
+"accno": "DOT-R11-TRA-01358-2024",
+"name": "John Gold Travel and Tour Services Corp.",
+"expiry": "2027-06-30",
+"lat": 7.080886,
+"lng": 125.612677,
+"check": "Approximate",
+"precision": "Nearby landmark: J.P. Laurel Elementary School"
+},
+{
+"accno": "DOT-R11-TRC-01205-2024",
+"name": "Joy Travel and Tours",
+"expiry": "2027-06-30",
+"lat": 7.0948099,
+"lng": 125.6366381,
+"check": "Approximate",
+"precision": "Nearby landmark: J & J Eatery"
+},
+{
+"accno": "DOT-R11-TTA-00291-2021",
+"name": "Karst Geo Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.0679149,
+"lng": 125.6060587,
+"check": "Approximate",
+"precision": "Nearby landmark: Calda Pizza"
+},
+{
+"accno": "DOT-R11-TRA-01381-2024",
+"name": "Kerc Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.05852517617092,
+"lng": 125.569231897675,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TRA-01614-2025",
+"name": "Labayk International Travel Corporation",
+"expiry": "2027-06-30",
+"lat": 7.07299583678495,
+"lng": 125.611913007473,
+"check": "User supplied",
+"precision": "Point precision unverified"
+},
+{
+"accno": "DOT-R11-TRA-00215-2021",
+"name": "Lailai Travel And Tours Of Davao, Inc.",
+"expiry": "2028-06-30",
+"lat": 7.0588,
+"lng": 125.5892,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TRA-00248-2021",
+"name": "Luke John Ticketing Services and Payment Center",
+"expiry": "2028-06-30",
+"lat": 7.0936562,
+"lng": 125.4982153,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TRA-01541-2025",
+"name": "Maca Express Travel Services",
+"expiry": "2027-06-30",
+"lat": 7.06118899710526,
+"lng": 125.565523660175,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TRA-01689-2026",
+"name": "Masanao Travel & Tours",
+"expiry": "2028-06-30",
+"lat": 7.0805264,
+"lng": 125.5436394,
+"check": "Approximate",
+"precision": "Nearby landmark: Catalunan Grande Barangay Hall"
+},
+{
+"accno": "DOT-R11-TRA-01232-2024",
+"name": "Mt Apo Travel and Tours, inc.",
+"expiry": "2028-06-30",
+"lat": 7.074931,
+"lng": 125.6144504,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-TRA-00084-2021",
+"name": "Okey Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.422364,
+"lng": 125.789983,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TTA-01523-2025",
+"name": "On-The-Go-Travellers Travel Agency",
+"expiry": "2027-06-30",
+"lat": 7.0716238,
+"lng": 125.6104304,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TRA-00703-2023",
+"name": "Pasyalera Tours & Travel",
+"expiry": "2028-06-30",
+"lat": 7.4397159,
+"lng": 125.8076612,
+"check": "Approximate",
+"precision": "Nearby landmark: Iglesia ni Cristo"
+},
+{
+"accno": "DOT-R11-TRA-01819-2026",
+"name": "Powerplanner Travel Consultancy Services",
+"expiry": "2027-06-30",
+"lat": 7.05764757181833,
+"lng": 125.591183295827,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TRA-00166-2021",
+"name": "Rakso Air Travel & Tours, Inc.",
+"expiry": "2028-06-30",
+"lat": 7.080886,
+"lng": 125.612677,
+"check": "Approximate",
+"precision": "Nearby landmark: J.P. Laurel Elementary School"
+},
+{
+"accno": "DOT-R11-TRA-01566-2025",
+"name": "RNC Travel and Tours Services",
+"expiry": "2027-06-30",
+"lat": 7.309464,
+"lng": 125.700191,
+"check": "Approximate",
+"precision": "Nearby landmark: San Vicente Elementary School"
+},
+{
+"accno": "DOT-R11-TRA-00688-2023",
+"name": "Rose Travel & Tours",
+"expiry": "2028-06-30",
+"lat": 7.2958,
+"lng": 125.68,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TRA-01798-2026",
+"name": "Sarah Lea Travel and Tours Inc.",
+"expiry": "2029-06-30",
+"lat": 7.431843,
+"lng": 125.803791,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-TRA-01751-2026",
+"name": "Silk Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.070707,
+"lng": 125.6134197,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TRA-00354-2022",
+"name": "Southship Tours and Travel",
+"expiry": "2028-06-30",
+"lat": 7.0773502,
+"lng": 125.6052253,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-TRA-01210-2024",
+"name": "Sweetcase Tour Services",
+"expiry": "2028-06-30",
+"lat": 7.080886,
+"lng": 125.612677,
+"check": "Approximate",
+"precision": "Nearby landmark: J.P. Laurel Elementary School"
+},
+{
+"accno": "DOT-R11-TRA-00663-2023",
+"name": "Ticket1 Travel",
+"expiry": "2027-06-30",
+"lat": 7.0911,
+"lng": 125.6111,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TRA-01407-2025",
+"name": "Ticket1 Travel",
+"expiry": "2028-06-30",
+"lat": 7.0988,
+"lng": 125.6302,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TRA-00636-2023",
+"name": "TC Explore Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.0684454,
+"lng": 125.6063733,
+"check": "Approximate",
+"precision": "Nearby landmark: Elena Arcade"
+},
+{
+"accno": "DOT-R11-TRA-00122-2021",
+"name": "Vitor Tours and Travel",
+"expiry": "2028-06-30",
+"lat": 7.080459,
+"lng": 125.613718,
+"check": "Approximate",
+"precision": "Nearby landmark: Brgy. 13-B Health Center"
+},
+{
+"accno": "DOT-R11-TRA-00123-2021",
+"name": "Vitor Tours and Travel",
+"expiry": "2028-06-30",
+"lat": 7.0987981,
+"lng": 125.6307008,
+"check": "Approximate",
+"precision": "Nearby landmark: SM Lanang Premier Cinema"
+},
+{
+"accno": "DOT-R11-TRA-01013-2024",
+"name": "WeGo Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.44808821216426,
+"lng": 125.814233643703,
+"check": "User supplied",
+"precision": "Point precision unverified"
+},
+{
+"accno": "DOT-R11-TRA-01767-2026",
+"name": "WorldCrest Travel and Tours OPC",
+"expiry": "2027-06-30",
+"lat": 7.0524506,
+"lng": 125.5827086,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TRA-00082-2021",
+"name": "WWW INFINITY TRAVEL CO. LTD",
+"expiry": "2028-06-30",
+"lat": 7.1150965,
+"lng": 125.6461086,
+"check": "Approximate",
+"precision": "Nearby landmark: Saint Dominic Academy"
+},
+{
+"accno": "DOT-R11-TTA-00682-2023",
+"name": "168 Pacific Tours Incorporated",
+"expiry": "2028-06-30",
+"lat": 7.1027335,
+"lng": 125.614354,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TTA-01032-2024",
+"name": "A Joyfull Travel Opc",
+"expiry": "2028-06-30",
+"lat": 7.0753467,
+"lng": 125.6179402,
+"check": "Approximate",
+"precision": "Exact building"
+},
+{
+"accno": "DOT-R11-TTA-01265-2024",
+"name": "ACS Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.1174965,
+"lng": 125.6173304,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TTA-01143-2024",
+"name": "Airtrips Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.0704,
+"lng": 125.6056,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TTA-00116-2021",
+"name": "Angel Garnet Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.061855,
+"lng": 125.610251,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TTA-01740-2026",
+"name": "A-Par Travel & Tours Inc",
+"expiry": "2028-06-30",
+"lat": 7.0719101,
+"lng": 125.602873,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TTA-01944-2026",
+"name": "Aspectour Incorporated",
+"expiry": "2027-06-30",
+"lat": 7.05059,
+"lng": 125.58542,
+"check": "Matched building",
+"precision": "Villa Oro building"
+},
+{
+"accno": "DOT-R11-TRA-01222-2024",
+"name": "A-Star Travel and Tours",
+"expiry": "2027-06-30",
+"lat": 7.070641,
+"lng": 125.611131,
+"check": "Approximate",
+"precision": "Nearby landmark: EC Business Center"
+},
+{
+"accno": "DOT-R11-TTA-00316-2022",
+"name": "Aw Rah Tours and Travel Inc",
+"expiry": "2028-06-30",
+"lat": 7.07452657188013,
+"lng": 125.618902340004,
+"check": "User supplied",
+"precision": "Point precision unverified"
+},
+{
+"accno": "DOT-R11-TTA-00073-2021",
+"name": "Bloomers Asia Jewellers Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.06911118043501,
+"lng": 125.605374255346,
+"check": "User supplied",
+"precision": "Point precision unverified"
+},
+{
+"accno": "DOT-R11-TTA-01493-2025",
+"name": "Canaan Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.0805471,
+"lng": 125.6041196,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-TTA-00233-2021",
+"name": "Century Express Philippines Inc",
+"expiry": "2028-06-30",
+"lat": 7.1023619,
+"lng": 125.6366895,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TTA-00148-2021",
+"name": "CFBA Travel Station",
+"expiry": "2028-06-30",
+"lat": 7.0818469,
+"lng": 125.5533746,
+"check": "Approximate",
+"precision": "Nearby landmark: Saavedra Street"
+},
+{
+"accno": "DOT-R11-TTA-00410-2022",
+"name": "Chrisma Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.0754348,
+"lng": 125.520254,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-TTA-00412-2022",
+"name": "Clarv Travel and Business Center",
+"expiry": "2028-06-30",
+"lat": 7.151896,
+"lng": 125.58867,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TRA-00035-2020",
+"name": "Cybercrib Trips and Tours Travel Services",
+"expiry": "2028-06-30",
+"lat": 7.1066881,
+"lng": 125.6330433,
+"check": "Approximate",
+"precision": "Exact building"
+},
+{
+"accno": "DOT-R11-TTA-00715-2023",
+"name": "Elevation Travel and Tours Inc.",
+"expiry": "2028-06-30",
+"lat": 7.0725993,
+"lng": 125.6208855,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TTA-00646-2023",
+"name": "Etours Davao Inc.",
+"expiry": "2028-06-30",
+"lat": 7.2543339,
+"lng": 125.672364,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-TTA-01361-2024",
+"name": "Excel Global Travel & Tour Holidays",
+"expiry": "2028-06-30",
+"lat": 7.06035003003959,
+"lng": 125.569264705028,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TTA-00734-2023",
+"name": "Footsteps Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.0579044,
+"lng": 125.6048654,
+"check": "Approximate",
+"precision": "Nearby landmark: Quimpo Boulevard"
+},
+{
+"accno": "DOT-R11-TTA-01225-2024",
+"name": "GKR Tours",
+"expiry": "2028-06-30",
+"lat": 7.073765,
+"lng": 125.612,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-TTA-01615-2025",
+"name": "Globalwings Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.0692657,
+"lng": 125.6227748,
+"check": "Verified",
+"precision": "Exact building"
+},
+{
+"accno": "DOT-R11-TTA-01877-2026",
+"name": "Good Fortune Travel Centre",
+"expiry": "2028-06-30",
+"lat": 7.0724167,
+"lng": 125.6150323,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-TTA-01834-2026",
+"name": "Inclusive Travel and Tours, Inc.",
+"expiry": "2028-06-30",
+"lat": 7.05714352946865,
+"lng": 125.590543922814,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TTA-01810-2026",
+"name": "JGV Travel and Tours",
+"expiry": "2027-06-30",
+"lat": 7.1068801,
+"lng": 125.6135272,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-TTA-01542-2025",
+"name": "JJVen Tour Services",
+"expiry": "2027-06-30",
+"lat": 7.0485089,
+"lng": 125.5969546,
+"check": "Verified",
+"precision": "Exact building"
+},
+{
+"accno": "DOT-R11-TTA-01869-2026",
+"name": "JNJ Universal Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.598279,
+"lng": 125.9689471,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-TTA-01576-2025",
+"name": "Just To Explore Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.07697723494458,
+"lng": 125.610515938157,
+"check": "User supplied",
+"precision": "Point precision unverified"
+},
+{
+"accno": "DOT-R11-TTA-01897-2026",
+"name": "Lakbay Davao Travel & Consultancy and Business Center Inc.",
+"expiry": "2027-06-30",
+"lat": 7.05784,
+"lng": 125.57935,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TTA-01178-2024",
+"name": "LHB Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.0721632,
+"lng": 125.6026441,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-TTA-01757-2026",
+"name": "Liamdrei Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.0705697,
+"lng": 125.5576586,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TTA-01577-2025",
+"name": "Limitless Get-Away Travel and Tours",
+"expiry": "2027-06-30",
+"lat": 7.07685975614627,
+"lng": 125.606778756743,
+"check": "User supplied",
+"precision": "Point precision unverified"
+},
+{
+"accno": "DOT-R11-TTA-00651-2023",
+"name": "LNJT Travel & Tours",
+"expiry": "2028-06-30",
+"lat": 7.0912148,
+"lng": 125.6180132,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TTA-00620-2023",
+"name": "MBCC Travel and Tours Services",
+"expiry": "2028-06-30",
+"lat": 7.0801636,
+"lng": 125.5437938,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-TTA-01061-2024",
+"name": "Pan Asiaworld Holidays, Inc.",
+"expiry": "2028-06-30",
+"lat": 7.0694956,
+"lng": 125.6069009,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TTA-00390-2021",
+"name": "Plane-to-Go Travel Services",
+"expiry": "2028-06-30",
+"lat": 7.118158,
+"lng": 125.645744,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TTA-00436-2022",
+"name": "Prox Travel",
+"expiry": "2028-06-30",
+"lat": 7.0850226,
+"lng": 125.6166785,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TTA-00235-2021",
+"name": "Real Breeze Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.06126328966794,
+"lng": 125.570277266992,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TTA-01182-2024",
+"name": "RH Destinations Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 6.9819606,
+"lng": 125.4803925,
+"check": "Approximate",
+"precision": "Exact building"
+},
+{
+"accno": "DOT-R11-TTA-00465-2022",
+"name": "Sky Trail Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.0634368,
+"lng": 125.6051403,
+"check": "Approximate",
+"precision": "Nearby landmark: M/B Espaldon"
+},
+{
+"accno": "DOT-R11-TRA-00586-2023",
+"name": "Skyteam Services Inc",
+"expiry": "2028-06-30",
+"lat": 7.0702736,
+"lng": 125.5932845,
+"check": "Verified",
+"precision": "Exact building"
+},
+{
+"accno": "DOT-R11-TTA-00352-2022",
+"name": "Southern Travel Corporation",
+"expiry": "2028-06-30",
+"lat": 7.073765,
+"lng": 125.612,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-TTA-01611-2025",
+"name": "Surelite Travel and Tours",
+"expiry": "2027-06-30",
+"lat": 7.0729,
+"lng": 125.7095,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TTA-00458-2022",
+"name": "Tourlounge Travel Management",
+"expiry": "2027-06-30",
+"lat": 7.069723,
+"lng": 125.6087218,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TTA-01952-2026",
+"name": "Transcontinent Chartered Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.08331586071818,
+"lng": 125.581916409321,
+"check": "User supplied",
+"precision": "Point precision unverified"
+},
+{
+"accno": "DOT-R11-TTA-00345-2022",
+"name": "Travel Advantage Tour Services",
+"expiry": "2028-06-30",
+"lat": 7.0811387,
+"lng": 125.6023838,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TTA-00626-2023",
+"name": "Trip Expert Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.018,
+"lng": 125.726,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TTA-01377-2024",
+"name": "Wandertime Travel And Tours Corporation",
+"expiry": "2028-06-30",
+"lat": 7.05600964945292,
+"lng": 125.576127438156,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TTA-00232-2021",
+"name": "Yana Byahe Na Travel and Tours",
+"expiry": "2028-06-30",
+"lat": 7.0851448,
+"lng": 125.6143472,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-TOP-00388-2022",
+"name": "Card MRI Hijos Tours Inc.",
+"expiry": "2028-06-30",
+"lat": 7.0654336,
+"lng": 125.6065377,
+"check": "Approximate",
+"precision": "Nearby landmark: Felcris Anda"
+},
+{
+"accno": "DOT-R11-TOP-00120-2021",
+"name": "Projectphl81 Tour Services",
+"expiry": "2028-06-30",
+"lat": 7.0807144,
+"lng": 125.5827159,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-TTO-00446-2022",
+"name": "CWN Holiday Tours Services Corporation",
+"expiry": "2028-04-30",
+"lat": 7.0779357,
+"lng": 125.622782,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TTO-00454-2022",
+"name": "Aldimel Car Express Rent A Car",
+"expiry": "2028-04-30",
+"lat": 7.05693407229507,
+"lng": 125.588836093979,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TTO-01925-2026",
+"name": "Ecotrans Car Rentals Transport OPC",
+"expiry": "2028-04-30",
+"lat": 7.0958066,
+"lng": 125.6037808,
+"check": "Verified",
+"precision": "Exact building"
+},
+{
+"accno": "DOT-R11-TWT-00521-2022",
+"name": "MBCA Leticia by the Sea",
+"expiry": "2028-04-30",
+"lat": 7.00841,
+"lng": 125.67376,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TWT-01768-2026",
+"name": "EIJ VESSELS BOAT RENTAL",
+"expiry": "2028-04-30",
+"lat": 7.0728925,
+"lng": 125.7095291,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-TWT-01282-2024",
+"name": "YMC Ocean Breeze Island Cruise",
+"expiry": "2028-04-30",
+"lat": 7.0843043,
+"lng": 125.5979564,
+"check": "Approximate",
+"precision": "Nearby landmark: San Rafael Village Mini Gym"
+},
+{
+"accno": "DOT-R11-TWT-01948-2026",
+"name": "MBCA Bakunawa 1",
+"expiry": "2028-04-30",
+"lat": 6.96608,
+"lng": 125.72462,
+"check": "Approximate",
+"precision": "Kaputian locality"
+},
+{
+"accno": "DOT-R11-MCF-00161-2021",
+"name": "SMX Convention Center Davao",
+"expiry": "2028-06-30",
+"lat": 7.0988,
+"lng": 125.6302,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-MCO-00439-2022",
+"name": "Zegen Management Group Co.",
+"expiry": "2028-06-30",
+"lat": 7.1161425,
+"lng": 125.644512,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-RST-01778-2026",
+"name": "Arvie's Cafe",
+"expiry": "2027-01-06",
+"lat": 7.6037388,
+"lng": 125.967956,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-RST-00369-2022",
+"name": "Axl Dave Bibingka Food Corporation",
+"expiry": "2027-01-06",
+"lat": 7.5541979,
+"lng": 125.9297226,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-RST-00675-2023",
+"name": "BigFat Tummy's Steak and Seafood Restaurant",
+"expiry": "2027-06-04",
+"lat": 7.4397159,
+"lng": 125.8076612,
+"check": "Approximate",
+"precision": "Nearby landmark: Iglesia ni Cristo"
+},
+{
+"accno": "DOT-R11-RST-01291-2024",
+"name": "Braytside Cakes Catering Services",
+"expiry": "2027-04-28",
+"lat": 7.1280459,
+"lng": 125.8966684,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-RST-00340-2022",
+"name": "Chow2 Restaurant & Catering Services",
+"expiry": "2027-07-05",
+"lat": 7.3176458,
+"lng": 126.1226535,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-RST-01603-2025",
+"name": "Delmor's Grill House",
+"expiry": "2026-09-23",
+"lat": 7.6111272,
+"lng": 126.5651419,
+"check": "Approximate",
+"precision": "Nearby landmark: Lambajon Central Elementary School Sped Center"
+},
+{
+"accno": "DOT-R11-RST-01908-2026",
+"name": "Diskanso Cafe",
+"expiry": "2027-08-06",
+"lat": 7.1412,
+"lng": 125.893119,
+"check": "Verified",
+"precision": "Named place"
+},
+{
+"accno": "DOT-R11-RST-01909-2026",
+"name": "Dongturks Catering Services",
+"expiry": "2027-08-06",
+"lat": 7.5607666,
+"lng": 126.1387664,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-RST-00204-2021",
+"name": "Garden By The Bay Corporation",
+"expiry": "2026-10-14",
+"lat": 7.1089252,
+"lng": 125.6501663,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-RST-00597-2023",
+"name": "Garden Oases Restaurant",
+"expiry": "2026-09-30",
+"lat": 7.0641992,
+"lng": 125.6093294,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-RST-01920-2026",
+"name": "George BBQ",
+"expiry": "2027-08-07",
+"lat": 7.6716202,
+"lng": 126.0880291,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-RST-01604-2025",
+"name": "Hillside 88 Bar and Restaurant",
+"expiry": "2026-09-23",
+"lat": 6.897715,
+"lng": 126.149901,
+"check": "Verified",
+"precision": "Named place"
+},
+{
+"accno": "DOT-R11-RST-01853-2026",
+"name": "Hugo - Montevista Branch",
+"expiry": "2027-07-07",
+"lat": 7.5516437,
+"lng": 126.1367896,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RST-01296-2024",
+"name": "Hugo's Pizza",
+"expiry": "2027-07-07",
+"lat": 7.6040168,
+"lng": 125.9668069,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-RST-00211-2021",
+"name": "Jack's Ridge Resort and Restaurant",
+"expiry": "2027-04-01",
+"lat": 7.06626,
+"lng": 125.5821,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-RST-01890-2026",
+"name": "Jenniel's Café",
+"expiry": "2027-07-20",
+"lat": 7.3166121,
+"lng": 126.1263167,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-RST-01713-2026",
+"name": "Kapehan sa Tambacan",
+"expiry": "2027-03-19",
+"lat": 6.996504,
+"lng": 125.492925,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-RST-01329-2024",
+"name": "Kusina Kabacan",
+"expiry": "2026-10-12",
+"lat": 6.7676959,
+"lng": 125.3766307,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RST-01337-2024",
+"name": "Kusina Kabacan",
+"expiry": "2026-10-12",
+"lat": 6.8654928,
+"lng": 125.4374829,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RST-01811-2026",
+"name": "Leonora's Restaurant",
+"expiry": "2027-11-06",
+"lat": 7.1371876,
+"lng": 125.8937825,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-RST-00745-2023",
+"name": "Matina Swiss Deli and Restaurant",
+"expiry": "2027-03-09",
+"lat": 7.06,
+"lng": 125.572,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-RST-01647-2025",
+"name": "Marinatuna",
+"expiry": "2026-12-13",
+"lat": 7.094855,
+"lng": 125.620137,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-RST-01817-2026",
+"name": "New Davao Famous Restaurant Corp",
+"expiry": "2027-06-19",
+"lat": 7.0736791,
+"lng": 125.6148622,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RST-00171-2021",
+"name": "Nonki Japanese Restaurant",
+"expiry": "2027-07-07",
+"lat": 7.0816243,
+"lng": 125.6106753,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-RST-01121-2024",
+"name": "Parola-Baywalk Restaurant",
+"expiry": "2027-08-06",
+"lat": 6.950815,
+"lng": 126.2187185,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-RST-01859-2026",
+"name": "Pizzakaya - Maco",
+"expiry": "2027-07-07",
+"lat": 7.368797,
+"lng": 125.8556637,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-RST-01286-2024",
+"name": "PortSide Grill House Food Corporation",
+"expiry": "2027-09-07",
+"lat": 7.1412,
+"lng": 125.893119,
+"check": "Verified",
+"precision": "Named place"
+},
+{
+"accno": "DOT-R11-RST-01779-2026",
+"name": "Qan's Bibingka and Eatery",
+"expiry": "2027-01-06",
+"lat": 7.5541979,
+"lng": 125.9297226,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-RST-01648-2025",
+"name": "Rekado Filipino Cuisine",
+"expiry": "2026-12-13",
+"lat": 7.0775967,
+"lng": 125.6094928,
+"check": "Approximate",
+"precision": "Exact building"
+},
+{
+"accno": "DOT-R11-RST-01896-2026",
+"name": "Sabor Elas Cafe",
+"expiry": "2027-07-20",
+"lat": 7.5090357,
+"lng": 125.9226309,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-RST-00707-2023",
+"name": "Skyway21 Nature Park",
+"expiry": "2027-07-20",
+"lat": 7.3162372,
+"lng": 126.1359612,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-RST-00744-2023",
+"name": "The Swiss Deli Restaurant",
+"expiry": "2027-01-13",
+"lat": 7.1161166,
+"lng": 125.6288499,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RST-00104-2021",
+"name": "Tsuru",
+"expiry": "2027-10-02",
+"lat": 7.0603478,
+"lng": 125.5936177,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-RST-00092-2021",
+"name": "Tsuru Incorporated(Camus)",
+"expiry": "2027-07-23",
+"lat": 7.0700062,
+"lng": 125.6075976,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-RST-01266-2024",
+"name": "Tsuru Japanese Restaurant & Sushi Bar",
+"expiry": "2026-09-29",
+"lat": 7.0951581,
+"lng": 125.6152175,
+"check": "Approximate",
+"precision": "Exact building"
+},
+{
+"accno": "DOT-R11-RST-00748-2023",
+"name": "Tsuru Japanese Restaurant & Sushi Bar",
+"expiry": "2027-10-02",
+"lat": 7.080886,
+"lng": 125.612677,
+"check": "Approximate",
+"precision": "Nearby landmark: J.P. Laurel Elementary School"
+},
+{
+"accno": "DOT-R11-RST-01913-2026",
+"name": "Tsuru Japanese Restaurant & Sushi Bar",
+"expiry": "2027-08-06",
+"lat": 7.0579044,
+"lng": 125.6048654,
+"check": "Approximate",
+"precision": "Nearby landmark: Quimpo Boulevard"
+},
+{
+"accno": "DOT-R11-RST-01911-2026",
+"name": "Vikings",
+"expiry": "2027-08-06",
+"lat": 7.0983422,
+"lng": 125.6319949,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-RST-01601-2025",
+"name": "Zorbox Cafe",
+"expiry": "2026-09-15",
+"lat": 7.7748608,
+"lng": 126.4514554,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-TSP-00578-2023",
+"name": "Apo Ni Lola Durian Delicacies",
+"expiry": "2027-04-13",
+"lat": 7.05566,
+"lng": 125.57392,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TSP-01058-2024",
+"name": "Carabao Dive Center",
+"expiry": null,
+"lat": 7.07634265931018,
+"lng": 125.62572615165,
+"check": "User supplied",
+"precision": "Point precision unverified"
+},
+{
+"accno": "DOT-R11-TSP-01731-2026",
+"name": "Godel Agriventures Inc",
+"expiry": "2027-04-06",
+"lat": 7.1911262,
+"lng": 125.4386664,
+"check": "Approximate",
+"precision": "Nearby landmark: Malagos Checkpoint"
+},
+{
+"accno": "DOT-R11-TSP-01676-2026",
+"name": "Glide Freediving Diving Shop",
+"expiry": "2027-10-02",
+"lat": 7.0833,
+"lng": 125.75,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TSP-01675-2026",
+"name": "Ocean Bx",
+"expiry": "2027-10-02",
+"lat": 6.8973518,
+"lng": 126.2954235,
+"check": "Approximate",
+"precision": "Nearby landmark: Tower 11"
+},
+{
+"accno": "DOT-R11-TSP-01881-2026",
+"name": "Samal Freedive Collective Diving Center",
+"expiry": "2027-07-20",
+"lat": 7.11004,
+"lng": 125.671809,
+"check": "Verified",
+"precision": "Named place"
+},
+{
+"accno": "DOT-R11-TSP-01519-2025",
+"name": "South Shore Divers",
+"expiry": "2027-09-03",
+"lat": 7.0807339,
+"lng": 125.6026398,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-FTC-01243-2024",
+"name": "Belviz Farm",
+"expiry": "2026-12-09",
+"lat": 7.1782282,
+"lng": 125.4445414,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-AGT-00361-2022",
+"name": "Bemwa Farm Fresh Inc.",
+"expiry": "2026-12-09",
+"lat": 7.481914,
+"lng": 125.259499,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-FTC-01528-2025",
+"name": "Bukid Amara Tourism Agriventures Corporation",
+"expiry": "2027-06-02",
+"lat": 7.185,
+"lng": 125.48083,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-AGT-00288-2021",
+"name": "Damosa Land Inc. / Agriya Naturetainment",
+"expiry": "2028-02-05",
+"lat": 7.29396,
+"lng": 125.68415,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-AGT-00025-2020",
+"name": "Isla- Agri Ventures Inc",
+"expiry": "2027-06-11",
+"lat": 7.0833,
+"lng": 125.75,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-FTC-01574-2025",
+"name": "Lao Integrated Farms",
+"expiry": "2027-07-18",
+"lat": 6.8499044,
+"lng": 125.1829392,
+"check": "Approximate",
+"precision": "Nearby landmark: Eman Elementary School"
+},
+{
+"accno": "DOT-R11-TRE-00081-2021",
+"name": "Davao Crocodile Park Inc",
+"expiry": "2026-08-06",
+"lat": 7.0974,
+"lng": 125.599,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-TRE-01026-2024",
+"name": "JKM Mini Zoo",
+"expiry": "2027-03-03",
+"lat": 7.5794139,
+"lng": 125.6900943,
+"check": "Approximate",
+"precision": "Nearby landmark: Pag-asa Barangay Hall"
+},
+{
+"accno": "DOT-R11-SRC-00127-2021",
+"name": "Apo Golf and Country Club",
+"expiry": "2027-04-06",
+"lat": 7.0498522,
+"lng": 125.528232,
+"check": "Verified",
+"precision": "Establishment (by name)"
+},
+{
+"accno": "DOT-R11-SRC-00239-2021",
+"name": "Rancho Palos Verdes Golf & Sports Club Inc.",
+"expiry": "2026-10-11",
+"lat": 7.1620509,
+"lng": 125.6414346,
+"check": "Approximate",
+"precision": "Nearby landmark: Indangan Bridge"
+},
+{
+"accno": "DOT-R11-SRC-00231-2021",
+"name": "Rancho Palos Verdes Golf & Sports Club Inc.",
+"expiry": "2027-09-02",
+"lat": 7.0981749,
+"lng": 125.5964314,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-SRC-01658-2025",
+"name": "South Pacific Davao Country Club Inc.",
+"expiry": "2026-12-23",
+"lat": 7.0754348,
+"lng": 125.520254,
+"check": "Approximate",
+"precision": "Barangay / district"
+},
+{
+"accno": "DOT-R11-TRC-01205-2024",
+"name": "Craft College of Mindanao Inc.",
+"expiry": "2027-03-09",
+"lat": 7.088808,
+"lng": 125.6311385,
+"check": "Approximate",
+"precision": "Street"
+},
+{
+"accno": "DOT-R11-TRC-01499-2025",
+"name": "Davao Oriental International Technology College, Inc.",
+"expiry": "2027-06-25",
+"lat": 6.93233,
+"lng": 126.255165,
+"check": "Verified",
+"precision": "Named place"
+},
+{
+"accno": "DOT-R11-MSM-00462-2022",
+"name": "IMIN The Philippine-Japan Historical Museum",
+"expiry": "2026-07-25",
+"lat": 7.1902484,
+"lng": 125.4524905,
+"check": "Approximate",
+"precision": "City centre only"
+},
+{
+"accno": "DOT-R11-SPA-01236-2024",
+"name": "Elysia Wellness Spa",
+"expiry": "2026-12-10",
+"lat": 7.0673,
+"lng": 125.5918,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-SPA-00756-2024",
+"name": "Elysia Wellness Spa",
+"expiry": "2026-12-13",
+"lat": 7.0872,
+"lng": 125.6147,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-SPA-01815-2026",
+"name": "Elysia Wellness Spa",
+"expiry": "2027-06-19",
+"lat": 7.0935,
+"lng": 125.6262,
+"check": "Corrected",
+"precision": "Manually corrected"
+},
+{
+"accno": "DOT-R11-AMC-01412-2025",
+"name": "Gleshelle Aesthetic and Wellness Center",
+"expiry": "2027-07-05",
+"lat": 7.6040832,
+"lng": 125.9631477,
+"check": "Approximate",
+"precision": "Barangay / district"
+}
+]
+}
