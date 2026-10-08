@@ -139,11 +139,9 @@
                 </p>
 
                 <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="btn btn-poster-primary btn-block">Get Directions</a>
-                @include('partials.check-in-button', ['type' => 'destinations', 'listing' => $destination])
+                @include('partials.listing-external-links', ['listing' => $destination])
 
                 <x-save-heart type="destinations" :listing="$destination" variant="button" class="mt-10" />
-
-                @include('partials.listing-external-links', ['listing' => $destination])
 
                 @include('partials.map-embed', ['latitude' => $destination->latitude, 'longitude' => $destination->longitude, 'name' => $destination->name])
             </div>

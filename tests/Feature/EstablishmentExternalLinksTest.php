@@ -177,8 +177,8 @@ class EstablishmentExternalLinksTest extends TestCase
         $this->assertStringContainsString('href="https://instagram.com/linktestfalls" target="_blank" rel="noopener noreferrer"', $html);
     }
 
-    /** Check In Here must remain the real check-in action, never an external link. */
-    public function test_check_in_here_still_points_at_the_check_in_route_not_an_external_link(): void
+    /** The listing page has no check-in button: a visit is only recorded by scanning the QR code at the venue. */
+    public function test_the_listing_page_has_no_check_in_button_and_leads_with_the_website(): void
     {
         $partner = $this->partner();
         $listing = $partner->matchedListing()->first();
@@ -186,8 +186,22 @@ class EstablishmentExternalLinksTest extends TestCase
 
         $html = $this->get('/destinations/link-test-falls')->assertOk()->getContent();
 
-        $this->assertStringContainsString('Check In Here', $html);
-        $this->assertStringContainsString(route('check-in', ['type' => 'destinations', 'id' => $listing->id]), $html);
+        $this->assertStringNotContainsString('Check In Here', $html);
+        $this->assertStringNotContainsString('/check-in/destinations/'.$listing->id, $html);
+        $this->assertStringContainsString('Visit Official Website', $html);
+
+        // The website button sits right under Get Directions, before the Save button.
+        $this->assertLessThan(strpos($html, 'Visit Official Website'), strpos($html, 'Get Directions'));
+        $this->assertLessThan(strpos($html, 'save-form'), strpos($html, 'Visit Official Website'));
+    }
+
+    public function test_a_place_with_no_website_shows_no_website_button(): void
+    {
+        $this->partner();
+
+        $this->get('/destinations/link-test-falls')->assertOk()
+            ->assertDontSee('Visit Official Website')
+            ->assertDontSee('Check In Here');
     }
 
     public function test_a_guest_cannot_update_the_listing(): void
