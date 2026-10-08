@@ -85,7 +85,7 @@ class AdminListingController extends Controller
     public function store(Request $request, string $type): RedirectResponse
     {
         $config = $this->config($type);
-        $data = $request->validate($this->rules($type));
+        $data = $request->validate($this->rules($type), self::LINK_MESSAGES);
         $data = $this->withNormalisedStatus($this->withoutBlankRole($data));
 
         $data['slug'] = $this->uniqueSlug($config['model'], $data['name']);
@@ -137,7 +137,7 @@ class AdminListingController extends Controller
         $config = $this->config($type);
         $listing = $config['model']::findOrFail($id);
 
-        $data = $request->validate($this->rules($type, $listing->id));
+        $data = $request->validate($this->rules($type, $listing->id), self::LINK_MESSAGES);
         $data = $this->withNormalisedStatus($this->withoutBlankRole($data));
 
         foreach (['is_accredited', 'featured'] as $flag) {
@@ -279,9 +279,24 @@ class AdminListingController extends Controller
     /** Operating status is only tracked for the listing types an itinerary can contain. */
     private const STATUS_TYPES = ['destinations', 'accommodations', 'restaurants', 'souvenir-centers', 'souvenir_centers'];
 
+    /** The four optional links shown as "Find them online". Empty clears the link. */
+    private const LINK_RULES = [
+        'website_url' => ['nullable', 'url:http,https', 'max:255'],
+        'facebook_url' => ['nullable', 'url:http,https', 'max:255'],
+        'instagram_url' => ['nullable', 'url:http,https', 'max:255'],
+        'tiktok_url' => ['nullable', 'url:http,https', 'max:255'],
+    ];
+
+    private const LINK_MESSAGES = [
+        'website_url.url' => 'Enter the full website address, starting with http:// or https://.',
+        'facebook_url.url' => 'Enter the full Facebook address, starting with http:// or https://.',
+        'instagram_url.url' => 'Enter the full Instagram address, starting with http:// or https://.',
+        'tiktok_url.url' => 'Enter the full TikTok address, starting with http:// or https://.',
+    ];
+
     private function rules(string $type, ?int $ignoreId = null): array
     {
-        $rules = $this->baseRules($type, $ignoreId);
+        $rules = array_merge($this->baseRules($type, $ignoreId), self::LINK_RULES);
 
         return in_array($type, self::STATUS_TYPES, true)
             ? array_merge($rules, [

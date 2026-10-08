@@ -97,10 +97,8 @@
                     Distance from city center: {{ $accommodation->distance_km ? number_format($accommodation->distance_km, 1).' km' : 'N/A' }}
                 </p>
                 <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($accommodation->name.' '.$accommodation->location) }}" target="_blank" rel="noopener" class="btn btn-primary btn-block">Get Directions</a>
-                @include('partials.check-in-button', ['type' => 'accommodations', 'listing' => $accommodation])
+                @include('partials.find-them-online', ['listing' => $accommodation])
                 <x-save-heart type="accommodations" :listing="$accommodation" variant="button" class="mt-10" />
-
-                @include('partials.listing-external-links', ['listing' => $accommodation])
 
                 @include('partials.map-embed', ['latitude' => $accommodation->latitude, 'longitude' => $accommodation->longitude, 'name' => $accommodation->name])
             </div>
