@@ -85,6 +85,29 @@ class Destination extends Model
         return $this->morphMany(AccreditationRecord::class, 'listing', 'listing_kind', 'listing_id');
     }
 
+    /**
+     * The entry fee for the listing card, without the peso sign (the card adds its own): "150" for a
+     * single price, "150–450" for a range, "50 max" when the minimum is free, each per person. Null when the fee is free or not known,
+     * so the card keeps saying "Free entry" or shows the price-band meter instead.
+     */
+    public function posterPriceAmount(): ?string
+    {
+        $min = (float) ($this->entry_fee_min ?? 0);
+        $max = (float) ($this->entry_fee_max ?? 0);
+
+        if ($min <= 0 && $max <= 0) {
+            return null;
+        }
+
+        $max = max($min, $max);
+
+        if ($min <= 0) {
+            return number_format($max).' max / person'; // free to enter, some activities cost up to this
+        }
+
+        return ($min === $max ? number_format($min) : number_format($min).'–'.number_format($max)).' / person';
+    }
+
     public function posterUrl(): string
     {
         return route('destinations.show', $this);
