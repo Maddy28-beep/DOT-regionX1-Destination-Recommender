@@ -27,64 +27,26 @@
         </button>
 
         <div class="catalog-layout">
-            <aside class="filter-panel" id="filterPanel">
-                <h3>Filter results</h3>
-                <form method="GET" action="{{ route('accommodations.index') }}">
-                    <input type="hidden" name="type" value="{{ request('type') }}">
+            @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, 'type'); @endphp
 
-                    <div class="field">
-                        <label for="q">Search by name</label>
-                        <input type="text" id="q" name="q" value="{{ request('q') }}" placeholder="e.g. Pearl Farm">
-                    </div>
-
-                    <div class="field">
-                        <label for="region_id">Province / City</label>
-                        <select id="region_id" name="region_id">
-                            <option value="">All regions</option>
-                            @foreach ($regions as $region)
-                                <option value="{{ $region->id }}" @selected(request('region_id') == $region->id)>{{ $region->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label for="price_tier">Budget</label>
-                        <select id="price_tier" name="price_tier">
-                            <option value="">Any budget</option>
-                            <option value="Budget-Friendly" @selected(request('price_tier') === 'Budget-Friendly')>Budget-Friendly</option>
-                            <option value="Mid-range" @selected(request('price_tier') === 'Mid-range')>Mid-range</option>
-                            <option value="Premium" @selected(request('price_tier') === 'Premium')>Premium</option>
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label for="sort">Sort by</label>
-                        <select id="sort" name="sort">
-                            <option value="recommended" @selected(request('sort', 'recommended') === 'recommended')>Recommended</option>
-                            <option value="rating" @selected(request('sort') === 'rating')>Highest Rated</option>
-                            <option value="price_low" @selected(request('sort') === 'price_low')>Price: Low to High</option>
-                            <option value="price_high" @selected(request('sort') === 'price_high')>Price: High to Low</option>
-                            <option value="name" @selected(request('sort') === 'name')>Name (A&ndash;Z)</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" class="btn btn-poster-primary btn-block">Apply Filters</button>
-                    @if (request()->anyFilled(['q', 'region_id', 'price_tier', 'type']))
-                        <a href="{{ route('accommodations.index') }}" class="btn btn-poster-ghost btn-block" style="margin-top:8px;">Clear all</a>
-                    @endif
-                </form>
-            </aside>
+            @include('partials.catalog-filters', [
+                'route' => 'accommodations.index',
+                'placeholder' => 'e.g. Pearl Farm',
+                'regions' => $regions,
+                'activeFilters' => $activeFilters,
+                'tiers' => [['Budget-Friendly', 'Budget-Friendly', '₱'], ['Mid-range', 'Mid-range', '₱₱'], ['Premium', 'Premium', '₱₱₱']],
+                'anyBudget' => true,
+                'categoryParam' => 'type',
+            ])
 
             <div>
-                <div class="results-bar">
-                    <div class="results-count">{{ $accommodations->total() }} accommodation{{ $accommodations->total() === 1 ? '' : 's' }} found</div>
-                    @if ($accommodations->count())
-                        <div class="view-toggle" role="group" aria-label="Switch between grid and map view">
-                            <button type="button" class="view-toggle__btn active" data-view="grid"><x-icon name="grid" /> Grid View</button>
-                            <button type="button" class="view-toggle__btn" data-view="map"><x-icon name="map" /> Map View</button>
-                        </div>
-                    @endif
-                </div>
+                @include('partials.catalog-toolbar', [
+                    'results' => $accommodations,
+                    'noun' => 'accommodation',
+                    'sortOptions' => ['recommended' => 'Recommended', 'rating' => 'Highest Rated', 'price_low' => 'Price: Low to High', 'price_high' => 'Price: High to Low', 'name' => 'Name (A–Z)'],
+                    'activeFilters' => $activeFilters,
+                    'viewToggle' => 'grid-map',
+                ])
 
                 @if ($accommodations->count())
                     <div class="card-grid" data-view-panel="grid">
