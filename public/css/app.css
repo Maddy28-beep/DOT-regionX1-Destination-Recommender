@@ -5297,3 +5297,8 @@ body.mobile-menu-open .survey-invite { visibility: hidden; }
     .gallery-hero-mobile .gallery-hero__title .loc { max-width: none; }
     .gallery-hero-mobile .gallery-hero__title h1 { font-size: 1.7rem; }
 }
+
+.good-for--spaced { margin-bottom: 16px; }
+
+.stat-strip__item > div { min-width: 0; }
+.stat-strip__text--wrap { white-space: normal; overflow-wrap: anywhere; }

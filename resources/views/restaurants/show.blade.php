@@ -14,6 +14,24 @@
     $mapUrl = $restaurant->latitude && $restaurant->longitude
         ? "https://www.google.com/maps/search/?api=1&query={$restaurant->latitude},{$restaurant->longitude}"
         : 'https://www.google.com/maps/search/?api=1&query='.urlencode($restaurant->name.' '.$restaurant->location);
+
+    $tierLabel = match ($restaurant->price_tier) {
+        'Budget-Friendly' => 'Budget',
+        null, '' => null,
+        default => $restaurant->price_tier,
+    };
+
+    $hoursText = $restaurant->opening_hours ?: null;
+    $openNow = \App\Support\OpeningHours::isOpenNow($hoursText);
+    $pill = $restaurant->isClosedByStatus(now()) ? 'closed' : ($openNow === true ? 'open' : ($openNow === false ? 'closed' : null));
+
+    $strip = [
+        ['icon' => 'tag', 'label' => 'Price tier', 'text' => $tierLabel ?? '—', 'meter' => $restaurant->posterTier()],
+        ['icon' => 'utensils', 'label' => 'Cuisine', 'text' => $restaurant->cuisine_type ?: '—', 'wrap' => true],
+    ];
+    if ($restaurant->contact_number) {
+        $strip[] = ['icon' => 'phone', 'label' => 'Contact', 'text' => $restaurant->contact_number, 'wrap' => true];
+    }
 @endphp
 
 <div class="container">
@@ -38,42 +56,28 @@
 
     <div class="detail-layout">
         <div>
-            <div class="fact-grid">
-                <div class="fact">
-                    <div class="fact-val">{{ $restaurant->price_tier ?? '—' }}</div>
-                    <div class="fact-label">Budget Tier</div>
-                </div>
-                <div class="fact">
-                    <div class="fact-val">{{ $restaurant->cuisine_type ?? '—' }}</div>
-                    <div class="fact-label">Cuisine</div>
-                </div>
-                <div class="fact">
-                    <div class="fact-val">{{ $restaurant->opening_hours ?? '—' }}</div>
-                    <div class="fact-label">Hours</div>
-                </div>
-            </div>
+            @include('partials.stat-strip', ['items' => $strip])
 
-            <div class="side-card">
-                <h3 class="mt-0">About {{ $restaurant->name }}</h3>
-                <p>{{ $restaurant->description ?? 'No description available yet for this restaurant.' }}</p>
-            </div>
+            @include('partials.listing-about-card', [
+                'listing' => $restaurant,
+                'noun' => 'restaurant',
+                'groups' => ['Cuisine' => [$restaurant->cuisine_type]],
+            ])
 
             @include('partials.reviews-section', ['listing' => $restaurant, 'type' => 'restaurants', 'kind' => 'restaurant', 'emptyHint' => 'Be the first to dine and share your experience.'])
         </div>
 
         <div>
-            <div class="side-card">
-                <h3 class="mt-0">Plan your visit</h3>
-                <p style="font-size:.85rem; color:var(--muted); margin-top:0;">
-                    Hours: {{ $restaurant->opening_hours ?? 'Contact establishment' }}<br>
-                    Contact: {{ $restaurant->contact_number ?? 'Not provided' }}
-                </p>
-                <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="btn btn-primary btn-block">Get Directions</a>
-                @include('partials.find-them-online', ['listing' => $restaurant])
-                <x-save-heart type="restaurants" :listing="$restaurant" variant="button" class="mt-10" />
-
-                @include('partials.map-embed', ['latitude' => $restaurant->latitude, 'longitude' => $restaurant->longitude, 'name' => $restaurant->name])
-            </div>
+            @include('partials.listing-visit-card', [
+                'listing' => $restaurant,
+                'type' => 'restaurants',
+                'mapUrl' => $mapUrl,
+                'kicker' => 'Before you go',
+                'title' => 'Plan your visit',
+                'rows' => [
+                    ['icon' => 'clock', 'label' => 'Hours', 'value' => $hoursText ?? 'Contact establishment', 'pill' => $pill],
+                ],
+            ])
         </div>
     </div>
 

@@ -169,4 +169,86 @@ class DestinationDetailRedesignTest extends TestCase
         $this->assertSame(2, substr_count($html, '<h1>A Hotel</h1>'));
         $this->assertStringNotContainsString('class="poster-title" style="margin:20px 0 4px', $html);
     }
+
+    // ---- stays and dining use the same layout
+
+    private function stay(array $extra = []): Accommodation
+    {
+        return Accommodation::create($extra + [
+            'slug' => 'a-hotel', 'name' => 'A Hotel', 'location' => 'Davao City',
+            'region_id' => Region::firstOrCreate(['name' => 'Davao City'])->id,
+            'type' => 'Hotel', 'dot_classification' => '4-star', 'is_accredited' => true,
+            'rating' => 0, 'review_count' => 0, 'price_tier' => 'Premium',
+        ]);
+    }
+
+    public function test_a_stay_shows_price_per_night_and_a_plan_your_stay_card_with_check_in_and_out(): void
+    {
+        $stay = $this->stay([
+            'price_per_night' => 3500, 'distance_km' => 2.5, 'check_in' => '2:00 PM', 'check_out' => '12:00 NN',
+            'latitude' => 7.07, 'longitude' => 125.61,
+        ]);
+
+        $html = $this->get(route('accommodations.show', $stay))->assertOk()->getContent();
+
+        $this->assertStringContainsString('stat-strip', $html);
+        $this->assertStringContainsString('Per night', $html);
+        $this->assertStringContainsString('3,500', $html);
+        $this->assertStringContainsString('2.5 km', $html);
+        $this->assertSame(3, substr_count($html, 'class="is-on"'), 'Premium lights all three peso signs.');
+        $this->assertStringContainsString('Plan your stay', $html);
+        $this->assertStringContainsString('2:00 PM', $html);
+        $this->assertStringContainsString('12:00 NN', $html);
+        $this->assertStringContainsString('visit-card__map', $html);
+        $this->assertStringContainsString('Property type', $html);
+        $this->assertStringContainsString('<span class="good-for__chip">4-star</span>', $html);
+    }
+
+    public function test_a_stay_with_no_check_in_times_does_not_invent_any(): void
+    {
+        $stay = $this->stay();
+
+        $html = $this->get(route('accommodations.show', $stay))->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('2:00 PM', $html);
+        $this->assertStringNotContainsString('12:00 PM', $html);
+        $this->assertSame(2, substr_count($html, 'Not listed'));
+    }
+
+    public function test_a_restaurant_shows_cuisine_contact_and_an_hours_pill(): void
+    {
+        \Illuminate\Support\Carbon::setTestNow(\Illuminate\Support\Carbon::parse('2026-10-09 12:00', \App\Support\OpeningHours::TIMEZONE));
+
+        $eatery = \App\Models\Restaurant::create([
+            'slug' => 'a-diner', 'name' => 'A Diner', 'location' => 'Davao City',
+            'region_id' => Region::firstOrCreate(['name' => 'Davao City'])->id,
+            'cuisine_type' => 'Filipino Seafood', 'is_accredited' => true, 'rating' => 0, 'review_count' => 0,
+            'price_tier' => 'Mid-range', 'opening_hours' => '8:00 AM–9:00 PM', 'contact_number' => '(082) 123 4567',
+        ]);
+
+        $html = $this->get(route('restaurants.show', $eatery))->assertOk()->getContent();
+        \Illuminate\Support\Carbon::setTestNow();
+
+        $this->assertStringContainsString('stat-strip', $html);
+        $this->assertStringContainsString('Cuisine', $html);
+        $this->assertStringContainsString('(082) 123 4567', $html);
+        $this->assertStringContainsString('Plan your visit', $html);
+        $this->assertStringContainsString('Open now', $html);
+        $this->assertStringContainsString('<span class="good-for__chip">Filipino Seafood</span>', $html);
+    }
+
+    public function test_a_restaurant_without_a_phone_number_has_no_contact_tile(): void
+    {
+        $eatery = \App\Models\Restaurant::create([
+            'slug' => 'a-diner', 'name' => 'A Diner', 'location' => 'Davao City',
+            'region_id' => Region::firstOrCreate(['name' => 'Davao City'])->id,
+            'is_accredited' => true, 'rating' => 0, 'review_count' => 0, 'price_tier' => 'Budget-Friendly',
+        ]);
+
+        $html = $this->get(route('restaurants.show', $eatery))->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('stat-strip__label">Contact', $html);
+        $this->assertStringNotContainsString('Open now', $html);
+        $this->assertStringNotContainsString('Closed now', $html);
+    }
 }
