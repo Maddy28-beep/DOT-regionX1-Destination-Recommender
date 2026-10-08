@@ -72,6 +72,7 @@ class ThemeDayGrouper
         );
 
         $before = $this->score($groups, $sim);
+        $typesBefore = $this->typesPerDay($groups, $sequence);
         $distanceBefore = $this->totalDistance($groups, $sequence, $origin);
         $limit = $distanceBefore * (1 + self::MAX_EXTRA_DISTANCE) + self::DISTANCE_ALLOWANCE_KM;
 
@@ -141,6 +142,10 @@ class ThemeDayGrouper
                 'mean_similarity_after' => $meanAfter,
                 'distance_before_km' => round($distanceBefore, 1),
                 'distance_after_km' => round($this->totalDistance($groups, $sequence, $origin), 1),
+                // An independent check on coherence that does not use the embeddings: the average
+                // number of different place types in a day (lower = days are more alike).
+                'types_per_day_before' => round($typesBefore, 2),
+                'types_per_day_after' => round($this->typesPerDay($groups, $sequence), 2),
             ],
         ];
     }
@@ -169,6 +174,19 @@ class ThemeDayGrouper
         }
 
         return $sizes;
+    }
+
+    /** Average number of different place types per day, from the places' own type, not from the vectors. */
+    private function typesPerDay(array $groups, array $sequence): float
+    {
+        $days = 0;
+        $types = 0;
+        foreach ($groups as $members) {
+            $types += count(array_unique(array_map(fn (int $i) => (string) $sequence[$i]['row']['destination']->type, $members)));
+            $days++;
+        }
+
+        return $days > 0 ? $types / $days : 0.0;
     }
 
     /** How many pairs of stops share a day. */
