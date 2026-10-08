@@ -13,7 +13,7 @@
     </div>
     <div class="stat-card">
         <div class="stat-card-val">{{ $counts['expiring'] }}</div>
-        <div class="stat-card-label">Expiring Within 60 Days</div>
+        <div class="stat-card-label">Expiring Within 30 Days</div>
     </div>
     <div class="stat-card">
         <div class="stat-card-val">{{ $counts['expired'] }}</div>
