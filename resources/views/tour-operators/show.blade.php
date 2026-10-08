@@ -92,7 +92,7 @@
                     Budget tier: {{ $tourOperator->price_tier ?? 'Not specified' }}
                 </p>
                 <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="btn btn-primary btn-block">Get Directions</a>
-                @include('partials.listing-external-links', ['listing' => $tourOperator])
+                @include('partials.find-them-online', ['listing' => $tourOperator])
 
                 @include('partials.map-embed', ['latitude' => $tourOperator->latitude, 'longitude' => $tourOperator->longitude, 'name' => $tourOperator->name])
             </div>

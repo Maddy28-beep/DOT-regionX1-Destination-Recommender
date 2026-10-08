@@ -9,7 +9,8 @@
 
     $type:    URL segment from SavedListingController::TYPES.
     $variant: "icon" for the badge that floats on a listing card;
-              "button" for the labelled full-width button on a detail page.
+              "button" for the labelled full-width button on a detail page;
+              "square" for the heart beside Get Directions on the visit card.
 --}}
 
 @php
@@ -45,6 +46,17 @@
                 aria-pressed="{{ $isSaved ? 'true' : 'false' }}">
             <x-icon name="heart" :filled="$isSaved" />
             {{ $isSaved ? 'Saved' : 'Save this place' }}
+        </button>
+    @elseif ($variant === 'square')
+        <button type="submit" class="save-square {{ $isSaved ? 'is-saved' : '' }}"
+                aria-pressed="{{ $isSaved ? 'true' : 'false' }}"
+                title="{{ $isSaved ? 'Remove from saved' : 'Save this place' }}">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                 fill="{{ $isSaved ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21.2l7.7-7.7 1.1-1.1a5.5 5.5 0 0 0 0-7.8z"/>
+            </svg>
+            <span class="sr-only">{{ $isSaved ? 'Remove' : 'Save' }} {{ $listing->name }}</span>
         </button>
     @else
         <button type="submit" class="save-heart {{ $isSaved ? 'is-saved' : '' }}"

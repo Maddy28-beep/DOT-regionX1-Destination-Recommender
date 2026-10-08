@@ -123,8 +123,8 @@ class EstablishmentExternalLinksTest extends TestCase
 
         $html = $this->get('/destinations/link-test-falls')->assertOk()->getContent();
 
-        $this->assertStringContainsString('Visit Official Website', $html);
-        $this->assertStringNotContainsString('Visit Facebook Page', $html);
+        $this->assertStringContainsString('Official website', $html);
+        $this->assertStringNotContainsString('Facebook page', $html);
     }
 
     public function test_public_page_shows_facebook_button_when_only_facebook_is_set(): void
@@ -134,8 +134,8 @@ class EstablishmentExternalLinksTest extends TestCase
 
         $html = $this->get('/destinations/link-test-falls')->assertOk()->getContent();
 
-        $this->assertStringNotContainsString('Visit Official Website', $html);
-        $this->assertStringContainsString('Visit Facebook Page', $html);
+        $this->assertStringNotContainsString('Official website', $html);
+        $this->assertStringContainsString('Facebook page', $html);
     }
 
     public function test_public_page_shows_both_buttons_when_both_are_set(): void
@@ -148,8 +148,9 @@ class EstablishmentExternalLinksTest extends TestCase
 
         $html = $this->get('/destinations/link-test-falls')->assertOk()->getContent();
 
-        $this->assertStringContainsString('Visit Official Website', $html);
-        $this->assertStringContainsString('Visit Facebook Page', $html);
+        // two or more links: short names in a grid
+        $this->assertStringContainsString('<span>Website</span>', $html);
+        $this->assertStringContainsString('<span>Facebook</span>', $html);
     }
 
     public function test_public_page_hides_the_section_entirely_when_no_links_are_set(): void
@@ -158,8 +159,8 @@ class EstablishmentExternalLinksTest extends TestCase
 
         $html = $this->get('/destinations/link-test-falls')->assertOk()->getContent();
 
-        $this->assertStringNotContainsString('Visit Official Website', $html);
-        $this->assertStringNotContainsString('Visit Facebook Page', $html);
+        $this->assertStringNotContainsString('Find them online', $html);
+        $this->assertStringNotContainsString('Facebook page', $html);
         $this->assertStringNotContainsString('listing-links', $html);
     }
 
@@ -188,11 +189,11 @@ class EstablishmentExternalLinksTest extends TestCase
 
         $this->assertStringNotContainsString('Check In Here', $html);
         $this->assertStringNotContainsString('/check-in/destinations/'.$listing->id, $html);
-        $this->assertStringContainsString('Visit Official Website', $html);
+        $this->assertStringContainsString('Official website', $html);
 
-        // The website button sits right under Get Directions, before the Save button.
-        $this->assertLessThan(strpos($html, 'Visit Official Website'), strpos($html, 'Get Directions'));
-        $this->assertLessThan(strpos($html, 'save-form'), strpos($html, 'Visit Official Website'));
+        // Get Directions, with the save heart beside it, then the place's own links.
+        $this->assertLessThan(strpos($html, 'save-square'), strpos($html, 'Get Directions'));
+        $this->assertLessThan(strpos($html, 'Find them online'), strpos($html, 'save-square'));
     }
 
     public function test_a_place_with_no_website_shows_no_website_button(): void
@@ -200,7 +201,7 @@ class EstablishmentExternalLinksTest extends TestCase
         $this->partner();
 
         $this->get('/destinations/link-test-falls')->assertOk()
-            ->assertDontSee('Visit Official Website')
+            ->assertDontSee('Find them online')
             ->assertDontSee('Check In Here');
     }
 
