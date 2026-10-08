@@ -41,16 +41,7 @@
                 <p>{{ $souvenirCenter->description ?? 'No description available yet for this souvenir center.' }}</p>
             </div>
 
-            <div class="side-card">
-                <h3 class="mt-0">Traveler Reviews ({{ $souvenirCenter->reviews->count() }})</h3>
-                @forelse ($souvenirCenter->reviews as $review)
-                    @include('partials.review-item')
-                @empty
-                    <p style="color:var(--muted);">No reviews yet. Be the first to visit and share your experience.</p>
-                @endforelse
-
-                @include("partials.review-form", ["listing" => $souvenirCenter, "type" => "souvenir-centers", "kind" => "souvenir_center"])
-            </div>
+            @include('partials.reviews-section', ['listing' => $souvenirCenter, 'type' => 'souvenir-centers', 'kind' => 'souvenir_center'])
         </div>
 
         <div>

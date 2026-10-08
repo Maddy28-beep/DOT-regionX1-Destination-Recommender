@@ -1062,3 +1062,34 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+/*
+ * Review box: names the chosen rating ("Very good"), counts the comment against its 500-character limit,
+ * and keeps "Post my review" off until a star is picked. The stars are real radio inputs, so without this
+ * script the form still works -- the browser's own "required" check covers the missing rating.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-review-form]').forEach(function (form) {
+        var radios = form.querySelectorAll('input[name="rating"]');
+        var word = form.querySelector('[data-star-word]');
+        var words = word ? JSON.parse(word.getAttribute('data-words') || '{}') : {};
+        var comment = form.querySelector('[data-review-comment]');
+        var counter = form.querySelector('[data-review-counter]');
+        var submit = form.querySelector('button[type="submit"]');
+
+        function sync() {
+            var picked = form.querySelector('input[name="rating"]:checked');
+            if (word) { word.textContent = picked ? (words[picked.value] || '') : 'Tap a star to rate'; }
+            if (submit) { submit.disabled = !picked; }
+        }
+
+        radios.forEach(function (radio) { radio.addEventListener('change', sync); });
+        sync();
+
+        if (comment && counter) {
+            var count = function () { counter.textContent = comment.value.length + '/' + comment.maxLength; };
+            comment.addEventListener('input', count);
+            count();
+        }
+    });
+});
