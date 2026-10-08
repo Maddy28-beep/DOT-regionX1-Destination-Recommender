@@ -53,6 +53,19 @@ class AdminDashboardController extends Controller
         ];
 
         /*
+         * What the warning banner says. "Expired" records are already hidden from
+         * the public catalog (accreditation:sync-status flips is_accredited off), so
+         * the admin needs to know that places are missing, not just that some are
+         * about to be. whereDate because expiration_date is stored as a timestamp.
+         */
+        $accreditationAlert = [
+            'expired' => AccreditationRecord::where('status', 'Expired')->count(),
+            'expiring' => $stats['expiring_accreditations'],
+            'within_week' => AccreditationRecord::where('status', 'Expiring Soon')
+                ->whereDate('expiration_date', '<=', now()->addDays(7)->toDateString())->count(),
+        ];
+
+        /*
          * Recent activity is shown as QR check-ins rather than tourist
          * accounts: there are no traveler accounts to list. A check-in row
          * carries a place, a date and an opaque browser token, so this panel
@@ -67,9 +80,9 @@ class AdminDashboardController extends Controller
             ]);
 
         $pendingEstablishments = EstablishmentAccount::where('status', 'pending')->latest('submitted_at')->take(5)->get();
-        $expiring = AccreditationRecord::whereIn('status', ['Expiring Soon', 'Expired'])->orderBy('expiration_date')->take(5)->get();
+        $expiring = AccreditationRecord::with('listing')->whereIn('status', ['Expiring Soon', 'Expired'])->orderBy('expiration_date')->take(8)->get();
 
-        return view('admin.overview', compact('stats', 'recentVisits', 'pendingEstablishments', 'expiring'));
+        return view('admin.overview', compact('stats', 'recentVisits', 'pendingEstablishments', 'expiring', 'accreditationAlert'));
     }
 
     public function establishments(Request $request): View
