@@ -1,0 +1,45 @@
+name: Tests
+
+# Runs the whole test suite on every pull request and every push to main, so a broken
+# change is caught before it is merged and deployed. Tests use an in-memory SQLite
+# database (see phpunit.xml), so no database service is needed.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, pdo_sqlite, sqlite3, gd, zip, bcmath, fileinfo
+          coverage: none
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install PHP packages
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Prepare the app
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Run the tests
+        run: php artisan test
