@@ -34,6 +34,9 @@
      * queries per card.
      */
     $coverPhoto = $listing->coverPhoto();
+
+    // Places can be closed (see HasOperatingStatus); say so on the card, not only on the detail page.
+    $closedBadge = method_exists($listing, 'operatingBadge') ? $listing->operatingBadge() : null;
 @endphp
 
 <div class="dpost-card-wrap">
@@ -41,7 +44,7 @@
     <x-save-heart :type="$saveSegment" :listing="$listing" />
 @endif
 <a href="{{ $listing->posterUrl() }}" class="dpost-card">
-    <div class="dpost-card__art {{ $saveSegment ? 'has-save' : '' }}">
+    <div class="dpost-card__art {{ $saveSegment ? 'has-save' : '' }} {{ $closedBadge ? 'is-closed' : '' }}" @if ($closedBadge) data-closed="{{ $closedBadge }}" @endif>
         @if ($coverPhoto)
             {{-- alt is empty deliberately: .dpost-card__name below already
                  names the place and the whole card is a single link, so
