@@ -24,23 +24,14 @@ use Illuminate\Support\Collection;
  *   - when both places have coordinates it must be within MAX_DISTANCE_KM of
  *     the stop it replaces, so a swap never sends the traveller across the region.
  *
- * Within what is allowed, the order is a blend, not similarity alone. Two places can
- * mean nearly the same thing and still be a poor swap -- the most similar substitute
- * for a convention centre was a golf club -- so the traveller's own interests and the
- * distance count too: 50% similarity of meaning, 30% how well the place fits the
- * interests the traveller picked, 20% how close it is to the stop it replaces.
+ * Within what is allowed, the order is the model's alone: most similar in meaning first.
+ * The traveller's interests are checked afterwards and reported next to each suggestion
+ * (interest_fit), but they never reorder the list.
  */
 class SimilarDestinationService
 {
     /** Furthest a substitute may be from the stop it replaces. */
     public const MAX_DISTANCE_KM = 60.0;
-
-    /** How the order is made up; they add to 1. */
-    private const WEIGHT_SIMILARITY = 0.5;
-
-    private const WEIGHT_INTEREST = 0.3;
-
-    private const WEIGHT_PROXIMITY = 0.2;
 
     /** True once at least one destination has a stored vector. */
     public function isAvailable(): bool
@@ -103,8 +94,8 @@ class SimilarDestinationService
     /**
      * The best substitutes for $original within this itinerary.
      *
-     * @return Collection<int, array{destination: Destination, similarity: float, distance_km: ?float, score: float, interest_fit: ?float}>
-     *                                                                                                                                       interest_fit is null when the traveller picked no interests
+     * @return Collection<int, array{destination: Destination, similarity: float, distance_km: ?float, interest_fit: ?float}>
+     *                                                                                                          interest_fit is null when the traveller picked no interests
      */
     public function alternatives(Destination $original, Itinerary $itinerary, int $limit = 3): Collection
     {
@@ -145,26 +136,16 @@ class SimilarDestinationService
                 }
 
                 $similarity = round(DestinationEmbeddingService::similarity($originalVector, $embedding->vector), 4);
-                $fit = $interestFit?->get($candidate->id) ?? ($interestFit === null ? null : 0.0);
-
-                // No coordinates: neither near nor far, so the middle of the scale rather than a guess.
-                $proximity = $distance === null ? 0.5 : 1 - min($distance, self::MAX_DISTANCE_KM) / self::MAX_DISTANCE_KM;
 
                 return [
                     'destination' => $candidate,
                     'similarity' => $similarity,
                     'distance_km' => $distance !== null ? round($distance, 1) : null,
-                    'interest_fit' => $fit,
-                    'score' => round(
-                        self::WEIGHT_SIMILARITY * $similarity
-                        + self::WEIGHT_INTEREST * ($fit ?? 1.0)
-                        + self::WEIGHT_PROXIMITY * $proximity,
-                        4
-                    ),
+                    'interest_fit' => $interestFit?->get($candidate->id) ?? ($interestFit === null ? null : 0.0),
                 ];
             })
             ->filter()
-            ->sort(fn (array $a, array $b) => [$b['score'], $b['similarity']] <=> [$a['score'], $a['similarity']])
+            ->sortByDesc('similarity')
             ->take($limit)
             ->values();
     }
@@ -173,10 +154,9 @@ class SimilarDestinationService
      * Whether each candidate fits at least one of the interests the traveller picked: 1.0 if it does, 0.0 if
      * it does not, from the same content-based scoring the itinerary was built with. The scoring itself
      * grades by how many of the picked interests a place covers (a farm covering one of three scores a third),
-     * but for choosing a substitute the question is whether it fits the traveller's interests at all, and a
-     * tagged place would otherwise always lose to an untagged one that happens to score 1.
-     * Null when the traveller picked no interests (then it ranks nothing). A candidate the scoring leaves out
-     * (outside the traveller's distance range) counts as 0.
+     * but for telling the traveller why a place is offered the question is whether it fits at all.
+     * It only labels a suggestion; it never changes the order. Null when the traveller picked no interests.
+     * A candidate the scoring leaves out (outside the traveller's distance range) counts as 0.
      *
      * @param  Collection<int, Destination>  $candidates
      * @return Collection<int, float>|null  keyed by destination id
