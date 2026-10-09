@@ -2,6 +2,9 @@
 .exit-survey-page .survey-container { max-width:880px; }
 .exit-survey-page .page-head { text-align:center; padding:36px 0 20px; }
 .exit-survey-page .page-head p { margin:12px auto 0; }
+.exit-survey-page .survey-welcome { max-width:880px; display:flex; align-items:center; justify-content:center; gap:24px; text-align:left; }
+.survey-welcome__davo { width:100px; height:120px; object-fit:contain; flex-shrink:0; }
+@media(max-width:600px) { .exit-survey-page .survey-welcome { flex-direction:column; gap:14px; text-align:center; } .survey-welcome__davo { width:76px; height:92px; } }
 .exit-survey-page .page-title { font-family:'Barabara','Alfa Slab One',serif; text-transform:uppercase; color:var(--forest); }
 .exit-survey-page .panel { border:1px solid var(--border); background:var(--paper); border-radius:18px; box-shadow:none; margin-bottom:24px; overflow:visible; }
 .exit-survey-page .panel-head { background:transparent; padding:24px 28px 16px; }
