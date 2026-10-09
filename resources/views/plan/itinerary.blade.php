@@ -28,57 +28,86 @@
 @endphp
 
 <link rel="stylesheet" href="{{ asset('css/itinerary-page.css') }}?v={{ filemtime(public_path('css/itinerary-page.css')) }}">
-<div class="dash-shell itinerary-page">
-    <div class="dash-header">
-        <div class="container">
-            <div>
-                <span class="poster-kicker" style="font-size:1.05rem;">ready to go</span>
-                <h1 class="page-title" style="font-size:1.9rem; margin:0;">{{ $itinerary->title ?: 'My Itinerary' }}</h1>
-                @if (data_get($itinerary->day_themes, 'summary.regrouped'))
-                    <span class="plan-badge plan-badge--ai" title="A pretrained embedding model grouped similar places into the same day, without adding more than a quarter to the travelling.">&#10024; Days grouped by theme</span>
-                @endif
-                <div class="sub">
-                    Generated {{ $itinerary->generated_at->format('F j, Y g:i A') }}
-                    &middot; {{ $itinerary->total_days }} day{{ $itinerary->total_days === 1 ? '' : 's' }}
-                    @if ($itinerary->package)
-                        &middot; from the <a href="{{ route('packages.show', $itinerary->package) }}">{{ $itinerary->package->name }}</a> package
-                    @else
-                        {{-- Say what the ordering was actually measured from, so a
-                             plan sequenced from the regional default is not mistaken
-                             for one sequenced from where the traveller is. --}}
-                        &middot; ordered from {{ $preference->origin_label ?: 'Davao City centre' }}
-                        @if ($preference->arrival_time)
-                            &middot; arriving {{ \Illuminate\Support\Carbon::parse($preference->arrival_time)->format('g:i A') }}
-                        @endif
-                    @endif
-                </div>
-            </div>
-            <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                @if ($itinerary->tourist_account_id)
-                    <a href="{{ route('account.itineraries.show', $itinerary) }}" class="btn btn-outline">Saved to My Itineraries &check;</a>
-                @else
-                    <form method="POST" action="{{ route('plan.itinerary.save') }}">
-                        @csrf
-                        <button type="submit" class="btn btn-primary">Save Itinerary</button>
-                    </form>
-                @endif
-                {{--
-                    A package-adopted itinerary has no real preferences behind
-                    it to edit (see PackageController::planWith()) -- the
-                    correct way to move on from it is the "Start the trip
-                    planner" link in the panel below, which says plainly that
-                    it builds a fresh, different plan rather than implying
-                    there is something of the tourist's own to refine here.
-                --}}
-                @unless ($itinerary->package)
-                    <a href="{{ route('plan.edit') }}" class="btn btn-outline">Edit preferences</a>
-                @endunless
-            </div>
-        </div>
-    </div>
-
+<link rel="stylesheet" href="{{ asset('css/itinerary-redesign.css') }}?v={{ filemtime(public_path('css/itinerary-redesign.css')) }}">
+<div class="dash-shell itinerary-page itin">
     <div class="dash-body">
         <div class="container">
+            {{-- The welcome banner. Davo is a picture, not a speaker: nothing here claims more than "your plan is ready". --}}
+            <section class="itin-hero" aria-label="Your itinerary is ready">
+                <img class="itin-hero__davo" src="{{ asset('images/davo-wave.webp') }}" alt="" width="420" height="504">
+                <div class="itin-hero__copy">
+                    <p class="itin-hero__title">Your adventure is ready!</p>
+                    <p class="itin-hero__text">
+                        @if ($itinerary->package)
+                            Here&rsquo;s the day-by-day schedule for your package. Let&rsquo;s explore!
+                        @else
+                            Here&rsquo;s your personalized Davao itinerary. Let&rsquo;s explore!
+                        @endif
+                    </p>
+                </div>
+                <svg class="itin-hero__scene" viewBox="0 0 420 150" aria-hidden="true" focusable="false">
+                    <circle cx="300" cy="46" r="26" fill="#f6d78f" opacity=".75"/>
+                    <path d="M0 150V104c34-26 70-30 104-12 30-24 70-34 112-18 34-18 68-14 104 8 36-12 70-6 100 16v52z" fill="#cfe0c4" opacity=".7"/>
+                    <path d="M0 150v-26c50-18 96-14 140 6 52-22 104-24 156-4 46-10 88-4 124 14v10z" fill="#aac8a4" opacity=".75"/>
+                    <path d="M356 150V92M356 92c-14-2-24 6-30 14M356 92c10-8 22-8 32 0M356 92c-6-12-4-22 4-30M356 92c8-10 20-14 30-12" stroke="#4f8a5b" stroke-width="3" fill="none" stroke-linecap="round" opacity=".85"/>
+                    <path d="M394 150V108M394 108c-9-1-16 4-20 10M394 108c7-6 15-6 22 0" stroke="#4f8a5b" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/>
+                </svg>
+            </section>
+
+            <header class="itin-head">
+                <div class="itin-head__text">
+                    <h1 class="itin-title">{{ $itinerary->title ?: ($itinerary->package ? $itinerary->package->name : 'Your Davao itinerary') }}</h1>
+                    <p class="itin-sub">
+                        {{ $itinerary->total_days }} {{ \Illuminate\Support\Str::plural('day', $itinerary->total_days) }}
+                        @if ($itinerary->package)
+                            &middot; from the <a href="{{ route('packages.show', $itinerary->package) }}">{{ $itinerary->package->name }}</a> package
+                        @else
+                            @php $pickedInterests = $preference->activities->pluck('activity')->filter()->values(); @endphp
+                            @if ($pickedInterests->isNotEmpty())
+                                &middot; {{ $pickedInterests->take(2)->join(', ') }}@if ($pickedInterests->count() > 2) +{{ $pickedInterests->count() - 2 }} more @endif
+                            @endif
+                            @if (filled($preference->budget))
+                                &middot; {{ $preference->budget }}
+                            @endif
+                        @endif
+                    </p>
+                    @if (data_get($itinerary->day_themes, 'summary.regrouped'))
+                        <span class="plan-badge plan-badge--ai" title="A pretrained embedding model grouped similar places into the same day, without adding more than a quarter to the travelling.">&#10024; Days grouped by theme</span>
+                    @endif
+                    <p class="itin-meta">
+                        Generated {{ $itinerary->generated_at->format('F j, Y g:i A') }}
+                        @unless ($itinerary->package)
+                            {{-- Say what the ordering was actually measured from, so a plan sequenced from the regional
+                                 default is not mistaken for one sequenced from where the traveller is. --}}
+                            &middot; ordered from {{ $preference->origin_label ?: 'Davao City centre' }}
+                            @if ($preference->arrival_time)
+                                &middot; arriving {{ \Illuminate\Support\Carbon::parse($preference->arrival_time)->format('g:i A') }}
+                            @endif
+                        @endunless
+                    </p>
+                </div>
+
+                <div class="itin-actions">
+                    {{--
+                        A package-adopted itinerary has no real preferences behind it to edit (see
+                        PackageController::planWith()) -- the correct way to move on from it is the
+                        "Start the trip planner" link in the panel below, which says plainly that it builds a
+                        fresh, different plan rather than implying there is something of the tourist's own to refine here.
+                    --}}
+                    @unless ($itinerary->package)
+                        <a href="{{ route('plan.edit') }}" class="btn btn-outline"><x-icon name="filter" /> Edit preferences</a>
+                    @endunless
+                    @if ($itinerary->tourist_account_id)
+                        <a href="{{ route('account.itineraries.show', $itinerary) }}" class="btn btn-outline">Saved to My Itineraries &check;</a>
+                    @else
+                        <form method="POST" action="{{ route('plan.itinerary.save') }}">
+                            @csrf
+                            <button type="submit" class="btn btn-outline"><x-icon name="heart" /> Save Itinerary</button>
+                        </form>
+                    @endif
+                </div>
+            </header>
+
             @if (session('pending_save_itinerary'))
                 <div class="privacy-note" role="status">
                     <x-icon name="shield-check" />
@@ -95,10 +124,7 @@
 
             {{-- Set expectations honestly: no account is needed to plan or view
                  a trip, by design -- this note is about what happens if you
-                 don't create the optional one. Cream + dashed gold rather than
-                 the internal console's blue x-banner, so a standing fact about
-                 this page reads in its own brand voice instead of an
-                 admin-console notice. --}}
+                 don't create the optional one. --}}
             <div class="session-note" role="status">
                 <x-icon name="alert-triangle" />
                 <p>
@@ -109,31 +135,19 @@
                 </p>
             </div>
 
-            @if ($itemsByDay->isNotEmpty())
-                <nav class="itinerary-day-nav" aria-label="Jump to a day">
-                    <span>Your schedule</span>
-                    @foreach ($itemsByDay as $day => $items)
-                        <a href="#itinerary-day-{{ $day }}">Day {{ $day }}</a>
-                    @endforeach
-                    @unless ($itinerary->package)
-                        <a href="#itinerary-recommendations" class="itinerary-match-link">Recommendations</a>
-                    @endunless
-                </nav>
-            @endif
-
-
-
-            <div class="panel">
-                <div class="panel-head">
-                    <div>
-                        <h2>Day-by-Day Travel Plan</h2>
-                        <p>
-                            @if ($itinerary->package)
-                                As published by {{ $itinerary->package->provider_name ?? 'the provider' }} for this package.
-                            @else
-                                Sequenced by geographic proximity, with complementary stops surfaced from what past travelers tend to pair together.
-                            @endif
-                        </p>
+            <div class="itin-layout">
+                <div class="itin-main">
+                    <div class="itin-main__head">
+                        <div>
+                            <h2>Day-by-Day Travel Plan</h2>
+                            <p>
+                                @if ($itinerary->package)
+                                    As published by {{ $itinerary->package->provider_name ?? 'the provider' }} for this package.
+                                @else
+                                    Sequenced by geographic proximity, with complementary stops surfaced from what past travelers tend to pair together.
+                                @endif
+                            </p>
+                        </div>
                         @unless ($itinerary->package)
                             <button type="button" class="itinerary-explainer-trigger" id="itineraryExplainerOpen"
                                     aria-haspopup="dialog" aria-controls="itineraryExplainerModal" aria-expanded="false">
@@ -142,8 +156,7 @@
                             </button>
                         @endunless
                     </div>
-                </div>
-                <div class="panel-body">
+
                     @if ($itemsByDay->isEmpty())
                         <div class="empty-panel">
                             <div class="icon"><x-icon name="compass" /></div>
@@ -151,6 +164,15 @@
                             <p>Try regenerating your itinerary above.</p>
                         </div>
                     @else
+                        <nav class="itin-tabs" aria-label="Jump to a day" data-day-tabs>
+                            @foreach ($itemsByDay as $day => $items)
+                                <a href="#itinerary-day-{{ $day }}" data-day-tab="{{ $day }}">Day {{ $day }}</a>
+                            @endforeach
+                            @unless ($itinerary->package)
+                                <a href="#itinerary-recommendations" class="itin-tabs__more">Recommendations</a>
+                            @endunless
+                        </nav>
+
                         @foreach ($itemsByDay as $day => $items)
                             @php
                                 // Every place of the day, in order, deduped -- see
@@ -171,102 +193,33 @@
                                     ->unique()
                                     ->values();
                                 $mapsUrl = \App\Models\Itinerary::googleMapsUrl($stops);
+
+                                $theme = data_get($itinerary->day_themes, 'days.'.$day);
+                                $dayStops = $items->where('kind', 'activity')->count();
+                                $dayKm = round((float) $items->where('kind', 'travel')->sum('distance_km'), 1);
+                                $dayDate = $preference?->start_date
+                                    ? \Illuminate\Support\Carbon::parse($preference->start_date)->addDays($day - 1)->format('l, F j')
+                                    : null;
                             @endphp
 
-                            <section class="itinerary-day" id="itinerary-day-{{ $day }}" aria-labelledby="itinerary-day-title-{{ $day }}">
-                                <div class="itinerary-day-heading">
-                                    <h3 id="itinerary-day-title-{{ $day }}">Day {{ $day }}</h3>
-                                    <a href="#" class="itinerary-back-top">Back to top ↑</a>
-                                </div>
-                                @php $theme = data_get($itinerary->day_themes, 'days.'.$day); @endphp
-                                @if ($theme && $theme['label'])
-                                    <p class="day-theme"><strong>{{ $theme['label'] }}</strong>@if ($theme['similarity'] !== null) &middot; these places are {{ $theme['similarity'] }}% alike @endif</p>
-                                @endif
-
-                                <div class="day-timeline">
-                                @foreach ($items as $item)
-                                    @php
-                                        $listing = $item->listing();
-                                        $route = match (true) {
-                                            (bool) $item->destination_id => 'destinations.show',
-                                            (bool) $item->accommodation_id => 'accommodations.show',
-                                            (bool) $item->restaurant_id => 'restaurants.show',
-                                            (bool) $item->souvenir_center_id => 'souvenir-centers.show',
-                                            default => null,
-                                        };
-                                    @endphp
-                                    <div class="itinerary-item itinerary-item--{{ $item->kind }}">
-                                        <div class="itinerary-item__body">
-                                            {{-- A travel connector only ever needs the bare clock
-                                                 time -- it isn't a scheduled stop with a slot of its
-                                                 own, so pairing it with "AFTERNOON" read as a second,
-                                                 phantom stop rather than the journey between two. --}}
-                                            @if ($item->timeLabel() || ($item->kind !== 'travel' && $item->slot))
-                                                <div class="itinerary-item__meta">
-                                                    @if ($item->kind !== 'travel' && $item->slot)
-                                                        {{ $item->slot }}
-                                                        @if ($item->timeLabel()) &middot; @endif
-                                                    @endif
-                                                    {{ $item->timeLabel() }}
-                                                </div>
-                                            @endif
-                                            <strong>
-                                                {{-- Most titles already name the place, so linking the
-                                                     title itself avoids "Dinner at Acacia — Acacia". --}}
-                                                @if ($listing && $route && str_contains($item->title, $listing->name))
-                                                    <a href="{{ route($route, $listing) }}">{{ $item->title }}</a>
-                                                @elseif ($listing && $route)
-                                                    {{ $item->title }} &mdash;
-                                                    <a href="{{ route($route, $listing) }}">{{ $listing->name }}</a>
-                                                @else
-                                                    {{ $item->title }}
-                                                @endif
-                                            </strong>
-                                            <div class="sub">
-                                                {{ $item->travelSummary() }}
-                                            </div>
-                                            @if ($item->note)
-                                                <div class="sub">{{ $item->note }}</div>
-                                            @endif
-                                            @if ($item->ruleExplanation())
-                                                <div>
-                                                    <span class="pairing-tag">Popular pairing with {{ $item->rule_basis }}</span>
-                                                    <details class="pairing-why">
-                                                        <summary>why this pick?</summary>
-                                                        <p>{{ $item->ruleExplanation() }}</p>
-                                                    </details>
-                                                </div>
-                                            @endif
-                                            @if (($swap['available'] ?? false) && $item->kind === 'activity' && $item->destination_id)
-                                                @php $closed = $swap['closed'][$item->destination_id] ?? null; @endphp
-                                                <div class="swap" data-swap
-                                                     data-destination="{{ $item->destination_id }}"
-                                                     data-url="{{ route('plan.alternatives', $item->destination_id) }}"
-                                                     data-swap-url="{{ route('plan.swap') }}"
-                                                     data-token="{{ csrf_token() }}">
-                                                    @if ($closed)
-                                                        <div class="swap-notice" role="alert">
-                                                            <strong>Not available on your dates:</strong> {{ $closed['advisory'] }}.
-                                                            @if ($closed['substitute'])
-                                                                Closest open substitute:
-                                                                <strong>{{ $closed['substitute']['name'] }}</strong>
-                                                                ({{ $closed['substitute']['similarity'] }}% similar{{ $closed['substitute']['distance_km'] !== null ? ', '.$closed['substitute']['distance_km'].' km away' : '' }}).
-                                                                <form method="POST" action="{{ route('plan.swap') }}" class="swap-inline">
-                                                                    @csrf
-                                                                    <input type="hidden" name="original_id" value="{{ $item->destination_id }}">
-                                                                    <input type="hidden" name="replacement_id" value="{{ $closed['substitute']['id'] }}">
-                                                                    <button type="submit" class="btn btn-primary swap-use">Use {{ $closed['substitute']['name'] }} instead</button>
-                                                                </form>
-                                                            @endif
-                                                        </div>
-                                                    @endif
-                                                    <button type="button" class="swap-toggle" data-swap-toggle aria-expanded="false">Swap this stop</button>
-                                                    <div class="swap-panel" data-swap-panel hidden></div>
-                                                </div>
-                                            @endif
-                                        </div>
+                            <section class="itin-day" id="itinerary-day-{{ $day }}" data-day-panel="{{ $day }}" aria-labelledby="itinerary-day-title-{{ $day }}">
+                                <header class="itin-day__head">
+                                    <div>
+                                        <h3 id="itinerary-day-title-{{ $day }}">Day {{ $day }}@if ($theme && $theme['label']) <span>&middot; {{ $theme['label'] }}</span>@endif</h3>
+                                        <p class="itin-day__tag">
+                                            @if ($dayDate){{ $dayDate }} &middot; @endif
+                                            {{ $dayStops }} {{ \Illuminate\Support\Str::plural('stop', $dayStops) }}
+                                            @if ($dayKm > 0) &middot; about {{ rtrim(rtrim(number_format($dayKm, 1), '0'), '.') }} km of travel @endif
+                                            @if ($theme && $theme['label'] && $theme['similarity'] !== null) &middot; these places are {{ $theme['similarity'] }}% alike @endif
+                                        </p>
                                     </div>
-                                @endforeach
+                                    <a href="#" class="itinerary-back-top">Back to top ↑</a>
+                                </header>
+
+                                <div class="tl">
+                                    @foreach ($items as $item)
+                                        @include('partials.itinerary-timeline-row', ['item' => $item, 'swap' => $swap])
+                                    @endforeach
                                 </div>
 
                                 @if ($stops)
@@ -306,6 +259,8 @@
                         @endforeach
                     @endif
                 </div>
+
+                @include('partials.itinerary-overview', ['itinerary' => $itinerary, 'preference' => $preference, 'routeStops' => $routeStops])
             </div>
 
             @unless ($itinerary->package)
@@ -583,6 +538,7 @@
 @endunless
 
 <script src="{{ asset('js/itinerary-swap.js') }}?v={{ filemtime(public_path('js/itinerary-swap.js')) }}" defer></script>
+<script src="{{ asset('js/itinerary-days.js') }}?v={{ filemtime(public_path('js/itinerary-days.js')) }}" defer></script>
 <script>
     /*
      * Regenerating takes a fresh position if the traveller allows it, so a plan

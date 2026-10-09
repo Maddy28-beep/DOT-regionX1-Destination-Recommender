@@ -235,6 +235,12 @@ class TripPlannerController extends Controller
             'range_widened' => $itinerary->range_widened,
         ];
 
+        // The timeline shows each stop's photo and opening hours, so load them together rather than per row.
+        $itinerary->load([
+            'items.destination.photos', 'items.accommodation.photos', 'items.restaurant.photos', 'items.souvenirCenter.photos',
+            'items.destination.region', 'items.accommodation.region', 'items.restaurant.region', 'items.souvenirCenter.region',
+        ]);
+
         $swap = $this->swapData($itinerary);
 
         return view('plan.itinerary', compact('itinerary', 'preference', 'provenance', 'swap'));
