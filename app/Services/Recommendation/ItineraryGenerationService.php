@@ -23,9 +23,9 @@ use Illuminate\Support\Facades\DB;
 class ItineraryGenerationService
 {
     /** Fallback baseline when no live location is provided: Davao City center (matches "tourist's selected starting location"). */
-    private const DEFAULT_ORIGIN_LAT = 7.0731;
+    private const DEFAULT_ORIGIN_LAT = ContentBasedRecommendationService::DEFAULT_ORIGIN_LAT;
 
-    private const DEFAULT_ORIGIN_LNG = 125.6128;
+    private const DEFAULT_ORIGIN_LNG = ContentBasedRecommendationService::DEFAULT_ORIGIN_LNG;
 
     /** What to call the fallback baseline on the schedule's arrival row. */
     private const DEFAULT_ORIGIN_LABEL = 'Davao City centre';
