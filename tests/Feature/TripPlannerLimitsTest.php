@@ -160,12 +160,41 @@ class TripPlannerLimitsTest extends TestCase
         $this->assertSame('11:45:00', $visit->ends_at, 'The full 150 minutes, exactly as before.');
     }
 
+    public function test_a_place_that_opens_in_the_afternoon_is_visited_after_the_morning_stop(): void
+    {
+        $afternoon = $this->destination('Afternoon Park', 3, hours: '1:00 PM–10:00 PM');
+        $morning = $this->destination('Morning Park', 10);
+
+        // The afternoon place is first in the route, but it is not open yet.
+        $itinerary = $this->schedule([$afternoon, $morning], days: 2);
+
+        $first = $itinerary->items->where('kind', 'activity')->where('day_number', 1)->sortBy('sort_order')->values();
+
+        $this->assertSame($morning->id, $first[0]->destination_id, 'The morning stop goes first.');
+        $this->assertSame($afternoon->id, $first[1]->destination_id, 'The afternoon place follows once it is open.');
+        $this->assertGreaterThanOrEqual('13:00:00', $first[1]->starts_at);
+    }
+
+    public function test_when_the_only_stop_opens_later_the_day_does_not_begin_with_a_long_wait(): void
+    {
+        $afternoon = $this->destination('Afternoon Park', 3, hours: '1:00 PM–10:00 PM');
+
+        $itinerary = $this->schedule([$afternoon], days: 2);
+
+        $visit = $this->visit($itinerary, $afternoon);
+        $travel = $itinerary->items->where('kind', 'travel')->where('day_number', 1)->sortBy('sort_order')->first();
+
+        $this->assertNotNull($visit);
+        $this->assertGreaterThanOrEqual('13:00:00', $visit->starts_at);
+        $this->assertGreaterThanOrEqual('12:00:00', $travel->starts_at, 'Set off around midday, not at 8:30 to stand outside until 1 pm.');
+    }
+
     // ---- driving
 
     public function test_a_day_does_not_take_a_second_stop_that_would_mean_too_much_driving(): void
     {
         $near = $this->destination('Near Park', 10);
-        $far = $this->destination('Far Park', 24.8, 24.7);   // about 35 km from the centre, 29 km beyond the first stop
+        $far = $this->destination('Far Park', 28.75, 40.9);   // 45 km beyond the first stop and 50 km from the centre
 
         $itinerary = $this->schedule([$near, $far], distancePref: 'moderate');
 
@@ -176,7 +205,7 @@ class TripPlannerLimitsTest extends TestCase
     public function test_a_traveller_who_is_willing_to_go_far_gets_the_longer_day(): void
     {
         $near = $this->destination('Near Park', 10);
-        $far = $this->destination('Far Park', 24.8, 24.7);
+        $far = $this->destination('Far Park', 28.75, 40.9);
 
         $itinerary = $this->schedule([$near, $far], distancePref: 'far');
 
@@ -236,5 +265,45 @@ class TripPlannerLimitsTest extends TestCase
         foreach ($itinerary->items as $item) {
             $this->assertLessThanOrEqual('22:30:00', $item->starts_at, $item->title.' starts at a sensible hour');
         }
+    }
+
+    public function test_dinner_waits_for_the_traveller_when_the_drive_back_runs_long(): void
+    {
+        $stay = \App\Models\Accommodation::create([
+            'slug' => 'far-resort', 'name' => 'Far Resort', 'location' => 'Davao City', 'region_id' => $this->region(),
+            'type' => 'Resort', 'is_accredited' => true, 'rating' => 0, 'review_count' => 0,
+            'latitude' => $this->at(80, 0)[0], 'longitude' => $this->at(80, 0)[1],
+        ]);
+        $park = $this->destination('Near Park', 10);
+        $second = $this->destination('Second Park', 28);
+
+        $preference = TouristPreference::create([
+            'travel_days' => 2, 'travel_type' => 'Family', 'budget' => 'Mid-range', 'accommodation_pref' => 'Any',
+            'distance_pref' => 'far', 'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time Visitor', 'place_of_origin' => 'Manila',
+        ]);
+        $itinerary = Itinerary::create(['preference_id' => $preference->id, 'total_days' => 2, 'generated_at' => now()]);
+
+        app(ItineraryScheduleBuilder::class)->build(
+            $itinerary,
+            [
+                ['row' => ['destination' => $park->load('region'), 'drs' => 4.0], 'distance_km' => 1.0],
+                ['row' => ['destination' => $second->load('region'), 'drs' => 4.0], 'distance_km' => 1.0],
+            ],
+            $preference,
+            [1 => ['Morning', 'Afternoon'], 2 => ['Morning']],
+            ['lat' => self::ORIGIN_LAT, 'lng' => self::ORIGIN_LNG, 'label' => 'Davao City centre'],
+            ['listing' => $stay, 'rule' => null],
+        );
+
+        $items = $itinerary->fresh('items')->items->where('day_number', 1)->sortBy('sort_order')->values();
+        $travelBack = $items->where('kind', 'travel')->last();
+        $dinner = $items->firstWhere('title', 'Dinner — Far Resort');
+        $overnight = $items->firstWhere('kind', 'overnight');
+
+        $arrives = \Illuminate\Support\Carbon::parse($travelBack->starts_at)->addMinutes($travelBack->travel_max_minutes)->format('H:i:s');
+
+        $this->assertGreaterThan('18:30:00', $arrives, 'The scenario needs a drive that gets in after the usual dinner hour.');
+        $this->assertGreaterThanOrEqual($arrives, $dinner->starts_at, 'Dinner is not served before the traveller arrives.');
+        $this->assertGreaterThan($dinner->starts_at, $overnight->starts_at);
     }
 }

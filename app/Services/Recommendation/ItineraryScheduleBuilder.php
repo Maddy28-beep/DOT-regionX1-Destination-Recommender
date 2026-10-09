@@ -71,10 +71,10 @@ class ItineraryScheduleBuilder
      * on the last day). A day's first stop is always allowed, so a far-flung stop still gets a day of its own
      * instead of never being scheduled.
      */
-    private const DRIVE_BUDGET_MINUTES = ['near' => 180, 'moderate' => 240, 'far' => 360];
+    private const DRIVE_BUDGET_MINUTES = ['near' => 210, 'moderate' => 300, 'far' => 420];
 
     /** Used when the traveller's distance preference is missing or unknown. */
-    private const DEFAULT_DRIVE_BUDGET_MINUTES = 240;
+    private const DEFAULT_DRIVE_BUDGET_MINUTES = 300;
 
     /**
      * The souvenir stop is a short extra at the end of the trip, not a second excursion: it has to be near
@@ -83,6 +83,15 @@ class ItineraryScheduleBuilder
     private const SOUVENIR_MAX_KM = 20;
 
     private const SOUVENIR_LATEST_END = '19:00';
+
+    /**
+     * How long the traveller may wait outside a place for it to open before the stop is put off until
+     * later in the day. A place that opens at 1 pm is not a morning stop; it goes after lunch.
+     */
+    private const MAX_WAIT_FOR_OPENING_MINUTES = 60;
+
+    /** How many of the next stops are considered when the first one cannot be done right now. */
+    private const LOOKAHEAD = 3;
 
     private const DINNER = '18:30';
 
@@ -172,43 +181,91 @@ class ItineraryScheduleBuilder
             $driven = 0;
             $dayEnd = $isLastDay ? $origin : ($accommodation ? $this->place($accommodation) : null);
 
+            $shifted = false;
+
             while ($scheduled < $capacity && $queue !== []) {
-                $destination = $queue[0]['row']['destination'];
-                $there = $this->place($destination);
+                /*
+                 * Which stop next? Normally the first in the queue (the route is already ordered), but when
+                 * the first cannot be done right now -- it opens in the afternoon, or it would mean too much
+                 * driving -- the next few are tried instead, and the first is left for later in the day.
+                 */
+                $choice = null;
+                $waiting = null;
 
-                // The last stop of the final day is trimmed so there is time to
-                // shop, eat and still reach the departure point.
-                $visitMinutes = ($isLastDay && ($scheduled === $capacity - 1 || count($queue) === 1))
-                    ? self::SHORT_VISIT_MINUTES
-                    : self::VISIT_MINUTES;
+                foreach (array_slice(array_keys($queue), 0, self::LOOKAHEAD) as $index) {
+                    $destination = $queue[$index]['row']['destination'];
+                    $there = $this->place($destination);
 
-                $visit = $this->planVisit($clock, $here, $there, $visitMinutes, $lunchTaken, $destination);
+                    // The last stop of the final day is trimmed so there is time to
+                    // shop, eat and still reach the departure point.
+                    $visitMinutes = ($isLastDay && ($scheduled === $capacity - 1 || count($queue) === 1))
+                        ? self::SHORT_VISIT_MINUTES
+                        : self::VISIT_MINUTES;
 
-                if ($visit === null) {
-                    // Nothing was done today, so this stop is not just late for today -- if it cannot be done
-                    // even from a fresh morning (it has closed before anyone could get there, or it is too far
-                    // to visit in a day) it never will be. Drop it, so it cannot sit at the front of the queue
-                    // and keep every stop behind it from being scheduled.
-                    $freshMorning = Carbon::parse(self::DEPART_AFTER_BREAKFAST);
+                    $visit = $this->planVisit($clock, $here, $there, $visitMinutes, $lunchTaken, $destination);
 
-                    if ($scheduled === 0 && $this->planVisit($freshMorning, $here, $there, $visitMinutes, false, $destination) === null) {
-                        array_shift($queue);
+                    if ($visit === null) {
+                        continue;
+                    }
+
+                    // Too much driving for one day: not this stop, today.
+                    $leg = $this->estimateLeg($here, $there)['max_minutes'];
+                    $back = $dayEnd ? $this->estimateLeg($there, $dayEnd)['max_minutes'] : 0;
+
+                    if ($scheduled > 0 && $driven + $leg + $back > $this->driveBudget($preference)) {
+                        continue;
+                    }
+
+                    $candidate = compact('index', 'destination', 'there', 'visit', 'leg');
+
+                    if ($visit['wait'] <= self::MAX_WAIT_FOR_OPENING_MINUTES) {
+                        $choice = $candidate;
+
+                        break;
+                    }
+
+                    $waiting ??= $candidate;
+                }
+
+                // Nothing is done yet today and the only stop on offer opens later: set off later, so the
+                // traveller arrives as it opens instead of standing outside for hours.
+                if ($choice === null && $waiting !== null && $scheduled === 0) {
+                    if (! $shifted) {
+                        $shifted = true;
+                        $depart = $this->toQuarterHour($waiting['visit']['starts_at']->copy()->subMinutes($waiting['leg']));
+
+                        if ($depart->greaterThan($clock)) {
+                            $clock = $depart;
+                        }
 
                         continue;
+                    }
+
+                    $choice = $waiting;
+                }
+
+                if ($choice === null) {
+                    // Nothing was done today, so the first stop is not just late for today -- if it cannot be
+                    // done even from a fresh morning (it has closed before anyone could get there, or it is
+                    // too far to visit in a day) it never will be. Drop it, so it cannot sit at the front of
+                    // the queue and keep every stop behind it from being scheduled.
+                    if ($scheduled === 0) {
+                        $front = $queue[array_key_first($queue)]['row']['destination'];
+                        $freshMorning = Carbon::parse(self::DEPART_AFTER_BREAKFAST);
+
+                        if ($this->planVisit($freshMorning, $here, $this->place($front), self::VISIT_MINUTES, false, $front) === null) {
+                            array_shift($queue);
+
+                            continue;
+                        }
                     }
 
                     break;
                 }
 
-                // Too much driving for one day: leave this stop (and everything after it) for tomorrow.
-                $leg = $this->estimateLeg($here, $there)['max_minutes'];
-                $back = $dayEnd ? $this->estimateLeg($there, $dayEnd)['max_minutes'] : 0;
+                ['index' => $index, 'destination' => $destination, 'there' => $there, 'visit' => $visit, 'leg' => $leg] = $choice;
 
-                if ($scheduled > 0 && $driven + $leg + $back > $this->driveBudget($preference)) {
-                    break;
-                }
-
-                array_shift($queue);
+                array_splice($queue, $index, 1);
 
                 $clock = $this->addTravel($itinerary, $dayNumber, $sortOrder, $clock, $here, $there);
                 $driven += $leg;
@@ -280,8 +337,9 @@ class ItineraryScheduleBuilder
      * Mirrors what build() then does (slow travel estimate, lunch on arrival if it is due, quarter-hour
      * rounding), so a stop that passes here is scheduled exactly as checked.
      *
-     * @return array{minutes: int, starts_at: Carbon|null}|null  null when the stop cannot be done today;
-     *                                                           starts_at is set only when the visit has to wait for opening
+     * @return array{minutes: int, starts_at: Carbon|null, wait: int}|null  null when the stop cannot be done
+     *                                                                       today; starts_at and wait are set
+     *                                                                       only when the visit has to wait for opening
      */
     private function planVisit(Carbon $clock, array $from, array $to, int $visitMinutes, bool $lunchTaken, $destination): ?array
     {
@@ -305,7 +363,7 @@ class ItineraryScheduleBuilder
         $windows = OpeningHours::windows($destination->hours ?? null);
 
         if ($windows === null) {
-            return ['minutes' => $visitMinutes, 'starts_at' => null];
+            return ['minutes' => $visitMinutes, 'starts_at' => null, 'wait' => 0];
         }
 
         $midnight = $start->copy()->startOfDay();
@@ -324,6 +382,7 @@ class ItineraryScheduleBuilder
                 return [
                     'minutes' => $minutes,
                     'starts_at' => $begin > $startMinute ? $midnight->copy()->addMinutes($begin) : null,
+                    'wait' => $begin - $startMinute,
                 ];
             }
         }
@@ -449,7 +508,7 @@ class ItineraryScheduleBuilder
             return;
         }
 
-        $this->addTravel(
+        $arrival = $this->addTravel(
             $itinerary,
             $dayNumber,
             $sortOrder,
@@ -458,17 +517,23 @@ class ItineraryScheduleBuilder
             $this->place($accommodation),
         );
 
+        // Dinner is at the usual hour, or when the traveller gets back if the drive ran longer than that.
+        $dinner = Carbon::parse(self::DINNER);
+        $dinner = $this->toQuarterHour($arrival)->greaterThan($dinner) ? $this->toQuarterHour($arrival) : $dinner;
+        $overnight = Carbon::parse(self::OVERNIGHT);
+        $overnight = $dinner->copy()->addMinutes(90)->greaterThan($overnight) ? $dinner->copy()->addMinutes(90) : $overnight;
+
         $this->row($itinerary, $dayNumber, $sortOrder, [
             'kind' => 'meal',
             'title' => 'Dinner — '.$accommodation->name,
-            'starts_at' => Carbon::parse(self::DINNER),
+            'starts_at' => $dinner,
             'accommodation_id' => $accommodation->id,
         ]);
 
         $this->row($itinerary, $dayNumber, $sortOrder, array_merge([
             'kind' => 'overnight',
             'title' => 'Overnight stay',
-            'starts_at' => Carbon::parse(self::OVERNIGHT),
+            'starts_at' => $overnight,
             'accommodation_id' => $accommodation->id,
         ], $this->ruleColumns($stayRule)));
     }
