@@ -1,7 +1,7 @@
 @props(['title', 'message', 'actionUrl', 'actionLabel', 'secondaryUrl' => null, 'secondaryLabel' => null, 'variant' => 'search'])
 
 <div class="empty-state davo-empty-state">
-    <img class="davo-empty-state__mascot" src="{{ asset($variant === 'saved' ? 'images/davo-saved.png' : 'images/davo-search.png') }}" alt="" width="120" height="144">
+    <img class="davo-empty-state__mascot" src="{{ asset($variant === 'saved' ? 'images/davo-saved.webp' : 'images/davo-search.webp') }}" alt="" width="290" height="435">
     <h2>{{ $title }}</h2>
     <p>{{ $message }}</p>
     <div class="empty-state__actions">
