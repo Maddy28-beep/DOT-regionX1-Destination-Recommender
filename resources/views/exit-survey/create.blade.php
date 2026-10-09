@@ -6,10 +6,13 @@
 <link rel="stylesheet" href="{{ asset('css/exit-survey.css') }}?v={{ filemtime(public_path('css/exit-survey.css')) }}">
 <div class="exit-survey-page">
 <div class="page-head">
-    <div class="container">
+    <div class="container survey-welcome">
+        <img class="survey-welcome__davo" src="{{ asset('images/davo-survey-v2.webp') }}" alt="" width="100" height="120">
+        <div>
         <span class="poster-kicker" style="font-size:1.05rem;">how was your trip?</span>
         <h1 class="page-title" style="font-size:1.9rem; margin:0;">Visitor Exit Survey</h1>
         <p>Finished your trip? Tell us how it went and help improve tourism in Davao.</p>
+        </div>
     </div>
 </div>
 
