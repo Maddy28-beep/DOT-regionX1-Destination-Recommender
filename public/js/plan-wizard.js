@@ -116,6 +116,8 @@
         if (target <= current || validate(Array.from({length: target}, (_, i) => i))) show(target, true);
     }));
     const rows = [...loading.querySelectorAll('.plan-loading-workflow li')];
+    const itineraryLink = document.getElementById('planViewItinerary');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const errorBox = document.createElement('div');
     errorBox.className = 'alert alert-error';
     errorBox.setAttribute('role', 'alert');
@@ -128,9 +130,12 @@
         panel.hidden = false;
         nav.hidden = false;
         loading.hidden = true;
-        loading.classList.remove('is-ready');
-        rows.forEach(row => { row.classList.remove('is-complete'); row.querySelector('span').textContent = ''; });
-        document.getElementById('planLoadingTitle').textContent = 'Building your itinerary';
+        loading.classList.remove('is-ready', 'is-finishing');
+        loading.style.removeProperty('--plan-progress');
+        itineraryLink.hidden = true;
+        itineraryLink.removeAttribute('href');
+        rows.forEach(row => { row.classList.remove('is-complete', 'is-active'); row.querySelector('span').textContent = ''; });
+        document.getElementById('planLoadingTitle').textContent = 'Davo is planning your trip…';
     }
     form.addEventListener('submit', async event => {
         event.preventDefault();
@@ -143,6 +148,8 @@
         panel.hidden = true;
         nav.hidden = true;
         loading.hidden = false;
+        document.getElementById('planLoadingTitle').textContent = `Davo is planning your ${form.elements.namedItem('travel_days').value}-day trip…`;
+        rows.forEach(row => row.classList.add('is-active'));
         loading.focus();
         loading.scrollIntoView({block: 'start'});
         try {
@@ -169,15 +176,20 @@
                 return;
             }
             if (!data.redirect || new URL(data.redirect, location.href).origin !== location.origin) throw new Error('Invalid response');
-            // All three operations have finished on the server. Reveal their
+            // The operations have finished on the server. Reveal their
             // checks in sequence as a completion animation, not fake live progress.
-            for (const row of rows) {
+            loading.classList.add('is-finishing');
+            for (const [index, row] of rows.entries()) {
+                row.classList.remove('is-active');
                 row.classList.add('is-complete');
                 row.querySelector('span').textContent = '✓';
-                await new Promise(resolve => setTimeout(resolve, 350));
+                loading.style.setProperty('--plan-progress', `${(index + 1) / rows.length * 100}%`);
+                if (!reducedMotion) await new Promise(resolve => setTimeout(resolve, 250));
             }
             loading.classList.add('is-ready');
             document.getElementById('planLoadingTitle').textContent = 'Your itinerary is ready';
+            itineraryLink.href = data.redirect;
+            itineraryLink.hidden = false;
             await new Promise(resolve => setTimeout(resolve, 400));
             location.assign(data.redirect);
         } catch (_) {
