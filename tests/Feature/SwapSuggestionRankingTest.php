@@ -16,9 +16,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Swap suggestions are ordered by meaning, the traveller's interests and distance together (not by meaning
- * alone), each says why it is a fair swap, a swap that cannot be scheduled is refused instead of silently
- * deleting the stop, and a swap that works says what it did to the plan.
+ * Swap suggestions are ordered by the model's similarity of meaning alone; the traveller's interests and the
+ * distance never reorder them. Each suggestion says why it is a fair swap, a swap that cannot be scheduled is
+ * refused instead of silently deleting the stop, and a swap that works says what it did to the plan.
  */
 class SwapSuggestionRankingTest extends TestCase
 {
@@ -76,7 +76,7 @@ class SwapSuggestionRankingTest extends TestCase
 
     // ---- ordering
 
-    public function test_a_place_that_fits_the_travellers_interests_can_outrank_one_that_only_means_nearly_the_same(): void
+    public function test_the_order_is_the_models_even_when_another_place_fits_the_travellers_interests_better(): void
     {
         $stop = $this->place('Convention Hall', [1, 0, 0], ['type' => 'Events & Conventions']);
         // Almost the same meaning, but a spa, and the traveller asked for nature.
@@ -85,25 +85,43 @@ class SwapSuggestionRankingTest extends TestCase
 
         $trip = $this->tripWith($stop, ['Nature & Adventure']);
 
-        $this->assertSame(['Nature Trail', 'Day Spa'], $this->names($stop, $trip));
+        $this->assertSame(['Day Spa', 'Nature Trail'], $this->names($stop, $trip), 'Interests do not reorder the list.');
     }
 
-    public function test_without_picked_interests_the_order_is_meaning_then_distance(): void
+    public function test_interests_are_reported_next_to_each_suggestion_without_changing_the_order(): void
     {
         $stop = $this->place('Convention Hall', [1, 0, 0], ['type' => 'Events & Conventions']);
         $this->place('Day Spa', [0.99, 0.1, 0], ['type' => 'Wellness & Spa']);
         $this->place('Nature Trail', [0.8, 0.6, 0], ['type' => 'Nature & Adventure']);
 
-        $this->assertSame(['Day Spa', 'Nature Trail'], $this->names($stop, $this->tripWith($stop)));
+        $rows = app(SimilarDestinationService::class)
+            ->alternatives($stop, $this->tripWith($stop, ['Nature & Adventure']), 5)
+            ->mapWithKeys(fn ($row) => [$row['destination']->name => $row['interest_fit']]);
+
+        $this->assertSame(['Day Spa' => 0.0, 'Nature Trail' => 1.0], $rows->all());
     }
 
-    public function test_a_closer_place_wins_between_equally_similar_ones(): void
+    public function test_a_much_closer_place_does_not_outrank_a_more_similar_one(): void
     {
         $stop = $this->place('Zoo', [1, 0, 0]);
-        $this->place('Far Zoo', [0.9, 0.1, 0], ['latitude' => 7.50, 'longitude' => 125.50]);
-        $this->place('Near Zoo', [0.9, 0.1, 0], ['latitude' => 7.11, 'longitude' => 125.50]);
+        $this->place('Far Zoo', [0.95, 0.05, 0], ['latitude' => 7.50, 'longitude' => 125.50]);
+        $this->place('Near Zoo', [0.6, 0.8, 0], ['latitude' => 7.11, 'longitude' => 125.50]);
 
-        $this->assertSame(['Near Zoo', 'Far Zoo'], $this->names($stop, $this->tripWith($stop)));
+        $this->assertSame(['Far Zoo', 'Near Zoo'], $this->names($stop, $this->tripWith($stop)));
+    }
+
+    public function test_the_order_does_not_depend_on_which_interests_were_picked(): void
+    {
+        $stop = $this->place('Convention Hall', [1, 0, 0], ['type' => 'Events & Conventions']);
+        $this->place('Day Spa', [0.99, 0.1, 0], ['type' => 'Wellness & Spa']);
+        $this->place('Nature Trail', [0.8, 0.6, 0], ['type' => 'Nature & Adventure']);
+
+        $none = $this->names($stop, $this->tripWith($stop));
+        $nature = $this->names($stop, $this->tripWith($stop, ['Nature & Adventure']));
+        $wellness = $this->names($stop, $this->tripWith($stop, ['Relaxation & Wellness']));
+
+        $this->assertSame($none, $nature);
+        $this->assertSame($none, $wellness);
     }
 
     public function test_the_hard_rules_still_apply_whatever_the_blend(): void
