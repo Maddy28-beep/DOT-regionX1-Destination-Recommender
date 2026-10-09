@@ -175,9 +175,13 @@ class SimilarDestinationService
             return null;
         }
 
+        // Matched by meaning, the score is relative to the other candidates (best 1, worst 0), so "fits" means
+        // the upper half; matched by keyword it is the share of picked interests covered, so "fits" means any.
         return app(ContentBasedRecommendationService::class)
             ->rank($preference, $candidates)
-            ->mapWithKeys(fn (array $row) => [$row['destination']->id => $row['interest_fit'] > 0 ? 1.0 : 0.0]);
+            ->mapWithKeys(fn (array $row) => [$row['destination']->id => (
+                ($row['interest_source'] ?? 'keyword') === 'semantic' ? $row['interest_fit'] >= 0.5 : $row['interest_fit'] > 0
+            ) ? 1.0 : 0.0]);
     }
 
     private function distanceKm(Destination $a, Destination $b): ?float
