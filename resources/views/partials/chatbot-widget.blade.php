@@ -1,12 +1,12 @@
 <div id="chatbot-widget" class="chatbot-widget">
     <button type="button" id="chatbot-toggle" class="chatbot-toggle" aria-label="Chat with Davo, your Davao travel buddy" aria-controls="chatbot-panel" aria-expanded="false">
-        <span class="chatbot-avatar" aria-hidden="true"><img src="{{ asset('images/davo.png') }}" alt="" width="1134" height="1360"></span>
+        <span class="chatbot-avatar" aria-hidden="true"><img src="{{ asset('images/davo.webp') }}" alt="" width="512" height="512"></span>
         <span class="chatbot-toggle-badge" aria-hidden="true"><x-icon name="chat" /></span>
     </button>
 
     <div id="chatbot-panel" class="chatbot-panel" hidden role="region" aria-labelledby="chatbot-title">
         <div class="chatbot-panel-head">
-            <span class="chatbot-avatar chatbot-head-avatar" aria-hidden="true"><img src="{{ asset('images/davo.png') }}" alt="" width="1134" height="1360"></span>
+            <span class="chatbot-avatar chatbot-head-avatar" aria-hidden="true"><img src="{{ asset('images/davo.webp') }}" alt="" width="512" height="512"></span>
             <div class="chatbot-heading">
                 <strong id="chatbot-title">Davo · Explore DVO</strong>
                 <div class="sub">Your Davao travel buddy</div>
@@ -32,7 +32,7 @@
     }
     .chatbot-toggle:hover { transform: scale(1.06); background: var(--primary-dark); }
     .chatbot-avatar { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; border-radius: 50%; background: #fff5e5; flex-shrink: 0; }
-    .chatbot-avatar img { position: absolute; width: 145%; max-width: none; height: auto; left: -20%; top: -5%; pointer-events: none; }
+    .chatbot-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 45%; pointer-events: none; }
     .chatbot-toggle-badge { position: absolute; right: -3px; bottom: -3px; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; background: var(--primary); border: 2px solid var(--white); }
     .chatbot-toggle-badge svg { width: 13px; height: 13px; }
     .chatbot-widget button:focus-visible { outline: 3px solid #e98543; outline-offset: 3px; }
