@@ -3629,6 +3629,13 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 
 .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
 .empty-state__actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 18px; }
+.davo-empty-state { max-width: 680px; margin: 24px auto; padding: 32px 24px; background: var(--paper); border: 1px solid var(--border); border-radius: 20px; }
+.davo-empty-state__mascot { display: block; width: 120px; height: 144px; object-fit: contain; margin: 0 auto 18px; }
+.davo-empty-state h2 { color: var(--primary-dark); font: 700 clamp(1.2rem, 2.5vw, 1.5rem)/1.35 'Poppins', sans-serif; margin: 0 0 12px; }
+.davo-empty-state p { max-width: 470px; margin: 0 auto; line-height: 1.65; }
+.davo-empty-state .btn { clip-path: none; transform: none; border-radius: 10px; min-height: 44px; text-transform: none; }
+.davo-empty-state .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+@media (max-width: 480px) { .davo-empty-state { padding: 26px 18px; } .davo-empty-state__mascot { width: 100px; height: 120px; } .davo-empty-state .empty-state__actions { flex-direction: column; } }
 
 @media (max-width: 900px) {
     .catalog-layout { grid-template-columns: 1fr; }

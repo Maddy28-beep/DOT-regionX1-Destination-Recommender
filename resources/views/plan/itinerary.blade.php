@@ -34,7 +34,7 @@
         <div class="container">
             {{-- The welcome banner. Davo is a picture, not a speaker: nothing here claims more than "your plan is ready". --}}
             <section class="itin-hero" aria-label="Your itinerary is ready">
-                <img class="itin-hero__davo" src="{{ asset('images/davo-wave.webp') }}" alt="" width="420" height="504">
+                <img class="itin-hero__davo" src="{{ asset('images/davo-adventure-ready.png') }}" alt="Davo celebrating with a travel map" width="1200" height="1280">
                 <div class="itin-hero__copy">
                     <p class="itin-hero__title">Your adventure is ready!</p>
                     <p class="itin-hero__text">
