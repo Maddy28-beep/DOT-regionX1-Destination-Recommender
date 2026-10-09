@@ -212,6 +212,14 @@ class ContentBasedRecommendationService
     private const TARGET_STOPS_PER_DAY = 2;
 
     /**
+     * Where a trip is measured from when the traveller has not shared a position: the Davao City centre, the
+     * same starting point the itinerary itself is ordered and timed from (ItineraryGenerationService).
+     */
+    public const DEFAULT_ORIGIN_LAT = 7.0731;
+
+    public const DEFAULT_ORIGIN_LNG = 125.6128;
+
+    /**
      * Approximate centre of a Davao Region province/city, used as the LAST
      * resort in regionCentroid() -- only when none of that region's own
      * destinations have coordinates to average.
@@ -683,8 +691,16 @@ class ContentBasedRecommendationService
      *
      * Preference order: a real Haversine distance from the position the
      * traveller shared, then the listing's recorded distance-from-city-centre,
-     * then the centre of its region. The stored column is a fixed figure that
+     * then a Haversine distance from the city centre (the default starting
+     * point) for a listing that has coordinates but no recorded figure, then
+     * the centre of its region. The stored column is a fixed figure that
      * cannot know where the traveller is, which is the whole point of asking.
+     *
+     * The city-centre step matters because the imported accredited places have
+     * coordinates but no stored distance. Without it their distance counted as
+     * unknown whenever the traveller had not shared a position, so they all
+     * scored the same and the "near" limit never excluded one seventy
+     * kilometres out -- a traveller who asked for nearby got a day of driving.
      *
      * The `approximate` flag matters: a region centroid can be kilometres out
      * for a city the size of Davao, so a listing placed that way must not score
@@ -712,6 +728,21 @@ class ContentBasedRecommendationService
 
         if ($destination->distance_km !== null) {
             return ['km' => (float) $destination->distance_km, 'approximate' => false];
+        }
+
+        // No position shared and no recorded figure: measure from the city centre, which is where the plan starts.
+        $origin ??= ['lat' => self::DEFAULT_ORIGIN_LAT, 'lng' => self::DEFAULT_ORIGIN_LNG];
+
+        if ($destination->latitude !== null && $destination->longitude !== null) {
+            return [
+                'km' => $this->haversineKm(
+                    $origin['lat'],
+                    $origin['lng'],
+                    (float) $destination->latitude,
+                    (float) $destination->longitude,
+                ),
+                'approximate' => false,
+            ];
         }
 
         /*
