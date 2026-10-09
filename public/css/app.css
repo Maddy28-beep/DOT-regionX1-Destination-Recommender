@@ -5444,3 +5444,17 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
 .results-toolbar .view-toggle__btn:hover { background: var(--primary-light); color: var(--primary-dark); border-color: transparent; }
 .results-toolbar .view-toggle__btn.active { background: var(--primary); color: var(--white); box-shadow: none; }
 .results-toolbar .view-toggle__btn svg { width: 15px; height: 15px; }
+
+/* The card footer stays on one line: the price and the distance never wrap, and "from city" is dropped
+   when the card is too narrow to fit both in full. */
+.dcard__foot { container-type: inline-size; flex-wrap: nowrap; }
+.dcard__price { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dcard__dist { flex: none; }
+@container (max-width: 299px) {
+    .dcard__dist-more { display: none; }
+}
+@container (max-width: 239px) {
+    .dcard__price strong { font-size: .95rem; }
+    .dcard__price small { font-size: .74rem; }
+    .dcard__dist svg { display: none; }
+}

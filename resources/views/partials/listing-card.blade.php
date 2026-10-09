@@ -59,9 +59,9 @@
     // Right side of the footer.
     $meta = null;
     if ($isDestination && $listing->distance_km) {
-        $meta = ['swap', rtrim(rtrim(number_format((float) $listing->distance_km, 1), '0'), '.').' km from city'];
+        $meta = ['swap', rtrim(rtrim(number_format((float) $listing->distance_km, 1), '0'), '.').' km', ' from city'];
     } elseif ($isPackage && $listing->duration_label) {
-        $meta = ['clock', $listing->duration_label];
+        $meta = ['clock', $listing->duration_label, null];
     }
 
     // Tour operators are summed up by how many packages they run (loaded with the grid, never queried per card).
@@ -144,7 +144,7 @@
                     </span>
 
                     @if ($meta)
-                        <span class="dcard__dist"><x-icon :name="$meta[0]" /> {{ $meta[1] }}</span>
+                        <span class="dcard__dist"><x-icon :name="$meta[0]" /> {{ $meta[1] }}@if ($meta[2])<span class="dcard__dist-more">{{ $meta[2] }}</span>@endif</span>
                     @endif
                 </div>
             @endif
