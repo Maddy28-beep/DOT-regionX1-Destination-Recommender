@@ -170,9 +170,13 @@ class SimilarDestinationService
     }
 
     /**
-     * How well each candidate fits the interests the traveller picked (0 to 1), from the same content-based
-     * scoring the itinerary was built with, or null when the traveller picked none (then it ranks nothing).
-     * A candidate the scoring leaves out (outside the traveller's distance range) counts as 0.
+     * Whether each candidate fits at least one of the interests the traveller picked: 1.0 if it does, 0.0 if
+     * it does not, from the same content-based scoring the itinerary was built with. The scoring itself
+     * grades by how many of the picked interests a place covers (a farm covering one of three scores a third),
+     * but for choosing a substitute the question is whether it fits the traveller's interests at all, and a
+     * tagged place would otherwise always lose to an untagged one that happens to score 1.
+     * Null when the traveller picked no interests (then it ranks nothing). A candidate the scoring leaves out
+     * (outside the traveller's distance range) counts as 0.
      *
      * @param  Collection<int, Destination>  $candidates
      * @return Collection<int, float>|null  keyed by destination id
@@ -193,7 +197,7 @@ class SimilarDestinationService
 
         return app(ContentBasedRecommendationService::class)
             ->rank($preference, $candidates)
-            ->mapWithKeys(fn (array $row) => [$row['destination']->id => (float) $row['interest_fit']]);
+            ->mapWithKeys(fn (array $row) => [$row['destination']->id => $row['interest_fit'] > 0 ? 1.0 : 0.0]);
     }
 
     private function distanceKm(Destination $a, Destination $b): ?float
