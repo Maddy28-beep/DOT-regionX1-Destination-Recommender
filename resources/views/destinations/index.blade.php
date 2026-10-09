@@ -81,11 +81,7 @@
                         @endif
                     </div>
                 @else
-                    <div class="empty-state">
-                        <p><strong>No destinations match your filters.</strong></p>
-                        <p>Try clearing some filters or searching a different keyword.</p>
-                        <a href="{{ route('destinations.index') }}" class="btn btn-outline">Clear filters</a>
-                    </div>
+                    <x-davo-empty-state title="No destinations match your filters" message="Try another category or clear your filters to explore more options." :action-url="route('destinations.index')" action-label="Clear filters" />
                 @endif
                 </div>
             </div>
