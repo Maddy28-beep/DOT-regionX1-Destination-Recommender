@@ -18,13 +18,14 @@
 <link rel="stylesheet" href="{{ asset('css/plan-wizard.css') }}?v={{ filemtime(public_path('css/plan-wizard.css')) }}">
 <div class="plan-shell plan-wizard" id="planWizard">
     <div class="page-head page-head--with-action">
-        <div class="container">
-            <div>
+        <div class="container plan-introduction">
+            <img class="plan-davo" src="{{ asset('images/davo.png') }}" alt="Davo, your eagle travel buddy, waving hello" width="1134" height="1360">
+            <div class="plan-introduction-copy">
                 <span class="poster-kicker">Your Davao adventure starts here</span>
-                <h1 class="page-title">Let's Plan Your Trip.</h1>
+                <h1 class="page-title">Let’s plan your Davao adventure.</h1>
                 <p>A few preferences. A trip that feels like you. No sign-up needed.</p>
             </div>
-            <a href="{{ route('saved.index') }}" class="btn btn-outline">
+            <a href="{{ route('saved.index') }}" class="btn btn-outline plan-saved-link">
                 <x-icon name="heart" /> Saved Places
             </a>
         </div>
@@ -333,6 +334,7 @@
                 </div>
             </div>
             <section id="planLoading" class="plan-loading" role="status" aria-live="polite" aria-labelledby="planLoadingTitle" hidden tabindex="-1">
+                <img class="plan-loading-davo" src="{{ asset('images/davo-chat-avatar.png') }}" alt="" width="76" height="76">
                 <span class="plan-loading-spinner" aria-hidden="true"></span>
                 <h2 id="planLoadingTitle">Building your itinerary</h2>
                 <p>Matching Davao Region destinations to what you told us.</p>
