@@ -22,7 +22,7 @@
             return;
         }
 
-        panel.appendChild(el('p', 'swap-heading', 'Most similar places, ranked by meaning'));
+        panel.appendChild(el('p', 'swap-heading', 'Best swaps for your trip: similar in meaning, fitting your interests, and close by'));
         var list = el('ul', 'swap-list');
 
         data.alternatives.forEach(function (alt) {
@@ -39,6 +39,7 @@
             if (alt.type) meta += ' · ' + alt.type;
             if (alt.distance_km !== null) meta += ' · ' + alt.distance_km + ' km from this stop';
             info.appendChild(el('span', 'swap-option__meta', meta));
+            if (alt.reason) info.appendChild(el('span', 'swap-option__reason', alt.reason));
             li.appendChild(info);
 
             var form = el('form');
