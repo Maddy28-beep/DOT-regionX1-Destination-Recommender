@@ -116,7 +116,6 @@
         if (target <= current || validate(Array.from({length: target}, (_, i) => i))) show(target, true);
     }));
     const rows = [...loading.querySelectorAll('.plan-loading-workflow li')];
-    const itineraryLink = document.getElementById('planViewItinerary');
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const errorBox = document.createElement('div');
     errorBox.className = 'alert alert-error';
@@ -132,8 +131,6 @@
         loading.hidden = true;
         loading.classList.remove('is-ready', 'is-finishing');
         loading.style.removeProperty('--plan-progress');
-        itineraryLink.hidden = true;
-        itineraryLink.removeAttribute('href');
         rows.forEach(row => { row.classList.remove('is-complete', 'is-active'); row.querySelector('span').textContent = ''; });
         document.getElementById('planLoadingTitle').textContent = 'Davo is planning your trip…';
     }
@@ -188,8 +185,6 @@
             }
             loading.classList.add('is-ready');
             document.getElementById('planLoadingTitle').textContent = 'Your itinerary is ready';
-            itineraryLink.href = data.redirect;
-            itineraryLink.hidden = false;
             await new Promise(resolve => setTimeout(resolve, 400));
             location.assign(data.redirect);
         } catch (_) {

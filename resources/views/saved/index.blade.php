@@ -29,17 +29,15 @@
                 @endforeach
             </div>
         @empty
-            <div class="empty-state">
-                <h2 class="poster-title" style="color:var(--ocean-teal-dark);">Nothing saved yet</h2>
-                <p>
-                    Tap the heart on any destination, accommodation, restaurant or souvenir center
-                    and it will show up here.
-                </p>
-                <div class="empty-state__actions">
-                    <a href="{{ route('destinations.index') }}" class="btn btn-poster-primary">Browse Destinations</a>
-                    <a href="{{ route('plan.edit') }}" class="btn btn-poster-ghost">Plan My Trip</a>
-                </div>
-            </div>
+            <x-davo-empty-state
+                variant="saved"
+                title="Your next adventure starts here"
+                message="No saved places yet. Tap the heart on a place you like, and you will find it here when you are ready to plan."
+                :action-url="route('destinations.index')"
+                action-label="Explore destinations"
+                :secondary-url="route('plan.edit')"
+                secondary-label="Plan My Trip"
+            />
         @endforelse
     </div>
 </div>

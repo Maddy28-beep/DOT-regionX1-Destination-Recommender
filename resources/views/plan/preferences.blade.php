@@ -345,7 +345,6 @@
                     <li><span aria-hidden="true"></span> Adding travel times between stops</li>
                 </ul>
                 <div class="plan-loading-track" aria-hidden="true"><span></span></div>
-                <a id="planViewItinerary" class="btn plan-next" hidden>View my itinerary &rarr;</a>
                 </div>
             </section>
         </div>

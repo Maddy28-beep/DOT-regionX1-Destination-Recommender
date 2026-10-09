@@ -77,7 +77,6 @@
 .plan-loading-track { height:6px; overflow:hidden; border-radius:10px; background:#e9dfc6; margin-top:20px; }
 .plan-loading-track > span { display:block; height:100%; width:35%; border-radius:inherit; background:var(--primary); animation:plan-progress 1.6s ease-in-out infinite alternate; }
 .plan-loading.is-finishing .plan-loading-track > span { animation:none; width:var(--plan-progress,0%); transition:width .25s ease; }
-#planViewItinerary { margin-top:18px; font-size:.82rem; }
 @keyframes plan-spin { to { transform:rotate(360deg); } }
 @keyframes plan-progress { from { transform:translateX(-100%); } to { transform:translateX(290%); } }
 @media(max-width:640px) { .plan-wizard.is-building { padding:28px 0; } .plan-loading { gap:18px; padding:24px 20px; grid-template-columns:110px minmax(0,1fr); } .plan-loading .plan-loading-davo { width:110px; height:150px; } }

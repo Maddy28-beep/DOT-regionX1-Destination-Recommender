@@ -82,10 +82,7 @@
                         @endif
                     </div>
                 @else
-                    <div class="empty-state">
-                        <p><strong>No restaurants match your filters.</strong></p>
-                        <a href="{{ route('restaurants.index') }}" class="btn btn-outline">Clear filters</a>
-                    </div>
+                    <x-davo-empty-state title="No restaurants match your filters" message="Try another category or clear your filters to explore more options." :action-url="route('restaurants.index')" action-label="Clear filters" />
                 @endif
             </div>
         </div>
