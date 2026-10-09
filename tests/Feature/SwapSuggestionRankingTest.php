@@ -140,6 +140,18 @@ class SwapSuggestionRankingTest extends TestCase
             ->assertJsonPath('alternatives.0.reason', 'Not one of your picked interests');
     }
 
+    public function test_a_tagged_place_that_fits_one_of_several_picked_interests_counts_as_fitting(): void
+    {
+        $stop = $this->place('Convention Hall', [1, 0, 0], ['type' => 'Events & Conventions']);
+        $farm = $this->place('Sample Farm', [0.9, 0.1, 0], ['type' => 'Farm Tourism']);
+        \App\Models\DestinationTag::create(['destination_id' => $farm->id, 'kind' => 'category', 'value' => 'Nature']);
+        $trip = $this->tripWith($stop, ['Beach & Island', 'Nature & Adventure', 'Cultural Heritage']);
+
+        $this->withSession([TripPlannerController::ITINERARY_KEY => $trip->id])
+            ->getJson(route('plan.alternatives', $stop->id))
+            ->assertJsonPath('alternatives.0.reason', 'Matches your interests');
+    }
+
     public function test_no_interest_line_is_shown_when_the_traveller_picked_none(): void
     {
         $stop = $this->place('Zoo', [1, 0, 0]);
