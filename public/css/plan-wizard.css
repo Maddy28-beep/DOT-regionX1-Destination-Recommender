@@ -1,8 +1,20 @@
-.plan-wizard { background:var(--bg); padding-bottom:24px; }
+.plan-wizard { background:#f6f3ea; padding-bottom:24px; }
 .plan-wizard > .page-head { text-align:center; padding:40px 0 20px; background:transparent; border:0; }
 .plan-wizard > .page-head .container { display:flex; flex-direction:column; gap:16px; align-items:center; }
 .plan-wizard .page-title { font-family:'Barabara','Alfa Slab One',serif; text-transform:uppercase; font-size:clamp(1.9rem,4vw,2.7rem); color:var(--forest); margin:10px 0; }
 .plan-wizard .poster-kicker { font-family:'Poppins',sans-serif; text-transform:uppercase; font-size:.72rem; letter-spacing:.14em; font-weight:700; color:var(--muted); }
+.plan-wizard > .page-head .plan-introduction { max-width:940px; display:grid; grid-template-columns:128px minmax(0,1fr); gap:8px 26px; align-items:center; text-align:left; }
+.plan-davo { grid-row:1 / 3; width:128px; height:154px; object-fit:contain; align-self:center; }
+.plan-introduction-copy { min-width:0; }
+.plan-wizard .plan-introduction .page-title { text-transform:none; font-size:clamp(1.65rem,3.2vw,2.25rem); line-height:1.2; text-wrap:balance; margin:8px 0 10px; }
+.plan-wizard .plan-introduction p { margin:0; font-size:.9rem; line-height:1.65; }
+.plan-wizard .plan-saved-link { justify-self:start; padding:7px 12px; min-height:40px; font-size:.8rem; gap:6px; }
+.plan-loading-davo { display:block; width:76px; height:76px; object-fit:contain; margin:0 auto 18px; }
+@media(max-width:640px) {
+    .plan-wizard > .page-head .plan-introduction { grid-template-columns:1fr; gap:12px; text-align:center; justify-items:center; }
+    .plan-davo { grid-row:auto; width:82px; height:98px; }
+    .plan-wizard .plan-saved-link { justify-self:center; }
+}
 .plan-wizard .section-tight > .container { max-width:940px; }
 .plan-wizard .plan-panel { background:var(--paper); border:1px solid var(--border); box-shadow:0 6px 24px rgba(16,40,30,.04); border-radius:20px; overflow:visible; }
 .plan-wizard .panel-body { padding:32px; }
