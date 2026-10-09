@@ -10,12 +10,18 @@
            data-preview="{{ $surveyInvitePreview ? 'true' : 'false' }}"
            data-check-in="{{ session('show_survey_invite') ? 'true' : 'false' }}">
         <button type="button" class="survey-invite__close" data-survey-dismiss aria-label="Close survey invitation">&times;</button>
-        <span class="survey-invite__kicker">Your Davao experience</span>
-        <h2 id="surveyInviteTitle">Finished exploring Davao?</h2>
-        <p id="surveyInviteDescription">Share your trip experience to help improve local tourism. Still exploring? Come back when your visit is complete.</p>
+        <div class="survey-invite__intro">
+            <img class="survey-invite__davo" src="{{ asset('images/davo-survey-v2.webp') }}" alt="" width="72" height="86">
+            <div>
+                <span class="survey-invite__kicker">A moment with Davo</span>
+                <h2 id="surveyInviteTitle">How was your Davao trip?</h2>
+            </div>
+        </div>
+        <p id="surveyInviteDescription">Finished your visit? Tell us what worked well and what could be better for your next Davao adventure.</p>
+        <div class="survey-invite__note"><x-icon name="shield-check" /><span>Optional feedback · No sign-up needed</span></div>
         <div class="survey-invite__actions">
-            <a href="{{ route('exit-survey.create') }}" class="btn btn-primary" data-survey-answer>Answer survey <span aria-hidden="true">&rarr;</span></a>
-            <button type="button" class="btn btn-outline" data-survey-dismiss>Not yet</button>
+            <a href="{{ route('exit-survey.create') }}" class="btn btn-primary" data-survey-answer>Share my experience <span aria-hidden="true">&rarr;</span></a>
+            <button type="button" class="btn btn-outline" data-survey-dismiss>Maybe later</button>
         </div>
     </aside>
     <div id="surveyInviteAnnouncement" class="sr-only" aria-live="polite"></div>
