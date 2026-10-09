@@ -22,7 +22,7 @@
             return;
         }
 
-        panel.appendChild(el('p', 'swap-heading', 'Best swaps for your trip: similar in meaning, fitting your interests, and close by'));
+        panel.appendChild(el('p', 'swap-heading', 'Most similar places, ranked by meaning'));
         var list = el('ul', 'swap-list');
 
         data.alternatives.forEach(function (alt) {
