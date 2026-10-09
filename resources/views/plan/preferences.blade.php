@@ -19,7 +19,7 @@
 <div class="plan-shell plan-wizard" id="planWizard">
     <div class="page-head page-head--with-action">
         <div class="container plan-introduction">
-            <img class="plan-davo" src="{{ asset('images/davo.png') }}" alt="Davo, your eagle travel buddy, waving hello" width="1134" height="1360">
+            <img class="plan-davo" src="{{ asset('images/davo-wave.webp') }}" alt="Davo, your eagle travel buddy, waving hello" width="420" height="504">
             <div class="plan-introduction-copy">
                 <span class="poster-kicker">Your Davao adventure starts here</span>
                 <h1 class="page-title">Let’s plan your Davao adventure.</h1>
@@ -334,7 +334,7 @@
                 </div>
             </div>
             <section id="planLoading" class="plan-loading" role="status" aria-live="polite" aria-labelledby="planLoadingTitle" hidden tabindex="-1">
-                <img class="plan-loading-davo" src="{{ asset('images/davo.png') }}" alt="" width="180" height="216">
+                <img class="plan-loading-davo" src="{{ asset('images/davo-wave.webp') }}" alt="" width="420" height="504">
                 <div class="plan-loading-copy">
                 <div class="plan-loading-kicker">Hang tight</div>
                 <h2 id="planLoadingTitle">Davo is planning your trip…</h2>
