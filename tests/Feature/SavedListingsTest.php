@@ -131,7 +131,7 @@ class SavedListingsTest extends TestCase
             ->get(route('saved.index'))->assertOk()->getContent();
 
         $this->assertStringNotContainsString(route('destinations.show', $destination), $html);
-        $this->assertStringContainsString('Nothing saved yet', $html);
+        $this->assertStringContainsString('No saved places yet', $html);
     }
 
     /** All four saveable types land on the one page, grouped. */
