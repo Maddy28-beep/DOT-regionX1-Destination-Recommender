@@ -90,6 +90,33 @@ class ItineraryItem extends Model
         return $start.' – '.\Illuminate\Support\Carbon::parse($this->ends_at)->format('g:i A');
     }
 
+    /**
+     * How long the row lasts in words ("2 hours", "1 hour 30 min", "45 min"), or null for a row that is a
+     * moment (no end time) or has no times at all.
+     */
+    public function durationLabel(): ?string
+    {
+        if (blank($this->starts_at) || blank($this->ends_at)) {
+            return null;
+        }
+
+        $start = \Illuminate\Support\Carbon::parse($this->starts_at);
+        $minutes = (int) $start->diffInMinutes(\Illuminate\Support\Carbon::parse($this->ends_at));
+
+        if ($minutes <= 0) {
+            return null;
+        }
+
+        $hours = intdiv($minutes, 60);
+        $rest = $minutes % 60;
+
+        return match (true) {
+            $hours === 0 => $rest.' min',
+            $rest === 0 => $hours.' '.($hours === 1 ? 'hour' : 'hours'),
+            default => $hours.' '.($hours === 1 ? 'hour' : 'hours').' '.$rest.' min',
+        };
+    }
+
     /** The listing this row points at, whatever kind it is. */
     public function listing()
     {
