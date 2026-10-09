@@ -340,7 +340,7 @@ class DestinationDetailRedesignTest extends TestCase
 
         $this->assertStringContainsString('<span class="dcard__new">New</span>', $html);
         $this->assertStringNotContainsString('dcard__rating', $html);
-        $this->assertStringContainsString('28 km from city', $html);
+        $this->assertStringContainsString('28 km<span class="dcard__dist-more"> from city</span>', $html);
         $this->assertStringContainsString('DOT accredited', $html);
     }
 
