@@ -6,6 +6,7 @@ use App\Models\Advisory;
 use App\Models\Destination;
 use App\Models\DestinationEmbedding;
 use App\Models\Itinerary;
+use App\Services\Recommendation\ContentBasedRecommendationService;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -22,11 +23,24 @@ use Illuminate\Support\Collection;
  *     status and not under an active danger advisory (HasOperatingStatus);
  *   - when both places have coordinates it must be within MAX_DISTANCE_KM of
  *     the stop it replaces, so a swap never sends the traveller across the region.
+ *
+ * Within what is allowed, the order is a blend, not similarity alone. Two places can
+ * mean nearly the same thing and still be a poor swap -- the most similar substitute
+ * for a convention centre was a golf club -- so the traveller's own interests and the
+ * distance count too: 50% similarity of meaning, 30% how well the place fits the
+ * interests the traveller picked, 20% how close it is to the stop it replaces.
  */
 class SimilarDestinationService
 {
     /** Furthest a substitute may be from the stop it replaces. */
     public const MAX_DISTANCE_KM = 60.0;
+
+    /** How the order is made up; they add to 1. */
+    private const WEIGHT_SIMILARITY = 0.5;
+
+    private const WEIGHT_INTEREST = 0.3;
+
+    private const WEIGHT_PROXIMITY = 0.2;
 
     /** True once at least one destination has a stored vector. */
     public function isAvailable(): bool
@@ -89,7 +103,8 @@ class SimilarDestinationService
     /**
      * The best substitutes for $original within this itinerary.
      *
-     * @return Collection<int, array{destination: Destination, similarity: float, distance_km: ?float}>
+     * @return Collection<int, array{destination: Destination, similarity: float, distance_km: ?float, score: float, interest_fit: ?float}>
+     *                                                                                                                                       interest_fit is null when the traveller picked no interests
      */
     public function alternatives(Destination $original, Itinerary $itinerary, int $limit = 3): Collection
     {
@@ -106,6 +121,7 @@ class SimilarDestinationService
             ->availableDuring(...$this->windowFor($itinerary))
             ->where(fn ($q) => $q->whereNull('itinerary_role')->orWhere('itinerary_role', 'sightseeing'))
             ->whereNotIn('id', array_merge($inTrip, [$original->id]))
+            ->with('tags')
             ->get()
             ->keyBy('id');
 
@@ -114,9 +130,10 @@ class SimilarDestinationService
         }
 
         $vectors = DestinationEmbedding::whereIn('destination_id', $candidates->keys())->get()->keyBy('destination_id');
+        $interestFit = $this->interestFit($itinerary, $candidates);
 
         return $candidates
-            ->map(function (Destination $candidate) use ($original, $originalVector, $vectors) {
+            ->map(function (Destination $candidate) use ($original, $originalVector, $vectors, $interestFit) {
                 $embedding = $vectors->get($candidate->id);
                 if (! $embedding) {
                     return null;
@@ -127,16 +144,56 @@ class SimilarDestinationService
                     return null;
                 }
 
+                $similarity = round(DestinationEmbeddingService::similarity($originalVector, $embedding->vector), 4);
+                $fit = $interestFit?->get($candidate->id) ?? ($interestFit === null ? null : 0.0);
+
+                // No coordinates: neither near nor far, so the middle of the scale rather than a guess.
+                $proximity = $distance === null ? 0.5 : 1 - min($distance, self::MAX_DISTANCE_KM) / self::MAX_DISTANCE_KM;
+
                 return [
                     'destination' => $candidate,
-                    'similarity' => round(DestinationEmbeddingService::similarity($originalVector, $embedding->vector), 4),
+                    'similarity' => $similarity,
                     'distance_km' => $distance !== null ? round($distance, 1) : null,
+                    'interest_fit' => $fit,
+                    'score' => round(
+                        self::WEIGHT_SIMILARITY * $similarity
+                        + self::WEIGHT_INTEREST * ($fit ?? 1.0)
+                        + self::WEIGHT_PROXIMITY * $proximity,
+                        4
+                    ),
                 ];
             })
             ->filter()
-            ->sortByDesc('similarity')
+            ->sort(fn (array $a, array $b) => [$b['score'], $b['similarity']] <=> [$a['score'], $a['similarity']])
             ->take($limit)
             ->values();
+    }
+
+    /**
+     * How well each candidate fits the interests the traveller picked (0 to 1), from the same content-based
+     * scoring the itinerary was built with, or null when the traveller picked none (then it ranks nothing).
+     * A candidate the scoring leaves out (outside the traveller's distance range) counts as 0.
+     *
+     * @param  Collection<int, Destination>  $candidates
+     * @return Collection<int, float>|null  keyed by destination id
+     */
+    private function interestFit(Itinerary $itinerary, Collection $candidates): ?Collection
+    {
+        $preference = $itinerary->preference;
+
+        if (! $preference) {
+            return null;
+        }
+
+        $preference->loadMissing('activities', 'amenities');
+
+        if ($preference->activities->isEmpty()) {
+            return null;
+        }
+
+        return app(ContentBasedRecommendationService::class)
+            ->rank($preference, $candidates)
+            ->mapWithKeys(fn (array $row) => [$row['destination']->id => (float) $row['interest_fit']]);
     }
 
     private function distanceKm(Destination $a, Destination $b): ?float
