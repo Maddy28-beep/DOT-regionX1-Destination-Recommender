@@ -170,6 +170,25 @@ class SwapSuggestionRankingTest extends TestCase
             ->assertJsonPath('alternatives.0.reason', 'Matches your interests');
     }
 
+    public function test_when_interests_are_matched_by_meaning_the_labels_follow_the_same_measure(): void
+    {
+        \App\Models\InterestEmbedding::create([
+            'interest' => 'Wildlife', 'model' => 'test', 'dimensions' => 3,
+            'text_hash' => 'x', 'vector' => DestinationEmbeddingService::normalise([1, 0, 0]),
+        ]);
+        $stop = $this->place('Convention Hall', [0.5, 0.5, 0], ['type' => 'Events & Conventions']);
+        $this->place('Wildlife Park', [0.95, 0.05, 0], ['type' => 'Wildlife']);
+        $this->place('Day Spa', [0.05, 0.95, 0], ['type' => 'Wellness & Spa']);
+        $trip = $this->tripWith($stop, ['Wildlife']);
+
+        $reasons = collect($this->withSession([TripPlannerController::ITINERARY_KEY => $trip->id])
+            ->getJson(route('plan.alternatives', $stop->id))->json('alternatives'))
+            ->pluck('reason', 'name');
+
+        $this->assertSame('Matches your interests', $reasons['Wildlife Park']);
+        $this->assertSame('Not one of your picked interests', $reasons['Day Spa']);
+    }
+
     public function test_no_interest_line_is_shown_when_the_traveller_picked_none(): void
     {
         $stop = $this->place('Zoo', [1, 0, 0]);

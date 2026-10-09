@@ -23,8 +23,11 @@ class DestinationEmbeddingService
 {
     public const EXPORT_PATH = 'database/data/destination-embeddings.json';
 
-    /** nomic-embed-text expects a task prefix on every document it embeds. */
+    /** nomic-embed-text expects a task prefix on every document it embeds... */
     private const DOCUMENT_PREFIX = 'search_document: ';
+
+    /** ...and a different one on what is being searched for (a traveller's interest). */
+    public const QUERY_PREFIX = 'search_query: ';
 
     public function isConfigured(): bool
     {
@@ -62,9 +65,10 @@ class DestinationEmbeddingService
      * Embeds several texts in one request.
      *
      * @param  array<int, string>  $texts
+     * @param  string|null  $prefix  the model's task prefix; documents (places) by default
      * @return array<int, array<int, float>>  unit-length vectors, same order as $texts
      */
-    public function embed(array $texts): array
+    public function embed(array $texts, ?string $prefix = null): array
     {
         if ($texts === []) {
             return [];
@@ -73,7 +77,7 @@ class DestinationEmbeddingService
         $response = Http::timeout((int) config('services.embeddings.timeout', 120))
             ->post(rtrim((string) config('services.embeddings.url'), '/').'/api/embed', [
                 'model' => $this->model(),
-                'input' => array_map(fn (string $t) => self::DOCUMENT_PREFIX.$t, array_values($texts)),
+                'input' => array_map(fn (string $t) => ($prefix ?? self::DOCUMENT_PREFIX).$t, array_values($texts)),
             ]);
 
         if (! $response->successful()) {
@@ -134,10 +138,19 @@ class DestinationEmbeddingService
         ];
     }
 
-    /** Writes every stored vector to the shipped JSON file, keyed by destination slug. */
+    /**
+     * Writes every stored vector to the shipped JSON file: the destinations keyed by slug, and the survey
+     * interests under "interests". If this machine has no interest vectors, the ones already in the file are
+     * kept rather than dropped.
+     */
     public function export(?string $path = null): int
     {
         $path ??= base_path(self::EXPORT_PATH);
+
+        $interests = app(InterestEmbeddingService::class)->exportRows();
+        if ($interests === [] && is_file($path)) {
+            $interests = json_decode((string) file_get_contents($path), true)['interests'] ?? [];
+        }
         $rows = DestinationEmbedding::with('destination:id,slug')->get()
             ->filter(fn (DestinationEmbedding $e) => $e->destination)
             ->sortBy(fn (DestinationEmbedding $e) => $e->destination->slug)
@@ -148,7 +161,7 @@ class DestinationEmbeddingService
             ]]);
 
         file_put_contents($path, json_encode(
-            ['format' => 1, 'generated_at' => now()->toDateString(), 'embeddings' => $rows],
+            ['format' => 2, 'generated_at' => now()->toDateString(), 'embeddings' => $rows, 'interests' => $interests],
             JSON_UNESCAPED_SLASHES,
         ));
 
@@ -186,6 +199,20 @@ class DestinationEmbeddingService
         }
 
         return $stored;
+    }
+
+    /** Loads the "interests" section of the shipped JSON file. Returns how many interest vectors were stored. */
+    public function importInterests(?string $path = null): int
+    {
+        $path ??= base_path(self::EXPORT_PATH);
+
+        if (! is_file($path)) {
+            return 0;
+        }
+
+        $data = json_decode((string) file_get_contents($path), true);
+
+        return app(InterestEmbeddingService::class)->importRows($data['interests'] ?? []);
     }
 
     /** @param  array<int, float|int>  $v */

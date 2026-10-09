@@ -6,6 +6,7 @@ use App\Models\Destination;
 use App\Models\Region;
 use App\Models\TouristHealthProfile;
 use App\Models\TouristPreference;
+use App\Services\Embeddings\InterestEmbeddingService;
 use Illuminate\Support\Collection;
 
 /**
@@ -316,9 +317,13 @@ class ContentBasedRecommendationService
         $selectedAmenities = $preference->amenities->pluck('amenity')->all();
         $healthProfile = $preference->healthProfile()->with('conditions')->first();
 
+        // How well each place matches the picked interests by meaning (the embedding model), or null when
+        // the vectors are not there, in which case the keyword method below is used for everything.
+        $semanticFit = app(InterestEmbeddingService::class)->fitFor($selectedActivities, $candidates);
+
         return $candidates
-            ->map(function (Destination $destination) use ($preference, $maxReviewCount, $catalogueMean, $selectedActivities, $selectedAmenities, $healthProfile) {
-                $pm = $this->preferenceMatch($destination, $preference, $selectedActivities, $healthProfile);
+            ->map(function (Destination $destination) use ($preference, $maxReviewCount, $catalogueMean, $selectedActivities, $selectedAmenities, $healthProfile, $semanticFit) {
+                $pm = $this->preferenceMatch($destination, $preference, $selectedActivities, $healthProfile, $semanticFit?->get($destination->id));
                 $rs = $this->ratingsScore($destination, $catalogueMean);
                 $ps = $this->popularityScore($destination, $maxReviewCount);
                 $ds = $this->distanceScore($destination, $preference);
@@ -333,11 +338,14 @@ class ContentBasedRecommendationService
                 return [
                     // How well this place fits the interests the traveller picked (1 when none were
                     // picked). Not part of the DRS; it orders the ranking, see the sort below.
-                    'interest_fit' => $this->interestSimilarity(
+                    'interest_fit' => $semanticFit?->get($destination->id) ?? $this->interestSimilarity(
                         $destination->tags->where('kind', 'category')->pluck('value')->map(fn ($v) => strtolower($v))->all(),
                         $selectedActivities,
                         $destination->type,
                     ),
+                    // Which method produced interest_fit: 'semantic' is relative to the other candidates
+                    // (best match 1, worst 0), 'keyword' is the share of picked interests the place covers.
+                    'interest_source' => $semanticFit !== null ? 'semantic' : 'keyword',
                     'destination' => $destination,
                     'pm' => round($pm, 2),
                     'rs' => round($rs, 2),
@@ -399,7 +407,7 @@ class ContentBasedRecommendationService
     }
 
     /** Equation 1-2: weighted Preference Match, scaled to 1-5. */
-    private function preferenceMatch(Destination $destination, TouristPreference $preference, array $selectedActivities, ?TouristHealthProfile $healthProfile): float
+    private function preferenceMatch(Destination $destination, TouristPreference $preference, array $selectedActivities, ?TouristHealthProfile $healthProfile, ?float $semanticInterest = null): float
     {
         $categoryTags = $destination->tags->where('kind', 'category')->pluck('value')
             ->map(fn ($v) => strtolower($v))->all();
@@ -412,7 +420,8 @@ class ContentBasedRecommendationService
             'duration_of_stay' => 1.0, // visit_duration not yet populated on destinations; neutral
             'distance' => $this->distanceSimilarity($destination, $preference),
             'health_accessibility' => $this->healthAccessibilitySimilarity($destination, $preference, $healthProfile),
-            'interest' => $this->interestSimilarity($categoryTags, $selectedActivities, $destination->type),
+            // By meaning when the embedding vectors are available; by the typed keyword lists otherwise.
+            'interest' => $semanticInterest ?? $this->interestSimilarity($categoryTags, $selectedActivities, $destination->type),
             'demographic' => 1.0, // multi-select demographic groups are not part of the current schema; neutral
         ];
 

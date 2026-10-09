@@ -15,6 +15,11 @@ class ImportDestinationEmbeddings extends Command
     public function handle(DestinationEmbeddingService $service): int
     {
         $count = $service->import();
+        $interests = $service->importInterests();
+
+        if ($interests > 0) {
+            $this->info("Imported {$interests} interest vectors.");
+        }
 
         if ($count === 0) {
             $this->warn('No vectors imported. Run `php artisan embeddings:build` on a machine with Ollama first.');
