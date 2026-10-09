@@ -1,4 +1,4 @@
-.plan-wizard { background:#f6f3ea; padding-bottom:24px; }
+.plan-wizard { background:#fff; padding-bottom:24px; }
 .plan-wizard > .page-head { text-align:center; padding:40px 0 20px; background:transparent; border:0; }
 .plan-wizard > .page-head .container { display:flex; flex-direction:column; gap:16px; align-items:center; }
 .plan-wizard .page-title { font-family:'Barabara','Alfa Slab One',serif; text-transform:uppercase; font-size:clamp(1.9rem,4vw,2.7rem); color:var(--forest); margin:10px 0; }
@@ -58,7 +58,7 @@
 .plan-wizard .chip-checkbox-grid .field-check:has(input:focus-visible), .plan-wizard-step > h2:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
 .plan-wizard-actions #planStepStatus { color:var(--muted); font-size:.8rem; margin:auto; }
 .plan-wizard :is(button,a,input,select,textarea,summary):focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
-.plan-wizard.is-building { background:#f4f1e8; min-height:calc(100svh - var(--site-topbar-height,77px)); padding:54px 0; }
+.plan-wizard.is-building { background:#fff; min-height:calc(100svh - var(--site-topbar-height,77px)); padding:54px 0; }
 .plan-wizard.is-building > .page-head { display:none; }
 .plan-wizard.is-building .section-tight { padding:0; }
 .plan-loading { background:var(--paper); padding:80px 28px; border:0; border-radius:20px; text-align:center; min-height:430px; scroll-margin-top:calc(var(--site-topbar-height,77px) + 24px); }
