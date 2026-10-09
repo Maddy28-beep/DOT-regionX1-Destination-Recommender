@@ -334,15 +334,19 @@
                 </div>
             </div>
             <section id="planLoading" class="plan-loading" role="status" aria-live="polite" aria-labelledby="planLoadingTitle" hidden tabindex="-1">
-                <img class="plan-loading-davo" src="{{ asset('images/davo-chat-avatar.png') }}" alt="" width="76" height="76">
-                <span class="plan-loading-spinner" aria-hidden="true"></span>
-                <h2 id="planLoadingTitle">Building your itinerary</h2>
-                <p>Matching Davao Region destinations to what you told us.</p>
+                <img class="plan-loading-davo" src="{{ asset('images/davo.png') }}" alt="" width="180" height="216">
+                <div class="plan-loading-copy">
+                <div class="plan-loading-kicker">Hang tight</div>
+                <h2 id="planLoadingTitle">Davo is planning your trip…</h2>
                 <ul class="plan-loading-workflow" aria-label="Itinerary preparation workflow">
-                    <li><span aria-hidden="true">·</span> Reading your preferences</li>
-                    <li><span aria-hidden="true">·</span> Scoring nearby destinations</li>
-                    <li><span aria-hidden="true">·</span> Sequencing your days</li>
+                    <li><span aria-hidden="true"></span> Picking spots that match your interests</li>
+                    <li><span aria-hidden="true"></span> Ordering your stops</li>
+                    <li><span aria-hidden="true"></span> Checking opening hours</li>
+                    <li><span aria-hidden="true"></span> Adding travel times between stops</li>
                 </ul>
+                <div class="plan-loading-track" aria-hidden="true"><span></span></div>
+                <a id="planViewItinerary" class="btn plan-next" hidden>View my itinerary &rarr;</a>
+                </div>
             </section>
         </div>
     </div>
