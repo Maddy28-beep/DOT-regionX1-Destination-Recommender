@@ -16,7 +16,7 @@
 @endphp
 
 <link rel="stylesheet" href="{{ asset('css/plan-wizard.css') }}?v={{ filemtime(public_path('css/plan-wizard.css')) }}">
-<div class="plan-shell plan-wizard" id="planWizard">
+<div class="plan-shell plan-wizard" id="planWizard" data-draft-owner="{{ auth()->id() ?? 'guest' }}">
     <div class="page-head page-head--with-action">
         <div class="container plan-introduction">
             <img class="plan-davo" src="{{ asset('images/davo-wave-green.webp') }}" alt="Davo, your eagle travel buddy, waving hello" width="374" height="504">
@@ -43,6 +43,20 @@
                 </div>
             @endif
 
+            <section class="plan-resume" id="planResume" aria-labelledby="planResumeTitle" hidden>
+                <div class="plan-resume-davo" role="img" aria-label="Davo waving hello" style="background-image:url('{{ asset('images/davo-resume-frames.webp') }}')"></div>
+                <div>
+                    <span class="plan-resume-eyebrow">Welcome back</span>
+                    <h2 id="planResumeTitle">Ready to continue your Davao adventure?</h2>
+                    <p>Your trip basics and interests are saved on this device.</p>
+                    <div class="plan-resume-summary" id="planResumeSummary"></div>
+                    <div class="plan-resume-actions">
+                        <button type="button" id="planResumeContinue">Continue planning <span aria-hidden="true">&rarr;</span></button>
+                        <button type="button" id="planResumeDiscard">Start over</button>
+                    </div>
+                    <p class="plan-resume-note">You can review your answers before creating your itinerary. Dates, location and health details aren't saved in this draft.</p>
+                </div>
+            </section>
             <nav class="plan-wizard-steps" aria-label="Trip planning steps" hidden>
                 <button type="button" data-plan-step="0" aria-controls="plan-step-0">1 · Your trip</button>
                 <button type="button" data-plan-step="1" aria-controls="plan-step-1">2 · Your interests</button>
