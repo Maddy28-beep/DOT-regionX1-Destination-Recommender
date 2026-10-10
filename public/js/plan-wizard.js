@@ -91,6 +91,7 @@
         submit.hidden = index !== 2;
         next.textContent = index === 0 ? 'Next: your interests →' : 'Next: your comfort →';
         status.textContent = `Step ${index + 1} of 3`;
+        saveDraft();
         if (focus) {
             steps[index].querySelector('h2').focus({preventScroll: true});
             nav.scrollIntoView({block: 'start'});
@@ -126,8 +127,8 @@
     function resetLoading() {
         busy = false;
         root.classList.remove('is-building');
-        panel.hidden = false;
-        nav.hidden = false;
+        panel.hidden = resumePending;
+        nav.hidden = resumePending;
         loading.hidden = true;
         loading.classList.remove('is-ready', 'is-finishing');
         loading.style.removeProperty('--plan-progress');
@@ -173,6 +174,8 @@
                 return;
             }
             if (!data.redirect || new URL(data.redirect, location.href).origin !== location.origin) throw new Error('Invalid response');
+            clearDraft();
+            draftDirty = false;
             // The operations have finished on the server. Reveal their
             // checks in sequence as a completion animation, not fake live progress.
             loading.classList.add('is-finishing');
@@ -194,6 +197,57 @@
             errorBox.focus();
         }
     });
+    // Only low-sensitivity trip choices are persisted. Never serialize the form wholesale.
+    const draftKey = `dvo-plan-draft-v1:${root.dataset.draftOwner}`;
+    const draftNames = ['travel_days', 'travel_type', 'visitor_type', 'budget', 'accommodation_pref', 'distance_pref', 'activities[]', 'amenities[]'];
+    const draftFields = [...form.elements].filter(el => draftNames.includes(el.name));
+    let draftDirty = false;
+    let resumePending = false;
+    const resume = document.getElementById('planResume');
+    let draft = null;
+    function clearDraft() { try { localStorage.removeItem(draftKey); } catch (_) {} }
+    function saveDraft() {
+        if (!draftDirty || resumePending || busy) return;
+        const values = {};
+        draftNames.forEach(name => {
+            values[name] = draftFields.filter(el => el.name === name && (el.type !== 'checkbox' || el.checked)).map(el => el.value);
+        });
+        try { localStorage.setItem(draftKey, JSON.stringify({savedAt: Date.now(), step: current, values})); } catch (_) {}
+    }
+    form.addEventListener('input', event => { if (draftFields.includes(event.target)) { draftDirty = true; saveDraft(); } });
+    form.addEventListener('change', event => { if (draftFields.includes(event.target)) { draftDirty = true; saveDraft(); } });
+    try {
+        const stored = JSON.parse(localStorage.getItem(draftKey));
+        if (stored && Number.isFinite(stored.savedAt) && Date.now() - stored.savedAt < 7 * 86400000 && stored.values &&
+            draftNames.every(name => Array.isArray(stored.values[name]) && stored.values[name].every(value => typeof value === 'string'))) draft = stored;
+        else clearDraft();
+    } catch (_) { clearDraft(); }
+    function leaveResume() {
+        resumePending = false;
+        resume.hidden = true;
+        root.classList.remove('has-resume');
+        nav.hidden = false;
+        panel.hidden = false;
+    }
+    document.getElementById('planResumeContinue').addEventListener('click', () => {
+        if (!draft) return;
+        draftFields.forEach(el => {
+            const values = draft.values[el.name];
+            if (el.type === 'checkbox') el.checked = values.includes(el.value);
+            else if (values.length && (el.tagName !== 'SELECT' || [...el.options].some(option => option.value === values[0]))) el.value = values[0];
+            el.dispatchEvent(new Event('change', {bubbles: true}));
+        });
+        leaveResume();
+        draftDirty = true;
+        show(Number.isInteger(draft.step) ? Math.max(0, Math.min(2, draft.step)) : 0, true);
+    });
+    document.getElementById('planResumeDiscard').addEventListener('click', () => {
+        clearDraft();
+        draft = null;
+        draftDirty = false;
+        leaveResume();
+        show(0, true);
+    });
     window.addEventListener('pageshow', () => {
         resetLoading();
         show(current);
@@ -207,4 +261,31 @@
         show(Math.max(0, index));
         badField.setAttribute('aria-invalid', 'true');
     } else show(0);
+    if (draft && !errors.length) {
+        resumePending = true;
+        resume.hidden = false;
+        root.classList.add('has-resume');
+        nav.hidden = true;
+        panel.hidden = true;
+        const summary = document.getElementById('planResumeSummary');
+        const days = Number(draft.values.travel_days[0]);
+        const parts = [days >= 1 && days <= 30 ? `${days} ${days === 1 ? 'day' : 'days'}` : '', draft.values['activities[]'].slice(0, 2).join(' · '), draft.values.budget[0]];
+        parts.filter(Boolean).forEach(text => { const item = document.createElement('span'); item.textContent = text; summary.append(item); });
+        const sprite = resume.querySelector('.plan-resume-davo');
+        const motion = matchMedia('(prefers-reduced-motion: reduce)');
+        let waveTimer;
+        function stopWave() { clearTimeout(waveTimer); sprite.style.backgroundPosition = '0% 0%'; }
+        const frames = [0, 1, 2, 3, 4, 5, 6, 7, 8, 0];
+        function wave(index = 0) {
+            if (motion.matches || resume.hidden || document.hidden) { stopWave(); return; }
+            const frame = frames[index];
+            sprite.style.backgroundPosition = `${frame % 3 * 50}% ${Math.floor(frame / 3) * 50}%`;
+            if (index < frames.length - 1) waveTimer = setTimeout(() => wave(index + 1), index === 4 ? 110 : 180);
+        }
+        const image = new Image();
+        image.onload = () => wave();
+        image.src = sprite.style.backgroundImage.slice(5, -2);
+        motion.addEventListener('change', stopWave);
+        document.addEventListener('visibilitychange', () => { if (document.hidden) stopWave(); });
+    }
 })();
