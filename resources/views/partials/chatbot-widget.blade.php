@@ -1,6 +1,9 @@
 <div id="chatbot-widget" class="chatbot-widget">
     <button type="button" id="chatbot-toggle" class="chatbot-toggle" aria-label="Chat with Davo, your Davao travel buddy" aria-controls="chatbot-panel" aria-expanded="false">
-        <span class="chatbot-avatar" aria-hidden="true"><img src="{{ asset('images/davo.webp') }}" alt="" width="512" height="512"></span>
+        <span class="chatbot-avatar" aria-hidden="true">
+            <img class="chatbot-rest-pose" src="{{ asset('images/davo.webp') }}" alt="" width="512" height="512">
+            <img class="chatbot-wave-pose" src="{{ asset('images/davo-wave-green.webp') }}" alt="" width="374" height="504">
+        </span>
         <span class="chatbot-toggle-badge" aria-hidden="true"><x-icon name="chat" /></span>
     </button>
 
@@ -21,7 +24,7 @@
         <div id="chatbot-messages" class="chatbot-messages" role="log" aria-label="Conversation with Davo" aria-live="polite">
             <div class="chatbot-row chatbot-intro">
                 <span class="chatbot-avatar chatbot-mini-avatar" aria-hidden="true"><img src="{{ asset('images/davo.webp') }}" alt="" width="64" height="64" loading="lazy"></span>
-                <div class="chatbot-msg chatbot-msg-bot"><strong>Hi, I'm Davo!</strong> 👋 What can I help you find in Davao Region?</div>
+                <div class="chatbot-msg chatbot-msg-bot"><strong>Hi, I'm Davo!</strong> 👋 What would you like to explore?</div>
             </div>
             <div class="chatbot-suggest" id="chatbot-suggest">
                 <div class="chatbot-suggest-label">Try asking:</div>
@@ -55,6 +58,14 @@
     .chatbot-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 45%; pointer-events: none; }
     /* The launcher: a white disc, a green ring around the picture, and a green chat badge on its lower-right edge. */
     .chatbot-toggle .chatbot-avatar { border: 4px solid var(--primary); box-sizing: border-box; }
+    .chatbot-toggle .chatbot-wave-pose { display: none; position: absolute; inset: 0; object-fit: contain; object-position: center; transform-origin: 50% 85%; }
+    .chatbot-toggle.is-waving .chatbot-rest-pose { visibility: hidden; }
+    .chatbot-toggle.is-waving .chatbot-wave-pose { display: block; animation: davo-hello 1.2s ease-in-out; }
+    @keyframes davo-hello {
+        0%, 100% { transform: rotate(0); }
+        20%, 60% { transform: rotate(-7deg); }
+        40%, 80% { transform: rotate(7deg); }
+    }
     .chatbot-toggle-badge { position: absolute; right: -4px; bottom: -4px; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: var(--primary); border: 4px solid var(--white); box-shadow: 0 2px 8px rgba(0,0,0,.18); }
     .chatbot-toggle-badge svg { width: 17px; height: 17px; }
     .chatbot-widget button:focus-visible { outline: 3px solid #e98543; outline-offset: 3px; }
@@ -126,7 +137,13 @@
     }
     .chatbot-msg a.chatbot-action:hover { background: var(--primary-dark); }
 
-    .chatbot-typing { display: inline-flex; gap: 4px; padding: 14px 16px; }
+    .chatbot-typing { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 4px; padding: 14px 16px; }
+    .chatbot-typing-label { margin-right: 6px; font-size: .82rem; }
+    .chatbot-thinking .chatbot-mini-avatar img { animation: davo-think 2s ease-in-out infinite; transform-origin: 50% 80%; }
+    @keyframes davo-think { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-8deg); } }
+    .chatbot-retry { display: block; margin-top: 10px; padding: 8px 14px; border: 1px solid var(--primary); border-radius: 999px; background: var(--white); color: var(--primary-dark); font: inherit; font-weight: 600; cursor: pointer; }
+    .chatbot-retry:hover { background: var(--primary-light); }
+    .chatbot-icon-btn:disabled { opacity: .5; cursor: default; }
     .chatbot-typing i { width: 7px; height: 7px; border-radius: 50%; background: #c9b690; animation: chatbot-blink 1s infinite ease-in-out; }
     .chatbot-typing i:nth-child(2) { animation-delay: .15s; }
     .chatbot-typing i:nth-child(3) { animation-delay: .3s; }
@@ -161,8 +178,10 @@
         .chatbot-panel { max-height: calc(100dvh - 208px); }
     }
     @media (prefers-reduced-motion: reduce) {
+        .chatbot-toggle.is-waving .chatbot-wave-pose { animation: none; }
         .chatbot-toggle { transition: none; } .chatbot-toggle:hover { transform: none; }
         .chatbot-typing i { animation: none; opacity: .7; }
+        .chatbot-thinking .chatbot-mini-avatar img { animation: none; }
     }
 </style>
 
@@ -176,6 +195,27 @@
     function getWidget() { return document.getElementById('chatbot-widget'); }
     var AVATAR = @json(asset('images/davo.webp'));
     var greeting = null; // the opening message and chips, kept so "new chat" can put them back
+    var waveTimer;
+    var lastWave = 0;
+    function waveHello() {
+        var toggle = document.getElementById('chatbot-toggle');
+        var pose = toggle && toggle.querySelector('.chatbot-wave-pose');
+        // Keep the familiar portrait if the optional pose has not loaded.
+        if (!pose || !pose.complete || !pose.naturalWidth || Date.now() - lastWave < 4000) return;
+        lastWave = Date.now();
+        toggle.classList.add('is-waving');
+        clearTimeout(waveTimer);
+        waveTimer = setTimeout(function () { toggle.classList.remove('is-waving'); }, 1200);
+    }
+    var launcher = document.getElementById('chatbot-toggle');
+    if (launcher) {
+        launcher.addEventListener('pointerenter', function (event) {
+            if (event.pointerType === 'mouse' && getPanel().hidden) waveHello();
+        });
+        launcher.addEventListener('focus', function () {
+            if (launcher.matches(':focus-visible') && getPanel().hidden) waveHello();
+        });
+    }
 
     function setOpen(open) {
         var panel = getPanel();
@@ -186,8 +226,12 @@
         if (toggle) toggle.setAttribute('aria-expanded', String(open));
         if (!open && panel.contains(document.activeElement) && toggle) toggle.focus();
         if (open) {
+            waveHello();
             var input = document.getElementById('chatbot-input');
             if (input) input.focus();
+        } else if (toggle) {
+            clearTimeout(waveTimer);
+            toggle.classList.remove('is-waving');
         }
     }
 
@@ -250,7 +294,7 @@
         if (input) { input.value = ''; input.focus(); }
     }
 
-    function send(raw) {
+    function send(raw, retryRow) {
         var input = document.getElementById('chatbot-input');
         var sendBtn = document.getElementById('chatbot-send');
         var messages = document.getElementById('chatbot-messages');
@@ -264,13 +308,20 @@
         var suggest = document.getElementById('chatbot-suggest');
         if (suggest) suggest.hidden = true;
 
-        appendMessage(messages, text, 'user');
+        messages.querySelectorAll('.chatbot-retry').forEach(function (button) { button.remove(); });
+        if (retryRow) retryRow.remove();
+        else appendMessage(messages, text, 'user');
         input.value = '';
         input.disabled = true;
         if (sendBtn) sendBtn.disabled = true;
         var typing = appendTyping(messages);
+        var resetBtn = document.getElementById('chatbot-reset');
+        if (resetBtn) resetBtn.disabled = true;
+        var controller = new AbortController();
+        var timeout = setTimeout(function () { controller.abort(); }, 30000);
 
         fetch('{{ route('chatbot.respond') }}', {
+            signal: controller.signal,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -279,18 +330,33 @@
             },
             body: JSON.stringify({ message: text }),
         })
-            .then(function (res) { return res.json(); })
+            .then(function (res) {
+                if (!res.ok) throw new Error('Chat request failed');
+                return res.json();
+            })
             .then(function (data) {
+                if (!data || typeof data.response !== 'string' || !data.response.trim()) throw new Error('Empty reply');
                 typing.remove();
-                appendMessage(messages, data.response || 'Sorry, something went wrong.', 'bot', data.cards || [], data.action);
+                appendMessage(messages, data.response, 'bot', data.cards || [], data.action);
             })
             .catch(function () {
                 typing.remove();
-                appendMessage(messages, "Sorry, I couldn't reach the assistant right now. Please try again.", 'bot');
+                var failure = appendMessage(messages, "Sorry, I couldn't get a reply right now. You can try again.", 'bot');
+                var retry = document.createElement('button');
+                retry.type = 'button';
+                retry.className = 'chatbot-retry';
+                retry.textContent = 'Try again';
+                retry.addEventListener('click', function () { send(text, failure.parentNode); });
+                failure.appendChild(retry);
+                messages.scrollTop = messages.scrollHeight;
             })
             .finally(function () {
+                clearTimeout(timeout);
+                typing.remove();
                 input.disabled = false;
-                input.focus();
+                if (sendBtn) sendBtn.disabled = input.value.trim() === '';
+                if (resetBtn) resetBtn.disabled = false;
+                if (!getPanel().hidden && getWidget().contains(document.activeElement)) input.focus();
             });
     }
 
@@ -306,11 +372,10 @@
 
     function appendTyping(messages) {
         var row = document.createElement('div');
-        row.className = 'chatbot-row';
+        row.className = 'chatbot-row chatbot-thinking';
         var bubble = document.createElement('div');
         bubble.className = 'chatbot-msg chatbot-msg-bot chatbot-typing';
-        bubble.setAttribute('aria-label', 'Davo is typing');
-        bubble.innerHTML = '<i></i><i></i><i></i>';
+        bubble.innerHTML = '<span class="chatbot-typing-label">Davo is thinking…</span><i aria-hidden="true"></i><i aria-hidden="true"></i><i aria-hidden="true"></i>';
         row.appendChild(miniAvatar());
         row.appendChild(bubble);
         messages.appendChild(row);
@@ -351,6 +416,7 @@
             messages.appendChild(row);
         }
         messages.scrollTop = messages.scrollHeight;
+        return el;
     }
 
     function buildCard(c) {
