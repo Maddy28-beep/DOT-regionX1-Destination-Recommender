@@ -40,7 +40,9 @@ class AccreditationSeeder extends Seeder
 
         foreach ($sets as $kind => $listings) {
             foreach ($listings as $index => $listing) {
-                $cycle = $index % 6;
+                // Destinations stay Active: hiding two of them as a demo of the expired state removed Samal Island
+                // and Dahican Beach from the public site. Other listing kinds still show every state.
+                $cycle = $kind === 'destination' ? 2 : $index % 6;
                 [$status, $issued, $expires] = match (true) {
                     $cycle === 0 => ['Expired', Carbon::now()->subYears(2), Carbon::now()->subDays(15)],
                     $cycle === 1 => ['Expiring Soon', Carbon::now()->subYear(), Carbon::now()->addDays(30)],

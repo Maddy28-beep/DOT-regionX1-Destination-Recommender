@@ -279,7 +279,7 @@
                 <div class="panel-head">
                     <div>
                         <h2 id="itinerary-recommendations">Recommended Destinations</h2>
-                        <p>Ranked by how well each place matches your travel preferences.</p>
+                        <p>Ranked by how well each place fits your picked interests first, then by its recommendation score.</p>
                     </div>
                 </div>
                 <div class="panel-body">
@@ -424,7 +424,12 @@
                             <div>
                                 <strong>Apriori association rule mining</strong> over
                                 {{ $provenance['transactions'] }} visitation
-                                transaction{{ $provenance['transactions'] === 1 ? '' : 's' }} suggested
+                                transaction{{ $provenance['transactions'] === 1 ? '' : 's' }}
+                                @if ($provenance['transactions_demo'] > 0)
+                                    ({{ $provenance['transactions_demo'] }} simulated for demonstration,
+                                    {{ $provenance['transactions'] - $provenance['transactions_demo'] }} from real tourist surveys)
+                                @endif
+                                suggested
                                 where to eat, shop and stay
                                 @if ($provenance['rules_applied'] > 0)
                                     &mdash; {{ $provenance['rules_applied'] }}

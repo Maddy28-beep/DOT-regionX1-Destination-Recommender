@@ -228,6 +228,7 @@ class TripPlannerController extends Controller
             'destinations_ranked' => $itinerary->matches()->count(),
             'catalogue_size' => Destination::publiclyVisible()->count(),
             'transactions' => ExitSurvey::count(),
+            'transactions_demo' => ExitSurvey::where('data_source', 'demo')->count(),
             'rules_applied' => $itinerary->items()->whereNotNull('rule_basis')->count(),
             'origin' => $preference->origin_label ?: 'Davao City centre',
             'range_requested' => $preference->distance_pref,
