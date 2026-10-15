@@ -190,10 +190,36 @@
        (.sticky-cta, ~72px tall) pinned to the bottom of the viewport. Left at
        its default 20px offset, the chat bubble's higher z-index sits on top
        of that bar's right-hand button and silently intercepts taps meant for
-       it. Raising the widget above the bar's height keeps the two apart. */
+       it. Raising the widget above the bar's height keeps the two apart.
+
+       Only those pages need the lift. It used to apply everywhere, which parked
+       the button a hundred pixels up the screen where it covered page content,
+       such as the "Popular right now" call to action and its pause button. Pages
+       without the bar now keep it in the corner. */
     @media (max-width: 900px) {
-        .chatbot-widget { bottom: 92px; }
-        .chatbot-panel { max-height: calc(100dvh - 208px); }
+        .chatbot-widget { bottom: 16px; }
+        .chatbot-panel { max-height: calc(100dvh - 136px); }
+    }
+    @media (max-width: 900px) {
+        @supports selector(:has(*)) {
+            body:has(.sticky-cta) .chatbot-widget { bottom: 92px; }
+            body:has(.sticky-cta) .chatbot-panel { max-height: calc(100dvh - 208px); }
+        }
+        @supports not selector(:has(*)) {
+            .chatbot-widget { bottom: 92px; }
+            .chatbot-panel { max-height: calc(100dvh - 208px); }
+        }
+    }
+
+    /* Phones: a smaller button covers less of the page, and its bubble and panel follow its size. */
+    @media (max-width: 640px) {
+        .chatbot-widget { right: 12px; }
+        .chatbot-toggle { width: 62px; height: 62px; padding: 5px; }
+        .chatbot-toggle .chatbot-avatar { border-width: 3px; }
+        .chatbot-toggle-badge { width: 26px; height: 26px; right: -3px; bottom: -3px; border-width: 3px; }
+        .chatbot-toggle-badge svg { width: 12px; height: 12px; }
+        .chatbot-hint { right: 74px; bottom: 14px; padding: 9px 13px; font-size: .84rem; }
+        .chatbot-panel { bottom: 74px; right: -4px; }
     }
     @media (prefers-reduced-motion: reduce) {
         .chatbot-toggle.is-pinging { animation: none; }
