@@ -569,7 +569,8 @@ class ItineraryScheduleBuilder
             $here = $this->place($souvenirs);
         }
 
-        if (! $lunchTaken) {
+        // Only when it is still lunchtime: a traveller who lands late on a one-day trip got "lunch" at 23:30.
+        if (! $lunchTaken && $clock->lessThanOrEqualTo(Carbon::parse(self::LUNCH_LATEST)->addHour())) {
             $start = $this->toQuarterHour($clock);
             $this->row($itinerary, $dayNumber, $sortOrder, [
                 'kind' => 'meal',

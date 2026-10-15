@@ -80,7 +80,10 @@ class AdminDashboardController extends Controller
             ]);
 
         $pendingEstablishments = EstablishmentAccount::where('status', 'pending')->latest('submitted_at')->take(5)->get();
-        $expiring = AccreditationRecord::with('listing')->whereIn('status', ['Expiring Soon', 'Expired'])->orderBy('expiration_date')->take(8)->get();
+        // Four of each kind: sorted by date alone the 20-odd already-expired records would fill every row
+        // and the ones about to expire, which are the ones still avoidable, would never be listed.
+        $expiring = AccreditationRecord::with('listing')->where('status', 'Expired')->orderByDesc('expiration_date')->take(4)->get()
+            ->concat(AccreditationRecord::with('listing')->where('status', 'Expiring Soon')->orderBy('expiration_date')->take(4)->get());
 
         return view('admin.overview', compact('stats', 'recentVisits', 'pendingEstablishments', 'expiring', 'accreditationAlert'));
     }
