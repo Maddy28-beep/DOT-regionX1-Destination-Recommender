@@ -80,7 +80,7 @@
     <div class="panel-head">
         <div>
             <h2>Accreditation Watchlist</h2>
-            <p>Records expiring within 30 days or already expired, soonest first.</p>
+            <p>The most recently expired records, and the ones that expire soonest.</p>
         </div>
         <a href="{{ route('admin.accreditation') }}" class="btn btn-outline">View all</a>
     </div>
