@@ -12,7 +12,7 @@ use Tests\TestCase;
  *
  * The painted hero is withheld server-side via .has-footage whenever a clip
  * exists, and restored by the inline script in welcome.blade.php when it
- * decides against the video -- a phone, reduced motion, a metered connection,
+ * decides against the video -- reduced motion, a metered connection,
  * or a clip that will not decode. That inversion matters: a browser holds even
  * an inline script until pending stylesheets apply, so anything hidden by
  * script alone is painted first, and the illustration flashed on every load.
@@ -92,7 +92,7 @@ class HeroVideoTest extends TestCase
     /**
      * The markup must never carry a src: a browser starts downloading one
      * before any script can decide whether this visit should pay for it,
-     * which would defeat the phone and metered-connection checks entirely.
+     * which would defeat the reduced-motion and metered-connection checks entirely.
      */
     public function test_the_markup_carries_no_source_for_the_browser_to_preload(): void
     {
@@ -162,6 +162,22 @@ class HeroVideoTest extends TestCase
             '/<link[^>]*rel="preload"[^>]*as="image"[^>]*hero-poster/',
             $this->get('/')->assertOk()->getContent()
         );
+    }
+
+    /**
+     * Phones get the footage too: the clip is well under a megabyte, and most visitors are on a phone. What still
+     * opts a visit out is reduced motion, Data Saver and a slow connection -- never the width of the screen.
+     */
+    public function test_a_narrow_screen_is_not_a_reason_to_skip_the_footage(): void
+    {
+        $this->putVideo();
+
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('min-width: 900px', $html);
+        $this->assertStringContainsString('prefers-reduced-motion: reduce', $html);
+        $this->assertStringContainsString('saveData', $html);
+        $this->assertStringContainsString('(2g|3g)', $html);
     }
 
     /** Without a still there is nothing to paint onto, so no background is set. */

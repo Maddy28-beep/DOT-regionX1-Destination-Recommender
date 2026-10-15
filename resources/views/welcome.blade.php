@@ -39,8 +39,8 @@
         {{--
             Hero footage, carrying no src so the browser cannot start
             downloading before the script below has decided this visit can
-            afford it. On a phone, a metered connection, or with reduced
-            motion asked for, that script restores the painted hero instead.
+            afford it. On a metered connection, or with reduced motion
+            asked for, that script restores the painted hero instead.
 
             Muted + playsinline because no mobile browser will autoplay
             otherwise, and a background clip that makes noise is a bug rather
@@ -80,21 +80,23 @@
              * .has-footage and put back here, rather than the other way round.
              *
              * The <video> carries no src; this decides whether the visit can
-             * afford one. Three reasons to refuse, and the painted hero is
-             * restored in every one of them:
+             * afford one. Two reasons to refuse, and the painted hero is
+             * restored in both:
              *
              *   1. Reduced motion -- a full-bleed moving background is exactly
              *      what that preference exists to stop.
-             *   2. A narrow screen. Most visitors to a tourism site are on a
-             *      phone, often roaming.
-             *   3. Data Saver, or a connection reporting itself as 2g/3g.
+             *   2. Data Saver, or a connection reporting itself as 2g/3g.
+             *
+             * A narrow screen is not a reason. Most visitors to a tourism site
+             * are on a phone, and the clip is about 0.6 MB, so refusing phones
+             * took the footage away from the very people it is for and saved
+             * almost nothing. Data Saver and slow connections still opt out.
              */
             (function () {
                 var video = document.currentScript.parentNode.querySelector('.poster-hero__video');
                 if (!video) return;
 
-                var refuse = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-                    || !window.matchMedia('(min-width: 900px)').matches;
+                var refuse = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
                 var connection = navigator.connection || {};
                 if (connection.saveData === true || /(^|-)(2g|3g)$/.test(connection.effectiveType || '')) {
@@ -174,12 +176,26 @@
                     hero.classList.add('has-video');
                 }, { once: true });
 
-                // play() can reject on its own even when muted; the
-                // illustration is still there if it does.
-                var attempt = video.play();
-                if (attempt && typeof attempt.catch === 'function') {
-                    attempt.catch(function () {});
-                }
+                // play() can reject on its own even when muted (a phone in
+                // low-power mode, for one). The first frame stays on screen if
+                // it does, and the first touch or scroll is allowed to start it.
+                var start = function () {
+                    var attempt = video.play();
+                    if (attempt && typeof attempt.catch === 'function') {
+                        attempt.catch(function () {});
+                    }
+                };
+                start();
+
+                var retry = function () {
+                    if (video.paused) start();
+                    ['touchstart', 'pointerdown', 'scroll', 'keydown'].forEach(function (name) {
+                        window.removeEventListener(name, retry);
+                    });
+                };
+                ['touchstart', 'pointerdown', 'scroll', 'keydown'].forEach(function (name) {
+                    window.addEventListener(name, retry, { passive: true });
+                });
             })();
         </script>
     @endif
