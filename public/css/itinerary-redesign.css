@@ -159,4 +159,49 @@
     .itin-hero { padding-left: 104px; }
     .itin-hero__davo { width: 88px; }
 }
-@media print { .itin-hero, .itin-overview__map, .itin-tabs { display: none; } .itin.js-days .itin-day:not(.is-active) { display: block; } }
+.itinerary-refine { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:22px 26px; margin:24px 0; border:1px solid var(--border); border-radius:16px; background:var(--white); }
+.itinerary-refine h2, .itinerary-feedback h2 { margin:0; font-family:'Poppins',sans-serif; font-size:1.2rem; line-height:1.4; color:var(--primary-dark); }
+.itinerary-refine-actions { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.itinerary-refine-actions form { margin:0; }
+.itinerary-refine .btn, .itinerary-feedback .btn { border-radius:10px; clip-path:none; transform:none; }
+.itinerary-disclosure-hint { display:block; margin:4px 0 0; font-size:.86rem; font-weight:400; color:var(--muted); line-height:1.5; }
+.itinerary-page .itinerary-support-panel { padding:22px 24px 0; border-radius:14px; margin-top:18px; box-shadow:none; }
+.itinerary-page .itinerary-support-panel .panel-head { padding:0 0 18px; border:0; background:transparent; }
+.itinerary-page .itinerary-support-panel .panel-head h2 { font-size:1.4rem; margin:0; }
+.itinerary-page .itinerary-support-panel .panel-head p { max-width:none; margin:7px 0 0; line-height:1.55; }
+.itinerary-page .itinerary-support-panel .panel-body { padding:0; border-top:1px solid var(--border); }
+.itinerary-support-panel .itinerary-score-details > summary { display:grid; grid-template-columns:42px minmax(0,1fr) 16px; gap:16px; align-items:center; list-style:none; padding:18px 0; color:var(--ink); }
+.itinerary-support-panel summary::-webkit-details-marker { display:none; }
+.itinerary-disclosure-icon { display:grid; place-items:center; width:42px; height:42px; border-radius:50%; background:#e9f1ee; color:var(--primary-dark); }
+.itinerary-disclosure-icon svg { width:23px; height:23px; }
+.itinerary-disclosure-chevron { width:9px; height:9px; border-right:2px solid currentColor; border-top:2px solid currentColor; transform:rotate(45deg); justify-self:center; }
+.itinerary-score-details[open] > summary .itinerary-disclosure-chevron { transform:rotate(135deg); }
+.itinerary-support-panel .match-list, .itinerary-support-panel .provenance { padding-bottom:20px; }
+.itinerary-refine .btn svg { width:19px; height:19px; flex:none; }
+.itinerary-refine .btn { min-height:44px; padding:10px 18px; font-size:.9rem; }
+.itinerary-feedback h2 { font-size:1.4rem; }
+.itinerary-feedback img { margin-inline:12px 22px; }
+.itinerary-method-note { font-size:.85rem; color:var(--muted); margin-top:10px; }
+.itinerary-method-note svg { display:inline-block; width:17px; height:17px; vertical-align:-3px; margin-right:8px; }
+.itinerary-method-details .provenance { margin-top:24px; }
+.itinerary-score-details summary { cursor:pointer; }
+.itinerary-score-details summary:focus-visible { outline:3px solid var(--primary); outline-offset:6px; border-radius:4px; }
+.itinerary-feedback { display:flex; align-items:center; gap:28px; margin-top:24px; padding:24px 28px; background:var(--paper); border:1px solid #e9dfcd; border-radius:16px; }
+.itinerary-feedback img { width:128px; height:160px; object-fit:contain; flex-shrink:0; }
+.itinerary-feedback p { color:var(--muted); margin:10px 0 16px; }
+.itinerary-feedback .itinerary-feedback-note { font-size:.8rem; margin:10px 0 0; }
+.itinerary-plan-note { color:var(--muted); font-size:.8rem; margin:18px 0 0; }
+@media(max-width:640px) {
+    .itinerary-page .itinerary-support-panel { padding:18px 18px 0; }
+    .itinerary-page .itinerary-support-panel .panel-head h2, .itinerary-feedback h2 { font-size:1.2rem; }
+    .itinerary-support-panel .itinerary-score-details > summary { grid-template-columns:36px minmax(0,1fr) 12px; gap:10px; }
+    .itinerary-disclosure-icon { width:36px; height:36px; }
+    .itinerary-feedback img { margin-inline:0; }
+    .itinerary-refine { align-items:flex-start; flex-direction:column; padding:20px; }
+    .itinerary-refine-actions { width:100%; }
+    .itinerary-refine-actions > *, .itinerary-refine-actions .btn { width:100%; }
+    .itinerary-feedback { align-items:flex-start; gap:16px; padding:20px; }
+    .itinerary-feedback img { width:72px; height:100px; }
+}
+@media(max-width:400px) { .itinerary-feedback { flex-direction:column; } }
+@media print { .itin-hero, .itin-overview__map, .itin-tabs, .itinerary-refine, .itinerary-feedback { display: none; } .itin.js-days .itin-day:not(.is-active) { display: block; } }

@@ -237,9 +237,28 @@ class ItineraryPageRedesignTest extends TestCase
             ->assertSee('How was this itinerary created?')
             ->assertSee('Open Day 1 in Google Maps')
             ->assertSee('Recommended Destinations')
-            ->assertSee('Regenerate Itinerary')
-            ->assertSee('How This Plan Was Built')
+            ->assertSee('Your itinerary, your way')
+            ->assertSee('Regenerate itinerary')
+            ->assertSee('Explore other matches')
+            ->assertSee('How your plan was built')
+            ->assertSee('View technical details')
             ->assertSee('This plan lives in your browser session');
+    }
+
+    /** The old closing panel is now a Davo card; it must still lead to the exit survey, with a picture that exists. */
+    public function test_the_feedback_card_leads_to_the_exit_survey_with_a_picture_that_exists(): void
+    {
+        [$trip, $pref] = $this->plan();
+
+        $this->page($trip, $pref)->assertOk()
+            ->assertSee('How was your Davao adventure?')
+            ->assertSee('Share feedback')
+            ->assertSee(route('exit-survey.create'), false)
+            ->assertSee('images/davo-survey-v2.webp', false)
+            ->assertDontSee('davo-survey-v2.png', false)
+            ->assertSee('No reservations or payments are made');
+
+        $this->assertFileExists(public_path('images/davo-survey-v2.webp'));
     }
 
     // ---- the duration wording

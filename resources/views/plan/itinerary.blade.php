@@ -264,22 +264,27 @@
             </div>
 
             @unless ($itinerary->package)
-            <div class="panel">
+            <section class="itinerary-refine" aria-label="Adjust your itinerary">
+                <h2>Your itinerary, your way</h2>
+                <div class="itinerary-refine-actions">
+                    <form method="POST" action="{{ route('plan.regenerate') }}" id="regenerate-form">
+                        @csrf
+                        <input type="hidden" name="lat" id="regenerate-lat">
+                        <input type="hidden" name="lng" id="regenerate-lng">
+                        <button type="submit" class="btn btn-outline"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7v5h-5M20 12a8 8 0 1 0-2 5"/></svg> Regenerate itinerary</button>
+                    </form>
+                </div>
+            </section>
+            <div class="panel itinerary-support-panel">
                 <div class="panel-head">
                     <div>
                         <h2 id="itinerary-recommendations">Recommended Destinations</h2>
                         <p>Ranked by how well each place matches your travel preferences.</p>
                     </div>
-                    <form method="POST" action="{{ route('plan.regenerate') }}" id="regenerate-form">
-                        @csrf
-                        <input type="hidden" name="lat" id="regenerate-lat">
-                        <input type="hidden" name="lng" id="regenerate-lng">
-                        <button type="submit" class="btn btn-primary">Regenerate Itinerary</button>
-                    </form>
                 </div>
                 <div class="panel-body">
                     <details class="itinerary-score-details">
-                    <summary>View destinations and match scores</summary>
+                    <summary><span class="itinerary-disclosure-icon" aria-hidden="true"><x-icon name="map-pin" /></span><span>Explore other matches <span class="itinerary-disclosure-hint">View destinations and match scores</span></span><span class="itinerary-disclosure-chevron" aria-hidden="true"></span></summary>
                     <ul class="match-list">
                         @foreach ($topMatches as $match)
                             @php $tier = $match->match_score >= 3.5 ? 'strong' : 'fair'; @endphp
@@ -352,14 +357,20 @@
                 </div>
             </div>
             @else
-            <div class="panel">
+            <div class="panel itinerary-support-panel">
                 <div class="panel-head">
                     <div>
-                        <h2>How This Plan Was Built</h2>
-                        <p>Which method produced which part, and the data each one ran against.</p>
+                        <h2>How your plan was built</h2>
+                        <p>We matched destinations to your preferences and arranged nearby stops together.</p>
+                        <p class="itinerary-method-note"><x-icon name="info" aria-hidden="true" /> Travel times are planning estimates. Check opening hours before visiting.</p>
+                        @if ($provenance['range_widened'])
+                            <p class="itinerary-method-note">We widened your preferred travel range to find enough stops for your trip. Some destinations may be farther away than requested.</p>
+                        @endif
                     </div>
                 </div>
                 <div class="panel-body">
+                    <details class="itinerary-score-details itinerary-method-details">
+                    <summary><span class="itinerary-disclosure-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6"/></svg></span><span>View technical details <span class="itinerary-disclosure-hint">Recommendation methods, match scores, and data used</span></span><span class="itinerary-disclosure-chevron" aria-hidden="true"></span></summary>
                     <ol class="provenance">
                         <li>
                             <span class="provenance-step">Ranking</span>
@@ -427,33 +438,21 @@
                             </div>
                         </li>
                     </ol>
-                    <p class="sub" style="margin-top:14px;">
-                        This is a recommended plan, not a booking. It performs no reservation or payment,
-                        and it is yours to change to fit your time, budget and pace.
-                    </p>
+                    </details>
                 </div>
             </div>
             @endif
 
-            <div class="panel">
-                <div class="panel-head">
-                    <div>
-                        <h2>After Your Trip</h2>
-                        <p>Once you're back, a couple of minutes of feedback helps DOT Region XI improve this plan for the next traveller.</p>
-                    </div>
+            <section class="itinerary-feedback" aria-labelledby="itinerary-feedback-title">
+                <img src="{{ asset('images/davo-survey-v2.webp') }}" alt="" width="128" height="154" loading="lazy">
+                <div>
+                    <h2 id="itinerary-feedback-title">How was your Davao adventure?</h2>
+                    <p>After your trip, share your experience to help improve future recommendations.</p>
+                    <a href="{{ route('exit-survey.create') }}" class="btn btn-primary">Share feedback</a>
+                    <p class="itinerary-feedback-note">Optional &middot; About 2 minutes</p>
                 </div>
-                <div class="panel-body">
-                    <p class="sub">
-                        There's no account here, so nothing will remind you automatically &mdash;
-                        bookmark this page or the link below now, and come back to it after your trip.
-                        The exit survey takes about two minutes and, like everything else here, is
-                        completely anonymous.
-                    </p>
-                    <a href="{{ route('exit-survey.create') }}" class="btn btn-outline" style="margin-top:6px;">
-                        Open the exit survey
-                    </a>
-                </div>
-            </div>
+            </section>
+            <p class="itinerary-plan-note">This itinerary is a suggested plan. No reservations or payments are made.</p>
         </div>
     </div>
 </div>

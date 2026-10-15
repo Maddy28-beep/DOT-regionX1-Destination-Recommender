@@ -912,7 +912,8 @@ class TripPlannerTest extends TestCase
 
         $html = $this->get('/plan/itinerary')->assertOk()->getContent();
 
-        $this->assertStringContainsString('How This Plan Was Built', $html);
+        $this->assertStringContainsString('How your plan was built', $html);
+        $this->assertStringContainsString('View technical details', $html);
         $this->assertStringContainsString('Content-Based Recommendation', $html);
         $this->assertStringContainsString('Nearest-neighbour sequencing', $html);
         $this->assertStringContainsString('Apriori association rule mining', $html);
