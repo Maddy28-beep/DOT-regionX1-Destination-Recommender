@@ -3490,7 +3490,7 @@ select.site-dropdown-native {
     background-color: #16352d;
     background-image:
         linear-gradient(90deg, rgba(6, 24, 20, .62) 0%, rgba(6, 24, 20, .32) 52%, rgba(6, 24, 20, .06) 100%),
-        var(--catalog-banner-image, url('../images/davao-landscape-header.png'));
+        var(--catalog-banner-image, url('../images/davao-landscape-header.webp'));
     background-size: cover;
     background-position: center 30%;
     background-repeat: no-repeat;
@@ -3516,7 +3516,7 @@ select.site-dropdown-native {
         background-position: 28% center;
         background-image:
             linear-gradient(90deg, rgba(6, 24, 20, .64), rgba(6, 24, 20, .28)),
-            var(--catalog-banner-image, url('../images/davao-landscape-header.png'));
+            var(--catalog-banner-image, url('../images/davao-landscape-header.webp'));
     }
     .catalog-banner h1 {
         font-size: 2rem;
@@ -4955,7 +4955,7 @@ body:has(.dash-header) .toast-stack { top: 226px; }
 
 /* Accommodation artwork shares the compact catalog banner dimensions. */
 .catalog-banner--accommodations {
-    --catalog-banner-image: url('../images/davao-accommodations-header.png');
+    --catalog-banner-image: url('../images/davao-accommodations-header.webp');
     background-position: center 45%;
 }
 @media (max-width: 640px) {
@@ -4964,7 +4964,7 @@ body:has(.dash-header) .toast-stack { top: 226px; }
 
 /* Restaurant artwork keeps the dining scene and sunset in the banner crop. */
 .catalog-banner--restaurants {
-    --catalog-banner-image: url('../images/davao-restaurants-header.png');
+    --catalog-banner-image: url('../images/davao-restaurants-header.webp');
     background-position: center 55%;
 }
 @media (max-width: 640px) {
@@ -4972,11 +4972,11 @@ body:has(.dash-header) .toast-stack { top: 226px; }
 }
 
 .catalog-banner--packages {
-    --catalog-banner-image: url('../images/davao-packages-header.png');
+    --catalog-banner-image: url('../images/davao-packages-header.webp');
     background-position: center 50%;
 }
 .catalog-banner--souvenir-centers {
-    --catalog-banner-image: url('../images/davao-souvenirs-header.png');
+    --catalog-banner-image: url('../images/davao-souvenirs-header.webp');
     background-position: center 50%;
 }
 @media (max-width: 640px) {
@@ -4985,7 +4985,7 @@ body:has(.dash-header) .toast-stack { top: 226px; }
 }
 
 .catalog-banner--tour-operators {
-    --catalog-banner-image: url('../images/davao-tour-operators-header.png');
+    --catalog-banner-image: url('../images/davao-tour-operators-header.webp');
     background-position: center 55%;
 }
 @media (max-width: 640px) {
