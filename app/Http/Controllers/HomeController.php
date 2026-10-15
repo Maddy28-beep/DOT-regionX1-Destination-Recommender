@@ -180,7 +180,7 @@ class HomeController extends Controller
             ->take(8)
             ->get();
 
-        $packages = Package::publiclyVisible()->with('region', 'photos')
+        $packages = Package::publiclyVisible()->with('region', 'photos', 'tourOperator')
             ->orderByDesc('featured')
             ->orderByWeightedRating()
             ->take(3)
