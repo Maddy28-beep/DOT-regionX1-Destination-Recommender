@@ -3,6 +3,7 @@
 namespace App\Services\Chatbot;
 
 use App\Models\Accommodation;
+use App\Models\Concerns\HasOperatingStatus;
 use App\Models\ChatbotLog;
 use App\Models\Destination;
 use App\Models\Package;
@@ -70,10 +71,19 @@ class ChatbotService
     public function respond(string $message): array
     {
         $this->cardListings = [];
-        $intent = $this->detectIntent($message);
-        [$response, $source] = $this->groq->isConfigured()
-            ? $this->tryGroqResponse($message, $intent)
-            : [$this->buildResponse($intent, $message), 'rule_based'];
+
+        // A question about one named place is answered from the listing itself, never by a model: hours, fees and
+        // whether it is open or accredited are facts the database has, and a model can get them wrong.
+        $placeAnswer = $this->placeAnswer($message);
+        $intent = $placeAnswer !== null ? 'place' : $this->detectIntent($message);
+
+        if ($placeAnswer !== null) {
+            [$response, $source] = [$placeAnswer, 'rule_based'];
+        } else {
+            [$response, $source] = $this->groq->isConfigured()
+                ? $this->tryGroqResponse($message, $intent)
+                : [$this->buildResponse($intent, $message), 'rule_based'];
+        }
 
         ChatbotLog::create([
             'user_query' => Str::limit($message, 500, ''),
@@ -225,8 +235,132 @@ class ChatbotService
             'souvenir' => $this->listingResponse('souvenir', $message),
             'tour_operator' => $this->listingResponse('tour_operator', $message),
             'package' => $this->listingResponse('package', $message),
-            default => "I'm not sure I understood that. Try asking about destinations, accommodations, restaurants, tour packages, souvenir centers, or tour operators — or ask if a specific place is DOT-accredited.",
+            default => $this->fallbackResponse($message),
         };
+    }
+
+    /** Words that are part of a business name but say nothing about which business it is. */
+    private const NAME_FILLER = ['inc', 'corp', 'corporation', 'the', 'and', 'company', 'ltd', 'opc', 'for', 'est'];
+
+    /** Words that show the person is asking about a place, not browsing a list. */
+    private const PLACE_QUESTION = ['open', 'opens', 'hours', 'close', 'closed', 'closing', 'where', 'see', 'located', 'location',
+        'address', 'fee', 'price', 'cost', 'much', 'about', 'tell', 'visit', 'info', 'information', 'accredited', 'find'];
+
+    /** @return array<int, string> the distinctive lower-case words of a name or message */
+    private function nameTokens(string $text): array
+    {
+        $words = preg_split('/[^a-z]+/', str_replace(["'", '’'], '', strtolower($text)), -1, PREG_SPLIT_NO_EMPTY);
+
+        return collect($words)->reject(fn ($w) => strlen($w) < 3 || in_array($w, self::NAME_FILLER, true))->unique()->values()->all();
+    }
+
+    /**
+     * The one listing a message is clearly about, if any: every distinctive word of its name is in the message, or
+     * the message holds a word only that listing's name has ("eagle") and asks a question about a place.
+     *
+     * @return array{0: Model, 1: array}|null
+     */
+    private function namedListing(string $message): ?array
+    {
+        $messageWords = $this->nameTokens($message);
+        if ($messageWords === []) {
+            return null;
+        }
+
+        $asksAboutAPlace = array_intersect($messageWords, self::PLACE_QUESTION) !== []
+            || (bool) preg_match('/\b(is|are|does|do|how|what time)\b/i', $message);
+        $justAName = count($messageWords) <= 3;   // "eagle center", typed on its own
+
+        $rows = [];
+        $wordCount = [];
+        foreach (self::LISTING_CONFIG as $config) {
+            foreach ($config['model']::query()->get() as $listing) {
+                $tokens = $this->nameTokens($listing->name);
+                if ($tokens === []) {
+                    continue;
+                }
+                $rows[] = [$listing, $config, $tokens];
+                foreach ($tokens as $t) {
+                    $wordCount[$t] = ($wordCount[$t] ?? 0) + 1;
+                }
+            }
+        }
+
+        $best = null;
+        $bestScore = 0.0;
+        foreach ($rows as [$listing, $config, $tokens]) {
+            $hit = array_values(array_intersect($tokens, $messageWords));
+            if ($hit === []) {
+                continue;
+            }
+            $coverage = count($hit) / count($tokens);
+            $uniqueWord = collect($hit)->contains(fn ($w) => strlen($w) >= 5 && ($wordCount[$w] ?? 0) === 1);
+
+            // A single word of a longer name ("hello" in "Hello World Tour") is only enough when a place is being asked about.
+            $qualifies = $coverage >= 1.0
+                || ($asksAboutAPlace && ($uniqueWord || $coverage >= 0.6))
+                || ($justAName && $coverage >= 0.6);
+            $score = $coverage + (count($hit) / 10);
+            if ($qualifies && $score > $bestScore) {
+                $best = [$listing, $config];
+                $bestScore = $score;
+            }
+        }
+
+        return $best;
+    }
+
+    /** What the site knows about one named place, in a couple of sentences; null when the message is not about one. */
+    private function placeAnswer(string $message): ?string
+    {
+        $found = $this->namedListing($message);
+        if ($found === null) {
+            return null;
+        }
+
+        [$listing, $config] = $found;
+        $name = $listing->name;
+
+        if (! $listing->is_accredited || $listing->archived_at) {
+            return "{$name} is not shown as DOT-accredited right now (its accreditation may have lapsed or be waiting for renewal), so I can't recommend it. Ask me for similar places and I'll suggest ones that are currently accredited.";
+        }
+
+        $this->cardListings = [[$listing, $config['route']]];
+
+        $notice = in_array(HasOperatingStatus::class, class_uses_recursive($listing), true) ? $listing->operatingNotice() : null;
+        if ($notice !== null) {
+            return "{$name}: {$notice}. You may want to pick another place for now; I can suggest some.";
+        }
+
+        $kind = $listing->type ?? $listing->cuisine_type ?? $listing->specialization ?? $config['label'];
+        $where = trim((string) ($listing->location ?? ''));
+        $text = str_contains(strtolower($message), 'accredit') ? "Yes, {$name} is DOT-accredited. " : '';
+        $text .= $name.($where !== '' ? " is in {$where}" : '').' ('.strtolower((string) $kind).').';
+
+        $hours = trim((string) ($listing->hours ?? $listing->opening_hours ?? ''));
+        if ($hours !== '') {
+            $text .= " Hours: {$hours}.";
+        }
+        $fee = method_exists($listing, 'posterPriceAmount') ? $listing->posterPriceAmount() : null;
+        if ($fee) {
+            $text .= " Entrance: ₱{$fee}.";
+        }
+
+        return $text.' Hours and prices can change, so check before you go.';
+    }
+
+    /** Something to do next when no rule fits: say what to ask, and show a few well-rated places. */
+    private function fallbackResponse(string $message = ''): string
+    {
+        if (preg_match('/\b(open|opens|opening|hours|closed?|closing)\b/i', $message)) {
+            return 'Which place do you mean? Ask me with its name, for example "is Eden Nature Park open?" or "what time does the Philippine Eagle Center open?".';
+        }
+
+        $top = Destination::query()->where('is_accredited', true)->whereNull('archived_at')
+            ->availableDuring(now(), now())->orderByDesc('rating')->take(self::MAX_CARDS)->get();
+        $this->cardListings = $top->map(fn ($d) => [$d, 'destinations.show'])->all();
+
+        return "I'm not sure I understood that. You could ask things like \"where can I see wildlife?\", \"is Eden Nature Park open?\", \"where to stay in Davao City\", or \"plan a 3-day trip\". Here are a few places visitors like in the meantime.";
     }
 
     private function listingResponse(string $type, string $message): string
@@ -250,6 +384,9 @@ class ChatbotService
 
         /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = $modelClass::query()->where('is_accredited', true)->whereNull('archived_at');
+        if (in_array(HasOperatingStatus::class, class_uses_recursive($modelClass), true)) {
+            $query->availableDuring(now(), now());   // a place that is closed today is not offered
+        }
         if ($includeTags) {
             $query->with('tags');
         }
