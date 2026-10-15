@@ -75,7 +75,7 @@
                         <span class="plan-badge plan-badge--ai" title="A pretrained embedding model grouped similar places into the same day, without adding more than a quarter to the travelling.">&#10024; Days grouped by theme</span>
                     @endif
                     <p class="itin-meta">
-                        Generated {{ $itinerary->generated_at->format('F j, Y g:i A') }}
+                        Generated {{ $itinerary->generated_at->timezone('Asia/Manila')->format('F j, Y g:i A') }}
                         @unless ($itinerary->package)
                             {{-- Say what the ordering was actually measured from, so a plan sequenced from the regional
                                  default is not mistaken for one sequenced from where the traveller is. --}}

@@ -31,7 +31,7 @@
 
     <div class="brand">Explore<span>DVO</span></div>
     <div class="meta">Department of Tourism Region XI &mdash; Tourism Analytics Report</div>
-    <div class="meta">Date range: {{ \Carbon\Carbon::parse($from)->format('M j, Y') }} &ndash; {{ \Carbon\Carbon::parse($to)->format('M j, Y') }} &middot; Generated {{ now()->format('M j, Y g:i A') }}</div>
+    <div class="meta">Date range: {{ \Carbon\Carbon::parse($from)->format('M j, Y') }} &ndash; {{ \Carbon\Carbon::parse($to)->format('M j, Y') }} &middot; Generated {{ now()->timezone('Asia/Manila')->format('M j, Y g:i A') }}</div>
 
     <h1>{{ $reportType }}</h1>
     <p class="summary">{{ $report['summary'] }}</p>

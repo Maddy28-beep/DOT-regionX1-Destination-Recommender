@@ -89,7 +89,7 @@
                         <header class="advisory-card__band">
                             <x-icon :name="$level['icon']" />
                             <span>{{ $level['label'] }}</span>
-                            <time datetime="{{ $advisory->updated_at->toIso8601String() }}" title="{{ $advisory->updated_at->format('M j, Y \\a\\t g:i A') }}">Updated {{ $advisory->updated_at->diffForHumans() }}</time>
+                            <time datetime="{{ $advisory->updated_at->toIso8601String() }}" title="{{ $advisory->updated_at->timezone('Asia/Manila')->format('M j, Y \\a\\t g:i A') }}">Updated {{ $advisory->updated_at->diffForHumans() }}</time>
                         </header>
                         <div class="advisory-card__body">
                             <h3 class="advisory-card__title">{{ $advisory->title }}</h3>

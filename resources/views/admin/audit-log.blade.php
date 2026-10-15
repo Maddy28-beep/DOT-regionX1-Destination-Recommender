@@ -26,7 +26,7 @@
         <tbody>
             @forelse ($logs as $log)
                 <tr>
-                    <td>{{ $log->created_at?->format('M j, Y g:i A') }}</td>
+                    <td>{{ $log->created_at?->timezone('Asia/Manila')->format('M j, Y g:i A') }}</td>
                     <td>{{ $log->admin?->full_name ?? $log->admin?->email ?? 'Unknown' }}</td>
                     <td><code>{{ $log->action }}</code></td>
                     <td>
