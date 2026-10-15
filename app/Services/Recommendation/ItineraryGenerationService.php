@@ -434,6 +434,9 @@ class ItineraryGenerationService
         return (int) explode(':', (string) $time)[0];
     }
 
+    /** How much the stop farthest from a candidate stay counts, next to the total of all stops (see pickAccommodation). */
+    private const STAY_FARTHEST_WEIGHT = 2.0;
+
     /**
      * Suggests a nearby accommodation using Apriori co-visitation, falling back
      * to the traveller's stated accommodation preference.
@@ -448,6 +451,7 @@ class ItineraryGenerationService
     {
         $wanted = $preference->accommodation_pref;
         $wanted = ($wanted && $wanted !== 'Any') ? $wanted : null;
+        $mappedStops = $this->mappedStopCoordinates($dayStops);
 
         foreach ($dayStops as $stop) {
             $destination = $stop['row']['destination'];
@@ -467,6 +471,9 @@ class ItineraryGenerationService
                  * instead of quietly ignoring what was asked for.
                  */
                 ->filter(fn ($rule) => $wanted === null || $rule['listing']->type === $wanted)
+                // Past travellers pairing a stay with the FIRST stop says nothing about the other days: a stay more than
+                // this far from any stop of the trip is passed over for one chosen by distance below.
+                ->filter(fn ($rule) => ! $this->tooFarFromTrip($rule['listing'], $mappedStops))
                 ->values();
 
             if ($suggestions->isNotEmpty()) {
@@ -509,14 +516,16 @@ class ItineraryGenerationService
          * still breaks ties among stays at similar total distance; an
          * unlocatable stay is still offered rather than none at all.
          */
-        $mappedStops = $this->mappedStopCoordinates($dayStops);
-
         $listing = $mappedStops->isNotEmpty()
                 ? (clone $query)->whereNotNull('latitude')->whereNotNull('longitude')->get()
                     ->sortBy(function (Accommodation $a) use ($mappedStops) {
-                        return $mappedStops->sum(fn (array $stop) => $this->haversineKm(
+                        $distances = $mappedStops->map(fn (array $stop) => $this->haversineKm(
                             (float) $a->latitude, (float) $a->longitude, $stop['lat'], $stop['lng']
                         ));
+
+                        // The total keeps the stay central; adding the farthest stop stops it being picked where one
+                        // day's stop is an hours-long drive away while the others are close.
+                        return $distances->sum() + self::STAY_FARTHEST_WEIGHT * $distances->max();
                     })
                     ->first()
                 : null;
@@ -528,6 +537,21 @@ class ItineraryGenerationService
                 ->orderByDesc('rating')->first();
 
         return $listing ? ['listing' => $listing, 'rule' => null] : null;
+    }
+
+    /** The farthest a suggested stay may be from any sightseeing stop of the trip, in km. */
+    private const STAY_MAX_KM = 60.0;
+
+    /** True when a mapped stay is over STAY_MAX_KM from some stop; a stay with no position is never ruled out. */
+    private function tooFarFromTrip(Accommodation $stay, \Illuminate\Support\Collection $mappedStops): bool
+    {
+        if ($stay->latitude === null || $stay->longitude === null || $mappedStops->isEmpty()) {
+            return false;
+        }
+
+        return $mappedStops->contains(fn (array $stop) => $this->haversineKm(
+            (float) $stay->latitude, (float) $stay->longitude, $stop['lat'], $stop['lng']
+        ) > self::STAY_MAX_KM);
     }
 
     /**
