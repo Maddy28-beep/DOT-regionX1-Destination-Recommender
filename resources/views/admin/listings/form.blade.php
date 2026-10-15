@@ -91,6 +91,7 @@
                         <div class="field" style="flex:1; min-width:140px;">
                             <label for="hours">Operating Hours</label>
                             <input type="text" id="hours" name="hours" value="{{ old('hours', $listing->hours) }}">
+                            <small class="field-hint">Example: 8:00 AM–5:00 PM. For closed days: "Mon–Sat 8:00 AM–5:00 PM" or "8:00 AM–5:00 PM; Closed Mondays". The trip planner will not schedule the place on a closed day.</small>
                         </div>
                     </div>
                     <div class="filter-inline" style="align-items:start; margin-top:14px;">

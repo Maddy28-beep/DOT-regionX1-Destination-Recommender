@@ -162,6 +162,7 @@ class ItineraryScheduleBuilder
          * is what stops a distant stop dragging the day past midnight.
          */
         $queue = $sequence;
+        $tripStart = $preference->travelWindow()[0];
 
         // Where the traveller physically is. Starts at their baseline and moves
         // with them, which is what makes each journey estimate honest rather
@@ -171,6 +172,8 @@ class ItineraryScheduleBuilder
 
         foreach ($dayCapacities as $dayNumber => $slots) {
             $isLastDay = $dayNumber === $lastDay;
+            // The calendar date of this day, so a place that is closed on this weekday is not scheduled on it.
+            $date = $tripStart->copy()->addDays($dayNumber - 1);
             $capacity = count($slots);
 
             $clock = $this->openDay($itinerary, $dayNumber, $sortOrder, $preference, $origin, $accommodation);
@@ -202,7 +205,7 @@ class ItineraryScheduleBuilder
                         ? self::SHORT_VISIT_MINUTES
                         : self::VISIT_MINUTES;
 
-                    $visit = $this->planVisit($clock, $here, $there, $visitMinutes, $lunchTaken, $destination);
+                    $visit = $this->planVisit($clock, $here, $there, $visitMinutes, $lunchTaken, $destination, $date);
 
                     if ($visit === null) {
                         continue;
@@ -253,7 +256,14 @@ class ItineraryScheduleBuilder
                         $front = $queue[array_key_first($queue)]['row']['destination'];
                         $freshMorning = Carbon::parse(self::DEPART_AFTER_BREAKFAST);
 
-                        if ($this->planVisit($freshMorning, $here, $this->place($front), self::VISIT_MINUTES, false, $front) === null) {
+                        if ($this->planVisit($freshMorning, $here, $this->place($front), self::VISIT_MINUTES, false, $front, $date) === null) {
+                            // Closed only on today's weekday: keep it for a later day instead of dropping it.
+                            $closedToday = OpeningHours::windowsOn($front->hours ?? null, $date) === [];
+
+                            if ($closedToday && ! $isLastDay && $this->planVisit($freshMorning, $here, $this->place($front), self::VISIT_MINUTES, false, $front, $date->copy()->addDay()) !== null) {
+                                break;
+                            }
+
                             array_shift($queue);
 
                             continue;
@@ -341,7 +351,7 @@ class ItineraryScheduleBuilder
      *                                                                       today; starts_at and wait are set
      *                                                                       only when the visit has to wait for opening
      */
-    private function planVisit(Carbon $clock, array $from, array $to, int $visitMinutes, bool $lunchTaken, $destination): ?array
+    private function planVisit(Carbon $clock, array $from, array $to, int $visitMinutes, bool $lunchTaken, $destination, ?Carbon $date = null): ?array
     {
         $estimate = $this->estimateLeg($from, $to);
         $arrival = $clock->copy()->addMinutes($estimate['max_minutes']);
@@ -360,7 +370,14 @@ class ItineraryScheduleBuilder
             return null;
         }
 
-        $windows = OpeningHours::windows($destination->hours ?? null);
+        $windows = $date
+            ? OpeningHours::windowsOn($destination->hours ?? null, $date)
+            : OpeningHours::windows($destination->hours ?? null);
+
+        // Closed all day on this weekday ("Closed Mondays", "Mon–Sat ..." on a Sunday).
+        if ($windows === []) {
+            return null;
+        }
 
         if ($windows === null) {
             return ['minutes' => $visitMinutes, 'starts_at' => null, 'wait' => 0];
