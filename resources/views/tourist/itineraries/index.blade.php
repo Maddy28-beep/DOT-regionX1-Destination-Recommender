@@ -56,9 +56,9 @@
                         </div>
                         <div class="panel-body" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
                             <p class="sub" style="margin:0;">
-                                Created {{ $itinerary->generated_at->format('F j, Y') }}
+                                Created {{ $itinerary->generated_at->timezone('Asia/Manila')->format('F j, Y') }}
                                 @if ($itinerary->updated_at && ! $itinerary->updated_at->eq($itinerary->generated_at))
-                                    &middot; Last updated {{ $itinerary->updated_at->format('F j, Y') }}
+                                    &middot; Last updated {{ $itinerary->updated_at->timezone('Asia/Manila')->format('F j, Y') }}
                                 @endif
                             </p>
                             <div class="util-row">

@@ -34,7 +34,7 @@
                     @endunless
                 </div>
                 <p class="comment">{{ $notification->message }}</p>
-                <div class="owner-reply-label" style="margin-top:4px;">{{ $notification->created_at->format('M d, Y g:i A') }}</div>
+                <div class="owner-reply-label" style="margin-top:4px;">{{ $notification->created_at->timezone('Asia/Manila')->format('M d, Y g:i A') }}</div>
             </div>
         @empty
             <div class="empty-panel" style="padding:32px 24px;">
