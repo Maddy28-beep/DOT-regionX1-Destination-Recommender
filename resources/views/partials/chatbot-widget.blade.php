@@ -6,6 +6,7 @@
         </span>
         <span class="chatbot-toggle-badge" aria-hidden="true"><x-icon name="chat" /></span>
     </button>
+    <span id="chatbot-hint" class="chatbot-hint" aria-hidden="true">Need help? <strong>Ask Davo</strong> 👋</span>
 
     <div id="chatbot-panel" class="chatbot-panel" hidden role="region" aria-labelledby="chatbot-title">
         <div class="chatbot-panel-head">
@@ -54,6 +55,23 @@
         box-shadow: 0 8px 24px rgba(0,0,0,.2); transition: transform .15s ease, box-shadow .15s ease;
     }
     .chatbot-toggle:hover { transform: scale(1.05); box-shadow: 0 10px 28px rgba(0,0,0,.26); }
+    /* A soft green ring that spreads out twice from the button when the hint appears, to say "talk to me". */
+    .chatbot-toggle.is-pinging { animation: chatbot-ping 1.6s ease-out 2; }
+    @keyframes chatbot-ping {
+        0% { box-shadow: 0 8px 24px rgba(0,0,0,.2), 0 0 0 0 rgba(11,107,79,.4); }
+        100% { box-shadow: 0 8px 24px rgba(0,0,0,.2), 0 0 0 22px rgba(11,107,79,0); }
+    }
+    /* The speech bubble beside the launcher: shown on hover or focus, and once on its own a few seconds after the page loads. */
+    .chatbot-hint {
+        position: absolute; right: 100px; bottom: 26px; padding: 11px 16px; border-radius: 16px 16px 4px 16px;
+        background: var(--white); color: var(--primary-dark); font-size: .9rem; line-height: 1.2; white-space: nowrap;
+        box-shadow: 0 8px 24px rgba(0,0,0,.18); pointer-events: none;
+        opacity: 0; transform: translateX(10px) scale(.96); transform-origin: right bottom;
+        transition: opacity .2s ease, transform .2s ease;
+    }
+    .chatbot-hint strong { color: var(--primary); }
+    .chatbot-toggle:hover ~ .chatbot-hint, .chatbot-toggle:focus-visible ~ .chatbot-hint, .chatbot-hint.is-visible { opacity: 1; transform: none; }
+    .chatbot-toggle[aria-expanded="true"] ~ .chatbot-hint { display: none; }
     .chatbot-avatar { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; border-radius: 50%; background: #fff5e5; flex-shrink: 0; }
     .chatbot-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 45%; pointer-events: none; }
     /* The launcher: a white disc, a green ring around the picture, and a green chat badge on its lower-right edge. */
@@ -178,6 +196,8 @@
         .chatbot-panel { max-height: calc(100dvh - 208px); }
     }
     @media (prefers-reduced-motion: reduce) {
+        .chatbot-toggle.is-pinging { animation: none; }
+        .chatbot-hint { transition: none; transform: none; }
         .chatbot-toggle.is-waving .chatbot-wave-pose { animation: none; }
         .chatbot-toggle { transition: none; } .chatbot-toggle:hover { transform: none; }
         .chatbot-typing i { animation: none; opacity: .7; }
@@ -217,6 +237,26 @@
         });
     }
 
+    // Once a session, a few seconds after the page loads, the bubble offers help on its own and the button pulses; opening the chat dismisses it.
+    var hint = document.getElementById('chatbot-hint');
+    var hintTimer;
+    function hideHint() {
+        clearTimeout(hintTimer);
+        if (hint) hint.classList.remove('is-visible');
+        if (launcher) launcher.classList.remove('is-pinging');
+    }
+    try {
+        if (hint && launcher && !sessionStorage.getItem('dvo-chat-hint')) {
+            setTimeout(function () {
+                if (!getPanel().hidden) return;
+                sessionStorage.setItem('dvo-chat-hint', '1');
+                hint.classList.add('is-visible');
+                launcher.classList.add('is-pinging');
+                hintTimer = setTimeout(hideHint, 7000);
+            }, 4000);
+        }
+    } catch (_) { /* storage can be unavailable; the hint still shows on hover */ }
+
     function setOpen(open) {
         var panel = getPanel();
         if (!panel) return;
@@ -226,6 +266,7 @@
         if (toggle) toggle.setAttribute('aria-expanded', String(open));
         if (!open && panel.contains(document.activeElement) && toggle) toggle.focus();
         if (open) {
+            hideHint();
             waveHello();
             var input = document.getElementById('chatbot-input');
             if (input) input.focus();
