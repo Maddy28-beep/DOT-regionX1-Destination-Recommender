@@ -33,6 +33,13 @@ class ItineraryScheduleBuilder
     /** Non-arrival days start with breakfast at this hour. */
     private const BREAKFAST = '07:00';
 
+    /**
+     * A traveller who lands before this hour is not sent sightseeing straight off the plane: the day has
+     * a rest-and-breakfast block at the accommodation first, and the first outing is after breakfast,
+     * as on every other day. (Before this, a 4:00 AM arrival got a beach visit at 5:30 AM.)
+     */
+    private const EARLY_ARRIVAL_BEFORE = '06:00';
+
     /** ...and set off an hour later. */
     private const DEPART_AFTER_BREAKFAST = '08:00';
 
@@ -430,6 +437,17 @@ class ItineraryScheduleBuilder
                 'title' => 'Arrival — '.$origin['label'],
                 'starts_at' => $arrival,
             ]);
+
+            if ($arrival->lessThan(Carbon::parse(self::EARLY_ARRIVAL_BEFORE))) {
+                $this->row($itinerary, $dayNumber, $sortOrder, [
+                    'kind' => 'meal',
+                    'title' => 'Rest, freshen up and breakfast — '.($accommodation?->name ?? 'your accommodation'),
+                    'starts_at' => Carbon::parse(self::BREAKFAST),
+                    'accommodation_id' => $accommodation?->id,
+                ]);
+
+                return Carbon::parse(self::DEPART_AFTER_BREAKFAST);
+            }
 
             return $arrival->copy()->addMinutes(30);
         }
