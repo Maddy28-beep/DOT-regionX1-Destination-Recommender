@@ -56,6 +56,129 @@ final class OpeningHours
         return $windows ?: null;
     }
 
+    private const DAY_NAMES = ['mon' => 1, 'tue' => 2, 'wed' => 3, 'thu' => 4, 'fri' => 5, 'sat' => 6, 'sun' => 7];
+
+    private const TIME_RANGE = '\d{1,2}(?::\d{2})?\s*(?:am|pm)\s*(?:–|—|-|to)\s*\d{1,2}(?::\d{2})?\s*(?:am|pm)';
+
+    /**
+     * Opening windows on one particular date, for hours that name days: "Mon–Sat 8:00 AM–5:00 PM",
+     * "Mon–Fri 8:00 AM–5:00 PM; Sat 8:00 AM–12:00 PM", "Closed Mondays", "9:00 AM–5:00 PM; Closed Sun".
+     *
+     * Plain daily hours behave exactly as windows() does. Returns:
+     *   - a list of windows when the place is open that day,
+     *   - an empty list when it is closed that whole day,
+     *   - null when nothing about that day can be told from the text (no limit is put on the visit).
+     *
+     * @return array<int, array{0: int, 1: int}>|null
+     */
+    public static function windowsOn(?string $text, CarbonInterface $date): ?array
+    {
+        $plain = self::windows($text);
+        if ($plain !== null) {
+            return $plain;
+        }
+
+        $text = trim((string) $text);
+        if ($text === '') {
+            return null;
+        }
+
+        $weekday = $date->dayOfWeekIso;
+        $closed = [];
+        $timed = [];   // [ [days|null, open, close], ... ]
+
+        foreach (explode(';', $text) as $part) {
+            $part = trim($part);
+
+            if (preg_match('/^closed(?:\s+on)?\s+(.+)$/iu', $part, $m)) {
+                $days = self::days($m[1]);
+                if ($days === null) {
+                    return null;
+                }
+                $closed = array_merge($closed, $days);
+
+                continue;
+            }
+
+            if (! preg_match('/^(?:(.+?)\s*[:,]?\s+)?('.self::TIME_RANGE.')$/iu', $part, $m)) {
+                return null;
+            }
+
+            $days = ($m[1] ?? '') === '' ? null : self::days($m[1]);
+            if (($m[1] ?? '') !== '' && $days === null) {
+                return null;
+            }
+
+            $range = self::windows($m[2]);
+            if ($range === null) {
+                return null;
+            }
+
+            $timed[] = [$days, $range[0][0], $range[0][1]];
+        }
+
+        if (in_array($weekday, $closed, true)) {
+            return [];
+        }
+
+        $today = [];
+        foreach ($timed as [$days, $open, $close]) {
+            if ($days === null || in_array($weekday, $days, true)) {
+                $today[] = [$open, $close];
+            }
+        }
+
+        if ($today !== []) {
+            return $today;
+        }
+
+        // Opening times were given, but only for other days: closed today.
+        return $timed !== [] ? [] : null;
+    }
+
+    /**
+     * "Mon–Sat", "Sat & Sun", "Fri, Sat", "Mondays", "daily" as ISO weekday numbers (1 = Monday), or null when
+     * the text is not a list of days.
+     *
+     * @return array<int, int>|null
+     */
+    private static function days(string $text): ?array
+    {
+        $text = strtolower(trim($text));
+
+        if (preg_match('/^(daily|every\s*day|everyday|all\s+days)$/', $text)) {
+            return [1, 2, 3, 4, 5, 6, 7];
+        }
+
+        $set = [];
+        foreach (preg_split('/\s*(?:,|&|\band\b)\s*/', $text) as $piece) {
+            $piece = trim($piece);
+            if ($piece === '') {
+                continue;
+            }
+
+            if (! preg_match('/^([a-z]+)(?:\s*(?:–|—|-|to)\s*([a-z]+))?$/u', $piece, $m)) {
+                return null;
+            }
+
+            $from = self::DAY_NAMES[substr($m[1], 0, 3)] ?? null;
+            $to = isset($m[2]) ? (self::DAY_NAMES[substr($m[2], 0, 3)] ?? null) : $from;
+
+            if ($from === null || $to === null) {
+                return null;
+            }
+
+            for ($d = $from; ; $d = $d % 7 + 1) {   // "Sat–Mon" wraps past Sunday
+                $set[] = $d;
+                if ($d === $to) {
+                    break;
+                }
+            }
+        }
+
+        return $set === [] ? null : array_values(array_unique($set));
+    }
+
     /** True or false when the hours can be read, null when they cannot. */
     public static function isOpenNow(?string $text, ?CarbonInterface $now = null): ?bool
     {
