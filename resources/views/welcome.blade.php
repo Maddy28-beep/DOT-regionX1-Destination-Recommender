@@ -407,13 +407,8 @@
 </section>
 
 @if ($packages->count())
-    @php
-        // The platform doesn't track bookings, so "most popular" is a
-        // review-count proxy -- the two top packages here are both
-        // 4-star-plus, so rating alone can't tell them apart the way an
-        // actual popularity signal would.
-        $mostPopularPackage = $packages->sortByDesc('review_count')->first();
-    @endphp
+{{-- The same card as the packages page and every other grid. This strip kept its own older card, which also
+     ribboned one package "Most Popular" on a review-count proxy even while no package had a single review. --}}
 <section class="section landing-section landing-section--tint">
     <div class="container">
         <div class="dpost-head">
@@ -426,11 +421,7 @@
         </div>
         <div class="dpost-grid">
             @foreach ($packages as $package)
-                @include('partials.package-poster-card', [
-                    'package' => $package,
-                    'scene' => $package->posterScene(),
-                    'mostPopular' => $mostPopularPackage && $mostPopularPackage->id === $package->id,
-                ])
+                @include('partials.listing-poster-card', ['listing' => $package])
             @endforeach
         </div>
     </div>
