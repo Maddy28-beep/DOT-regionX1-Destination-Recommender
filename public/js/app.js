@@ -1147,3 +1147,172 @@ document.addEventListener('DOMContentLoaded', function () {
     form.addEventListener('change', refresh);
     refresh();
 });
+// Shared form dropdowns. Native selects keep their values, events and validation.
+(function () {
+    function initTicketDropdowns() {
+        var closeCurrent = null;
+        document.querySelectorAll('select:not([multiple])').forEach(function (select, serial) {
+            if (select.size > 1) return;
+            if (select.dataset.enhanced) return;
+            select.dataset.enhanced = 'true';
+            var ticket = !!select.closest('.ticket-search');
+            if (!select.id) select.id = 'site-select-' + serial;
+            var label = select.labels && select.labels[0];
+            var field = document.createElement('span');
+            field.className = 'site-dropdown' + (ticket ? ' site-dropdown--ticket' : '');
+            select.before(field);
+            field.appendChild(select);
+            if (label && !label.id) label.id = select.id + '-label';
+            var trigger = document.createElement('button');
+            trigger.type = 'button';
+            trigger.className = 'ticket-dropdown-trigger site-dropdown-trigger';
+            trigger.id = select.id + '-trigger';
+            trigger.setAttribute('role', 'combobox');
+            trigger.setAttribute('aria-haspopup', 'listbox');
+            trigger.setAttribute('aria-expanded', 'false');
+            if (label && !label.contains(select)) trigger.setAttribute('aria-labelledby', label.id + ' ' + trigger.id);
+            else trigger.setAttribute('aria-label', select.getAttribute('aria-label') || (label && label.querySelector('span') ? label.querySelector('span').textContent : select.title || select.name.replace(/_/g, ' ')));
+            var list = document.createElement('div');
+            list.id = select.id + '-options';
+            list.className = 'ticket-dropdown-list';
+            list.setAttribute('role', 'listbox');
+            if (label && !label.contains(select)) list.setAttribute('aria-labelledby', label.id);
+            else list.setAttribute('aria-label', trigger.getAttribute('aria-label'));
+            list.hidden = true;
+            trigger.setAttribute('aria-controls', list.id);
+            var options = Array.from(select.options);
+            var active = select.selectedIndex;
+            var typed = '', lastTyped = 0;
+            var rows = [];
+            function rebuild() {
+                options = Array.from(select.options);
+                list.replaceChildren();
+                rows = options.map(function (option, index) {
+                var row = document.createElement('div');
+                row.id = list.id + '-' + index;
+                row.className = 'ticket-dropdown-option';
+                row.setAttribute('role', 'option');
+                row.textContent = option.textContent;
+                row.setAttribute('aria-disabled', String(option.disabled || (option.parentElement.tagName === 'OPTGROUP' && option.parentElement.disabled)));
+                row.addEventListener('pointerdown', function (event) { event.preventDefault(); });
+                row.addEventListener('click', function () { choose(index); });
+                list.appendChild(row);
+                return row;
+                });
+            }
+            rebuild();
+            var error = document.createElement('span');
+            error.className = 'site-dropdown-error';
+            error.id = select.id + '-dropdown-error';
+            error.hidden = true;
+            error.setAttribute('aria-live', 'polite');
+            function sync() {
+                trigger.textContent = select.selectedOptions[0] ? select.selectedOptions[0].textContent : 'Select an option';
+                trigger.disabled = select.disabled;
+                trigger.setAttribute('aria-required', String(select.required));
+                trigger.setAttribute('aria-invalid', select.getAttribute('aria-invalid') || String(!error.hidden && !select.validity.valid));
+                trigger.setAttribute('aria-describedby', [select.getAttribute('aria-describedby'), error.hidden ? '' : error.id].filter(Boolean).join(' '));
+                if (select.validity.valid) error.hidden = true;
+                trigger.classList.toggle('is-empty', select.value === '');
+                rows.forEach(function (row, index) {
+                    row.setAttribute('aria-selected', String(index === select.selectedIndex));
+                });
+            }
+            function highlight(index) {
+                if (!options.length) return;
+                active = (index + options.length) % options.length;
+                rows.forEach(function (row, i) { row.classList.toggle('is-active', i === active); });
+                trigger.setAttribute('aria-activedescendant', rows[active].id);
+                rows[active].scrollIntoView({ block: 'nearest' });
+            }
+            function close() {
+                list.hidden = true;
+                trigger.setAttribute('aria-expanded', 'false');
+                trigger.removeAttribute('aria-activedescendant');
+                if (closeCurrent === close) closeCurrent = null;
+            }
+            function open() {
+                if (select.disabled || !options.length) return;
+                sync();
+                if (closeCurrent) closeCurrent();
+                var rect = trigger.getBoundingClientRect();
+                var width = Math.min(Math.max(rect.width, 200), window.innerWidth - 24);
+                var below = window.innerHeight - rect.bottom - 16;
+                var above = rect.top - 16;
+                var upwards = below < 180 && above > below;
+                list.style.width = width + 'px';
+                list.style.left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12)) + 'px';
+                list.style.maxHeight = Math.max(80, Math.min(280, upwards ? above : below)) + 'px';
+                list.style.top = upwards ? 'auto' : rect.bottom + 8 + 'px';
+                list.style.bottom = upwards ? window.innerHeight - rect.top + 8 + 'px' : 'auto';
+                list.hidden = false;
+                trigger.setAttribute('aria-expanded', 'true');
+                closeCurrent = close;
+                highlight(Math.max(0, select.selectedIndex));
+            }
+            function choose(index) {
+                if (!options[index] || rows[index].getAttribute('aria-disabled') === 'true') return;
+                select.selectedIndex = index;
+                select.dispatchEvent(new Event('input', { bubbles: true }));
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+                close();
+                trigger.focus();
+            }
+            trigger.addEventListener('click', function () { list.hidden ? open() : close(); });
+            trigger.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' || event.key === 'Tab') { close(); return; }
+                if (['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', ' '].includes(event.key)) {
+                    event.preventDefault();
+                    if (list.hidden) { open(); return; }
+                    if (event.key === 'Enter' || event.key === ' ') choose(active);
+                    else {
+                        var next = event.key === 'Home' ? 0 : event.key === 'End' ? options.length - 1 : active + (event.key === 'ArrowDown' ? 1 : -1);
+                        var direction = event.key === 'ArrowUp' || event.key === 'End' ? -1 : 1;
+                        for (var attempts = 0; attempts < options.length; attempts++, next += direction) {
+                            var candidate = (next + options.length) % options.length;
+                            if (rows[candidate].getAttribute('aria-disabled') !== 'true') { highlight(candidate); break; }
+                        }
+                    }
+                } else if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+                    event.preventDefault();
+                    if (list.hidden) open();
+                    typed = Date.now() - lastTyped > 700 ? event.key : typed + event.key;
+                    lastTyped = Date.now();
+                    var match = options.findIndex(function (option, index) { return rows[index].getAttribute('aria-disabled') !== 'true' && option.textContent.toLowerCase().startsWith(typed.toLowerCase()); });
+                    if (match >= 0) highlight(match);
+                }
+            });
+            trigger.addEventListener('blur', close);
+            document.addEventListener('pointerdown', function (event) {
+                if (!field.contains(event.target) && !list.contains(event.target)) close();
+            });
+            window.addEventListener('resize', close);
+            window.addEventListener('scroll', function (event) { if (!list.contains(event.target)) close(); }, true);
+            select.addEventListener('change', sync);
+            window.addEventListener('pageshow', sync);
+            if (select.form) select.form.addEventListener('reset', function () { error.hidden = true; setTimeout(sync, 0); close(); });
+            select.addEventListener('invalid', function (event) {
+                event.preventDefault();
+                error.textContent = select.validationMessage;
+                error.hidden = false;
+                sync();
+                trigger.focus();
+            });
+            select.addEventListener('focus', function () { trigger.focus(); });
+            new MutationObserver(function () { rebuild(); sync(); close(); }).observe(select, {
+                childList:true, subtree:true, characterData:true, attributes:true,
+                attributeFilter:['disabled','required','selected','aria-invalid','aria-describedby']
+            });
+            field.appendChild(trigger);
+            field.appendChild(error);
+            document.body.appendChild(list);
+            select.classList.add('site-dropdown-native');
+            select.tabIndex = -1;
+            select.setAttribute('aria-hidden', 'true');
+            if (label && !label.contains(select)) label.htmlFor = trigger.id;
+            sync();
+        });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initTicketDropdowns);
+    else initTicketDropdowns();
+})();
