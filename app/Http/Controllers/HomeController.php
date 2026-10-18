@@ -214,13 +214,19 @@ class HomeController extends Controller
         // list eventually do.
         $interestOptions = ExitSurveyController::ACTIVITIES;
 
+        // What each tab of the hero search can narrow by besides a name and a place: a kind of stay for the
+        // Stays tab, a cuisine for Dining. Only values some listing on the site actually has, so a choice
+        // never leads to an empty page.
+        $stayTypes = Accommodation::publiclyVisible()->whereNotNull('type')->distinct()->orderBy('type')->pluck('type');
+        $cuisineTypes = Restaurant::publiclyVisible()->whereNotNull('cuisine_type')->distinct()->orderBy('cuisine_type')->pluck('cuisine_type');
+
         $popularSearchChips = $this->popularSearchChips($destinations);
 
         $upcomingEvents = Event::published()->upcoming()->chronological()->take(3)->get();
 
         $postcardSlides = PostcardSlide::active()->ordered()->get();
 
-        return view('welcome', compact('destinations', 'packages', 'stats', 'regions', 'heroVideo', 'interestOptions', 'popularSearchChips', 'upcomingEvents', 'postcardSlides'))
+        return view('welcome', compact('destinations', 'packages', 'stats', 'regions', 'heroVideo', 'interestOptions', 'stayTypes', 'cuisineTypes', 'popularSearchChips', 'upcomingEvents', 'postcardSlides'))
             ->with('regionMap', $this->regionMap($regions));
     }
 }
