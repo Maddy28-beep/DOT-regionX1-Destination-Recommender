@@ -42,7 +42,7 @@
                     <x-icon name="send" />
                 </button>
             </div>
-            <p class="chatbot-disclaimer">Davo is an AI assistant and can make mistakes. Check prices and hours before you go.</p>
+            <p class="chatbot-disclaimer">Davo is a chatbot and can make mistakes. Check prices and hours before you go.</p>
         </form>
     </div>
 </div>
