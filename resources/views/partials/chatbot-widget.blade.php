@@ -50,20 +50,21 @@
 <style>
     .chatbot-widget { position: fixed; right: 20px; bottom: 20px; z-index: 200; }
     .chatbot-toggle {
-        position: relative; width: 84px; height: 84px; padding: 7px; border-radius: 50%; border: 0; cursor: pointer;
-        background: var(--white); color: var(--white); display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 8px 24px rgba(0,0,0,.2); transition: transform .15s ease, box-shadow .15s ease;
+        position: relative; width: 76px; height: 76px; padding: 0; border-radius: 50%; border: 0; cursor: pointer;
+        background: transparent; color: var(--white); display: flex; align-items: center; justify-content: center;
+        transition: transform .15s ease;
     }
-    .chatbot-toggle:hover { transform: scale(1.05); box-shadow: 0 10px 28px rgba(0,0,0,.26); }
+    .chatbot-toggle:hover { transform: scale(1.05); }
+    .chatbot-toggle:hover .chatbot-avatar { box-shadow: 0 10px 26px rgba(0,0,0,.34); }
     /* A soft green ring that spreads out twice from the button when the hint appears, to say "talk to me". */
     .chatbot-toggle.is-pinging { animation: chatbot-ping 1.6s ease-out 2; }
     @keyframes chatbot-ping {
-        0% { box-shadow: 0 8px 24px rgba(0,0,0,.2), 0 0 0 0 rgba(11,107,79,.4); }
-        100% { box-shadow: 0 8px 24px rgba(0,0,0,.2), 0 0 0 22px rgba(11,107,79,0); }
+        0% { box-shadow: 0 0 0 0 rgba(11,107,79,.4); }
+        100% { box-shadow: 0 0 0 22px rgba(11,107,79,0); }
     }
     /* The speech bubble beside the launcher: shown on hover or focus, and once on its own a few seconds after the page loads. */
     .chatbot-hint {
-        position: absolute; right: 100px; bottom: 26px; padding: 11px 16px; border-radius: 16px 16px 4px 16px;
+        position: absolute; right: 92px; bottom: 18px; padding: 11px 16px; border-radius: 16px 16px 4px 16px;
         background: var(--white); color: var(--primary-dark); font-size: .9rem; line-height: 1.2; white-space: nowrap;
         box-shadow: 0 8px 24px rgba(0,0,0,.18); pointer-events: none;
         opacity: 0; transform: translateX(10px) scale(.96); transform-origin: right bottom;
@@ -74,8 +75,8 @@
     .chatbot-toggle[aria-expanded="true"] ~ .chatbot-hint { display: none; }
     .chatbot-avatar { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; border-radius: 50%; background: #fff5e5; flex-shrink: 0; }
     .chatbot-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 45%; pointer-events: none; }
-    /* The launcher: a white disc, a green ring around the picture, and a green chat badge on its lower-right edge. */
-    .chatbot-toggle .chatbot-avatar { border: 4px solid var(--primary); box-sizing: border-box; }
+    /* The launcher: Davo inside a green ring, with a green chat badge on its lower-right edge. No white disc behind it. */
+    .chatbot-toggle .chatbot-avatar { border: 4px solid var(--primary); box-sizing: border-box; box-shadow: 0 6px 18px rgba(0,0,0,.3); transition: box-shadow .15s ease; }
     .chatbot-toggle .chatbot-wave-pose { display: none; position: absolute; inset: 0; object-fit: contain; object-position: center; transform-origin: 50% 85%; }
     .chatbot-toggle.is-waving .chatbot-rest-pose { visibility: hidden; }
     .chatbot-toggle.is-waving .chatbot-wave-pose { display: block; animation: davo-hello 1.2s ease-in-out; }
@@ -84,7 +85,7 @@
         20%, 60% { transform: rotate(-7deg); }
         40%, 80% { transform: rotate(7deg); }
     }
-    .chatbot-toggle-badge { position: absolute; right: -4px; bottom: -4px; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: var(--primary); border: 4px solid var(--white); box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+    .chatbot-toggle-badge { position: absolute; right: -4px; bottom: -4px; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: var(--primary); border: 0; box-shadow: 0 3px 10px rgba(0,0,0,.32); }
     .chatbot-toggle-badge svg { width: 17px; height: 17px; }
     .chatbot-widget button:focus-visible { outline: 3px solid #e98543; outline-offset: 3px; }
     .chatbot-head-avatar { width: 48px; height: 48px; margin-right: 12px; box-shadow: 0 0 0 2px rgba(255,255,255,.9); }
@@ -92,7 +93,7 @@
     .chatbot-heading strong { font-size: 1.05rem; }
 
     .chatbot-panel {
-        position: absolute; right: 0; bottom: 96px; width: 380px; max-width: calc(100vw - 40px);
+        position: absolute; right: 0; bottom: 88px; width: 380px; max-width: calc(100vw - 40px);
         background: var(--white); border: 1px solid var(--border); border-radius: 20px;
         box-shadow: 0 14px 40px rgba(0,0,0,.2); display: flex; flex-direction: column; overflow: hidden;
         max-height: min(600px, calc(100dvh - 136px));
@@ -214,12 +215,12 @@
     /* Phones: a smaller button covers less of the page, and its bubble and panel follow its size. */
     @media (max-width: 640px) {
         .chatbot-widget { right: 12px; }
-        .chatbot-toggle { width: 62px; height: 62px; padding: 5px; }
+        .chatbot-toggle { width: 58px; height: 58px; }
         .chatbot-toggle .chatbot-avatar { border-width: 3px; }
-        .chatbot-toggle-badge { width: 26px; height: 26px; right: -3px; bottom: -3px; border-width: 3px; }
+        .chatbot-toggle-badge { width: 24px; height: 24px; right: -3px; bottom: -3px; }
         .chatbot-toggle-badge svg { width: 12px; height: 12px; }
-        .chatbot-hint { right: 74px; bottom: 14px; padding: 9px 13px; font-size: .84rem; }
-        .chatbot-panel { bottom: 74px; right: -4px; }
+        .chatbot-hint { right: 70px; bottom: 10px; padding: 9px 13px; font-size: .84rem; }
+        .chatbot-panel { bottom: 70px; right: -4px; }
     }
     @media (prefers-reduced-motion: reduce) {
         .chatbot-toggle.is-pinging { animation: none; }
