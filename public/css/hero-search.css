@@ -64,7 +64,7 @@ body.hero-page { --hs-overlap: clamp(150px, 24vh, 210px); }
     position: relative;
     display: flow-root;
     background: #fff;
-    padding-bottom: 44px;
+    padding-bottom: 84px;
     /* One pixel up, over the picture's last row: at a fractional zoom that row blends dark into the white
        and drew a hairline under the curve. */
     margin-top: -1px;
@@ -89,6 +89,10 @@ body.hero-page { --hs-overlap: clamp(150px, 24vh, 210px); }
 .hero-lower .stat-num { color: var(--primary-dark); }
 .hero-lower .stat-item--rating .stat-num { color: var(--accent-dark, #b9441f); }
 .hero-lower .stat-label { color: var(--muted, #5b6b64); }
+/* The "See what's popular" cue, pinned to the foot of this white ground (it is the positioned parent). */
+.hero-lower .hero-scroll-cue { color: var(--muted, #5b6b64); bottom: 24px; }
+.hero-lower .hero-scroll-cue:hover,
+.hero-lower .hero-scroll-cue:focus-visible { color: var(--primary-dark); outline-color: var(--primary); }
 
 /* ---------- The card ---------- */
 .hero-search {
