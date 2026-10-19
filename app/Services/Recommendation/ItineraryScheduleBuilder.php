@@ -709,8 +709,7 @@ class ItineraryScheduleBuilder
      */
     private function nearbyRestaurant($destination): ?array
     {
-        $rule = $this->apriori->suggestionsFor('destination', $destination->id, 5)
-            ->firstWhere('listing_kind', 'restaurant');
+        $rule = $this->apriori->suggestionsFor('destination', $destination->id, 5, 'restaurant')->first();
 
         if (! $rule || ! $rule['listing']) {
             return null;
@@ -782,8 +781,7 @@ class ItineraryScheduleBuilder
         $candidates = [];
 
         if ($lastDestination) {
-            $rule = $this->apriori->suggestionsFor('destination', $lastDestination->id, 5)
-                ->firstWhere('listing_kind', 'souvenir_center');
+            $rule = $this->apriori->suggestionsFor('destination', $lastDestination->id, 5, 'souvenir_center')->first();
 
             if ($rule && $rule['listing']) {
                 $candidates[] = [

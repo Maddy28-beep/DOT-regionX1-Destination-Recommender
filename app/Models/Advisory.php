@@ -46,8 +46,8 @@ class Advisory extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query
-            ->where(fn ($q) => $q->whereNull('starts_at')->orWhereDate('starts_at', '<=', now()))
-            ->where(fn ($q) => $q->whereNull('ends_at')->orWhereDate('ends_at', '>=', now()));
+            ->where(fn ($q) => $q->whereNull('starts_at')->orWhereDate('starts_at', '<=', now('Asia/Manila')))
+            ->where(fn ($q) => $q->whereNull('ends_at')->orWhereDate('ends_at', '>=', now('Asia/Manila')));
     }
 
     public function scopeGeneral(Builder $query): Builder

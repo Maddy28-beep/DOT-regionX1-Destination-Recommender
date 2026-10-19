@@ -63,11 +63,14 @@ class AprioriService
         int $listingId,
         int $limit = 5,
         float $minConfidence = 0.1,
-        int $minSupportCount = 2
+        int $minSupportCount = 2,
+        ?string $onlyKind = null
     ): Collection {
         $surveyIdsWithA = $this->visits()->where('listing_kind', $listingKind)
             ->where('listing_id', $listingId)
-            ->pluck('exit_survey_id');
+            ->pluck('exit_survey_id')
+            ->unique()
+            ->values();
 
         $countA = $surveyIdsWithA->count();
         $totalTransactions = $this->surveys()->count();
@@ -77,6 +80,9 @@ class AprioriService
         }
 
         $coOccurrences = $this->visits()->whereIn('exit_survey_id', $surveyIdsWithA)
+            // The kind the caller wants is chosen here, before the limit below: otherwise the strongest rules of
+            // other kinds use up the limit and a restaurant or stay that is a good match is never seen.
+            ->when($onlyKind !== null, fn ($q) => $q->where('listing_kind', $onlyKind))
             ->where(function ($q) use ($listingKind, $listingId) {
                 $q->where('listing_kind', '!=', $listingKind)
                     ->orWhere('listing_id', '!=', $listingId);
@@ -142,11 +148,13 @@ class AprioriService
      * Convenience: top associated listings for a destination, already resolved to models,
      * used by the itinerary generator to suggest complementary accommodations/restaurants/etc.
      */
-    public function suggestionsFor(string $listingKind, int $listingId, int $limit = 3): Collection
+    public function suggestionsFor(string $listingKind, int $listingId, int $limit = 3, ?string $onlyKind = null): Collection
     {
-        $rules = $this->getAssociatedListings($listingKind, $listingId, $limit);
+        // Over-fetch, then trim: places that are hidden, closed or not yet visible drop out when the rules are
+        // resolved, and cutting to the limit first could leave fewer suggestions than there were good rules.
+        $rules = $this->getAssociatedListings($listingKind, $listingId, $limit * 4, 0.1, 2, $onlyKind);
 
-        return $this->resolveListings($rules);
+        return $this->resolveListings($rules)->take($limit)->values();
     }
 
     /**
