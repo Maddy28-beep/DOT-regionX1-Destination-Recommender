@@ -222,20 +222,19 @@
 .pc-toggle[aria-pressed="true"] .pc-toggle__pause { display: none; }
 .pc-toggle[aria-pressed="true"] .pc-toggle__play { display: block; }
 
-/* The existing angled-corner cream button. The clip-path would cut off a focus
-   ring, so it is dropped (and the corners rounded) while focused. */
+/* The cream call-to-action under each slide: softly rounded, with a lift on hover. */
 .pc-cta__btn {
     background: var(--pc-cream);
     color: var(--accent-dark);
-    border-radius: 0;
-    clip-path: var(--clip-angled);
-    transform: translateZ(0);
+    border-radius: var(--btn-radius);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .28);
     white-space: nowrap;
+    transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
 }
-.pc-cta__btn:hover { background: var(--sun-glow); color: var(--ink); }
+.pc-cta__btn:hover { background: var(--sun-glow); color: var(--ink); transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0, 0, 0, .32); }
+.pc-cta__btn:active { transform: translateY(0); }
 .pc-cta__btn:focus-visible {
-    clip-path: none;
-    border-radius: var(--radius-sm);
+    border-radius: var(--btn-radius);
     outline: 3px solid var(--pc-cream);
     outline-offset: 3px;
 }

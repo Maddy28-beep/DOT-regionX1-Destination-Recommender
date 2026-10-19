@@ -51,11 +51,11 @@
     --paper: #FFF7E9;
     --forest: #1E5C43;
 
-    /* The one primary-CTA silhouette: a torn/angled top-right corner, as on
-       "Plan My Trip", "View Package", "Get Directions" and "Get Started Free".
-       Defined once so every primary action shares an identical shape instead
-       of each section re-declaring its own polygon. */
-    --clip-angled: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+    /* Every button shares one corner radius. (Primary actions used to carry an angled top-right cut,
+       --clip-angled; it is now "none" so any leftover rule that still points at it simply draws a rounded
+       button. The angled/stamp shapes remain only on non-button decoration such as ribbons and stamps.) */
+    --btn-radius: 12px;
+    --clip-angled: none;
 
     /* ---- Internal-console tokens -------------------------------------
        One set of semantic tones for every status pill, inline banner and
@@ -132,7 +132,7 @@ a { color: inherit; text-decoration: none; }
     justify-content: center;
     gap: 8px;
     border: none;
-    border-radius: var(--radius-sm);
+    border-radius: var(--btn-radius);
     padding: 11px 20px;
     font-size: .95rem;
     font-weight: 600;
@@ -154,8 +154,8 @@ a { color: inherit; text-decoration: none; }
 .btn-accent {
     background: var(--accent);
     color: var(--white);
-    border-radius: 0;
-    clip-path: var(--clip-angled);
+    border-radius: var(--btn-radius);
+    clip-path: none;
     transform: translateZ(0);
 }
 .btn-accent:hover { background: var(--accent-dark); }
@@ -166,7 +166,7 @@ a { color: inherit; text-decoration: none; }
    leaving keyboard users with no focus indicator at all. */
 .btn-accent:focus-visible {
     clip-path: none;
-    border-radius: var(--radius-sm);
+    border-radius: var(--btn-radius);
     outline: 2px solid var(--primary);
     outline-offset: 2px;
 }
@@ -2376,8 +2376,8 @@ select.site-dropdown-native {
        some rendering paths. An inset shadow paints inside the already-
        clipped box instead, so it can't escape the clip. */
     box-shadow: inset 0 0 0 1.5px var(--stamp-red);
-    border-radius: 0;
-    clip-path: var(--clip-angled);
+    border-radius: var(--btn-radius);
+    clip-path: none;
     transform: translateZ(0);
     transition: background .15s ease, color .15s ease;
 }
@@ -2388,7 +2388,7 @@ select.site-dropdown-native {
    .btn) actually shows instead of being cut off on the angled corner. */
 .dpost-cta:focus-visible {
     clip-path: none;
-    border-radius: var(--radius-sm);
+    border-radius: var(--btn-radius);
     outline: 2px solid var(--primary);
     outline-offset: 2px;
 }
@@ -2796,8 +2796,8 @@ select.site-dropdown-native {
 .pkg-book-btn {
     background: var(--primary-dark);
     color: var(--paper);
-    border-radius: 0;
-    clip-path: var(--clip-angled);
+    border-radius: var(--btn-radius);
+    clip-path: none;
     transform: translateZ(0);
     padding: 9px 16px;
     font-size: .85rem;
@@ -3196,8 +3196,8 @@ select.site-dropdown-native {
     z-index: 2;
     background: var(--paper);
     color: var(--accent-dark);
-    border-radius: 0;
-    clip-path: var(--clip-angled);
+    border-radius: var(--btn-radius);
+    clip-path: none;
     transform: translateZ(0);
 }
 .cta-banner .btn:hover { background: var(--sun-glow); color: var(--ink); }
@@ -3869,8 +3869,8 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 .btn-poster-primary {
     background: var(--primary-dark);
     color: var(--paper);
-    border-radius: 0;
-    clip-path: var(--clip-angled);
+    border-radius: var(--btn-radius);
+    clip-path: none;
     transform: translateZ(0);
 }
 .btn-poster-primary:hover { background: var(--primary); }
@@ -3878,8 +3878,8 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
     background: transparent;
     color: var(--ink);
     box-shadow: inset 0 0 0 1.5px var(--border);
-    border-radius: 0;
-    clip-path: var(--clip-angled);
+    border-radius: var(--btn-radius);
+    clip-path: none;
     transform: translateZ(0);
 }
 .btn-poster-ghost:hover { background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--muted); }
@@ -4178,16 +4178,16 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
    public pages use. */
 .portal .btn-primary {
     background: var(--primary-dark);
-    border-radius: 0;
-    clip-path: var(--clip-angled);
+    border-radius: var(--btn-radius);
+    clip-path: none;
     transform: translateZ(0);
 }
 .portal .btn-primary:hover { background: var(--primary); }
 .btn-danger {
     background: var(--stamp-red);
     color: var(--paper);
-    border-radius: 0;
-    clip-path: var(--clip-angled);
+    border-radius: var(--btn-radius);
+    clip-path: none;
     transform: translateZ(0);
 }
 .btn-danger:hover { background: var(--accent-dark); }
@@ -4207,8 +4207,8 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 .portal-alert .btn {
     background: var(--paper);
     color: var(--stamp-red);
-    border-radius: 0;
-    clip-path: var(--clip-angled);
+    border-radius: var(--btn-radius);
+    clip-path: none;
     transform: translateZ(0);
     font-weight: 700;
     white-space: nowrap;
@@ -5869,3 +5869,23 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
     .visit-card__text { flex: 1 1 calc(100% - 56px); }
     .visit-card__pill { margin: -6px 0 0 56px; }
 }
+
+/* ---------- Card call-to-action buttons: soft rounded corners ----------
+   The cream "Explore ..." button on the Popular Right Now slides, the featured banner's "Plan This Trip" and the
+   package card's book button used the angled-corner cut. They are rounded here, with the same colours. */
+.dpost-banner__cta.btn-accent, .pkg-book-btn {
+    clip-path: none; transform: none; border-radius: var(--btn-radius);
+}
+.dpost-banner__cta.btn-accent { box-shadow: 0 6px 16px rgba(0, 0, 0, .22); transition: background .15s ease, transform .15s ease; }
+.dpost-banner__cta.btn-accent:hover { transform: translateY(-2px); }
+
+/* The filter's "Show results" button: softly rounded like the card buttons, instead of the angled cut. */
+.filter-panel [data-filter-submit] {
+    clip-path: none; transform: none; border-radius: var(--btn-radius);
+}
+@media (min-width: 901px) { .filter-panel [data-filter-submit] { box-shadow: 0 4px 12px rgba(11, 60, 45, .18); } }
+
+/* The "Plan my trip" call-to-action banner: both buttons softly rounded like the card buttons. */
+.cta-banner .btn { clip-path: none; transform: none; border-radius: var(--btn-radius); box-shadow: 0 6px 16px rgba(120, 40, 10, .22); transition: background .15s ease, transform .15s ease; }
+.cta-banner .btn:hover { transform: translateY(-2px); }
+.cta-banner .btn-ghost { border-radius: var(--btn-radius); box-shadow: none; }
