@@ -377,3 +377,18 @@ body.hero-page { --hs-overlap: clamp(150px, 24vh, 210px); }
     .hero-search__tab-body,
     .hero-search__pill span { transition: none; }
 }
+
+/* ---------- The first screen ----------
+   The picture, the search card and the stats are one screen. On a tall display they used to end short of the
+   bottom edge, and the top of "Popular right now" peeked in beneath the scroll cue. The group is now at least as
+   tall as the window and the light ground stretches to fill it, which also parks the scroll cue at the true
+   bottom. On a window shorter than the content nothing changes: it simply scrolls. */
+.hero-screen {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
+    min-height: 100dvh;
+}
+.hero-screen > .poster-hero { flex: none; }
+.hero-screen > .hero-lower { flex: 1 0 auto; }

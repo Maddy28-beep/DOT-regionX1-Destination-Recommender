@@ -27,6 +27,8 @@
      The script below puts the illustration back if it decides against the
      video, and the <noscript> block does the same when there is no script at
      all. --}}
+{{-- The picture and the card beneath it are one screen: on a tall display the next section must not peek in under the cue. --}}
+<div class="hero-screen">
 <section class="poster-hero{{ $heroVideo ? ' has-footage' : '' }}"
     @if ($heroVideo && $heroVideo['poster'])
         {{-- The clip's own first frame, as the ground the video paints onto.
@@ -411,6 +413,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
     </a>
 </div>
+</div>{{-- /.hero-screen --}}
 
 @include('partials.postcard-carousel')
 
