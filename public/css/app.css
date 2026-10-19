@@ -5830,3 +5830,42 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
     .sticky-cta .btn { white-space: nowrap; padding-inline: 10px; font-size: .92rem; min-height: 44px; }
     .sticky-cta .save-form--button, .sticky-cta .save-form--button .btn { height: 100%; }
 }
+
+/* ---------- Phones: listing detail pages ----------
+   On a phone the practical card (best time, hours, how long, map) sat below the reviews, so "Plan your visit"
+   was a long scroll away. It now follows the About card, and reviews come after it. The card's own Directions /
+   Save buttons repeat the bottom bar, so they are dropped where that bar shows. */
+@media (max-width: 900px) {
+    .detail-layout:has(> div > .visit-card) { gap: 20px; }
+    .detail-layout:has(> div > .visit-card) > div { display: contents; }
+    .detail-layout:has(> div > .visit-card) > div > * { order: 2; margin-block: 0; }
+    .detail-layout:has(> div > .visit-card) .stat-strip { order: 1; }
+    .detail-layout:has(> div > .visit-card) .visit-card { order: 3; }
+    .detail-layout:has(> div > .visit-card) .reviews-card { order: 4; }
+    body:has(.sticky-cta) .visit-card__actions { display: none; }
+}
+
+/* ---------- Phones: detail page polish (from the live iPhone) ---------- */
+/* "Before you go" sat on top of the heading (an inline span under a tight line-height). */
+.visit-card__kicker { display: block; margin-bottom: 8px; line-height: 1.2; }
+.visit-card__title { line-height: 1.1; }
+
+@media (max-width: 900px) {
+    /* The bottom bar: two clean, equal buttons. The angled poster clip and the inset-ring ghost drew a stray double
+       edge on the Save button, and the bar ignored the iPhone's home-indicator area. */
+    .sticky-cta { padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); }
+    .sticky-cta .btn-poster-primary, .sticky-cta .btn-poster-ghost {
+        clip-path: none; transform: none; border-radius: 12px; box-shadow: none;
+    }
+    .sticky-cta .btn-poster-primary { background: var(--primary-dark); }
+    .sticky-cta .btn-poster-ghost { background: #fff; color: var(--primary-dark); border: 1.5px solid var(--primary); }
+    .sticky-cta .btn-poster-ghost.is-saved { color: var(--stamp-red); border-color: var(--stamp-red); }
+}
+
+@media (max-width: 640px) {
+    .visit-card { padding: 22px 18px 18px; }
+    /* long hours ("8:00 AM–5:00 PM") no longer share a line with the Open/Closed pill: the pill drops under them */
+    .visit-card__row { flex-wrap: wrap; }
+    .visit-card__text { flex: 1 1 calc(100% - 56px); }
+    .visit-card__pill { margin: -6px 0 0 56px; }
+}

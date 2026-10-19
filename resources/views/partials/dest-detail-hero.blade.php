@@ -31,7 +31,7 @@
 
     <span class="dpost-badge-rating">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
-        @if ($destination->review_count > 0) {{ number_format($destination->rating, 1) }} &middot; {{ $destination->review_count }} reviews @else New @endif
+        @if ($destination->review_count > 0) {{ number_format($destination->rating, 1) }} &middot; {{ $destination->review_count }} {{ \Illuminate\Support\Str::plural('review', $destination->review_count) }} @else New @endif
     </span>
 
     <div class="dest-detail-hero__content">
