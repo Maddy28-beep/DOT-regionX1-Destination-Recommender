@@ -161,3 +161,19 @@
     body:has(#planWizard.is-building) #chatbot-widget { bottom: 16px; }
 }
 @media(max-width:640px) { .plan-wizard .plan-optional > summary { font-size: .95rem; } }
+
+/* iPhone Safari draws date and time fields with their own width and centred text, so they pushed past the card
+   (the time box hung off the right edge). Plain boxes that obey the column, text on the left like the others. */
+.plan-wizard input[type="date"], .plan-wizard input[type="time"] {
+    -webkit-appearance: none; appearance: none;
+    display: block; box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%;
+    text-align: left;
+}
+@media(max-width:640px) { .plan-wizard input[type="date"], .plan-wizard input[type="time"] { height: 48px; } }
+.plan-wizard input[type="date"]::-webkit-date-and-time-value, .plan-wizard input[type="time"]::-webkit-date-and-time-value {
+    min-width: 0; text-align: left;
+}
+.plan-wizard input[type="date"]::-webkit-calendar-picker-indicator, .plan-wizard input[type="time"]::-webkit-calendar-picker-indicator {
+    margin: 0; padding: 0;
+}
+.plan-wizard .field { min-width: 0; }
