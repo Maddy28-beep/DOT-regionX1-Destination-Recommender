@@ -88,8 +88,13 @@
     }
 
     // Hover and keyboard focus anywhere inside pause autoplay.
-    root.addEventListener('mouseenter', function () { hoverPaused = true; syncState(); });
-    root.addEventListener('mouseleave', function () { hoverPaused = false; syncState(); });
+    // Hover only means something with a mouse: a phone fakes mouseenter on a tap and never sends mouseleave, which
+    // left autoplay stuck paused after the first touch.
+    var canHover = window.matchMedia && window.matchMedia('(hover: hover)').matches;
+    if (canHover) {
+        root.addEventListener('mouseenter', function () { hoverPaused = true; syncState(); });
+        root.addEventListener('mouseleave', function () { hoverPaused = false; syncState(); });
+    }
     root.addEventListener('focusin', function () { focusPaused = true; syncState(); });
     root.addEventListener('focusout', function (e) {
         if (!root.contains(e.relatedTarget)) { focusPaused = false; syncState(); }

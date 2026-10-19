@@ -49,23 +49,7 @@
 </div>
 
 @if ($notifications->hasPages())
-    <div class="pagination">
-        @if ($notifications->onFirstPage())
-            <span class="disabled">&laquo;</span>
-        @else
-            <a href="{{ $notifications->previousPageUrl() }}">&laquo;</a>
-        @endif
-
-        @foreach ($notifications->getUrlRange(1, $notifications->lastPage()) as $page => $url)
-            <span class="{{ $page === $notifications->currentPage() ? 'active' : '' }}"><a href="{{ $url }}">{{ $page }}</a></span>
-        @endforeach
-
-        @if ($notifications->hasMorePages())
-            <a href="{{ $notifications->nextPageUrl() }}">&raquo;</a>
-        @else
-            <span class="disabled">&raquo;</span>
-        @endif
-    </div>
+    @include('partials.pagination', ['paginator' => $notifications])
 @endif
 
 @endsection

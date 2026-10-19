@@ -1,0 +1,379 @@
+/* The landing page search card, in the manner of a travel site's search panel: a white bar of tabs (the five
+   catalogues) floating over a light body, budget as quick choices, a name search, one box for Duration and
+   Interest, and a wide Explore button on the card's lower edge.
+
+   It replaces the single row of four selects (.ticket-search). The tabs and the budget pills are real radio
+   inputs, so the form works without script and the keyboard and screen readers get proper groups;
+   hero-search.js only adds the placeholder and the greyed-out filters.
+
+   One view, one focal point: the headline and the whole card fit on a laptop screen without scrolling, and
+   Explore is the only strongly coloured control on it. */
+
+/* ---------- The hero around the card ---------- */
+
+/* A brighter picture behind the card. The footage's wash used to be a heavy dark green over everything;
+   it is lighter now, and deepens only toward the foot of the hero, where the next section begins. The
+   headline keeps its readability from a stronger shadow instead of from a dark veil. */
+.poster-hero .poster-hero__video-scrim,
+.poster-hero.has-footage .poster-hero__video-scrim {
+    background: linear-gradient(to bottom,
+        rgba(11, 40, 30, .34) 0%,
+        rgba(11, 40, 30, .20) 42%,
+        rgba(11, 40, 30, .30) 72%,
+        rgba(11, 40, 30, .62) 100%);
+}
+.poster-hero.has-video .poster-hero__kicker,
+.poster-hero.has-video .poster-hero__title,
+.poster-hero.has-video .poster-hero__subhead {
+    text-shadow: 0 2px 4px rgba(6, 26, 19, .55), 0 4px 22px rgba(6, 26, 19, .45);
+}
+
+/* The picture is a short band, and the card straddles its lower edge: --hs-overlap is how much of the card
+   rides up into the picture. The hero keeps just enough room under the headline for that part of the card,
+   and the card is pulled up by the same amount (see .hero-lower .hero-search). */
+body.hero-page { --hs-overlap: clamp(150px, 24vh, 210px); }
+.poster-hero {
+    min-height: 0;
+    padding-top: clamp(84px, 11vh, 128px);
+    padding-bottom: calc(var(--hs-overlap) + 14px);
+}
+.poster-hero .hero-tourism-brands { margin-bottom: 8px; }
+.poster-hero__title { font-size: clamp(2.3rem, 5.6vw, 4.1rem); margin: 2px 0 8px; }
+.poster-hero__subhead { font-size: clamp(.95rem, 1.6vw, 1.1rem); font-weight: 500; }
+.poster-hero__content { margin-bottom: 4px; }
+
+/* The soft curve along the picture's foot: a white shape the picture bulges down into behind the card, rising
+   toward the sides. It is drawn over the picture but under the headline, and overlaps the hero's last pixel
+   so no hairline of picture shows beneath it. */
+.hero-edge {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    z-index: 3;
+    display: block;
+    width: 100%;
+    height: clamp(64px, 7.4vw, 124px);
+    pointer-events: none;
+}
+.hero-edge path { fill: #fff; }
+
+/* ---------- Below the picture ---------- */
+/* flow-root keeps the card's negative margin from dragging this white ground up over the picture. */
+.hero-lower {
+    position: relative;
+    display: flow-root;
+    background: #fff;
+    padding-bottom: 84px;
+    /* One pixel up, over the picture's last row: at a fractional zoom that row blends dark into the white
+       and drew a hairline under the curve. */
+    margin-top: -1px;
+}
+.hero-lower .hero-search { margin-top: calc(-1 * var(--hs-overlap)); }
+
+/* The popular searches and the stats were made for a dark picture; here they sit on white. */
+.hero-lower .hero-popular-searches__label { color: var(--muted, #4a5a52); }
+.hero-lower .hero-popular-searches__chip {
+    border-color: #cfd8d2;
+    background: #fff;
+    color: var(--primary-dark);
+}
+.hero-lower .hero-popular-searches__chip:hover,
+.hero-lower .hero-popular-searches__chip:focus-visible {
+    background: #e4f1ea;
+    border-color: var(--primary);
+    color: var(--primary-dark);
+    outline-color: var(--primary);
+}
+.hero-lower .stat-item { border-left-color: #d9dfda; }
+.hero-lower .stat-num { color: var(--primary-dark); }
+.hero-lower .stat-item--rating .stat-num { color: var(--accent-dark, #b9441f); }
+.hero-lower .stat-label { color: var(--muted, #5b6b64); }
+/* The "See what's popular" cue, pinned to the foot of this white ground (it is the positioned parent). */
+.hero-lower .hero-scroll-cue { color: var(--muted, #5b6b64); bottom: 24px; }
+.hero-lower .hero-scroll-cue:hover,
+.hero-lower .hero-scroll-cue:focus-visible { color: var(--primary-dark); outline-color: var(--primary); }
+
+/* ---------- The card ---------- */
+.hero-search {
+    position: relative;
+    z-index: 6;
+    width: min(940px, calc(100% - 32px));
+    margin: 0 auto 42px;
+    color: var(--ink);
+    text-align: left;
+}
+
+/* The tab bar: its own white card, overlapping the top of the body. */
+.hero-search__bar {
+    position: relative;
+    z-index: 2;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .14);
+}
+.hero-search__tabs {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+    margin: 0;
+    padding: 0 8px;
+    min-width: 0;
+    border: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.hero-search__tabs::-webkit-scrollbar { display: none; }
+
+.hero-search__tab { position: relative; flex: 0 0 auto; margin: 0; cursor: pointer; }
+.hero-search__tab input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+.hero-search__tab-body {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 15px 18px 12px;
+    border-bottom: 3px solid transparent;
+    color: var(--ink);
+    font-size: .95rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: color .15s ease;
+}
+.hero-search__tab-body svg { width: 19px; height: 19px; flex: none; }
+.hero-search__tab:hover .hero-search__tab-body { color: var(--primary); }
+.hero-search__tab input:checked + .hero-search__tab-body {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+.hero-search__tab input:focus-visible + .hero-search__tab-body {
+    outline: 3px solid var(--primary);
+    outline-offset: -3px;
+    border-radius: 10px;
+}
+
+/* The body: a light panel tucked under the bar. */
+.hero-search__body {
+    position: relative;
+    margin-top: -22px;
+    padding: 40px 22px 46px;
+    border-radius: 0 0 22px 22px;
+    background: #f5f6f3;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .26);
+}
+
+/* ---------- Budget pills ---------- */
+.hero-search__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 14px;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+}
+.hero-search__pill { position: relative; margin: 0; cursor: pointer; }
+.hero-search__pill input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+.hero-search__pill span {
+    display: block;
+    padding: 10px 20px;
+    border: 1.5px solid #d7dcd5;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--ink);
+    font-size: .92rem;
+    font-weight: 500;
+    transition: border-color .15s ease, background .15s ease, color .15s ease;
+}
+.hero-search__pill:hover span { border-color: var(--primary); }
+.hero-search__pill input:checked + span {
+    border-color: var(--primary);
+    background: #e4f1ea;
+    color: var(--primary-dark);
+    font-weight: 700;
+}
+.hero-search__pill input:focus-visible + span { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+/* ---------- Name search ---------- */
+.hero-search__field { position: relative; }
+.hero-search__field svg {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    width: 21px;
+    height: 21px;
+    transform: translateY(-50%);
+    color: var(--muted, #6b7a73);
+    pointer-events: none;
+}
+.hero-search__field input {
+    display: block;
+    width: 100%;
+    height: 56px;
+    padding: 0 16px 0 48px;
+    border: 1px solid #dde1db;
+    border-radius: 14px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    font-size: 1rem;
+}
+.hero-search__field input::placeholder { color: var(--muted, #6b7a73); opacity: 1; }
+.hero-search__field input:focus-visible {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(11, 107, 79, .18);
+}
+
+/* ---------- Duration | Interest in one box ---------- */
+.hero-search__pair {
+    display: grid;
+    /* The script sets how many boxes this tab uses (one to three). */
+    grid-template-columns: repeat(var(--hs-cols, 2), minmax(0, 1fr));
+    margin-top: 12px;
+    overflow: hidden;
+    border: 1px solid #dde1db;
+    border-radius: 14px;
+    background: #fff;
+}
+.hero-search__box { position: relative; min-width: 0; }
+.hero-search__box[hidden],
+.hero-search__pills[hidden] { display: none; }
+.hero-search__box + .hero-search__box { border-left: 1px solid #dde1db; }
+.hero-search__box > svg {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    z-index: 2;
+    width: 21px;
+    height: 21px;
+    transform: translateY(-50%);
+    color: var(--primary);
+    pointer-events: none;
+}
+.hero-search__box label {
+    position: absolute;
+    left: 50px;
+    top: 10px;
+    z-index: 2;
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+    color: var(--muted, #6b7a73);
+    pointer-events: none;
+}
+/* The native select, before the shared dropdown script replaces it. */
+.hero-search__box select {
+    width: 100%;
+    height: 60px;
+    padding: 26px 34px 6px 50px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: .95rem;
+    font-weight: 600;
+}
+/* The shared dropdown's trigger, restyled to sit flat inside the box. */
+.hero-search__box .site-dropdown-trigger {
+    min-height: 60px;
+    padding: 26px 38px 6px 50px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--ink);
+    font-size: .95rem;
+    font-weight: 600;
+}
+.hero-search__box .site-dropdown-trigger:hover:not(:disabled),
+.hero-search__box .site-dropdown-trigger[aria-expanded="true"] { background: #f2f6f3; border: 0; }
+.hero-search__box .site-dropdown-trigger:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.hero-search__box .site-dropdown-trigger.is-empty { color: var(--muted, #4a5a52); font-weight: 500; }
+
+.hero-search__hint:empty { display: none; }
+.hero-search__hint {
+    margin: 12px 4px 0;
+    font-size: .82rem;
+    color: var(--muted, #6b7a73);
+}
+
+/* ---------- Explore: the one strongly coloured control ---------- */
+.hero-search .hero-search__go {
+    position: absolute;
+    left: 50%;
+    bottom: -27px;
+    z-index: 3;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    width: min(62%, 380px);
+    height: 54px;
+    padding: 0 24px;
+    border-radius: 999px;
+    clip-path: none;
+    font-size: 1.05rem;
+    box-shadow: 0 8px 20px rgba(153, 53, 28, .38);
+}
+.hero-search .hero-search__go:hover { transform: translateX(-50%); }
+.hero-search .hero-search__go:active { transform: translateX(-50%) scale(.98); }
+.hero-search .hero-search__go svg { width: 20px; height: 20px; }
+
+/* ---------- Short screens: keep the whole card in one view ---------- */
+@media (max-height: 780px) and (min-width: 861px) {
+    body.hero-page { --hs-overlap: clamp(130px, 22vh, 170px); }
+    .poster-hero { padding-top: 78px; }
+    .poster-hero__subhead { display: none; }
+    .poster-hero .hero-tourism-brands { display: none; }
+    .hero-search__tab-body { padding-block: 12px 9px; }
+    .hero-search__body { padding: 34px 20px 42px; }
+    .hero-search__pills { margin-bottom: 10px; }
+    .hero-search__hint { margin-top: 8px; }
+}
+
+/* ---------- Tablet and phone ---------- */
+@media (max-width: 860px) {
+    .hero-search__tab-body { padding: 13px 13px 11px; font-size: .9rem; }
+    .hero-search__body { padding: 38px 16px 44px; }
+}
+@media (max-width: 640px) {
+    .hero-search { width: calc(100% - 24px); }
+    .hero-search__bar { border-radius: 18px; }
+    .hero-search__body { border-radius: 0 0 18px 18px; }
+    .hero-search__tabs { justify-content: flex-start; }
+    .hero-search__tab-body { gap: 6px; padding: 12px 11px 10px; font-size: .85rem; }
+    .hero-search__tab-body svg { width: 17px; height: 17px; }
+    /* Five tabs do not fit a phone, so the strip scrolls; a fade at the right edge says there is more. */
+    .hero-search__tabs {
+        -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+        mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+        padding-right: 28px;
+    }
+    .hero-search__pills { gap: 8px; }
+    .hero-search__pill span { padding: 9px 14px; font-size: .86rem; }
+    .hero-search__pair { grid-template-columns: 1fr; }
+    .hero-search__box + .hero-search__box { border-left: 0; border-top: 1px solid #dde1db; }
+    .hero-search .hero-search__go { width: min(86%, 340px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-search__tab-body,
+    .hero-search__pill span { transition: none; }
+}

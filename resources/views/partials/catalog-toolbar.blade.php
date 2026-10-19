@@ -19,6 +19,12 @@
     <div class="results-count">{{ $results->total() }} {{ \Illuminate\Support\Str::plural($noun, $results->total()) }} found</div>
 
     <div class="results-toolbar__controls">
+        {{-- Opens the filters as a sheet on a phone (public/js/filter-sheet.js); hidden beside a wide screen. --}}
+        <button type="button" class="filter-toggle" data-filter-sheet-open aria-controls="filterPanel" aria-expanded="false" aria-haspopup="dialog">
+            <x-icon name="filter" /> Filters
+            @if ($activeFilters->isNotEmpty())<span class="filter-toggle__count" aria-label="{{ $activeFilters->count() }} on">{{ $activeFilters->count() }}</span>@endif
+        </button>
+
         <label class="sort-control">
             <span>Sort by</span>
             <select name="sort" form="{{ $formId }}" onchange="this.form.submit()">

@@ -5534,3 +5534,338 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
 }
 
 .swap-option__reason { display: block; margin-top: 2px; font-size: .78rem; color: var(--primary-dark); }
+
+/* ---------- Phones: two cards to a row ----------
+   Every listing grid (destinations, stays, dining, packages, souvenirs, operators, saved places and the
+   "related" strips) is .card-grid or .dpost-grid. At phone width a card is about 158 px wide, so the card's
+   insides tighten to fit: a 4:3 photo, smaller type, one tag, a two-line name, and a price over the distance
+   instead of beside it. Nothing is dropped that a tap on the card would not show on its own page. */
+@media (max-width: 640px) {
+    .card-grid,
+    .dpost-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .dcard__art { aspect-ratio: 4 / 3; }
+    .dcard__new { top: 7px; left: 7px; padding: 2px 6px; font-size: .6rem; }
+    .dcard__body { padding: 9px 10px 11px; }
+
+    .dcard__top { min-height: 0; margin-bottom: 5px; gap: 4px; }
+    .dcard__dot { font-size: .62rem; gap: 3px; }
+    .dcard__dot svg { width: 11px; height: 11px; }
+    .dcard__rating { font-size: .7rem; gap: 3px; }
+    .dcard__rating svg { width: 11px; height: 11px; }
+    .dcard__rating > span { display: none; }   /* the review count; the card is too narrow for it */
+
+    .dcard__name {
+        margin-bottom: 4px;
+        font-size: .9rem;
+        line-height: 1.25;
+        /* Two lines at most; the grid already makes every card in a row the same height. */
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        overflow: hidden;
+    }
+    .dcard__loc { margin-bottom: 7px; font-size: .72rem; gap: 4px; }
+    .dcard__loc svg { width: 12px; height: 12px; }
+
+    .dcard__tags { margin-bottom: 8px; }
+    .dcard__tags .dpost-tag { padding: 2px 7px; font-size: .64rem; }
+    .dcard__tags .dpost-tag:nth-child(n+2) { display: none; }
+
+    .dcard__foot { flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 1px; padding-top: 7px; }
+    .dcard__price { max-width: 100%; }
+    .dcard__price strong { font-size: .9rem; }
+    .dcard__price small,
+    .dcard__from { font-size: .68rem; }
+    .dcard__dist { font-size: .7rem; gap: 3px; }
+    .dcard__dist svg { width: 12px; height: 12px; }
+    .dcard__dist-more { display: none; }
+}
+
+/* ---------- Phone drawer: an icon in front of every link ----------
+   Each primary link has a small tinted tile with its icon. The current page is a tinted row with a solid tile,
+   instead of the underline the top bar uses (an underlined word in a drawer row reads as a mistake). The
+   account and partner links carry a bare icon, like "Saved" always did. */
+.mobile-menu__icon {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--primary-light);
+    color: var(--primary);
+    transition: background .15s ease, color .15s ease;
+}
+.mobile-menu__icon svg { width: 19px; height: 19px; }
+.mobile-menu__label { display: inline-flex; align-items: center; gap: 12px; }
+
+.mobile-menu__group a,
+.mobile-menu .nav-more__toggle { gap: 12px; }
+.mobile-menu__group .nav-more__links a { font-size: .95rem; min-height: 42px; }
+.mobile-menu__group .nav-more__links .mobile-menu__icon { width: 30px; height: 30px; border-radius: 9px; }
+.mobile-menu__group .nav-more__links .mobile-menu__icon svg { width: 17px; height: 17px; }
+
+.mobile-menu__group a:hover .mobile-menu__icon,
+.mobile-menu__group a:active .mobile-menu__icon,
+.mobile-menu .nav-more__toggle:hover .mobile-menu__icon { background: #fff; }
+
+.mobile-menu .mobile-menu__group a[aria-current="page"],
+.mobile-menu .nav-more__toggle.is-active {
+    text-decoration: none;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+}
+.mobile-menu a[aria-current="page"] .mobile-menu__icon,
+.mobile-menu .nav-more__toggle.is-active .mobile-menu__icon { background: var(--primary); color: #fff; }
+
+.mobile-menu__utility--small svg { opacity: .8; }
+.mobile-menu__foot .btn { display: flex; align-items: center; justify-content: center; gap: 9px; }
+.mobile-menu__foot .btn svg { width: 19px; height: 19px; flex: none; }
+
+/* ---------- Phones: filters as a bottom sheet, tidier listing toolbar ----------
+   Opening the filters used to push the whole listing down. On a phone the panel is now a sheet over the page
+   (public/js/filter-sheet.js), so the page never moves. Wide screens keep the panel beside the grid. */
+.filter-sheet-overlay, .filter-panel__close, .catalog-categories__extra { display: none; }
+.filter-toggle__count {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px;
+    background: var(--primary); color: #fff; font-size: .72rem; font-weight: 800; line-height: 1;
+}
+
+@media (max-width: 900px) {
+    .filter-toggle {
+        margin-bottom: 0; min-height: 42px; padding: 0 16px; gap: 8px;
+        background: var(--white); color: var(--primary-dark); border: 1.5px solid var(--primary);
+        border-radius: 999px; font: inherit; font-weight: 700; font-size: .9rem;
+        -webkit-appearance: none; appearance: none; -webkit-tap-highlight-color: transparent;
+    }
+    .filter-toggle:active { background: var(--primary-light); }
+    .filter-toggle:focus-visible { outline: 3px solid var(--accent, #ff693b); outline-offset: 2px; }
+
+    .filter-sheet-overlay {
+        display: block; position: fixed; inset: 0; z-index: 1190;
+        background: rgba(10, 30, 24, .5);
+        opacity: 0; visibility: hidden; transition: opacity .22s ease, visibility 0s linear .22s;
+    }
+    body.filter-sheet-open .filter-sheet-overlay { opacity: 1; visibility: visible; transition: opacity .22s ease; }
+    body.filter-sheet-open { overflow: hidden; }
+    body.filter-sheet-open #chatbot-widget { visibility: hidden; }
+
+    .filter-panel {
+        display: block; position: fixed; inset: auto 0 0 0; z-index: 1200;
+        width: 100%; max-height: min(88dvh, 720px); margin: 0; padding: 0;
+        overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+        background: var(--paper); border: 0; border-radius: 22px 22px 0 0;
+        box-shadow: 0 -12px 40px rgba(10, 30, 24, .28);
+        transform: translateY(104%); visibility: hidden;
+        transition: transform .28s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .28s;
+    }
+    .filter-panel.open { display: block; margin-bottom: 0; transform: none; visibility: visible; transition: transform .28s cubic-bezier(.2, .8, .2, 1); }
+    .filter-panel:focus { outline: none; }
+
+    .filter-panel--v2 .filter-panel__head {
+        position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 12px;
+        margin: 0; padding: 22px 18px 12px; background: var(--paper); border-bottom: 1px solid var(--border);
+    }
+    .filter-panel--v2 .filter-panel__head::before {   /* the grab handle */
+        content: ""; position: absolute; top: 8px; left: 50%; width: 40px; height: 4px;
+        margin-left: -20px; border-radius: 2px; background: var(--border);
+    }
+    .filter-panel--v2 .filter-panel__head h3 { margin: 0; flex: 1; font-size: 1.1rem; }
+    .filter-panel__close {
+        display: inline-flex; align-items: center; justify-content: center; flex: none;
+        width: 38px; height: 38px; padding: 0; border: 0; border-radius: 50%;
+        background: var(--primary-light); color: var(--primary-dark); cursor: pointer;
+    }
+    .filter-panel__close:focus-visible { outline: 3px solid var(--accent, #ff693b); outline-offset: 2px; }
+    .filter-panel--v2 form { padding: 16px 18px 0; }
+    .filter-panel--v2 [data-filter-submit] {
+        position: sticky; bottom: 0; margin-top: 18px;
+        box-shadow: 0 0 0 14px var(--paper), 0 -8px 14px 14px var(--paper);
+    }
+    .filter-panel--v2 form::after { content: ""; display: block; height: max(16px, env(safe-area-inset-bottom)); }
+
+    /* categories: one swipeable row instead of a wrapped block */
+    .catalog-categories {
+        flex-wrap: nowrap; overflow-x: auto; gap: 8px; margin: 0 -20px 14px; padding: 2px 20px 6px;
+        scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    }
+    .catalog-categories::-webkit-scrollbar { display: none; }
+    .catalog-categories .chip, .catalog-categories .catalog-categories__extra { flex: none; white-space: nowrap; }
+    .catalog-categories__extra { display: inline-flex; }
+    .catalog-categories__more { display: none; }
+
+    /* toolbar: count + view switch on one line, Filters + Sort on the next, applied filters swipe sideways */
+    .results-toolbar {
+        display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px 12px; margin-bottom: 14px;
+    }
+    .results-toolbar__controls { display: contents; }
+    .results-count { grid-column: 1; grid-row: 1; font-weight: 700; color: var(--ink); font-size: .78rem; line-height: 1.3; }
+    .results-toolbar .destination-view-toggle, .results-toolbar .view-toggle { grid-column: 2; grid-row: 1; justify-self: end; }
+    .results-toolbar .destination-view-toggle button, .results-toolbar .view-toggle__btn { padding: 6px 14px; font-size: .88rem; }
+    .results-toolbar .filter-toggle { grid-column: 1; grid-row: 2; justify-self: start; }
+    .results-toolbar .sort-control { grid-column: 2; grid-row: 2; justify-self: end; }
+    .results-toolbar .sort-control > span:not(.site-dropdown) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .results-toolbar .sort-control select, .results-toolbar .sort-control .site-dropdown { min-width: 0; width: auto; max-width: 168px; }
+    .results-toolbar .active-filters {
+        grid-column: 1 / -1; grid-row: 3; flex-wrap: nowrap; overflow-x: auto; margin: 0 -20px; padding: 0 20px 2px;
+        scrollbar-width: none;
+    }
+    .results-toolbar .active-filters::-webkit-scrollbar { display: none; }
+    .results-toolbar .active-filters > * { flex: none; white-space: nowrap; }
+}
+
+@media (max-width: 480px) {
+    .explorer-map { height: 300px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .filter-panel, .filter-sheet-overlay { transition: none !important; }
+}
+
+/* ---------- Pagination: a short window of numbers (partials/pagination.blade.php) ----------
+   The older rules above style every <a> and <span> inside .pagination as a box, so the wrappers here are reset
+   first and only the page and step controls are drawn as boxes. */
+.pagination--windowed { align-items: center; flex-wrap: nowrap; gap: 6px; }
+.pagination--windowed .pagination__numbers,
+.pagination--windowed .pagination__status {
+    min-width: 0; height: auto; padding: 0; border: 0; border-radius: 0; background: none;
+    display: inline-flex; align-items: center; gap: 6px; font-weight: 500;
+}
+.pagination--windowed .pagination__status { display: none; color: var(--muted); font-size: .9rem; }
+.pagination--windowed .pagination__status strong { color: var(--ink); font-weight: 800; }
+.pagination--windowed .pagination__page,
+.pagination--windowed .pagination__step { min-width: 40px; height: 40px; padding: 0 10px; font-size: .9rem; }
+.pagination--windowed .pagination__step { font-size: 1.3rem; line-height: 1; }
+.pagination--windowed .pagination__page.is-current { background: var(--primary); border-color: var(--primary); color: var(--white); }
+.pagination--windowed .pagination__step.is-disabled { color: var(--border); background: transparent; }
+.pagination--windowed a:hover { background: var(--primary-light); }
+.pagination--windowed a:focus-visible { outline: 3px solid var(--accent, #ff693b); outline-offset: 2px; }
+.pagination--windowed .pagination__gap {
+    min-width: 18px; height: 40px; padding: 0; border: 0; background: none; color: var(--muted);
+}
+
+@media (max-width: 560px) {
+    /* the numbers give way to "Page 3 of 26" between two large arrows */
+    .pagination--windowed { justify-content: space-between; gap: 12px; margin-top: 24px; }
+    .pagination--windowed .pagination__numbers { display: none; }
+    .pagination--windowed .pagination__status { display: inline-flex; gap: .35em; }
+    .pagination--windowed .pagination__step { min-width: 48px; height: 48px; border-radius: 14px; }
+}
+
+/* ---------- Phones: the featured destination banner ----------
+   Stacked at full size it ran taller than the screen (a 220px photo over ~420px of copy). Here the photo is a
+   short strip and the copy is tightened, so the whole card fits in about one screen. */
+@media (max-width: 640px) {
+    .dpost-banner { margin-bottom: 20px; border-radius: 16px; min-height: 0; }
+    .dpost-banner__art { min-height: 0; height: 150px; }
+    .dpost-banner__art .dpost-card__photo, .dpost-banner__art svg { width: 100%; height: 100%; object-fit: cover; }
+    .dpost-banner .dpost-ribbon { top: 14px; left: -46px; width: 150px; padding: 4px 0; font-size: .66rem; }
+    .dpost-banner__copy { padding: 18px 18px 20px; }
+    .dpost-banner__kicker { font-size: .95rem; margin-bottom: 2px; }
+    .dpost-banner__name { font-size: 1.5rem; margin-bottom: 8px; }
+    .dpost-banner__blurb {
+        font-size: .88rem; line-height: 1.5; margin-bottom: 12px;
+        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .dpost-banner__meta { gap: 4px 12px; font-size: .84rem; margin-bottom: 16px; }
+    .dpost-banner__cta { align-self: stretch; justify-content: center; text-align: center; padding: 12px 18px; }
+}
+
+/* "How this works": four tall cards (a 64px stamp over the text) became about 1000px of scrolling on a phone.
+   Here each is a row, with the stamp beside the words. */
+@media (max-width: 560px) {
+    .feature-grid { gap: 12px; }
+    .feature-card {
+        display: grid; grid-template-columns: 52px 1fr; column-gap: 14px; align-items: start; padding: 16px;
+    }
+    .feature-card .feature-stamp { grid-row: 1 / span 2; width: 52px; height: 52px; margin: 0; }
+    .feature-card .feature-stamp svg { width: 24px; height: 24px; }
+    .feature-card h3 { grid-column: 2; margin-bottom: 4px; font-size: .98rem; }
+    .feature-card p { grid-column: 2; font-size: .85rem; line-height: 1.5; }
+}
+
+/* ---------- Phones: a shorter footer ----------
+   One column of every link made the footer ~1350px, more than a screen and a half. The travellers' list runs in
+   two columns, Partners and the DOT note sit side by side, and the spacing is tighter. */
+@media (max-width: 480px) {
+    .site-footer { padding-top: 40px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 26px 20px; }
+    .footer-grid > div:nth-child(1), .footer-grid > div:nth-child(2) { grid-column: 1 / -1; }
+    .footer-grid h4 { margin-bottom: 10px; }
+    .footer-grid a, .footer-grid p { margin-bottom: 0; }
+    .footer-grid a { padding: 7px 0; }
+    .footer-grid > div:nth-child(2) { display: grid; grid-template-columns: 1fr 1fr; column-gap: 20px; }
+    .footer-grid > div:nth-child(2) h4 { grid-column: 1 / -1; }
+    .footer-grid > div:nth-child(4) p { margin-bottom: 8px; font-size: .84rem; }
+}
+
+/* Phones: the events category chips are a swipeable row; the scrollbar under them looked like a stray line. */
+@media (max-width: 1023px) {
+    .chip-row--poster { scrollbar-width: none; margin-inline: -20px; padding-inline: 20px; }
+    .chip-row--poster::-webkit-scrollbar { display: none; }
+    .chip-row--poster .chip { flex: none; white-space: nowrap; }
+}
+
+/* Phones: the fact strip under a listing's hero (price, fee, distance...) read as three tall rows. Side by side
+   they take a third of the height; four facts sit two by two. */
+@media (max-width: 640px) {
+    .stat-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); flex-direction: initial; }
+    .stat-strip:has(.stat-strip__item:nth-child(4)) { grid-template-columns: 1fr 1fr; }
+    .stat-strip__item { flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px 12px; border-top: 0; border-left: 1.5px dashed var(--border); }
+    .stat-strip__item:first-child { border-left: 0; }
+    .stat-strip__icon { width: 34px; height: 34px; }
+    .stat-strip__icon svg { width: 18px; height: 18px; }
+    .stat-strip__value { font-size: 1rem; }
+    .stat-strip:has(.stat-strip__item:nth-child(4)) .stat-strip__item:nth-child(odd) { border-left: 0; }
+    .stat-strip:has(.stat-strip__item:nth-child(4)) .stat-strip__item:nth-child(n+3) { border-top: 1.5px dashed var(--border); }
+
+    /* the bottom bar's two buttons: one line each, so "Save this place" no longer wraps */
+    .sticky-cta { gap: 8px; padding: 10px 14px; }
+    .sticky-cta .btn { white-space: nowrap; padding-inline: 10px; font-size: .92rem; min-height: 44px; }
+    .sticky-cta .save-form--button, .sticky-cta .save-form--button .btn { height: 100%; }
+}
+
+/* ---------- Phones: listing detail pages ----------
+   On a phone the practical card (best time, hours, how long, map) sat below the reviews, so "Plan your visit"
+   was a long scroll away. It now follows the About card, and reviews come after it. The card's own Directions /
+   Save buttons repeat the bottom bar, so they are dropped where that bar shows. */
+@media (max-width: 900px) {
+    .detail-layout:has(> div > .visit-card) { gap: 20px; }
+    .detail-layout:has(> div > .visit-card) > div { display: contents; }
+    .detail-layout:has(> div > .visit-card) > div > * { order: 2; margin-block: 0; }
+    .detail-layout:has(> div > .visit-card) .stat-strip { order: 1; }
+    .detail-layout:has(> div > .visit-card) .visit-card { order: 3; }
+    .detail-layout:has(> div > .visit-card) .reviews-card { order: 4; }
+    body:has(.sticky-cta) .visit-card__actions { display: none; }
+}
+
+/* ---------- Phones: detail page polish (from the live iPhone) ---------- */
+/* "Before you go" sat on top of the heading (an inline span under a tight line-height). */
+.visit-card__kicker { display: block; margin-bottom: 8px; line-height: 1.2; }
+.visit-card__title { line-height: 1.1; }
+
+@media (max-width: 900px) {
+    /* The bottom bar: two clean, equal buttons. The angled poster clip and the inset-ring ghost drew a stray double
+       edge on the Save button, and the bar ignored the iPhone's home-indicator area. */
+    .sticky-cta { padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); }
+    .sticky-cta .btn-poster-primary, .sticky-cta .btn-poster-ghost {
+        clip-path: none; transform: none; border-radius: 12px; box-shadow: none;
+    }
+    .sticky-cta .btn-poster-primary { background: var(--primary-dark); }
+    .sticky-cta .btn-poster-ghost { background: #fff; color: var(--primary-dark); border: 1.5px solid var(--primary); }
+    .sticky-cta .btn-poster-ghost.is-saved { color: var(--stamp-red); border-color: var(--stamp-red); }
+}
+
+@media (max-width: 640px) {
+    .visit-card { padding: 22px 18px 18px; }
+    /* long hours ("8:00 AM–5:00 PM") no longer share a line with the Open/Closed pill: the pill drops under them */
+    .visit-card__row { flex-wrap: wrap; }
+    .visit-card__text { flex: 1 1 calc(100% - 56px); }
+    .visit-card__pill { margin: -6px 0 0 56px; }
+}

@@ -22,10 +22,6 @@
         @endphp
         @include('partials.catalog-categories', ['categoryLabel' => 'Accommodation categories'])
 
-        <button type="button" class="filter-toggle" onclick="document.getElementById('filterPanel').classList.toggle('open')">
-            <x-icon name="filter" /> Filters
-        </button>
-
         <div class="catalog-layout">
             @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, 'type'); @endphp
 
@@ -59,23 +55,7 @@
                         @include('partials.listing-results-map', ['listings' => $accommodations, 'id' => 'accommodations-map'])
                     </div>
 
-                    <div class="pagination" data-view-panel="grid">
-                        @if ($accommodations->onFirstPage())
-                            <span class="disabled">&laquo;</span>
-                        @else
-                            <a href="{{ $accommodations->previousPageUrl() }}">&laquo;</a>
-                        @endif
-
-                        @foreach ($accommodations->getUrlRange(1, $accommodations->lastPage()) as $page => $url)
-                            <span class="{{ $page === $accommodations->currentPage() ? 'active' : '' }}"><a href="{{ $url }}">{{ $page }}</a></span>
-                        @endforeach
-
-                        @if ($accommodations->hasMorePages())
-                            <a href="{{ $accommodations->nextPageUrl() }}">&raquo;</a>
-                        @else
-                            <span class="disabled">&raquo;</span>
-                        @endif
-                    </div>
+                    @include('partials.pagination', ['paginator' => $accommodations, 'panel' => 'grid'])
                 @else
                     <x-davo-empty-state title="No accommodations match your filters" message="Try another category or clear your filters to explore more options." :action-url="route('accommodations.index')" action-label="Clear filters" />
                 @endif

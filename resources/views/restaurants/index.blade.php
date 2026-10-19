@@ -27,10 +27,6 @@
             'moreCategoriesLabel' => 'More cuisines',
         ])
 
-        <button type="button" class="filter-toggle" onclick="document.getElementById('filterPanel').classList.toggle('open')">
-            <x-icon name="filter" /> Filters
-        </button>
-
         <div class="catalog-layout">
             @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, 'cuisine_type'); @endphp
 
@@ -64,23 +60,7 @@
                         @include('partials.listing-results-map', ['listings' => $restaurants, 'id' => 'restaurants-map'])
                     </div>
 
-                    <div class="pagination" data-view-panel="grid">
-                        @if ($restaurants->onFirstPage())
-                            <span class="disabled">&laquo;</span>
-                        @else
-                            <a href="{{ $restaurants->previousPageUrl() }}">&laquo;</a>
-                        @endif
-
-                        @foreach ($restaurants->getUrlRange(1, $restaurants->lastPage()) as $page => $url)
-                            <span class="{{ $page === $restaurants->currentPage() ? 'active' : '' }}"><a href="{{ $url }}">{{ $page }}</a></span>
-                        @endforeach
-
-                        @if ($restaurants->hasMorePages())
-                            <a href="{{ $restaurants->nextPageUrl() }}">&raquo;</a>
-                        @else
-                            <span class="disabled">&raquo;</span>
-                        @endif
-                    </div>
+                    @include('partials.pagination', ['paginator' => $restaurants, 'panel' => 'grid'])
                 @else
                     <x-davo-empty-state title="No restaurants match your filters" message="Try another category or clear your filters to explore more options." :action-url="route('restaurants.index')" action-label="Clear filters" />
                 @endif

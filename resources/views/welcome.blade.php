@@ -8,6 +8,7 @@
     @include('partials.head-assets')
     <link rel="stylesheet" href="{{ asset('css/landing-sections.css') }}?v={{ filemtime(public_path('css/landing-sections.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/postcard-carousel.css') }}?v={{ filemtime(public_path('css/postcard-carousel.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/hero-search.css') }}?v={{ filemtime(public_path('css/hero-search.css')) }}">
     @if ($heroVideo && $heroVideo['poster'])
         {{-- Fetched in parallel with the stylesheet so the hero's ground is
              ready at first paint, rather than arriving after it. --}}
@@ -223,6 +224,19 @@
         <p class="poster-hero__subhead">Sun-warmed islands, misty highlands, and the Philippine Eagle's home &mdash; discover DOT-accredited stays, tours, and eats across Region XI.</p>
     </div>
 
+    {{-- The picture ends on a soft curve, not a ruler-straight line: it bulges down behind the search card and
+         rises toward the sides, in the white of the ground below. --}}
+    <svg class="hero-edge" viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <path d="M0,120 L0,26 Q720,176 1440,26 L1440,120 Z"/>
+    </svg>
+
+</section>
+
+{{--
+    The hero's picture ends here, partway behind the search card: the card straddles its lower edge, and the
+    rest of the card, the popular searches, the stats and the scroll cue sit on a light ground beneath it.
+--}}
+<div class="hero-lower">
     {{--
         Every option carries an explicit value. Without one a select submits
         its own label, so "Duration" arrived as the string "1–2 days" -- en
@@ -239,49 +253,120 @@
         real default. data-empty-select marks which ones app.js should track
         for the .is-empty placeholder styling.
     --}}
-    <form class="ticket-search container" action="{{ route('search') }}" method="GET">
-        <div class="field">
-            <label for="purpose">I want to&hellip;</label>
-            <select id="purpose" name="purpose">
-                <option value="destinations">Explore destinations</option>
-                <option value="accommodations">Find a place to stay</option>
-                <option value="restaurants">Find a place to eat</option>
-                <option value="packages">Browse tour packages</option>
-                <option value="souvenir_centers">Shop for souvenirs</option>
-            </select>
-        </div>
-        <div class="field">
-            <label for="duration">Duration</label>
-            <select id="duration" name="duration" data-empty-select>
-                <option value="">Any length</option>
-                <option value="1-2">1&ndash;2 days</option>
-                <option value="3-4">3&ndash;4 days</option>
-                <option value="5-plus">5+ days</option>
-            </select>
-        </div>
-        <div class="field">
-            <label for="budget">Budget</label>
-            <select id="budget" name="budget" data-empty-select>
-                <option value="">Any budget</option>
-                <option value="Budget-Friendly">Budget-Friendly</option>
-                <option value="Mid-range">Mid-range</option>
-                <option value="Premium">Premium</option>
-            </select>
-        </div>
-        <div class="field">
-            <label for="interest">Interest</label>
-            {{-- Same list the Plan Your Trip survey uses (HomeController's
-                 $interestOptions, reused from ExitSurveyController::ACTIVITIES)
-                 so the two can't drift apart. --}}
-            <select id="interest" name="interest" data-empty-select>
-                <option value="">Any interest</option>
-                @foreach ($interestOptions as $interest)
-                    <option value="{{ $interest }}">{{ $interest }}</option>
+    {{--
+        The search card, in two parts: a white bar of tabs (the five catalogues, as radio inputs named
+        "purpose", so the form works without script) floating over a light body holding the budget as quick
+        choices, a name search and one box for Duration and Interest, with Explore on the lower edge.
+
+        The boxes under the name search belong to the chosen tab: every tab can narrow by place (province or
+        city), and then by what only that catalogue records -- an interest for destinations and packages, a
+        kind of stay, a cuisine, a trip length. The script shows only the boxes the chosen tab can use (and
+        disables the rest so they are not sent); SearchController drops anything else on the server too.
+        Budget is radio pills, with "Any budget" (an empty value, which the search ignores) as the default,
+        and is left out for souvenir shops, which record no price tier.
+    --}}
+    <form class="hero-search" action="{{ route('search') }}" method="GET" data-hero-search>
+        <div class="hero-search__bar">
+            <fieldset class="hero-search__tabs">
+                <legend class="sr-only">I want to&hellip;</legend>
+                @foreach ([
+                    ['destinations', 'Destinations', 'map-pin', 'Search a place', 'region_id interest', 1],
+                    ['accommodations', 'Stays', 'building', 'Search a hotel or resort', 'region_id type', 1],
+                    ['restaurants', 'Dining', 'utensils', 'Search a restaurant', 'region_id cuisine_type', 1],
+                    ['packages', 'Packages', 'ticket', 'Search a tour package', 'region_id interest duration', 1],
+                    ['souvenir_centers', 'Souvenirs', 'tag', 'Search a souvenir shop', 'region_id', 0],
+                ] as [$value, $label, $icon, $placeholder, $filterKeys, $hasBudget])
+                    <label class="hero-search__tab">
+                        <input type="radio" name="purpose" value="{{ $value }}"
+                            data-placeholder="{{ $placeholder }}"
+                            data-filters="{{ $filterKeys }}"
+                            data-budget="{{ $hasBudget }}"
+                            @checked($loop->first)>
+                        <span class="hero-search__tab-body"><x-icon :name="$icon" /> {{ $label }}</span>
+                    </label>
                 @endforeach
-            </select>
+            </fieldset>
         </div>
-        <button type="submit" class="btn btn-accent">Explore &rarr;</button>
+
+        <div class="hero-search__body">
+            <fieldset class="hero-search__pills" data-budget-pills>
+                <legend class="sr-only">Budget</legend>
+                @foreach ([['', 'Any budget'], ['Budget-Friendly', 'Budget-friendly'], ['Mid-range', 'Mid-range'], ['Premium', 'Premium']] as [$value, $label])
+                    <label class="hero-search__pill">
+                        <input type="radio" name="budget" value="{{ $value }}" @checked($loop->first)>
+                        <span>{{ $label }}</span>
+                    </label>
+                @endforeach
+            </fieldset>
+
+            <div class="hero-search__field">
+                <x-icon name="search" />
+                <label for="hero-search-q" class="sr-only">Search by name</label>
+                <input id="hero-search-q" type="search" name="q" maxlength="100" placeholder="Search a place"
+                    autocomplete="off" enterkeyhint="search" data-search-field>
+            </div>
+
+            <div class="hero-search__pair" data-search-filters>
+                <div class="hero-search__box" data-filter="region_id">
+                    <x-icon name="map-pin" />
+                    <label for="search-region">Where</label>
+                    <select id="search-region" name="region_id" data-empty-select>
+                        <option value="">Anywhere in Region XI</option>
+                        @foreach ($regions as $region)
+                            <option value="{{ $region->id }}">{{ $region->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="hero-search__box" data-filter="interest">
+                    <x-icon name="heart" />
+                    <label for="interest">Interest</label>
+                    {{-- Same list the Plan Your Trip survey uses (HomeController's
+                         $interestOptions, reused from ExitSurveyController::ACTIVITIES)
+                         so the two can't drift apart. --}}
+                    <select id="interest" name="interest" data-empty-select>
+                        <option value="">Any interest</option>
+                        @foreach ($interestOptions as $interest)
+                            <option value="{{ $interest }}">{{ $interest }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="hero-search__box" data-filter="type" hidden>
+                    <x-icon name="building" />
+                    <label for="search-stay-type">Kind of stay</label>
+                    <select id="search-stay-type" name="type" data-empty-select disabled>
+                        <option value="">Any kind of stay</option>
+                        @foreach ($stayTypes as $stayType)
+                            <option value="{{ $stayType }}">{{ $stayType }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="hero-search__box" data-filter="cuisine_type" hidden>
+                    <x-icon name="utensils" />
+                    <label for="search-cuisine">Cuisine</label>
+                    <select id="search-cuisine" name="cuisine_type" data-empty-select disabled>
+                        <option value="">Any cuisine</option>
+                        @foreach ($cuisineTypes as $cuisine)
+                            <option value="{{ $cuisine }}">{{ $cuisine }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="hero-search__box" data-filter="duration" hidden>
+                    <x-icon name="calendar" />
+                    <label for="duration">Trip length</label>
+                    <select id="duration" name="duration" data-empty-select disabled>
+                        <option value="">Any length</option>
+                        <option value="1-2">1&ndash;2 days</option>
+                        <option value="3-4">3&ndash;4 days</option>
+                        <option value="5-plus">5+ days</option>
+                    </select>
+                </div>
+            </div>
+            <p class="hero-search__hint" data-search-hint aria-live="polite"></p>
+        </div>
+
+        <button type="submit" class="btn btn-accent hero-search__go">Explore <x-icon name="arrow-right" /></button>
     </form>
+    <script src="{{ asset('js/hero-search.js') }}?v={{ filemtime(public_path('js/hero-search.js')) }}" defer></script>
 
 
 
@@ -325,7 +410,7 @@
         See what's popular
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
     </a>
-</section>
+</div>
 
 @include('partials.postcard-carousel')
 
@@ -509,7 +594,9 @@
             <div class="about-copy">
                 <p>Stretching inland from the Davao Gulf, Region XI climbs from lowland rainforest and coconut country into the cool, mist-held highlands around Mount Apo &mdash; at 2,954 metres, the highest ground in the Philippines. The change happens quickly: a single morning can take you from a beachfront on Samal to a highland trail where the temperature drops ten degrees and the birdsong changes entirely.</p>
 
-                <p>What makes the region unusual is how close that wilderness sits to an ordinary working city. Davao City covers more ground than almost any other city in the country, yet the Philippine Eagle &mdash; the national bird, and one of the rarest raptors alive &mdash; still nests in the forest along its western edge. Fishing towns, durian orchards, Lumad communities and a full-service metro all share the same gulf, and moving between them takes hours rather than days.</p>
+                <button type="button" class="read-more" data-read-more="aboutMoreText" aria-expanded="false" aria-controls="aboutMoreText" hidden>Read more</button>
+
+                <p id="aboutMoreText" class="about-copy__more">What makes the region unusual is how close that wilderness sits to an ordinary working city. Davao City covers more ground than almost any other city in the country, yet the Philippine Eagle &mdash; the national bird, and one of the rarest raptors alive &mdash; still nests in the forest along its western edge. Fishing towns, durian orchards, Lumad communities and a full-service metro all share the same gulf, and moving between them takes hours rather than days.</p>
 
                 @php
                     /*
@@ -651,5 +738,6 @@
 
 <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
 <script src="{{ asset('js/postcard-carousel.js') }}?v={{ filemtime(public_path('js/postcard-carousel.js')) }}" defer></script>
+<script src="{{ asset('js/read-more.js') }}?v={{ filemtime(public_path('js/read-more.js')) }}" defer></script>
 </body>
 </html>
