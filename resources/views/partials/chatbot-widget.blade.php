@@ -487,9 +487,11 @@
     function appendMessage(messages, text, who, cards, action) {
         var el = document.createElement('div');
         el.className = 'chatbot-msg ' + (who === 'user' ? 'chatbot-msg-user' : 'chatbot-msg-bot');
-        var escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        // Quotes are escaped too: the link step below puts the address inside href="...", so a quote in it could
+        // otherwise close the attribute and add one of its own (an event handler).
+        var escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         escaped = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        escaped = escaped.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+        escaped = escaped.replace(/(https?:\/\/(?:[^\s&]|&amp;)+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
         el.innerHTML = escaped;
 
         if (cards && cards.length) {

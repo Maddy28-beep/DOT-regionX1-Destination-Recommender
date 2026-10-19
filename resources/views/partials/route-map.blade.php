@@ -89,7 +89,12 @@
                                 var distText = step.distance >= 1000
                                     ? (step.distance / 1000).toFixed(1) + ' km'
                                     : Math.round(step.distance) + ' m';
-                                li.innerHTML = instruction + ' <span class="step-dist">(' + distText + ')</span>';
+                                // Text only: road names come from OpenStreetMap, which anyone can edit, so they are never parsed as HTML.
+                                li.appendChild(document.createTextNode(instruction + ' '));
+                                var dist = document.createElement('span');
+                                dist.className = 'step-dist';
+                                dist.textContent = '(' + distText + ')';
+                                li.appendChild(dist);
                                 stepsEl.appendChild(li);
                                 stepNum++;
                             });

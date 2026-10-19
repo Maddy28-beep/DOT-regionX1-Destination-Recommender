@@ -116,6 +116,15 @@ class SimilarDestinationService
             ->get()
             ->keyBy('id');
 
+        // A substitute that is closed on the day the stop is planned for would be offered and then refused by the
+        // planner, so it is left out here (hours that name days, like "Closed Mondays").
+        $day = $itinerary->items()->where('destination_id', $original->id)->value('day_number');
+
+        if ($day !== null) {
+            $date = $this->windowFor($itinerary)[0]->copy()->addDays((int) $day - 1);
+            $candidates = $candidates->reject(fn (Destination $c) => \App\Support\OpeningHours::windowsOn($c->hours, $date) === []);
+        }
+
         if ($candidates->isEmpty()) {
             return collect();
         }
