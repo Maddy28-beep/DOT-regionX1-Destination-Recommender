@@ -4,12 +4,7 @@
    peeking in. Each card is one link: a photo with a dark foot, the number of places in the top corner, and the
    mood's handwritten line, name and "Explore" at the bottom. */
 
-.moods { padding-top: 56px; padding-bottom: 60px; scroll-margin-top: 70px; }   /* the hero's scroll cue lands here, below the sticky header */
-
-.moods__head { margin-bottom: 26px; }
-.moods__kicker { display: block; margin-bottom: 4px; color: var(--stamp-red, #c4432b); font-size: 1.2rem; }
-.moods__title { margin: 0 0 8px; font-size: clamp(2.1rem, 4.4vw, 3.2rem); line-height: 1; color: var(--primary-dark); }
-.moods__head p { margin: 0; max-width: 56ch; font-size: .95rem; color: var(--muted); }
+.moods { scroll-margin-top: 70px; }   /* the hero's scroll cue lands here, below the sticky header */
 
 /* ---- the row ---- */
 .moods__row {
@@ -86,8 +81,6 @@
     .moods__item { flex: 0 0 clamp(190px, 30vw, 240px); scroll-snap-align: start; }
 }
 @media (max-width: 640px) {
-    .moods { padding-top: 40px; padding-bottom: 36px; }
-    .moods__head { margin-bottom: 18px; }
     .moods__item { flex-basis: min(62vw, 230px); }
     .mood__photo { aspect-ratio: 3 / 5; }
     .mood__count { top: 14px; right: 14px; }

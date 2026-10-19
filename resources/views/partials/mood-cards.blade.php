@@ -14,10 +14,13 @@
 @if ($postcardSlides->isNotEmpty())
     <section class="section landing-section landing-section--tint moods" id="known-for" aria-labelledby="moodsTitle">
         <div class="container">
-            <div class="moods__head">
-                <span class="moods__kicker poster-kicker">a quick postcard tour</span>
-                <h2 class="moods__title poster-title" id="moodsTitle">What Davao is known for</h2>
-                <p>Pick a mood and we'll show you every DOT-accredited spot that fits.</p>
+            {{-- The same heading as every other landing section (Popular Destinations, Featured Tour Packages...). --}}
+            <div class="dpost-head">
+                <div>
+                    <span class="dpost-kicker poster-kicker">a quick postcard tour</span>
+                    <h2 class="poster-title" id="moodsTitle" style="color:var(--ocean-teal-dark);">What Davao is known for</h2>
+                    <p>Pick a mood and we'll show you every DOT-accredited spot that fits.</p>
+                </div>
             </div>
 
             <ul class="moods__row" role="list">
