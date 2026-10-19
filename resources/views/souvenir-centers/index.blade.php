@@ -13,10 +13,6 @@
 <div class="section-tight">
     <div class="container">
 
-        <button type="button" class="filter-toggle" onclick="document.getElementById('filterPanel').classList.toggle('open')">
-            <x-icon name="filter" /> Filters
-        </button>
-
         <div class="catalog-layout">
             @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, null); @endphp
 

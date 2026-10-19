@@ -8,6 +8,11 @@
     @foreach ($featuredTypes as $type => $label)
         <a href="{{ request()->fullUrlWithQuery([$categoryParam => $type, 'page' => null]) }}" class="chip {{ request($categoryParam) === $type ? 'active' : '' }}" @if (request($categoryParam) === $type) aria-current="true" @endif>{{ $label }}</a>
     @endforeach
+    {{-- On a phone the chips are one scrolling row, where the "More" dropdown below would be clipped, so the rest of
+         the categories are chips of their own there (and hidden on a wide screen, which has the dropdown). --}}
+    @foreach ($moreTypes as $type)
+        <a href="{{ request()->fullUrlWithQuery([$categoryParam => $type, 'page' => null]) }}" class="chip catalog-categories__extra {{ request($categoryParam) === $type ? 'active' : '' }}" @if (request($categoryParam) === $type) aria-current="true" @endif>{{ $type }}</a>
+    @endforeach
     @if ($moreTypes->isNotEmpty())
         <details class="catalog-categories__more">
             <summary class="chip {{ $moreTypeSelected ? 'active' : '' }}">
