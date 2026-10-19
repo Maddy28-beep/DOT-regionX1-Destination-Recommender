@@ -120,16 +120,16 @@
 
     <nav class="mobile-menu__body" aria-label="Mobile navigation">
         <div class="mobile-menu__group">
-            @include('partials.navigation-links', ['navId' => 'mobile'])
+            @include('partials.navigation-links', ['navId' => 'mobile', 'icons' => true])
         </div>
 
         <div class="mobile-menu__divider"></div>
 
         <div class="mobile-menu__group mobile-menu__group--plain">
             @if ($isTouristAuthed)
-                <a href="{{ route('account.itineraries') }}" @if(request()->routeIs('account.itineraries')) aria-current="page" @endif class="mobile-menu__utility mobile-menu__saved">My Itineraries</a>
+                <a href="{{ route('account.itineraries') }}" @if(request()->routeIs('account.itineraries')) aria-current="page" @endif class="mobile-menu__utility mobile-menu__saved"><x-icon name="map" /> My Itineraries</a>
             @else
-                <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="mobile-menu__utility mobile-menu__saved">Log in</a>
+                <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="mobile-menu__utility mobile-menu__saved"><x-icon name="log-in" /> Log in</a>
             @endif
             <a href="{{ $isTouristAuthed ? route('account.saved') : route('saved.index') }}" class="mobile-menu__utility mobile-menu__saved" @if(request()->routeIs('saved.*', 'account.saved')) aria-current="page" @endif>
                 <x-icon name="heart" />
@@ -145,16 +145,16 @@
                 <span class="mobile-menu__account">Signed in as {{ auth('tourist')->user()->alias }}</span>
                 <form method="POST" action="{{ route('account.logout') }}">
                     @csrf
-                    <button type="submit" class="mobile-menu__utility mobile-menu__utility--btn">Log out</button>
+                    <button type="submit" class="mobile-menu__utility mobile-menu__utility--btn"><x-icon name="log-out" /> Log out</button>
                 </form>
             @else
-                <a href="{{ route('account.register') }}" class="mobile-menu__utility mobile-menu__utility--small">Create a free account</a>
+                <a href="{{ route('account.register') }}" class="mobile-menu__utility mobile-menu__utility--small"><x-icon name="user" /> Create a free account</a>
             @endif
-            <a href="{{ route('portal.establishment.register') }}" class="mobile-menu__utility mobile-menu__utility--small">List your establishment</a>
+            <a href="{{ route('portal.establishment.register') }}" class="mobile-menu__utility mobile-menu__utility--small"><x-icon name="building" /> List your establishment</a>
         </div>
     </nav>
 
     <div class="mobile-menu__foot">
-        <a href="{{ route('plan.choose') }}" @if(request()->routeIs('plan.*')) aria-current="page" @endif class="btn btn-primary btn-block">Plan My Trip</a>
+        <a href="{{ route('plan.choose') }}" @if(request()->routeIs('plan.*')) aria-current="page" @endif class="btn btn-primary btn-block"><x-icon name="compass" /> Plan My Trip</a>
     </div>
 </div>
