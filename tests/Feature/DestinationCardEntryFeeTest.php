@@ -52,6 +52,7 @@ class DestinationCardEntryFeeTest extends TestCase
         $html = $this->get('/destinations')->assertOk()->assertSee('Free entry')->getContent();
 
         $this->assertStringNotContainsString('/ person', $html);
-        $this->assertStringContainsString('dcard__band', $html, 'A place with no fee on record keeps the price band.');
+        $this->assertStringContainsString('class="dcard__tier">Mid-range<', $html, 'A place with no fee on record says its price band in words.');
+        $this->assertStringNotContainsString('dcard__band', $html, 'No row of peso symbols.');
     }
 }

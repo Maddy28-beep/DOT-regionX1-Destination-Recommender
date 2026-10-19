@@ -31,9 +31,11 @@ class DestinationFiltersToolbarTest extends TestCase
         $html = $this->get('/destinations')->assertOk()->getContent();
 
         $this->assertSame(4, substr_count($html, 'name="price_tier"'));
-        foreach (['Free', 'Budget', 'Mid-range', 'Premium', 'No fee'] as $label) {
+        foreach (['Free', 'Budget', 'Mid-range', 'Premium'] as $label) {
             $this->assertStringContainsString($label, $html);
         }
+        $panel = substr($html, (int) strpos($html, 'id="filterPanel"'), 6000);
+        $this->assertStringNotContainsString('₱', $panel, 'The budget tiles are words, with no peso signs.');
         $this->assertStringContainsString('All of Davao Region', $html);
         $this->assertStringContainsString('Province or city', $html);
         $this->assertMatchesRegularExpression('/data-filter-submit>\s*Show results\s*<\/button>/', $html);
@@ -50,7 +52,7 @@ class DestinationFiltersToolbarTest extends TestCase
 
         $this->assertStringContainsString('1 destination found', $html);
         $this->assertStringContainsString('Showing:', $html);
-        $this->assertStringContainsString('Budget ₱', $html);
+        $this->assertStringContainsString('Budget-friendly', $html);
         $this->assertMatchesRegularExpression('/Show results \(1 filter\)/', $html);
         $this->assertStringContainsString('Clear all', $html);
         $this->assertStringContainsString('Cheap Beach', $html);
@@ -66,7 +68,7 @@ class DestinationFiltersToolbarTest extends TestCase
 
         $this->assertMatchesRegularExpression('/Show results \(2 filters\)/', $html);
         $this->assertStringContainsString('Search: eden', $html);
-        $this->assertStringContainsString('Mid-range ₱₱', $html);
+        $this->assertStringContainsString('Remove filter: Mid-range', $html);
 
         // Removing the budget chip keeps the search and drops the budget.
         preg_match_all('/<a href="([^"]+)" class="filter-chip" aria-label="Remove filter: ([^"]+)"/', $html, $m, PREG_SET_ORDER);

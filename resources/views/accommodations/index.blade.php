@@ -30,7 +30,7 @@
                 'placeholder' => 'e.g. Pearl Farm',
                 'regions' => $regions,
                 'activeFilters' => $activeFilters,
-                'tiers' => [['Budget-Friendly', 'Budget-Friendly', '₱'], ['Mid-range', 'Mid-range', '₱₱'], ['Premium', 'Premium', '₱₱₱']],
+                'tiers' => [['Budget-Friendly', 'Budget-Friendly', ''], ['Mid-range', 'Mid-range', ''], ['Premium', 'Premium', '']],
                 'anyBudget' => true,
                 'categoryParam' => 'type',
             ])

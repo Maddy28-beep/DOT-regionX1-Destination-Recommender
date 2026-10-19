@@ -8,7 +8,7 @@
     $placeholder      example for the search box
     $regions          collection of Region
     $activeFilters    from App\Support\ActiveFilters::from()
-    $tiers            optional list of [value, name, sub]; leave out for listings with no budget filter
+    $tiers            optional list of [value, name, sub]; leave out for listings with no budget filter (sub may be '')
     $anyBudget        optional; put an "Any budget" tile first (selected while no budget is chosen)
     $categoryParam    optional name of the page's category filter ("type", "cuisine_type"); it is carried as a
                       hidden field because the category chips above the grid set it
@@ -18,8 +18,11 @@
 --}}
 @php
     $tiers = $tiers ?? [];
+    // A tile's third value is a small line under its name (the peso signs). A page whose tiles have none (dining
+    // names its bands in words only) gets plain tiles, "Any budget" included.
+    $tileHasSub = collect($tiers)->contains(fn ($tier) => ($tier[2] ?? '') !== '');
     if (! empty($anyBudget) && $tiers) {
-        array_unshift($tiers, ['', 'Any budget', 'All']);
+        array_unshift($tiers, ['', 'Any budget', $tileHasSub ? 'All' : '']);
     }
     $hidden = $hidden ?? [];
     $formId = $formId ?? 'catalogFilters';
@@ -75,7 +78,7 @@
                         <label class="budget-tile">
                             <input type="radio" name="price_tier" value="{{ $value }}" @checked($value === '' ? ! request()->filled('price_tier') : request('price_tier') === $value) data-filter-count @if ($value === '') data-any @endif>
                             <span class="budget-tile__name">{{ $name }}</span>
-                            <span class="budget-tile__sub">{{ $sub }}</span>
+                            @if ($sub !== '')<span class="budget-tile__sub">{{ $sub }}</span>@endif
                         </label>
                     @endforeach
                 </div>
