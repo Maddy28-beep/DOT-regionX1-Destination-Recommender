@@ -5900,3 +5900,6 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
 .hero-popular-searches > * { flex: none; white-space: nowrap; }
 .hero-popular-searches > :first-child { margin-left: auto; }
 .hero-popular-searches > :last-child { margin-right: auto; }
+
+/* A restaurant's price band, said in words (no peso sign): the bold line a destination gives its entry fee. */
+.dcard__tier { font-size: .95rem; font-weight: 800; color: var(--primary-dark); }

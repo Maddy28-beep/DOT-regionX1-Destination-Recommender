@@ -3,7 +3,7 @@
     heart (and a NEW tag until the listing has reviews), then the DOT mark and rating, name, a sub-line,
     tags, and a footer whose content depends on the type -- entry fee and distance for a destination,
     "from" price per night for a stay, price and duration for a package, the number of packages for a tour
-    operator. Whatever a listing has no data for is left out rather than filled in.
+    operator, the price band in words (no peso sign) and the distance from the city centre for a restaurant. Whatever a listing has no data for is left out rather than filled in.
 
     Rendered by listing-poster-card. The heart sits outside the anchor (a form inside a link is invalid and
     would swallow the click), so the wrapper is what lifts on hover. Only listings that can be saved get
@@ -21,6 +21,7 @@
     $isStay = $listing instanceof \App\Models\Accommodation;
     $isPackage = $listing instanceof \App\Models\Package;
     $isOperator = $listing instanceof \App\Models\TourOperator;
+    $isRestaurant = $listing instanceof \App\Models\Restaurant;
 
     // Where it is, with the region added only when the location does not already name it.
     $where = trim((string) $listing->location);
@@ -64,6 +65,17 @@
         $meta = ['clock', $listing->duration_label, null];
     }
 
+    // A restaurant's price is a band, not a figure, so it is said in words ("Mid-range") with no peso sign, beside how
+    // far it is from the city centre when it has a map location.
+    $tierWord = null;
+    if ($isRestaurant) {
+        $tierWord = ['Free' => 'Free', 'Budget-Friendly' => 'Budget-friendly', 'Mid-range' => 'Mid-range', 'Premium' => 'Premium'][$listing->price_tier] ?? null;
+        $km = $listing->distanceFromCityCentreKm();
+        if ($km !== null) {
+            $meta = ['swap', rtrim(rtrim(number_format($km, 1), '0'), '.').' km', ' from city'];
+        }
+    }
+
     // Tour operators are summed up by how many packages they run (loaded with the grid, never queried per card).
     $packageCount = $isOperator ? ($listing->packages_count ?? null) : null;
 
@@ -73,7 +85,7 @@
             ->take(2)->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('')
         : null;
 
-    $hasFooter = $priceMain || ($isDestination && $tier === 0) || $packageCount || ($tier !== null && ! $isOperator) || $meta;
+    $hasFooter = $priceMain || ($isDestination && $tier === 0) || $packageCount || ($tier !== null && ! $isOperator && ! $isRestaurant) || $tierWord || $meta;
 @endphp
 
 <div class="dpost-card-wrap">
@@ -135,7 +147,9 @@
                             <strong>Free entry</strong>
                         @elseif ($packageCount)
                             <span class="dcard__count">{{ $packageCount }} tour {{ \Illuminate\Support\Str::plural('package', $packageCount) }}</span>
-                        @elseif ($tier !== null && ! $isOperator)
+                        @elseif ($tierWord)
+                            <span class="dcard__tier">{{ $tierWord }}</span>
+                        @elseif ($tier !== null && ! $isOperator && ! $isRestaurant)
                             {{-- No exact price on record: show the price band instead. --}}
                             <span class="dcard__band" aria-label="Price tier {{ $tier }} of 3">
                                 @for ($i = 1; $i <= 3; $i++)<span class="{{ $i <= $tier ? 'is-on' : '' }}">&#8369;</span>@endfor
