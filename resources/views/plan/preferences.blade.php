@@ -271,7 +271,7 @@
                                            id="origin_label"
                                            name="origin_label"
                                            value="{{ old('origin_label', $preference->origin_label) }}"
-                                           placeholder="Start typing an address, e.g. Francisco Bangoy"
+                                           placeholder="Hotel, airport or address"
                                            autocomplete="off"
                                            role="combobox"
                                            aria-expanded="false"

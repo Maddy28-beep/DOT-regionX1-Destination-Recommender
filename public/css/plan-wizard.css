@@ -104,3 +104,60 @@
 @media(max-width:460px) { .plan-loading { grid-template-columns:1fr; } .plan-loading .plan-loading-davo { margin:auto; height:128px; } }
 @media(prefers-reduced-motion:reduce) { .plan-loading-workflow li.is-active span, .plan-loading-track > span { animation:none; } .plan-loading.is-finishing .plan-loading-track > span { transition:none; } }
 @media(max-width:640px) { .plan-wizard .panel-body { padding:22px 18px; } .plan-wizard > .page-head { padding-top:26px; } .plan-wizard .filter-inline, .plan-wizard #plan-step-0 > .plan-section-group:first-of-type .filter-inline { grid-template-columns:1fr; } .plan-wizard-steps { gap:7px; } .plan-wizard-steps button { font-size:.73rem; padding:12px 2px; } .plan-wizard .chip-checkbox-grid { grid-template-columns:1fr; } .plan-wizard-actions { gap:12px; } .plan-wizard-actions .plan-next { width:100%; } .plan-wizard input:not([type="checkbox"]), .plan-wizard select, .plan-wizard textarea { font-size:16px; } }
+
+/* ---- phones ----
+   The intro (mascot, kicker, title, blurb, button) ran ~360px before the first question, every field was a
+   full-width row, the interest tiles were a one-column stack and the Next button sat at the very bottom of a long
+   step. Here: a compact intro, paired fields, two-column tiles and a Back / Next bar that stays on screen. */
+@media(max-width:640px) {
+    .plan-wizard > .page-head { padding: 16px 0 6px; }
+    .plan-wizard:not(.has-resume) > .page-head .plan-introduction {
+        grid-template-columns: 68px minmax(0, 1fr); gap: 4px 14px; text-align: left; justify-items: stretch; align-items: center;
+    }
+    .plan-wizard:not(.has-resume) .plan-davo { grid-column: 1; grid-row: 1; width: 68px; height: 82px; }
+    .plan-wizard:not(.has-resume) .plan-introduction-copy { grid-column: 2; grid-row: 1; }
+    .plan-wizard:not(.has-resume) .plan-saved-link { grid-column: 1 / -1; grid-row: 2; justify-self: start; min-height: 36px; padding: 5px 12px; }
+    .plan-wizard .poster-kicker { font-size: .6rem; letter-spacing: .1em; }
+    .plan-wizard .plan-introduction .page-title { font-size: 1.35rem; margin: 3px 0 4px; }
+    .plan-wizard .plan-introduction p { font-size: .84rem; line-height: 1.5; }
+    .plan-resume-davo { width: 120px; height: 120px; }
+
+    .plan-wizard .section-tight { padding-top: 12px; }
+    .plan-wizard-steps { margin-bottom: 14px; }
+    .plan-wizard-step > h2 { font-size: 1.2rem; }
+    .plan-step-intro { margin-bottom: 16px; font-size: .9rem; }
+
+    /* paired fields: days | with whom, date | time, budget | stay; the wide ones keep a row each */
+    .plan-wizard .filter-inline { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 12px; }
+    .plan-wizard .filter-inline:has(#place_of_origin) { grid-template-columns: 1fr; }
+    .plan-wizard #plan-step-0 > .plan-section-group:first-of-type .filter-inline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .plan-wizard .plan-field-wide { grid-column: 1 / -1; }
+    .plan-wizard .field label { font-size: .86rem; }
+    .plan-wizard input:not([type="checkbox"]):not([type="hidden"]), .plan-wizard select { min-height: 48px; }
+    .plan-wizard .plan-section-group { margin-bottom: 14px; }
+
+    /* interest, amenity and access tiles: two to a row */
+    .plan-wizard .chip-checkbox-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .plan-wizard .chip-checkbox-grid .field-check { padding: 12px; gap: 8px; font-size: .86rem; line-height: 1.3; min-height: 52px; }
+
+    .plan-wizard .origin-control .btn { flex: 1 1 auto; }
+
+    /* Back / Next stay in view at the bottom of the card */
+    .plan-wizard-actions {
+        position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; flex-wrap: nowrap; gap: 10px;
+        margin: 0; padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+        background: var(--paper); border-top: 1px solid var(--border);
+        box-shadow: 0 -8px 18px rgba(16, 40, 30, .08);
+    }
+    .plan-wizard:not(.is-building) { padding-bottom: 88px; }
+    .plan-wizard #plan-step-2 .filter-inline { grid-template-columns: 1fr; }
+    .plan-wizard-actions .plan-next { flex: 1 1 auto; width: auto; margin-left: 0; justify-content: center; padding: 12px 12px; font-size: .92rem; white-space: nowrap; }
+    .plan-wizard-actions #planBack { flex: none; }
+    .plan-wizard-actions #planStepStatus {
+        position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+    }
+    /* the chat button would sit on top of that bar, so it rides above it on this page */
+    body:has(#planWizard) #chatbot-widget { bottom: calc(86px + env(safe-area-inset-bottom)); }
+    body:has(#planWizard.is-building) #chatbot-widget { bottom: 16px; }
+}
+@media(max-width:640px) { .plan-wizard .plan-optional > summary { font-size: .95rem; } }
