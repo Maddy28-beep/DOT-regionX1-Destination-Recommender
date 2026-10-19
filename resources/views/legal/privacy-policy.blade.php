@@ -141,8 +141,9 @@
                             the coordinates of the stops (not your name). Like any website you visit, these
                             services can see your IP address.</li>
                         <li><strong>Address search.</strong> If you type an address as your starting point,
-                            the text you type is sent from our server to OpenStreetMap's address search
-                            service to suggest matches.</li>
+                            the text you type is sent from our server to @if (filled(config('services.geoapify.key')))
+                            Geoapify's address search service (outside the Philippines) @else
+                            OpenStreetMap's address search service @endif to suggest matches.</li>
                         <li><strong>Your device's location.</strong> Only used if you press "Use my current
                             location" and allow it in your browser, and rounded to roughly 100&nbsp;metres
                             before it is stored.</li>
