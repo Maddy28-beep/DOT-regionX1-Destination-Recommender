@@ -43,23 +43,7 @@
                         @include('partials.listing-results-map', ['listings' => $souvenirCenters, 'id' => 'souvenir-centers-map'])
                     </div>
 
-                    <div class="pagination" data-view-panel="grid">
-                        @if ($souvenirCenters->onFirstPage())
-                            <span class="disabled">&laquo;</span>
-                        @else
-                            <a href="{{ $souvenirCenters->previousPageUrl() }}">&laquo;</a>
-                        @endif
-
-                        @foreach ($souvenirCenters->getUrlRange(1, $souvenirCenters->lastPage()) as $page => $url)
-                            <span class="{{ $page === $souvenirCenters->currentPage() ? 'active' : '' }}"><a href="{{ $url }}">{{ $page }}</a></span>
-                        @endforeach
-
-                        @if ($souvenirCenters->hasMorePages())
-                            <a href="{{ $souvenirCenters->nextPageUrl() }}">&raquo;</a>
-                        @else
-                            <span class="disabled">&raquo;</span>
-                        @endif
-                    </div>
+                    @include('partials.pagination', ['paginator' => $souvenirCenters, 'panel' => 'grid'])
                 @else
                     <x-davo-empty-state title="No souvenir centers match your filters" message="Try another category or clear your filters to explore more options." :action-url="route('souvenir-centers.index')" action-label="Clear filters" />
                 @endif
