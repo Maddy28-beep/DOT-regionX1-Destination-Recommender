@@ -2,7 +2,7 @@
 
 @section('title', ($slide->exists ? 'Edit' : 'Add').' slide — DOT Admin')
 @section('page-title', $slide->exists ? 'Edit slide' : 'Add slide')
-@section('page-sub', 'A slide in the homepage Popular Right Now carousel')
+@section('page-sub', 'A card in the landing page\'s What Davao is known for row')
 
 @section('content')
 

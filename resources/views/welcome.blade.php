@@ -7,7 +7,7 @@
     <title>ExploreDVO — Discover the Wonders of Davao Region</title>
     @include('partials.head-assets')
     <link rel="stylesheet" href="{{ asset('css/landing-sections.css') }}?v={{ filemtime(public_path('css/landing-sections.css')) }}">
-    <link rel="stylesheet" href="{{ asset('css/postcard-carousel.css') }}?v={{ filemtime(public_path('css/postcard-carousel.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/mood-cards.css') }}?v={{ filemtime(public_path('css/mood-cards.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/hero-search.css') }}?v={{ filemtime(public_path('css/hero-search.css')) }}">
     @if ($heroVideo && $heroVideo['poster'])
         {{-- Fetched in parallel with the stylesheet so the hero's ground is
@@ -408,14 +408,14 @@
         </div>
     </div>
 
-    <a href="#popular-right-now" class="hero-scroll-cue">
-        See what's popular
+    <a href="#known-for" class="hero-scroll-cue">
+        Discover Davao
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
     </a>
 </div>
 </div>{{-- /.hero-screen --}}
 
-@include('partials.postcard-carousel')
+@include('partials.mood-cards')
 
 @php
     // Scene mapping now lives on Destination::illustrationScene() -- reused
@@ -740,7 +740,6 @@
 @include('partials.chatbot-widget')
 
 <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
-<script src="{{ asset('js/postcard-carousel.js') }}?v={{ filemtime(public_path('js/postcard-carousel.js')) }}" defer></script>
 <script src="{{ asset('js/read-more.js') }}?v={{ filemtime(public_path('js/read-more.js')) }}" defer></script>
 </body>
 </html>

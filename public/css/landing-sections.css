@@ -19,10 +19,10 @@
 .landing-section--tint { background: var(--bg); }
 .landing-section--white { background: var(--white); }
 
-/* The first section after the hero or the carousel starts on a straight edge: the
-   carousel ends in a solid caption bar that a sheet must not slide over. */
+/* The first section after the hero starts on a straight edge: the scroll cue sits at the foot of the hero
+   block, and a sheet sliding up over it would cover it. */
 .poster-hero + .landing-section,
-#popular-right-now + .landing-section {
+.hero-screen + .landing-section {
     margin-top: 0;
     border-radius: 0;
     box-shadow: none;

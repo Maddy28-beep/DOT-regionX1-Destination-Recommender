@@ -2281,7 +2281,7 @@ select.site-dropdown-native {
     border-color: var(--paper);
 }
 
-/* Anchors to #popular-right-now (welcome.blade.php); scroll-margin-top on
+/* Anchors to #known-for (welcome.blade.php); scroll-margin-top on
    that section (below) keeps the sticky header from covering its heading
    when the jump lands.
 

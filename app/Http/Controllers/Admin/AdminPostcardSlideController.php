@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Slides of the homepage "Popular Right Now" carousel: caption, call to
+ * Cards of the landing page's "What Davao is known for" row: caption, call to
  * action, photo (with generated variants), alt text and focal point.
  */
 class AdminPostcardSlideController extends Controller
@@ -43,7 +43,7 @@ class AdminPostcardSlideController extends Controller
         $slide = PostcardSlide::create($data);
 
         return redirect()->route('admin.postcard-slides.index')
-            ->with(Toast::success('Slide added', "\"{$slide->title}\" is now in the Popular Right Now carousel."));
+            ->with(Toast::success('Slide added', "\"{$slide->title}\" is now on the landing page, under What Davao is known for."));
     }
 
     public function edit(PostcardSlide $postcardSlide): View
@@ -74,7 +74,7 @@ class AdminPostcardSlideController extends Controller
         $this->images->delete($postcardSlide);
         $postcardSlide->delete();
 
-        return back()->with(Toast::success('Slide removed', "\"{$title}\" is no longer in the carousel."));
+        return back()->with(Toast::success('Slide removed', "\"{$title}\" is no longer on the landing page."));
     }
 
     private function validated(Request $request, bool $imageRequired): array

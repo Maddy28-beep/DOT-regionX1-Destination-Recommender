@@ -1,8 +1,8 @@
 @extends('layouts.admin')
 
-@section('title', 'Carousel slides — DOT Admin')
-@section('page-title', 'Popular Right Now carousel')
-@section('page-sub', 'The photo slides at the top of the homepage, after the hero')
+@section('title', 'Mood cards — DOT Admin')
+@section('page-title', 'What Davao is known for')
+@section('page-sub', 'The tall mood cards under the landing page hero. Each opens the page its link points to; a link to a catalogue shows how many places are in it.')
 
 @section('content')
 
@@ -43,7 +43,7 @@
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="6" class="cell-muted">No slides yet. The homepage hides the carousel until there is at least one.</td></tr>
+                <tr><td colspan="6" class="cell-muted">No cards yet. The landing page hides this row until there is at least one.</td></tr>
             @endforelse
         </tbody>
     </table>
