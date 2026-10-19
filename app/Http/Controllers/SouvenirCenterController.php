@@ -28,6 +28,7 @@ class SouvenirCenterController extends Controller
         };
 
         $souvenirCenters = $query->paginate(9)->withQueryString();
+        \App\Support\SearchLog::record($request, 'souvenir-centers', $souvenirCenters->total());
 
         $regions = Region::orderBy('name')->get();
 

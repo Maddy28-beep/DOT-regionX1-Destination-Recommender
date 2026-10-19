@@ -5889,3 +5889,14 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
 .cta-banner .btn { clip-path: none; transform: none; border-radius: var(--btn-radius); box-shadow: 0 6px 16px rgba(120, 40, 10, .22); transition: background .15s ease, transform .15s ease; }
 .cta-banner .btn:hover { transform: translateY(-2px); }
 .cta-banner .btn-ghost { border-radius: var(--btn-radius); box-shadow: none; }
+
+/* "Popular searches": always one row of (at most) four. It is centred when it fits; on a narrow screen it keeps
+   to one line and swipes sideways instead of wrapping onto a second row. */
+.hero-popular-searches {
+    flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; gap: 8px;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.hero-popular-searches::-webkit-scrollbar { display: none; }
+.hero-popular-searches > * { flex: none; white-space: nowrap; }
+.hero-popular-searches > :first-child { margin-left: auto; }
+.hero-popular-searches > :last-child { margin-right: auto; }

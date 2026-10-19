@@ -36,6 +36,7 @@ class TourOperatorController extends Controller
         };
 
         $tourOperators = $query->paginate(9)->withQueryString();
+        \App\Support\SearchLog::record($request, 'tour-operators', $tourOperators->total());
 
         $regions = Region::orderBy('name')->get();
         $specializations = TourOperator::query()->whereNotNull('specialization')->distinct()->orderBy('specialization')->pluck('specialization');

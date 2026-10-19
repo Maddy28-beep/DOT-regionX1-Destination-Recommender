@@ -38,6 +38,7 @@ class AccommodationController extends Controller
         };
 
         $accommodations = $query->paginate(9)->withQueryString();
+        \App\Support\SearchLog::record($request, 'accommodations', $accommodations->total());
 
         $regions = Region::orderBy('name')->get();
         $types = Accommodation::query()->whereNotNull('type')->distinct()->orderBy('type')->pluck('type');

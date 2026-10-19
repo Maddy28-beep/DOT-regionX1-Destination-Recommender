@@ -64,6 +64,7 @@ class DestinationController extends Controller
             'url' => route('destinations.show', $destination),
         ]);
         $destinations = $query->paginate(9)->withQueryString();
+        \App\Support\SearchLog::record($request, 'destinations', $destinations->total());
 
         $regions = Region::orderBy('name')->get();
         $types = Destination::query()->whereNotNull('type')->distinct()->orderBy('type')->pluck('type');

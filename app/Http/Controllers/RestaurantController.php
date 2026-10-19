@@ -36,6 +36,7 @@ class RestaurantController extends Controller
         };
 
         $restaurants = $query->paginate(9)->withQueryString();
+        \App\Support\SearchLog::record($request, 'restaurants', $restaurants->total());
 
         $regions = Region::orderBy('name')->get();
         $cuisineTypes = Restaurant::query()->whereNotNull('cuisine_type')->distinct()->orderBy('cuisine_type')->pluck('cuisine_type');
