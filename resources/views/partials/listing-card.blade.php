@@ -1,5 +1,5 @@
 {{--
-    The listing card for destinations, stays, packages, souvenir centers and tour operators: photo with the
+    The listing card for destinations, stays, restaurants, packages, souvenir centers and tour operators: photo with the
     heart (and a NEW tag until the listing has reviews), then the DOT mark and rating, name, a sub-line,
     tags, and a footer whose content depends on the type -- entry fee and distance for a destination,
     "from" price per night for a stay, price and duration for a package, the number of packages for a tour
