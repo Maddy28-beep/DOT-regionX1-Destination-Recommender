@@ -320,7 +320,9 @@ class AdminConsoleUiTest extends TestCase
                 'visitor_token' => $token,
                 'listing_kind' => 'destination',
                 'listing_id' => $listing->id,
-                'visit_date' => now()->toDateString(),
+                // The card counts "today" by the Manila calendar (the DOT's day), while now() is UTC: between
+                // midnight and 8 am in Manila the two are different dates, so a UTC "today" was counted as yesterday.
+                'visit_date' => now('Asia/Manila')->toDateString(),
                 'source' => 'qr_scan',
             ]);
         }
