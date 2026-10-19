@@ -27,12 +27,18 @@
     $filterCount = $activeFilters->count();
 @endphp
 
-<aside class="filter-panel filter-panel--v2" id="filterPanel">
+{{-- On a phone the panel is a bottom sheet over this dim layer; on a wide screen neither is shown. --}}
+<div class="filter-sheet-overlay" id="filterOverlay" data-filter-sheet-overlay></div>
+
+<aside class="filter-panel filter-panel--v2" id="filterPanel" tabindex="-1">
     <div class="filter-panel__head">
-        <h3>Filters</h3>
+        <h3 id="filterPanelTitle">Filters</h3>
         @if ($filterCount)
             <a href="{{ route($route, $clearParams) }}" class="filter-panel__clear">Clear all</a>
         @endif
+        <button type="button" class="filter-panel__close" data-filter-sheet-close aria-label="Close filters">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+        </button>
     </div>
 
     <form method="GET" action="{{ route($route) }}" id="{{ $formId }}" data-filter-form>
@@ -81,3 +87,4 @@
         </button>
     </form>
 </aside>
+<script src="{{ asset('js/filter-sheet.js') }}?v={{ filemtime(public_path('js/filter-sheet.js')) }}" defer></script>
