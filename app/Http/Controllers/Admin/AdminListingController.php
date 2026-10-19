@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Establishment\EstablishmentDashboardController;
 use App\Models\Accommodation;
 use App\Models\Destination;
 use App\Models\Package;
@@ -44,7 +45,7 @@ class AdminListingController extends Controller
         }
 
         if ($request->filled('q')) {
-            $query->where('name', 'like', '%'.$request->string('q').'%');
+            \App\Support\SearchTerm::contains($query, 'name', (string) $request->string('q'));
         }
 
         $listings = $query->orderBy('name')->paginate(12)->withQueryString();
@@ -107,7 +108,7 @@ class AdminListingController extends Controller
         }
 
         return redirect()->route('admin.listings.index', $type)
-            ->with(Toast::success("{$config['singular']} created", "\"{$listing->name}\" has been added to the catalog."));
+            ->with(Toast::success("{$config['singular']} created", "\"{$listing->name}\" has been added to the catalog.".$this->hoursNote($type, $listing)));
     }
 
     public function edit(string $type, int $id): View
@@ -157,7 +158,7 @@ class AdminListingController extends Controller
         }
 
         return redirect()->route('admin.listings.index', $type)
-            ->with(Toast::success("{$config['singular']} updated", "Your changes to \"{$listing->name}\" have been saved."));
+            ->with(Toast::success("{$config['singular']} updated", "Your changes to \"{$listing->name}\" have been saved.".$this->hoursNote($type, $listing)));
     }
 
     public function archive(string $type, int $id): RedirectResponse
@@ -205,6 +206,22 @@ class AdminListingController extends Controller
         $n = $listings->count();
 
         return back()->with(Toast::success('Bulk action complete', "{$n} ".Str::plural(strtolower($config['singular']), $n)." {$verb}."));
+    }
+
+    /**
+     * The trip planner limits a visit by a destination's hours only when it can read them. Say so when it cannot,
+     * so a typo like "8am to 5" is noticed now instead of silently putting no limit on the visit.
+     */
+    private function hoursNote(string $type, $listing): string
+    {
+        if ($type !== 'destinations' || blank($listing->hours)) {
+            return '';
+        }
+
+        $readable = \App\Support\OpeningHours::windows($listing->hours) !== null
+            || \App\Support\OpeningHours::windowsOn($listing->hours, now('Asia/Manila')) !== null;
+
+        return $readable ? '' : ' Note: the trip planner cannot read these hours, so it will not limit visits by them. Use a form like "8:00 AM–5:00 PM" or "Mon–Sat 8:00 AM–5:00 PM".';
     }
 
     private function config(string $type): array
@@ -288,6 +305,8 @@ class AdminListingController extends Controller
     ];
 
     private const LINK_MESSAGES = [
+        'latitude.between' => 'That latitude is outside the Davao Region. Check the sign and that latitude and longitude are not swapped.',
+        'longitude.between' => 'That longitude is outside the Davao Region. Check the sign and that latitude and longitude are not swapped.',
         'website_url.url' => 'Enter the full website address, starting with http:// or https://.',
         'facebook_url.url' => 'Enter the full Facebook address, starting with http:// or https://.',
         'instagram_url.url' => 'Enter the full Instagram address, starting with http:// or https://.',
@@ -343,13 +362,13 @@ class AdminListingController extends Controller
                 'type' => ['nullable', 'string', 'max:80'],
                 'price_tier' => ['nullable', 'string', 'max:20'],
                 'entry_fee_min' => ['nullable', 'numeric', 'min:0'],
-                'entry_fee_max' => ['nullable', 'numeric', 'min:0'],
+                'entry_fee_max' => ['nullable', 'numeric', 'min:0', 'gte:entry_fee_min'],
                 'distance_km' => ['nullable', 'numeric', 'min:0'],
                 'visit_duration' => ['nullable', 'string', 'max:50'],
                 'best_time' => ['nullable', 'string', 'max:80'],
                 'hours' => ['nullable', 'string', 'max:100'],
-                'latitude' => ['nullable', 'numeric', 'between:-90,90'],
-                'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+                'latitude' => ['nullable', 'numeric', 'between:'.EstablishmentDashboardController::REGION_BOUNDS['lat'][0].','.EstablishmentDashboardController::REGION_BOUNDS['lat'][1]],
+                'longitude' => ['nullable', 'numeric', 'between:'.EstablishmentDashboardController::REGION_BOUNDS['lng'][0].','.EstablishmentDashboardController::REGION_BOUNDS['lng'][1]],
                 'featured' => ['nullable', 'boolean'],
             ]),
             'accommodations' => array_merge($common, [
@@ -360,8 +379,8 @@ class AdminListingController extends Controller
                 'check_in' => ['nullable', 'date_format:H:i'],
                 'check_out' => ['nullable', 'date_format:H:i'],
                 'distance_km' => ['nullable', 'numeric', 'min:0'],
-                'latitude' => ['nullable', 'numeric', 'between:-90,90'],
-                'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+                'latitude' => ['nullable', 'numeric', 'between:'.EstablishmentDashboardController::REGION_BOUNDS['lat'][0].','.EstablishmentDashboardController::REGION_BOUNDS['lat'][1]],
+                'longitude' => ['nullable', 'numeric', 'between:'.EstablishmentDashboardController::REGION_BOUNDS['lng'][0].','.EstablishmentDashboardController::REGION_BOUNDS['lng'][1]],
                 'featured' => ['nullable', 'boolean'],
             ]),
             'restaurants' => array_merge($common, [
@@ -370,8 +389,8 @@ class AdminListingController extends Controller
                 'price_tier' => ['nullable', 'string', 'max:20'],
                 'opening_hours' => ['nullable', 'string', 'max:100'],
                 'contact_number' => ['nullable', 'string', 'max:20'],
-                'latitude' => ['nullable', 'numeric', 'between:-90,90'],
-                'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+                'latitude' => ['nullable', 'numeric', 'between:'.EstablishmentDashboardController::REGION_BOUNDS['lat'][0].','.EstablishmentDashboardController::REGION_BOUNDS['lat'][1]],
+                'longitude' => ['nullable', 'numeric', 'between:'.EstablishmentDashboardController::REGION_BOUNDS['lng'][0].','.EstablishmentDashboardController::REGION_BOUNDS['lng'][1]],
             ]),
             'packages' => array_merge($common, [
                 'duration_label' => ['nullable', 'string', 'max:50'],
@@ -381,20 +400,20 @@ class AdminListingController extends Controller
                 'type' => ['nullable', 'string', 'max:80'],
                 'provider_name' => ['nullable', 'string', 'max:150'],
                 'tour_operator_id' => ['nullable', 'exists:tour_operators,id'],
-                'latitude' => ['nullable', 'numeric', 'between:-90,90'],
-                'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+                'latitude' => ['nullable', 'numeric', 'between:'.EstablishmentDashboardController::REGION_BOUNDS['lat'][0].','.EstablishmentDashboardController::REGION_BOUNDS['lat'][1]],
+                'longitude' => ['nullable', 'numeric', 'between:'.EstablishmentDashboardController::REGION_BOUNDS['lng'][0].','.EstablishmentDashboardController::REGION_BOUNDS['lng'][1]],
                 'featured' => ['nullable', 'boolean'],
             ]),
             'souvenir-centers' => array_merge($common, [
-                'latitude' => ['nullable', 'numeric', 'between:-90,90'],
-                'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+                'latitude' => ['nullable', 'numeric', 'between:'.EstablishmentDashboardController::REGION_BOUNDS['lat'][0].','.EstablishmentDashboardController::REGION_BOUNDS['lat'][1]],
+                'longitude' => ['nullable', 'numeric', 'between:'.EstablishmentDashboardController::REGION_BOUNDS['lng'][0].','.EstablishmentDashboardController::REGION_BOUNDS['lng'][1]],
             ]),
             'tour-operators' => array_merge($common, [
                 'specialization' => ['nullable', 'string', 'max:80'],
                 'price_tier' => ['nullable', 'string', 'max:20'],
                 'contact_number' => ['nullable', 'string', 'max:20'],
-                'latitude' => ['nullable', 'numeric', 'between:-90,90'],
-                'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+                'latitude' => ['nullable', 'numeric', 'between:'.EstablishmentDashboardController::REGION_BOUNDS['lat'][0].','.EstablishmentDashboardController::REGION_BOUNDS['lat'][1]],
+                'longitude' => ['nullable', 'numeric', 'between:'.EstablishmentDashboardController::REGION_BOUNDS['lng'][0].','.EstablishmentDashboardController::REGION_BOUNDS['lng'][1]],
             ]),
             default => $common,
         };

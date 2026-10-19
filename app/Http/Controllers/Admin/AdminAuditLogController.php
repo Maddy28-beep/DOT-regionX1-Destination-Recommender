@@ -15,7 +15,7 @@ class AdminAuditLogController extends Controller
         $action = trim((string) $request->query('action', ''));
 
         $logs = SystemAuditLog::with('admin')
-            ->when($action !== '', fn ($q) => $q->where('action', 'like', '%'.$action.'%'))
+            ->when($action !== '', fn ($q) => \App\Support\SearchTerm::contains($q, 'action', $action))
             ->latest('created_at')
             ->latest('id')
             ->paginate(25)

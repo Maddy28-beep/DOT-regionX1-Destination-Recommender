@@ -14,7 +14,7 @@ class TourOperatorController extends Controller
         $query = TourOperator::publiclyVisible()->with('region', 'photos')->withCount('reviews')->withCount(['packages' => fn ($q) => $q->whereNull('archived_at')->where('is_accredited', true)]);
 
         if ($request->filled('q')) {
-            $query->where('name', 'like', '%'.$request->string('q').'%');
+            \App\Support\SearchTerm::contains($query, 'name', (string) $request->string('q'));
         }
 
         if ($request->filled('region_id')) {
