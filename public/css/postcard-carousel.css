@@ -256,8 +256,11 @@
     .pc-arrow--prev { left: 10px; }
     .pc-arrow--next { right: 10px; }
     .pc-arrow svg { width: 20px; height: 20px; }
-    .pc-thumbs { gap: 8px; }
-    .pc-thumb { width: 68px; height: 44px; border-radius: 8px; }
+    /* The thumbnails share whatever room the pause button leaves, so any number of slides fits on any phone. */
+    .pc-controls { gap: 12px; }
+    .pc-thumbs { flex: 1 1 auto; min-width: 0; max-width: 100%; gap: 8px; }
+    .pc-thumb { flex: 1 1 0; min-width: 0; width: auto; max-width: 76px; height: 44px; border-radius: 8px; }
+    .pc-toggle { flex: none; }
     .pc-caption__name { font-size: 30px; }
 }
 
@@ -274,3 +277,28 @@
 /* Inactive captions and buttons are hidden with the attribute; component
    classes that set display (.btn, .pc-caption__where) must not override it. */
 .pc [hidden] { display: none !important; }
+
+/* ---------- Phones: a smaller carousel ----------
+   At 420px of photo, a 34px heading, a 30px caption and a 22px-padded bar the section ran ~680px, most of a
+   screen. Everything is scaled down here so the photo, the caption and the button show together without
+   dominating the page. */
+@media (max-width: 640px) {
+    .pc-stage { height: clamp(250px, 36vh, 300px); }
+    .pc-stage::before { height: 130px; }
+    .pc-stage::after { height: 56px; }
+    .pc-heading { padding: 18px 18px 0; }
+    .pc-heading h2 { font-size: 26px; margin-bottom: 4px; }
+    .pc-heading p { font-size: 13px; line-height: 1.4; max-width: 30ch; }
+    .pc-arrow { width: 36px; height: 36px; margin-top: -18px; border-width: 1.5px; }
+    .pc-arrow--prev { left: 8px; }
+    .pc-arrow--next { right: 8px; }
+    .pc-arrow svg { width: 18px; height: 18px; }
+
+    .pc-bar { gap: 12px; padding: 14px 16px 18px; }
+    .pc-caption__kicker { font-size: 1.05rem; margin-bottom: 0; }
+    .pc-caption__name { font-size: 24px; }
+    .pc-caption__where { margin-top: 4px; font-size: .85rem; }
+    .pc-thumb { height: 40px; border-radius: 7px; }
+    .pc-toggle { width: 38px; height: 38px; }
+    .pc-cta__btn { padding: 11px 16px; font-size: .95rem; min-height: 44px; }
+}
