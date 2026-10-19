@@ -183,10 +183,6 @@
     .chatbot-send svg { width: 20px; height: 20px; }
     .chatbot-disclaimer { margin: 8px 4px 0; text-align: center; font-size: .72rem; line-height: 1.35; color: var(--muted, #6b7a73); }
 
-    @media (max-width: 480px) {
-        .chatbot-panel { width: calc(100vw - 32px); right: -4px; }
-    }
-
     /* Below 900px, listing detail pages show a full-width sticky CTA bar
        (.sticky-cta, ~72px tall) pinned to the bottom of the viewport. Left at
        its default 20px offset, the chat bubble's higher z-index sits on top
@@ -212,15 +208,30 @@
         }
     }
 
-    /* Phones: a smaller button covers less of the page, and its bubble and panel follow its size. */
+    /* Phones: a smaller button covers less of the page, and the chat opens as a sheet from the bottom edge
+       (full width, rounded top) instead of a floating card pushed to one side. While it is open the sheet itself
+       carries the close button, so the launcher steps out of the way. The --chat-kb / --chat-vvh values are set by
+       the script below from the visual viewport, so the on-screen keyboard cannot cover the message box. */
     @media (max-width: 640px) {
         .chatbot-widget { right: 12px; }
-        .chatbot-toggle { width: 58px; height: 58px; }
+        .chatbot-toggle { width: 52px; height: 52px; }
         .chatbot-toggle .chatbot-avatar { border-width: 3px; }
-        .chatbot-toggle-badge { width: 24px; height: 24px; right: -3px; bottom: -3px; }
-        .chatbot-toggle-badge svg { width: 12px; height: 12px; }
-        .chatbot-hint { right: 70px; bottom: 10px; padding: 9px 13px; font-size: .84rem; }
-        .chatbot-panel { bottom: 70px; right: -4px; }
+        .chatbot-toggle-badge { width: 22px; height: 22px; right: -3px; bottom: -3px; }
+        .chatbot-toggle-badge svg { width: 11px; height: 11px; }
+        .chatbot-hint { right: 64px; bottom: 8px; padding: 8px 12px; font-size: .82rem; }
+        .chatbot-toggle[aria-expanded="true"] { visibility: hidden; }
+
+        body .chatbot-widget .chatbot-panel {
+            position: fixed; left: 0; right: 0; bottom: var(--chat-kb, 0px); width: auto; max-width: none;
+            border-width: 1px 0 0; border-radius: 22px 22px 0 0;
+            box-shadow: 0 -12px 40px rgba(0,0,0,.25);
+            max-height: min(84dvh, calc(var(--chat-vvh, 100dvh) - 10px));
+        }
+        .chatbot-panel-head { padding: 14px 12px 14px 16px; }
+        .chatbot-head-avatar { width: 42px; height: 42px; margin-right: 10px; }
+        .chatbot-messages { overscroll-behavior: contain; flex-basis: 340px; }
+        .chatbot-form { padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); }
+        .chatbot-disclaimer { margin-top: 6px; }
     }
     @media (prefers-reduced-motion: reduce) {
         .chatbot-toggle.is-pinging { animation: none; }
@@ -284,19 +295,41 @@
         }
     } catch (_) { /* storage can be unavailable; the hint still shows on hover */ }
 
+    // Keep the sheet on top of the on-screen keyboard: the visual viewport is what shrinks when it opens.
+    var vv = window.visualViewport;
+    function fitToKeyboard() {
+        var widget = getWidget(), panel = getPanel();
+        if (!widget || !panel) return;
+        if (!vv || panel.hidden) {
+            widget.style.removeProperty('--chat-kb');
+            widget.style.removeProperty('--chat-vvh');
+            return;
+        }
+        widget.style.setProperty('--chat-kb', Math.max(0, window.innerHeight - vv.height - vv.offsetTop) + 'px');
+        widget.style.setProperty('--chat-vvh', vv.height + 'px');
+    }
+    if (vv) {
+        vv.addEventListener('resize', fitToKeyboard);
+        vv.addEventListener('scroll', fitToKeyboard);
+    }
+
     function setOpen(open) {
         var panel = getPanel();
         if (!panel) return;
         panel.hidden = !open;
         panel.style.display = open ? 'flex' : 'none';
+        fitToKeyboard();
         var toggle = document.getElementById('chatbot-toggle');
         if (toggle) toggle.setAttribute('aria-expanded', String(open));
         if (!open && panel.contains(document.activeElement) && toggle) toggle.focus();
         if (open) {
             hideHint();
             waveHello();
-            var input = document.getElementById('chatbot-input');
-            if (input) input.focus();
+            // On a phone, focusing the box would raise the keyboard over the greeting before it is read, so focus
+            // the close button instead (a keyboard or screen-reader user still lands inside the dialog).
+            var onPhone = window.matchMedia && window.matchMedia('(max-width: 640px)').matches;
+            var input = document.getElementById(onPhone ? 'chatbot-close' : 'chatbot-input');
+            if (input) input.focus({ preventScroll: true });
         } else if (toggle) {
             clearTimeout(waveTimer);
             toggle.classList.remove('is-waving');
