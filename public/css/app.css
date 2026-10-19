@@ -5585,3 +5585,44 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
     .dcard__dist svg { width: 12px; height: 12px; }
     .dcard__dist-more { display: none; }
 }
+
+/* ---------- Phone drawer: an icon in front of every link ----------
+   Each primary link has a small tinted tile with its icon. The current page is a tinted row with a solid tile,
+   instead of the underline the top bar uses (an underlined word in a drawer row reads as a mistake). The
+   account and partner links carry a bare icon, like "Saved" always did. */
+.mobile-menu__icon {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--primary-light);
+    color: var(--primary);
+    transition: background .15s ease, color .15s ease;
+}
+.mobile-menu__icon svg { width: 19px; height: 19px; }
+.mobile-menu__label { display: inline-flex; align-items: center; gap: 12px; }
+
+.mobile-menu__group a,
+.mobile-menu .nav-more__toggle { gap: 12px; }
+.mobile-menu__group .nav-more__links a { font-size: .95rem; min-height: 42px; }
+.mobile-menu__group .nav-more__links .mobile-menu__icon { width: 30px; height: 30px; border-radius: 9px; }
+.mobile-menu__group .nav-more__links .mobile-menu__icon svg { width: 17px; height: 17px; }
+
+.mobile-menu__group a:hover .mobile-menu__icon,
+.mobile-menu__group a:active .mobile-menu__icon,
+.mobile-menu .nav-more__toggle:hover .mobile-menu__icon { background: #fff; }
+
+.mobile-menu .mobile-menu__group a[aria-current="page"],
+.mobile-menu .nav-more__toggle.is-active {
+    text-decoration: none;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+}
+.mobile-menu a[aria-current="page"] .mobile-menu__icon,
+.mobile-menu .nav-more__toggle.is-active .mobile-menu__icon { background: var(--primary); color: #fff; }
+
+.mobile-menu__utility--small svg { opacity: .8; }
+.mobile-menu__foot .btn { display: flex; align-items: center; justify-content: center; gap: 9px; }
+.mobile-menu__foot .btn svg { width: 19px; height: 19px; flex: none; }
