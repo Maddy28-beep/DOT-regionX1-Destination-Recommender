@@ -38,22 +38,23 @@ class PortalAuthController extends Controller
             return redirect()->intended(route('admin.overview'));
         }
 
+        $credentials = ['email' => $data['identifier'], 'password' => $data['password']];
+
+        // Check the password first. Telling someone an account is "still pending" before they have proved it is
+        // theirs would let anyone find out which e-mail addresses are registered, and in what state.
+        if (! Auth::guard('establishment')->validate($credentials)) {
+            return back()->withErrors(['identifier' => 'Those credentials do not match our records.'])->onlyInput('identifier');
+        }
+
         $account = \App\Models\EstablishmentAccount::where('email', $data['identifier'])->first();
 
         if (! $account || $account->status !== 'approved') {
             return back()
-                ->withErrors(['identifier' => $account
-                    ? 'This establishment account is still '.$account->status.' and cannot sign in yet.'
-                    : 'Those credentials do not match our records.'])
+                ->withErrors(['identifier' => 'This establishment account is still '.($account->status ?? 'pending').' and cannot sign in yet.'])
                 ->onlyInput('identifier');
         }
 
-        if (! Auth::guard('establishment')->attempt([
-            'email' => $data['identifier'],
-            'password' => $data['password'],
-        ], $request->boolean('remember'))) {
-            return back()->withErrors(['identifier' => 'Those credentials do not match our records.'])->onlyInput('identifier');
-        }
+        Auth::guard('establishment')->attempt($credentials, $request->boolean('remember'));
 
         $request->session()->regenerate();
 

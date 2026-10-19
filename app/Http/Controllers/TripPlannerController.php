@@ -140,7 +140,8 @@ class TripPlannerController extends Controller
             'budget' => ['required', 'string', 'max:20'],
             'accommodation_pref' => ['required', 'string', 'max:20'],
             'distance_pref' => ['required', 'in:near,moderate,far'],
-            'start_date' => ['nullable', 'date'],
+            // Not more than two years ahead: a typo such as 2062 would otherwise be planned as written.
+            'start_date' => ['nullable', 'date', 'before_or_equal:'.now('Asia/Manila')->addYears(2)->toDateString()],
             'arrival_time' => ['nullable', 'date_format:H:i'],
             // Bounds are the real ones, so a malformed or spoofed reading is
             // rejected rather than quietly sequencing the trip from the sea.

@@ -81,6 +81,16 @@ class ExitSurveyController extends Controller
         'over_100000' => 125000,
     ];
 
+    /** The kinds a survey may list as visited, and where each one lives. */
+    private const PLACE_MODELS = [
+        'destination' => Destination::class,
+        'accommodation' => Accommodation::class,
+        'restaurant' => Restaurant::class,
+        'package' => Package::class,
+        'souvenir_center' => SouvenirCenter::class,
+        'tour_operator' => TourOperator::class,
+    ];
+
     public function create(): View
     {
         $placeModels = [
@@ -201,15 +211,31 @@ class ExitSurveyController extends Controller
          * id hit the preference_id foreign key and crashed a survey that
          * otherwise had nothing wrong with it.
          */
+        $isTest = $request->boolean('test');
+        $token = \App\Http\Middleware\EnsureVisitorToken::get($request);
+        $throttleKey = 'exit-survey:'.$token;
+
+        // Surveys feed the analytics and the association rules, so one browser cannot flood them. Trial-mode
+        // surveys (?test=1) are exempt: they are cleared automatically and never counted.
+        if (! $isTest && $token !== '' && \Illuminate\Support\Facades\Cache::has($throttleKey)) {
+            return back()->withInput()->withErrors(['overall_rating' => 'You already sent your feedback a little while ago. Thank you! You can answer again later.']);
+        }
+
         $preferenceId = $request->session()->get(TripPlannerController::PREFERENCE_KEY);
 
         if ($preferenceId && ! TouristPreference::whereKey($preferenceId)->exists()) {
             $preferenceId = null;
         }
 
-        $isTest = $request->boolean('test');
+        // Only places that exist, and each place once.
+        $places = collect($data['places_visited'] ?? [])->unique()->filter(function (string $place) {
+            [$kind, $id] = explode(':', $place, 2);
+            $model = self::PLACE_MODELS[$kind] ?? null;
 
-        $survey = DB::transaction(function () use ($data, $preferenceId, $isTest) {
+            return $model !== null && $model::whereKey((int) $id)->exists();
+        })->values()->all();
+
+        $survey = DB::transaction(function () use ($data, $preferenceId, $isTest, $places) {
             $survey = ExitSurvey::create(
                 collect($data)->except(['places_visited', 'activities', 'test'])
                     ->put('preference_id', $preferenceId)
@@ -218,7 +244,7 @@ class ExitSurveyController extends Controller
                     ->all()
             );
 
-            foreach ($data['places_visited'] ?? [] as $place) {
+            foreach ($places as $place) {
                 [$kind, $id] = explode(':', $place, 2);
                 ExitSurveyVisit::create(['exit_survey_id' => $survey->id, 'listing_kind' => $kind, 'listing_id' => $id]);
             }
@@ -235,6 +261,10 @@ class ExitSurveyController extends Controller
         // the recap page doesn't lose it, the same durability the trip
         // planner already gives guest_itinerary_id.
         $request->session()->put('last_exit_survey_id', $survey->id);
+
+        if (! $isTest && $token !== '') {
+            \Illuminate\Support\Facades\Cache::put($throttleKey, 1, now()->addHours(6));
+        }
 
         return redirect()->route('exit-survey.recap')->with(Toast::success('Thanks for your feedback', 'Your response helps DOT Region XI improve tourism services.'));
     }

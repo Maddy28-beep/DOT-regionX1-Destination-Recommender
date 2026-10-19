@@ -50,7 +50,17 @@ class CheckInController extends Controller
         $listing = $config['model']::findOrFail($id);
         abort_unless($listing->is_accredited && ! $listing->archived_at, 404, 'Check-in is only available for currently DOT-accredited, active listings.');
 
-        $today = now()->toDateString();
+        // Only the link printed in the QR code is signed. A plain /check-in/... address, typed in or loaded by
+        // another page, would otherwise count a visit (and unlock a review) for someone who was never there.
+        if (! $request->hasValidSignature()) {
+            return redirect()->route($config['route'], $listing)->with(Toast::error(
+                'Scan the QR code to check in',
+                'Check-in works by scanning the code displayed at '.$listing->name.'.'
+            ));
+        }
+
+        // The Philippine date, not the server's UTC one: a day starts at midnight in Davao.
+        $today = now('Asia/Manila')->toDateString();
 
         $attributes = [
             'visitor_token' => EnsureVisitorToken::get($request),

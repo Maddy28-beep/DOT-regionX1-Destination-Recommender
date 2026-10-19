@@ -180,7 +180,7 @@ class EstablishmentPortalRendersTest extends TestCase
             ->get('/portal/establishment/listing')
             ->getContent();
 
-        $expected = route('check-in', ['type' => 'accommodations', 'id' => $listing->id]);
+        $expected = \App\Http\Controllers\QrCodeController::signedCheckInUrl('accommodations', $listing->id);
 
         $this->assertStringContainsString('qr-frame', $html);
         $this->assertStringContainsString(e($expected), $html);

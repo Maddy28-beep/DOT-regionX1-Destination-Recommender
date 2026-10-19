@@ -24,7 +24,12 @@ class EstablishmentRegistrationController extends Controller
             'business_name' => ['required', 'string', 'max:150'],
             'listing_kind' => ['required', 'in:accommodation,restaurant,package,souvenir_center,tour_operator'],
             'claimed_accreditation_number' => ['nullable', 'string', 'max:50'],
-            'email' => ['required', 'email', 'max:100', 'unique:establishment_accounts,email'],
+            'email' => ['required', 'email', 'max:100', 'unique:establishment_accounts,email', function ($attribute, $value, $fail) {
+                // Postgres compares text exactly, so Ana@x.com and ana@x.com would otherwise be two accounts.
+                if (EstablishmentAccount::whereRaw('lower(email) = ?', [mb_strtolower((string) $value)])->exists()) {
+                    $fail('That e-mail address is already registered.');
+                }
+            }],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'contact_person' => ['required', 'string', 'max:100'],
             'contact_number' => ['required', 'string', 'max:20'],

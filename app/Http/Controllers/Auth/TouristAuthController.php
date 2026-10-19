@@ -28,7 +28,12 @@ class TouristAuthController extends Controller
     public function register(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'alias' => ['required', 'string', 'min:3', 'max:30', 'alpha_dash', 'unique:tourist_accounts,alias'],
+            'alias' => ['required', 'string', 'min:3', 'max:30', 'alpha_dash', 'unique:tourist_accounts,alias', function ($attribute, $value, $fail) {
+                // Exact comparison would let "Maddy" and "maddy" both exist, and one could pass for the other.
+                if (TouristAccount::whereRaw('lower(alias) = ?', [mb_strtolower((string) $value)])->exists()) {
+                    $fail('That alias is already taken.');
+                }
+            }],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
