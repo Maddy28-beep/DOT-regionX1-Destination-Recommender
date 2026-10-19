@@ -55,9 +55,14 @@
                             browser's cookies discards it.</li>
                         <li><strong>Chatbot questions</strong> &mdash; your messages to the assistant are
                             logged to improve its answers, but carry no browser token, cookie, or other link
-                            back to you. Today the assistant answers using the site's own rules and does not
+                            back to you. @if (filled(config('services.groq.key')))
+                            To help word its answers, the assistant also sends the text of your question
+                            (and nothing else about you: no browser token, name or location) to an outside
+                            AI service, Groq, whose servers are outside the Philippines. Questions about one
+                            named place are answered from our own data and are not sent. @else
+                            Today the assistant answers using the site's own rules and does not
                             send your question to any outside service; if that ever changes, this policy
-                            will be updated to say so. Do not type personal details into the chat.</li>
+                            will be updated to say so. @endif Do not type personal details into the chat.</li>
                         <li><strong>Exit survey responses (optional)</strong> &mdash; the survey is
                             anonymous and asks for no name or email. Your answers (places visited, ratings,
                             spending, where you came from) are not linked to your browser token or to any
