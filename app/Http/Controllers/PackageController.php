@@ -37,7 +37,7 @@ class PackageController extends Controller
         $query = Package::publiclyVisible()->with('region', 'photos', 'tourOperator')->withCount('reviews');
 
         if ($request->filled('q')) {
-            $query->where('name', 'like', '%'.$request->string('q').'%');
+            \App\Support\SearchTerm::contains($query, 'name', (string) $request->string('q'));
         }
 
         if ($request->filled('region_id')) {

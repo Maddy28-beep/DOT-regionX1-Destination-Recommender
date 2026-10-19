@@ -15,7 +15,7 @@ class DestinationController extends Controller
         $query = Destination::publiclyVisible()->with('region', 'tags', 'photos')->withCount('reviews');
 
         if ($request->filled('q')) {
-            $query->where('name', 'like', '%'.$request->string('q').'%');
+            \App\Support\SearchTerm::contains($query, 'name', (string) $request->string('q'));
         }
 
         if ($request->filled('region_id')) {

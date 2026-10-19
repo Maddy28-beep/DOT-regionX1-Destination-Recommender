@@ -14,7 +14,7 @@ class RestaurantController extends Controller
         $query = Restaurant::publiclyVisible()->with('region', 'photos')->withCount('reviews');
 
         if ($request->filled('q')) {
-            $query->where('name', 'like', '%'.$request->string('q').'%');
+            \App\Support\SearchTerm::contains($query, 'name', (string) $request->string('q'));
         }
 
         if ($request->filled('region_id')) {
