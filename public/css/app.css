@@ -5534,3 +5534,54 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
 }
 
 .swap-option__reason { display: block; margin-top: 2px; font-size: .78rem; color: var(--primary-dark); }
+
+/* ---------- Phones: two cards to a row ----------
+   Every listing grid (destinations, stays, dining, packages, souvenirs, operators, saved places and the
+   "related" strips) is .card-grid or .dpost-grid. At phone width a card is about 158 px wide, so the card's
+   insides tighten to fit: a 4:3 photo, smaller type, one tag, a two-line name, and a price over the distance
+   instead of beside it. Nothing is dropped that a tap on the card would not show on its own page. */
+@media (max-width: 640px) {
+    .card-grid,
+    .dpost-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .dcard__art { aspect-ratio: 4 / 3; }
+    .dcard__new { top: 7px; left: 7px; padding: 2px 6px; font-size: .6rem; }
+    .dcard__body { padding: 9px 10px 11px; }
+
+    .dcard__top { min-height: 0; margin-bottom: 5px; gap: 4px; }
+    .dcard__dot { font-size: .62rem; gap: 3px; }
+    .dcard__dot svg { width: 11px; height: 11px; }
+    .dcard__rating { font-size: .7rem; gap: 3px; }
+    .dcard__rating svg { width: 11px; height: 11px; }
+    .dcard__rating > span { display: none; }   /* the review count; the card is too narrow for it */
+
+    .dcard__name {
+        margin-bottom: 4px;
+        font-size: .9rem;
+        line-height: 1.25;
+        /* Two lines at most; the grid already makes every card in a row the same height. */
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        overflow: hidden;
+    }
+    .dcard__loc { margin-bottom: 7px; font-size: .72rem; gap: 4px; }
+    .dcard__loc svg { width: 12px; height: 12px; }
+
+    .dcard__tags { margin-bottom: 8px; }
+    .dcard__tags .dpost-tag { padding: 2px 7px; font-size: .64rem; }
+    .dcard__tags .dpost-tag:nth-child(n+2) { display: none; }
+
+    .dcard__foot { flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 1px; padding-top: 7px; }
+    .dcard__price { max-width: 100%; }
+    .dcard__price strong { font-size: .9rem; }
+    .dcard__price small,
+    .dcard__from { font-size: .68rem; }
+    .dcard__dist { font-size: .7rem; gap: 3px; }
+    .dcard__dist svg { width: 12px; height: 12px; }
+    .dcard__dist-more { display: none; }
+}
