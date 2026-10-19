@@ -45,7 +45,7 @@ class DestinationDetailRedesignTest extends TestCase
 
     // ---- the stat strip
 
-    public function test_the_strip_shows_the_tier_with_its_band_the_entry_fee_range_and_the_distance(): void
+    public function test_the_strip_shows_the_tier_in_words_the_entry_fee_range_and_the_distance(): void
     {
         $place = $this->place(['entry_fee_min' => 150, 'entry_fee_max' => 400, 'distance_km' => 7.5]);
 
@@ -53,7 +53,7 @@ class DestinationDetailRedesignTest extends TestCase
 
         $this->assertStringContainsString('stat-strip', $html);
         $this->assertStringContainsString('Mid-range', $html);
-        $this->assertSame(2, substr_count($html, 'class="is-on"'), 'Mid-range lights two of the three peso signs.');
+        $this->assertStringNotContainsString('stat-strip__meter', $html, 'The tier is a word; there is no row of peso symbols beside it.');
         $this->assertStringContainsString('150–400', $html);
         $this->assertStringContainsString('7.5 km', $html);
     }
@@ -195,7 +195,7 @@ class DestinationDetailRedesignTest extends TestCase
         $this->assertStringContainsString('Per night', $html);
         $this->assertStringContainsString('3,500', $html);
         $this->assertStringContainsString('2.5 km', $html);
-        $this->assertSame(3, substr_count($html, 'class="is-on"'), 'Premium lights all three peso signs.');
+        $this->assertStringNotContainsString('stat-strip__meter', $html, 'Premium is a word; there is no row of peso symbols.');
         $this->assertStringContainsString('Plan your stay', $html);
         $this->assertStringContainsString('2:00 PM', $html);
         $this->assertStringContainsString('12:00 NN', $html);

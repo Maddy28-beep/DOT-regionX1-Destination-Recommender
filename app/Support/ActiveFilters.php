@@ -14,12 +14,12 @@ use Illuminate\Support\Collection;
  */
 class ActiveFilters
 {
-    /** Labels for the budget tiles; the peso signs match the tiles in the filter panel. */
+    /** Labels for the budget tiles: the band in words, as the filter panel names it (no peso signs). */
     public const TIER_LABELS = [
         'Free' => 'Free',
-        'Budget-Friendly' => 'Budget ₱',
-        'Mid-range' => 'Mid-range ₱₱',
-        'Premium' => 'Premium ₱₱₱',
+        'Budget-Friendly' => 'Budget-friendly',
+        'Mid-range' => 'Mid-range',
+        'Premium' => 'Premium',
     ];
 
     /**

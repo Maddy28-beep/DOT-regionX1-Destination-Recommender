@@ -35,7 +35,7 @@
                 'placeholder' => 'e.g. Apo Summit Guides',
                 'regions' => $regions,
                 'activeFilters' => $activeFilters,
-                'tiers' => [['Budget-Friendly', 'Budget-Friendly', '₱'], ['Mid-range', 'Mid-range', '₱₱'], ['Premium', 'Premium', '₱₱₱']],
+                'tiers' => [['Budget-Friendly', 'Budget-Friendly', ''], ['Mid-range', 'Mid-range', ''], ['Premium', 'Premium', '']],
                 'anyBudget' => true,
                 'categoryParam' => 'specialization',
             ])

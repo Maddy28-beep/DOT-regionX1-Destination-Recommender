@@ -70,10 +70,47 @@ class CatalogFiltersToolbarTest extends TestCase
         $html = $this->get('/restaurants?cuisine_type=Seafood&price_tier=Premium&region_id='.$region->id.'&q=tuna')->assertOk()->getContent();
 
         $this->assertMatchesRegularExpression('/Show results \(4 filters\)/', $html);
-        foreach (['Search: tuna', 'Davao City', 'Premium ₱₱₱', 'Seafood'] as $label) {
+        foreach (['Search: tuna', 'Davao City', 'Premium', 'Seafood'] as $label) {
             $this->assertStringContainsString('Remove filter: '.$label, $html);
         }
         $this->assertStringContainsString('Clear all', $html);
+    }
+
+    public function test_the_dining_filter_names_its_budget_in_words_with_no_peso_sign(): void
+    {
+        $html = $this->get('/restaurants?price_tier=Mid-range')->assertOk()->getContent();
+
+        $panel = substr($html, (int) strpos($html, 'id="filterPanel"'), 6000);
+        foreach (['Any budget', 'Budget-friendly', 'Mid-range', 'Premium'] as $name) {
+            $this->assertStringContainsString('budget-tile__name">'.$name.'<', $panel, $name);
+        }
+        $this->assertStringNotContainsString('budget-tile__sub', $panel, 'No peso line under the tile names.');
+        $this->assertStringNotContainsString('&#8369;', $panel);
+        $this->assertStringNotContainsString('₱', $panel);
+        $this->assertStringContainsString('Remove filter: Mid-range"', $html, 'The chip for the chosen band has no peso signs either.');
+    }
+
+    public function test_no_catalogue_shows_peso_signs_in_its_budget_filter(): void
+    {
+        foreach (['/destinations', '/accommodations', '/packages', '/tour-operators', '/restaurants'] as $url) {
+            $html = $this->get($url.'?price_tier=Premium')->assertOk()->getContent();
+
+            $panel = substr($html, (int) strpos($html, 'id="filterPanel"'), 6000);
+            $this->assertStringContainsString('budget-tile__name', $panel, $url);
+            $this->assertStringNotContainsString('₱', $panel, $url);
+            $this->assertStringNotContainsString('budget-tile__sub', $panel, $url);
+            $this->assertStringContainsString('Remove filter: Premium"', $html, $url.': the chip names the band in words.');
+        }
+    }
+
+    public function test_the_active_filters_helper_names_the_budget_in_words(): void
+    {
+        foreach (['Free' => 'Free', 'Budget-Friendly' => 'Budget-friendly', 'Mid-range' => 'Mid-range', 'Premium' => 'Premium'] as $tier => $label) {
+            $filters = ActiveFilters::from(Request::create('/x', 'GET', ['price_tier' => $tier]), collect());
+
+            $this->assertSame($label, $filters->get('price_tier'));
+            $this->assertStringNotContainsString('₱', $filters->get('price_tier'));
+        }
     }
 
     public function test_a_page_with_no_budget_filter_does_not_offer_or_count_one(): void
@@ -98,7 +135,7 @@ class CatalogFiltersToolbarTest extends TestCase
         );
 
         $this->assertSame(['q', 'price_tier', 'type', 'interest'], $some->keys()->all(), 'An unknown region is dropped rather than shown blank.');
-        $this->assertSame('Budget ₱', $some['price_tier']);
+        $this->assertSame('Budget-friendly', $some['price_tier']);
         $this->assertSame('Hotel', $some['type']);
     }
 }
