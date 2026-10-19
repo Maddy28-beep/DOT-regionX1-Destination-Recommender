@@ -3,7 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\AdminUser;
+use App\Models\Destination;
 use App\Models\PostcardSlide;
+use App\Models\Region;
+use App\Models\Restaurant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
@@ -11,9 +14,9 @@ use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 /**
- * The homepage "Popular Right Now" carousel renders from postcard_slides
- * records (caption, button, photo, alt text, focal point), and DOT admins
- * manage those records, with the photo resized to WebP variants on upload.
+ * The landing page's "What Davao is known for" mood cards render from postcard_slides records (caption, link,
+ * photo, focal point), each with the number of places its link leads to, and DOT admins manage those records, with
+ * the photo resized to WebP variants on upload.
  */
 class PostcardCarouselTest extends TestCase
 {
@@ -39,47 +42,92 @@ class PostcardCarouselTest extends TestCase
         ]);
     }
 
-    public function test_migration_carries_over_the_four_original_slides(): void
+    public function test_the_site_ships_five_mood_cards(): void
     {
-        $this->assertSame(4, PostcardSlide::count());
+        $cards = PostcardSlide::ordered()->pluck('title')->all();
+
+        $this->assertSame(['Islands & Beaches', 'Highlands & Nature', 'Wildlife', 'Culture & Heritage', 'Food & Dining'], $cards);
     }
 
-    public function test_homepage_renders_caption_button_alt_and_focal_point_from_the_record(): void
+    public function test_the_homepage_renders_each_card_as_one_link_with_its_words_and_focal_point(): void
     {
         PostcardSlide::query()->delete();
-        $this->slide();
+        $this->slide(['title' => 'Test Beach', 'kicker' => 'sun and sea', 'cta_label' => 'Explore →', 'cta_url' => '/destinations']);
 
-        $this->get('/')->assertOk()
+        $html = $this->get('/')->assertOk()
+            ->assertSee('What Davao is known for')
+            ->assertSee('Pick a mood and we', false)
+            ->assertSee('sun and sea')
             ->assertSee('Test Beach')
-            ->assertSee('View destination')
-            ->assertSee('alt="Aerial view of a turquoise island coastline"', false)
             ->assertSee('--focal: 30% 45%', false)
-            ->assertSee('fetchpriority="high"', false);
+            ->getContent();
+
+        $this->assertStringContainsString('href="'.url('/destinations').'" class="mood"', $html);
+        $this->assertMatchesRegularExpression('/class="mood__cta">Explore </', $html, 'The arrow in a label is replaced by the card own arrow icon.');
+        $this->assertStringContainsString('id="known-for"', $html, 'The hero scroll cue lands here.');
+        $this->assertStringContainsString('href="#known-for" class="hero-scroll-cue"', $html);
     }
 
-    public function test_a_single_slide_has_no_arrows_thumbnails_or_pause_button(): void
+    public function test_a_card_that_links_to_a_catalogue_shows_how_many_places_are_in_it(): void
+    {
+        $region = Region::firstOrCreate(['name' => 'Davao City']);
+        foreach (['alpha-falls', 'bravo-beach', 'charlie-cove'] as $slug) {
+            Destination::create([
+                'slug' => $slug, 'name' => ucwords(str_replace('-', ' ', $slug)), 'location' => 'Davao City',
+                'region_id' => $region->id, 'type' => 'Beach & Leisure', 'is_accredited' => true,
+                'rating' => 4.5, 'review_count' => 3, 'price_tier' => 'Mid-range',
+            ]);
+        }
+        Destination::create([
+            'slug' => 'delta-hike', 'name' => 'Delta Hike', 'location' => 'Davao City', 'region_id' => $region->id,
+            'type' => 'Hiking', 'is_accredited' => true, 'rating' => 4.0, 'review_count' => 1, 'price_tier' => 'Budget-Friendly',
+        ]);
+
+        PostcardSlide::query()->delete();
+        $beaches = $this->slide(['title' => 'Beaches', 'cta_url' => '/destinations?type=Beach+%26+Leisure']);
+        $one = $this->slide(['title' => 'One place', 'cta_url' => '/destinations/alpha-falls', 'sort_order' => 51]);
+        $away = $this->slide(['title' => 'Away', 'cta_url' => 'https://example.test/', 'sort_order' => 52]);
+
+        $this->assertSame(3, $beaches->listingCount(), 'The same filter the catalogue page applies to that link.');
+        $this->assertNull($one->listingCount(), 'A single place has no count.');
+        $this->assertNull($away->listingCount(), 'An outside link has no count.');
+
+        $html = $this->get('/')->getContent();
+        $this->assertStringContainsString('[3] places', $html);
+        $this->assertSame(1, substr_count($html, 'class="mood__count"'), 'Only the card that leads to a catalogue shows a count.');
+        $this->get('/destinations?type=Beach+%26+Leisure')->assertSee('3 destinations found');
+    }
+
+    public function test_the_food_card_counts_the_dining_listings(): void
+    {
+        $region = Region::firstOrCreate(['name' => 'Davao City']);
+        Restaurant::create(['slug' => 'marina-tuna', 'name' => 'Marina Tuna', 'location' => 'Davao City', 'region_id' => $region->id, 'is_accredited' => true, 'rating' => 0, 'review_count' => 0]);
+
+        $this->assertSame(1, PostcardSlide::where('cta_url', '/restaurants')->first()->listingCount());
+    }
+
+    public function test_a_card_whose_photo_file_is_missing_shows_the_placeholder_not_a_broken_image(): void
     {
         PostcardSlide::query()->delete();
-        $this->slide();
+        $this->slide(['image_path' => 'images/postcards/does-not-exist.webp']);
 
-        $this->get('/')->assertOk()
-            ->assertDontSee('pc-arrow', false)
-            ->assertDontSee('pc-thumb', false)
-            ->assertDontSee('pc-toggle', false);
+        $this->get('/')->assertOk()->assertSee('mood__photo mood__photo--none', false)->assertDontSee('does-not-exist', false);
     }
 
-    public function test_inactive_slides_are_not_shown_and_an_empty_carousel_is_omitted(): void
-    {
-        PostcardSlide::query()->update(['is_active' => false]);
-
-        $this->get('/')->assertOk()->assertDontSee('Popular Right Now');
-    }
-
-    public function test_only_the_first_image_is_eager(): void
+    public function test_cards_use_a_card_sized_copy_of_the_photo(): void
     {
         $html = $this->get('/')->assertOk()->getContent();
 
-        $this->assertSame(1, substr_count($html, 'fetchpriority="high"'));
+        $this->assertStringContainsString('island-beach-card.webp', $html, 'Not the 1.4MB full-size photograph.');
+        $this->assertStringNotContainsString('-enhanced.webp', $html);
+        $this->assertSame(0, substr_count($html, 'fetchpriority="high"'), 'The row is below the fold, so nothing in it is a priority image.');
+    }
+
+    public function test_inactive_cards_are_not_shown_and_an_empty_row_is_omitted(): void
+    {
+        PostcardSlide::query()->update(['is_active' => false]);
+
+        $this->get('/')->assertOk()->assertDontSee('What Davao is known for');
     }
 
     public function test_admin_pages_render(): void

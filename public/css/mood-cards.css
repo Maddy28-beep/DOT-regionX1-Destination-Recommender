@@ -1,0 +1,91 @@
+/* "What Davao is known for": tall mood cards under the landing hero.
+
+   Five portrait cards in a row on a wide screen; on a phone or tablet the row swipes sideways with the next card
+   peeking in. Each card is one link: a photo with a dark foot, the number of places in the top corner, and the
+   mood's handwritten line, name and "Explore" at the bottom. */
+
+.moods { padding-top: 56px; padding-bottom: 60px; scroll-margin-top: 70px; }   /* the hero's scroll cue lands here, below the sticky header */
+
+.moods__head { margin-bottom: 26px; }
+.moods__kicker { display: block; margin-bottom: 4px; color: var(--stamp-red, #c4432b); font-size: 1.2rem; }
+.moods__title { margin: 0 0 8px; font-size: clamp(2.1rem, 4.4vw, 3.2rem); line-height: 1; color: var(--primary-dark); }
+.moods__head p { margin: 0; max-width: 56ch; font-size: .95rem; color: var(--muted); }
+
+/* ---- the row ---- */
+.moods__row {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px;
+}
+.moods__item { min-width: 0; }
+
+/* ---- a card ---- */
+.mood {
+    position: relative; display: block; padding: 6px; border-radius: 18px;
+    background: #fff; box-shadow: 0 8px 22px rgba(16, 40, 30, .10);
+    color: #fff; text-decoration: none;
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+.mood:hover { transform: translateY(-5px); box-shadow: 0 16px 32px rgba(16, 40, 30, .18); }
+.mood:focus-visible { outline: 3px solid var(--accent, #ff693b); outline-offset: 3px; }
+
+.mood__photo {
+    position: relative; display: block; overflow: hidden; border-radius: 13px;
+    aspect-ratio: 9 / 16;
+    background: linear-gradient(to bottom, #3d5f50, #12261d);
+}
+.mood__photo img {
+    display: block; width: 100%; height: 100%; object-fit: cover; object-position: var(--focal, 50% 50%);
+    transition: transform .6s ease;
+}
+.mood:hover .mood__photo img { transform: scale(1.05); }
+.mood__photo::after {          /* the dark foot the words sit on */
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to top, rgba(8, 24, 17, .94) 0%, rgba(8, 24, 17, .6) 30%, rgba(8, 24, 17, 0) 62%);
+}
+.mood__photo--none { display: grid; place-items: center; }
+.mood__photo--none svg { width: 30px; height: 30px; color: rgba(255, 255, 255, .45); }
+
+.mood__count {
+    position: absolute; top: 16px; right: 16px; z-index: 2;
+    padding: 4px 9px; border: 1px dashed rgba(255, 255, 255, .75); border-radius: 6px;
+    background: rgba(10, 30, 22, .45);
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    font: 700 .72rem/1.2 'Poppins', sans-serif; letter-spacing: .02em; white-space: nowrap;
+}
+
+.mood__copy {
+    position: absolute; left: 16px; right: 14px; bottom: 16px; z-index: 2;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+}
+.mood__kicker { color: var(--sun-glow, #f6c75a); font-size: 1.05rem; line-height: 1.1; }
+.mood__name { font-size: clamp(1.45rem, 2.1vw, 2rem); line-height: .98; text-transform: uppercase; color: #fff; overflow-wrap: anywhere; }
+.mood__cta {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
+    font: 700 .84rem 'Poppins', sans-serif; color: #fff;
+}
+.mood__cta svg { width: 15px; height: 15px; transition: transform .2s ease; }
+.mood:hover .mood__cta svg { transform: translateX(4px); }
+
+/* ---- tablet and phone: a swipeable row ---- */
+@media (max-width: 1000px) {
+    .moods__row {
+        display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory;
+        margin: 0 -20px; padding: 6px 20px 22px; scroll-padding-inline: 20px;
+        scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    }
+    .moods__row::-webkit-scrollbar { display: none; }
+    .moods__item { flex: 0 0 clamp(190px, 30vw, 240px); scroll-snap-align: start; }
+}
+@media (max-width: 640px) {
+    .moods { padding-top: 40px; padding-bottom: 36px; }
+    .moods__head { margin-bottom: 18px; }
+    .moods__item { flex-basis: min(62vw, 230px); }
+    .mood__photo { aspect-ratio: 3 / 5; }
+    .mood__count { top: 14px; right: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mood, .mood__photo img, .mood__cta svg { transition: none; }
+    .mood:hover { transform: none; }
+    .mood:hover .mood__photo img { transform: none; }
+}
