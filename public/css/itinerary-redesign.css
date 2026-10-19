@@ -205,3 +205,72 @@
 }
 @media(max-width:400px) { .itinerary-feedback { flex-direction:column; } }
 @media print { .itin-hero, .itin-overview__map, .itin-tabs, .itinerary-refine, .itinerary-feedback { display: none; } .itin.js-days .itin-day:not(.is-active) { display: block; } }
+
+/* ---- phones ----
+   The timeline kept a 58px time column beside the rail, so a card got only ~215px and "8:45 AM to 11:15 AM"
+   wrapped onto three lines. Here the time sits above its card and the card takes the full width; the day tabs
+   are one sticky row; the header buttons share a line. */
+@media (max-width: 640px) {
+    .itin .dash-body { padding-top: 8px; }
+    .itin-hero { margin: 28px 0 16px; min-height: 108px; padding: 14px 14px 14px 112px; border-radius: 16px; }
+    .itin-hero__title { font-size: 1.3rem; margin-bottom: 4px; }
+    .itin-hero__text { font-size: .9rem; line-height: 1.4; }
+
+    .itin-title { font-size: 1.55rem; }
+    .itin-sub { font-size: .95rem; }
+    .itin-meta { font-size: .76rem; }
+    .itin-head { gap: 14px; margin-bottom: 12px; }
+    .itin-head__text { flex: 1 1 100%; }
+    .itin-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+    .itin-actions .btn { justify-content: center; padding-inline: 8px; font-size: .88rem; white-space: nowrap; }
+    .itin-actions .btn:only-child, .itin-actions form:only-child .btn { grid-column: 1 / -1; }
+    .itin-actions form .btn { width: 100%; }
+
+    .itinerary-page .session-note { padding: 12px 14px; font-size: .86rem; line-height: 1.5; }
+    .itin-main__head h2 { font-size: 1.05rem; }
+    .itin-main__head p { font-size: .84rem; }
+    .itinerary-explainer-trigger { font-size: .88rem; }
+
+    /* day tabs: one swipeable row that stays in view while you scroll the day */
+    .itin-tabs {
+        position: sticky; top: var(--site-topbar-height, 64px); z-index: 20;
+        flex-wrap: nowrap; overflow-x: auto; gap: 8px; margin: 12px -20px 14px; padding: 8px 20px;
+        background: rgba(255, 255, 255, .96); border-bottom: 1px solid var(--border);
+        scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    }
+    .itin-tabs::-webkit-scrollbar { display: none; }
+    .itin-tabs a { flex: none; padding: 8px 18px; font-size: .88rem; white-space: nowrap; }
+    .itin-day { scroll-margin-top: calc(var(--site-topbar-height, 64px) + 64px); }
+
+    .itin-day__head { margin-bottom: 12px; }
+    .itin-day h3 { font-size: 1.3rem; }
+    .itin-day__tag { font-size: .84rem; line-height: 1.45; }
+    .itinerary-back-top { display: none; }
+
+    .tl-row { grid-template-columns: 16px minmax(0, 1fr); grid-template-areas: "rail time" "rail content"; column-gap: 10px; }
+    .tl-time { grid-area: time; display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 5px; padding: 0 0 4px; text-align: left; font-size: .8rem; }
+    .tl-time strong { display: inline; font-size: .86rem; }
+    .tl-row--travel .tl-time { display: none; }
+    .tl-rail { grid-area: rail; }
+    .tl-content { grid-area: content; padding: 0 0 14px; }
+    .tl-dot { margin-top: 3px; }
+    .tl-row:first-child .tl-rail::before { top: 10px; }
+    .tl-row:last-child .tl-rail::before { bottom: calc(100% - 10px); }
+    .tl-row--travel { grid-template-areas: "rail content"; }
+    .tl-row--travel .tl-dot { margin-top: 0; }
+
+    .tl-card { padding: 10px; gap: 10px; }
+    .tl-card__media { aspect-ratio: 2 / 1; }
+    .tl-card h4 { font-size: 1rem; }
+    .tl-card__what { font-size: .88rem; margin: 2px 0 4px; }
+    .tl-card--meal, .tl-card--overnight { grid-template-columns: 64px minmax(0, 1fr); gap: 12px; }
+    .tl-card .swap-toggle { display: inline-flex; align-items: center; min-height: 40px; }
+
+    .itinerary-feedback { flex-direction: row; align-items: center; gap: 14px; padding: 18px; }
+    .itinerary-feedback img { width: 64px; height: 84px; }
+    .itinerary-feedback h2 { font-size: 1.1rem; }
+    .itinerary-feedback p { margin: 6px 0 12px; font-size: .9rem; }
+}
+@media (max-width: 400px) {
+    .itinerary-feedback { flex-direction: row; }
+}
