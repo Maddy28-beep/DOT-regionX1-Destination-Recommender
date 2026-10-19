@@ -455,8 +455,7 @@ class ItineraryGenerationService
 
         foreach ($dayStops as $stop) {
             $destination = $stop['row']['destination'];
-            $suggestions = $this->apriori->suggestionsFor('destination', $destination->id, 3)
-                ->filter(fn ($rule) => $rule['listing_kind'] === 'accommodation')
+            $suggestions = $this->apriori->suggestionsFor('destination', $destination->id, 3, 'accommodation')
                 /*
                  * The stated accommodation type is a requirement, not a hint.
                  * Apriori only knows what past tourists happened to pair with a
