@@ -102,6 +102,9 @@ class ItineraryScheduleBuilder
 
     private const DINNER = '18:30';
 
+    /** Arriving at the accommodation after this, dinner is not planned: only the late check-in. */
+    private const LATEST_DINNER_START = '21:30';
+
     private const OVERNIGHT = '20:00';
 
     /** Buffer between finishing at a place and setting off from it. */
@@ -551,6 +554,20 @@ class ItineraryScheduleBuilder
             $here,
             $this->place($accommodation),
         );
+
+        // Reaching the accommodation after the latest dinner time (a late flight, a long drive from the airport):
+        // there is no dinner to plan, only the check-in. Before this, a 11:30 PM arrival was given dinner at
+        // 1:45 AM and an overnight stay at 3:15 AM.
+        if ($this->toQuarterHour($arrival)->greaterThan(Carbon::parse(self::LATEST_DINNER_START))) {
+            $this->row($itinerary, $dayNumber, $sortOrder, array_merge([
+                'kind' => 'overnight',
+                'title' => 'Late check-in and overnight stay',
+                'starts_at' => $this->toQuarterHour($arrival),
+                'accommodation_id' => $accommodation->id,
+            ], $this->ruleColumns($stayRule)));
+
+            return;
+        }
 
         // Dinner is at the usual hour, or when the traveller gets back if the drive ran longer than that.
         $dinner = Carbon::parse(self::DINNER);
