@@ -60,23 +60,7 @@
                         @include('partials.listing-results-map', ['listings' => $tourOperators, 'id' => 'tour-operators-map'])
                     </div>
 
-                    <div class="pagination" data-view-panel="grid">
-                        @if ($tourOperators->onFirstPage())
-                            <span class="disabled">&laquo;</span>
-                        @else
-                            <a href="{{ $tourOperators->previousPageUrl() }}">&laquo;</a>
-                        @endif
-
-                        @foreach ($tourOperators->getUrlRange(1, $tourOperators->lastPage()) as $page => $url)
-                            <span class="{{ $page === $tourOperators->currentPage() ? 'active' : '' }}"><a href="{{ $url }}">{{ $page }}</a></span>
-                        @endforeach
-
-                        @if ($tourOperators->hasMorePages())
-                            <a href="{{ $tourOperators->nextPageUrl() }}">&raquo;</a>
-                        @else
-                            <span class="disabled">&raquo;</span>
-                        @endif
-                    </div>
+                    @include('partials.pagination', ['paginator' => $tourOperators, 'panel' => 'grid'])
                 @else
                     <x-davo-empty-state title="No tour operators match your filters" message="Try another category or clear your filters to explore more options." :action-url="route('tour-operators.index')" action-label="Clear filters" />
                 @endif

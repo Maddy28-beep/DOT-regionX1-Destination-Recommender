@@ -50,23 +50,7 @@
                         @endforeach
                     </div>
 
-                    <div class="pagination">
-                        @if ($packages->onFirstPage())
-                            <span class="disabled">&laquo;</span>
-                        @else
-                            <a href="{{ $packages->previousPageUrl() }}">&laquo;</a>
-                        @endif
-
-                        @foreach ($packages->getUrlRange(1, $packages->lastPage()) as $page => $url)
-                            <span class="{{ $page === $packages->currentPage() ? 'active' : '' }}"><a href="{{ $url }}">{{ $page }}</a></span>
-                        @endforeach
-
-                        @if ($packages->hasMorePages())
-                            <a href="{{ $packages->nextPageUrl() }}">&raquo;</a>
-                        @else
-                            <span class="disabled">&raquo;</span>
-                        @endif
-                    </div>
+                    @include('partials.pagination', ['paginator' => $packages])
                 @else
                     <x-davo-empty-state title="No packages match your filters" message="Try another category or clear your filters to explore more options." :action-url="route('packages.index')" action-label="Clear filters" />
                 @endif
