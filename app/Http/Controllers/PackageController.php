@@ -84,6 +84,7 @@ class PackageController extends Controller
         };
 
         $packages = $query->paginate(9)->withQueryString();
+        \App\Support\SearchLog::record($request, 'packages', $packages->total());
 
         $regions = Region::orderBy('name')->get();
         $types = Package::query()->whereNotNull('type')->distinct()->orderBy('type')->pluck('type');

@@ -11,6 +11,7 @@ use App\Models\Region;
 use App\Models\Restaurant;
 use App\Models\SouvenirCenter;
 use App\Models\TourOperator;
+use App\Support\SearchLog;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
@@ -138,31 +139,51 @@ class HomeController extends Controller
     }
 
     /**
-     * "Popular searches" chips under the hero search bar: real, clickable
-     * destinations rather than invented copy. Built from the same
-     * best-first ordering (featured, then weighted rating) the rest of the
-     * homepage already trusts for "what's worth surfacing" -- not a
-     * separate click-tracked "most viewed" table, which doesn't exist yet
-     * and would be a whole feature on its own.
+     * The chips under the hero search bar, and the label that honestly describes them.
+     *
+     * First choice is what visitors really search for (App\Support\SearchLog: terms searched often enough, lately,
+     * that found something). While there are fewer than four of those, the row is topped up with the best-ranked
+     * destinations (featured, then weighted rating -- the same ordering the rest of the homepage trusts) and a "Free
+     * to visit" filter when it would return something. The label says "Popular searches:" only when all four chips
+     * really are searches; otherwise it says "Popular:", which is true of both kinds.
      *
      * @param  \Illuminate\Support\Collection<int, Destination>  $destinations
-     * @return \Illuminate\Support\Collection<int, array{label: string, url: string}>
+     * @return array{0: \Illuminate\Support\Collection<int, array{label: string, url: string}>, 1: string}
      */
-    private function popularSearchChips(Collection $destinations): Collection
+    private function popularSearchChips(Collection $destinations): array
     {
-        $chips = $destinations->take(3)->map(fn (Destination $d) => [
-            'label' => $d->name,
-            'url' => route('destinations.show', $d),
-        ]);
+        $limit = 4;
+        $chips = SearchLog::popular($limit);
 
-        // A real filter link, not label text -- only offered when it would
-        // actually return something, so the chip never leads to an empty
-        // results page.
-        if (Destination::publiclyVisible()->where('price_tier', 'Free')->exists()) {
-            $chips->push(['label' => 'Free to visit', 'url' => route('destinations.index', ['price_tier' => 'Free'])]);
+        if ($chips->count() >= $limit) {
+            return [$chips->values(), 'Popular searches:'];
         }
 
-        return $chips->values();
+        // A place a search chip already covers ("Samal" for Samal Island) is not offered a second time.
+        $covered = fn (Destination $d) => $chips->contains(
+            fn (array $chip) => str_contains(mb_strtolower($d->name), mb_strtolower($chip['label']))
+        );
+
+        $fill = $destinations
+            ->reject($covered)
+            ->take(3)
+            ->map(fn (Destination $d) => [
+                'label' => $d->name,
+                'url' => route('destinations.show', $d),
+            ])->values();
+
+        // A real filter link, not label text -- only offered when it would actually return something, so the chip
+        // never leads to an empty results page.
+        if (Destination::publiclyVisible()->where('price_tier', 'Free')->exists()) {
+            $fill->push(['label' => 'Free to visit', 'url' => route('destinations.index', ['price_tier' => 'Free'])]);
+        } elseif ($extra = $destinations->reject($covered)->values()->get(3)) {
+            // Four chips make one tidy row; with no free places to point at, a fourth destination fills the slot.
+            $fill->push(['label' => $extra->name, 'url' => route('destinations.show', $extra)]);
+        }
+
+        $chips = $chips->concat($fill)->take($limit)->values();
+
+        return [$chips, $chips->isEmpty() ? 'Popular searches:' : 'Popular:'];
     }
 
     public function index(): View
@@ -220,13 +241,13 @@ class HomeController extends Controller
         $stayTypes = Accommodation::publiclyVisible()->whereNotNull('type')->distinct()->orderBy('type')->pluck('type');
         $cuisineTypes = Restaurant::publiclyVisible()->whereNotNull('cuisine_type')->distinct()->orderBy('cuisine_type')->pluck('cuisine_type');
 
-        $popularSearchChips = $this->popularSearchChips($destinations);
+        [$popularSearchChips, $popularSearchLabel] = $this->popularSearchChips($destinations);
 
         $upcomingEvents = Event::published()->upcoming()->chronological()->take(3)->get();
 
         $postcardSlides = PostcardSlide::active()->ordered()->get();
 
-        return view('welcome', compact('destinations', 'packages', 'stats', 'regions', 'heroVideo', 'interestOptions', 'stayTypes', 'cuisineTypes', 'popularSearchChips', 'upcomingEvents', 'postcardSlides'))
+        return view('welcome', compact('destinations', 'packages', 'stats', 'regions', 'heroVideo', 'interestOptions', 'stayTypes', 'cuisineTypes', 'popularSearchChips', 'popularSearchLabel', 'upcomingEvents', 'postcardSlides'))
             ->with('regionMap', $this->regionMap($regions));
     }
 }
