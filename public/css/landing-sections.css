@@ -95,3 +95,23 @@
     .hero-tourism-brands .hero-tourism-brands__dot { width: 38px; }
     .hero-tourism-brands .hero-tourism-brands__love { width: 84px; }
 }
+
+/* Phones: each section kept its 64px of padding above and below, so two sections were 128px apart. Tighter here
+   (still well past the 22px the next sheet slides over the bottom of this one). */
+@media (max-width: 640px) {
+    .landing-section.section { padding-top: 40px; padding-bottom: 40px; }
+    .landing-section.about-region { padding-top: 36px; padding-bottom: 36px; }
+}
+
+/* About Davao Region: on a phone the second paragraph folds behind "Read more" (public/js/read-more.js). */
+.read-more { display: none; }
+@media (max-width: 640px) {
+    .about-copy.has-fold .about-copy__more:not(.is-open) { display: none; }
+    .about-copy .read-more {
+        display: inline-flex; align-items: center; min-height: 44px; margin: 0 0 16px; padding: 0;
+        border: 0; background: none; color: var(--primary-dark); font: inherit; font-weight: 700;
+        text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+    }
+    .about-copy .read-more[hidden] { display: none; }
+    .about-copy .read-more:focus-visible { outline: 3px solid var(--accent, #ff693b); outline-offset: 2px; }
+}
