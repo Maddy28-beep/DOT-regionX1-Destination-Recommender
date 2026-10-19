@@ -48,6 +48,26 @@ class Restaurant extends Model
         return array_values(array_filter([$this->cuisine_type]));
     }
 
+    /**
+     * Straight-line distance from the city centre the recommender plans from, in km; null when the place has no
+     * map location. Used for the "km from city" line on a dining card, as destinations show theirs.
+     */
+    public function distanceFromCityCentreKm(): ?float
+    {
+        if ($this->latitude === null || $this->longitude === null) {
+            return null;
+        }
+
+        $lat1 = deg2rad(\App\Services\Recommendation\ContentBasedRecommendationService::DEFAULT_ORIGIN_LAT);
+        $lat2 = deg2rad((float) $this->latitude);
+        $dLat = $lat2 - $lat1;
+        $dLng = deg2rad((float) $this->longitude - \App\Services\Recommendation\ContentBasedRecommendationService::DEFAULT_ORIGIN_LNG);
+
+        $a = sin($dLat / 2) ** 2 + cos($lat1) * cos($lat2) * sin($dLng / 2) ** 2;
+
+        return round(6371 * 2 * asin(min(1, sqrt($a))), 1);
+    }
+
     public function region(): BelongsTo
     {
         return $this->belongsTo(Region::class);
