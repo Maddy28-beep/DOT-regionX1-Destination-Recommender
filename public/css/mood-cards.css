@@ -58,7 +58,16 @@
     display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
 }
 .mood__kicker { color: var(--sun-glow, #f6c75a); font-size: 1.05rem; line-height: 1.1; }
-.mood__name { font-size: clamp(1.45rem, 2.1vw, 2rem); line-height: .98; text-transform: uppercase; color: #fff; overflow-wrap: anywhere; }
+/* The name is sized from the card it sits on, so the longest word ("HIGHLANDS") always fits on one line whatever
+   the screen: "HIGHLANDS" is about 6.6em wide in this face, and the name has the card's width less the 30px of
+   inset around it, so the size is that width over 7.1em. (The first line is the fallback for a browser without
+   container units.) */
+.mood { container-type: inline-size; }
+.mood__name {
+    font-size: clamp(1.25rem, 1.5vw, 1.6rem);
+    font-size: clamp(1.1rem, calc((100cqw - 30px) / 7.1), 2rem);
+    line-height: 1; text-transform: uppercase; color: #fff; overflow-wrap: break-word;
+}
 .mood__cta {
     display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
     font: 700 .84rem 'Poppins', sans-serif; color: #fff;
@@ -67,7 +76,7 @@
 .mood:hover .mood__cta svg { transform: translateX(4px); }
 
 /* ---- tablet and phone: a swipeable row ---- */
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
     .moods__row {
         display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory;
         margin: 0 -20px; padding: 6px 20px 22px; scroll-padding-inline: 20px;
