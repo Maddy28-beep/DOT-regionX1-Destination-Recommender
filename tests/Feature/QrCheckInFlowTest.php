@@ -9,6 +9,7 @@ use App\Models\Region;
 use App\Models\TouristVisit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 /**
@@ -72,6 +73,33 @@ class QrCheckInFlowTest extends TestCase
         );
     }
 
+    /** The link printed in the venue's QR code. */
+    private function scan(Destination $listing): string
+    {
+        return URL::signedRoute('check-in', ['type' => 'destinations', 'id' => $listing->id]);
+    }
+
+    /** A plain, unsigned address is not a scan: nothing is recorded and no review is unlocked. */
+    public function test_an_unsigned_check_in_address_records_nothing(): void
+    {
+        $listing = $this->listing();
+
+        $this->get("/check-in/destinations/{$listing->id}")
+            ->assertRedirect(route('destinations.show', $listing));
+
+        $this->assertSame(0, TouristVisit::count());
+    }
+
+    /** Altering the id of a signed link (to credit a different place) breaks the signature. */
+    public function test_a_signed_link_cannot_be_pointed_at_another_listing(): void
+    {
+        $listing = $this->listing();
+        $signed = $this->scan($listing);
+
+        $this->get(str_replace('/destinations/'.$listing->id, '/destinations/'.($listing->id + 1), $signed))->assertNotFound();
+        $this->assertSame(0, TouristVisit::count());
+    }
+
     /**
      * The point of the Data Privacy Act change: scanning works with no login
      * at all. A traveler standing at the gate is counted straight away rather
@@ -81,7 +109,7 @@ class QrCheckInFlowTest extends TestCase
     {
         $listing = $this->listing();
 
-        $this->get("/check-in/destinations/{$listing->id}")
+        $this->get($this->scan($listing))
             ->assertRedirect(route('destinations.show', $listing))
             ->assertSessionHas('status');
 
@@ -93,7 +121,7 @@ class QrCheckInFlowTest extends TestCase
     {
         $listing = $this->listing();
 
-        $this->get("/check-in/destinations/{$listing->id}");
+        $this->get($this->scan($listing));
 
         $visit = TouristVisit::sole();
 
@@ -123,7 +151,7 @@ class QrCheckInFlowTest extends TestCase
 
         foreach (range(1, 3) as $attempt) {
             $this->withCookie(EnsureVisitorToken::COOKIE, $token)
-                ->get("/check-in/destinations/{$listing->id}")
+                ->get($this->scan($listing))
                 ->assertRedirect(route('destinations.show', $listing));
         }
 
@@ -141,7 +169,7 @@ class QrCheckInFlowTest extends TestCase
 
         foreach ([(string) \Illuminate\Support\Str::uuid(), (string) \Illuminate\Support\Str::uuid()] as $token) {
             $this->withCookie(EnsureVisitorToken::COOKIE, $token)
-                ->get("/check-in/destinations/{$listing->id}");
+                ->get($this->scan($listing));
         }
 
         $this->assertSame(2, TouristVisit::count());
@@ -153,7 +181,7 @@ class QrCheckInFlowTest extends TestCase
         $listing = $this->listing();
         $listing->update(['is_accredited' => false]);
 
-        $this->get("/check-in/destinations/{$listing->id}")->assertNotFound();
+        $this->get($this->scan($listing))->assertNotFound();
 
         $this->assertSame(0, TouristVisit::count());
     }
@@ -163,7 +191,7 @@ class QrCheckInFlowTest extends TestCase
     {
         $listing = $this->listing();
 
-        $this->get("/check-in/destinations/{$listing->id}");
+        $this->get($this->scan($listing));
 
         $this->assertTrue(session('show_survey_invite'));
     }
@@ -174,13 +202,13 @@ class QrCheckInFlowTest extends TestCase
         $listing = $this->listing();
         $token = (string) \Illuminate\Support\Str::uuid();
 
-        $this->withCookie(EnsureVisitorToken::COOKIE, $token)->get("/check-in/destinations/{$listing->id}");
+        $this->withCookie(EnsureVisitorToken::COOKIE, $token)->get($this->scan($listing));
         // The flash from the first request is consumed by reading it above;
         // start clean before the rescan so only the second request's own
         // flash (or lack of one) is being asserted.
         session()->forget('show_survey_invite');
 
-        $this->withCookie(EnsureVisitorToken::COOKIE, $token)->get("/check-in/destinations/{$listing->id}");
+        $this->withCookie(EnsureVisitorToken::COOKIE, $token)->get($this->scan($listing));
 
         $this->assertNull(session('show_survey_invite'));
     }
@@ -190,7 +218,7 @@ class QrCheckInFlowTest extends TestCase
     {
         $listing = $this->listing();
 
-        $this->get("/check-in/destinations/{$listing->id}");
+        $this->get($this->scan($listing));
         $this->get(route('destinations.show', $listing));
 
         $this->get(route('home'))->assertOk();

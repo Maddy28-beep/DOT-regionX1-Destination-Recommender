@@ -46,7 +46,7 @@ class AdminDashboardController extends Controller
             // it is stored as "2026-08-30 00:00:00" and never equals the plain
             // "2026-08-30" a toDateString() produces. A straight comparison
             // reads 0 forever. Same trap as CheckInController's dedupe.
-            'checkins_today' => TouristVisit::whereDate('visit_date', now()->toDateString())->count(),
+            'checkins_today' => TouristVisit::whereDate('visit_date', now('Asia/Manila')->toDateString())->count(),
             'destinations' => Destination::where('is_accredited', true)->count(),
             'pending_establishments' => EstablishmentAccount::where('status', 'pending')->count(),
             'expiring_accreditations' => AccreditationRecord::where('status', 'Expiring Soon')->count(),
@@ -143,7 +143,7 @@ class AdminDashboardController extends Controller
             'review_note' => 'Rejected via DOT Admin portal.',
         ]);
 
-        return back()->with(Toast::success('Establishment rejected', "{$establishment->business_name} has been notified."));
+        return back()->with(Toast::success('Establishment rejected', "{$establishment->business_name} is marked as rejected. Nothing is sent automatically, so let them know directly."));
     }
 
     /**
@@ -540,10 +540,19 @@ class AdminDashboardController extends Controller
             $out = fopen('php://output', 'w');
             fputcsv($out, $report['headers']);
             foreach ($report['rows'] as $row) {
-                fputcsv($out, $row);
+                fputcsv($out, array_map([self::class, 'csvSafe'], $row));
             }
             fclose($out);
         }, $filename, ['Content-Type' => 'text/csv']);
+    }
+
+    /**
+     * A cell that starts with = + - @ (or a tab/return) is run as a formula when the file is opened in Excel.
+     * Exit-survey comments are typed by anonymous visitors, so a leading apostrophe makes such text plain text.
+     */
+    public static function csvSafe(mixed $value): mixed
+    {
+        return is_string($value) && preg_match('/^[=+\-@\t\r]/', $value) ? "'".$value : $value;
     }
 
     public function printReport(Request $request): View
@@ -557,8 +566,25 @@ class AdminDashboardController extends Controller
 
     private function reportParams(Request $request): array
     {
-        $from = $request->get('from', now()->subDays(30)->toDateString());
-        $to = $request->get('to', now()->toDateString());
+        // Philippine dates, and only real ones: anything else falls back to the default range instead of
+        // reaching the database as text it cannot read.
+        $isDate = function ($v) {
+            if (! is_string($v) || ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $v)) {
+                return false;
+            }
+
+            return checkdate((int) substr($v, 5, 2), (int) substr($v, 8, 2), (int) substr($v, 0, 4));
+        };
+
+        $from = $request->get('from');
+        $to = $request->get('to');
+        $from = $isDate($from) ? $from : now('Asia/Manila')->subDays(30)->toDateString();
+        $to = $isDate($to) ? $to : now('Asia/Manila')->toDateString();
+
+        if ($from > $to) {
+            [$from, $to] = [$to, $from];
+        }
+
         $reportType = in_array($request->get('report_type'), self::REPORT_TYPES, true)
             ? $request->get('report_type')
             : self::REPORT_TYPES[0];
@@ -568,13 +594,15 @@ class AdminDashboardController extends Controller
 
     private function buildReport(string $reportType, string $from, string $to): array
     {
-        $rangeEnd = $to.' 23:59:59';
+        // Timestamps are stored in UTC; the dates picked are Philippine days.
+        $start = \Illuminate\Support\Carbon::parse($from, 'Asia/Manila')->startOfDay()->utc()->toDateTimeString();
+        $rangeEnd = \Illuminate\Support\Carbon::parse($to, 'Asia/Manila')->endOfDay()->utc()->toDateTimeString();
 
         return match ($reportType) {
-            'Exit Survey Responses' => $this->exitSurveyReport($from, $rangeEnd),
-            'Accreditation Status' => $this->accreditationReport($from, $rangeEnd),
-            'Destination Visits' => $this->destinationVisitsReport($from, $rangeEnd),
-            'Trip Plans Created' => $this->tripPlansReport($from, $rangeEnd),
+            'Exit Survey Responses' => $this->exitSurveyReport($start, $rangeEnd),
+            'Accreditation Status' => $this->accreditationReport($start, $rangeEnd),
+            'Destination Visits' => $this->destinationVisitsReport($start, $rangeEnd),
+            'Trip Plans Created' => $this->tripPlansReport($start, $rangeEnd),
             default => $this->verifiedVisitsReport($from, $to),
         };
     }
@@ -637,7 +665,7 @@ class AdminDashboardController extends Controller
                 $p->travel_purpose ?? '-',
                 $p->budget ?? '-',
                 $p->travel_days,
-                $p->created_at->format('Y-m-d H:i'),
+                $p->created_at->timezone('Asia/Manila')->format('Y-m-d H:i'),
             ])->all(),
         ];
     }
@@ -652,7 +680,7 @@ class AdminDashboardController extends Controller
                 .($avg ? ', averaging '.round($avg, 1).'/5 overall satisfaction.' : '.'),
             'headers' => ['Submitted At', 'Origin', 'Residency', 'Visitor Type', 'Purpose', 'Days Stayed', 'Total Spend', 'Overall Rating', 'Would Recommend', 'Comments'],
             'rows' => $surveys->map(fn ($s) => [
-                $s->submitted_at->format('Y-m-d H:i'), $s->origin ?? '—', $s->residency_type ?? '—', $s->visitor_type ?? '—',
+                $s->submitted_at->timezone('Asia/Manila')->format('Y-m-d H:i'), $s->origin ?? '—', $s->residency_type ?? '—', $s->visitor_type ?? '—',
                 $s->travel_purpose ?? '—', $s->actual_days_stayed ?? '—',
                 ExitSurveyController::SPEND_BRACKETS[$s->estimated_total_spend] ?? '—',
                 $s->overall_rating ?? '—', $s->would_recommend ?? '—', $s->comments ?? '',

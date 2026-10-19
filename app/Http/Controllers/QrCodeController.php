@@ -13,6 +13,7 @@ use Endroid\QrCode\Writer\SvgWriter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
 class QrCodeController extends Controller
@@ -111,7 +112,17 @@ class QrCodeController extends Controller
     {
         $segment = self::KIND_TO_SEGMENT[$listingKind] ?? null;
 
-        return $segment ? route('check-in', ['type' => $segment, 'id' => $listing->id]) : null;
+        return $segment ? self::signedCheckInUrl($segment, (int) $listing->id) : null;
+    }
+
+    /**
+     * The check-in URL carries a signature made with the application key, so only the printed QR code (and
+     * anyone who scanned it) has a valid link. A bare /check-in/destinations/5 typed or embedded elsewhere is
+     * refused, which is what makes a check-in, and the review it unlocks, evidence of being at the place.
+     */
+    public static function signedCheckInUrl(string $segment, int $listingId): string
+    {
+        return URL::signedRoute('check-in', ['type' => $segment, 'id' => $listingId]);
     }
 
     /**
@@ -129,7 +140,7 @@ class QrCodeController extends Controller
         // baked into the encoded URL, every listing's code is distinct and a
         // scan can only ever be credited to the listing it was printed for.
         // See TouristVisit for the whole counting flow.
-        $url = route('check-in', ['type' => $segment, 'id' => $listing->id]);
+        $url = self::signedCheckInUrl($segment, (int) $listing->id);
 
         $builder = new Builder(
             writer: new SvgWriter(),
