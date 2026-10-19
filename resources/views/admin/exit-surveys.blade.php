@@ -107,12 +107,12 @@
 
     @php
         $insightLines = array_filter([
-            $insights['highest_rated_category'] ? "Highest-rated category: <strong>{$insights['highest_rated_category']}</strong>" : null,
-            $insights['lowest_rated_category'] ? "Lowest-rated category: <strong>{$insights['lowest_rated_category']}</strong>" : null,
+            $insights['highest_rated_category'] ? "Highest-rated category: <strong>".e($insights['highest_rated_category'])."</strong>" : null,
+            $insights['lowest_rated_category'] ? "Lowest-rated category: <strong>".e($insights['lowest_rated_category'])."</strong>" : null,
             $insights['most_common_origin'] ? "Most common visitor origin: <strong>".e($insights['most_common_origin'])."</strong>" : null,
-            $insights['most_common_purpose'] ? "Most common purpose of travel: <strong>{$insights['most_common_purpose']}</strong>" : null,
+            $insights['most_common_purpose'] ? "Most common purpose of travel: <strong>".e($insights['most_common_purpose'])."</strong>" : null,
             $insights['most_visited_place'] ? "Most visited place: <strong>".e($insights['most_visited_place'])."</strong>" : null,
-            $insights['most_popular_activity'] ? "Most popular activity: <strong>{$insights['most_popular_activity']}</strong>" : null,
+            $insights['most_popular_activity'] ? "Most popular activity: <strong>".e($insights['most_popular_activity'])."</strong>" : null,
         ]);
     @endphp
     @if (! empty($insightLines))

@@ -107,7 +107,7 @@ class ItineraryGenerationService
         $rangeWidened = $this->contentBased->lastRangeWidened;
 
         if ($ranked->isEmpty()) {
-            throw new \RuntimeException('No accredited destinations are available to build an itinerary.');
+            throw new \App\Exceptions\NoDestinationsAvailable();
         }
 
         $totalDays = max(1, (int) $preference->travel_days);

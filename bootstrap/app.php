@@ -50,5 +50,16 @@ return Application::configure(basePath: dirname(__DIR__))
             : route('portal.login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Nothing is open for the tourist's dates and preferences: say so and send them back to adjust, instead of
+        // an error page.
+        $exceptions->render(function (\App\Exceptions\NoDestinationsAvailable $e, Request $request) {
+            $title = 'No open places for this trip';
+            $detail = 'Every place that fits is closed on those dates or out of range. Try other dates or a wider distance.';
+
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $title.'. '.$detail], 422);
+            }
+
+            return redirect()->route('plan.edit')->with(\App\Support\Toast::error($title, $detail));
+        });
     })->create();
