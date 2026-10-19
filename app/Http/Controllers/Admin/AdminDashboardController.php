@@ -62,7 +62,7 @@ class AdminDashboardController extends Controller
             'expired' => AccreditationRecord::where('status', 'Expired')->count(),
             'expiring' => $stats['expiring_accreditations'],
             'within_week' => AccreditationRecord::where('status', 'Expiring Soon')
-                ->whereDate('expiration_date', '<=', now()->addDays(7)->toDateString())->count(),
+                ->whereDate('expiration_date', '<=', now('Asia/Manila')->addDays(7)->toDateString())->count(),
         ];
 
         /*

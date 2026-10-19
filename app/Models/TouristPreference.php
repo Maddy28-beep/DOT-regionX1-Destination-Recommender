@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 
 /**
  * One trip's travel-preference survey.
@@ -79,7 +80,8 @@ class TouristPreference extends Model
      */
     public function travelWindow(): array
     {
-        $from = ($this->start_date ?? now())->copy()->startOfDay();
+        // No start date given: today in the Philippines (the server runs on UTC, which is still yesterday until 8 AM).
+        $from = ($this->start_date ?? Carbon::parse(now('Asia/Manila')->toDateString()))->copy()->startOfDay();
         $days = max(1, (int) $this->travel_days);
 
         return [$from, $from->copy()->addDays($days - 1)];

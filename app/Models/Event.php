@@ -40,7 +40,7 @@ class Event extends Model
     /** Still to come, or running today: the end date (or the start, for a one-day event) has not passed. */
     public function scopeUpcoming(Builder $query): Builder
     {
-        $today = Carbon::today()->toDateString();
+        $today = now('Asia/Manila')->toDateString();
 
         return $query->where(function (Builder $q) use ($today) {
             $q->where('ends_on', '>=', $today)
@@ -100,7 +100,8 @@ class Event extends Model
     /** "Happening now", "Today", "Tomorrow", "In 6 days", or "Ended". */
     public function countdownLabel(): string
     {
-        $today = Carbon::today();
+        // Today's date in the Philippines, held as a date (midnight) like the event dates it is compared with.
+        $today = Carbon::parse(now('Asia/Manila')->toDateString());
 
         if ($this->lastDay()->lt($today)) {
             return 'Ended';
