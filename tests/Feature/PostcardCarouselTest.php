@@ -93,7 +93,7 @@ class PostcardCarouselTest extends TestCase
         $this->assertNull($away->listingCount(), 'An outside link has no count.');
 
         $html = $this->get('/')->getContent();
-        $this->assertStringContainsString('[3] places', $html);
+        $this->assertStringContainsString('[<span data-count-up>3</span>] places', $html);
         $this->assertSame(1, substr_count($html, 'class="mood__count"'), 'Only the card that leads to a catalogue shows a count.');
         $this->get('/destinations?type=Beach+%26+Leisure')->assertSee('3 destinations found');
     }

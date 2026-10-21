@@ -91,3 +91,7 @@
     .mood:hover { transform: none; }
     .mood:hover .mood__photo img { transform: none; }
 }
+
+/* The place count counts up as the card scrolls into view (public/js/count-up.js): digits of equal width, so the
+   badge does not change width while it counts. */
+.mood__count [data-count-up] { font-variant-numeric: tabular-nums; }

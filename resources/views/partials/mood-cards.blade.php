@@ -41,7 +41,7 @@
                             </span>
 
                             @if ($count !== null)
-                                <span class="mood__count">[{{ $count }}] {{ \Illuminate\Support\Str::plural('place', $count) }}</span>
+                                <span class="mood__count">[<span data-count-up>{{ $count }}</span>] {{ \Illuminate\Support\Str::plural('place', $count) }}</span>
                             @endif
 
                             <span class="mood__copy">

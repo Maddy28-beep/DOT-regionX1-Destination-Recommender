@@ -384,15 +384,15 @@
     <div class="stats">
         <div class="stats-strip">
             <div class="stat-item">
-                <div class="stat-num">{{ $stats['destinations'] }}+</div>
+                <div class="stat-num" data-count-up>{{ $stats['destinations'] }}+</div>
                 <div class="stat-label">Destinations</div>
             </div>
             <div class="stat-item">
-                <div class="stat-num">{{ $stats['regions'] }}</div>
+                <div class="stat-num" data-count-up>{{ $stats['regions'] }}</div>
                 <div class="stat-label">Cities &amp; Provinces</div>
             </div>
             <div class="stat-item">
-                <div class="stat-num">{{ $stats['accommodations'] }}+</div>
+                <div class="stat-num" data-count-up>{{ $stats['accommodations'] }}+</div>
                 <div class="stat-label">Accommodations</div>
             </div>
             {{-- No fabricated placeholder here: this stood at a hard-coded
@@ -401,7 +401,7 @@
                  stat simply stands down. --}}
             @if ($stats['avg_rating'])
                 <div class="stat-item stat-item--rating">
-                    <div class="stat-num">{{ number_format($stats['avg_rating'], 1) }}</div>
+                    <div class="stat-num" data-count-up>{{ number_format($stats['avg_rating'], 1) }}</div>
                     <div class="stat-label">Traveler Rating</div>
                 </div>
             @endif
@@ -740,6 +740,7 @@
 @include('partials.chatbot-widget')
 
 <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
+<script src="{{ asset('js/count-up.js') }}?v={{ filemtime(public_path('js/count-up.js')) }}" defer></script>
 <script src="{{ asset('js/read-more.js') }}?v={{ filemtime(public_path('js/read-more.js')) }}" defer></script>
 </body>
 </html>
