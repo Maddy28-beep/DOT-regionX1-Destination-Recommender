@@ -164,6 +164,19 @@
                             <p>Try regenerating your itinerary above.</p>
                         </div>
                     @else
+                        @php
+                            // A day between the first and the last with no sightseeing at all: the catalogue ran out of
+                            // places that fit the picks (a long trip, a narrow range). Say so instead of showing bare days.
+                            $lastDay = $itemsByDay->keys()->max();
+                            $freeDays = $itemsByDay->filter(fn ($items, $d) => $d !== 1 && $d !== $lastDay && $items->where('kind', 'activity')->isEmpty())->count();
+                        @endphp
+                        @if ($freeDays > 0 && ! $itinerary->package)
+                            <div class="itin-notice" role="note" style="margin:0 0 16px; padding:12px 16px; border-radius:12px; background:#fff7e6; border:1px solid #f0c36d;">
+                                <strong>{{ $freeDays }} {{ \Illuminate\Support\Str::plural('day', $freeDays) }} of this trip {{ $freeDays === 1 ? 'has' : 'have' }} no sightseeing planned.</strong>
+                                We ran out of accredited places that fit your interests and range. Try adding interests, choosing a farther range, or planning fewer days.
+                            </div>
+                        @endif
+
                         <nav class="itin-tabs" aria-label="Jump to a day" data-day-tabs>
                             @foreach ($itemsByDay as $day => $items)
                                 <a href="#itinerary-day-{{ $day }}" data-day-tab="{{ $day }}">Day {{ $day }}</a>
@@ -208,7 +221,8 @@
                                         <h3 id="itinerary-day-title-{{ $day }}">Day {{ $day }}@if ($theme && $theme['label']) <span>&middot; {{ $theme['label'] }}</span>@endif</h3>
                                         <p class="itin-day__tag">
                                             @if ($dayDate){{ $dayDate }} &middot; @endif
-                                            {{ $dayStops }} {{ \Illuminate\Support\Str::plural('stop', $dayStops) }}
+                                            @if ($dayStops === 0 && $day !== 1 && $day !== $lastDay)Free day, no sightseeing planned
+                                            @else{{ $dayStops }} {{ \Illuminate\Support\Str::plural('stop', $dayStops) }}@endif
                                             @if ($dayKm > 0) &middot; about {{ rtrim(rtrim(number_format($dayKm, 1), '0'), '.') }} km of travel @endif
                                             @if ($theme && $theme['label'] && $theme['similarity'] !== null) &middot; these places are {{ $theme['similarity'] }}% alike @endif
                                         </p>

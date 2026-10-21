@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>ExploreDVO — Discover the Wonders of Davao Region</title>
+    @include('partials.share-meta', ['metaTitle' => 'ExploreDVO — Discover the Wonders of Davao Region'])
     @include('partials.head-assets')
     <link rel="stylesheet" href="{{ asset('css/landing-sections.css') }}?v={{ filemtime(public_path('css/landing-sections.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/mood-cards.css') }}?v={{ filemtime(public_path('css/mood-cards.css')) }}">

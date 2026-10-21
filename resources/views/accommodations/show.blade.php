@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', $accommodation->name.' — ExploreDVO')
+@section('meta_description', \Illuminate\Support\Str::limit(trim(strip_tags((string) ($accommodation->description ?? $accommodation->name.' on ExploreDVO, the DOT Region XI tourism platform.'))), 155))
 
 @section('content')
 @php
