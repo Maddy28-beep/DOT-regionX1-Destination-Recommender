@@ -123,6 +123,20 @@ class PostcardCarouselTest extends TestCase
         $this->assertSame(0, substr_count($html, 'fetchpriority="high"'), 'The row is below the fold, so nothing in it is a priority image.');
     }
 
+    public function test_the_row_loads_the_slideshow_script_which_leaves_reduced_motion_alone(): void
+    {
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertMatchesRegularExpression('#js/mood-slideshow\.js\?v=\d+#', $html);
+
+        $js = file_get_contents(public_path('js/mood-slideshow.js'));
+        $this->assertStringContainsString('prefers-reduced-motion', $js, 'No autoplay for people who ask for less motion.');
+        $this->assertStringContainsString('moods__dot', $js, 'Dots show which card is up and let a visitor pick one.');
+        $this->assertStringContainsString('touchstart', $js, 'A touch stops the slideshow.');
+        $this->assertStringContainsString('visibilitychange', $js, 'It stops while the tab is not showing.');
+        $this->assertStringContainsString('(max-width: 1100px)', $js, 'Same breakpoint as the stylesheet: only where the row is a swipe row.');
+    }
+
     public function test_inactive_cards_are_not_shown_and_an_empty_row_is_omitted(): void
     {
         PostcardSlide::query()->update(['is_active' => false]);

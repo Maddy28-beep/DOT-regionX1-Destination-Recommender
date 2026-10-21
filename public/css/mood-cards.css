@@ -95,3 +95,22 @@
 /* The place count counts up as the card scrolls into view (public/js/count-up.js): digits of equal width, so the
    badge does not change width while it counts. */
 .mood__count [data-count-up] { font-variant-numeric: tabular-nums; }
+
+/* ---- the slideshow controls (built by public/js/mood-slideshow.js, only where the row is a swipe row) ---- */
+.moods__controls { display: none; }
+@media (max-width: 1100px) {
+    .moods__controls {
+        display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: -6px; min-height: 20px;
+    }
+    .moods__dots { display: flex; align-items: center; gap: 8px; }
+    .moods__dot {
+        width: 9px; height: 9px; padding: 0; border: 0; border-radius: 999px; cursor: pointer;
+        background: rgba(11, 94, 82, .25); transition: width .25s ease, background .25s ease;
+        /* a bigger tap area than the dot itself */
+        position: relative;
+    }
+    .moods__dot::after { content: ""; position: absolute; inset: -12px -5px; }
+    .moods__dot[aria-current="true"] { width: 26px; background: var(--primary); }
+    .moods__dot:focus-visible { outline: 3px solid var(--accent, #ff693b); outline-offset: 3px; }
+}
+@media (prefers-reduced-motion: reduce) { .moods__dot { transition: none; } }
