@@ -741,6 +741,7 @@
 
 <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
 <script src="{{ asset('js/count-up.js') }}?v={{ filemtime(public_path('js/count-up.js')) }}" defer></script>
+<script src="{{ asset('js/mood-slideshow.js') }}?v={{ filemtime(public_path('js/mood-slideshow.js')) }}" defer></script>
 <script src="{{ asset('js/read-more.js') }}?v={{ filemtime(public_path('js/read-more.js')) }}" defer></script>
 </body>
 </html>
