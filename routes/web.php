@@ -34,6 +34,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+Route::get('/sitemap.xml', \App\Http\Controllers\SitemapController::class)->name('sitemap');
+
 // Legal pages linked from the footer. Static content, no controller needed;
 // the Privacy Policy also serves as the RA 10173 (Data Privacy Act) notice
 // rather than duplicating the same facts across two documents that could

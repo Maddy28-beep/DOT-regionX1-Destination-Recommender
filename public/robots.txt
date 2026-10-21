@@ -1,2 +1,8 @@
 User-agent: *
-Disallow:
+Disallow: /portal/
+Disallow: /account/
+Disallow: /plan/
+Disallow: /check-in/
+Disallow: /exit-survey
+
+Sitemap: https://www.exploredavao.com/sitemap.xml

@@ -17,6 +17,9 @@ use Illuminate\View\View;
 
 class HomeController extends Controller
 {
+    /** Reviews the visible destinations must have in total before the landing page shows an average rating. */
+    public const MIN_REVIEWS_FOR_RATING_STAT = 10;
+
     /**
      * Footage for the hero, when any has been supplied.
      *
@@ -219,8 +222,12 @@ class HomeController extends Controller
              * of 5 on the landing page -- eight genuinely well-rated places
              * (~4.5) dragged under by seventeen unrated ones.
              */
-            'avg_rating' => round((float) Destination::publiclyVisible()
-                ->where('review_count', '>', 0)->avg('rating'), 1),
+            // And only once there are enough reviews behind it: one 5-star review made the landing page boast
+            // "5.0 Traveler Rating". Below the threshold the stat stands down, like the other "nothing real to
+            // show" cases above.
+            'avg_rating' => (int) Destination::publiclyVisible()->sum('review_count') >= self::MIN_REVIEWS_FOR_RATING_STAT
+                ? round((float) Destination::publiclyVisible()->where('review_count', '>', 0)->avg('rating'), 1)
+                : null,
         ];
 
         // Drives the About-the-Region pills, so each one links through to that
