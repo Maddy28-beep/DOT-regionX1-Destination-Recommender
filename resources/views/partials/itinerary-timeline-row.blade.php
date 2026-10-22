@@ -45,6 +45,7 @@
         'overnight' => 'moon',
         'meal' => 'utensils',
         'travel' => 'car',
+        'free' => 'clock',
         default => 'compass',
     };
 @endphp

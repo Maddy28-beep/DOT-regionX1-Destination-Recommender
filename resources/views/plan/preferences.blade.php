@@ -88,9 +88,16 @@
                                     <label for="start_date">Planned arrival date (optional)</label>
                                     <input type="date" id="start_date" name="start_date" value="{{ old('start_date', optional($preference->start_date)->format('Y-m-d')) }}">
                                 </div>
+                                @php
+                                    // Quoted from the scheduler so the help can never disagree with what the planner does.
+                                    $prepMinutes = \App\Services\Recommendation\ItineraryScheduleBuilder::ARRIVAL_PREPARATION_MINUTES;
+                                    $earliestStart = \Illuminate\Support\Carbon::parse(\App\Services\Recommendation\ItineraryScheduleBuilder::EARLIEST_DEPARTURE)->format('g:i A');
+                                    $lastSightseeing = \Illuminate\Support\Carbon::parse(\App\Services\Recommendation\ItineraryScheduleBuilder::LAST_ACTIVITY_END)->format('g:i A');
+                                    $arrivalHelp = "When you expect to arrive in Davao. We allow about {$prepMinutes} minutes before your first outing and never start an outing before {$earliestStart}. A later arrival leaves less of your first day, so it may have fewer stops, or none if you arrive in the evening. Destination sightseeing ends by {$lastSightseeing}. Leave it blank and we'll assume {$earliestStart}.";
+                                @endphp
                                 <div class="field" style="flex:1; min-width:160px;">
-                                    <label for="arrival_time">Arrival time (optional)
-                                        <span class="field-help" tabindex="0" title="We won't put a morning stop on your first day if you land in the afternoon." aria-label="We won't put a morning stop on your first day if you land in the afternoon."><x-icon name="info" /></span>
+                                    <label for="arrival_time">Planned arrival time (optional)
+                                        <span class="field-help" tabindex="0" title="{{ $arrivalHelp }}" aria-label="{{ $arrivalHelp }}"><x-icon name="info" /></span>
                                     </label>
                                     <input type="time" id="arrival_time" name="arrival_time"
                                            value="{{ old('arrival_time', $preference->arrival_time ? substr((string) $preference->arrival_time, 0, 5) : '') }}">

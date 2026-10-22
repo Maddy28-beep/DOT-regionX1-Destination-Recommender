@@ -55,6 +55,7 @@ class ItineraryItem extends Model
             'overnight' => 'Within Accommodation',
             'meal' => $this->accommodation_id ? 'Within Accommodation' : 'Within Destination',
             'departure' => 'End of Itinerary',
+            'free' => 'Location of your choice',
             default => 'On-site Activity',
         };
     }
