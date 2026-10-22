@@ -16,15 +16,17 @@ use ReflectionMethod;
 use Tests\TestCase;
 
 /**
- * Characterization of how the itinerary generator handles the tourist's arrival time TODAY.
+ * Characterization of how the itinerary generator handles the tourist's arrival time.
  *
- * These tests record what the code does now, not what it should do. They exist so that the
- * arrival-scheduling work can be reviewed as an explicit diff of expectations: a later change
- * to behaviour has to edit the specific lines below, in the same commit, and say why.
+ * These tests record what the code does, so that changes to arrival scheduling are reviewed as an
+ * explicit diff of expectations: a change to behaviour has to edit the specific lines below, in the
+ * same commit, and say why. History: they were first written against the original behaviour (PR #124);
+ * the arrival-scheduling change then flipped, deliberately, only the expectations for arrivals before
+ * 07:30 (the new rule: departure = max(arrival + 30 min, 08:00), with neutral free time before it).
  *
- * Where today's behaviour is a known defect the test name says KNOWN DEFECT and the comment
- * says what the intended behaviour is. Those expectations are meant to be flipped, deliberately,
- * by the change that fixes them; a flip anywhere else is a regression.
+ * Where behaviour is a known defect the test name says KNOWN DEFECT and the comment says what the
+ * intended behaviour is. Those expectations are meant to be flipped, deliberately, by the change that
+ * fixes them; a flip anywhere else is a regression. (The midnight defect is still open.)
  *
  * Fixed inputs throughout: the clock is frozen, the trip starts on a fixed date, the starting
  * point is the default (Davao City centre) and every fixture has a single deterministic ranking.
@@ -166,23 +168,23 @@ class ArrivalBaselineTest extends TestCase
     // ---------------------------------------------------------------------------------------------
 
     /**
-     * Current rule (ItineraryScheduleBuilder::openDay): before 06:00 the day opens at 08:00 after a
-     * rest-and-breakfast block; from 06:00 it opens at arrival + 30 minutes (unrounded); a blank
-     * time is treated as an 08:00 arrival. The first activity is the next quarter hour at or after
-     * (departure + the slower travel estimate).
+     * The rule (ItineraryScheduleBuilder::openDay): departure = the later of (arrival + 30 minutes,
+     * unrounded) and 08:00. An arrival before 07:30 therefore departs at 08:00, and the time until
+     * then is a neutral free-time row. A blank time is planned as an 08:00 arrival. The first activity
+     * is the next quarter hour at or after (departure + the slower travel estimate).
      *
      * columns: arrival, departure, activity (long leg), activity (short leg), row kinds before the first journey row
      */
     public static function arrivals(): array
     {
         return [
-            'blank (treated as an 08:00 arrival)' => [null, '08:30', '10:00', '08:45', ['baseline']],
-            '04:00' => ['04:00', '08:00', '09:30', '08:15', ['baseline', 'meal']],
-            '05:59' => ['05:59', '08:00', '09:30', '08:15', ['baseline', 'meal']],
-            '06:00 (KNOWN DEFECT: outing 30 min after arrival)' => ['06:00', '06:30', '08:00', '06:45', ['baseline']],
-            '06:01 (KNOWN DEFECT)' => ['06:01', '06:31', '08:15', '07:00', ['baseline']],
-            '07:00 (KNOWN DEFECT)' => ['07:00', '07:30', '09:00', '07:45', ['baseline']],
-            '07:29 (KNOWN DEFECT)' => ['07:29', '07:59', '09:30', '08:15', ['baseline']],
+            'blank (planned as an 08:00 arrival)' => [null, '08:30', '10:00', '08:45', ['baseline']],
+            '04:00' => ['04:00', '08:00', '09:30', '08:15', ['baseline', 'free']],
+            '05:59' => ['05:59', '08:00', '09:30', '08:15', ['baseline', 'free']],
+            '06:00 (was: departed 06:30, outing at 08:00)' => ['06:00', '08:00', '09:30', '08:15', ['baseline', 'free']],
+            '06:01 (was: departed 06:31)' => ['06:01', '08:00', '09:30', '08:15', ['baseline', 'free']],
+            '07:00 (was: departed 07:30)' => ['07:00', '08:00', '09:30', '08:15', ['baseline', 'free']],
+            '07:29 (was: departed 07:59)' => ['07:29', '08:00', '09:30', '08:15', ['baseline', 'free']],
             '07:30' => ['07:30', '08:00', '09:30', '08:15', ['baseline']],
             '08:00' => ['08:00', '08:30', '10:00', '08:45', ['baseline']],
             '09:00' => ['09:00', '09:30', '11:00', '09:45', ['baseline']],
@@ -190,7 +192,7 @@ class ArrivalBaselineTest extends TestCase
     }
 
     #[DataProvider('arrivals')]
-    public function test_long_first_leg_departure_and_first_activity_today(?string $arrival, string $departure, string $activityLong, string $activityShort, array $kindsBeforeJourney): void
+    public function test_long_first_leg_departure_and_first_activity(?string $arrival, string $departure, string $activityLong, string $activityShort, array $kindsBeforeJourney): void
     {
         $this->longLegFixture();
         $day1 = $this->day($this->generate($this->preference($arrival)), 1);
@@ -210,7 +212,7 @@ class ArrivalBaselineTest extends TestCase
     }
 
     #[DataProvider('arrivals')]
-    public function test_short_first_leg_departure_and_first_activity_today(?string $arrival, string $departure, string $activityLong, string $activityShort): void
+    public function test_short_first_leg_departure_and_first_activity(?string $arrival, string $departure, string $activityLong, string $activityShort): void
     {
         $this->shortLegFixture();
         $day1 = $this->day($this->generate($this->preference($arrival)), 1);
@@ -239,36 +241,43 @@ class ArrivalBaselineTest extends TestCase
     // 2. The rows around arrival
     // ---------------------------------------------------------------------------------------------
 
-    public function test_before_0600_the_day_has_a_rest_and_breakfast_row_naming_the_recommended_accommodation(): void
+    public function test_an_early_arrival_shows_neutral_free_time_not_a_hotel_row(): void
     {
         $this->longLegFixture();
         $day1 = $this->day($this->generate($this->preference('04:00')), 1);
 
-        $this->assertSame(['kind' => 'baseline', 'title' => 'Arrival — Davao City centre', 'start' => '04:00', 'end' => null, 'accommodation' => null], $day1[0]);
-        $this->assertSame('meal', $day1[1]['kind']);
-        $this->assertSame('Rest, freshen up and breakfast — City Inn', $day1[1]['title']);
-        $this->assertSame('07:00', $day1[1]['start']);
-        $this->assertNotNull($day1[1]['accommodation'], 'today this row implies a recommended stay is ready at 07:00');
+        $this->assertSame(['kind' => 'baseline', 'title' => 'Planned arrival', 'start' => '04:00', 'end' => null, 'accommodation' => null], $day1[0]);
+        $this->assertSame(['kind' => 'free', 'title' => 'Free time until 8:00 AM', 'start' => '04:00', 'end' => '08:00', 'accommodation' => null], $day1[1]);
+        $this->assertSame('travel', $day1[2]['kind']);
+        $this->assertSame('08:00', $day1[2]['start'], 'the free time ends exactly when the first journey starts');
+
+        $this->assertNotContains('meal', array_column(array_slice($day1, 0, 3), 'kind'), 'no meal is assumed');
+        $this->assertSame([null, null], array_column(array_slice($day1, 0, 2), 'accommodation'), 'no accommodation is implied');
     }
 
-    public function test_from_0600_there_is_no_rest_row_and_the_gap_before_departure_is_unexplained(): void
+    public function test_an_arrival_after_0600_also_gets_free_time_so_no_span_is_unexplained(): void
     {
         $this->longLegFixture();
         $day1 = $this->day($this->generate($this->preference('06:00')), 1);
 
-        $this->assertSame(['baseline', 'travel'], [$day1[0]['kind'], $day1[1]['kind']]);
-        $this->assertSame('06:00', $day1[0]['start']);
-        $this->assertSame('06:30', $day1[1]['start'], 'the 30 minutes between them is hard-coded and never shown');
+        $this->assertSame(['baseline', 'free', 'travel'], [$day1[0]['kind'], $day1[1]['kind'], $day1[2]['kind']]);
+        $this->assertSame(['06:00', '06:00', '08:00'], [$day1[0]['start'], $day1[1]['start'], $day1[2]['start']]);
+        $this->assertSame('08:00', $day1[1]['end']);
     }
 
-    public function test_a_blank_arrival_is_treated_as_an_0800_arrival_with_no_disclosure(): void
+    public function test_a_blank_arrival_is_planned_as_an_0800_arrival_and_says_so(): void
     {
         $this->longLegFixture();
-        $day1 = $this->day($this->generate($this->preference(null)), 1);
+        $itinerary = $this->generate($this->preference(null));
+        $day1 = $this->day($itinerary, 1);
 
-        $this->assertSame('Arrival — Davao City centre', $day1[0]['title']);
-        $this->assertSame('08:00', $day1[0]['start'], 'an arrival the tourist never gave is shown as a row at 08:00');
-        $this->assertSame('08:30', $day1[1]['start']);
+        $this->assertSame('Planned arrival', $day1[0]['title']);
+        $this->assertSame('08:00', $day1[0]['start']);
+        $this->assertSame('08:30', $day1[1]['start'], 'scheduling is unchanged: an 08:00 arrival departs at 08:30');
+        $this->assertSame(
+            'No arrival time provided; assuming 8:00 AM. Starting point for travel times: Davao City centre.',
+            $itinerary->items()->where('kind', 'baseline')->value('note')
+        );
     }
 
     public function test_day_two_always_opens_with_breakfast_at_0700_whatever_the_arrival(): void
@@ -457,8 +466,8 @@ class ArrivalBaselineTest extends TestCase
         $second = $this->generate($preference->refresh());
 
         $this->assertNotSame($first->id, $second->id, 'regenerating builds a new itinerary');
-        $this->assertSame('06:31', $this->firstOf($this->day($first, 1), 'travel')['start']);
-        $this->assertSame('06:31', $this->firstOf($this->day($second, 1), 'travel')['start']);
+        $this->assertSame('08:00', $this->firstOf($this->day($first, 1), 'travel')['start']);
+        $this->assertSame('08:00', $this->firstOf($this->day($second, 1), 'travel')['start']);
         $this->assertSame($this->stops($first, 1), $this->stops($second, 1));
     }
 

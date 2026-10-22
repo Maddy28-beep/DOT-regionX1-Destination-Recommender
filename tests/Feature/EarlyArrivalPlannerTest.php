@@ -11,7 +11,7 @@ use App\Services\Recommendation\ItineraryGenerationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/** A traveller who lands in the small hours gets a rest-and-breakfast block, not a 5:30 AM outing. */
+/** A traveller who lands in the small hours gets neutral free time until 8 AM, not a 5:30 AM outing. */
 class EarlyArrivalPlannerTest extends TestCase
 {
     use RefreshDatabase;
@@ -33,17 +33,17 @@ class EarlyArrivalPlannerTest extends TestCase
             ->items()->where('day_number', 1)->orderBy('sort_order')->get()->all();
     }
 
-    public function test_a_4am_arrival_rests_and_has_breakfast_before_the_first_outing(): void
+    public function test_a_4am_arrival_has_free_time_before_the_first_outing(): void
     {
         $rows = $this->rows('04:00');
 
         $this->assertSame('baseline', $rows[0]->kind);
-        $this->assertSame('meal', $rows[1]->kind);
-        $this->assertStringStartsWith('Rest, freshen up and breakfast', $rows[1]->title);
+        $this->assertSame('free', $rows[1]->kind, 'nothing is assumed about a room or a meal');
+        $this->assertSame('Free time until 8:00 AM', $rows[1]->title);
 
         $firstOuting = collect($rows)->first(fn ($r) => $r->kind === 'activity');
         $this->assertNotNull($firstOuting);
-        $this->assertGreaterThanOrEqual('08:00', substr((string) $firstOuting->starts_at, 0, 5), 'no sightseeing before breakfast');
+        $this->assertGreaterThanOrEqual('08:00', substr((string) $firstOuting->starts_at, 0, 5), 'no sightseeing before 8 AM');
     }
 
     public function test_a_normal_morning_arrival_is_unchanged(): void

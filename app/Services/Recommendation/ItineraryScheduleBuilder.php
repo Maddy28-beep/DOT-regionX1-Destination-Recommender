@@ -34,14 +34,17 @@ class ItineraryScheduleBuilder
     private const BREAKFAST = '07:00';
 
     /**
-     * A traveller who lands before this hour is not sent sightseeing straight off the plane: the day has
-     * a rest-and-breakfast block at the accommodation first, and the first outing is after breakfast,
-     * as on every other day. (Before this, a 4:00 AM arrival got a beach visit at 5:30 AM.)
+     * No day's first journey starts before this. A traveller who lands earlier is not sent sightseeing
+     * straight off the plane (a 4:00 AM arrival once got a beach visit at 5:30 AM); the time until
+     * then is shown as free time. Public because the planning form quotes it.
      */
-    private const EARLY_ARRIVAL_BEFORE = '06:00';
+    public const EARLIEST_DEPARTURE = '08:00';
 
-    /** ...and set off an hour later. */
-    private const DEPART_AFTER_BREAKFAST = '08:00';
+    /**
+     * A planning estimate, not a measured airport, port or transfer time: the minutes between the
+     * arrival time the traveller entered and setting off. Public because the planning form quotes it.
+     */
+    public const ARRIVAL_PREPARATION_MINUTES = 30;
 
     /** How long a traveller spends at one place, in minutes. */
     private const VISIT_MINUTES = 150;
@@ -264,7 +267,7 @@ class ItineraryScheduleBuilder
                     // the queue and keep every stop behind it from being scheduled.
                     if ($scheduled === 0) {
                         $front = $queue[array_key_first($queue)]['row']['destination'];
-                        $freshMorning = Carbon::parse(self::DEPART_AFTER_BREAKFAST);
+                        $freshMorning = Carbon::parse(self::EARLIEST_DEPARTURE);
 
                         if ($this->planVisit($freshMorning, $here, $this->place($front), self::VISIT_MINUTES, false, $front, $date) === null) {
                             // Closed only on today's weekday: keep it for a later day instead of dropping it.
@@ -434,25 +437,40 @@ class ItineraryScheduleBuilder
     ): Carbon {
         if ($dayNumber === 1) {
             $arrival = $this->arrivalTime($preference);
+            $earliest = Carbon::parse(self::EARLIEST_DEPARTURE);
+
+            // The starting point is stated here, apart from the title: it is where travel times are measured
+            // from, not necessarily where the traveller arrives. A blank arrival time is still planned as
+            // an arrival at the earliest departure, and says so.
+            $note = 'Starting point for travel times: '.$origin['label'].'.';
+            if (blank($preference->arrival_time)) {
+                $note = 'No arrival time provided; assuming '.$arrival->format('g:i A').'. '.$note;
+            }
 
             $this->row($itinerary, $dayNumber, $sortOrder, [
                 'kind' => 'baseline',
-                'title' => 'Arrival — '.$origin['label'],
+                'title' => 'Planned arrival',
                 'starts_at' => $arrival,
+                'note' => $note,
             ]);
 
-            if ($arrival->lessThan(Carbon::parse(self::EARLY_ARRIVAL_BEFORE))) {
+            // departure = the later of (arrival + preparation) and the earliest departure.
+            $ready = $arrival->copy()->addMinutes(self::ARRIVAL_PREPARATION_MINUTES);
+
+            if ($ready->lessThan($earliest)) {
+                // Neutral on purpose: nothing about a room, a meal or any service is assumed or arranged.
                 $this->row($itinerary, $dayNumber, $sortOrder, [
-                    'kind' => 'meal',
-                    'title' => 'Rest, freshen up and breakfast — '.($accommodation?->name ?? 'your accommodation'),
-                    'starts_at' => Carbon::parse(self::BREAKFAST),
-                    'accommodation_id' => $accommodation?->id,
+                    'kind' => 'free',
+                    'title' => 'Free time until '.$earliest->format('g:i A'),
+                    'starts_at' => $arrival,
+                    'ends_at' => $earliest,
+                    'note' => 'You might rest or eat; nothing is arranged.',
                 ]);
 
-                return Carbon::parse(self::DEPART_AFTER_BREAKFAST);
+                return $earliest;
             }
 
-            return $arrival->copy()->addMinutes(30);
+            return $ready;
         }
 
         $this->row($itinerary, $dayNumber, $sortOrder, [
@@ -462,7 +480,7 @@ class ItineraryScheduleBuilder
             'accommodation_id' => $accommodation?->id,
         ]);
 
-        return Carbon::parse(self::DEPART_AFTER_BREAKFAST);
+        return Carbon::parse(self::EARLIEST_DEPARTURE);
     }
 
     /** A journey row, returning the clock at arrival. */
