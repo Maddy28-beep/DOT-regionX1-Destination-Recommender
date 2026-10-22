@@ -92,7 +92,8 @@
                                     // Quoted from the scheduler so the help can never disagree with what the planner does.
                                     $prepMinutes = \App\Services\Recommendation\ItineraryScheduleBuilder::ARRIVAL_PREPARATION_MINUTES;
                                     $earliestStart = \Illuminate\Support\Carbon::parse(\App\Services\Recommendation\ItineraryScheduleBuilder::EARLIEST_DEPARTURE)->format('g:i A');
-                                    $arrivalHelp = "When you expect to arrive in Davao. We allow about {$prepMinutes} minutes before your first outing and never start an outing before {$earliestStart}. Leave it blank and we'll assume {$earliestStart}.";
+                                    $lastSightseeing = \Illuminate\Support\Carbon::parse(\App\Services\Recommendation\ItineraryScheduleBuilder::LAST_ACTIVITY_END)->format('g:i A');
+                                    $arrivalHelp = "When you expect to arrive in Davao. We allow about {$prepMinutes} minutes before your first outing and never start an outing before {$earliestStart}. A later arrival leaves less of your first day, so it may have fewer stops, or none if you arrive in the evening. Sightseeing ends by {$lastSightseeing}. Leave it blank and we'll assume {$earliestStart}.";
                                 @endphp
                                 <div class="field" style="flex:1; min-width:160px;">
                                     <label for="arrival_time">Planned arrival time (optional)

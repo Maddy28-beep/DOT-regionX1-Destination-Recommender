@@ -67,9 +67,9 @@ class ItineraryScheduleBuilder
      * stop with a four-hour drive produced souvenir shopping at 1:45 AM and a
      * departure at 3:30 AM. A stop that cannot finish by the cutoff is pushed
      * to the next day instead, and a plan with fewer stops is worth more than
-     * one that is impossible.
+     * one that is impossible. Public because the planning form quotes it.
      */
-    private const LAST_ACTIVITY_END = '18:00';
+    public const LAST_ACTIVITY_END = '18:00';
 
     /**
      * How long a day may spend on the road, on the slow end of the travel estimates, by how far the traveller
