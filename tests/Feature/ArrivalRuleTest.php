@@ -378,7 +378,7 @@ class ArrivalRuleTest extends TestCase
 
         $this->get(route('plan.edit'))->assertOk()
             ->assertSee('A later arrival leaves less of your first day, so it may have fewer stops, or none if you arrive in the evening.')
-            ->assertSee("Sightseeing ends by {$cutoff}.");
+            ->assertSee("Destination sightseeing ends by {$cutoff}.");
         $this->assertSame('6:00 PM', $cutoff, 'the sentence in the PR and the form say 6:00 PM because the scheduler cutoff is 18:00');
     }
 
