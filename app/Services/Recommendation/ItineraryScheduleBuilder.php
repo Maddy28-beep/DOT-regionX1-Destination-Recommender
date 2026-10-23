@@ -110,6 +110,13 @@ class ItineraryScheduleBuilder
 
     private const OVERNIGHT = '20:00';
 
+    /**
+     * Back at the accommodation with at least this long before dinner, the gap is shown as free time. Shorter
+     * than this is only the slack left by the quarter-hour rounding and the departure buffer. Dinner stays at its
+     * fixed hour either way: this row only says what the time before it is.
+     */
+    private const MIN_FREE_TIME_BEFORE_DINNER_MINUTES = 30;
+
     /** Buffer between finishing at a place and setting off from it. */
     private const DEPARTURE_BUFFER_MINUTES = 15;
 
@@ -589,8 +596,23 @@ class ItineraryScheduleBuilder
         }
 
         // Dinner is at the usual hour, or when the traveller gets back if the drive ran longer than that.
+        $returned = $this->toQuarterHour($arrival);
         $dinner = Carbon::parse(self::DINNER);
-        $dinner = $this->toQuarterHour($arrival)->greaterThan($dinner) ? $this->toQuarterHour($arrival) : $dinner;
+        $dinner = $returned->greaterThan($dinner) ? $returned : $dinner;
+
+        // Back well before dinner: say so, instead of leaving an unexplained jump from the return journey to dinner.
+        // Neutral on purpose, like the early-arrival free time: no listing is attached, and nothing about a room,
+        // a meal or any service is claimed.
+        if (($dinner->getTimestamp() - $returned->getTimestamp()) / 60 >= self::MIN_FREE_TIME_BEFORE_DINNER_MINUTES) {
+            $this->row($itinerary, $dayNumber, $sortOrder, [
+                'kind' => 'free',
+                'title' => 'Free time until dinner',
+                'starts_at' => $returned,
+                'ends_at' => $dinner,
+                'note' => 'Nothing is arranged for this time.',
+            ]);
+        }
+
         $overnight = Carbon::parse(self::OVERNIGHT);
         $overnight = $dinner->copy()->addMinutes(90)->greaterThan($overnight) ? $dinner->copy()->addMinutes(90) : $overnight;
 
