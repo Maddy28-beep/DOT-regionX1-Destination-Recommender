@@ -28,10 +28,24 @@ places with no confidently matched photograph in the reviewed directory.
 One additional listing already had an uploaded photograph and was preserved.
 Logo-only images, generic stock images, and ambiguous name matches were excluded.
 
-Source attribution is stored with each imported photo for internal reference.
-Public availability and attribution do not establish a reuse license; no license
-claim is made for these source images.
+## Permission records (manifest v2)
 
-## Included in the repository
+Each entry in `manifest.json` carries a `verification_status`: `unverified`, `identity_checked`, `second_source`,
+`approved` or `rejected`. **Only `approved` entries are imported**, and only when the record is complete:
+`permission_basis`, `permission_ref` (for the owners' meeting: which meeting / attendance sheet), `permission_date`,
+`credit_text` (the credit the owner agreed to), `verified_by`, `verified_at`, plus `source_url` unless the picture
+was supplied by the establishment itself. The `sha256` of every file is checked, so a picture changed after approval
+is caught. Check the manifest any time with:
 
-The photographs in this folder are committed, so a fresh clone can run `php artisan migrate --seed` and get them. `DatabaseSeeder` runs `VerifiedListingPhotoSeeder` first and then `SampleListingPhotoSeeder`, which fills only the listings that still have no real photo. Run `php artisan storage:link` once so the copied files are served. No source credit is shown on the public pages.
+```sh
+php artisan listing-photos:validate
+```
+
+The 68 legacy entries (Davao City Tourism / Eden Nature Park, imported 7 October 2026) are `unverified` because no
+permission record was kept with them. They stay on the live site until a decision is made; a fresh install will not
+re-import them until each is approved. Photos already in the database keep working and show "Source: ..." as credit.
+
+Pages show the credit under the gallery, label any sample or placeholder as "Illustration, not a photo of this
+place", and show a "Report a photo" link when `LISTING_PHOTO_REPORT_EMAIL` is set in `.env`.
+
+`DatabaseSeeder` runs `VerifiedListingPhotoSeeder` first and then `SampleListingPhotoSeeder`. Run `php artisan storage:link` once so copied files are served.

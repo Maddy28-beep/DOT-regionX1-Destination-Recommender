@@ -12,7 +12,10 @@
 <div class="dest-detail-hero">
     @php $photo = $destination->coverPhoto(); @endphp
     @if ($photo && ! str_ends_with(strtolower($photo->path), '.svg'))
-        <img src="{{ $photo->url() }}" alt="{{ $destination->name }}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+        <img src="{{ $photo->url() }}" alt="{{ $photo->isIllustration() ? 'Illustration, not a photo of '.$destination->name : $destination->name }}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+        @if ($photo->isIllustration())
+            <span class="photo-illustration-tag">Illustration, not a photo of this place</span>
+        @endif
     @else
         @include('partials.poster-illustration', ['scene' => $scene])
     @endif

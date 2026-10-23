@@ -2,19 +2,31 @@
 
 namespace Database\Seeders;
 
+use App\Support\ListingPhotoManifest;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Copies the manifest's pictures onto listings, but only the ones whose verification_status is `approved`, and
+ * only when the entry carries its evidence (see ListingPhotoManifest): who allowed it, on what basis, the credit to
+ * show, and who checked it shows the right place. An entry that is not approved, or whose record is incomplete, is
+ * left out and nothing about it is published. Safe to run repeatedly.
+ */
 class VerifiedListingPhotoSeeder extends Seeder
 {
+    /** Where manifest.json and the images are; null means database/data/listing-photos. Set by tests. */
+    public ?string $directory = null;
+
     public function run(): void
     {
-        $directory = database_path('data/listing-photos');
-        $entries = json_decode(file_get_contents($directory.'/manifest.json'), true, flags: JSON_THROW_ON_ERROR);
+        $manifest = $this->directory ? new ListingPhotoManifest($this->directory) : ListingPhotoManifest::default();
+        $directory = $manifest->directory();
 
-        foreach ($entries as $entry) {
-            // The image files are kept out of git (see database/data/listing-photos/README.md).
-            if (! is_file($directory.'/'.$entry['file'])) {
+        foreach ($manifest->approved() as $entry) {
+            $problems = $manifest->problemsWith($entry);
+            if ($problems !== []) {
+                $this->command?->warn('Skipped, incomplete record: '.implode('; ', $problems));
+
                 continue;
             }
 
@@ -36,8 +48,18 @@ class VerifiedListingPhotoSeeder extends Seeder
                 'category' => 'General',
                 'is_primary' => true,
                 'sort_order' => -1,
-                'source_url' => $entry['source_url'],
-                'source_name' => $entry['source_name'],
+                'source_url' => $entry['source_url'] ?? null,
+                'source_name' => $entry['source_name'] ?? null,
+                'source_type' => $entry['source_type'],
+                'permission_basis' => $entry['permission_basis'],
+                'permission_ref' => $entry['permission_ref'],
+                'permission_date' => $entry['permission_date'],
+                'licence' => $entry['licence'] ?? null,
+                'credit_text' => $entry['credit_text'],
+                'show_credit' => $entry['show_credit'] ?? true,
+                'verification_status' => 'approved',
+                'verified_by' => $entry['verified_by'],
+                'verified_at' => $entry['verified_at'],
             ]);
         }
     }

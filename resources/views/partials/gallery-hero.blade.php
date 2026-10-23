@@ -8,16 +8,25 @@
         $photos = $photos->reject(fn ($photo) => $photo->category === 'Sample image')->values();
         $total = $photos->count();
     }
+
+    // Generic pictures and drawings are shown plainly as such; a real photograph is described by its category.
+    $onlyIllustrations = $total > 0 && $photos->every(fn ($photo) => $photo->isIllustration());
+    $altFor = fn ($photo) => $photo->isIllustration()
+        ? 'Illustration, not a photo of '.$title
+        : $title.($photo->category && $photo->category !== 'General' ? ' ('.strtolower($photo->category).')' : '');
 @endphp
 
 @if ($total > 0)
-    <div data-gallery data-photos='@json($photos->map(fn ($p) => ["url" => $p->url(), "category" => $p->category])->values())'>
+    <div data-gallery data-photos='@json($photos->map(fn ($p) => ["url" => $p->url(), "category" => $p->category, "credit" => $p->creditLine()])->values())'>
         {{-- Mobile: swipeable full-photo carousel (touch-native via scroll-snap) --}}
         <div class="gallery-hero-mobile" @if($total > 1) data-carousel @endif>
             <div class="carousel-track">
                 @foreach ($photos as $i => $photo)
                     <a href="#" class="carousel-slide" data-open="{{ $i }}">
-                        <img src="{{ $photo->url() }}" alt="{{ $title }}">
+                        <img src="{{ $photo->url() }}" alt="{{ $altFor($photo) }}">
+                        @if ($onlyIllustrations && $i === 0)
+                            <span class="photo-illustration-tag">Illustration, not a photo of this place</span>
+                        @endif
                     </a>
                 @endforeach
             </div>
@@ -54,12 +63,15 @@
         {{-- Desktop: Agoda-style grid (main + thumbnails) --}}
         <div class="gallery-hero {{ $total === 1 ? 'single' : '' }}">
             <a href="#" class="g-main" data-open="0">
-                <img src="{{ $photos[0]->url() }}" alt="{{ $title }}">
+                <img src="{{ $photos[0]->url() }}" alt="{{ $altFor($photos[0]) }}">
+                @if ($onlyIllustrations)
+                    <span class="photo-illustration-tag">Illustration, not a photo of this place</span>
+                @endif
             </a>
             @if ($total >= 2)
                 @foreach ($photos->slice(1, 2) as $i => $photo)
                     <a href="#" class="g-thumb {{ $total === 2 ? 'g-thumb-span' : '' }}" data-open="{{ $i + 1 }}">
-                        <img src="{{ $photo->url() }}" alt="{{ $title }}">
+                        <img src="{{ $photo->url() }}" alt="{{ $altFor($photo) }}">
                         @if ($loop->last && $total > 3)
                             <div class="g-more-overlay">+{{ $total - 3 }} more</div>
                         @endif
@@ -88,6 +100,8 @@
                 <div class="loc">{{ $subtitle }}</div>
             </div>
         </div>
+
+        @include('partials.photo-credit', ['photos' => $photos, 'title' => $title])
 
         @php $categories = $photos->groupBy('category'); @endphp
         @if ($categories->count() > 1)

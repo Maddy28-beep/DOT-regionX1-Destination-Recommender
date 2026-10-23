@@ -20,6 +20,7 @@
 
 
     @include('partials.dest-detail-hero', ['destination' => $destination])
+    @include('partials.photo-credit', ['photos' => collect([$destination->coverPhoto()])->filter(), 'title' => $destination->name])
 
     <div class="detail-layout">
         <div>
