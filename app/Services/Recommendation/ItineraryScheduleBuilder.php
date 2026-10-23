@@ -166,6 +166,7 @@ class ItineraryScheduleBuilder
         $accommodation = $stay['listing'] ?? null;
         $stayRule = $stay['rule'] ?? null;
         $sortOrder = 0;
+        $this->lastStart = $this->pastMidnight = [];
         $lastDay = array_key_last($dayCapacities);
 
         /*
@@ -667,11 +668,42 @@ class ItineraryScheduleBuilder
         ]);
     }
 
+    /**
+     * The latest stored start time of each day, and the days whose clock has run past midnight, both keyed
+     * "itinerary-day". The schedule columns are `time` (no date), so a row after midnight would otherwise be
+     * stored as, say, 00:15 inside Day 1: shown as a morning time, with the day's times running backwards.
+     *
+     * @var array<string, string>
+     */
+    private array $lastStart = [];
+
+    /** @var array<string, bool> */
+    private array $pastMidnight = [];
+
     /** Writes one schedule line. */
     private function row(Itinerary $itinerary, int $dayNumber, int &$sortOrder, array $attributes): void
     {
         $starts = $attributes['starts_at'] ?? null;
         $ends = $attributes['ends_at'] ?? null;
+
+        // A row whose time precedes the one before it in the same day has crossed midnight, and so has every row
+        // after it: those carry no time, only a note, rather than a time that reads as the next morning.
+        $key = $itinerary->id.'-'.$dayNumber;
+        if ($starts !== null) {
+            $time = $starts->format('H:i:s');
+            if (! empty($this->pastMidnight[$key]) || (isset($this->lastStart[$key]) && $time < $this->lastStart[$key])) {
+                $this->pastMidnight[$key] = true;
+                $starts = $ends = null;
+                $note = 'This falls after midnight, so no set time is shown.';
+                $attributes['note'] = filled($attributes['note'] ?? null) ? $attributes['note'].' '.$note : $note;
+            } else {
+                $this->lastStart[$key] = $time;
+                // A stay that begins before midnight and ends after it keeps its start and drops the end.
+                if ($ends !== null && $ends->format('H:i:s') < $time) {
+                    $ends = null;
+                }
+            }
+        }
 
         // Overrides go on the LEFT of the union: array + keeps the left-hand
         // key, and passing the Carbon objects through unformatted wrote a full
@@ -682,6 +714,7 @@ class ItineraryScheduleBuilder
             'slot' => $starts ? $this->slotFor($starts) : 'Any time',
             'starts_at' => $starts?->format('H:i:s'),
             'ends_at' => $ends?->format('H:i:s'),
+            'note' => $attributes['note'] ?? null,
         ] + $attributes);
     }
 

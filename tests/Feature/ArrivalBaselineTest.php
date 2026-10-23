@@ -26,7 +26,7 @@ use Tests\TestCase;
  *
  * Where behaviour is a known defect the test name says KNOWN DEFECT and the comment says what the
  * intended behaviour is. Those expectations are meant to be flipped, deliberately, by the change that
- * fixes them; a flip anywhere else is a regression. (The midnight defect is still open.)
+ * fixes them; a flip anywhere else is a regression. (The midnight defect is fixed.)
  *
  * Fixed inputs throughout: the clock is frozen, the trip starts on a fixed date, the starting
  * point is the default (Davao City centre) and every fixture has a single deterministic ranking.
@@ -395,12 +395,12 @@ class ArrivalBaselineTest extends TestCase
     // ---------------------------------------------------------------------------------------------
 
     /**
-     * KNOWN DEFECT. The builder's clock runs past midnight, but the schedule columns are `time`
-     * (no date), so a row after midnight is stored as, say, 00:15 inside Day 1: it is displayed
-     * as a morning time and the day's times run backwards. Intended behaviour: no row is stored
-     * with a time that precedes the row before it; rows past midnight carry no time and a note.
+     * The builder's clock runs past midnight, but the schedule columns are `time` (no date), so a row after
+     * midnight used to be stored as, say, 00:15 inside Day 1: displayed as a morning time, with the day's
+     * times running backwards. No row is stored with a time that precedes the row before it; rows past
+     * midnight carry no time and a note.
      *
-     * @return list<string> the rows stored past midnight: the first whose time is earlier than the row before it, and every later row of that day
+     * @return list<string> the rows stored with a time earlier than the row before them (must be empty)
      */
     private function wrappedTitles(Itinerary $itinerary, int $days): array
     {
@@ -408,14 +408,11 @@ class ArrivalBaselineTest extends TestCase
 
         foreach (range(1, $days) as $day) {
             $previous = null;
-            $pastMidnight = false;
             foreach ($this->day($itinerary, $day) as $row) {
                 if ($row['start'] === null) {
                     continue;
                 }
-                // The first row whose time is earlier than the one before it crossed midnight; so did every later row of the day.
-                $pastMidnight = $pastMidnight || ($previous !== null && $row['start'] < $previous);
-                if ($pastMidnight) {
+                if ($previous !== null && $row['start'] < $previous) {
                     $wrapped[] = "day {$day}: {$row['kind']}: {$row['title']} at {$row['start']}";
                 }
                 $previous = $row['start'];
@@ -425,23 +422,23 @@ class ArrivalBaselineTest extends TestCase
         return $wrapped;
     }
 
-    public function test_known_defect_a_2330_arrival_stores_times_that_run_backwards(): void
+    public function test_a_2330_arrival_no_longer_stores_times_that_run_backwards(): void
     {
         $this->multiFixture();
 
         foreach ([1, 2, 3] as $days) {
             $itinerary = $this->generate($this->preference('23:30', $days));
 
-            $this->assertSame(self::EXPECTED_WRAPS[$days], $this->wrappedTitles($itinerary, $days), "{$days}-day trip, arrival 23:30");
+            $this->assertSame([], $this->wrappedTitles($itinerary, $days), "{$days}-day trip, arrival 23:30");
+
+            // The rows that fall after midnight keep their place in the day but show no time, with a note.
+            $afterMidnight = $itinerary->items()->where('day_number', 1)->whereNull('starts_at')->get();
+            $this->assertCount(2, $afterMidnight, "{$days}-day trip: travel and the last row fall after midnight");
+            foreach ($afterMidnight as $row) {
+                $this->assertStringContainsString('after midnight', (string) $row->note);
+            }
         }
     }
-
-    /** Recorded from the current implementation. */
-    private const EXPECTED_WRAPS = [
-        1 => ['day 1: travel: Travel to Davao City centre at 00:15', 'day 1: departure: Departure at 00:30'],
-        2 => ['day 1: travel: Travel to City Inn at 00:15', 'day 1: overnight: Late check-in and overnight stay at 00:30'],
-        3 => ['day 1: travel: Travel to City Inn at 00:15', 'day 1: overnight: Late check-in and overnight stay at 00:30'],
-    ];
 
     public function test_an_evening_arrival_before_the_wrap_threshold_is_chronological(): void
     {
