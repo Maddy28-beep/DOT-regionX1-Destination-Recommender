@@ -98,6 +98,9 @@
             @if ($coverPhoto)
                 {{-- alt is empty on purpose: the name below already names the place and the card is one link. --}}
                 <img src="{{ $coverPhoto->url() }}" alt="" class="dpost-card__photo" loading="lazy" decoding="async">
+                @if ($coverPhoto->isIllustration())
+                    <span class="photo-illustration-tag photo-illustration-tag--card">Illustration</span>
+                @endif
             @elseif ($isOperator && $initials)
                 <div class="dcard__monogram"><span>{{ $initials }}</span></div>
             @else

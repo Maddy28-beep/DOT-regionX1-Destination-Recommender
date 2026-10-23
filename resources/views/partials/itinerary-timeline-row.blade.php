@@ -75,6 +75,9 @@
                 <div class="tl-card__media">
                     @if ($realPhoto)
                         <img src="{{ $realPhoto->url() }}" alt="" loading="lazy" decoding="async">
+                        @if ($realPhoto->isIllustration())
+                            <span class="photo-illustration-tag photo-illustration-tag--card">Illustration</span>
+                        @endif
                     @elseif ($kind === 'activity' && method_exists($listing, 'posterScene'))
                         @include('partials.poster-illustration', ['scene' => $listing->posterScene()])
                     @else

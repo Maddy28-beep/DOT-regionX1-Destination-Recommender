@@ -301,6 +301,7 @@ document.addEventListener('DOMContentLoaded', function () {
             imgEl.src = photos[current].url;
             var label = (current + 1) + ' / ' + photos.length;
             if (photos[current].category) label += ' · ' + photos[current].category;
+            if (photos[current].credit) label += ' · ' + photos[current].credit;
             metaEl.textContent = label;
         }
 
