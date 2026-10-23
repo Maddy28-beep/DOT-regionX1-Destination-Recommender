@@ -127,6 +127,25 @@ class ArrivalRuleTest extends TestCase
             ])->all();
     }
 
+    /**
+     * The free-time row that fills the wait before the first journey, if there is one. Day 1 can also hold a
+     * "Free time until dinner" row after the return journey, so a free row is only the early-arrival one when
+     * it comes before the first journey.
+     */
+    private function earlyArrivalFree(array $rows): ?array
+    {
+        foreach ($rows as $row) {
+            if ($row['kind'] === 'travel') {
+                return null;
+            }
+            if ($row['kind'] === 'free') {
+                return $row;
+            }
+        }
+
+        return null;
+    }
+
     private function firstOf(array $rows, string $kind): ?array
     {
         foreach ($rows as $row) {
@@ -171,7 +190,7 @@ class ArrivalRuleTest extends TestCase
             $this->assertSame($departure->format('H:i'), $this->firstOf($day1, 'travel')['start'], "departure for arrival {$arrival}");
             $this->assertSame($activity->format('H:i'), $this->firstOf($day1, 'activity')['start'], "first activity for arrival {$arrival}");
 
-            $free = $this->firstOf($day1, 'free');
+            $free = $this->earlyArrivalFree($day1);
             if ($at->lessThan($earliest->copy()->subMinutes(30))) {
                 $this->assertNotNull($free, "free time for arrival {$arrival}");
                 $this->assertSame([$arrival, '08:00'], [$free['start'], $free['end']], "free time spans arrival to 08:00 for {$arrival}");
@@ -209,11 +228,11 @@ class ArrivalRuleTest extends TestCase
         $at0731 = $this->day($this->generate($this->preference('07:31')), 1);
 
         $this->assertSame('08:00', $this->firstOf($at0729, 'travel')['start']);
-        $this->assertNotNull($this->firstOf($at0729, 'free'));
+        $this->assertNotNull($this->earlyArrivalFree($at0729));
         $this->assertSame('08:00', $this->firstOf($at0730, 'travel')['start'], '07:30 + 30 minutes = 08:00 exactly');
-        $this->assertNull($this->firstOf($at0730, 'free'), 'nothing left to fill at 07:30');
+        $this->assertNull($this->earlyArrivalFree($at0730), 'nothing left to fill at 07:30');
         $this->assertSame('08:01', $this->firstOf($at0731, 'travel')['start'], 'from 07:30 departure is arrival + 30, unrounded');
-        $this->assertNull($this->firstOf($at0731, 'free'));
+        $this->assertNull($this->earlyArrivalFree($at0731));
     }
 
     // ---- early arrivals plan the same day as the 04:00 case ------------------------------------------
