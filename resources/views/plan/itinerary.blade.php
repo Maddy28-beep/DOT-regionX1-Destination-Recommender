@@ -232,7 +232,7 @@
 
                                 <div class="tl">
                                     @foreach ($items as $item)
-                                        @include('partials.itinerary-timeline-row', ['item' => $item, 'swap' => $swap])
+                                        @include('partials.itinerary-timeline-row', ['item' => $item, 'swap' => $swap, 'ideas' => ($ideas ?? [])[$item->id] ?? []])
                                     @endforeach
                                 </div>
 

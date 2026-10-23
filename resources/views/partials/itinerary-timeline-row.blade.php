@@ -9,6 +9,8 @@
 
     $item   an ItineraryItem (listing, photos and region already loaded)
     $swap   the swap data from the controller
+    $ideas  optional souvenir ideas for this row (only Day 1's "Free time until dinner" has any); see FreeTimeIdeas.
+            They are suggestions beside the schedule, never rows of it: no time, nothing booked.
 --}}
 @php
     $listing = $item->listing();
@@ -159,6 +161,22 @@
                     @endif
                 </span>
             </p>
+
+            @if ($kind === 'free' && ! empty($ideas))
+                <details class="tl-ideas">
+                    <summary>Optional ideas for this free time ({{ count($ideas) }})</summary>
+                    <p class="tl-ideas__intro">These are ideas only. They are not part of your plan, nothing is booked, and we can't promise they're open.</p>
+                    <ul class="tl-ideas__list">
+                        @foreach ($ideas as $idea)
+                            <li>
+                                <a href="{{ route('souvenir-centers.show', $idea['shop']) }}">{{ $idea['shop']->name }}</a>
+                                <span>Souvenir shop &middot; Approx. {{ rtrim(rtrim(number_format($idea['km'], 1), '0'), '.') }} km from your accommodation</span>
+                                <small>Opening hours are not listed. Check before visiting.</small>
+                            </li>
+                        @endforeach
+                    </ul>
+                </details>
+            @endif
         @endif
     </div>
 </div>

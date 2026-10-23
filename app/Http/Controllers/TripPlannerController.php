@@ -13,6 +13,7 @@ use App\Models\TouristPreference;
 use App\Services\Geocoding\AddressSuggestionService;
 use App\Services\Embeddings\SimilarDestinationService;
 use App\Services\Recommendation\ContentBasedRecommendationService;
+use App\Services\Recommendation\FreeTimeIdeas;
 use App\Services\Recommendation\ItineraryGenerationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -245,7 +246,10 @@ class TripPlannerController extends Controller
 
         $swap = $this->swapData($itinerary);
 
-        return view('plan.itinerary', compact('itinerary', 'preference', 'provenance', 'swap'));
+        // Optional ideas for Day 1's free time before dinner: read-only, never part of the schedule.
+        $ideas = app(FreeTimeIdeas::class)->forItinerary($itinerary, $preference);
+
+        return view('plan.itinerary', compact('itinerary', 'preference', 'provenance', 'swap', 'ideas'));
     }
 
     public function regenerate(Request $request): RedirectResponse

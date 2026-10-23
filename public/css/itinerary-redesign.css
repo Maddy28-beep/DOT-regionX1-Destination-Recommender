@@ -114,6 +114,22 @@
 .tl-line strong, .tl-line a { color: var(--primary-dark); font-weight: 700; }
 .tl-line small { display: block; font-size: .8rem; color: var(--muted); }
 
+/* Optional ideas under a free-time row: dashed and collapsed, so they never read as a scheduled stop. */
+.tl-ideas { margin: 0 0 10px 42px; font-size: .88rem; }
+.tl-ideas summary { display: flex; align-items: center; gap: 10px; min-height: 40px; list-style: none; cursor: pointer; font-weight: 600; color: var(--primary-dark); }
+.tl-ideas summary::-webkit-details-marker { display: none; }
+/* The arrow: display:flex above removes the browser's own marker, so the summary says it opens in CSS. */
+.tl-ideas summary::after { content: ""; flex: none; width: 8px; height: 8px; margin-top: -4px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .15s ease; }
+.tl-ideas[open] summary::after { margin-top: 4px; transform: rotate(-135deg); }
+.tl-ideas__intro { margin: 2px 0 8px; font-size: .82rem; color: var(--muted); }
+.tl-ideas__list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.tl-ideas__list li { padding: 0 12px 8px; border: 1px dashed var(--border); border-radius: 10px; }
+/* The whole name line is the tap target (about 40px, taller when a long name wraps). */
+.tl-ideas__list a { display: flex; align-items: center; min-height: 40px; color: var(--primary-dark); font-weight: 700; overflow-wrap: anywhere; }
+.tl-ideas__list span, .tl-ideas__list small { display: block; font-size: .82rem; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) { .tl-ideas summary::after { transition: none; } }
+
 .itin .day-actions { margin-top: 8px; padding-top: 18px; border-top: 1px solid var(--border); }
 
 /* ---- trip overview ---- */
@@ -144,6 +160,7 @@
     .itin-overview { position: static; }
 }
 @media (max-width: 640px) {
+    .tl-ideas { margin-left: 0; }
     .itin-hero { margin-top: 36px; padding: 16px 16px 16px 128px; min-height: 124px; }
     .itin-hero__davo { left: 10px; width: 108px; }
     .itin-hero__scene { display: none; }
