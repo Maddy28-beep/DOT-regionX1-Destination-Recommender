@@ -326,7 +326,7 @@ class ArrivalRuleTest extends TestCase
     {
         $response = $this->get(route('plan.edit'))->assertOk();
 
-        $response->assertSee('Planned arrival time (optional)');
+        $response->assertSee('Arrival time (optional)');
         $response->assertSee('about 30 minutes before your first outing and never start an outing before 8:00 AM.');
         $response->assertSee("we'll assume 8:00 AM.");
         $response->assertDontSee("We won't put a morning stop on your first day", false);

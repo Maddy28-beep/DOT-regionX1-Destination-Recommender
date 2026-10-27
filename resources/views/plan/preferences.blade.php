@@ -29,6 +29,7 @@
             <a href="{{ route('saved.index') }}" class="btn btn-outline plan-saved-link">
                 <x-icon name="heart" /> Saved Places
             </a>
+            <p class="plan-davo-says" id="planDavoSays" aria-live="polite" hidden></p>
         </div>
     </div>
 
@@ -59,10 +60,10 @@
                 </div>
             </section>
             <nav class="plan-wizard-steps" aria-label="Trip planning steps" hidden>
-                <button type="button" data-plan-step="0" aria-controls="plan-step-0">1 · Your trip</button>
-                <button type="button" data-plan-step="1" aria-controls="plan-step-1">2 · Your interests</button>
-                <button type="button" data-plan-step="2" aria-controls="plan-step-2">3 · Stay &amp; budget</button>
-                <button type="button" data-plan-step="3" aria-controls="plan-step-3">4 · Getting around</button>
+                <button type="button" data-plan-step="0" aria-controls="plan-step-0"><b class="plan-step-num" aria-hidden="true">1</b> Your trip</button>
+                <button type="button" data-plan-step="1" aria-controls="plan-step-1"><b class="plan-step-num" aria-hidden="true">2</b> Your interests</button>
+                <button type="button" data-plan-step="2" aria-controls="plan-step-2"><b class="plan-step-num" aria-hidden="true">3</b> Stay &amp; budget</button>
+                <button type="button" data-plan-step="3" aria-controls="plan-step-3"><b class="plan-step-num" aria-hidden="true">4</b> Getting around</button>
             </nav>
             <div class="panel plan-panel">
                 <div class="panel-head">
@@ -79,74 +80,7 @@
                     <form method="POST" action="{{ route('plan.update') }}" id="planPreferencesForm">
                         @csrf
 
-                        <div class="plan-section">
-                            <h3 class="plan-section__title"><x-icon name="clock" /> Trip Basics</h3>
-                            <div class="filter-inline" style="align-items:start;">
-                                <div class="field" style="flex:1; min-width:160px;">
-                                    <label for="travel_days">Number of travel days</label>
-                                    <input type="number" id="travel_days" name="travel_days" min="1" max="30" value="{{ old('travel_days', $preference->travel_days ?? 3) }}" required>
-                                </div>
-                                <div class="field" style="flex:1; min-width:180px;">
-                                    <label for="start_date">Planned arrival date (optional)</label>
-                                    <input type="date" id="start_date" name="start_date" value="{{ old('start_date', optional($preference->start_date)->format('Y-m-d')) }}">
-                                </div>
-                                @php
-                                    // Quoted from the scheduler so the help can never disagree with what the planner does.
-                                    $prepMinutes = \App\Services\Recommendation\ItineraryScheduleBuilder::ARRIVAL_PREPARATION_MINUTES;
-                                    $earliestStart = \Illuminate\Support\Carbon::parse(\App\Services\Recommendation\ItineraryScheduleBuilder::EARLIEST_DEPARTURE)->format('g:i A');
-                                    $lastSightseeing = \Illuminate\Support\Carbon::parse(\App\Services\Recommendation\ItineraryScheduleBuilder::LAST_ACTIVITY_END)->format('g:i A');
-                                    $arrivalHelp = "When you expect to arrive in Davao. We allow about {$prepMinutes} minutes before your first outing and never start an outing before {$earliestStart}. A later arrival leaves less of your first day, so it may have fewer stops, or none if you arrive in the evening. Destination sightseeing ends by {$lastSightseeing}. Leave it blank and we'll assume {$earliestStart}.";
-                                @endphp
-                                <div class="field" style="flex:1; min-width:160px;">
-                                    <label for="arrival_time">Planned arrival time (optional)
-                                        <span class="field-help" tabindex="0" title="{{ $arrivalHelp }}" aria-label="{{ $arrivalHelp }}"><x-icon name="info" /></span>
-                                    </label>
-                                    <input type="time" id="arrival_time" name="arrival_time"
-                                           value="{{ old('arrival_time', $preference->arrival_time ? substr((string) $preference->arrival_time, 0, 5) : '') }}">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="plan-section">
-                            <h3 class="plan-section__title"><x-icon name="compass" /> Travel Style</h3>
-                            <div class="filter-inline" style="align-items:start;">
-                                <div class="field" style="flex:1; min-width:180px;">
-                                    <label for="travel_type">Who are you traveling with?</label>
-                                    <select id="travel_type" name="travel_type" class="form-select" required>
-                                        @foreach ($travelTypes as $value => $label)
-                                            <option value="{{ $value }}" @selected(old('travel_type', $preference->travel_type) === $value)>{{ $label }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="field" style="flex:1; min-width:180px;">
-                                    <label for="travel_purpose">Purpose of travel</label>
-                                    <select id="travel_purpose" name="travel_purpose" class="form-select" required>
-                                        <option value="" disabled @selected(! old('travel_purpose', $preference->travel_purpose))>Select a purpose</option>
-                                        @foreach ($travelPurposes as $purpose)
-                                            <option value="{{ $purpose }}" @selected(old('travel_purpose', $preference->travel_purpose) === $purpose)>{{ $purpose }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="field" style="flex:1; min-width:180px;">
-                                    <label for="visitor_type">Is this your first visit to Davao?</label>
-                                    <select id="visitor_type" name="visitor_type" class="form-select" data-local-toggle required>
-                                        <option value="" disabled @selected(! old('visitor_type', $preference->visitor_type))>Select one</option>
-                                        @foreach ($visitorTypes as $type)
-                                            <option value="{{ $type }}" @selected(old('visitor_type', $preference->visitor_type) === $type)>{{ $type }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="field" style="flex:1; min-width:200px;" data-origin-field>
-                                    <label for="place_of_origin"><span data-origin-label>Where are you visiting from?</span>
-                                        <span class="field-help" tabindex="0" title="Helps DOT understand where visitors are travelling from." aria-label="Helps DOT understand where visitors are travelling from."><x-icon name="info" /></span>
-                                    </label>
-                                    <input type="text" id="place_of_origin" name="place_of_origin"
-                                           value="{{ old('place_of_origin', $preference->place_of_origin) }}"
-                                           placeholder="e.g. Manila, Cebu, South Korea"
-                                           @unless(old('visitor_type', $preference->visitor_type) === 'Regular / Local') required @endunless>
-                                </div>
-                            </div>
-                        </div>
+                        @include('partials.plan-trip-basics')
 
                         @include('partials.plan-stay-budget')
                         @include('partials.plan-getting-around')
@@ -154,29 +88,7 @@
                         <div class="plan-section">
                             <h3 class="plan-section__title"><x-icon name="star" /> Interests &amp; Amenities</h3>
 
-                            <div class="field" style="margin-top:0;" data-checkbox-group="activities">
-                                <label>Interests &amp; activities <span class="field-required-hint">Select at least one</span></label>
-                                <div class="chip-checkbox-grid">
-                                    @foreach ($activityOptions as $activity)
-                                        <label class="field-check">
-                                            <input type="checkbox" name="activities[]" value="{{ $activity }}" @checked(in_array($activity, old('activities', $selectedActivities)))>
-                                            <span>{{ $activity }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <div class="field" style="margin-top:18px;" data-checkbox-group="amenities">
-                                <label>Preferred amenities <span class="field-required-hint">Select at least one</span></label>
-                                <div class="chip-checkbox-grid">
-                                    @foreach ($amenityOptions as $amenity)
-                                        <label class="field-check">
-                                            <input type="checkbox" name="amenities[]" value="{{ $amenity }}" @checked(in_array($amenity, old('amenities', $selectedAmenities)))>
-                                            <span>{{ $amenity }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </div>
+                            @include('partials.plan-interests')
 
                             <div class="field" style="margin-top:18px;">
                                 <label for="accessibility_notes">Anything else we should know? (optional)</label>
@@ -196,52 +108,54 @@
                             Coordinates are rounded to ~110 m before storage (see
                             TripPlannerController::applyOrigin).
                         --}}
-                        <div class="plan-section">
-                            <h3 class="plan-section__title"><x-icon name="map-pin" /> Starting Point</h3>
-                            <div class="field" style="margin-top:0;">
-                                <label for="origin_label">Where are you starting from? (optional)</label>
-                                <div class="privacy-note">
-                                    <x-icon name="map-pin" />
-                                    <p>
-                                        Your hotel, the airport, or any address. We order your stops from nearest to
-                                        furthest. Rounded to about 100 metres before we store it, never linked to your
-                                        name, and cleared when you clear the trip.
-                                    </p>
+                        <div class="plan-section pc-block">
+                            <header class="pc-block__head"><h3>Where you start</h3><p>Optional &mdash; your stops are ordered from here.</p></header>
+
+                            <input type="hidden" name="origin_lat" id="origin_lat" value="{{ old('origin_lat', $preference->origin_lat) }}">
+                            <input type="hidden" name="origin_lng" id="origin_lng" value="{{ old('origin_lng', $preference->origin_lng) }}">
+
+                            <div class="pc-grid">
+                                <div class="field pc-field pc-col-8">
+                                    <label for="origin_label">Hotel, airport or address</label>
+                                    {{-- Combobox pattern: a text input that owns a listbox
+                                         of suggestions, so it stays usable by keyboard and
+                                         to a screen reader rather than being a div that
+                                         happens to respond to clicks. --}}
+                                    <div class="address-field">
+                                        <x-icon name="map-pin" class="pc-origin__pin" />
+                                        <input type="text"
+                                               id="origin_label"
+                                               name="origin_label"
+                                               value="{{ old('origin_label', $preference->origin_label) }}"
+                                               placeholder="Hotel, airport or address"
+                                               autocomplete="off"
+                                               role="combobox"
+                                               aria-expanded="false"
+                                               aria-autocomplete="list"
+                                               aria-controls="origin-suggestions"
+                                               aria-describedby="origin-status">
+                                        <ul id="origin-suggestions" class="address-suggestions" role="listbox" aria-label="Address suggestions" hidden></ul>
+                                    </div>
                                 </div>
 
-                                <input type="hidden" name="origin_lat" id="origin_lat" value="{{ old('origin_lat', $preference->origin_lat) }}">
-                                <input type="hidden" name="origin_lng" id="origin_lng" value="{{ old('origin_lng', $preference->origin_lng) }}">
-
-                                {{-- Combobox pattern: a text input that owns a listbox
-                                     of suggestions, so it stays usable by keyboard and
-                                     to a screen reader rather than being a div that
-                                     happens to respond to clicks. --}}
-                                <div class="address-field">
-                                    <input type="text"
-                                           id="origin_label"
-                                           name="origin_label"
-                                           value="{{ old('origin_label', $preference->origin_label) }}"
-                                           placeholder="Hotel, airport or address"
-                                           autocomplete="off"
-                                           role="combobox"
-                                           aria-expanded="false"
-                                           aria-autocomplete="list"
-                                           aria-controls="origin-suggestions"
-                                           aria-describedby="origin-status">
-                                    <ul id="origin-suggestions" class="address-suggestions" role="listbox" aria-label="Address suggestions" hidden></ul>
+                                <div class="field pc-field pc-col-4">
+                                    <span class="pc-label" aria-hidden="true">&nbsp;</span>
+                                    <button type="button" class="btn btn-outline pc-locate" id="origin-btn"><x-icon name="locate" /> Use my current location</button>
                                 </div>
 
-                                <div class="origin-control">
-                                    <button type="button" class="btn btn-outline btn-sm" id="origin-btn">Use my current location</button>
-                                    <button type="button" class="btn btn-outline btn-sm" id="origin-clear"
-                                            @if (! $preference->origin_lat && ! $preference->origin_label) hidden @endif>Clear</button>
-                                    <span class="origin-status" id="origin-status" role="status">
-                                        @if ($preference->origin_label)
-                                            Starting from {{ $preference->origin_label }}.
-                                        @else
-                                            Not set &mdash; we'll plan from Davao City centre.
-                                        @endif
-                                    </span>
+                                <div class="pc-col-12 pc-start-notes">
+                                    <div class="origin-control">
+                                        <button type="button" class="btn btn-outline btn-sm" id="origin-clear"
+                                                @if (! $preference->origin_lat && ! $preference->origin_label) hidden @endif>Clear</button>
+                                        <span class="origin-status" id="origin-status" role="status">
+                                            @if ($preference->origin_label)
+                                                Starting from {{ $preference->origin_label }}.
+                                            @else
+                                                Not set &mdash; we'll plan from Davao City centre.
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <p class="pc-privacy"><x-icon name="shield-check" /> Your hotel, the airport, or any address. We order your stops from nearest to furthest. Rounded to about 100 metres before we store it, never linked to your name, and cleared when you clear the trip.</p>
                                 </div>
                             </div>
                         </div>
@@ -506,6 +420,7 @@
 </script>
 
 <script>window.planWizardErrors = {{ Illuminate\Support\Js::from($errors->keys()) }};</script>
+<script src="{{ asset('js/plan-basics.js') }}?v={{ filemtime(public_path('js/plan-basics.js')) }}" defer></script>
 <script src="{{ asset('js/plan-comfort.js') }}?v={{ filemtime(public_path('js/plan-comfort.js')) }}" defer></script>
 <script src="{{ asset('js/plan-wizard.js') }}?v={{ filemtime(public_path('js/plan-wizard.js')) }}" defer></script>
 

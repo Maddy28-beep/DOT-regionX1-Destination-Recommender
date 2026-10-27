@@ -72,3 +72,167 @@
     .plan-wizard .pc-bar { grid-template-columns: 100px minmax(0, 1fr); }
     .plan-wizard .pc-bar__time { grid-column: 1 / -1; text-align: left; margin-top: -4px; }
 }
+
+/* ---- Trip form steps 1 and 2 ----
+   One 12-column grid, one gutter and one control height (--pc-h) for the whole step, so every row lines up.
+   Blocks carry a title and a divider; each field keeps one line for its hint so neighbours end level. */
+.plan-wizard { --pc-h: 56px; --pc-gap: 20px; }
+
+.plan-wizard.is-wizard .pc-block { margin: 0 0 32px; padding: 0 0 32px; border: 0; border-bottom: 1px solid var(--border); }
+.plan-wizard.is-wizard .pc-block:last-of-type { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 0; }
+.plan-wizard .pc-block__head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; margin: 0 0 16px; }
+.plan-wizard .pc-block__head h3 { margin: 0; font: 800 1.1rem 'Poppins', sans-serif; color: var(--primary-dark); }
+.plan-wizard .pc-block__head p { margin: 0; font-size: .84rem; color: var(--muted); }
+
+.plan-wizard .pc-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 22px var(--pc-gap); align-items: start; }
+.plan-wizard .pc-col-3 { grid-column: span 3; }
+.plan-wizard .pc-col-4 { grid-column: span 4; }
+.plan-wizard .pc-col-6 { grid-column: span 6; }
+.plan-wizard .pc-col-8 { grid-column: span 8; }
+.plan-wizard .pc-col-12 { grid-column: 1 / -1; }
+.plan-wizard .pc-field { margin: 0; min-width: 0; }
+.plan-wizard .pc-field > label, .plan-wizard .pc-field > legend, .plan-wizard .pc-label { display: block; margin: 0 0 8px; padding: 0; font: 700 .88rem/1.3 'Poppins', sans-serif; color: var(--primary-dark); }
+.plan-wizard .pc-field > legend { float: left; width: 100%; }
+.plan-wizard .pc-field > legend + * { clear: both; }
+.plan-wizard .pc-hint { min-height: 1.3em; margin: 8px 2px 0; font-size: .8rem; line-height: 1.3; color: var(--muted); }
+.plan-wizard .pc-hint.is-set { color: var(--primary-dark); font-weight: 600; }
+
+/* every control is the same height */
+.plan-wizard .pc-field input:not([type="radio"]):not([type="checkbox"]):not([type="hidden"]) { min-height: var(--pc-h); }
+.plan-wizard .pc-stepper { min-height: var(--pc-h); }
+.plan-wizard .pc-quick { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; min-height: var(--pc-h); }
+.plan-wizard .pc-quick button { min-height: 40px; padding: 0 16px; border: 1.5px solid var(--border); border-radius: 999px; background: var(--white); font: 600 .84rem 'Poppins', sans-serif; color: var(--primary-dark); cursor: pointer; }
+.plan-wizard .pc-quick button:hover { background: var(--primary-light); border-color: var(--primary); }
+.plan-wizard .pc-quick button:focus-visible { outline: 3px solid #e98543; outline-offset: 2px; }
+.plan-wizard .pc-locate { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: var(--pc-h); border-radius: 12px; font-weight: 700; white-space: nowrap; }
+.plan-wizard .pc-locate svg { width: 17px; height: 17px; }
+
+/* [-] 3 days [+] */
+.plan-wizard .pc-stepper { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; background: var(--white); border: 1.5px solid var(--border); border-radius: 12px; }
+.plan-wizard .pc-stepper button { display: none; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 10px; background: transparent; color: var(--primary-dark); cursor: pointer; place-items: center; }
+.plan-wizard .pc-stepper.is-ready button { display: grid; }
+.plan-wizard .pc-stepper button:hover:not(:disabled) { background: var(--primary-light); }
+.plan-wizard .pc-stepper button:disabled { color: var(--border); cursor: default; }
+.plan-wizard .pc-stepper button svg { width: 18px; height: 18px; }
+.plan-wizard .pc-stepper__value { display: inline-flex; align-items: baseline; justify-content: center; gap: 6px; flex: 1; font: 700 1.05rem 'Poppins', sans-serif; color: var(--primary-dark); }
+.plan-wizard .pc-stepper__value input { width: 2.6ch; min-width: 0; min-height: 0; padding: 0; border: 0; background: transparent; text-align: right; font: inherit; color: inherit; -moz-appearance: textfield; appearance: textfield; }
+.plan-wizard .pc-stepper__value input::-webkit-outer-spin-button, .plan-wizard .pc-stepper__value input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.plan-wizard .pc-stepper__value input:focus-visible { outline: 3px solid #e98543; outline-offset: 2px; }
+.plan-wizard .pc-stepper:not(.is-ready) { padding: 4px 8px; }
+.plan-wizard .pc-stepper:not(.is-ready) .pc-stepper__value input { width: 4ch; text-align: center; }
+
+/* companions: five cards on the full width, icons level */
+.plan-wizard .pc-cards--5 { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+.plan-wizard .pc-cards--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.plan-wizard .pc-card--center { align-items: center; text-align: center; }
+.plan-wizard .pc-cards--5 .pc-card--center { justify-content: flex-start; min-height: 108px; padding: 16px 8px 12px; gap: 10px; }
+.plan-wizard .pc-card--center strong { display: flex; align-items: flex-start; justify-content: center; min-height: 2.5em; font-size: .9rem; }
+
+/* visit type: a compact row, the same height as the input beside it */
+.plan-wizard .pc-cards--rows { gap: 10px; }
+.plan-wizard .pc-card--row { flex-direction: row; align-items: center; gap: 10px; min-height: var(--pc-h); padding: 8px 12px; border-radius: 12px; }
+.plan-wizard .pc-card--row .pc-card__icon { flex: none; width: 34px; height: 34px; border-radius: 10px; }
+.plan-wizard .pc-card--row .pc-card__icon svg { width: 18px; height: 18px; }
+.plan-wizard .pc-card--row strong { font-size: .84rem; line-height: 1.25; text-align: left; }
+.plan-wizard .pc-welcome { display: flex; align-items: center; gap: 10px; min-height: var(--pc-h); padding: 0 16px; border: 1.5px dashed var(--primary); border-radius: 12px; background: var(--primary-light); color: var(--primary-dark); font: 600 .88rem 'Poppins', sans-serif; }
+.plan-wizard .pc-welcome svg { flex: none; width: 20px; height: 20px; }
+.plan-wizard .pc-field.is-local > label { visibility: hidden; }
+.plan-wizard .pc-field.is-local > input { display: none; }
+
+/* arrival time chips, on the full width: nothing wraps */
+.plan-wizard .pc-slots { display: none; }
+.plan-wizard [data-arrival].has-slots .pc-slots { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.plan-wizard .pc-slot { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 76px; padding: 8px 6px; text-align: center; cursor: pointer; background: var(--white); border: 1.5px solid var(--border); border-radius: 12px; color: var(--primary-dark); transition: border-color .15s, background .15s; }
+.plan-wizard .pc-slot:hover { border-color: var(--muted); }
+.plan-wizard .pc-slot strong { font: 700 .86rem 'Poppins', sans-serif; }
+.plan-wizard .pc-slot small { font-size: .76rem; line-height: 1.3; color: var(--muted); }
+.plan-wizard .pc-slot[aria-pressed="true"], .plan-wizard .pc-slot--exact.is-open { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 0 0 3px rgba(45, 106, 79, .14); }
+.plan-wizard .pc-slot:focus-visible, .plan-wizard .pc-slot__open:focus-visible { outline: 3px solid #e98543; outline-offset: 2px; }
+.plan-wizard [data-arrival].has-slots input[type="time"] { margin-top: 10px; max-width: 220px; }
+/* Exact time opens inside its own chip without changing its size, so the other chips never move. */
+.plan-wizard .pc-slot--exact { position: relative; display: block; padding: 0; overflow: hidden; cursor: default; }
+.plan-wizard .pc-slot__open { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; width: 100%; padding: 8px 6px; border: 0; background: transparent; cursor: pointer; font: inherit; color: inherit; }
+.plan-wizard .pc-slot--exact input[type="time"] { display: none; position: absolute; left: 10px; right: 10px; bottom: 9px; width: auto; max-width: none; margin: 0; padding: 0 8px; font-size: .82rem; }
+.plan-wizard .pc-field .pc-slot--exact input[type="time"] { min-height: 0 !important; height: 32px !important; }
+.plan-wizard .pc-slot--exact.is-open input[type="time"] { display: block; }
+.plan-wizard .pc-slot--exact.is-open .pc-slot__open { inset: 0 0 auto 0; height: 38px; justify-content: flex-start; padding-top: 9px; }
+.plan-wizard .pc-slot--exact.is-open .pc-slot__open small { display: none; }
+
+/* purpose chips carry an icon */
+.plan-wizard .pc-chip--icon { gap: 8px; padding: 0 18px 0 14px; }
+.plan-wizard .pc-chip--icon svg { width: 17px; height: 17px; flex: none; }
+.plan-wizard .plan-purpose { margin: 0 0 26px; }
+
+/* interests and amenities as check cards */
+.plan-wizard .pc-group.field { margin-bottom: 26px; }
+.plan-wizard .pc-legend { display: block; margin: 0 0 10px; font: 700 .95rem 'Poppins', sans-serif; color: var(--primary-dark); }
+.plan-wizard .pc-legend .field-required-hint { margin-left: 6px; font: 400 .8rem 'Poppins', sans-serif; font-style: italic; color: var(--muted); }
+.plan-wizard .pc-checks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.plan-wizard .pc-check { position: relative; display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 10px 16px; cursor: pointer; background: var(--white); border: 1.5px solid var(--border); border-radius: 12px; transition: border-color .15s, background .15s; }
+.plan-wizard .pc-check:hover { border-color: var(--muted); }
+.plan-wizard .pc-check input { position: absolute; opacity: 0; pointer-events: none; width: auto; height: 0; }
+.plan-wizard .pc-check__icon { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--primary-light); color: var(--primary); }
+.plan-wizard .pc-check__icon svg { width: 20px; height: 20px; }
+.plan-wizard .pc-check__text { flex: 1; min-width: 0; font: 600 .95rem 'Poppins', sans-serif; color: var(--primary-dark); }
+.plan-wizard .pc-check__box { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border: 1.5px solid var(--border); border-radius: 7px; background: var(--white); color: transparent; }
+.plan-wizard .pc-check__box svg { width: 14px; height: 14px; stroke-width: 3; }
+.plan-wizard .pc-check:has(input:checked) { border-color: var(--primary); background: var(--primary-light); }
+.plan-wizard .pc-check:has(input:checked) .pc-check__icon { background: var(--primary); color: #fff; }
+.plan-wizard .pc-check:has(input:checked) .pc-check__box { background: var(--primary); border-color: var(--primary); color: #fff; }
+.plan-wizard .pc-check:has(input:focus-visible) { outline: 3px solid #e98543; outline-offset: 2px; }
+
+/* where you start: the address and "use my location" on one line */
+.plan-wizard .pc-origin__pin { position: absolute; left: 16px; top: 50%; width: 18px; height: 18px; margin-top: -9px; color: var(--muted); pointer-events: none; z-index: 1; }
+.plan-wizard .address-field input { padding-left: 44px; }
+.plan-wizard .pc-start-notes { display: grid; gap: 8px; margin-top: -6px; }
+.plan-wizard .pc-start-notes .origin-control { margin: 0; }
+.plan-wizard .origin-status { font-size: .84rem; color: var(--muted); }
+.plan-wizard .origin-status::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--muted); vertical-align: 1px; }
+.plan-wizard .pc-privacy { display: flex; gap: 8px; align-items: flex-start; margin: 0; font-size: .84rem; line-height: 1.5; color: var(--muted); }
+.plan-wizard .pc-privacy svg { flex: none; width: 16px; height: 16px; margin-top: 2px; }
+
+/* the step tabs: a number that becomes a tick */
+.plan-wizard .plan-wizard-steps button { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.plan-wizard .plan-step-num { display: inline-grid; place-items: center; width: 26px; height: 26px; border: 1.5px solid var(--muted); border-radius: 50%; font: 600 .78rem 'Poppins', sans-serif; color: var(--muted); }
+.plan-wizard .plan-wizard-steps button[aria-current="step"] .plan-step-num { background: #c8501f; border-color: #c8501f; color: #fff; }
+.plan-wizard .plan-wizard-steps button.is-complete .plan-step-num { background: var(--primary); border-color: var(--primary); color: #fff; font-size: 0; }
+.plan-wizard .plan-wizard-steps button.is-complete .plan-step-num::before { content: '\2713'; font-size: .8rem; }
+
+/* Davo's line for the step */
+.plan-wizard .plan-davo-says { grid-column: 3; grid-row: 1 / 3; align-self: center; max-width: 250px; margin: 0; padding: 14px 18px; border: 1px solid #efe1c3; border-radius: 16px; background: #fdf3e0; font-size: .92rem; line-height: 1.5; color: var(--ink); position: relative; }
+.plan-wizard .plan-davo-says::before { content: ''; position: absolute; left: -8px; top: 50%; width: 14px; height: 14px; margin-top: -7px; background: inherit; border-left: 1px solid #efe1c3; border-bottom: 1px solid #efe1c3; transform: rotate(45deg); }
+.plan-wizard > .page-head .plan-introduction { max-width: 1140px; grid-template-columns: 128px minmax(0, 1fr) auto; }
+.plan-wizard.has-resume .plan-davo-says { display: none; }
+
+/* the footer: Back on the left, the step in the middle, Next on the right */
+@media (min-width: 641px) {
+    .plan-wizard .plan-wizard-actions { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin-top: 8px; padding-top: 24px; border-top: 1px solid var(--border); }
+    .plan-wizard .plan-wizard-actions #planBack { grid-column: 1; justify-self: start; }
+    .plan-wizard .plan-wizard-actions #planStepStatus { grid-column: 2; text-align: center; color: var(--muted); font-size: .9rem; }
+    .plan-wizard .plan-wizard-actions .plan-next { grid-column: 3; justify-self: end; }
+}
+
+@media (max-width: 1000px) {
+    .plan-wizard .pc-col-3 { grid-column: span 6; }
+    .plan-wizard .pc-col-4, .plan-wizard .pc-col-6, .plan-wizard .pc-col-8 { grid-column: 1 / -1; }
+    .plan-wizard .pc-cards--5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+    .plan-wizard .plan-davo-says { grid-column: 1 / -1; grid-row: auto; max-width: none; }
+    .plan-wizard .plan-davo-says::before { display: none; }
+}
+@media (max-width: 640px) {
+    .plan-wizard .pc-col-3 { grid-column: 1 / -1; }
+    .plan-wizard.is-wizard .pc-block { margin-bottom: 24px; padding-bottom: 24px; }
+    .plan-wizard .pc-cards--5 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .plan-wizard .pc-cards--3.pc-cards--rows { grid-template-columns: 1fr; }
+    .plan-wizard [data-arrival].has-slots .pc-slots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .plan-wizard .pc-checks { grid-template-columns: 1fr; }
+    .plan-wizard .plan-wizard-steps button { flex-direction: column; gap: 4px; font-size: .72rem; padding-inline: 2px; }
+}
+
+/* phones: the icon-over-label cards keep their shape (the card rule above for steps 3 and 4 lays cards out in a row) */
+@media (max-width: 760px) {
+    .plan-wizard .pc-card--center { flex-direction: column; flex-wrap: nowrap; align-items: center; justify-content: flex-start; padding: 14px 8px 12px; min-height: 96px; }
+    .plan-wizard .pc-card--row { flex-wrap: nowrap; padding: 8px 12px; min-height: var(--pc-h); }
+}

@@ -178,8 +178,11 @@ class TransportAndResortSettingTest extends TestCase
     {
         $html = $this->get('/plan')->assertOk()->getContent();
 
-        $this->assertStringContainsString('4 · Getting around', $html);
-        $this->assertStringContainsString('3 · Stay &amp; budget', $html);
+        $this->assertMatchesRegularExpression('/plan-step-num[^>]*>4<\/b> Getting around/', $html);
+        $this->assertMatchesRegularExpression('/plan-step-num[^>]*>3<\/b> Stay &amp; budget/', $html);
+        $this->assertStringContainsString('name="travel_type" value="Solo" checked', $html, 'Solo is picked until they choose.');
+        $this->assertStringContainsString('data-arrival-slots', $html);
+        $this->assertStringContainsString('data-stepper', $html);
         $this->assertMatchesRegularExpression('/name="budget" value="Mid-range" checked/', $html);
         $this->assertMatchesRegularExpression('/name="accommodation_pref" value="Any"[^>]*checked/', $html);
         $this->assertMatchesRegularExpression('/name="distance_pref" value="moderate" checked/', $html);
