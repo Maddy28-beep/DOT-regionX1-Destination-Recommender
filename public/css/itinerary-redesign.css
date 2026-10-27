@@ -6,34 +6,9 @@
 .itin :is(a, button, summary):focus-visible { outline: 3px solid var(--accent, #e98543); outline-offset: 3px; }
 
 /* ---- welcome banner ---- */
-.itin-hero {
-    position: relative;
-    display: flex;
-    align-items: center;
-    min-height: 150px;
-    margin: 44px 0 24px;
-    padding: 18px 28px 18px 200px;
-    border: 1px solid #efe1c3;
-    border-radius: 18px;
-    background: linear-gradient(100deg, #fdf0d6 0%, #fbf3e2 55%, #f3f1e1 100%);
-}
-.itin-hero__davo { position: absolute; left: 22px; bottom: -4px; width: 150px; height: auto; max-height: 200px; object-fit: contain; z-index: 2; }
-.itin-hero__copy { position: relative; z-index: 1; max-width: 520px; }
-.itin-hero__title { margin: 0 0 6px; font: 800 clamp(1.6rem, 3.6vw, 2.35rem)/1.15 'Poppins', sans-serif; color: var(--primary-dark); }
-.itin-hero__text { margin: 0; font-size: clamp(.98rem, 1.6vw, 1.15rem); color: var(--ink); }
-.itin-hero__scene { position: absolute; right: 0; bottom: 0; height: 100%; width: auto; max-width: 48%; clip-path: inset(0 0 0 0 round 0 18px 18px 0); pointer-events: none; }
 
 /* ---- title and actions ---- */
-.itin-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px 24px; flex-wrap: wrap; margin: 6px 0 16px; }
-.itin-head__text { min-width: 0; }
-.itin-title { margin: 0; font: 800 clamp(1.7rem, 3.4vw, 2.4rem)/1.15 'Poppins', sans-serif; color: var(--primary-dark); text-transform: none; }
-.itin-sub { margin: 6px 0 0; font-size: 1.02rem; color: var(--muted); }
-.itin-meta { margin: 6px 0 0; font-size: .8rem; color: var(--muted); line-height: 1.6; }
 .itin .plan-badge { margin-top: 8px; }
-.itin-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-.itin-actions form { margin: 0; }
-.itin-actions .btn { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: var(--primary-dark); border-color: var(--primary); }
-.itin-actions .btn svg { width: 16px; height: 16px; }
 
 /* ---- layout: plan on the left, overview on the right ---- */
 .itin-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 30px; align-items: start; margin-bottom: 28px; }
@@ -133,37 +108,14 @@
 .itin .day-actions { margin-top: 8px; padding-top: 18px; border-top: 1px solid var(--border); }
 
 /* ---- trip overview ---- */
-.itin-overview {
-    position: sticky;
-    top: calc(var(--site-topbar-height, 77px) + 16px);
-    padding: 20px;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    background: #fff;
-    box-shadow: 0 2px 10px rgba(24, 55, 39, .05);
-}
-.itin-overview h2 { margin: 0 0 14px; font: 800 1.2rem/1.3 'Poppins', sans-serif; color: var(--primary-dark); }
-.itin-overview__map { height: 240px; overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: var(--primary-light); }
-.itin-overview__legend { margin: 8px 0 4px; font-size: .76rem; color: var(--muted); }
-.itin-overview__facts { margin: 8px 0 0; }
-.itin-overview__facts > div { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 12px 0; border-top: 1px solid var(--border); }
-.itin-overview__facts dt { display: flex; align-items: center; gap: 9px; margin: 0; font-size: .86rem; color: var(--ink); white-space: nowrap; }
-.itin-overview__facts dt svg { width: 17px; height: 17px; color: var(--primary); }
-.itin-overview__facts dd { margin: 0; text-align: right; font-size: .88rem; font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
-.itin-overview__note { display: flex; align-items: flex-start; gap: 8px; margin: 6px 0 0; padding-top: 12px; border-top: 1px solid var(--border); font-size: .8rem; color: var(--muted); }
-.itin-overview__note svg { flex: none; width: 16px; height: 16px; margin-top: 1px; }
 .itin-pin span { display: grid; place-items: center; width: 28px; height: 28px; border: 2px solid #fff; border-radius: 50%; background: var(--primary-dark); color: #fff; font: 700 .78rem 'Poppins', sans-serif; box-shadow: 0 1px 4px rgba(0, 0, 0, .3); }
 
 /* ---- smaller screens ---- */
 @media (max-width: 960px) {
     .itin-layout { grid-template-columns: 1fr; }
-    .itin-overview { position: static; }
 }
 @media (max-width: 640px) {
     .tl-ideas { margin-left: 0; }
-    .itin-hero { margin-top: 36px; padding: 16px 16px 16px 128px; min-height: 124px; }
-    .itin-hero__davo { left: 10px; width: 108px; }
-    .itin-hero__scene { display: none; }
     .itin-tabs .itin-tabs__more { margin-left: 0; }
     .tl-row { grid-template-columns: 58px 18px minmax(0, 1fr); column-gap: 8px; }
     .tl-time strong { font-size: .8rem; }
@@ -173,8 +125,6 @@
     .tl-card--meal .tl-card__media, .tl-card--overnight .tl-card__media { aspect-ratio: 1; }
 }
 @media (max-width: 420px) {
-    .itin-hero { padding-left: 104px; }
-    .itin-hero__davo { width: 88px; }
 }
 .itinerary-refine { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:22px 26px; margin:24px 0; border:1px solid var(--border); border-radius:16px; background:var(--white); }
 .itinerary-refine h2, .itinerary-feedback h2 { margin:0; font-family:'Poppins',sans-serif; font-size:1.2rem; line-height:1.4; color:var(--primary-dark); }
@@ -229,19 +179,7 @@
    are one sticky row; the header buttons share a line. */
 @media (max-width: 640px) {
     .itin .dash-body { padding-top: 8px; }
-    .itin-hero { margin: 28px 0 16px; min-height: 108px; padding: 14px 14px 14px 112px; border-radius: 16px; }
-    .itin-hero__title { font-size: 1.3rem; margin-bottom: 4px; }
-    .itin-hero__text { font-size: .9rem; line-height: 1.4; }
 
-    .itin-title { font-size: 1.55rem; }
-    .itin-sub { font-size: .95rem; }
-    .itin-meta { font-size: .76rem; }
-    .itin-head { gap: 14px; margin-bottom: 12px; }
-    .itin-head__text { flex: 1 1 100%; }
-    .itin-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
-    .itin-actions .btn { justify-content: center; padding-inline: 8px; font-size: .88rem; white-space: nowrap; }
-    .itin-actions .btn:only-child, .itin-actions form:only-child .btn { grid-column: 1 / -1; }
-    .itin-actions form .btn { width: 100%; }
 
     .itinerary-page .session-note { padding: 12px 14px; font-size: .86rem; line-height: 1.5; }
     .itin-main__head h2 { font-size: 1.05rem; }
@@ -290,4 +228,169 @@
 }
 @media (max-width: 400px) {
     .itinerary-feedback { flex-direction: row; }
+}
+
+/* How the plan is built around the traveller's choices: the "Planned around" strip, the tour operators near their
+   starting point, the way of travelling on each journey, resort tags and the note on a long day. */
+
+
+.tl-line small a { color: var(--primary); font-weight: 600; margin-left: 4px; }
+.tl-card__tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; }
+.tl-tag { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; background: var(--primary-light); color: var(--primary-dark); border: 1px solid rgba(45, 106, 79, .2); font: 600 .72rem 'Poppins', sans-serif; }
+.tl-tag--match { background: var(--primary); color: #fff; border-color: var(--primary); }
+.tl-tag svg { width: 11px; height: 11px; }
+
+.itin-longday { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 14px; padding: 12px 14px; border-radius: 12px; background: #fff7e6; border: 1px solid #f0c36d; color: #6b5200; font-size: .84rem; line-height: 1.5; }
+.itin-longday svg { width: 18px; height: 18px; flex: none; margin-top: 2px; }
+.itin-longday a { color: inherit; font-weight: 700; }
+
+/* ---- compact banner: the welcome, what the plan is, and what to do with it ---- */
+.itin-banner {
+    position: relative;
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 6px 22px;
+    margin: 18px 0 20px;
+    padding: 16px 24px 16px 20px;
+    border: 1px solid #efe1c3;
+    border-radius: 18px;
+    background: linear-gradient(100deg, #fdf0d6 0%, #fbf3e2 60%, #f6f2e2 100%);
+}
+.itin-banner__davo { width: 112px; height: auto; max-height: 124px; object-fit: contain; align-self: end; margin-bottom: -16px; }
+.itin-banner__copy { min-width: 0; }
+.itin-banner__title { margin: 0; font: 800 clamp(1.7rem, 3.4vw, 2.35rem)/1.15 'Poppins', sans-serif; color: var(--primary-dark); }
+.itin-banner__name { margin: 2px 0 0; font: 700 1.05rem 'Poppins', sans-serif; color: var(--ink); }
+.itin-banner__sub { margin: 6px 0 0; font-size: 1rem; line-height: 1.5; color: var(--ink); }
+.itin-banner__sub a { color: var(--primary-dark); font-weight: 600; }
+.itin-banner__meta { margin: 4px 0 0; font-size: .76rem; color: var(--muted); }
+.itin .plan-badge { margin-top: 8px; }
+.itin-banner__actions { display: flex; flex-direction: column; gap: 8px; width: 340px; max-width: 100%; }
+.itin-banner__buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.itin-banner__buttons form { margin: 0; }
+.itin-banner__buttons .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 46px; padding: 10px 12px; border-radius: 10px; font-weight: 700; white-space: nowrap; }
+.itin-banner__buttons > :only-child, .itin-banner__buttons form:only-child { grid-column: 1 / -1; }
+.itin-banner__buttons .btn-outline { background: #fff; color: var(--primary-dark); }
+.itin-banner__buttons .btn svg { width: 16px; height: 16px; }
+.itin-banner__unsaved { margin: 0; text-align: left; font-size: .84rem; line-height: 1.4; color: #b0402a; }
+
+/* ---- day tabs as cards, with the two quiet links on the right ---- */
+.itin-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; margin: 0 0 22px; }
+.itin-tabs { margin: 0; flex: 1 1 auto; }
+.itin-tabs a {
+    display: flex; flex-direction: column; gap: 1px;
+    min-width: 138px; padding: 9px 16px;
+    border: 1.5px solid var(--primary); border-radius: 12px;
+    font: 500 .8rem 'Poppins', sans-serif; line-height: 1.35;
+}
+.itin-tabs a strong { font: 700 1.02rem 'Poppins', sans-serif; }
+.itin-tabs a small { font-size: .8rem; color: var(--muted); }
+.itin-tabs a.is-active small { color: rgba(255, 255, 255, .85); }
+.itin-bar__links { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.itin-bar__links .itinerary-explainer-trigger { margin: 0; }
+.itin-more {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 18px;
+    border: 1px solid var(--border); border-radius: 999px; background: #fff;
+    font: 600 .92rem 'Poppins', sans-serif; color: var(--primary-dark); text-decoration: none;
+}
+.itin-more:hover { background: var(--primary-light); }
+.itin-more svg { width: 17px; height: 17px; }
+
+.itin-layout { grid-template-columns: minmax(0, 1fr) 380px; }
+
+/* ---- the plan, as the screenshots show it: quiet journey lines, plain slim rows, a heart and a swap on each card ---- */
+.tl-row--travel .tl-dot, .tl-row--travel .tl-time { visibility: hidden; }
+.tl-row--travel .tl-dot { width: 0; height: 0; margin: 0; }
+.tl-row--travel .tl-content { padding: 0 0 10px; }
+.tl-travel { flex-direction: row; align-items: center; gap: 8px; font-size: .88rem; color: var(--muted); }
+.tl-travel svg { flex: none; width: 17px; height: 17px; color: var(--muted); }
+.tl-line__icon { display: none; }
+.tl-line { padding: 8px 0 4px; }
+.tl-line strong { font-size: 1.05rem; }
+.tl-row--baseline .tl-time, .tl-row--pickup .tl-time, .tl-row--free .tl-time { padding-top: 6px; }
+.tl-row--baseline .tl-dot, .tl-row--pickup .tl-dot, .tl-row--free .tl-dot { margin-top: 8px; }
+.tl-row--baseline .tl-time strong, .tl-row--pickup .tl-time strong, .tl-row--free .tl-time strong { font-size: 1rem; }
+
+.tl-card { position: relative; grid-template-columns: 150px minmax(0, 1fr) 40px; }
+.tl-card--meal, .tl-card--overnight { grid-template-columns: 150px minmax(0, 1fr) 40px; align-items: start; }
+.tl-card__label { margin: 0 0 4px; font: 700 .7rem 'Poppins', sans-serif; letter-spacing: .07em; text-transform: uppercase; color: #b0402a; }
+.tl-card__what .icon, .tl-card__what svg { width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; color: var(--primary); }
+.tl-card__actions { display: flex; flex-direction: column; gap: 8px; }
+.tl-card__actions .save-square { width: 40px; height: 40px; border-radius: 10px; }
+.tl-card__actions .save-square svg { width: 19px; height: 19px; }
+.tl-card .swap { position: static; }
+.tl-card .swap-toggle {
+    position: absolute; right: 12px; top: 60px;
+    display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
+    border: 1px solid var(--border); border-radius: 10px; background: #fff; color: var(--ink); text-decoration: none;
+}
+.tl-card .swap-toggle:hover { border-color: var(--primary); color: var(--primary); }
+.tl-card .swap-toggle svg { width: 19px; height: 19px; }
+.tl-card .swap-panel { grid-column: 1 / -1; }
+
+/* ---- the side column: the day's map, the operators, what the plan is built around ---- */
+.itin-side { display: grid; gap: 16px; align-self: start; }
+.itin-side__card { padding: 18px; border: 1px solid var(--border); border-radius: 16px; background: #fff; box-shadow: 0 2px 10px rgba(24, 55, 39, .05); }
+.itin-side__card h2 { margin: 0; font: 800 1.1rem/1.3 'Poppins', sans-serif; color: var(--primary-dark); }
+
+.itin-daymap__head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.itin-daymap__head span { font-size: .84rem; color: var(--muted); white-space: nowrap; }
+.itin-daymap__map { height: 330px; overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: var(--primary-light); }
+.itin-daymap__buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.itin-daymap__buttons .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 8px 10px; border-radius: 10px; font-weight: 700; color: var(--primary-dark); background: #fff; }
+.itin-daymap__buttons .btn[hidden] { display: none; }
+.itin-daymap__buttons .btn:only-child { grid-column: 1 / -1; }
+.itin-daymap__buttons .btn svg { width: 16px; height: 16px; }
+.itin-pin span { display: grid; place-items: center; width: 28px; height: 28px; border: 2px solid #fff; border-radius: 50%; background: var(--primary-dark); color: #fff; font: 700 .78rem 'Poppins', sans-serif; box-shadow: 0 1px 4px rgba(0, 0, 0, .3); }
+.itin-pin--origin span { width: 16px; height: 16px; background: #c8501f; }
+
+.itin-ops h2 { display: flex; align-items: center; gap: 8px; font-size: 1.05rem; }
+.itin-ops h2 svg { width: 20px; height: 20px; flex: none; color: var(--primary); }
+.itin-ops__lead { margin: 6px 0 4px; font-size: .86rem; line-height: 1.5; color: var(--muted); }
+.itin-ops__list { margin: 0; padding: 0; list-style: none; }
+.itin-op { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 0; border-top: 1px solid var(--border); }
+.itin-op__main { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.itin-op__name { font: 700 .92rem/1.3 'Poppins', sans-serif; color: var(--primary-dark); text-decoration: none; overflow-wrap: anywhere; }
+.itin-op__name:hover { text-decoration: underline; }
+.itin-op__meta { font-size: .78rem; color: var(--muted); }
+.itin-op__meta a { color: var(--primary); font-weight: 600; }
+.itin-op__phone {
+    flex: none; display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 6px 14px;
+    border: 1px solid var(--border); border-radius: 999px; background: #fff;
+    font: 700 .8rem 'Poppins', sans-serif; color: var(--primary-dark); text-decoration: none; white-space: nowrap;
+}
+.itin-op__phone:hover { background: var(--primary-light); }
+.itin-op__phone svg { width: 14px; height: 14px; }
+.itin-ops__more { display: inline-block; margin-top: 4px; padding: 10px 0 2px; border-top: 1px solid var(--border); width: 100%; font: 700 .86rem 'Poppins', sans-serif; color: var(--primary-dark); text-decoration: none; }
+.itin-ops__more:hover { text-decoration: underline; }
+
+.itin-around { background: #fff6e4; border-color: #f0dfb8; box-shadow: none; }
+.itin-around__head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.itin-around__head h2 { font-size: 1rem; color: var(--ink); }
+.itin-around__edit { font: 700 .86rem 'Poppins', sans-serif; color: var(--primary-dark); text-decoration: underline; text-underline-offset: 3px; }
+.itin-around__chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 12px; }
+.itin-around__chip { padding: 5px 12px; border-radius: 999px; background: #e3efe6; color: var(--primary-dark); font: 600 .8rem 'Poppins', sans-serif; }
+.itin-around__note { display: flex; align-items: center; gap: 8px; margin: 0; font-size: .82rem; color: var(--muted); }
+.itin-around__note svg { flex: none; width: 15px; height: 15px; }
+
+@media (max-width: 960px) {
+    .itin-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 960px) {
+    .itin-banner__actions { grid-column: 1 / -1; width: auto; }
+}
+@media (max-width: 760px) {
+    .itin-banner { grid-template-columns: 84px minmax(0, 1fr); padding: 14px 14px 16px; gap: 10px 14px; }
+    .itin-banner__davo { width: 84px; margin-bottom: 0; }
+    .itin-banner__title { font-size: 1.45rem; }
+    .itin-banner__sub { font-size: .92rem; }
+    .itin-banner__buttons .btn { padding-inline: 8px; font-size: .9rem; }
+    .itin-bar { margin-bottom: 16px; }
+    .itin-bar__links { width: 100%; justify-content: space-between; }
+    .itin-tabs a { min-width: 0; }
+    .itin-daymap__map { height: 240px; }
+    .tl-card, .tl-card--meal, .tl-card--overnight { grid-template-columns: minmax(0, 1fr) 40px; }
+    .tl-card__media { grid-column: 1 / -1; }
+    .tl-card__actions { grid-column: 2; grid-row: 2; }
+    .tl-card .swap-toggle { top: auto; bottom: 12px; }
 }

@@ -451,6 +451,7 @@ class ItineraryGenerationService
     {
         $wanted = $preference->accommodation_pref;
         $wanted = ($wanted && $wanted !== 'Any') ? $wanted : null;
+        $setting = $this->wantedResortSetting($preference);
         $mappedStops = $this->mappedStopCoordinates($dayStops);
 
         foreach ($dayStops as $stop) {
@@ -469,7 +470,7 @@ class ItineraryGenerationService
                  * suggests fits, fall through and book from the catalogue
                  * instead of quietly ignoring what was asked for.
                  */
-                ->filter(fn ($rule) => $wanted === null || $rule['listing']->type === $wanted)
+                ->filter(fn ($rule) => $this->fitsStayPreference($rule['listing'], $wanted, $setting))
                 // Past travellers pairing a stay with the FIRST stop says nothing about the other days: a stay more than
                 // this far from any stop of the trip is passed over for one chosen by distance below.
                 ->filter(fn ($rule) => ! $this->tooFarFromTrip($rule['listing'], $mappedStops))
@@ -491,7 +492,9 @@ class ItineraryGenerationService
         }
 
         $query = Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip();
-        if ($wanted !== null) {
+        if ($setting !== null) {
+            $query->whereIn('type', self::RESORT_TYPES)->withResortSetting($setting);
+        } elseif ($wanted !== null) {
             $query->where('type', $wanted);
         }
 
@@ -532,10 +535,37 @@ class ItineraryGenerationService
         $listing ??= (clone $query)->whereNotNull('latitude')->whereNotNull('longitude')
                 ->orderByDesc('rating')->first()
             ?? $query->orderByDesc('rating')->first()
+            // No resort of that setting is available: a resort of any setting is still closer to the ask than a hotel.
+            ?? ($setting !== null
+                ? Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip()
+                    ->whereIn('type', self::RESORT_TYPES)->orderByDesc('rating')->first()
+                : null)
             ?? Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip()
                 ->orderByDesc('rating')->first();
 
         return $listing ? ['listing' => $listing, 'rule' => null] : null;
+    }
+
+    /** What counts as a resort when a traveller asks for one by setting: an island resort is filed as a Beach Resort. */
+    private const RESORT_TYPES = ['Resort', 'Beach Resort'];
+
+    /** The resort setting the traveller asked for, if they asked for a resort and named a setting we know. */
+    private function wantedResortSetting(TouristPreference $preference): ?string
+    {
+        return $preference->accommodation_pref === 'Resort'
+            && in_array($preference->resort_setting, Accommodation::RESORT_SETTINGS, true)
+            ? $preference->resort_setting
+            : null;
+    }
+
+    /** Whether a listing satisfies the stated accommodation type and, for resorts, the stated setting. */
+    private function fitsStayPreference(Accommodation $stay, ?string $wanted, ?string $setting): bool
+    {
+        if ($setting !== null) {
+            return in_array($stay->type, self::RESORT_TYPES, true) && in_array($setting, $stay->resortSettingList(), true);
+        }
+
+        return $wanted === null || $stay->type === $wanted;
     }
 
     /** The farthest a suggested stay may be from any sightseeing stop of the trip, in km. */

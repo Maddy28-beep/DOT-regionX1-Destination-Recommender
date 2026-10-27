@@ -174,6 +174,8 @@ class ItineraryScheduleBuilder
         $stayRule = $stay['rule'] ?? null;
         $sortOrder = 0;
         $this->lastStart = $this->pastMidnight = [];
+        // Every journey estimate this build makes is at the pace of how the traveller said they will get around.
+        $this->transport = $preference->transport_pref;
         $lastDay = array_key_last($dayCapacities);
 
         /*
@@ -335,6 +337,22 @@ class ItineraryScheduleBuilder
     }
 
     /**
+     * The allowance for a leg that cannot be measured, at the pace of how the traveller said they get around.
+     *
+     * UNKNOWN_TRAVEL_MINUTES is what such a leg takes at a car's slowest pace. A slower way of travelling takes
+     * proportionally longer over the same unknown road (a jeep, at 15 km/h against a car's 25, needs 75 minutes),
+     * so a jeepney day is not planned as if its unmeasured legs were done by car. Rounded to the quarter hour like
+     * every other journey time.
+     */
+    private function unknownLegMinutes(): int
+    {
+        $carSlowest = TransportMode::slowKmh(TransportMode::PERSONAL_CAR);
+        $scaled = self::UNKNOWN_TRAVEL_MINUTES * $carSlowest / TransportMode::slowKmh($this->transport);
+
+        return max(15, (int) (round($scaled / 15) * 15));
+    }
+
+    /**
      * A leg's distance and duration, or a plain time allowance when either end
      * has no coordinates.
      *
@@ -343,10 +361,12 @@ class ItineraryScheduleBuilder
     private function estimateLeg(array $from, array $to): array
     {
         if (! $this->measurable($from, $to)) {
+            $allowance = $this->unknownLegMinutes();
+
             return [
                 'distance_km' => null,
-                'min_minutes' => self::UNKNOWN_TRAVEL_MINUTES,
-                'max_minutes' => self::UNKNOWN_TRAVEL_MINUTES,
+                'min_minutes' => $allowance,
+                'max_minutes' => $allowance,
             ];
         }
 
@@ -354,6 +374,7 @@ class ItineraryScheduleBuilder
             $this->haversineKm($from['lat'], $from['lng'], $to['lat'], $to['lng']),
             $from['region'] ?? null,
             $to['region'] ?? null,
+            $this->transport,
         );
     }
 
@@ -689,6 +710,9 @@ class ItineraryScheduleBuilder
             'starts_at' => $this->toQuarterHour($clock),
         ]);
     }
+
+    /** The TransportMode the current build() is planning for; null plans as a personal car. */
+    private ?string $transport = null;
 
     /**
      * The latest stored start time of each day, and the days whose clock has run past midnight, both keyed

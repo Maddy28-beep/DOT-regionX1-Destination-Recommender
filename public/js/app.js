@@ -971,6 +971,31 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /*
+ * Travel preference survey: the resort-setting question only makes sense for a resort, so it is shown when
+ * "Resort" is the accommodation preference and cleared when it is not. The server ignores a stray value
+ * either way (TripPlannerController::update); this just stops the traveller answering a question that
+ * will not be used.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    var choices = document.querySelectorAll('[data-resort-toggle]');
+    var field = document.querySelector('[data-resort-setting-field]');
+    if (!choices.length || !field) return;
+
+    function sync() {
+        var chosen = document.querySelector('[data-resort-toggle]:checked');
+        var isResort = !!chosen && chosen.value === 'Resort';
+        field.hidden = !isResort;
+        if (!isResort) {
+            var any = field.querySelector('input[type="radio"][value=""]');
+            if (any) any.checked = true;
+        }
+    }
+
+    choices.forEach(function (choice) { choice.addEventListener('change', sync); });
+    sync();
+});
+
+/*
  * Landing-page card reveal: destination/package and feature cards
  * fade and slide up as they scroll into view, staggered within each grid so
  * they don't all snap in at once. Scoped to body.hero-page, which only

@@ -88,6 +88,7 @@ class AdminListingController extends Controller
         $config = $this->config($type);
         $data = $request->validate($this->rules($type), self::LINK_MESSAGES);
         $data = $this->withNormalisedStatus($this->withoutBlankRole($data));
+        $data = $this->withEncodedResortSettings($type, $data);
 
         $data['slug'] = $this->uniqueSlug($config['model'], $data['name']);
 
@@ -140,6 +141,7 @@ class AdminListingController extends Controller
 
         $data = $request->validate($this->rules($type, $listing->id), self::LINK_MESSAGES);
         $data = $this->withNormalisedStatus($this->withoutBlankRole($data));
+        $data = $this->withEncodedResortSettings($type, $data);
 
         foreach (['is_accredited', 'featured'] as $flag) {
             if (array_key_exists($flag, $data)) {
@@ -346,6 +348,19 @@ class AdminListingController extends Controller
         return $data;
     }
 
+    /**
+     * An accommodation's resort settings arrive as checkboxes (an array, or nothing at all when every box is
+     * cleared) and are stored as one delimited string. Absent means "none ticked", so an edit can clear them.
+     */
+    private function withEncodedResortSettings(string $type, array $data): array
+    {
+        if ($type === 'accommodations') {
+            $data['resort_settings'] = Accommodation::encodeResortSettings($data['resort_settings'] ?? []);
+        }
+
+        return $data;
+    }
+
     private function baseRules(string $type, ?int $ignoreId = null): array
     {
         $common = [
@@ -374,6 +389,8 @@ class AdminListingController extends Controller
             'accommodations' => array_merge($common, [
                 'type' => ['nullable', 'string', 'max:80'],
                 'dot_classification' => ['nullable', 'string', 'max:50'],
+                'resort_settings' => ['nullable', 'array'],
+                'resort_settings.*' => [Rule::in(Accommodation::RESORT_SETTINGS)],
                 'price_tier' => ['nullable', 'string', 'max:20'],
                 'price_per_night' => ['nullable', 'numeric', 'min:0'],
                 'check_in' => ['nullable', 'date_format:H:i'],

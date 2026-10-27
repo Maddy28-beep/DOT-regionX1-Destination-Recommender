@@ -60,6 +60,21 @@ class ItineraryItem extends Model
         };
     }
 
+    /** A journey in a few words, for the line between two cards: "15 min · 1.4 km", "30–45 min · 9.8 km". */
+    public function travelBrief(): string
+    {
+        if ($this->distance_km === null) {
+            return 'Travel time varies';
+        }
+
+        $km = rtrim(rtrim(number_format((float) $this->distance_km, 1), '0'), '.');
+        $minutes = $this->travel_min_minutes === $this->travel_max_minutes
+            ? $this->travel_min_minutes.' min'
+            : $this->travel_min_minutes.'–'.$this->travel_max_minutes.' min';
+
+        return "{$minutes} · {$km} km";
+    }
+
     private function describeTravel(): string
     {
         if ($this->distance_km === null) {
@@ -116,6 +131,14 @@ class ItineraryItem extends Model
             $rest === 0 => $hours.' '.($hours === 1 ? 'hour' : 'hours'),
             default => $hours.' '.($hours === 1 ? 'hour' : 'hours').' '.$rest.' min',
         };
+    }
+
+    /** The same length in the short form a card uses: "2 h 30 min", "1 h", "45 min". */
+    public function durationShort(): ?string
+    {
+        $label = $this->durationLabel();
+
+        return $label === null ? null : str_replace([' hours', ' hour'], ' h', $label);
     }
 
     /** The listing this row points at, whatever kind it is. */

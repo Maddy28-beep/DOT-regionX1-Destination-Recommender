@@ -72,7 +72,7 @@ class FreeTimeIdeas
 
         foreach ($shops as $shop) {
             $straightKm = $this->haversineKm($originLat, $originLng, (float) $shop->latitude, (float) $shop->longitude);
-            $leg = $this->travel->estimate($straightKm, $accommodation->region?->name, $shop->region?->name);
+            $leg = $this->travel->estimate($straightKm, $accommodation->region?->name, $shop->region?->name, $preference->transport_pref);
 
             // Both ways on the slow estimate, plus the visit, has to fit before dinner.
             if (2 * $leg['max_minutes'] + self::VISIT_MINUTES > $window) {

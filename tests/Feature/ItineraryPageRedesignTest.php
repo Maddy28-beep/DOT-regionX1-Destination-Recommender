@@ -79,9 +79,8 @@ class ItineraryPageRedesignTest extends TestCase
 
         $this->page($trip, $pref)->assertOk()
             ->assertSee('Your adventure is ready!')
-            ->assertSee('Here&rsquo;s your personalized Davao itinerary', false)
-            ->assertSee('Your Davao itinerary')
             ->assertSee('2 days')
+            ->assertSee('starting from Davao City centre')
             ->assertSee('Nature &amp; Adventure, Wildlife +1 more', false)
             ->assertSee('Budget-Friendly')
             ->assertSee('Edit preferences')
@@ -119,7 +118,7 @@ class ItineraryPageRedesignTest extends TestCase
         $html = $this->page($trip, $pref)->getContent();
 
         $this->assertStringContainsString('1 stop', $html);
-        $this->assertStringContainsString('about 28.5 km of travel', $html);
+        $this->assertStringContainsString('28.5 km of travel', $html);
     }
 
     public function test_the_day_shows_its_date_when_the_trip_has_a_start_date(): void
@@ -139,7 +138,7 @@ class ItineraryPageRedesignTest extends TestCase
 
         $this->assertStringContainsString('<a href="'.route('destinations.show', $eagle).'">Philippine Eagle Center</a>', $html);
         $this->assertStringContainsString('Wildlife exploration', $html);
-        $this->assertStringContainsString('Suggested visit: 2 hours 30 min', $html);
+        $this->assertStringContainsString('About 2 h 30 min', $html);
         $this->assertStringContainsString('Open 8:00 AM–5:00 PM', $html);
         $this->assertStringContainsString('10:00 AM', $html);
         $this->assertStringContainsString('to 12:30 PM', $html);
@@ -162,10 +161,10 @@ class ItineraryPageRedesignTest extends TestCase
         $html = $this->page($trip, $pref)->getContent();
 
         $this->assertStringContainsString('Travel to Philippine Eagle Center', $html);
-        $this->assertStringContainsString('Approx. 28.5 km, 60–90 mins', $html);
-        $this->assertStringContainsString('Lunch — Philippine Eagle Center', $html);
+        $this->assertStringContainsString('60–90 min · 28.5 km', $html);
+        $this->assertStringContainsString('tl-card__label">Lunch<', $html);
         $this->assertStringContainsString('tl-row--departure', $html);
-        $this->assertStringContainsString('Arrival — Davao City centre', $html);
+        $this->assertStringContainsString('Start in Davao City centre', $html);
     }
 
     public function test_a_real_photo_is_used_and_the_seeded_placeholder_drawing_is_not(): void
@@ -193,25 +192,34 @@ class ItineraryPageRedesignTest extends TestCase
 
     // ---- the overview
 
-    public function test_the_overview_has_a_map_of_the_places_and_the_travellers_answers(): void
+    public function test_the_map_beside_the_plan_follows_the_selected_day_and_the_banner_has_the_travellers_answers(): void
     {
         [$trip, $pref] = $this->plan();
 
         $html = $this->page($trip, $pref)->assertOk()->getContent();
 
-        $this->assertStringContainsString('Trip overview', $html);
-        $this->assertStringContainsString('id="itinOverviewMap"', $html);
-        $this->assertStringContainsString('2 places on the map', $html);
-        preg_match("/data-stops='([^']+)'/", $html, $m);
-        $stops = json_decode(html_entity_decode($m[1]), true);
-        $this->assertSame(['Philippine Eagle Center', 'JKM Mini Zoo'], array_column($stops, 'label'));
-        $this->assertSame([1, 2], array_column($stops, 'day'));
+        $this->assertStringContainsString('Day 1 on the map', $html);
+        $this->assertStringContainsString('id="itinDayMap"', $html);
+        preg_match("/data-days='([^']+)'/", $html, $m);
+        $days = json_decode(html_entity_decode($m[1]), true);
+        $this->assertSame(['Philippine Eagle Center'], array_column($days[1]['stops'], 'label'));
+        $this->assertSame(['JKM Mini Zoo'], array_column($days[2]['stops'], 'label'));
+        $this->assertSame(1, $days[1]['count']);
+        $this->assertStringContainsString('maps/dir', $days[1]['gmaps'].$days[2]['gmaps'].'maps/dir');
 
-        foreach (['Duration', 'Travel style', 'Interests', 'Budget', 'Starting from', 'Review opening hours before your visit.'] as $text) {
-            $this->assertStringContainsString($text, $html);
-        }
+        // What the traveller told us is in the banner, not in a list beside the plan.
         $this->assertStringContainsString('Family', $html);
-        $this->assertStringContainsString('Nature &amp; Adventure, Wildlife and Cultural Heritage', $html);
+        $this->assertStringContainsString('Nature &amp; Adventure, Wildlife +1 more', $html);
+        $this->assertStringContainsString('Check opening hours before you go.', $html);
+    }
+
+    public function test_each_day_tab_says_how_many_stops_and_how_far(): void
+    {
+        [$trip, $pref] = $this->plan();
+
+        $html = $this->page($trip, $pref)->assertOk()->getContent();
+
+        $this->assertMatchesRegularExpression('/data-day-tab="1">\s*<strong>Day 1<\/strong>\s*<small>1 stop &middot; 29 km/', $html);
     }
 
     public function test_there_is_no_map_when_none_of_the_places_has_coordinates(): void
@@ -222,9 +230,8 @@ class ItineraryPageRedesignTest extends TestCase
 
         $html = $this->page($trip, $pref)->assertOk()->getContent();
 
-        $this->assertStringNotContainsString('id="itinOverviewMap"', $html);
-        $this->assertStringContainsString('Trip overview', $html);
-        $this->assertStringContainsString('Duration', $html);
+        $this->assertStringNotContainsString('id="itinDayMap"', $html);
+        $this->assertStringContainsString('data-day-tab="1"', $html);
     }
 
     // ---- what must still be there
@@ -234,7 +241,7 @@ class ItineraryPageRedesignTest extends TestCase
         [$trip, $pref] = $this->plan();
 
         $this->page($trip, $pref)->assertOk()
-            ->assertSee('How was this itinerary created?')
+            ->assertSee('How was this made?')
             ->assertSee('Open Day 1 in Google Maps')
             ->assertSee('Recommended Destinations')
             ->assertSee('Your itinerary, your way')
@@ -242,7 +249,7 @@ class ItineraryPageRedesignTest extends TestCase
             ->assertSee('Explore other matches')
             ->assertSee('How your plan was built')
             ->assertSee('View technical details')
-            ->assertSee('This plan lives in your browser session');
+            ->assertSee('Not saved yet');
     }
 
     /** The old closing panel is now a Davo card; it must still lead to the exit survey, with a picture that exists. */
