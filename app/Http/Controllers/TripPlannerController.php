@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Accommodation;
 use App\Models\Destination;
 use App\Models\ExitSurvey;
 use App\Models\Itinerary;
@@ -15,6 +16,8 @@ use App\Services\Embeddings\SimilarDestinationService;
 use App\Services\Recommendation\ContentBasedRecommendationService;
 use App\Services\Recommendation\FreeTimeIdeas;
 use App\Services\Recommendation\ItineraryGenerationService;
+use App\Services\Recommendation\TourOperatorSuggester;
+use App\Services\Recommendation\TransportMode;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -104,11 +107,20 @@ class TripPlannerController extends Controller
              * the gate would be worse than no label at all.
              */
             'distanceRadii' => ContentBasedRecommendationService::RANGE_RADIUS_KM,
+            // Only the resort settings a listing actually has, so no card leads to an empty answer.
+            'resortSettings' => $this->availableResortSettings(),
+            'transportComparison' => TransportMode::comparison(),
         ]);
     }
 
     public function update(Request $request): RedirectResponse|\Illuminate\Http\JsonResponse
     {
+        // The form shows "Public Transport" as one card with Jeepney / Taxi under it; the planner stores the kind.
+        if ($request->input('transport_pref') === 'public') {
+            $kind = $request->input('public_kind');
+            $request->merge(['transport_pref' => in_array($kind, [TransportMode::JEEP, TransportMode::TAXI], true) ? $kind : TransportMode::JEEP]);
+        }
+
         $data = $request->validate([
             'travel_days' => ['required', 'integer', 'min:1', 'max:30'],
             'travel_type' => ['required', 'string', 'max:20'],
@@ -140,7 +152,11 @@ class TripPlannerController extends Controller
             'place_of_origin' => ['nullable', 'string', 'max:150', 'required_unless:visitor_type,Regular / Local'],
             'budget' => ['required', 'string', 'max:20'],
             'accommodation_pref' => ['required', 'string', 'max:20'],
+            // Which kind of resort, when a resort was asked for; ignored (and cleared) for anything else.
+            'resort_setting' => ['nullable', Rule::in(Accommodation::RESORT_SETTINGS)],
             'distance_pref' => ['required', 'in:near,moderate,far'],
+            // How they will get around. Optional: no answer plans as a personal car, as every trip did before this.
+            'transport_pref' => ['nullable', Rule::in(TransportMode::keys())],
             // Not more than two years ahead: a typo such as 2062 would otherwise be planned as written.
             'start_date' => ['nullable', 'date', 'before_or_equal:'.now('Asia/Manila')->addYears(2)->toDateString()],
             'arrival_time' => ['nullable', 'date_format:H:i'],
@@ -170,6 +186,10 @@ class TripPlannerController extends Controller
             'health_conditions.*' => ['string', Rule::in(array_keys(self::HEALTH_CONDITIONS))],
             'health_other' => ['nullable', 'string', 'max:300'],
         ]);
+
+        // A setting only means something for a resort, and an unanswered field must clear a previous answer.
+        $data['resort_setting'] = $data['accommodation_pref'] === 'Resort' ? ($data['resort_setting'] ?? null) : null;
+        $data['transport_pref'] = $data['transport_pref'] ?? null;
 
         $preference = $this->currentPreference($request) ?? new TouristPreference();
 
@@ -249,7 +269,16 @@ class TripPlannerController extends Controller
         // Optional ideas for Day 1's free time before dinner: read-only, never part of the schedule.
         $ideas = app(FreeTimeIdeas::class)->forItinerary($itinerary, $preference);
 
-        return view('plan.itinerary', compact('itinerary', 'preference', 'provenance', 'swap', 'ideas'));
+        // Someone picked up by a tour operator is shown who is near their starting point. A package already
+        // names its own operator, so it needs no suggestions.
+        $operators = ! $itinerary->package_id && TransportMode::isTourOperator($preference->transport_pref)
+            ? app(TourOperatorSuggester::class)->near(
+                $preference->origin_lat !== null ? (float) $preference->origin_lat : null,
+                $preference->origin_lng !== null ? (float) $preference->origin_lng : null,
+            )
+            : collect();
+
+        return view('plan.itinerary', compact('itinerary', 'preference', 'provenance', 'swap', 'ideas', 'operators'));
     }
 
     public function regenerate(Request $request): RedirectResponse
@@ -421,6 +450,24 @@ class TripPlannerController extends Controller
         }
 
         return $swap;
+    }
+
+    /**
+     * The resort settings at least one bookable resort is filed under, in the order the planner offers them.
+     *
+     * @return list<string>
+     */
+    private function availableResortSettings(): array
+    {
+        $filed = Accommodation::query()
+            ->where('is_accredited', true)->whereNull('archived_at')
+            ->whereNotNull('resort_settings')
+            ->pluck('resort_settings')
+            ->flatMap(fn ($encoded) => array_filter(explode('|', (string) $encoded)))
+            ->unique()
+            ->all();
+
+        return array_values(array_filter(Accommodation::RESORT_SETTINGS, fn ($setting) => in_array($setting, $filed, true)));
     }
 
     /** The preference this browser's session points at. */

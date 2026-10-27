@@ -9,6 +9,10 @@
 
     $item   an ItineraryItem (listing, photos and region already loaded)
     $swap   the swap data from the controller
+    $preference  the preference the plan was built from (optional): names the way of travelling on each journey and
+            whether a resort stay matches the setting asked for
+    $stay   the overnight row that follows when this row is dinner at the place the traveller sleeps: the two are shown as
+            one card, "Dinner & overnight stay" (optional)
     $ideas  optional souvenir ideas for this row (only Day 1's "Free time until dinner" has any); see FreeTimeIdeas.
             They are suggestions beside the schedule, never rows of it: no time, nothing booked.
 --}}
@@ -27,6 +31,8 @@
     $end = filled($item->ends_at) ? \Illuminate\Support\Carbon::parse($item->ends_at) : null;
 
     $isCard = $listing && in_array($kind, ['activity', 'meal', 'overnight'], true);
+    $saveSegment = $listing ? \App\Http\Controllers\SavedListingController::segmentFor($listing) : null;
+    $merged = ($stay ?? null) !== null && $kind === 'meal';
 
     // The photo, unless it is only the seeded placeholder drawing.
     $photo = $listing?->coverPhoto();
@@ -41,6 +47,21 @@
     $hours = $listing && filled($listing->hours ?? null) && \App\Support\OpeningHours::windows($listing->hours) !== null
         ? $listing->hours
         : null;
+
+    // How they said they would travel, shown on each journey. Nothing is shown when they did not say.
+    $transport = $preference?->transport_pref ?? null;
+    $transportIcon = match (true) {
+        \App\Services\Recommendation\TransportMode::isTourOperator($transport) => 'van',
+        $transport === \App\Services\Recommendation\TransportMode::JEEP => 'bus',
+        $transport === \App\Services\Recommendation\TransportMode::RENTAL_CAR => 'key',
+        default => 'car',
+    };
+
+    // A resort stay's settings, and whether they include the one the traveller asked for.
+    $isStay = $kind === 'overnight' || $merged;
+    $stayTags = $isStay && $listing instanceof \App\Models\Accommodation ? $listing->resortSettingList() : [];
+    $askedSetting = ($preference?->accommodation_pref ?? null) === 'Resort' ? ($preference->resort_setting ?? null) : null;
+    $stayMatches = $askedSetting && in_array($askedSetting, $stayTags, true);
 
     $icon = match ($kind) {
         'baseline', 'departure' => 'map-pin',
@@ -61,14 +82,16 @@
     </div>
 
     <div class="tl-rail" aria-hidden="true">
-        <span class="tl-dot">@if ($kind === 'travel')<x-icon name="car" />@endif</span>
+        <span class="tl-dot"></span>
     </div>
 
     <div class="tl-content">
         @if ($kind === 'travel')
+            {{-- "15 min · 1.4 km": the way of travelling is the icon, the destination is the next card. --}}
             <p class="tl-travel">
-                <strong>{{ $item->title }}</strong>
-                <span>{{ $item->travelSummary() }}</span>
+                <x-icon :name="$transportIcon" />
+                <span class="sr-only">{{ $item->title }}: </span>
+                <span>{{ $item->travelBrief() }}</span>
             </p>
         @elseif ($isCard)
             <article class="tl-card tl-card--{{ $kind }}">
@@ -86,6 +109,17 @@
                 </div>
 
                 <div class="tl-card__body">
+                    @php
+                        // The small line above the name: what kind of place a stop is, or which meal / night this is.
+                        $label = match (true) {
+                            $merged => 'Dinner & overnight stay',
+                            $kind === 'overnight' => $item->title,
+                            $kind === 'meal' => trim(\Illuminate\Support\Str::before($item->title, ' — ')),
+                            $kind === 'activity' && $item->destination_id => $listing->type ?? null,
+                            default => null,
+                        };
+                    @endphp
+                    @if (filled($label))<p class="tl-card__label">{{ $label }}</p>@endif
                     @if ($kind === 'activity' && ! $item->destination_id)
                         {{-- The souvenir stop has no name in its title, so the shop is named as the subject. --}}
                         <h4>{{ $item->title }}</h4>
@@ -93,13 +127,27 @@
                     @elseif ($kind === 'activity')
                         <h4><a href="{{ route($route, $listing) }}">{{ $listing->name }}</a></h4>
                         <p class="tl-card__what">{{ $what }}</p>
+                    @elseif ($isStay && $route)
+                        {{-- The night's stay is named, like every other stop, instead of only "Overnight stay". --}}
+                        <h4><a href="{{ route($route, $listing) }}">{{ $listing->name }}</a></h4>
+                        @if ($merged)
+                            <p class="tl-card__what"><x-icon name="building" /> Dinner {{ $start?->format('g:i A') }} &middot; check in for the night</p>
+                        @endif
+                        @if ($stayTags !== [] || $stayMatches)
+                            <p class="tl-card__tags">
+                                @if ($stayMatches)<span class="tl-tag tl-tag--match"><x-icon name="check" /> Matches your choice</span>@endif
+                                @foreach ($stayTags as $tag)<span class="tl-tag">{{ $tag === 'All-Inclusive' ? 'All Inclusive' : $tag }}</span>@endforeach
+                            </p>
+                        @endif
+                    @elseif ($kind === 'meal' && $route && $listing)
+                        <h4><a href="{{ route($route, $listing) }}">{{ $listing->name }}</a></h4>
                     @else
                         <h4>{{ $item->title }}</h4>
                         <p class="tl-card__what">{{ $item->travelSummary() }}</p>
                     @endif
 
-                    @if ($item->durationLabel() && $kind === 'activity')
-                        <p class="tl-card__meta"><x-icon name="timer" /> Suggested visit: {{ $item->durationLabel() }}</p>
+                    @if ($item->durationShort() && in_array($kind, ['activity', 'meal'], true))
+                        <p class="tl-card__meta"><x-icon name="timer" /> About {{ $item->durationShort() }}</p>
                     @endif
                     @if ($hours && $kind === 'activity')
                         <p class="tl-card__meta"><x-icon name="clock" /> Open {{ $hours }}</p>
@@ -142,25 +190,43 @@
                                     @endif
                                 </div>
                             @endif
-                            <button type="button" class="swap-toggle" data-swap-toggle aria-expanded="false">Swap this stop</button>
+                            <button type="button" class="swap-toggle" data-swap-toggle aria-expanded="false" title="Swap this stop"><x-icon name="swap" /><span class="sr-only">Swap this stop</span></button>
                             <div class="swap-panel" data-swap-panel hidden></div>
                         </div>
                     @endif
                 </div>
+
+                @if ($saveSegment)
+                    <div class="tl-card__actions"><x-save-heart :type="$saveSegment" :listing="$listing" variant="square" /></div>
+                @endif
             </article>
         @else
             {{-- Arrival, departure, or a row whose place we do not hold: a slim line, not a card. --}}
             <p class="tl-line">
                 <span class="tl-line__icon"><x-icon :name="$icon" /></span>
                 <span>
-                    @if ($listing && $route && str_contains($item->title, $listing->name))
+                    @if ($kind === 'baseline' && $preference)
+                        <strong>Start in {{ $preference->origin_label ?: 'Davao City centre' }}</strong>
+                        <small>
+                            @if (blank($preference->arrival_time))
+                                No arrival time set, so we assumed {{ $start?->format('g:i A') }}. <a href="{{ route('plan.edit') }}">Set arrival time</a>
+                            @else
+                                You arrive at {{ $start?->format('g:i A') }}.
+                            @endif
+                        </small>
+                    @elseif ($listing && $route && str_contains($item->title, $listing->name))
                         <a href="{{ route($route, $listing) }}">{{ $item->title }}</a>
                     @else
                         <strong>{{ $item->title }}</strong>
                     @endif
-                    <small>{{ $item->travelSummary() }}</small>
-                    @if ($item->note)
-                        <small>{{ $item->note }}</small>
+                    @if ($kind === 'free' && $item->note === 'Nothing is arranged for this time.')
+                        {{-- The free time before dinner: said plainly, and where to spend it. --}}
+                        <small>Nothing planned &mdash; rest at your {{ ($preference?->accommodation_pref ?? null) === 'Resort' ? 'resort' : 'stay' }} or explore nearby.</small>
+                    @elseif ($kind !== 'baseline' || ! $preference)
+                        <small>{{ $item->travelSummary() }}</small>
+                        @if ($item->note)
+                            <small>{{ $item->note }}</small>
+                        @endif
                     @endif
                 </span>
             </p>

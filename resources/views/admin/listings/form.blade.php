@@ -129,6 +129,19 @@
                             <label for="type">Type</label>
                             <input type="text" id="type" name="type" value="{{ old('type', $listing->type) }}" placeholder="e.g. Beach Resort">
                         </div>
+                        {{-- Only used when a traveller asks for a resort of a particular setting. --}}
+                        <div class="field" style="flex:2; min-width:260px;">
+                            <label>Resort setting <span class="field-help-text">(resorts only, tick all that apply)</span></label>
+                            @php($ticked = old('resort_settings', $listing->resortSettingList()))
+                            <div class="chip-checkbox-grid">
+                                @foreach (\App\Models\Accommodation::RESORT_SETTINGS as $setting)
+                                    <label class="field-check">
+                                        <input type="checkbox" name="resort_settings[]" value="{{ $setting }}" @checked(in_array($setting, $ticked, true))>
+                                        <span>{{ $setting }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
                         <div class="field" style="flex:1; min-width:160px;">
                             <label for="dot_classification">DOT Classification</label>
                             <input type="text" id="dot_classification" name="dot_classification" value="{{ old('dot_classification', $listing->dot_classification) }}">

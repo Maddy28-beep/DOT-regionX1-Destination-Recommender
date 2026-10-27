@@ -280,8 +280,7 @@ class ArrivalRuleTest extends TestCase
 
         $response = $this->page($preference, $itinerary)->assertOk();
 
-        $response->assertSee('Planned arrival');
-        $response->assertSee('Starting point for travel times: Davao City centre.');
+        $response->assertSee('Start in Davao City centre');
         $response->assertSee('Free time until 8:00 AM');
         $response->assertSee('You might rest or eat; nothing is arranged.');
         $response->assertSee('Location of your choice');
@@ -314,11 +313,13 @@ class ArrivalRuleTest extends TestCase
 
         $blank = $this->preference(null);
         $this->page($blank, $this->generate($blank))->assertOk()
-            ->assertSee('No arrival time provided; assuming 8:00 AM.');
+            ->assertSee('No arrival time set, so we assumed 8:00 AM.')
+            ->assertSee('Set arrival time');
 
         $given = $this->preference('09:00');
         $this->page($given, $this->generate($given))->assertOk()
-            ->assertDontSee('No arrival time provided');
+            ->assertDontSee('No arrival time set')
+            ->assertSee('You arrive at 9:00 AM.');
     }
 
     public function test_the_planning_form_describes_the_rule_it_uses(): void

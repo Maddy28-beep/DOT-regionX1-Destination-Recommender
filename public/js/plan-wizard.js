@@ -4,14 +4,19 @@
     const form = document.getElementById('planPreferencesForm');
     if (!root || !form) return;
     const sections = [...form.querySelectorAll('.plan-section')];
-    const sectionFor = name => form.elements.namedItem(name)?.closest('.plan-section');
+    // A group of radio buttons comes back from namedItem() as a list, not an element, so look at its first one.
+    const sectionFor = name => {
+        const field = form.elements.namedItem(name);
+        return (field && !field.closest ? field[0] : field)?.closest('.plan-section');
+    };
     const basics = sectionFor('travel_days');
     const style = sectionFor('travel_type');
     const budget = sectionFor('budget');
+    const travel = sectionFor('distance_pref');
     const origin = sectionFor('origin_label');
     const health = sectionFor('health_other');
     const interests = form.querySelector('[name="activities[]"]')?.closest('.plan-section');
-    if (![basics, style, budget, origin, health, interests].every(Boolean)) return;
+    if (![basics, style, budget, travel, origin, health, interests].every(Boolean)) return;
     const actions = form.querySelector('.plan-wizard-actions');
     const nav = root.querySelector('.plan-wizard-steps');
     const panel = root.querySelector('.plan-panel');
@@ -20,11 +25,12 @@
     const next = document.getElementById('planNext');
     const submit = form.querySelector('[type="submit"]');
     const status = document.getElementById('planStepStatus');
-    const headings = ['Tell us about your trip.', 'What would you love to do?', 'Make it comfortable for you.'];
+    const headings = ['Tell us about your trip.', 'What would you love to do?', 'Where will you rest, and what’s your budget?', 'How will you get around?'];
     const descriptions = [
         'The basics — when you’re coming and who’s coming with you.',
         'Choose the interests you’d like your trip to include.',
-        'Choose your spending style and how far you’d like to explore.'
+        'Two quick choices. A budget and a place to stay are already picked, so you can go straight on.',
+        'How far you’d like to explore, and how you’ll get from your starting point.'
     ];
     const steps = headings.map((title, index) => {
         const step = document.createElement('section');
@@ -45,12 +51,12 @@
     steps[0].append(basics, style, origin);
     steps[1].append(interests);
     steps[2].append(budget);
+    steps[3].append(travel);
     // Pair duration with travel companions, then keep date/time together.
     const companions = form.querySelector('#travel_type').closest('.field');
     const arrivalDate = form.querySelector('#start_date').closest('.field');
     basics.querySelector('.filter-inline').insertBefore(companions, arrivalDate);
     origin.classList.add('plan-starting-point');
-    form.querySelector('#distance_pref').closest('.field').classList.add('plan-field-wide');
     const purpose = form.querySelector('#travel_purpose').closest('.field');
     purpose.classList.add('plan-purpose');
     steps[1].insertBefore(purpose, interests);
@@ -60,7 +66,7 @@
         const summary = document.createElement('summary');
         summary.textContent = label;
         options.append(summary, ...fields);
-        steps[2].append(options);
+        steps[3].append(options);
         if ([...options.querySelectorAll('input,textarea')].some(el => el.type === 'checkbox' ? el.checked : el.value.trim())) options.open = true;
     }
     // Amenities is no longer wrapped in its own optional accordion here: it
@@ -76,6 +82,7 @@
     nav.hidden = false;
     status.hidden = false;
     form.noValidate = true;
+    const last = steps.length - 1;
     let current = 0;
     let busy = false;
     function show(index, focus = false) {
@@ -87,10 +94,10 @@
             else button.removeAttribute('aria-current');
         });
         back.hidden = index === 0;
-        next.hidden = index === 2;
-        submit.hidden = index !== 2;
-        next.textContent = index === 0 ? 'Next: your interests →' : 'Next: your comfort →';
-        status.textContent = `Step ${index + 1} of 3`;
+        next.hidden = index === last;
+        submit.hidden = index !== last;
+        next.textContent = ['Next: your interests →', 'Next: stay & budget →', 'Next: getting around →'][index] || 'Next →';
+        status.textContent = `Step ${index + 1} of ${steps.length}`;
         saveDraft();
         if (focus) {
             steps[index].querySelector('h2').focus({preventScroll: true});
@@ -138,8 +145,8 @@
     form.addEventListener('submit', async event => {
         event.preventDefault();
         if (busy) return;
-        if (current < 2) { if (validate([current])) show(current + 1, true); return; }
-        if (!validate([0, 1, 2])) return;
+        if (current < last) { if (validate([current])) show(current + 1, true); return; }
+        if (!validate(steps.map((_, i) => i))) return;
         busy = true;
         errorBox.hidden = true;
         root.classList.add('is-building');
@@ -198,8 +205,8 @@
         }
     });
     // Only low-sensitivity trip choices are persisted. Never serialize the form wholesale.
-    const draftKey = `dvo-plan-draft-v1:${root.dataset.draftOwner}`;
-    const draftNames = ['travel_days', 'travel_type', 'visitor_type', 'budget', 'accommodation_pref', 'distance_pref', 'activities[]', 'amenities[]'];
+    const draftKey = `dvo-plan-draft-v2:${root.dataset.draftOwner}`;
+    const draftNames = ['travel_days', 'travel_type', 'visitor_type', 'budget', 'accommodation_pref', 'resort_setting', 'distance_pref', 'transport_pref', 'public_kind', 'activities[]', 'amenities[]'];
     const draftFields = [...form.elements].filter(el => draftNames.includes(el.name));
     let draftDirty = false;
     let resumePending = false;
@@ -210,7 +217,7 @@
         if (!draftDirty || resumePending || busy) return;
         const values = {};
         draftNames.forEach(name => {
-            values[name] = draftFields.filter(el => el.name === name && (el.type !== 'checkbox' || el.checked)).map(el => el.value);
+            values[name] = draftFields.filter(el => el.name === name && (!['checkbox', 'radio'].includes(el.type) || el.checked)).map(el => el.value);
         });
         try { localStorage.setItem(draftKey, JSON.stringify({savedAt: Date.now(), step: current, values})); } catch (_) {}
     }
@@ -233,13 +240,13 @@
         if (!draft) return;
         draftFields.forEach(el => {
             const values = draft.values[el.name];
-            if (el.type === 'checkbox') el.checked = values.includes(el.value);
+            if (el.type === 'checkbox' || el.type === 'radio') el.checked = values.includes(el.value);
             else if (values.length && (el.tagName !== 'SELECT' || [...el.options].some(option => option.value === values[0]))) el.value = values[0];
             el.dispatchEvent(new Event('change', {bubbles: true}));
         });
         leaveResume();
         draftDirty = true;
-        show(Number.isInteger(draft.step) ? Math.max(0, Math.min(2, draft.step)) : 0, true);
+        show(Number.isInteger(draft.step) ? Math.max(0, Math.min(last, draft.step)) : 0, true);
     });
     document.getElementById('planResumeDiscard').addEventListener('click', () => {
         clearDraft();

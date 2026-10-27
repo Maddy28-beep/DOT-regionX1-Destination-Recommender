@@ -365,6 +365,6 @@ class FreeTimeBeforeDinnerTest extends TestCase
 
         $this->assertSame(1, Itinerary::query()->latest('id')->firstOrFail()->items()->where('title', self::TITLE)->count(), 'the trip has the row');
 
-        $this->get(route('plan.itinerary'))->assertOk()->assertSee(self::TITLE)->assertSee(self::NOTE);
+        $this->get(route('plan.itinerary'))->assertOk()->assertSee(self::TITLE)->assertSee('Nothing planned &mdash; rest at your', false);
     }
 }

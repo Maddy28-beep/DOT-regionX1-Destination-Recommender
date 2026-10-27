@@ -26,13 +26,11 @@ class TravelTimeEstimator
     /** Road distance vs straight line. 1.3 is the usual planning figure for mixed terrain. */
     private const DETOUR_FACTOR = 1.3;
 
-    /** Fastest and slowest sustained speeds worth planning around, km/h. */
-    private const FAST_KMH = 40.0;
-
-    private const SLOW_KMH = 25.0;
-
-    /** Getting out of one place and into the next: parking, walking, waiting. */
-    private const OVERHEAD_MINUTES = 10;
+    /*
+     * Speeds and per-leg overhead (parking, walking, waiting) come from the traveller's TransportMode. A
+     * personal car -- the default when nothing was chosen -- is 40 / 25 km/h and 10 minutes, which is what
+     * this class used to hard-code for everyone.
+     */
 
     /**
      * The Island Garden City of Samal is reached by ferry from Davao City.
@@ -46,9 +44,10 @@ class TravelTimeEstimator
     /**
      * @param  string|null  $fromRegion  region name of the origin, when known
      * @param  string|null  $toRegion    region name of the destination, when known
+     * @param  string|null  $mode        a TransportMode value; null (or unknown) plans as a personal car
      * @return array{distance_km: float, min_minutes: int, max_minutes: int, ferry: bool}
      */
-    public function estimate(float $straightLineKm, ?string $fromRegion = null, ?string $toRegion = null): array
+    public function estimate(float $straightLineKm, ?string $fromRegion = null, ?string $toRegion = null, ?string $mode = null): array
     {
         $roadKm = $straightLineKm * self::DETOUR_FACTOR;
 
@@ -57,8 +56,9 @@ class TravelTimeEstimator
         $ferry = ($fromRegion === self::FERRY_REGION) !== ($toRegion === self::FERRY_REGION);
         $ferryMinutes = $ferry ? self::FERRY_MINUTES : 0;
 
-        $fast = ($roadKm / self::FAST_KMH) * 60 + self::OVERHEAD_MINUTES + $ferryMinutes;
-        $slow = ($roadKm / self::SLOW_KMH) * 60 + self::OVERHEAD_MINUTES + $ferryMinutes;
+        $overhead = TransportMode::overheadMinutes($mode);
+        $fast = ($roadKm / TransportMode::fastKmh($mode)) * 60 + $overhead + $ferryMinutes;
+        $slow = ($roadKm / TransportMode::slowKmh($mode)) * 60 + $overhead + $ferryMinutes;
 
         return [
             'distance_km' => round($roadKm, 1),

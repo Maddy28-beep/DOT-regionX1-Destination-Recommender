@@ -1365,7 +1365,7 @@ class TripPlannerTest extends TestCase
      * candidatesWithinRange() has always computed whether it had to widen the
      * search past what the traveller asked for, but nothing downstream ever
      * read lastRangeTierUsed/lastRangeWidened -- so a traveller who picked
-     * "Within the City" for a baseline like Mati City (which doesn't have
+     * "Close Proximity" for a baseline like Mati City (which doesn't have
      * enough destinations inside 25km) got stops 60-70km away with no
      * indication their preference had been loosened to build the plan.
      */
@@ -1401,8 +1401,8 @@ class TripPlannerTest extends TestCase
         $html = $this->get('/plan/itinerary')->assertOk()->getContent();
 
         $this->assertStringContainsString('widened', $html);
-        $this->assertStringContainsString('Within the City', $html);
-        $this->assertStringContainsString('Moderate distance', $html);
+        $this->assertStringContainsString('Close Proximity', $html);
+        $this->assertStringContainsString('Commutable', $html);
     }
 
     /** The disclosure must not appear when the requested range already held enough destinations. */

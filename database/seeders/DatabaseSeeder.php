@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             TourOperatorSeeder::class,
             RealAccreditedEstablishmentSeeder::class,
             MabuhayAccommodationTypeSeeder::class,
+            ResortSettingSeeder::class,
             DestinationCategoryTagSeeder::class,
             AccreditationSeeder::class,
             EstablishmentSeeder::class,

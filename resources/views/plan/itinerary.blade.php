@@ -17,7 +17,19 @@
     $topMatches = $itinerary->distinctTopMatches(max(5, $scheduledDestinationCount));
     $routeStops = $itinerary->routeStops();
 
-    $rangeTierLabels = ['near' => 'Within the City', 'moderate' => 'Moderate distance', 'far' => 'Willing to travel farther'];
+    // How the traveller said they get around, for the strip, the pick-up rows and the long-day note.
+    $transport = $preference?->transport_pref;
+    $byOperator = ! $itinerary->package && \App\Services\Recommendation\TransportMode::isTourOperator($transport);
+    $fmtMinutes = fn (int $m) => $m >= 60 ? intdiv($m, 60).' h'.($m % 60 ? ' '.($m % 60).' min' : '') : $m.' min';
+    $longDayMinutes = 240;
+
+    // Each day's stops and distance, for its tab and the map beside it.
+    $dayMeta = $itemsByDay->map(fn ($items) => [
+        'stops' => $items->where('kind', 'activity')->count(),
+        'km' => round((float) $items->where('kind', 'travel')->sum('distance_km'), 1),
+    ])->all();
+
+    $rangeTierLabels = ['near' => 'Close Proximity', 'moderate' => 'Commutable', 'far' => 'Remote'];
 
     // Directions-only "Starting Point" widget below is package-specific and
     // only makes sense once we actually know where the package is -- see the
@@ -32,81 +44,66 @@
 <div class="dash-shell itinerary-page itin">
     <div class="dash-body">
         <div class="container">
-            {{-- The welcome banner. Davo is a picture, not a speaker: nothing here claims more than "your plan is ready". --}}
-            <section class="itin-hero" aria-label="Your itinerary is ready">
-                <img class="itin-hero__davo" src="{{ asset('images/davo-adventure-ready.webp') }}" alt="Davo celebrating with a travel map" width="450" height="478">
-                <div class="itin-hero__copy">
-                    <p class="itin-hero__title">Your adventure is ready!</p>
-                    <p class="itin-hero__text">
-                        @if ($itinerary->package)
-                            Here&rsquo;s the day-by-day schedule for your package. Let&rsquo;s explore!
-                        @else
-                            Here&rsquo;s your personalized Davao itinerary. Let&rsquo;s explore!
-                        @endif
-                    </p>
-                </div>
-                <svg class="itin-hero__scene" viewBox="0 0 420 150" aria-hidden="true" focusable="false">
-                    <circle cx="300" cy="46" r="26" fill="#f6d78f" opacity=".75"/>
-                    <path d="M0 150V104c34-26 70-30 104-12 30-24 70-34 112-18 34-18 68-14 104 8 36-12 70-6 100 16v52z" fill="#cfe0c4" opacity=".7"/>
-                    <path d="M0 150v-26c50-18 96-14 140 6 52-22 104-24 156-4 46-10 88-4 124 14v10z" fill="#aac8a4" opacity=".75"/>
-                    <path d="M356 150V92M356 92c-14-2-24 6-30 14M356 92c10-8 22-8 32 0M356 92c-6-12-4-22 4-30M356 92c8-10 20-14 30-12" stroke="#4f8a5b" stroke-width="3" fill="none" stroke-linecap="round" opacity=".85"/>
-                    <path d="M394 150V108M394 108c-9-1-16 4-20 10M394 108c7-6 15-6 22 0" stroke="#4f8a5b" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/>
-                </svg>
-            </section>
+            {{-- One compact banner: the welcome, what the plan is, and what to do with it. Davo is a picture, not a speaker:
+                 nothing here claims more than "your plan is ready". --}}
+            @php
+                $pickedInterests = $itinerary->package ? collect() : ($preference?->activities?->pluck('activity')->filter()->values() ?? collect());
+                $startingFrom = $preference?->origin_label ?: 'Davao City centre';
+            @endphp
+            <section class="itin-banner" aria-label="Your itinerary is ready">
+                <img class="itin-banner__davo" src="{{ asset('images/davo-adventure-ready.webp') }}" alt="Davo celebrating with a travel map" width="450" height="478">
 
-            <header class="itin-head">
-                <div class="itin-head__text">
-                    <h1 class="itin-title">{{ $itinerary->title ?: ($itinerary->package ? $itinerary->package->name : 'Your Davao itinerary') }}</h1>
-                    <p class="itin-sub">
+                <div class="itin-banner__copy">
+                    <h1 class="itin-banner__title">Your adventure is ready!</h1>
+                    @if ($itinerary->title || $itinerary->package)
+                        <p class="itin-banner__name">{{ $itinerary->title ?: $itinerary->package->name }}</p>
+                    @endif
+                    <p class="itin-banner__sub">
                         {{ $itinerary->total_days }} {{ \Illuminate\Support\Str::plural('day', $itinerary->total_days) }}
                         @if ($itinerary->package)
                             &middot; from the <a href="{{ route('packages.show', $itinerary->package) }}">{{ $itinerary->package->name }}</a> package
                         @else
-                            @php $pickedInterests = $preference->activities->pluck('activity')->filter()->values(); @endphp
+                            @if (filled($preference?->travel_type))&middot; {{ $preference->travel_type }}@endif
                             @if ($pickedInterests->isNotEmpty())
                                 &middot; {{ $pickedInterests->take(2)->join(', ') }}@if ($pickedInterests->count() > 2) +{{ $pickedInterests->count() - 2 }} more @endif
                             @endif
-                            @if (filled($preference->budget))
-                                &middot; {{ $preference->budget }}
-                            @endif
+                            @if (filled($preference?->budget))&middot; {{ $preference->budget }}@endif
+                            &middot; starting from {{ $startingFrom }}@if ($preference?->arrival_time), arriving {{ \Illuminate\Support\Carbon::parse($preference->arrival_time)->format('g:i A') }}@endif
                         @endif
                     </p>
+                    <p class="itin-banner__meta">Generated {{ $itinerary->generated_at->timezone('Asia/Manila')->format('F j, Y g:i A') }}</p>
                     @if (data_get($itinerary->day_themes, 'summary.regrouped'))
                         <span class="plan-badge plan-badge--ai" title="A pretrained embedding model grouped similar places into the same day, without adding more than a quarter to the travelling.">&#10024; Days grouped by theme</span>
                     @endif
-                    <p class="itin-meta">
-                        Generated {{ $itinerary->generated_at->timezone('Asia/Manila')->format('F j, Y g:i A') }}
-                        @unless ($itinerary->package)
-                            {{-- Say what the ordering was actually measured from, so a plan sequenced from the regional
-                                 default is not mistaken for one sequenced from where the traveller is. --}}
-                            &middot; ordered from {{ $preference->origin_label ?: 'Davao City centre' }}
-                            @if ($preference->arrival_time)
-                                &middot; arriving {{ \Illuminate\Support\Carbon::parse($preference->arrival_time)->format('g:i A') }}
-                            @endif
-                        @endunless
-                    </p>
                 </div>
 
-                <div class="itin-actions">
-                    {{--
-                        A package-adopted itinerary has no real preferences behind it to edit (see
-                        PackageController::planWith()) -- the correct way to move on from it is the
-                        "Start the trip planner" link in the panel below, which says plainly that it builds a
-                        fresh, different plan rather than implying there is something of the tourist's own to refine here.
-                    --}}
-                    @unless ($itinerary->package)
-                        <a href="{{ route('plan.edit') }}" class="btn btn-outline"><x-icon name="filter" /> Edit preferences</a>
+                <div class="itin-banner__actions">
+                    <div class="itin-banner__buttons">
+                        {{--
+                            A package-adopted itinerary has no real preferences behind it to edit (see
+                            PackageController::planWith()) -- the correct way to move on from it is the
+                            "Start the trip planner" link in the panel below, which says plainly that it builds a
+                            fresh, different plan rather than implying there is something of the tourist's own to refine here.
+                        --}}
+                        @unless ($itinerary->package)
+                            <a href="{{ route('plan.edit') }}" class="btn btn-outline"><x-icon name="filter" /> Edit preferences</a>
+                        @endunless
+                        @if ($itinerary->tourist_account_id)
+                            <a href="{{ route('account.itineraries.show', $itinerary) }}" class="btn btn-primary">Saved to My Itineraries &check;</a>
+                        @else
+                            <form method="POST" action="{{ route('plan.itinerary.save') }}">
+                                @csrf
+                                <button type="submit" class="btn btn-primary"><x-icon name="heart" /> Save Itinerary</button>
+                            </form>
+                        @endif
+                    </div>
+                    {{-- Set expectations honestly: no account is needed to plan or view a trip, by design -- this is what
+                         happens if you do not save it. --}}
+                    @unless ($itinerary->tourist_account_id)
+                        <p class="itin-banner__unsaved" role="status">Not saved yet &mdash; this plan disappears when you close the tab.</p>
                     @endunless
-                    @if ($itinerary->tourist_account_id)
-                        <a href="{{ route('account.itineraries.show', $itinerary) }}" class="btn btn-outline">Saved to My Itineraries &check;</a>
-                    @else
-                        <form method="POST" action="{{ route('plan.itinerary.save') }}">
-                            @csrf
-                            <button type="submit" class="btn btn-outline"><x-icon name="heart" /> Save Itinerary</button>
-                        </form>
-                    @endif
                 </div>
-            </header>
+            </section>
 
             @if (session('pending_save_itinerary'))
                 <div class="privacy-note" role="status">
@@ -122,40 +119,32 @@
                 </div>
             @endif
 
-            {{-- Set expectations honestly: no account is needed to plan or view
-                 a trip, by design -- this note is about what happens if you
-                 don't create the optional one. --}}
-            <div class="session-note" role="status">
-                <x-icon name="alert-triangle" />
-                <p>
-                    This plan lives in your browser session, so it disappears when you close the tab
-                    &mdash; unless you save it. <a href="{{ route('saved.index') }}">Heart the places you like</a>
-                    and they will still be here when you come back, or
-                    <a href="{{ route('account.register') }}">create a free account</a> to keep this whole itinerary.
-                </p>
-            </div>
-
-            <div class="itin-layout">
-                <div class="itin-main">
-                    <div class="itin-main__head">
-                        <div>
-                            <h2>Day-by-Day Travel Plan</h2>
-                            <p>
-                                @if ($itinerary->package)
-                                    As published by {{ $itinerary->package->provider_name ?? 'the provider' }} for this package.
-                                @else
-                                    Sequenced by geographic proximity, with complementary stops surfaced from what past travelers tend to pair together.
-                                @endif
-                            </p>
-                        </div>
-                        @unless ($itinerary->package)
+            @if ($itemsByDay->isNotEmpty())
+                <div class="itin-bar">
+                    <nav class="itin-tabs" aria-label="Jump to a day" data-day-tabs>
+                        @foreach ($itemsByDay as $day => $items)
+                            <a href="#itinerary-day-{{ $day }}" data-day-tab="{{ $day }}">
+                                <strong>Day {{ $day }}</strong>
+                                <small>{{ $dayMeta[$day]['stops'] }} {{ \Illuminate\Support\Str::plural('stop', $dayMeta[$day]['stops']) }}@if ($dayMeta[$day]['km'] >= 1) &middot; {{ round($dayMeta[$day]['km']) }} km @endif</small>
+                            </a>
+                        @endforeach
+                    </nav>
+                    @unless ($itinerary->package)
+                        <div class="itin-bar__links">
                             <button type="button" class="itinerary-explainer-trigger" id="itineraryExplainerOpen"
                                     aria-haspopup="dialog" aria-controls="itineraryExplainerModal" aria-expanded="false">
                                 <x-icon name="info" />
-                                How was this itinerary created?
+                                How was this made?
                             </button>
-                        @endunless
-                    </div>
+                            <a href="#itinerary-recommendations" class="itin-more"><x-icon name="compass" /> More ideas</a>
+                        </div>
+                    @endunless
+                </div>
+            @endif
+
+            <div class="itin-layout">
+                <div class="itin-main">
+                    <h2 class="sr-only">Day-by-Day Travel Plan</h2>
 
                     @if ($itemsByDay->isEmpty())
                         <div class="empty-panel">
@@ -176,15 +165,6 @@
                                 We ran out of accredited places that fit your interests and range. Try adding interests, choosing a farther range, or planning fewer days.
                             </div>
                         @endif
-
-                        <nav class="itin-tabs" aria-label="Jump to a day" data-day-tabs>
-                            @foreach ($itemsByDay as $day => $items)
-                                <a href="#itinerary-day-{{ $day }}" data-day-tab="{{ $day }}">Day {{ $day }}</a>
-                            @endforeach
-                            @unless ($itinerary->package)
-                                <a href="#itinerary-recommendations" class="itin-tabs__more">Recommendations</a>
-                            @endunless
-                        </nav>
 
                         @foreach ($itemsByDay as $day => $items)
                             @php
@@ -208,8 +188,18 @@
                                 $mapsUrl = \App\Models\Itinerary::googleMapsUrl($stops);
 
                                 $theme = data_get($itinerary->day_themes, 'days.'.$day);
-                                $dayStops = $items->where('kind', 'activity')->count();
-                                $dayKm = round((float) $items->where('kind', 'travel')->sum('distance_km'), 1);
+                                $dayStops = $dayMeta[$day]['stops'];
+                                $dayKm = $dayMeta[$day]['km'];
+                                // Where the day is: its theme when there is one, otherwise the area most of its stops are in.
+                                $dayArea = $items->where('kind', 'activity')
+                                    ->map(fn ($row) => $row->destination?->region?->name)->filter()->countBy()->sortDesc()->keys()->first();
+                                // The night's stay, for "back at your resort by evening".
+                                $night = $items->firstWhere('kind', 'overnight');
+                                $stayWord = $night?->accommodation
+                                    ? (in_array(strtolower((string) $night->accommodation->type), ['resort', 'hotel', 'homestay', 'hostel', 'inn'], true) ? strtolower($night->accommodation->type) : 'stay')
+                                    : null;
+                                // When the day's first journey leaves: for a tour operator, the planned pick-up.
+                                $pickupAt = $items->firstWhere('kind', 'travel')?->starts_at;
                                 $dayDate = $preference?->start_date
                                     ? \Illuminate\Support\Carbon::parse($preference->start_date)->addDays($day - 1)->format('l, F j')
                                     : null;
@@ -218,21 +208,50 @@
                             <section class="itin-day" id="itinerary-day-{{ $day }}" data-day-panel="{{ $day }}" aria-labelledby="itinerary-day-title-{{ $day }}">
                                 <header class="itin-day__head">
                                     <div>
-                                        <h3 id="itinerary-day-title-{{ $day }}">Day {{ $day }}@if ($theme && $theme['label']) <span>&middot; {{ $theme['label'] }}</span>@endif</h3>
+                                        <h3 id="itinerary-day-title-{{ $day }}">Day {{ $day }}@if ($theme && $theme['label']) <span>&middot; {{ $theme['label'] }}</span>@elseif ($dayArea) <span>&middot; {{ $dayArea }}</span>@endif</h3>
                                         <p class="itin-day__tag">
                                             @if ($dayDate){{ $dayDate }} &middot; @endif
                                             @if ($dayStops === 0 && $day !== 1 && $day !== $lastDay)Free day, no sightseeing planned
                                             @else{{ $dayStops }} {{ \Illuminate\Support\Str::plural('stop', $dayStops) }}@endif
-                                            @if ($dayKm > 0) &middot; about {{ rtrim(rtrim(number_format($dayKm, 1), '0'), '.') }} km of travel @endif
+                                            @if ($dayKm > 0) &middot; {{ rtrim(rtrim(number_format($dayKm, 1), '0'), '.') }} km {{ ! $itinerary->package && filled($transport) ? \App\Services\Recommendation\TransportMode::phrase($transport) : 'of travel' }} @endif
+                                            @if ($stayWord) &middot; back at your {{ $stayWord }} by evening @endif
                                             @if ($theme && $theme['label'] && $theme['similarity'] !== null) &middot; these places are {{ $theme['similarity'] }}% alike @endif
                                         </p>
                                     </div>
-                                    <a href="#" class="itinerary-back-top">Back to top ↑</a>
                                 </header>
 
+                                @php $dayTravelMax = (int) $items->where('kind', 'travel')->sum('travel_max_minutes'); @endphp
+                                @if (! $itinerary->package && $dayTravelMax > $longDayMinutes)
+                                    <p class="itin-longday" role="note">
+                                        <x-icon name="alert-triangle" />
+                                        <span>This day has up to {{ $fmtMinutes($dayTravelMax) }} of travel {{ \App\Services\Recommendation\TransportMode::phrase($transport) }}.
+                                        You can swap a stop below, or change how you travel in <a href="{{ route('plan.edit') }}">your preferences</a>.</span>
+                                    </p>
+                                @endif
+
+                                @php
+                                    // Dinner at the place you sleep, followed by the night there: one card, "Dinner & overnight stay".
+                                    $rows = $items->values();
+                                    $stayAfterDinner = [];
+                                    foreach ($rows as $i => $row) {
+                                        $following = $rows[$i + 1] ?? null;
+                                        if ($row->kind === 'meal' && $row->accommodation_id && $following?->kind === 'overnight'
+                                            && $following->accommodation_id === $row->accommodation_id && str_starts_with(strtolower($row->title), 'dinner')) {
+                                            $stayAfterDinner[$row->id] = $following;
+                                        }
+                                    }
+                                    $mergedNights = collect($stayAfterDinner)->pluck('id')->all();
+                                @endphp
                                 <div class="tl">
-                                    @foreach ($items as $item)
-                                        @include('partials.itinerary-timeline-row', ['item' => $item, 'swap' => $swap, 'ideas' => ($ideas ?? [])[$item->id] ?? []])
+                                    @foreach ($rows as $item)
+                                        @continue(in_array($item->id, $mergedNights, true))
+                                        @if ($byOperator && $loop->first && $item->kind !== 'baseline')
+                                            @include('partials.itinerary-pickup-row', ['at' => $pickupAt])
+                                        @endif
+                                        @include('partials.itinerary-timeline-row', ['item' => $item, 'swap' => $swap, 'ideas' => ($ideas ?? [])[$item->id] ?? [], 'preference' => $preference, 'stay' => $stayAfterDinner[$item->id] ?? null])
+                                        @if ($byOperator && $item->kind === 'baseline')
+                                            @include('partials.itinerary-pickup-row', ['at' => $pickupAt])
+                                        @endif
                                     @endforeach
                                 </div>
 
@@ -274,7 +293,7 @@
                     @endif
                 </div>
 
-                @include('partials.itinerary-overview', ['itinerary' => $itinerary, 'preference' => $preference, 'routeStops' => $routeStops])
+                @include('partials.itinerary-aside', ['itinerary' => $itinerary, 'preference' => $preference, 'routeStops' => $routeStops, 'dayMeta' => $dayMeta, 'operators' => $operators ?? collect()])
             </div>
 
             @unless ($itinerary->package)
@@ -376,7 +395,7 @@
                     <div>
                         <h2>How your plan was built</h2>
                         <p>We matched destinations to your preferences and arranged nearby stops together.</p>
-                        <p class="itinerary-method-note"><x-icon name="info" aria-hidden="true" /> Travel times are planning estimates. Check opening hours before visiting.</p>
+                        <p class="itinerary-method-note"><x-icon name="info" aria-hidden="true" /> Travel times are planning estimates{{ $preference->transport_pref ? ', worked out for '.\App\Services\Recommendation\TransportMode::label($preference->transport_pref) : '' }}. Check opening hours before visiting.</p>
                         @if ($provenance['range_widened'])
                             <p class="itinerary-method-note">We widened your preferred travel range to find enough stops for your trip. Some destinations may be farther away than requested.</p>
                         @endif

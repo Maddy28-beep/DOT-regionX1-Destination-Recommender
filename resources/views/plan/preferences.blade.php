@@ -16,6 +16,7 @@
 @endphp
 
 <link rel="stylesheet" href="{{ asset('css/plan-wizard.css') }}?v={{ filemtime(public_path('css/plan-wizard.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/plan-comfort.css') }}?v={{ filemtime(public_path('css/plan-comfort.css')) }}">
 <div class="plan-shell plan-wizard" id="planWizard" data-draft-owner="{{ auth()->id() ?? 'guest' }}">
     <div class="page-head page-head--with-action">
         <div class="container plan-introduction">
@@ -60,7 +61,8 @@
             <nav class="plan-wizard-steps" aria-label="Trip planning steps" hidden>
                 <button type="button" data-plan-step="0" aria-controls="plan-step-0">1 · Your trip</button>
                 <button type="button" data-plan-step="1" aria-controls="plan-step-1">2 · Your interests</button>
-                <button type="button" data-plan-step="2" aria-controls="plan-step-2">3 · Your comfort</button>
+                <button type="button" data-plan-step="2" aria-controls="plan-step-2">3 · Stay &amp; budget</button>
+                <button type="button" data-plan-step="3" aria-controls="plan-step-3">4 · Getting around</button>
             </nav>
             <div class="panel plan-panel">
                 <div class="panel-head">
@@ -146,67 +148,8 @@
                             </div>
                         </div>
 
-                        <div class="plan-section">
-                            <h3 class="plan-section__title"><x-icon name="target" /> Budget &amp; Distance</h3>
-                            <div class="filter-inline" style="align-items:start;">
-                                <div class="field" style="flex:1; min-width:180px;">
-                                    <label for="budget">Budget</label>
-                                    <select id="budget" name="budget" class="form-select" required>
-                                        @foreach (['Budget-Friendly', 'Mid-range', 'Premium'] as $b)
-                                            <option value="{{ $b }}" @selected(old('budget', $preference->budget) === $b)>{{ $b }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="field" style="flex:1; min-width:180px;">
-                                    <label for="accommodation_pref">Accommodation preference</label>
-                                    <select id="accommodation_pref" name="accommodation_pref" class="form-select" required>
-                                        @foreach (['Any', 'Hotel', 'Resort', 'Beach Resort', 'Homestay'] as $a)
-                                            <option value="{{ $a }}" @selected(old('accommodation_pref', $preference->accommodation_pref) === $a)>{{ $a === 'Homestay' ? 'Homestay / Self-catering' : $a }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="field" style="flex:1; min-width:180px;">
-                                    <label for="distance_pref">Preferred travel distance
-                                        {{-- "~" is doing real work: when a radius holds too few places
-                                             for the trip length the gate widens to the next tier rather
-                                             than returning a half-empty plan, and the itinerary says so
-                                             when it happens. Stating a hard figure here would promise a
-                                             ceiling the recommender is designed to break. --}}
-                                        <span class="field-help" tabindex="0" title="Measured from your starting point. If there aren't enough DOT-accredited places in range, we widen the search and tell you on the itinerary." aria-label="Measured from your starting point. If there aren't enough DOT-accredited places in range, we widen the search and tell you on the itinerary."><x-icon name="info" /></span>
-                                    </label>
-                                    {{--
-                                        The radius comes from the recommender's own gate
-                                        (ContentBasedRecommendationService::RANGE_RADIUS_KM) rather
-                                        than being written out here, so the number a traveller reads
-                                        is the number their results are actually filtered by.
-                                    --}}
-                                    @php
-                                        $distanceNames = [
-                                            'near' => 'Nearby (within city)',
-                                            'moderate' => 'Moderate distance',
-                                            'far' => 'Far / willing to travel',
-                                        ];
-                                    @endphp
-                                    <select id="distance_pref" name="distance_pref" class="form-select" required>
-                                        @foreach ($distanceNames as $value => $name)
-                                            <option value="{{ $value }}" @selected(old('distance_pref', $preference->distance_pref) === $value)>
-                                                {{-- Kept terse deliberately. A closed <select> clips
-                                                     rather than wraps, and at 375px only ~240px of
-                                                     text fits: the longer phrasing ("... — anywhere in
-                                                     the region", 338px) was cut off mid-word on a
-                                                     phone, which is where most of these are filled in. --}}
-                                                {{ $name }} &middot;
-                                                @if ($distanceRadii[$value] === null)
-                                                    no limit
-                                                @else
-                                                    ~{{ (int) $distanceRadii[$value] }} km
-                                                @endif
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+                        @include('partials.plan-stay-budget')
+                        @include('partials.plan-getting-around')
 
                         <div class="plan-section">
                             <h3 class="plan-section__title"><x-icon name="star" /> Interests &amp; Amenities</h3>
@@ -563,6 +506,7 @@
 </script>
 
 <script>window.planWizardErrors = {{ Illuminate\Support\Js::from($errors->keys()) }};</script>
+<script src="{{ asset('js/plan-comfort.js') }}?v={{ filemtime(public_path('js/plan-comfort.js')) }}" defer></script>
 <script src="{{ asset('js/plan-wizard.js') }}?v={{ filemtime(public_path('js/plan-wizard.js')) }}" defer></script>
 
 @endsection
