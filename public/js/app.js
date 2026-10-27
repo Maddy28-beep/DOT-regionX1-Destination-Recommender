@@ -950,23 +950,34 @@ document.addEventListener('DOMContentLoaded', function () {
  * require for this traveller.
  */
 document.addEventListener('DOMContentLoaded', function () {
-    var toggle = document.querySelector('[data-local-toggle]');
+    var toggles = document.querySelectorAll('[data-local-toggle]');
     var field = document.querySelector('[data-origin-field]');
-    if (!toggle || !field) return;
+    if (!toggles.length || !field) return;
 
     var input = field.querySelector('input');
     var hint = field.querySelector('[data-origin-hint]');
     var label = field.querySelector('[data-origin-label]');
     var defaultHint = hint ? hint.textContent : '';
+    var welcome = field.querySelector('[data-origin-welcome]');
+    var kept = input.value;
 
     function sync() {
-        var isLocal = toggle.value === 'Regular / Local';
+        var chosen = document.querySelector('[data-local-toggle]:checked');
+        var isLocal = !!chosen && chosen.value === 'Regular / Local';
         input.required = !isLocal;
         if (label) label.textContent = isLocal ? 'Where are you visiting from? (optional)' : 'Where are you visiting from?';
         if (hint) hint.textContent = isLocal ? "Optional since you're local." : defaultHint;
+
+        // A local has no "visiting from": the box is cleared and replaced by a welcome, and its answer comes
+        // back if they change their mind.
+        if (isLocal && !field.classList.contains('is-local')) kept = input.value || kept;
+        if (!isLocal && field.classList.contains('is-local') && input.value === '') input.value = kept;
+        if (isLocal) input.value = '';
+        field.classList.toggle('is-local', isLocal);
+        if (welcome) welcome.hidden = !isLocal;
     }
 
-    toggle.addEventListener('change', sync);
+    toggles.forEach(function (toggle) { toggle.addEventListener('change', sync); });
     sync();
 });
 

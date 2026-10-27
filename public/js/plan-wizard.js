@@ -11,12 +11,13 @@
     };
     const basics = sectionFor('travel_days');
     const style = sectionFor('travel_type');
+    const visit = sectionFor('visitor_type');
     const budget = sectionFor('budget');
     const travel = sectionFor('distance_pref');
     const origin = sectionFor('origin_label');
     const health = sectionFor('health_other');
     const interests = form.querySelector('[name="activities[]"]')?.closest('.plan-section');
-    if (![basics, style, budget, travel, origin, health, interests].every(Boolean)) return;
+    if (![basics, style, visit, budget, travel, origin, health, interests].every(Boolean)) return;
     const actions = form.querySelector('.plan-wizard-actions');
     const nav = root.querySelector('.plan-wizard-steps');
     const panel = root.querySelector('.plan-panel');
@@ -25,6 +26,13 @@
     const next = document.getElementById('planNext');
     const submit = form.querySelector('[type="submit"]');
     const status = document.getElementById('planStepStatus');
+    const says = document.getElementById('planDavoSays');
+    const davoLines = [
+        'Four quick steps and I’ll build your day-by-day plan!',
+        'Pick as many as you like — I’ll spread them across your days.',
+        'Tell me your budget and I’ll match stays, food and fees to it.',
+        'Last one! Then I’ll put your plan together.'
+    ];
     const headings = ['Tell us about your trip.', 'What would you love to do?', 'Where will you rest, and what’s your budget?', 'How will you get around?'];
     const descriptions = [
         'The basics — when you’re coming and who’s coming with you.',
@@ -48,18 +56,11 @@
         form.insertBefore(step, actions);
         return step;
     });
-    steps[0].append(basics, style, origin);
+    // Who is coming, when, where from, where they start: the order the blocks read in.
+    steps[0].append(style, basics, visit, origin);
     steps[1].append(interests);
     steps[2].append(budget);
     steps[3].append(travel);
-    // Pair duration with travel companions, then keep date/time together.
-    const companions = form.querySelector('#travel_type').closest('.field');
-    const arrivalDate = form.querySelector('#start_date').closest('.field');
-    basics.querySelector('.filter-inline').insertBefore(companions, arrivalDate);
-    origin.classList.add('plan-starting-point');
-    const purpose = form.querySelector('#travel_purpose').closest('.field');
-    purpose.classList.add('plan-purpose');
-    steps[1].insertBefore(purpose, interests);
     function optionalGroup(label, fields) {
         const options = document.createElement('details');
         options.className = 'plan-optional';
@@ -98,6 +99,7 @@
         submit.hidden = index !== last;
         next.textContent = ['Next: your interests →', 'Next: stay & budget →', 'Next: getting around →'][index] || 'Next →';
         status.textContent = `Step ${index + 1} of ${steps.length}`;
+        if (says) { says.textContent = davoLines[index] || ''; says.hidden = false; }
         saveDraft();
         if (focus) {
             steps[index].querySelector('h2').focus({preventScroll: true});

@@ -115,10 +115,10 @@ class TripPlannerTest extends TestCase
         $this->assertStringContainsString('name="amenities[]"', $html);
 
         // And the required ones must be fields a browser will actually submit
-        // -- a required <select> needs at least one <option>, not just the tag.
-        preg_match('/<select[^>]*name="travel_type"[^>]*>(.*?)<\/select>/s', $html, $m);
-        $this->assertNotEmpty($m, 'travel_type must be a real select element.');
-        $this->assertStringContainsString('<option', $m[1] ?? '', 'travel_type must offer at least one option.');
+        // -- a required radio group needs several choices and one of them already picked,
+        // so the browser has a value to send even if the traveller never touches it.
+        $this->assertGreaterThanOrEqual(5, preg_match_all('/<input type="radio" name="travel_type"/', $html), 'travel_type must offer its choices.');
+        $this->assertMatchesRegularExpression('/<input type="radio" name="travel_type" value="Solo"[^>]*checked/', $html, 'travel_type must come with a choice picked.');
     }
 
     /**
