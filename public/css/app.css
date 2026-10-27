@@ -3484,8 +3484,8 @@ select.site-dropdown-native {
 .catalog-banner {
     display: flex;
     align-items: center;
-    min-height: 260px;
-    padding-block: 36px;
+    min-height: 160px;
+    padding-block: 22px;
     color: #fff;
     background-color: #16352d;
     background-image:
@@ -3496,8 +3496,8 @@ select.site-dropdown-native {
     background-repeat: no-repeat;
 }
 .catalog-banner h1 {
-    margin: 0 0 12px;
-    font-size: 2.75rem;
+    margin: 0 0 6px;
+    font-size: 2.3rem;
     line-height: 1.1;
     text-wrap: balance;
     text-shadow: 0 2px 12px rgba(0, 0, 0, .2);
@@ -3505,21 +3505,21 @@ select.site-dropdown-native {
 .catalog-banner p {
     margin: 0;
     max-width: 46ch;
-    font-size: 1rem;
-    line-height: 1.65;
+    font-size: .95rem;
+    line-height: 1.5;
     text-shadow: 0 1px 6px rgba(0, 0, 0, .3);
 }
 @media (max-width: 640px) {
     .catalog-banner {
-        min-height: 220px;
-        padding-block: 28px;
+        min-height: 132px;
+        padding-block: 18px;
         background-position: 28% center;
         background-image:
             linear-gradient(90deg, rgba(6, 24, 20, .64), rgba(6, 24, 20, .28)),
             var(--catalog-banner-image, url('../images/davao-landscape-header.webp'));
     }
     .catalog-banner h1 {
-        font-size: 2rem;
+        font-size: 1.7rem;
     }
 }
 
