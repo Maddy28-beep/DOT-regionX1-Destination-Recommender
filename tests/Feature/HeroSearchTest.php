@@ -55,6 +55,15 @@ class HeroSearchTest extends TestCase
     }
 
     /** An unrecognised or absent purpose still has to go somewhere sensible. */
+    public function test_the_first_screen_is_fitted_to_the_window(): void
+    {
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertStringContainsString('class="hero-screen"', $html);
+        $this->assertStringContainsString('js/hero-fit.js', $html,
+            'The first screen is scaled to the window by this script, so the stats and the scroll cue are never below the fold.');
+    }
+
     public function test_an_unknown_purpose_falls_back_to_destinations(): void
     {
         foreach (['/search', '/search?purpose=', '/search?purpose=nonsense'] as $url) {

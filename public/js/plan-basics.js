@@ -46,6 +46,7 @@
         const refresh = () => {
             const value = Number(input.value);
             if (unit) unit.textContent = value === 1 ? 'day' : 'days';
+            input.style.width = `${Math.max(1, input.value.length)}ch`; // sized to the digits, so "3 days" sits in the middle
             stepper.querySelectorAll('[data-step]').forEach(button => {
                 button.disabled = Number(button.dataset.step) < 0 ? value <= min : value >= max;
             });

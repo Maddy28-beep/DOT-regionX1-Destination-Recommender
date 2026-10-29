@@ -18,6 +18,7 @@
 
 <link rel="stylesheet" href="{{ asset('css/plan-wizard.css') }}?v={{ filemtime(public_path('css/plan-wizard.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/plan-comfort.css') }}?v={{ filemtime(public_path('css/plan-comfort.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/plan-compact.css') }}?v={{ filemtime(public_path('css/plan-compact.css')) }}">
 <div class="plan-shell plan-wizard" id="planWizard" data-draft-owner="{{ auth()->id() ?? 'guest' }}">
     <div class="page-head page-head--with-action">
         <div class="container plan-introduction">
@@ -117,7 +118,7 @@
 
                             <div class="pc-grid">
                                 <div class="field pc-field pc-col-8">
-                                    <label for="origin_label">Hotel, airport or address</label>
+                                    <label for="origin_label" data-start-label>Hotel, airport or address</label>
                                     {{-- Combobox pattern: a text input that owns a listbox
                                          of suggestions, so it stays usable by keyboard and
                                          to a screen reader rather than being a div that
@@ -142,6 +143,18 @@
                                 <div class="field pc-field pc-col-4">
                                     <span class="pc-label" aria-hidden="true">&nbsp;</span>
                                     <button type="button" class="btn btn-outline pc-locate" id="origin-btn"><x-icon name="locate" /> Use my current location</button>
+                                </div>
+
+                                {{-- Where most visitors arrive. A tap fills the box with the name only; the server finds the
+                                     coordinates when the form is sent, the same as for a typed address (plan-origin.js). --}}
+                                <div class="pc-col-12 pc-arrivals" data-arrival-points hidden>
+                                    <span class="pc-label" id="arrivalPointsLabel">Or start from a common arrival point</span>
+                                    <div class="pc-quick" role="group" aria-labelledby="arrivalPointsLabel">
+                                        <button type="button" data-start-pick="Davao International Airport">Davao Airport</button>
+                                        <button type="button" data-start-pick="Ecoland Bus Terminal, Davao City">Bus terminal</button>
+                                        <button type="button" data-start-pick="Sasa Wharf, Davao City">Seaport</button>
+                                        <button type="button" data-start-pick="San Pedro Street, Davao City">City centre</button>
+                                    </div>
                                 </div>
 
                                 <div class="pc-col-12 pc-start-notes">
@@ -422,6 +435,7 @@
 
 <script>window.planWizardErrors = {{ Illuminate\Support\Js::from($errors->keys()) }};</script>
 <script src="{{ asset('js/plan-basics.js') }}?v={{ filemtime(public_path('js/plan-basics.js')) }}" defer></script>
+<script src="{{ asset('js/plan-origin.js') }}?v={{ filemtime(public_path('js/plan-origin.js')) }}" defer></script>
 <script src="{{ asset('js/plan-comfort.js') }}?v={{ filemtime(public_path('js/plan-comfort.js')) }}" defer></script>
 <script src="{{ asset('js/plan-wizard.js') }}?v={{ filemtime(public_path('js/plan-wizard.js')) }}" defer></script>
 

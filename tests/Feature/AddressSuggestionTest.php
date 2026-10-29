@@ -201,6 +201,20 @@ class AddressSuggestionTest extends TestCase
             'Sharing the device position stays available alongside typing.');
     }
 
+    public function test_the_form_offers_a_place_picker_and_common_arrival_points(): void
+    {
+        $html = $this->get('/plan')->assertOk()->getContent();
+
+        $this->assertStringContainsString('origin-from-suggestions', $html,
+            'Where are you visiting from? is a picker over cities and countries.');
+        $this->assertStringContainsString('name="place_of_origin"', $html,
+            'The picker is still the same field, so what is submitted does not change.');
+        $this->assertStringContainsString('data-start-pick="Davao International Airport"', $html);
+        $this->assertStringContainsString('js/plan-origin.js', $html);
+        $this->assertStringNotContainsString('Welcome home', $html,
+            'A regular or local still sees the origin box (optional); the starting point is its own, separate question.');
+    }
+
     /**
      * An address typed out in full, without picking a suggestion, must still
      * position the trip. Ignoring it would leave the plan sequenced from the
