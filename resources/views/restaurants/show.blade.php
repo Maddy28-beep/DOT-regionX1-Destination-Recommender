@@ -66,6 +66,8 @@
                 'groups' => [],
             ])
 
+            @include('partials.listing-amenities-card', ['listing' => $restaurant, 'kind' => 'restaurant'])
+
             @include('partials.reviews-section', ['listing' => $restaurant, 'type' => 'restaurants', 'kind' => 'restaurant', 'emptyHint' => 'Be the first to dine and share your experience.'])
         </div>
 

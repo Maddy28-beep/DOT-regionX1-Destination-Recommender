@@ -3,132 +3,79 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Partner Dashboard — ExploreDVO')</title>
     @include('partials.head-assets')
+    {{-- The shell, top bar and modal are the DOT Admin's (one look for both consoles); partner-shell.css adds what only
+         a partner has: the completeness ring, the preview, the photo grid, insights. --}}
+    <link rel="stylesheet" href="{{ asset('css/admin-shell.css') }}?v={{ filemtime(public_path('css/admin-shell.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/partner-shell.css') }}?v={{ filemtime(public_path('css/partner-shell.css')) }}">
+    {{-- The map-position form opens in the modal, where a script tag arriving with the form would not run, so the map
+         library is loaded with the page. --}}
+    <link rel="stylesheet" href="{{ asset('vendor/leaflet/leaflet.css') }}">
+    <script src="{{ asset('vendor/leaflet/leaflet.js') }}"></script>
 </head>
-<body class="portal">
-    <header class="site-header">
-        <div class="container bar">
-            <a href="{{ route('establishment.overview') }}" class="brand">Explore<span class="dot">DVO</span> <span class="brand-badge" style="font-size:.7rem; font-weight:700; color:var(--muted); margin-left:6px;">PARTNER</span></a>
-            <div class="header-actions">
-                <button type="button" class="admin-menu-toggle" onclick="document.getElementById('estSidebar').classList.toggle('open')"><x-icon name="menu" /> <span class="menu-toggle-label">Menu</span></button>
-                <div class="notif-bell-wrap">
-                    <button type="button" class="notif-bell" onclick="document.getElementById('notifDropdown').classList.toggle('open')" aria-label="Notifications">
-                        <x-icon name="bell" />
-                        @if ($navUnreadCount > 0)
-                            <span class="notif-badge">{{ $navUnreadCount > 9 ? '9+' : $navUnreadCount }}</span>
-                        @endif
-                    </button>
-                    <div class="notif-dropdown" id="notifDropdown">
-                        <div class="notif-dropdown-head">Notifications</div>
-                        @forelse ($navNotifications as $notification)
-                            <div class="notif-item {{ $notification->is_read ? '' : 'unread' }}">
-                                <div class="notif-item-title">{{ $notification->title }}</div>
-                                <p class="notif-item-msg">{{ $notification->message }}</p>
-                                <div class="notif-item-date">{{ $notification->created_at->diffForHumans() }}</div>
-                            </div>
-                        @empty
-                            <p class="notif-empty">No notifications yet.</p>
-                        @endforelse
-                        <a href="{{ route('establishment.notifications') }}" class="notif-dropdown-footer">View All</a>
-                    </div>
-                </div>
-                <span class="header-account-chip">
-                    <span class="header-account-chip__name">
-                        <x-icon name="building" />
-                        <span>{{ auth('establishment')->user()->business_name }}</span>
-                    </span>
-                    <form method="POST" action="{{ route('portal.logout') }}" class="header-account-chip__logout-form">
-                        @csrf
-                        <button type="submit" class="header-account-chip__logout" aria-label="Log out" title="Log out">
-                            <x-icon name="log-out" />
-                        </button>
-                    </form>
-                </span>
-            </div>
-        </div>
-    </header>
-
-    {{--
-        Portal-wide alert bar. Composed in AppServiceProvider from
-        EstablishmentAccount::portalStatus(), the single source of truth the
-        Overview cards also read -- so the bar can never contradict the status
-        shown further down the page.
-    --}}
-    @if (($navStatus['actionRequired'] ?? false) && $navStatus['detail'])
-        <div class="portal-alert {{ $navStatus['tone'] === 'warn' ? 'portal-alert--warn' : '' }}">
-            <div class="container">
-                <svg class="portal-alert__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>
-                </svg>
-                <div class="portal-alert__text">
-                    <strong>{{ $navStatus['label'] }}.</strong> {{ $navStatus['detail'] }}
-                </div>
-                <a href="{{ route('establishment.notifications') }}" class="btn">Renew Accreditation &rarr;</a>
-            </div>
-        </div>
-    @endif
-
-    <div class="admin-topbar">
-        <div class="container">
-            <div>
-                <h1>@yield('page-title', 'Overview')</h1>
-                <div class="sub">@yield('page-sub', 'Manage your ExploreDVO listing')</div>
-            </div>
-        </div>
-    </div>
+<body class="admin partner">
+    <a class="skip-link" href="#admin-main">Skip to main content</a>
+    @include('partials.partner-topbar')
 
     <div class="admin-shell">
-        <aside class="admin-sidebar" id="estSidebar">
-            <div class="group-label">My Establishment</div>
-            <a href="{{ route('establishment.overview') }}" class="{{ request()->routeIs('establishment.overview') ? 'active' : '' }}">
-                <span class="nav-link-label"><x-icon name="target" /><span>Overview</span></span>
+        <aside class="admin-sidebar" id="estSidebar" aria-label="Partner">
+            <div class="group-label">My establishment</div>
+            <a href="{{ route('establishment.overview') }}" class="{{ request()->routeIs('establishment.overview') ? 'active' : '' }}"><x-icon name="target" /><span>Overview</span></a>
+            <a href="{{ route('establishment.listing.edit') }}" class="{{ request()->routeIs('establishment.listing.*') ? 'active' : '' }}"><x-icon name="building" /><span>My Listing</span></a>
+            @if (auth('establishment')->user()->listing_kind === 'tour_operator')
+                <a href="{{ route('establishment.packages') }}" class="{{ request()->routeIs('establishment.packages*') ? 'active' : '' }}"><x-icon name="package" /><span>My packages</span>
+                    @if ($navPackagesChanges > 0)<b class="ptr-nb" title="DOT asked for a change to {{ $navPackagesChanges }}">{{ $navPackagesChanges }}<span class="sr-only"> need your attention</span></b>@endif
+                </a>
+            @endif
+            <a href="{{ route('establishment.photos') }}" class="{{ request()->routeIs('establishment.photos*') ? 'active' : '' }}"><x-icon name="camera" /><span>Photos</span></a>
+            <a href="{{ route('establishment.promotions') }}" class="{{ request()->routeIs('establishment.promotions*') ? 'active' : '' }}"><x-icon name="tag" /><span>Promos &amp; Discounts</span></a>
+            <a href="{{ route('establishment.reviews') }}" class="{{ request()->routeIs('establishment.reviews*') ? 'active' : '' }}"><x-icon name="chat" /><span>Guest Reviews</span>
+                @if ($navUnrepliedCount > 0)<b class="ptr-nb" title="{{ $navUnrepliedCount }} awaiting your reply">{{ $navUnrepliedCount }}<span class="sr-only"> awaiting your reply</span></b>@endif
             </a>
-            <a href="{{ route('establishment.listing.edit') }}" class="{{ request()->routeIs('establishment.listing.*') ? 'active' : '' }}">
-                <span class="nav-link-label"><x-icon name="building" /><span>My Listing</span></span>
-            </a>
-            <a href="{{ route('establishment.photos') }}" class="{{ request()->routeIs('establishment.photos') ? 'active' : '' }}">
-                <span class="nav-link-label"><x-icon name="camera" /><span>Photos</span></span>
-            </a>
-            <a href="{{ route('establishment.promotions') }}" class="{{ request()->routeIs('establishment.promotions') ? 'active' : '' }}">
-                <span class="nav-link-label"><x-icon name="star" /><span>Promos &amp; Discounts</span></span>
-            </a>
-            <a href="{{ route('establishment.reviews') }}" class="{{ request()->routeIs('establishment.reviews') ? 'active' : '' }}">
-                <span class="nav-link-label"><x-icon name="chat" /><span>Guest Reviews</span></span>
-                @if ($navUnrepliedCount > 0)
-                    <span class="nav-badge" title="{{ $navUnrepliedCount }} awaiting your reply">{{ $navUnrepliedCount }}</span>
-                @endif
-            </a>
-            <a href="{{ route('establishment.notifications') }}" class="{{ request()->routeIs('establishment.notifications') ? 'active' : '' }}">
-                <span class="nav-link-label"><x-icon name="bell" /><span>Notifications</span></span>
-                @if ($navUnreadCount > 0)
-                    <span class="nav-badge" title="{{ $navUnreadCount }} unread">{{ $navUnreadCount }}</span>
-                @endif
+
+            <div class="group-label">Performance</div>
+            <a href="{{ route('establishment.insights') }}" class="{{ request()->routeIs('establishment.insights') ? 'active' : '' }}"><x-icon name="chart" /><span>Insights</span></a>
+
+            <div class="group-label">Account</div>
+            <a href="{{ route('establishment.notifications') }}" class="{{ request()->routeIs('establishment.notifications*') ? 'active' : '' }}"><x-icon name="bell" /><span>Notifications</span>
+                @if ($navUnreadCount > 0)<b class="ptr-nb" title="{{ $navUnreadCount }} unread">{{ $navUnreadCount }}<span class="sr-only"> unread</span></b>@endif
             </a>
         </aside>
 
-        <main class="admin-main">
-            <div class="container" style="padding-inline:0; max-width:100%;">
+        <main class="admin-main" id="admin-main" tabindex="-1">
+            <div class="admin-pagehead">
+                <div>
+                    <h1>@yield('page-title', 'Overview')</h1>
+                    <div class="sub">@yield('page-sub', 'Manage your ExploreDVO listing')</div>
+                </div>
+                @hasSection('page-actions')
+                    <div class="admin-pagehead__actions">@yield('page-actions')</div>
+                @endif
+            </div>
 
+            <div class="container" style="padding-inline:0; max-width:100%;">
                 @yield('content')
             </div>
         </main>
     </div>
 
-    {{-- Shared behaviours (custom file-input status, etc.). Everything in
-         app.js is guarded by element lookups, so the public-site carousel and
-         lightbox code is inert here. --}}
+    {{-- Every form of the portal opens here (public/js/admin-modal.js, shared with the DOT Admin): a native <dialog>.
+         Each form is a real page too; the modal only changes how the link to it behaves. --}}
+    <dialog id="adminModal" class="adm-modal" aria-labelledby="adminModalTitle">
+        <header class="adm-modal__head">
+            <div><h2 id="adminModalTitle"></h2><p id="adminModalSub"></p></div>
+            <button type="button" class="adm-icon-btn" data-modal-close aria-label="Close"><x-icon name="x" /></button>
+        </header>
+        <div class="adm-modal__body" id="adminModalBody" aria-live="polite"></div>
+    </dialog>
+    <script src="{{ asset('js/admin-modal.js') }}?v={{ filemtime(public_path('js/admin-modal.js')) }}" defer></script>
+    <script src="{{ asset('js/admin-topbar.js') }}?v={{ filemtime(public_path('js/admin-topbar.js')) }}" defer></script>
+    <script src="{{ asset('js/partner-portal.js') }}?v={{ filemtime(public_path('js/partner-portal.js')) }}" defer></script>
+
+    {{-- Shared behaviours (custom file-input status, etc.). Everything in app.js is guarded by element lookups. --}}
     <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
     @include('partials.flash-toast')
-
-    <script>
-        document.addEventListener('click', function (e) {
-            var wrap = document.querySelector('.notif-bell-wrap');
-            var dropdown = document.getElementById('notifDropdown');
-            if (wrap && dropdown && !wrap.contains(e.target)) {
-                dropdown.classList.remove('open');
-            }
-        });
-    </script>
 </body>
 </html>

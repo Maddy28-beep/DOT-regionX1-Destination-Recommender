@@ -4,66 +4,15 @@
 @section('page-title', $establishment->business_name)
 @section('page-sub', 'Account status and listing summary')
 
+@if ($listing)
+    @section('page-actions')
+        <a href="{{ route('establishment.listing.form', 'details') }}" class="btn btn-primary" data-modal-form data-title="Edit details" data-sub="What travellers read about you and where they can find you online"><x-icon name="pencil" /> Edit listing</a>
+    @endsection
+@endif
+
 @section('content')
 
 @php $portalStatus = $establishment->portalStatus(); @endphp
-
-@if ($listing && method_exists($listing, 'operatingNotice'))
-    @php $closedNotice = $listing->operatingNotice(); @endphp
-    <div class="panel" style="margin-bottom:18px;">
-        <div class="panel-head">
-            <div>
-                <h2>Operating status</h2>
-                <p>Tell travelers when your place is closed. Closed places are not recommended in trip plans.</p>
-            </div>
-            <span class="status-pill {{ $closedNotice ? 'status-expired' : 'status-active' }}">{{ $closedNotice ? 'Closed' : 'Open' }}</span>
-        </div>
-        <div class="panel-body">
-            <p style="margin:0 0 12px;">{{ $closedNotice ?? 'Your place is shown to travelers as open.' }}</p>
-            <a href="{{ route('establishment.listing.edit') }}#operating-status" class="btn btn-primary">Change operating status</a>
-        </div>
-    </div>
-@endif
-
-<div class="stat-cards">
-    {{--
-        One effective status, from EstablishmentAccount::portalStatus(). It
-        folds account approval and accreditation validity together, so this
-        card can't read "Approved" while the panel below reads "Expired" --
-        the contradiction that made the page look like it disagreed with
-        itself. The alert bar in the layout reads the same method.
-    --}}
-    <div class="stat-card">
-        @if ($portalStatus['actionRequired'])
-            <span class="status-pill status-{{ $portalStatus['tone'] === 'danger' ? 'expired' : 'expiring' }}">Action Required</span>
-        @endif
-        <div class="stat-card-val">{{ $portalStatus['label'] }}</div>
-        <div class="stat-card-label">Account Status</div>
-    </div>
-    {{-- Visibility is no longer its own card: portalStatus() already folds it
-         into the status above, so a separate "Live / Hidden" tile would be a
-         second place for the same fact to drift out of sync. --}}
-    <div class="stat-card">
-        <div class="stat-card-val">{{ ucwords(str_replace('_', ' ', $establishment->listing_kind)) }}</div>
-        <div class="stat-card-label">Establishment Type</div>
-    </div>
-    <div class="stat-card">
-        {{--
-            Guard on review_count, not on rating. `rating` is cast to decimal:2,
-            so an unrated listing hands the view the STRING "0.0" -- and every
-            string but "0" is truthy in PHP, so the em-dash branch could never
-            run and the dashboard greeted an unreviewed partner with "0.0 ★".
-            review_count is a plain integer and says the thing that actually
-            matters: whether anybody has rated this at all.
-        --}}
-        <div class="stat-card-val">{{ ($listing?->review_count ?? 0) > 0 ? number_format($listing->rating, 1).' ★' : '—' }}</div>
-        <div class="stat-card-label">Current Rating</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-card-val">{{ $listing?->review_count ?? 0 }}</div>
-        <div class="stat-card-label">Total Reviews</div>
-    </div>
-</div>
 
 @if ($establishment->status === 'pending')
     <div class="panel">
@@ -92,118 +41,115 @@
         </div>
     </div>
 @else
-    @if ($accreditation)
-        @php
-            $daysLeft = $accreditation->expiration_date ? (int) round(now()->startOfDay()->diffInDays($accreditation->expiration_date->copy()->startOfDay(), false)) : null;
-            $statusClass = match ($accreditation->status) {
-                'Active' => 'status-active',
-                'Expiring Soon' => 'status-expiring',
-                default => 'status-expired',
-            };
-        @endphp
-        <div class="panel">
-            <div class="panel-head">
-                <div>
-                    <h2>DOT Accreditation</h2>
-                    <p>Accreditation #{{ $accreditation->accreditation_number }}</p>
-                </div>
-                <span class="status-pill {{ $statusClass }}">{{ $accreditation->status }}</span>
-            </div>
-            <div class="panel-body">
-                @if ($accreditation->status === 'Expired')
-                    <x-banner tone="danger">
-                        {{-- Stated from the visibility flag, not inferred from the record status --}}
-                        @if ($isPubliclyVisible)
-                            Your listing is still visible to travelers, but DOT Region XI may hide it at any time &mdash; please arrange renewal.
-                        @else
-                            Your listing is currently hidden from public search until DOT Region XI processes your renewal.
-                        @endif
-                        <x-slot:action>
-                            <a href="{{ route('establishment.notifications') }}" class="btn btn-danger">Upload Renewal Documents</a>
-                        </x-slot:action>
-                    </x-banner>
-                @elseif ($accreditation->status === 'Expiring Soon')
-                    <x-banner tone="warn">
-                        Expires <strong>{{ $accreditation->expiration_date->format('M d, Y') }}</strong>
-                        ({{ $daysLeft }} day{{ $daysLeft === 1 ? '' : 's' }} left). Coordinate with DOT Region XI
-                        on renewal before your listing is hidden from public search.
-                        <x-slot:action>
-                            <a href="{{ route('establishment.notifications') }}" class="btn btn-primary">Start Renewal</a>
-                        </x-slot:action>
-                    </x-banner>
-                @else
-                    <x-banner tone="success">
-                        Valid through <strong>{{ $accreditation->expiration_date?->format('M d, Y') ?? 'N/A' }}</strong>.
-                    </x-banner>
-                @endif
+    @php
+        $daysLeft = $accreditation && $accreditation->expiration_date ? (int) round(now()->startOfDay()->diffInDays($accreditation->expiration_date->copy()->startOfDay(), false)) : null;
+        $tracksStatus = method_exists($listing, 'operatingNotice');
+        $closedNotice = $tracksStatus ? $listing->operatingNotice() : null;
+    @endphp
 
-                @if (! $isPubliclyVisible && $accreditation->status !== 'Expired')
-                    <x-banner tone="warn">
-                        Your listing is currently <strong>hidden from public search</strong>, even though this
-                        accreditation record is marked {{ $accreditation->status }}. Contact DOT Region XI to have it restored.
-                    </x-banner>
-                @endif
-            </div>
+    {{--
+        One effective status, from EstablishmentAccount::portalStatus(): it folds account approval and accreditation
+        validity together, so the alert, the card and the top bar can never disagree. Visibility is not its own card
+        for the same reason.
+    --}}
+    @if ($portalStatus['actionRequired'] && $portalStatus['detail'])
+        <div class="adm-alert {{ $portalStatus['tone'] === 'danger' ? 'adm-alert--danger' : '' }}" role="status">
+            <x-icon name="alert-triangle" />
+            <div><strong>{{ $portalStatus['label'] }}.</strong> {{ $portalStatus['detail'] }}</div>
         </div>
     @endif
 
-    <div class="panel">
-        <div class="panel-head">
-            <div>
-                <h2>{{ $listing->name }}</h2>
-                <p>{{ $listing->location }}</p>
+    <div class="adm-kpis ptr-kpis">
+        <div class="adm-kpi">
+            <span class="adm-kpi__ic"><x-icon name="shield-check" /></span>
+            <div style="flex:1; min-width:0;">
+                <div class="adm-kpi__val" style="font-size:1.1rem;">{{ $portalStatus['label'] }}</div>
+                <div class="adm-kpi__lab">
+                    @if ($accreditation && $daysLeft !== null)
+                        {{ $daysLeft >= 0 ? $daysLeft.' '.\Illuminate\Support\Str::plural('day', $daysLeft).' left' : 'Expired '.$accreditation->expiration_date->format('M j, Y') }}
+                    @else
+                        {{ ucwords(str_replace('_', ' ', $establishment->listing_kind)) }}
+                    @endif
+                </div>
+                @if ($accreditation && $daysLeft !== null && $daysLeft >= 0)
+                    <div class="ptr-bar {{ $daysLeft <= 60 ? 'is-warn' : '' }}"><i style="width:{{ max(4, min(100, round($daysLeft / 365 * 100))) }}%"></i></div>
+                @endif
             </div>
-            <a href="{{ route('establishment.listing.edit') }}" class="btn btn-primary">Edit Listing</a>
         </div>
-        <div class="panel-body">
-            <p style="color:var(--muted); font-size:.88rem; margin:0;">{{ $listing->description ?? 'No description yet — add one from the Edit Listing page.' }}</p>
+        <div class="adm-kpi">
+            <span class="adm-kpi__ic"><x-icon name="star" /></span>
+            <div>
+                {{-- Guard on review_count, not rating: rating is cast to decimal:2, so an unrated listing hands the view
+                     the truthy string "0.0". --}}
+                <div class="adm-kpi__val">{{ ($listing->review_count ?? 0) > 0 ? number_format($listing->rating, 1) : '—' }}</div>
+                <div class="adm-kpi__lab">{{ $listing->review_count ?? 0 }} {{ \Illuminate\Support\Str::plural('review', $listing->review_count ?? 0) }}</div>
+                @if ($unrepliedCount > 0)<div class="adm-kpi__flag">{{ $unrepliedCount }} awaiting reply</div>@endif
+            </div>
+        </div>
+        <div class="adm-kpi">
+            <span class="adm-kpi__ic"><x-icon name="locate" /></span>
+            <div>
+                <div class="adm-kpi__val">{{ number_format($visits['total']) }}</div>
+                <div class="adm-kpi__lab">QR check-ins, last 30 days</div>
+                @php $visitChange = \App\Services\Establishment\ListingInsights::change($visits['total'], $visits['before']); @endphp
+                @if ($visitChange !== null)<div class="adm-kpi__flag ptr-flag--{{ $visitChange >= 0 ? 'up' : 'down' }}">{{ $visitChange >= 0 ? '↑' : '↓' }} {{ abs($visitChange) }}% on the 30 days before</div>@endif
+            </div>
+        </div>
+        <div class="adm-kpi">
+            <span class="adm-kpi__ic"><x-icon name="route" /></span>
+            <div>
+                @if ($tripPlans)
+                    <div class="adm-kpi__val">{{ number_format($tripPlans['total']) }}</div>
+                    <div class="adm-kpi__lab">trip plans included you</div>
+                    @php $planChange = \App\Services\Establishment\ListingInsights::change($tripPlans['total'], $tripPlans['before']); @endphp
+                    @if ($planChange !== null)<div class="adm-kpi__flag ptr-flag--{{ $planChange >= 0 ? 'up' : 'down' }}">{{ $planChange >= 0 ? '↑' : '↓' }} {{ abs($planChange) }}% on the 30 days before</div>@endif
+                @else
+                    <div class="adm-kpi__val">{{ $photoCount }}</div>
+                    <div class="adm-kpi__lab">{{ \Illuminate\Support\Str::plural('photo', $photoCount) }} on your page</div>
+                @endif
+            </div>
         </div>
     </div>
 
-    <div class="two-col-panels">
-        <div class="panel">
-            <div class="panel-head">
-                <div>
-                    <h2>Photos</h2>
+    <div class="adm-cols ptr-cols2">
+        <div class="adm-stack">
+            @include('establishment.partials.readiness', ['readiness' => $readiness])
+
+            <div class="adm-card">
+                <div class="adm-card__head">
+                    <div><h2>Recent reviews</h2><p>What travellers said about your listing</p></div>
+                    <a href="{{ route('establishment.reviews') }}" class="adm-link">View all</a>
                 </div>
-                <a href="{{ route('establishment.photos') }}" class="btn btn-outline">Manage Photos</a>
-            </div>
-            <div class="panel-body">
-                @if ($photoCount > 0)
-                    <p style="color:var(--muted); font-size:.88rem; margin:0;">{{ $photoCount }} photo{{ $photoCount === 1 ? '' : 's' }} uploaded.</p>
-                @else
-                    <x-banner tone="warn">
-                        No photos uploaded yet &mdash; your listing falls back to an illustration.
-                    </x-banner>
-                @endif
+                <div class="adm-card__body">
+                    @forelse ($recentReviews as $review)
+                        @include('establishment.partials.review', ['review' => $review])
+                    @empty
+                        <p class="ptr-empty">No reviews yet.</p>
+                    @endforelse
+                </div>
             </div>
         </div>
 
-        <div class="panel">
-            <div class="panel-head">
-                <div>
-                    <h2>Recent Reviews</h2>
-                    @if ($unrepliedCount > 0)
-                        <p style="color:var(--tone-warn-ink); font-weight:600;">{{ $unrepliedCount }} awaiting your reply</p>
-                    @endif
-                </div>
-                <a href="{{ route('establishment.reviews') }}" class="btn btn-outline">View All</a>
-            </div>
-            <div class="panel-body">
-                @if ($unrepliedCount > 0)
-                    <x-banner tone="success">
-                        {{ $unrepliedCount }} review{{ $unrepliedCount === 1 ? '' : 's' }} awaiting your response.
-                    </x-banner>
-                @endif
-                @forelse ($recentReviews as $review)
-                    <div class="review-item">
-                        <div class="author">{{ $review->author_name ?? 'Traveler' }}</div>
-                        <div class="stars">{{ str_repeat('★', $review->rating).str_repeat('☆', 5 - $review->rating) }}</div>
-                        <p class="comment">{{ $review->comment }}</p>
+        <div class="adm-stack">
+            @if ($tracksStatus)
+                <div class="adm-card ptr-status {{ $closedNotice ? 'is-closed' : '' }}">
+                    <span class="ptr-status__dot" aria-hidden="true"></span>
+                    <div>
+                        <h2>{{ $closedNotice ? 'Closed' : 'Open for visitors' }}</h2>
+                        <p>{{ $closedNotice ?? 'Travellers see you as open.' }}</p>
                     </div>
-                @empty
-                    <p style="color:var(--muted); font-size:.88rem; margin:0;">No reviews yet.</p>
-                @endforelse
+                    <a href="{{ route('establishment.listing.form', 'status') }}" class="btn btn-outline btn-sm" data-modal-form data-title="Operating status" data-sub="Tell travellers whether you are open" data-size="narrow">Change</a>
+                </div>
+            @endif
+
+            <div class="adm-card">
+                <div class="adm-card__head">
+                    <div><h2>How travellers see you</h2><p>Updates as you edit</p></div>
+                    <a href="{{ route('establishment.listing.edit') }}" class="adm-link">My Listing</a>
+                </div>
+                <div class="adm-card__body ptr-pad">
+                    @include('establishment.partials.preview')
+                </div>
             </div>
         </div>
     </div>

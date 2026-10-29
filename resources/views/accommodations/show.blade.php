@@ -58,6 +58,8 @@
                 'groups' => ['Property type' => [$accommodation->type], 'DOT classification' => [$accommodation->dot_classification]],
             ])
 
+            @include('partials.listing-amenities-card', ['listing' => $accommodation, 'kind' => 'accommodation'])
+
             @if ($accommodation->roomTypes->count())
                 <div class="side-card">
                     <h3 class="mt-0">Room Types</h3>

@@ -327,6 +327,8 @@
             @break
     @endswitch
 
+    @include('admin.listings._amenities', ['type' => $type, 'listing' => $listing])
+
     @include('admin.listings.online-presence', ['listing' => $listing])
 
     @if (in_array($type, ['destinations', 'accommodations', 'restaurants', 'souvenir-centers', 'souvenir_centers'], true))

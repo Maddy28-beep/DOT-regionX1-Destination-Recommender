@@ -15,6 +15,8 @@ use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\Establishment\EstablishmentDashboardController;
+use App\Http\Controllers\Establishment\EstablishmentInsightsController;
+use App\Http\Controllers\Establishment\EstablishmentPackageController;
 use App\Http\Controllers\Establishment\EstablishmentPhotoController;
 use App\Http\Controllers\Establishment\EstablishmentPromotionController;
 use App\Http\Controllers\EventController;
@@ -209,6 +211,13 @@ Route::prefix('portal/admin')->name('admin.')->middleware(['auth:admin', \App\Ht
     Route::post('/establishments/{establishment}/reject', [AdminDashboardController::class, 'rejectEstablishment'])->name('establishments.reject');
     Route::post('/establishments/{establishment}/match', [AdminDashboardController::class, 'matchEstablishmentListing'])->name('establishments.match');
 
+    // Packages tour operators sent in: approved here before travellers can see them
+    Route::get('/package-approvals', [\App\Http\Controllers\Admin\AdminPackageApprovalController::class, 'index'])->name('package-approvals');
+    Route::get('/package-approvals/{package}', [\App\Http\Controllers\Admin\AdminPackageApprovalController::class, 'review'])->whereNumber('package')->name('package-approvals.review');
+    Route::post('/package-approvals/{package}/decide', [\App\Http\Controllers\Admin\AdminPackageApprovalController::class, 'decide'])->whereNumber('package')->name('package-approvals.decide');
+    Route::post('/package-approvals/{package}/pause', [\App\Http\Controllers\Admin\AdminPackageApprovalController::class, 'pause'])->whereNumber('package')->name('package-approvals.pause');
+    Route::post('/package-approvals/{package}/resume', [\App\Http\Controllers\Admin\AdminPackageApprovalController::class, 'resume'])->whereNumber('package')->name('package-approvals.resume');
+
     Route::get('/accreditation', [AdminDashboardController::class, 'accreditation'])->name('accreditation');
     Route::post('/accreditation/{accreditation}/renew', [AdminDashboardController::class, 'renewAccreditation'])->name('accreditation.renew');
     Route::post('/accreditation/bulk-renew', [AdminDashboardController::class, 'bulkRenewAccreditation'])->name('accreditation.bulk-renew');
@@ -270,20 +279,47 @@ Route::prefix('portal/establishment')->name('establishment.')->middleware('auth:
     Route::get('/', [EstablishmentDashboardController::class, 'overview'])->name('overview');
     Route::get('/listing', [EstablishmentDashboardController::class, 'editListing'])->name('listing.edit');
     Route::put('/listing', [EstablishmentDashboardController::class, 'updateListing'])->name('listing.update');
+    Route::get('/listing/{section}', [EstablishmentDashboardController::class, 'form'])->whereIn('section', array_keys(EstablishmentDashboardController::SECTIONS))->name('listing.form');
     Route::get('/listing/qr-code', [QrCodeController::class, 'establishment'])->name('listing.qr-code');
     Route::get('/reviews', [EstablishmentDashboardController::class, 'reviews'])->name('reviews');
+    Route::get('/reviews/{review}/reply', [EstablishmentDashboardController::class, 'replyForm'])->name('reviews.reply.form');
     Route::post('/reviews/{review}/reply', [EstablishmentDashboardController::class, 'replyToReview'])->name('reviews.reply');
+    Route::get('/insights', [EstablishmentInsightsController::class, 'index'])->name('insights');
+
+    // My packages: a tour operator's own packages, sent to DOT for approval before travellers see them
+    Route::get('/packages', [EstablishmentPackageController::class, 'index'])->name('packages');
+    Route::get('/packages/create', [EstablishmentPackageController::class, 'create'])->name('packages.create');
+    Route::post('/packages', [EstablishmentPackageController::class, 'store'])->name('packages.store');
+    Route::get('/packages/{package}', [EstablishmentPackageController::class, 'show'])->whereNumber('package')->name('packages.show');
+    Route::get('/packages/{package}/edit', [EstablishmentPackageController::class, 'edit'])->whereNumber('package')->name('packages.edit');
+    Route::put('/packages/{package}', [EstablishmentPackageController::class, 'update'])->whereNumber('package')->name('packages.update');
+    Route::delete('/packages/{package}', [EstablishmentPackageController::class, 'destroy'])->whereNumber('package')->name('packages.destroy');
+    Route::post('/packages/{package}/submit', [EstablishmentPackageController::class, 'submit'])->whereNumber('package')->name('packages.submit');
+    Route::post('/packages/{package}/withdraw', [EstablishmentPackageController::class, 'withdraw'])->whereNumber('package')->name('packages.withdraw');
+    Route::post('/packages/{package}/pause', [EstablishmentPackageController::class, 'pause'])->whereNumber('package')->name('packages.pause');
+    Route::post('/packages/{package}/resume', [EstablishmentPackageController::class, 'resume'])->whereNumber('package')->name('packages.resume');
+    Route::get('/packages/{package}/photos/create', [EstablishmentPackageController::class, 'photoForm'])->whereNumber('package')->name('packages.photos.create');
+    Route::post('/packages/{package}/photos', [EstablishmentPackageController::class, 'photoStore'])->whereNumber('package')->name('packages.photos.store');
+    Route::delete('/packages/{package}/photos/{photo}', [EstablishmentPackageController::class, 'photoDestroy'])->whereNumber(['package', 'photo'])->name('packages.photos.destroy');
+    Route::post('/packages/{package}/duplicate', [EstablishmentPackageController::class, 'duplicate'])->whereNumber('package')->name('packages.duplicate');
     Route::get('/notifications', [EstablishmentDashboardController::class, 'notifications'])->name('notifications');
     Route::post('/notifications/read-all', [EstablishmentDashboardController::class, 'markNotificationsRead'])->name('notifications.read-all');
 
     Route::get('/photos', [EstablishmentPhotoController::class, 'index'])->name('photos');
+    Route::get('/photos/create', [EstablishmentPhotoController::class, 'create'])->name('photos.create');
     Route::post('/photos', [EstablishmentPhotoController::class, 'store'])->name('photos.store');
+    Route::post('/photos/reorder', [EstablishmentPhotoController::class, 'reorderAll'])->name('photos.reorder');
+    Route::get('/photos/credit', [EstablishmentPhotoController::class, 'creditForm'])->name('photos.credit.bulk.form');
+    Route::put('/photos/credit', [EstablishmentPhotoController::class, 'saveCredit'])->name('photos.credit.bulk');
+    Route::get('/photos/{photo}/credit', [EstablishmentPhotoController::class, 'creditForm'])->whereNumber('photo')->name('photos.credit.form');
+    Route::put('/photos/{photo}/credit', [EstablishmentPhotoController::class, 'saveCredit'])->whereNumber('photo')->name('photos.credit');
     Route::post('/photos/{photo}/primary', [EstablishmentPhotoController::class, 'setPrimary'])->name('photos.primary');
     Route::delete('/photos/{photo}', [EstablishmentPhotoController::class, 'destroy'])->name('photos.destroy');
     Route::post('/photos/{photo}/up', [EstablishmentPhotoController::class, 'moveUp'])->name('photos.up');
     Route::post('/photos/{photo}/down', [EstablishmentPhotoController::class, 'moveDown'])->name('photos.down');
 
     Route::get('/promotions', [EstablishmentPromotionController::class, 'index'])->name('promotions');
+    Route::get('/promotions/create', [EstablishmentPromotionController::class, 'create'])->name('promotions.create');
     Route::post('/promotions', [EstablishmentPromotionController::class, 'store'])->name('promotions.store');
     Route::delete('/promotions/{promotion}', [EstablishmentPromotionController::class, 'destroy'])->name('promotions.destroy');
 });

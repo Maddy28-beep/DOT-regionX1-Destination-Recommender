@@ -1,275 +1,120 @@
 @extends('layouts.establishment')
 
-@section('title', 'Edit Listing — Partner Dashboard')
+@section('title', 'My Listing — Partner Dashboard')
 @section('page-title', 'My Listing')
-@section('page-sub', 'Update the information travelers see on ExploreDVO')
+@section('page-sub', 'The information travellers see on ExploreDVO')
+
+@section('page-actions')
+    <a href="{{ route('establishment.listing.form', 'details') }}" class="btn btn-primary" data-modal-form data-title="Edit details" data-sub="What travellers read about you and where they can find you online"><x-icon name="pencil" /> Edit details</a>
+@endsection
 
 @section('content')
 
 @php
-    $priceLabel = match ($establishment->listing_kind) {
-        'accommodation' => 'Price per night (₱)',
-        'package' => 'Price per person (₱)',
+    $kind = $establishment->listing_kind;
+    $price = match ($kind) {
+        'accommodation' => $listing->price_per_night ? '₱'.number_format($listing->price_per_night).' per night' : null,
+        'package' => $listing->price_per_pax ? '₱'.number_format($listing->price_per_pax).' per person' : null,
         default => null,
     };
-    $priceValue = match ($establishment->listing_kind) {
-        'accommodation' => $listing->price_per_night,
-        'package' => $listing->price_per_pax,
-        default => null,
-    };
-
-    // One line per day, "Title | Description", matching what the form
-    // posts back -- so re-editing shows exactly what was last saved.
-    $itineraryText = $establishment->listing_kind === 'package'
-        ? $listing->itineraryDays->map(fn ($day) => $day->description ? "{$day->title} | {$day->description}" : $day->title)->implode("\n")
-        : '';
+    $tracksStatus = method_exists($listing, 'operatingNotice');
+    $closedNotice = $tracksStatus ? $listing->operatingNotice() : null;
+    $hasPoint = $listing->latitude !== null && $listing->longitude !== null;
+    $edit = fn (string $section, string $title, string $sub, ?string $size = null) => 'href="'.route('establishment.listing.form', $section).'" data-modal-form data-title="'.e($title).'" data-sub="'.e($sub).'"'.($size ? ' data-size="'.$size.'"' : '');
 @endphp
 
-<div class="panel">
-    <div class="panel-head">
-        <div>
-            <h2>{{ $listing->name }}</h2>
-            <p>Update the details travelers see on your listing page.</p>
+<div class="adm-cols ptr-cols2">
+    <div class="adm-stack">
+        @include('establishment.partials.readiness', ['readiness' => $readiness])
+
+        <div class="adm-card">
+            <div class="adm-card__head">
+                <div><h2>{{ $listing->name }}</h2><p>{{ $listing->location }}</p></div>
+            </div>
+            <div class="adm-card__body">
+                <p class="ptr-note">Your listing <strong>name</strong> and <strong>accreditation details</strong> are managed by DOT Region XI and can't be edited here. Contact DOT Region XI if either needs correcting.</p>
+                <dl class="ptr-dl">
+                    <dt>Description</dt><dd>{{ $listing->description ?: '—' }}</dd>
+                    <dt>Budget tier</dt><dd>{{ $listing->price_tier ?: '—' }}</dd>
+                    @if ($price)<dt>Price</dt><dd>{{ $price }}</dd>@endif
+                    @if ($hoursColumn)
+                        <dt>Opening hours</dt>
+                        <dd>@if ($hours !== '' && $hours !== null){{ $hours }} <a class="adm-link" {!! $edit('hours', 'Opening hours', 'Shown to travellers and used when they plan a day', 'narrow') !!}>Edit</a>@else<span class="ptr-missing">Not set</span> <a class="adm-link" {!! $edit('hours', 'Opening hours', 'Shown to travellers and used when they plan a day', 'narrow') !!}>Add hours</a>@endif</dd>
+                    @endif
+                    <dt>Map position</dt>
+                    <dd>@if ($hasPoint){{ number_format((float) $listing->latitude, 5) }}, {{ number_format((float) $listing->longitude, 5) }} <a class="adm-link" {!! $edit('position', 'Pin your place on the map', 'Travellers use this to find you and to plan the route between places', 'narrow') !!}>Move</a>@else<span class="ptr-missing">Not set</span> <a class="adm-link" {!! $edit('position', 'Pin your place on the map', 'Travellers use this to find you and to plan the route between places', 'narrow') !!}>Pin it</a>@endif</dd>
+                    <dt>Website</dt><dd>{{ $listing->website_url ?: '—' }}</dd>
+                    <dt>Facebook</dt><dd>{{ $listing->facebook_url ?: '—' }}</dd>
+                    <dt>Instagram</dt><dd>{{ $listing->instagram_url ?: '—' }}</dd>
+                    <dt>TikTok</dt><dd>{{ $listing->tiktok_url ?: '—' }}</dd>
+                    @if ($kind === 'package')
+                        <dt>Itinerary</dt><dd>{{ $listing->itineraryDays->count() }} {{ \Illuminate\Support\Str::plural('day', $listing->itineraryDays->count()) }}</dd>
+                    @endif
+                </dl>
+            </div>
         </div>
     </div>
-    <div class="panel-body">
-        <x-banner tone="info">
-            Your listing <strong>name</strong> and <strong>accreditation details</strong> are managed by
-            DOT Region XI Admin and can't be edited here. Contact DOT Region XI if either needs correcting.
-        </x-banner>
 
-        <form method="POST" action="{{ route('establishment.listing.update') }}" id="listing-form">
-            @csrf
-            @method('PUT')
-
-            @if (method_exists($listing, 'operatingNotice'))
-                @include('partials.operating-status-fields', ['listing' => $listing])
-            @endif
-
-            <div class="field">
-                <label for="description">Description</label>
-                <textarea id="description" name="description" rows="5">{{ old('description', $listing->description) }}</textarea>
+    <div class="adm-stack">
+        @if ($tracksStatus)
+            <div id="operating-status" class="adm-card ptr-status {{ $closedNotice ? 'is-closed' : '' }}">
+                <span class="ptr-status__dot" aria-hidden="true"></span>
+                <div>
+                    <h2>Operating status</h2>
+                    <p>{{ $closedNotice ?? 'Open for visitors' }}</p>
+                </div>
+                <a href="{{ route('establishment.listing.form', 'status') }}" class="btn btn-outline btn-sm" data-modal-form data-title="Operating status" data-sub="Tell travellers whether you are open" data-size="narrow">Change</a>
             </div>
-
-            <div class="field">
-                <label for="price_tier">Budget tier</label>
-                <select id="price_tier" name="price_tier" class="form-select">
-                    <option value="">Not specified</option>
-                    <option value="Budget-Friendly" @selected(old('price_tier', $listing->price_tier) === 'Budget-Friendly')>Budget-Friendly</option>
-                    <option value="Mid-range" @selected(old('price_tier', $listing->price_tier) === 'Mid-range')>Mid-range</option>
-                    <option value="Premium" @selected(old('price_tier', $listing->price_tier) === 'Premium')>Premium</option>
-                </select>
-            </div>
-
-            @if ($priceLabel)
-                <div class="field">
-                    <label for="price_amount">{{ $priceLabel }}</label>
-                    <input type="number" id="price_amount" name="price_amount" step="0.01" min="0" value="{{ old('price_amount', $priceValue) }}">
-                </div>
-            @endif
-
-            @include('partials.location-picker', ['listing' => $listing])
-
-            @if ($establishment->listing_kind === 'package')
-                <div class="field-group" style="margin-top:20px;">
-                    <label>Day-by-Day Itinerary</label>
-                    <p class="field-hint" style="margin-top:0;">
-                        Add one card per day of the trip, in order. A short title is enough &mdash; the
-                        detail underneath is optional.
-                    </p>
-
-                    {{--
-                        A plain "Title | Description" textarea (the previous version of this field)
-                        asked a non-technical tour operator to learn a delimiter convention with no
-                        visual feedback for getting it wrong. This keeps the exact same wire format --
-                        the hidden #itinerary textarea below still posts "Title | Description" one line
-                        per day, so EstablishmentDashboardController::syncItineraryDays() needs no
-                        changes at all -- it's purely a friendlier way to build that same string.
-                    --}}
-                    <div class="itinerary-editor" id="itinerary-editor"></div>
-
-                    <template id="itinerary-day-template">
-                        <div class="itinerary-day-card">
-                            <div class="itinerary-day-card__head">
-                                <span class="itinerary-day-card__label">Day <span data-day-number></span></span>
-                                <div class="itinerary-day-card__actions">
-                                    <button type="button" data-move-up aria-label="Move this day earlier" title="Move earlier">&#9650;</button>
-                                    <button type="button" data-move-down aria-label="Move this day later" title="Move later">&#9660;</button>
-                                    <button type="button" data-remove aria-label="Remove this day" title="Remove day">&#10005;</button>
-                                </div>
-                            </div>
-                            <input type="text" data-day-title placeholder="What happens this day? e.g. Arrival &amp; Camp 1">
-                            <textarea data-day-description rows="2" placeholder="More detail (optional)"></textarea>
-                        </div>
-                    </template>
-
-                    <button type="button" class="btn btn-outline btn-sm" id="itinerary-add-day" style="margin-top:4px;">+ Add another day</button>
-
-                    <textarea id="itinerary" name="itinerary" hidden>{{ old('itinerary', $itineraryText) }}</textarea>
-                </div>
-            @endif
-
-            <div class="field-group" style="margin-top:24px;">
-                <h3 style="margin-bottom:4px;">Online Presence</h3>
-                <p class="field-hint" style="margin-top:0;">Optional. Add links so travelers can find you online &mdash; they'll appear on your public listing page automatically.</p>
-
-                <div class="field">
-                    <label for="website_url">Official Website</label>
-                    <input type="url" id="website_url" name="website_url" placeholder="https://www.yourbusiness.com" value="{{ old('website_url', $listing->website_url) }}">
-                </div>
-
-                <div class="field">
-                    <label for="facebook_url">Facebook Page</label>
-                    <input type="url" id="facebook_url" name="facebook_url" placeholder="https://facebook.com/yourbusiness" value="{{ old('facebook_url', $listing->facebook_url) }}">
-                </div>
-
-                <div class="field">
-                    <label for="instagram_url">Instagram (optional)</label>
-                    <input type="url" id="instagram_url" name="instagram_url" placeholder="https://instagram.com/yourbusiness" value="{{ old('instagram_url', $listing->instagram_url) }}">
-                </div>
-
-                <div class="field">
-                    <label for="tiktok_url">TikTok (optional)</label>
-                    <input type="url" id="tiktok_url" name="tiktok_url" placeholder="https://tiktok.com/@yourbusiness" value="{{ old('tiktok_url', $listing->tiktok_url) }}">
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary" style="margin-top:20px;">Save Changes</button>
-        </form>
-    </div>
-</div>
-
-<div class="panel">
-    <div class="panel-head">
-        <div>
-            <h2>Your QR Code</h2>
-            <p>Scanning this opens your ExploreDVO listing page directly &mdash; print it for your counter, window, or brochures.</p>
-        </div>
-    </div>
-    <div class="panel-body">
-        @if (app(\App\Support\SampleData::class)->isSample($listing))
-            <x-banner tone="warn">
-                This listing is sample data, not DOT-verified, so it has no QR code.
-            </x-banner>
-        @elseif ($listing->is_accredited && ! $listing->archived_at)
-            <div class="qr-block">
-                <div class="qr-frame">
-                    <span class="qr-frame__tab">Scan me</span>
-                    <img src="{{ route('establishment.listing.qr-code') }}" alt="QR code linking to {{ $listing->name }}">
-                </div>
-
-                <div class="qr-meta">
-                    <div class="qr-meta__label">Where this code goes</div>
-                    <a href="{{ $qrTargetUrl }}" class="qr-url" target="_blank" rel="noopener">{{ $qrTargetUrl }}</a>
-
-                    <x-banner tone="info">
-                        Scanning also records a check-in for signed-in travelers before forwarding
-                        them to your listing page &mdash; that's what powers your visit counts.
-                    </x-banner>
-
-                    <div class="qr-actions">
-                        <a href="{{ route('establishment.listing.qr-code') }}"
-                           download="{{ \Illuminate\Support\Str::slug($listing->name) }}-qr-code.svg"
-                           class="btn btn-primary">Download QR Code</a>
-                        <a href="{{ route('establishment.listing.qr-code') }}" target="_blank" rel="noopener"
-                           class="btn btn-outline">Open for printing</a>
-                    </div>
-                </div>
-            </div>
-        @else
-            <x-banner tone="warn">
-                A QR code becomes available once your listing is DOT-accredited and active.
-            </x-banner>
         @endif
+
+        @if ($amenityKeys !== null)
+            @php
+                $facilities = array_values(array_filter($amenityKeys, fn ($k) => \App\Support\Amenities::group($k) === \App\Support\Amenities::FACILITY));
+                $access = array_values(array_filter($amenityKeys, fn ($k) => \App\Support\Amenities::group($k) === \App\Support\Amenities::ACCESS));
+                $unphotographed = array_values(array_diff($amenityKeys, $amenityPhotos));
+            @endphp
+            <div class="adm-card" id="amenities">
+                <div class="adm-card__head">
+                    <div><h2>Amenities</h2><p>{{ count($amenityKeys) }} ticked. Travellers and the trip planner use these.</p></div>
+                    <a href="{{ route('establishment.listing.form', 'amenities') }}" class="btn btn-outline btn-sm" data-modal-form data-title="Amenities" data-sub="Tick what is really there" data-size="narrow"><x-icon name="pencil" /> Edit</a>
+                </div>
+                <div class="adm-card__body ptr-pad">
+                    <span class="ptr-eyebrow">Facilities</span>
+                    <div>@include('partials.amenity-chips', ['keys' => $facilities, 'evidence' => $amenityPhotos, 'empty' => 'None ticked yet'])</div>
+                    <span class="ptr-eyebrow" style="margin-top:10px;">Accessibility</span>
+                    <div>@include('partials.amenity-chips', ['keys' => $access, 'evidence' => $amenityPhotos, 'empty' => 'None ticked yet'])</div>
+                    @if ($unphotographed !== [])
+                        <p class="ptr-callout" style="margin:12px 0 0;"><b>{{ count($unphotographed) }} ticked without a photo:</b> {{ collect($unphotographed)->map(fn ($k) => \App\Support\Amenities::label($k))->implode(', ') }}. Optional, but travellers trust what they can see. <a class="adm-link" href="{{ route('establishment.photos') }}">Add photos</a></p>
+                    @endif
+                </div>
+            </div>
+        @endif
+
+        <div class="adm-card">
+            <div class="adm-card__head">
+                <div><h2>Your QR code</h2><p>Guests scan it to check in</p></div>
+            </div>
+            <div class="adm-card__body">
+                @if (app(\App\Support\SampleData::class)->isSample($listing))
+                    <p class="ptr-note">This listing is sample data, not DOT-verified, so it has no QR code.</p>
+                @elseif ($listing->is_accredited && ! $listing->archived_at)
+                    <div class="ptr-qr">
+                        <div class="ptr-qr__img"><img src="{{ route('establishment.listing.qr-code') }}" alt="QR code linking to {{ $listing->name }}"></div>
+                        <div>
+                            <p>Print it for your front desk or entrance. Scanning records a check-in for signed-in travellers before sending them to your page &mdash; that is what powers your visit counts.</p>
+                            <p class="ptr-url"><a href="{{ $qrTargetUrl }}" target="_blank" rel="noopener">Where this code goes<span class="sr-only"> (opens in a new tab)</span></a></p>
+                            <div class="ptr-qr__acts">
+                                <a href="{{ route('establishment.listing.qr-code') }}" download="{{ \Illuminate\Support\Str::slug($listing->name) }}-qr-code.svg" class="btn btn-primary btn-sm">Download</a>
+                                <a href="{{ route('establishment.listing.qr-code') }}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">Open for printing<span class="sr-only"> (opens in a new tab)</span></a>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    <p class="ptr-note">A QR code becomes available once your listing is DOT-accredited and active.</p>
+                @endif
+            </div>
+        </div>
     </div>
 </div>
-
-@if ($establishment->listing_kind === 'package')
-<script>
-    /*
-     * Day-by-day itinerary editor: builds the "Title | Description" text the
-     * server has always expected (EstablishmentDashboardController::
-     * syncItineraryDays()), but as individual day cards instead of a
-     * delimiter format the operator would otherwise have to learn. Nothing
-     * about the wire format or the backend changed -- #itinerary is still a
-     * plain textarea, just hidden and filled in right before submit.
-     */
-    (function () {
-        var editor = document.getElementById('itinerary-editor');
-        var template = document.getElementById('itinerary-day-template');
-        var addBtn = document.getElementById('itinerary-add-day');
-        var hidden = document.getElementById('itinerary');
-        var form = document.getElementById('listing-form');
-        if (!editor || !template || !addBtn || !hidden || !form) return;
-
-        function renumber() {
-            var cards = editor.querySelectorAll('.itinerary-day-card');
-            cards.forEach(function (card, index) {
-                card.querySelector('[data-day-number]').textContent = index + 1;
-                card.querySelector('[data-move-up]').disabled = index === 0;
-                card.querySelector('[data-move-down]').disabled = index === cards.length - 1;
-            });
-        }
-
-        function addCard(title, description) {
-            var card = template.content.firstElementChild.cloneNode(true);
-            card.querySelector('[data-day-title]').value = title || '';
-            card.querySelector('[data-day-description]').value = description || '';
-
-            card.querySelector('[data-remove]').addEventListener('click', function () {
-                card.remove();
-                renumber();
-            });
-            card.querySelector('[data-move-up]').addEventListener('click', function () {
-                var prev = card.previousElementSibling;
-                if (prev) editor.insertBefore(card, prev);
-                renumber();
-            });
-            card.querySelector('[data-move-down]').addEventListener('click', function () {
-                var next = card.nextElementSibling;
-                if (next) editor.insertBefore(next, card);
-                renumber();
-            });
-
-            editor.appendChild(card);
-            return card;
-        }
-
-        // Seed from whatever the hidden textarea already holds -- the last
-        // saved days, or old('itinerary') after a failed submit -- so
-        // re-opening this page always shows the same days it last posted.
-        var existingLines = hidden.value.split('\n').map(function (l) { return l.trim(); }).filter(Boolean);
-        if (existingLines.length) {
-            existingLines.forEach(function (line) {
-                var bar = line.indexOf('|');
-                if (bar === -1) {
-                    addCard(line, '');
-                } else {
-                    addCard(line.slice(0, bar).trim(), line.slice(bar + 1).trim());
-                }
-            });
-        } else {
-            addCard('', '');
-        }
-        renumber();
-
-        addBtn.addEventListener('click', function () {
-            addCard('', '');
-            renumber();
-        });
-
-        form.addEventListener('submit', function () {
-            var lines = [];
-            editor.querySelectorAll('.itinerary-day-card').forEach(function (card) {
-                var title = card.querySelector('[data-day-title]').value.trim();
-                var description = card.querySelector('[data-day-description]').value.trim();
-                if (!title) return; // an empty card is skipped, not saved as a blank day
-                lines.push(description ? title + ' | ' + description : title);
-            });
-            hidden.value = lines.join('\n');
-        });
-    })();
-</script>
-@endif
 
 @endsection

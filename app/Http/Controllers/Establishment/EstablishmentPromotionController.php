@@ -3,15 +3,20 @@
 namespace App\Http\Controllers\Establishment;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Establishment\Concerns\ReturnsToPage;
 use App\Models\EstablishmentAccount;
 use App\Models\Promotion;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 use App\Support\Toast;
 
 class EstablishmentPromotionController extends Controller
 {
+    use ReturnsToPage;
+
     public function index(Request $request): View|RedirectResponse
     {
         $establishment = $request->user('establishment');
@@ -27,7 +32,23 @@ class EstablishmentPromotionController extends Controller
         return view('establishment.promotions', compact('establishment', 'listing', 'promotions'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function create(Request $request): View|Response|RedirectResponse
+    {
+        $establishment = $request->user('establishment');
+        $listing = $establishment->matchedListing;
+
+        if (! $listing) {
+            return redirect()->route('establishment.overview')
+                ->with(Toast::success('No listing linked yet', 'A DOT Admin will link one once your accreditation is verified.'));
+        }
+
+        return $this->modalView($request, 'establishment.form-page', 'establishment.forms.promo', [
+            'establishment' => $establishment, 'listing' => $listing,
+            'section' => 'promo', 'title' => 'Add a promo', 'sub' => 'Shown on your public page',
+        ]);
+    }
+
+    public function store(Request $request): RedirectResponse|JsonResponse
     {
         $establishment = $request->user('establishment');
         $listing = $establishment->matchedListing;
@@ -47,7 +68,7 @@ class EstablishmentPromotionController extends Controller
             'listing_id' => $listing->id,
         ]);
 
-        return back()->with(Toast::success('Promo added', 'Travelers will now see it on your listing page.'));
+        return $this->savedTo($request, route('establishment.promotions'), Toast::success('Promo added', 'Travelers will now see it on your listing page.'));
     }
 
     public function destroy(Request $request, Promotion $promotion): RedirectResponse

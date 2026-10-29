@@ -6,7 +6,7 @@
 
 @section('content')
 @php
-    $icons = ['accred' => 'shield-check', 'coords' => 'map-pin', 'hours' => 'clock', 'embed' => 'sparkles', 'credit' => 'lock', 'desc' => 'text', 'photo' => 'image'];
+    $icons = ['accred' => 'shield-check', 'coords' => 'map-pin', 'hours' => 'clock', 'embed' => 'sparkles', 'credit' => 'lock', 'desc' => 'text', 'photo' => 'image', 'amenities' => 'star'];
     $ringColour = $summary['readiness'] >= 80 ? 'var(--primary)' : ($summary['readiness'] >= 50 ? '#e0a100' : 'var(--danger)');
     $worst = collect($applicable)->filter(fn ($c) => ($summary['missing'][$c] ?? 0) > 0)->sortBy(fn ($c) => $percent($c))->first();
     $typeLabel = $types[$type]['label'];

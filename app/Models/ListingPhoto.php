@@ -14,7 +14,7 @@ class ListingPhoto extends Model
     public const SAMPLE_CATEGORY = 'Sample image';
 
     protected $fillable = [
-        'listing_kind', 'listing_id', 'path', 'category', 'sort_order', 'is_primary', 'source_url', 'source_name',
+        'listing_kind', 'listing_id', 'path', 'category', 'amenity', 'sort_order', 'is_primary', 'source_url', 'source_name',
         'source_type', 'permission_basis', 'permission_ref', 'permission_date', 'licence', 'credit_text', 'show_credit',
         'verification_status', 'verified_by', 'verified_at',
     ];
