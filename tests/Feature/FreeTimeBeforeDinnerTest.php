@@ -163,10 +163,10 @@ class FreeTimeBeforeDinnerTest extends TestCase
     public static function gaps(): array
     {
         return [
-            'back at 18:30, no gap' => ['11:00', 0, false],
-            '15 minutes is only slack' => ['10:45', 15, false],
-            'exactly 30 minutes' => ['10:30', 30, true],
-            '45 minutes' => ['10:15', 45, true],
+            'back at 18:30, no gap' => ['14:45', 0, false],
+            '15 minutes is only slack' => ['14:30', 15, false],
+            'exactly 30 minutes' => ['14:15', 30, true],
+            '45 minutes' => ['14:00', 45, true],
         ];
     }
 
@@ -207,7 +207,7 @@ class FreeTimeBeforeDinnerTest extends TestCase
     {
         $this->fixture();
 
-        $itinerary = $this->generate('10:30');
+        $itinerary = $this->generate('14:15');
         $row = $itinerary->items()->where('title', self::TITLE)->firstOrFail();
 
         $this->assertSame('free', $row->kind);
@@ -282,7 +282,7 @@ class FreeTimeBeforeDinnerTest extends TestCase
         $this->fixture();
 
         $seen = 0;
-        foreach (['08:00', '09:00', '10:15', '10:30', '12:00', '13:00', '15:00'] as $arrival) {
+        foreach (['08:00', '09:00', '10:15', '14:15', '12:00', '13:00', '15:00'] as $arrival) {
             foreach ([2, 3] as $days) {
                 foreach (['near', 'moderate', 'far'] as $distance) {
                     $itinerary = $this->generate($arrival, $days, $distance);
@@ -325,7 +325,7 @@ class FreeTimeBeforeDinnerTest extends TestCase
     {
         $this->fixture();
 
-        $itinerary = $this->generate('10:30');
+        $itinerary = $this->generate('14:15');
         $stopsBefore = $itinerary->items()->where('kind', 'activity')->pluck('destination_id')->all();
         $routeBefore = $itinerary->fresh('items')->routeStops();
 
@@ -360,7 +360,7 @@ class FreeTimeBeforeDinnerTest extends TestCase
         $this->post('/plan', [
             'travel_days' => 2, 'travel_type' => 'Couple', 'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => 'near',
             'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time Visitor', 'place_of_origin' => 'Cebu City', 'start_date' => '2026-10-28',
-            'arrival_time' => '10:30', 'activities' => ['Wildlife'], 'amenities' => ['Parking Area'],
+            'arrival_time' => '14:15', 'activities' => ['Wildlife'], 'amenities' => ['Parking Area'],
         ])->assertRedirect(route('plan.itinerary'));
 
         $this->assertSame(1, Itinerary::query()->latest('id')->firstOrFail()->items()->where('title', self::TITLE)->count(), 'the trip has the row');

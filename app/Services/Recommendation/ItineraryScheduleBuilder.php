@@ -3,6 +3,8 @@
 namespace App\Services\Recommendation;
 
 use App\Models\Accommodation;
+use App\Models\Destination;
+use App\Models\Restaurant;
 use App\Support\OpeningHours;
 use App\Models\Itinerary;
 use App\Models\TouristPreference;
@@ -52,13 +54,28 @@ class ItineraryScheduleBuilder
     /** A shorter visit, used where the day has to fit more in. */
     private const SHORT_VISIT_MINUTES = 90;
 
-    /** Lunch is taken at the first opportunity inside this window. */
-    private const LUNCH_FROM = '11:30';
+    /**
+     * Meal windows, as the times a meal may START. Outside its window a meal is not planned at all (no breakfast
+     * on a noon start, no lunch after 1 PM) rather than faked at the wrong hour.
+     */
+    private const BREAKFAST_LATEST = '08:30';
 
-    /** Past this, a meal is not lunch any more and is skipped rather than faked. */
-    private const LUNCH_LATEST = '14:00';
+    private const BREAKFAST_MINUTES = 45;
+
+    private const LUNCH_FROM = '12:00';
+
+    private const LUNCH_LATEST = '13:00';
 
     private const MEAL_MINUTES = 60;
+
+    /** How far from where the traveller is an accredited restaurant may be to be offered as the meal stop. */
+    private const MEAL_SEARCH_KM = 10;
+
+    /** Leaving within this long before a window opens, the traveller eats first instead of setting off. */
+    private const EAT_FIRST_LEAD_MINUTES = 45;
+
+    /** A visit squeezed in before lunch has to be at least this long, or lunch comes first. */
+    private const MIN_VISIT_BEFORE_LUNCH_MINUTES = 60;
 
     /**
      * A day's sightseeing has to be finished by this hour.
@@ -105,8 +122,8 @@ class ItineraryScheduleBuilder
 
     private const DINNER = '18:30';
 
-    /** Arriving at the accommodation after this, dinner is not planned: only the late check-in. */
-    private const LATEST_DINNER_START = '21:30';
+    /** Arriving at the accommodation after this (the end of the dinner window), dinner is not planned: only the late check-in. */
+    private const LATEST_DINNER_START = '19:30';
 
     private const OVERNIGHT = '20:00';
 
@@ -176,6 +193,7 @@ class ItineraryScheduleBuilder
         $this->lastStart = $this->pastMidnight = [];
         // Every journey estimate this build makes is at the pace of how the traveller said they will get around.
         $this->transport = $preference->transport_pref;
+        $this->mealRestaurants = null;
         $lastDay = array_key_last($dayCapacities);
 
         /*
@@ -199,7 +217,7 @@ class ItineraryScheduleBuilder
             $date = $tripStart->copy()->addDays($dayNumber - 1);
             $capacity = count($slots);
 
-            $clock = $this->openDay($itinerary, $dayNumber, $sortOrder, $preference, $origin, $accommodation);
+            $clock = $this->openDay($itinerary, $dayNumber, $sortOrder, $preference, $origin, $accommodation, $date);
             $lunchTaken = false;
             $scheduled = 0;
 
@@ -300,17 +318,12 @@ class ItineraryScheduleBuilder
 
                 array_splice($queue, $index, 1);
 
-                $clock = $this->addTravel($itinerary, $dayNumber, $sortOrder, $clock, $here, $there);
+                // The journey, with the meal that falls before it, on the way, or on arrival (see planLeg).
+                $plan = $visit['plan'];
+                $clock = $this->commitLeg($itinerary, $dayNumber, $sortOrder, $plan, $here, $there, $destination, $date);
+                $lunchTaken = $plan['lunchTaken'];
                 $driven += $leg;
                 $here = $there;
-
-                // Checked on arrival as well as after the visit: a stop that
-                // starts at noon and runs to half past two would otherwise
-                // straddle the whole lunch window and skip the meal entirely.
-                if (! $lunchTaken && $this->lunchIsDue($clock)) {
-                    $clock = $this->addLunch($itinerary, $dayNumber, $sortOrder, $clock, $destination);
-                    $lunchTaken = true;
-                }
 
                 // A place that is not open yet on arrival: the visit starts when it opens.
                 if ($visit['starts_at'] !== null && $visit['starts_at']->greaterThan($clock)) {
@@ -322,13 +335,13 @@ class ItineraryScheduleBuilder
                 $scheduled++;
 
                 if (! $lunchTaken && $this->lunchIsDue($clock)) {
-                    $clock = $this->addLunch($itinerary, $dayNumber, $sortOrder, $clock, $destination);
+                    $clock = $this->addMeal($itinerary, $dayNumber, $sortOrder, $clock, 'Lunch', $there, $destination, $date, 'after');
                     $lunchTaken = true;
                 }
             }
 
             if ($isLastDay) {
-                $this->closeTripDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $origin, $lunchTaken, $lastDestination);
+                $this->closeTripDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $origin, $lunchTaken, $lastDestination, $date);
             } else {
                 $this->closeOvernightDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $accommodation, $stayRule);
                 $here = $accommodation ? $this->place($accommodation) : $here;
@@ -389,27 +402,30 @@ class ItineraryScheduleBuilder
      * Mirrors what build() then does (slow travel estimate, lunch on arrival if it is due, quarter-hour
      * rounding), so a stop that passes here is scheduled exactly as checked.
      *
-     * @return array{minutes: int, starts_at: Carbon|null, wait: int}|null  null when the stop cannot be done
+     * @return array{minutes: int, starts_at: Carbon|null, wait: int, plan: array}|null  null when the stop cannot be done
      *                                                                       today; starts_at and wait are set
      *                                                                       only when the visit has to wait for opening
      */
     private function planVisit(Carbon $clock, array $from, array $to, int $visitMinutes, bool $lunchTaken, $destination, ?Carbon $date = null): ?array
     {
-        $estimate = $this->estimateLeg($from, $to);
-        $arrival = $clock->copy()->addMinutes($estimate['max_minutes']);
+        // The journey and any meal it makes room for. Lunch is only charged when it is actually taken, so a
+        // mid-afternoon arrival is not made an hour longer than it is.
+        $plan = $this->planLeg($clock, $from, $to, $lunchTaken, $visitMinutes);
+        $visitMinutes = $plan['visitMinutes'];
+        $start = $this->toQuarterHour($plan['arrival']);
 
-        // Charge for lunch only when lunch would genuinely be taken on arrival.
-        // Charging for it unconditionally made a mid-afternoon arrival look an
-        // hour longer than it is and cost the traveller their only stop.
-        if (! $lunchTaken && $this->lunchIsDue($arrival)) {
-            $arrival = $this->toQuarterHour($arrival)->addMinutes(self::MEAL_MINUTES);
-        }
-
-        $start = $this->toQuarterHour($arrival);
-
-        // The sightseeing cutoff, on the full visit as it always was.
+        // The sightseeing cutoff, on the full visit as it always was. The one exception: when a meal on this very
+        // journey is what pushed the visit past the cutoff, a short visit that still fits is better than losing the
+        // stop (a long transfer with lunch on the way would otherwise empty the day).
         if ($start->copy()->addMinutes($visitMinutes)->greaterThan(Carbon::parse(self::LAST_ACTIVITY_END))) {
-            return null;
+            $fit = $this->minutesBetween($start, Carbon::parse(self::LAST_ACTIVITY_END));
+            $hasMeal = count(array_filter($plan['steps'], fn (array $step) => $step['type'] === 'meal')) > 0;
+
+            if (! $hasMeal || $fit < min($visitMinutes, self::SHORT_VISIT_MINUTES)) {
+                return null;
+            }
+
+            $visitMinutes = $fit;
         }
 
         $windows = $date
@@ -422,7 +438,7 @@ class ItineraryScheduleBuilder
         }
 
         if ($windows === null) {
-            return ['minutes' => $visitMinutes, 'starts_at' => null, 'wait' => 0];
+            return ['minutes' => $visitMinutes, 'starts_at' => null, 'wait' => 0, 'plan' => $plan];
         }
 
         $midnight = $start->copy()->startOfDay();
@@ -442,6 +458,7 @@ class ItineraryScheduleBuilder
                     'minutes' => $minutes,
                     'starts_at' => $begin > $startMinute ? $midnight->copy()->addMinutes($begin) : null,
                     'wait' => $begin - $startMinute,
+                    'plan' => $plan,
                 ];
             }
         }
@@ -463,6 +480,7 @@ class ItineraryScheduleBuilder
         TouristPreference $preference,
         array $origin,
         ?Accommodation $accommodation,
+        ?Carbon $date = null,
     ): Carbon {
         if ($dayNumber === 1) {
             $arrival = $this->arrivalTime($preference);
@@ -486,6 +504,16 @@ class ItineraryScheduleBuilder
             // departure = the later of (arrival + preparation) and the earliest departure.
             $ready = $arrival->copy()->addMinutes(self::ARRIVAL_PREPARATION_MINUTES);
 
+            // Setting off inside the breakfast window: eat first, near the starting point, then go. Only for an
+            // arrival time the traveller gave; an assumed one does not invent a meal.
+            if (filled($preference->arrival_time)
+                && $ready->greaterThanOrEqualTo(Carbon::parse(self::BREAKFAST))
+                && $ready->lessThanOrEqualTo(Carbon::parse(self::BREAKFAST_LATEST))) {
+                $end = $this->addMeal($itinerary, $dayNumber, $sortOrder, $ready, 'Breakfast', $origin, null, $date, 'start');
+
+                return $end->lessThan($earliest) ? $earliest : $end;
+            }
+
             if ($ready->lessThan($earliest)) {
                 // Neutral on purpose: nothing about a room, a meal or any service is assumed or arranged.
                 $this->row($itinerary, $dayNumber, $sortOrder, [
@@ -502,12 +530,14 @@ class ItineraryScheduleBuilder
             return $ready;
         }
 
-        $this->row($itinerary, $dayNumber, $sortOrder, [
+        // At the stay when there is one; otherwise the traveller's own choice, never a made-up "your accommodation".
+        $this->row($itinerary, $dayNumber, $sortOrder, array_filter([
             'kind' => 'meal',
-            'title' => 'Breakfast — '.($accommodation?->name ?? 'your accommodation'),
+            'title' => $accommodation ? 'Breakfast — '.$accommodation->name : 'Breakfast (your choice)',
             'starts_at' => Carbon::parse(self::BREAKFAST),
             'accommodation_id' => $accommodation?->id,
-        ]);
+            'note' => $accommodation ? null : 'No stay is planned, so breakfast is up to you.',
+        ], fn ($v) => $v !== null));
 
         return Carbon::parse(self::EARLIEST_DEPARTURE);
     }
@@ -549,26 +579,253 @@ class ItineraryScheduleBuilder
     }
 
     /**
-     * Lunch, at a nearby DOT-accredited restaurant where Apriori knows one and
-     * at the destination itself otherwise -- which is the truthful answer for
-     * a resort or park with its own restaurant.
+     * One journey, with the meal that belongs to it.
+     *
+     * Lunch is a meal STOP, never a destination. Where it falls depends on where the journey sits against the
+     * lunch window (it may START between 12:00 and 1:00 PM):
+     *   - setting off inside the window: lunch first, near where the traveller is;
+     *   - setting off up to 45 minutes before it opens, and the journey would cross it: lunch first, at 12:00;
+     *   - a journey that spans the whole window: split in two, with lunch on the way;
+     *   - arriving inside the window: lunch on arrival, near the place;
+     *   - arriving before the window with too little time for a worthwhile visit before it: lunch first;
+     *     with time for one, the visit is cut short to end when the window opens.
+     * A journey that starts after the window, or that ends before it opens with no visit running past it, has no
+     * lunch in it. planVisit() and commitLeg() both read this one plan, so what is checked is what is written.
+     *
+     * @return array{steps: list<array<string, mixed>>, arrival: Carbon, lunchTaken: bool, visitMinutes: int}
      */
-    private function addLunch(Itinerary $itinerary, int $dayNumber, int &$sortOrder, Carbon $clock, $destination): Carbon
+    private function planLeg(Carbon $clock, array $from, array $to, bool $lunchTaken, int $visitMinutes): array
     {
-        $suggestion = $this->nearbyRestaurant($destination);
-        $restaurant = $suggestion['listing'] ?? null;
-        $start = $this->toQuarterHour($clock);
+        $estimate = $this->estimateLeg($from, $to);
+        $total = $estimate['max_minutes'];
+        $open = Carbon::parse(self::LUNCH_FROM);
+        $latest = Carbon::parse(self::LUNCH_LATEST);
+        $steps = [];
+        $t = $clock->copy();
 
-        $this->row($itinerary, $dayNumber, $sortOrder, array_merge([
-            'kind' => 'meal',
-            'title' => 'Lunch — '.($restaurant?->name ?? $destination->name),
-            'starts_at' => $start,
-            'ends_at' => $start->copy()->addMinutes(self::MEAL_MINUTES),
-            'restaurant_id' => $restaurant?->id,
-            'destination_id' => $restaurant ? null : $destination->id,
-        ], $this->ruleColumns($suggestion['rule'] ?? null)));
+        $travel = function (int $minutes) use (&$steps, &$t, $estimate, $total) {
+            if ($minutes <= 0) {
+                return;
+            }
 
-        return $start->copy()->addMinutes(self::MEAL_MINUTES);
+            $steps[] = ['type' => 'travel', 'start' => $t->copy(), 'minutes' => $minutes, 'share' => $total > 0 ? $minutes / $total : 1.0, 'estimate' => $estimate];
+            $t = $t->copy()->addMinutes($minutes);
+        };
+
+        $meal = function (Carbon $at, string $phase, array $near) use (&$steps, &$t) {
+            $start = $this->toQuarterHour($at);
+            $steps[] = ['type' => 'meal', 'at' => $start, 'phase' => $phase, 'near' => $near];
+            $t = $start->copy()->addMinutes(self::MEAL_MINUTES);
+        };
+
+        $end = $t->copy()->addMinutes($total);
+
+        if (! $lunchTaken && $t->greaterThanOrEqualTo($open) && $t->lessThanOrEqualTo($latest)) {
+            $meal($t, 'start', $from);
+            $lunchTaken = true;
+            $travel($total);
+        } elseif (! $lunchTaken && $t->lessThan($open) && $end->greaterThan($open) && $this->minutesBetween($t, $open) <= self::EAT_FIRST_LEAD_MINUTES) {
+            $meal($open, 'start', $from);
+            $lunchTaken = true;
+            $travel($total);
+        } elseif (! $lunchTaken && $t->lessThan($open) && $end->greaterThan($latest)) {
+            $before = $this->minutesBetween($t, $open);
+            $travel($before);
+            $meal($open, 'road', $this->pointAt($from, $to, $total > 0 ? $before / $total : 0.5));
+            $lunchTaken = true;
+            $travel($total - $before);
+        } else {
+            $travel($total);
+
+            if (! $lunchTaken && $t->greaterThanOrEqualTo($open) && $t->lessThanOrEqualTo($latest)) {
+                $meal($t, 'arrival', $to);
+                $lunchTaken = true;
+            }
+        }
+
+        if (! $lunchTaken && $t->lessThan($open) && $t->copy()->addMinutes($visitMinutes)->greaterThan($latest)) {
+            $room = $this->minutesBetween($t, $open);
+
+            if ($room < self::MIN_VISIT_BEFORE_LUNCH_MINUTES) {
+                $meal($open, 'arrival', $to);
+                $lunchTaken = true;
+            } else {
+                $visitMinutes = $room;
+            }
+        }
+
+        return ['steps' => $steps, 'arrival' => $t, 'lunchTaken' => $lunchTaken, 'visitMinutes' => $visitMinutes];
+    }
+
+    /** Writes the rows of a planLeg() plan and returns the clock when they are done. */
+    private function commitLeg(Itinerary $itinerary, int $dayNumber, int &$sortOrder, array $plan, array $from, array $to, $destination, ?Carbon $date): Carbon
+    {
+        $travelSteps = count(array_filter($plan['steps'], fn (array $step) => $step['type'] === 'travel'));
+        $seen = 0;
+
+        foreach ($plan['steps'] as $step) {
+            if ($step['type'] === 'meal') {
+                $onSite = $step['phase'] === 'arrival' ? $destination : null;
+                $this->addMeal($itinerary, $dayNumber, $sortOrder, $step['at'], 'Lunch', $step['near'], $onSite, $date, $step['phase']);
+
+                continue;
+            }
+
+            $seen++;
+            $estimate = $step['estimate'];
+            $share = $step['share'];
+            $whole = $share >= 0.999;
+
+            $this->row($itinerary, $dayNumber, $sortOrder, [
+                'kind' => 'travel',
+                'title' => ($seen === $travelSteps ? 'Travel to ' : 'Travel toward ').$to['label'],
+                'starts_at' => $step['start']->copy(),
+                'distance_km' => $estimate['distance_km'] === null ? null : ($whole ? $estimate['distance_km'] : round($estimate['distance_km'] * $share, 1)),
+                'travel_min_minutes' => $whole ? $estimate['min_minutes'] : (int) round($estimate['min_minutes'] * $share),
+                'travel_max_minutes' => $step['minutes'],
+            ]);
+        }
+
+        return $plan['arrival']->copy();
+    }
+
+    /** Whole minutes from $a to $b (negative when $b is earlier). */
+    private function minutesBetween(Carbon $a, Carbon $b): int
+    {
+        return (int) round(($b->getTimestamp() - $a->getTimestamp()) / 60);
+    }
+
+    /** The point a fraction of the way from one place to another, for a meal on the road. */
+    private function pointAt(array $from, array $to, float $fraction): array
+    {
+        if (! $this->measurable($from, $to)) {
+            return $from;
+        }
+
+        return [
+            'lat' => $from['lat'] + ($to['lat'] - $from['lat']) * $fraction,
+            'lng' => $from['lng'] + ($to['lng'] - $from['lng']) * $fraction,
+            'label' => 'the road',
+            'region' => null,
+        ];
+    }
+
+    /** @var \Illuminate\Support\Collection<int, Restaurant>|null  accredited, mapped restaurants, loaded once per build */
+    private $mealRestaurants = null;
+
+    /**
+     * A meal row. It is always somewhere to eat, never a sightseeing stop: the destination's own restaurant when
+     * its amenities include one, else an accredited restaurant within MEAL_SEARCH_KM of where the traveller is
+     * (same region, open at that hour), else "(your choice)" with no listing attached.
+     *
+     * @param  array{lat: float|null, lng: float|null, label: string, region?: string|null}  $near
+     * @param  string  $phase  'start' (before setting off), 'road' (on the way), 'arrival' or 'after' (at a place)
+     * @return Carbon the clock when the meal is over
+     */
+    private function addMeal(Itinerary $itinerary, int $dayNumber, int &$sortOrder, Carbon $at, string $meal, array $near, ?Destination $onSite, ?Carbon $date, string $phase): Carbon
+    {
+        $start = $this->toQuarterHour($at);
+        $minutes = $meal === 'Breakfast' ? self::BREAKFAST_MINUTES : self::MEAL_MINUTES;
+        $stop = $this->mealStop($start, $minutes, $near, $onSite, $date);
+
+        $attributes = ['kind' => 'meal', 'starts_at' => $start, 'ends_at' => $start->copy()->addMinutes($minutes)];
+
+        if ($stop['kind'] === 'onsite') {
+            $attributes += ['title' => $meal.' — '.$onSite->name.' Restaurant', 'destination_id' => $onSite->id];
+        } elseif ($stop['kind'] === 'restaurant') {
+            $attributes += [
+                'title' => $meal.' — '.$stop['listing']->name.($phase === 'road' ? ' (on the way)' : ''),
+                'restaurant_id' => $stop['listing']->id,
+            ] + $this->ruleColumns($stop['rule'] ?? null);
+        } else {
+            $attributes += [
+                'title' => $meal.' break'.($phase === 'road' ? ' on the way' : '').' (your choice)',
+                'note' => 'No accredited restaurant within '.self::MEAL_SEARCH_KM.' km that is open then. Choose where to eat.',
+            ];
+        }
+
+        $this->row($itinerary, $dayNumber, $sortOrder, $attributes);
+
+        return $attributes['ends_at']->copy();
+    }
+
+    /** @return array{kind: string, listing?: Restaurant, rule?: array|null} */
+    private function mealStop(Carbon $start, int $minutes, array $near, ?Destination $onSite, ?Carbon $date): array
+    {
+        if ($onSite && $this->hasOwnRestaurant($onSite)) {
+            return ['kind' => 'onsite'];
+        }
+
+        // A restaurant Apriori ties to the place, when it also passes the same distance, region and hours checks.
+        if ($onSite && ($suggestion = $this->nearbyRestaurant($onSite)) && $this->mealFits($suggestion['listing'], $start, $minutes, $near, $date)) {
+            return ['kind' => 'restaurant', 'listing' => $suggestion['listing'], 'rule' => $suggestion['rule']];
+        }
+
+        $best = null;
+        $bestKm = null;
+
+        foreach ($this->mealRestaurants() as $restaurant) {
+            if (! $this->mealFits($restaurant, $start, $minutes, $near, $date)) {
+                continue;
+            }
+
+            $km = $this->haversineKm($near['lat'], $near['lng'], (float) $restaurant->latitude, (float) $restaurant->longitude);
+
+            if ($bestKm === null || $km < $bestKm) {
+                $best = $restaurant;
+                $bestKm = $km;
+            }
+        }
+
+        return $best ? ['kind' => 'restaurant', 'listing' => $best, 'rule' => null] : ['kind' => 'none'];
+    }
+
+    /** Within MEAL_SEARCH_KM, in the same region when both are known, and open for the meal. */
+    private function mealFits($restaurant, Carbon $start, int $minutes, array $near, ?Carbon $date): bool
+    {
+        if ($near['lat'] === null || $near['lng'] === null || $restaurant->latitude === null || $restaurant->longitude === null) {
+            return false;
+        }
+
+        if ($this->haversineKm($near['lat'], $near['lng'], (float) $restaurant->latitude, (float) $restaurant->longitude) > self::MEAL_SEARCH_KM) {
+            return false;
+        }
+
+        $region = $near['region'] ?? null;
+
+        if ($region !== null && $restaurant->region?->name !== null && $restaurant->region->name !== $region) {
+            return false;
+        }
+
+        $windows = $date ? OpeningHours::windowsOn($restaurant->opening_hours, $date) : OpeningHours::windows($restaurant->opening_hours);
+
+        if ($windows === null) {
+            return true; // hours that cannot be read put no limit on the meal
+        }
+
+        $begin = $start->hour * 60 + $start->minute;
+
+        foreach ($windows as [$open, $close]) {
+            if ($begin >= $open && $begin + 30 <= $close) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** The destination's own restaurant: its amenities say so. */
+    private function hasOwnRestaurant(Destination $destination): bool
+    {
+        $destination->loadMissing('tags');
+
+        return $destination->tags->where('kind', 'amenity')->contains(fn ($tag) => mb_strtolower(trim((string) $tag->value)) === 'restaurant');
+    }
+
+    private function mealRestaurants()
+    {
+        return $this->mealRestaurants ??= Restaurant::publiclyVisible()->with('region')
+            ->whereNotNull('latitude')->whereNotNull('longitude')->orderBy('id')->get();
     }
 
     /**
@@ -653,7 +910,7 @@ class ItineraryScheduleBuilder
     }
 
     /** The final day: souvenirs, a last meal if lunch has not happened, then the journey out. */
-    private function closeTripDay(Itinerary $itinerary, int $dayNumber, int &$sortOrder, Carbon $clock, array $here, array $origin, bool $lunchTaken, $lastDestination = null): void
+    private function closeTripDay(Itinerary $itinerary, int $dayNumber, int &$sortOrder, Carbon $clock, array $here, array $origin, bool $lunchTaken, $lastDestination = null, ?Carbon $date = null): void
     {
         $suggestion = $this->souvenirStop($here, $lastDestination, $clock);
         $souvenirs = $suggestion['listing'] ?? null;
@@ -683,16 +940,9 @@ class ItineraryScheduleBuilder
             $here = $this->place($souvenirs);
         }
 
-        // Only when it is still lunchtime: a traveller who lands late on a one-day trip got "lunch" at 23:30.
-        if (! $lunchTaken && $clock->lessThanOrEqualTo(Carbon::parse(self::LUNCH_LATEST)->addHour())) {
-            $start = $this->toQuarterHour($clock);
-            $this->row($itinerary, $dayNumber, $sortOrder, [
-                'kind' => 'meal',
-                'title' => 'Lunch before departure',
-                'starts_at' => $start,
-                'ends_at' => $start->copy()->addMinutes(self::MEAL_MINUTES),
-            ]);
-            $clock = $start->copy()->addMinutes(self::MEAL_MINUTES);
+        // Only inside the lunch window: not at 8 AM, and not at 23:30 for a traveller who lands late.
+        if (! $lunchTaken && $this->lunchIsDue($clock)) {
+            $clock = $this->addMeal($itinerary, $dayNumber, $sortOrder, $clock, 'Lunch', $here, null, $date, 'after');
         }
 
         $clock = $this->addTravel(
@@ -781,14 +1031,7 @@ class ItineraryScheduleBuilder
             : Carbon::parse(substr((string) $preference->arrival_time, 0, 5));
     }
 
-    /**
-     * Lunch is due once the window opens and stays due until it is genuinely
-     * too late to call it lunch.
-     *
-     * The first version only fired if the clock landed inside a narrow window
-     * at the exact moment it was checked, so a day whose stops ended at 11:15
-     * and 2:15 skipped the meal altogether.
-     */
+    /** Lunch is due while the clock is inside the lunch window (the times it may start): 12:00 to 1:00 PM. */
     private function lunchIsDue(Carbon $clock): bool
     {
         return $clock->greaterThanOrEqualTo(Carbon::parse(self::LUNCH_FROM))

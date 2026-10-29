@@ -275,7 +275,7 @@ class TripPlannerLimitsTest extends TestCase
             'latitude' => $this->at(80, 0)[0], 'longitude' => $this->at(80, 0)[1],
         ]);
         $park = $this->destination('Near Park', 10);
-        $second = $this->destination('Second Park', 28);
+        $second = $this->destination('Second Park', 60); // far enough north that the drive back reaches the resort inside the dinner window (18:00 to 19:30)
 
         $preference = TouristPreference::create([
             'travel_days' => 2, 'travel_type' => 'Family', 'budget' => 'Mid-range', 'accommodation_pref' => 'Any',
