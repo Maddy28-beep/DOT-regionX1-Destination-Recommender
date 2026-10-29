@@ -59,10 +59,7 @@
                             &middot; <a href="{{ $mapsUrl }}" target="_blank" rel="noopener noreferrer">Map<span class="sr-only"> for {{ $operator->name }} (opens in a new tab)</span></a>
                         </span>
                     </div>
-                    @if ($dial !== '' && $sampleData->isSample($operator))
-                        {{-- Not verified, so shown but not offered as a call link. --}}
-                        <span class="itin-op__phone"><x-icon name="phone" /> {{ $number }}</span>
-                    @elseif ($dial !== '')
+                    @if ($dial !== '')
                         <a class="itin-op__phone" href="tel:{{ $dial }}"><x-icon name="phone" /> {{ $number }}</a>
                     @endif
                 </li>
