@@ -67,6 +67,29 @@
             </div>
         @endif
 
+        @if ($amenityKeys !== null)
+            @php
+                $facilities = array_values(array_filter($amenityKeys, fn ($k) => \App\Support\Amenities::group($k) === \App\Support\Amenities::FACILITY));
+                $access = array_values(array_filter($amenityKeys, fn ($k) => \App\Support\Amenities::group($k) === \App\Support\Amenities::ACCESS));
+                $unphotographed = array_values(array_diff($amenityKeys, $amenityPhotos));
+            @endphp
+            <div class="adm-card" id="amenities">
+                <div class="adm-card__head">
+                    <div><h2>Amenities</h2><p>{{ count($amenityKeys) }} ticked. Travellers and the trip planner use these.</p></div>
+                    <a href="{{ route('establishment.listing.form', 'amenities') }}" class="btn btn-outline btn-sm" data-modal-form data-title="Amenities" data-sub="Tick what is really there" data-size="narrow"><x-icon name="pencil" /> Edit</a>
+                </div>
+                <div class="adm-card__body ptr-pad">
+                    <span class="ptr-eyebrow">Facilities</span>
+                    <div>@include('partials.amenity-chips', ['keys' => $facilities, 'evidence' => $amenityPhotos, 'empty' => 'None ticked yet'])</div>
+                    <span class="ptr-eyebrow" style="margin-top:10px;">Accessibility</span>
+                    <div>@include('partials.amenity-chips', ['keys' => $access, 'evidence' => $amenityPhotos, 'empty' => 'None ticked yet'])</div>
+                    @if ($unphotographed !== [])
+                        <p class="ptr-callout" style="margin:12px 0 0;"><b>{{ count($unphotographed) }} ticked without a photo:</b> {{ collect($unphotographed)->map(fn ($k) => \App\Support\Amenities::label($k))->implode(', ') }}. Optional, but travellers trust what they can see. <a class="adm-link" href="{{ route('establishment.photos') }}">Add photos</a></p>
+                    @endif
+                </div>
+            </div>
+        @endif
+
         <div class="adm-card">
             <div class="adm-card__head">
                 <div><h2>Your QR code</h2><p>Guests scan it to check in</p></div>

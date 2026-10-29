@@ -42,6 +42,12 @@ class AdminDataCompletenessTest extends TestCase
         return ListingPhoto::create($extra + ['listing_kind' => 'destination', 'listing_id' => $d->id, 'path' => $path, 'is_primary' => true]);
     }
 
+    /** Enough ticked amenities that the amenities check passes. */
+    private function amenities($destination): void
+    {
+        app(\App\Services\Amenities\AmenityStore::class)->sync('destination', $destination, ['parking', 'restroom', 'wifi', 'ramp']);
+    }
+
     private function theme(Destination $d): void
     {
         DB::table('destination_embeddings')->insert([
@@ -57,7 +63,7 @@ class AdminDataCompletenessTest extends TestCase
         $failing = app(DataCompleteness::class)->failing('destinations');
 
         $this->assertCount(1, $failing);
-        $this->assertEqualsCanonicalizing(['coords', 'hours', 'embed', 'desc', 'photo'], $failing[0]['miss']);
+        $this->assertEqualsCanonicalizing(['coords', 'hours', 'embed', 'desc', 'photo', 'amenities'], $failing[0]['miss']);
     }
 
     public function test_a_complete_listing_passes_everything(): void
@@ -65,6 +71,7 @@ class AdminDataCompletenessTest extends TestCase
         $d = $this->destination('Whole Falls', ['latitude' => 7.07, 'longitude' => 125.6, 'hours' => 'Daily 8-5']);
         $this->photo($d, 'p.jpg', ['source_name' => 'Owner']);
         $this->theme($d);
+        $this->amenities($d);
 
         $service = app(DataCompleteness::class);
 
@@ -76,6 +83,7 @@ class AdminDataCompletenessTest extends TestCase
     {
         $d = $this->destination('Uncredited Falls', ['latitude' => 7.07, 'longitude' => 125.6, 'hours' => 'x']);
         $this->theme($d);
+        $this->amenities($d);
         $this->photo($d, 'real.jpg');
         $this->photo($d, 'placeholder.svg', ['is_primary' => false]);
 
@@ -101,6 +109,7 @@ class AdminDataCompletenessTest extends TestCase
         $d = $this->destination('Lapsed Falls', ['latitude' => 7.07, 'longitude' => 125.6, 'hours' => 'x']);
         $this->photo($d, 'p.jpg', ['source_name' => 'Owner']);
         $this->theme($d);
+        $this->amenities($d);
         AccreditationRecord::create(['listing_kind' => 'destination', 'listing_id' => $d->id, 'accreditation_number' => 'N1', 'status' => 'Expired', 'issue_date' => now()->subYears(2), 'expiration_date' => now()->subDay()]);
         $gone = $this->destination('Gone Falls');
         $gone->update(['archived_at' => now()]);
@@ -170,7 +179,7 @@ class AdminDataCompletenessTest extends TestCase
             ->postJson("/portal/admin/data-completeness/destinations/{$d->id}", ['check' => 'coords', 'position' => '(7.0707, 125.6087)'])
             ->assertOk()
             ->assertJsonPath('summary.missing.coords', 0)
-            ->assertJsonPath('row.miss', ['hours', 'embed', 'photo']);
+            ->assertJsonPath('row.miss', ['hours', 'embed', 'amenities', 'photo']);
 
         $d->refresh();
         $this->assertEquals(7.0707, (float) $d->latitude);

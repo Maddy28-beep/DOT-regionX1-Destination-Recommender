@@ -29,6 +29,9 @@
     if ($navUnrepliedCount > 0) {
         $attention[] = ['tone' => 'info', 'icon' => 'chat', 'title' => $navUnrepliedCount.' '.\Illuminate\Support\Str::plural('review', $navUnrepliedCount).' '.($navUnrepliedCount === 1 ? 'is' : 'are').' waiting for your reply', 'detail' => 'Replying shows travellers you are listening.', 'action' => 'Reply', 'url' => route('establishment.reviews')];
     }
+    if ($navPackagesChanges > 0) {
+        $attention[] = ['tone' => 'warn', 'icon' => 'package', 'title' => 'DOT asked for a change to '.$navPackagesChanges.' '.\Illuminate\Support\Str::plural('package', $navPackagesChanges), 'detail' => 'Edit it and send it again.', 'action' => 'Open', 'url' => route('establishment.packages', ['status' => 'changes_requested'])];
+    }
     foreach ($navNotifications->where('is_read', false)->take(3) as $note) {
         $attention[] = ['tone' => 'info', 'icon' => 'bell', 'title' => $note->title, 'detail' => \Illuminate\Support\Str::limit($note->message, 80), 'action' => 'Read', 'url' => route('establishment.notifications')];
     }
@@ -53,6 +56,9 @@
             <div class="adm-menu" data-menu>
                 <button type="button" class="btn btn-primary adm-new" data-menu-btn aria-haspopup="menu" aria-expanded="false"><x-icon name="plus" /><span class="adm-hide-sm">Add</span><x-icon name="chevron-down" class="adm-caret" /></button>
                 <div class="adm-pop adm-pop--new" role="menu" aria-label="Add something" hidden>
+                    @if ($partner->listing_kind === 'tour_operator')
+                        <a role="menuitem" href="{{ route('establishment.packages.create') }}" data-modal-form data-title="Add a package" data-sub="Save a draft any time. DOT reviews it before travellers can see it."><x-icon name="package" />A package</a>
+                    @endif
                     <a role="menuitem" href="{{ route('establishment.promotions.create') }}" data-modal-form data-title="Add a promo" data-sub="Shown on your public page" data-size="narrow"><x-icon name="tag" />A promo or discount</a>
                     <a role="menuitem" href="{{ route('establishment.photos.create') }}" data-modal-form data-title="Upload photos" data-sub="JPG, PNG or WebP, up to 2 MB each" data-size="narrow"><x-icon name="camera" />Photos</a>
                 </div>

@@ -42,6 +42,8 @@
         <div>
             @include('partials.listing-about-card', ['listing' => $souvenirCenter, 'noun' => 'souvenir center', 'groups' => []])
 
+            @include('partials.listing-amenities-card', ['listing' => $souvenirCenter, 'kind' => 'souvenir_center'])
+
             @include('partials.reviews-section', ['listing' => $souvenirCenter, 'type' => 'souvenir-centers', 'kind' => 'souvenir_center'])
         </div>
 

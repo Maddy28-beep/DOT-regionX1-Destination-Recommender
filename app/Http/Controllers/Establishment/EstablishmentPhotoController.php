@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Establishment\Concerns\ReturnsToPage;
 use App\Models\EstablishmentAccount;
 use App\Models\ListingPhoto;
+use App\Services\Amenities\AmenityStore;
 use App\Services\Establishment\ListingReadiness;
+use App\Support\Amenities;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,7 +21,21 @@ class EstablishmentPhotoController extends Controller
 {
     use ReturnsToPage;
 
-    public const CATEGORIES = ['General', 'Exterior', 'Interior', 'Amenities', 'Food', 'Views'];
+    public const CATEGORIES = ['General', 'Exterior', 'Interior', 'Amenities', 'Accessibility', 'Food', 'Views'];
+
+    /** The categories whose photos say which amenity they show; the system never reads the picture, the uploader says. */
+    public const AMENITY_CATEGORIES = ['Amenities' => Amenities::FACILITY, 'Accessibility' => Amenities::ACCESS];
+
+    /** @return array<string, array<string, string>> category => [key => label], what each amenity category may be about, for this kind */
+    public static function amenityChoices(string $kind): array
+    {
+        $out = [];
+        foreach (self::AMENITY_CATEGORIES as $category => $group) {
+            $out[$category] = collect(Amenities::keysFor($kind, $group))->mapWithKeys(fn ($k) => [$k => Amenities::label($k)])->all();
+        }
+
+        return array_filter($out);
+    }
 
     public function index(Request $request): View|RedirectResponse
     {
@@ -53,6 +69,7 @@ class EstablishmentPhotoController extends Controller
 
         return $this->modalView($request, 'establishment.form-page', 'establishment.forms.photos-upload', [
             'establishment' => $establishment, 'listing' => $listing, 'categories' => self::CATEGORIES,
+            'amenityChoices' => self::amenityChoices($establishment->listing_kind),
             'section' => 'photos-upload', 'title' => 'Upload photos', 'sub' => 'JPG, PNG or WebP, up to 2 MB each',
         ]);
     }
@@ -139,7 +156,18 @@ class EstablishmentPhotoController extends Controller
             'category' => ['required', 'string', 'in:'.implode(',', self::CATEGORIES)],
             'credit_text' => ['nullable', 'required_without:own', 'string', 'max:120'],
             'own' => ['nullable', 'boolean'],
+            'amenity' => ['nullable', 'string'],
         ], ['credit_text.required_without' => 'Say who took the photos, or tick that they are your own.']);
+
+        // An Amenities or Accessibility photo has to say which one it shows, from the same list the listing ticks.
+        $choices = self::amenityChoices($establishment->listing_kind)[$data['category']] ?? null;
+        $amenity = null;
+        if ($choices !== null) {
+            if (empty($data['amenity']) || ! array_key_exists($data['amenity'], $choices)) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['amenity' => 'Say which amenity the photo shows, so it is not just "'.$data['category'].'".']);
+            }
+            $amenity = $data['amenity'];
+        }
 
         $credit = $request->boolean('own') ? $establishment->business_name : trim((string) ($data['credit_text'] ?? ''));
 
@@ -154,11 +182,17 @@ class EstablishmentPhotoController extends Controller
                 'listing_id' => $listing->id,
                 'path' => $path,
                 'category' => $data['category'],
+                'amenity' => $amenity,
                 'sort_order' => $nextSort + $i,
                 'is_primary' => ! $hasPhotos && $i === 0,
                 'credit_text' => $credit,
                 'source_name' => $credit,
             ]);
+        }
+
+        // The photo says the amenity is there, so it is ticked on the listing too.
+        if ($amenity) {
+            app(AmenityStore::class)->add($establishment->listing_kind, $listing, $amenity);
         }
 
         $n = count($data['photos']);

@@ -49,6 +49,8 @@ class DataCompleteness
             'why' => 'A photo needs its source recorded before it can be shown with permission.'],
         'desc' => ['label' => 'Description', 'short' => 'Description', 'severity' => 'low', 'fix' => 'edit',
             'why' => 'Cards and pages look empty without one.'],
+        'amenities' => ['label' => 'Amenities', 'short' => 'Amenities', 'severity' => 'low', 'fix' => 'edit',
+            'why' => 'Travellers and the trip planner cannot tell what is there, or whether it is accessible.'],
         'photo' => ['label' => 'Photo', 'short' => 'Photo', 'severity' => 'low', 'fix' => 'edit',
             'why' => 'A listing without a photo shows a placeholder.'],
     ];
@@ -77,6 +79,7 @@ class DataCompleteness
         return array_values(array_filter(array_keys(self::CHECKS), fn (string $check) => match ($check) {
             'hours' => $config['hours'] !== null,
             'embed' => $config['themes'],
+            'amenities' => \App\Support\Amenities::hasList($config['kind']) && $config['kind'] !== 'package',
             default => true,
         }));
     }
@@ -96,10 +99,11 @@ class DataCompleteness
         $photos = DB::table('listing_photos')->where('listing_kind', $config['kind'])->get()->groupBy('listing_id');
         $themed = $config['themes'] ? DB::table('destination_embeddings')->pluck('destination_id')->flip() : collect();
         $accreditation = DB::table('accreditation_records')->where('listing_kind', $config['kind'])->get()->groupBy('listing_id');
+        $amenities = $this->amenityCounts($config['kind']);
 
         $failing = [];
         foreach ($rows as $row) {
-            $miss = array_values(array_filter($applicable, fn (string $check) => $this->fails($check, $row, $config, $photos->get($row->getKey(), collect()), $themed, $accreditation->get($row->getKey(), collect()))));
+            $miss = array_values(array_filter($applicable, fn (string $check) => $this->fails($check, $row, $config, $photos->get($row->getKey(), collect()), $themed, $accreditation->get($row->getKey(), collect()), $amenities)));
 
             if ($miss !== []) {
                 $failing[] = ['id' => (int) $row->getKey(), 'name' => (string) $row->name, 'where' => $row->location, 'miss' => $miss];
@@ -147,11 +151,12 @@ class DataCompleteness
         $photos = DB::table('listing_photos')->where('listing_kind', $config['kind'])->where('listing_id', $listing->getKey())->get();
         $themed = $config['themes'] ? DB::table('destination_embeddings')->where('destination_id', $listing->getKey())->pluck('destination_id')->flip() : collect();
         $accreditation = DB::table('accreditation_records')->where('listing_kind', $config['kind'])->where('listing_id', $listing->getKey())->get();
+        $amenities = $this->amenityCounts($config['kind'], $listing->getKey());
 
-        return array_values(array_filter($this->applicable($type), fn (string $check) => $this->fails($check, $listing, $config, $photos, $themed, $accreditation)));
+        return array_values(array_filter($this->applicable($type), fn (string $check) => $this->fails($check, $listing, $config, $photos, $themed, $accreditation, $amenities)));
     }
 
-    private function fails(string $check, Model $row, array $config, $photos, $themed, $accreditation): bool
+    private function fails(string $check, Model $row, array $config, $photos, $themed, $accreditation, $amenities = null): bool
     {
         // The seeded placeholder drawings are not photos.
         $real = $photos->filter(fn ($p) => ! str_ends_with(strtolower((string) $p->path), '.svg'));
@@ -161,11 +166,28 @@ class DataCompleteness
             'hours' => $config['hours'] !== null && trim((string) ($row->{$config['hours']} ?? '')) === '',
             'desc' => trim((string) ($row->description ?? '')) === '',
             'photo' => $real->isEmpty(),
+            'amenities' => (int) ($amenities?->get($row->getKey(), 0) ?? 0) < \App\Support\Amenities::ENOUGH,
             'credit' => $real->isNotEmpty() && $real->every(fn ($p) => trim((string) $p->source_name) === '' && trim((string) $p->source_url) === ''),
             'embed' => ! $themed->has($row->getKey()),
             'accred' => $this->expired($accreditation),
             default => false,
         };
+    }
+
+    /** How many amenities each listing of the kind has ticked, by listing id (destinations keep theirs as tags). */
+    private function amenityCounts(string $kind, ?int $id = null)
+    {
+        if ($kind === 'destination') {
+            $offered = array_map(fn (string $k) => \App\Support\Amenities::label($k), \App\Support\Amenities::FOR_KIND['destination']);
+
+            return DB::table('destination_tags')->where('kind', 'amenity')->whereIn('value', $offered)
+                ->when($id, fn ($q) => $q->where('destination_id', $id))
+                ->selectRaw('destination_id as id, count(*) as n')->groupBy('destination_id')->pluck('n', 'id');
+        }
+
+        return DB::table('listing_amenities')->where('listing_kind', $kind)
+            ->when($id, fn ($q) => $q->where('listing_id', $id))
+            ->selectRaw('listing_id as id, count(*) as n')->groupBy('listing_id')->pluck('n', 'id');
     }
 
     private function expired($records): bool

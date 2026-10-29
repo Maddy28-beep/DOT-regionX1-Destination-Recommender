@@ -27,6 +27,16 @@
         </div>
     </div>
 
+    @if (! empty($amenityChoices))
+        <div class="field" id="photo_shows_box" hidden>
+            <label for="photo_shows">Which one does it show?</label>
+            <select id="photo_shows" name="amenity" class="form-select">
+                <option value="">Choose</option>
+            </select>
+            <p class="field-hint" id="photo_shows_hint">The system does not read the picture, so say what it is. That is what lets it sit under the right amenity.</p>
+        </div>
+    @endif
+
     <label class="ptr-check"><input type="checkbox" name="own" value="1" id="photo_own" @checked(old('own'))> These are my own photos</label>
     <p class="field-hint">Travellers see this credit under each photo.</p>
 
@@ -44,6 +54,25 @@
         function sync() { credit.disabled = own.checked; }
         own.addEventListener('change', sync);
         sync();
+
+
+        // Amenities and Accessibility photos say which amenity they show, from the same list the listing ticks.
+        var choices = @json($amenityChoices ?? []);
+        var ticked = @json(app(\App\Services\Amenities\AmenityStore::class)->keys($establishment->listing_kind, $listing));
+        var cat = document.getElementById('photo_category'), box = document.getElementById('photo_shows_box'), shows = document.getElementById('photo_shows'), hint = document.getElementById('photo_shows_hint');
+        if (cat && box && shows) {
+            function fill() {
+                var list = choices[cat.value];
+                box.hidden = !list;
+                shows.required = !!list;
+                shows.innerHTML = '<option value="">Choose</option>' + Object.keys(list || {}).map(function (k) { return '<option value="' + k + '">' + list[k] + '</option>'; }).join('');
+            }
+            cat.addEventListener('change', fill);
+            shows.addEventListener('change', function () {
+                hint.textContent = shows.value && ticked.indexOf(shows.value) === -1 ? 'You have not ticked this amenity yet. It will be ticked for you when you upload.' : 'The system does not read the picture, so say what it is. That is what lets it sit under the right amenity.';
+            });
+            fill();
+        }
 
         // Markup set by the modal does not get app.js's file-status handler, so the chosen names are shown here.
         var input = document.getElementById('photo_files');

@@ -8,6 +8,8 @@ use App\Http\Controllers\QrCodeController;
 use App\Models\Destination;
 use App\Models\Package;
 use App\Models\Review;
+use App\Services\Amenities\AmenityStore;
+use App\Support\Amenities;
 use App\Services\Establishment\ListingInsights;
 use App\Services\Establishment\ListingReadiness;
 use App\Support\OpeningHoursText;
@@ -98,8 +100,10 @@ class EstablishmentDashboardController extends Controller
         $readiness = app(ListingReadiness::class)->for($establishment->listing_kind, $listing);
         $hoursColumn = ListingReadiness::hoursColumn($establishment->listing_kind);
         $hours = $hoursColumn ? trim((string) $listing->{$hoursColumn}) : null;
+        $amenityKeys = $this->hasAmenityList($establishment->listing_kind) ? app(AmenityStore::class)->keys($establishment->listing_kind, $listing) : null;
+        $amenityPhotos = $amenityKeys === null ? [] : $listing->photos->pluck('amenity')->filter()->unique()->all();
 
-        return view('establishment.edit-listing', compact('establishment', 'listing', 'qrTargetUrl', 'readiness', 'hoursColumn', 'hours'));
+        return view('establishment.edit-listing', compact('establishment', 'listing', 'qrTargetUrl', 'readiness', 'hoursColumn', 'hours', 'amenityKeys', 'amenityPhotos'));
     }
 
     /** The sections of My Listing that are edited in their own form (a modal where JavaScript is on). */
@@ -107,6 +111,7 @@ class EstablishmentDashboardController extends Controller
         'details' => ['Edit details', 'What travellers read about you and where they can find you online'],
         'status' => ['Operating status', 'Tell travellers whether you are open'],
         'hours' => ['Opening hours', 'Shown to travellers and used when they plan a day'],
+        'amenities' => ['Amenities', 'What is really there. Travellers and the trip planner use this.'],
         'position' => ['Pin your place on the map', 'Travellers use this to find you and to plan the route between places'],
     ];
 
@@ -125,6 +130,7 @@ class EstablishmentDashboardController extends Controller
         $hoursColumn = ListingReadiness::hoursColumn($establishment->listing_kind);
         abort_if($section === 'status' && ! method_exists($listing, 'operatingNotice'), 404);
         abort_if($section === 'hours' && ! $hoursColumn, 404);
+        abort_if($section === 'amenities' && ! $this->hasAmenityList($establishment->listing_kind), 404);
 
         $data = [
             'establishment' => $establishment,
@@ -133,6 +139,10 @@ class EstablishmentDashboardController extends Controller
             'title' => self::SECTIONS[$section][0],
             'sub' => self::SECTIONS[$section][1],
         ];
+
+        if ($section === 'amenities') {
+            $data['ticked'] = app(AmenityStore::class)->keys($establishment->listing_kind, $listing);
+        }
 
         if ($section === 'hours') {
             $text = trim((string) $listing->{$hoursColumn});
@@ -159,6 +169,14 @@ class EstablishmentDashboardController extends Controller
         $section = $request->string('section')->toString() ?: 'all';
         $part = fn (string $name) => $section === 'all' || $section === $name;
         $hoursColumn = ListingReadiness::hoursColumn($establishment->listing_kind);
+
+        if ($section === 'amenities') {
+            abort_if(! $this->hasAmenityList($establishment->listing_kind), 404);
+            $request->validate(['amenities' => ['nullable', 'array'], 'amenities.*' => ['string']]);
+            app(AmenityStore::class)->sync($establishment->listing_kind, $listing, (array) $request->input('amenities', []));
+
+            return $this->savedTo($request, route('establishment.listing.edit'), Toast::success('Amenities saved', 'Travellers see them on your page and the trip planner uses them.'));
+        }
 
         if ($section === 'hours') {
             abort_if(! $hoursColumn, 404);
@@ -259,6 +277,12 @@ class EstablishmentDashboardController extends Controller
         };
 
         return $this->savedTo($request, route('establishment.listing.edit'), $toast);
+    }
+
+    /** Destinations, stays, restaurants and souvenir centers tick amenities; packages and tour operators do not (a package has its own accessibility section). */
+    private function hasAmenityList(string $kind): bool
+    {
+        return $kind !== 'package' && Amenities::hasList($kind);
     }
 
     /**

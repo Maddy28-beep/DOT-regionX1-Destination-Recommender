@@ -50,7 +50,7 @@
                         </div>
                         <div class="ptr-photo__meta">
                             <span class="ptr-photo__grip" title="Drag to reorder" aria-hidden="true">&#8942;&#8942;</span>
-                            <strong>{{ $photo->category }}</strong>
+                            <strong>{{ $photo->category }}@if ($photo->amenity)<span class="amen-chip amen-chip--access" style="margin:4px 0 0; display:flex; width:fit-content; font-size:.66rem; padding:1px 8px;">Shows: {{ \App\Support\Amenities::label($photo->amenity) }}</span>@endif</strong>
                             @php $credited = $readiness->credited($photo); @endphp
                             <a href="{{ route('establishment.photos.credit.form', $photo) }}" class="ptr-credit {{ $credited ? 'is-ok' : 'is-missing' }}" data-modal-form data-title="Photo credit" data-sub="Travellers see who took each photo" data-size="narrow"
                                aria-label="{{ $credited ? 'Credit: '.($photo->credit_text ?: $photo->source_name).'. Change it' : 'Add a credit for this '.$photo->category.' photo' }}">{{ $credited ? 'Credited' : 'Add credit' }}</a>
