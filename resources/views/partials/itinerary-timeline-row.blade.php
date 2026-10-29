@@ -160,6 +160,9 @@
                     @if ($item->ruleExplanation())
                         <div class="tl-card__pairing">
                             <span class="pairing-tag">Popular pairing with {{ $item->rule_basis }}</span>
+                            @if (($listing && app(\App\Support\SampleData::class)->isSample($listing)) || app(\App\Support\SampleData::class)->isSampleName($item->rule_basis))
+                                <x-sample-tag />
+                            @endif
                             <details class="pairing-why">
                                 <summary>why this pick?</summary>
                                 <p>{{ $item->ruleExplanation() }}</p>

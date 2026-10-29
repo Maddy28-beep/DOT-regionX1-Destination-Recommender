@@ -48,6 +48,13 @@
                     @endforeach
                 </select>
             </div>
+            <div class="field">
+                <label for="include_simulated">Simulated rows</label>
+                <label class="check-inline" style="font-weight:400;">
+                    <input type="checkbox" id="include_simulated" name="include_simulated" value="1" @checked($includeSimulated)>
+                    Include simulated survey rows
+                </label>
+            </div>
             <button type="submit" class="btn btn-primary">Apply Filter</button>
             @if ($hasActiveFilters)
                 <a href="{{ route('admin.exit-surveys') }}" class="btn btn-outline">Clear Filters</a>
@@ -55,6 +62,12 @@
         </form>
     </div>
 </div>
+
+@if ($includeSimulated)
+    <x-banner tone="warn">These figures include simulated demo surveys. They show how the system works and are not what visitors said.</x-banner>
+@elseif ($simulatedHidden > 0)
+    <x-banner tone="info">Showing real tourist responses only. {{ $simulatedHidden }} simulated demo survey{{ $simulatedHidden === 1 ? '' : 's' }} {{ $simulatedHidden === 1 ? 'is' : 'are' }} left out; tick &ldquo;Include simulated survey rows&rdquo; to add them.</x-banner>
+@endif
 
 @if ($count === 0)
     <div class="panel">

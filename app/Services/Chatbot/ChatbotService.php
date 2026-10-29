@@ -179,14 +179,15 @@ class ChatbotService
     /** Grounds the model in what ExploreDVO actually has, so it doesn't invent listings or make booking promises. */
     private function buildSystemPrompt(): string
     {
-        $listings = collect(self::LISTING_CONFIG)->flatMap(function ($config, $type) {
+        $sampleData = app(\App\Support\SampleData::class);
+        $listings = collect(self::LISTING_CONFIG)->flatMap(function ($config, $type) use ($sampleData) {
             return $config['model']::query()
                 ->where('is_accredited', true)
                 ->whereNull('archived_at')
                 ->orderByDesc('rating')
                 ->limit(10)
-                ->pluck('name')
-                ->map(fn ($name) => "{$name} ({$config['label']})");
+                ->get(['id', 'name'])
+                ->map(fn ($l) => $l->name.($sampleData->isSample($l) ? ' [sample data, not DOT-verified]' : '')." ({$config['label']})");
         })->implode('; ');
 
         return <<<PROMPT
@@ -195,10 +196,11 @@ class ChatbotService
             Davao Occidental, Davao Oriental, Davao del Sur, and Island Garden City of Samal).
 
             Only recommend destinations, accommodations, restaurants, tour packages, souvenir centers, and
-            tour operators from this list of DOT-accredited listings currently on the platform: {$listings}
+            tour operators from this list of listings currently on the platform: {$listings}
 
             Rules:
             - Keep replies short (2-4 sentences), friendly, and specific to Davao Region tourism.
+            - A listing marked [sample data, not DOT-verified] has a placeholder accreditation number. You may mention it, but never call it DOT-accredited or verified; say it is sample data.
             - Never invent a listing that isn't in the list above. If nothing fits, say so and suggest browsing the site.
             - You do not handle bookings, reservations, or payments — say so if asked.
             - For personalized itineraries, point people at Plan My Trip. No account or sign-in is needed anywhere on this site.
@@ -334,7 +336,14 @@ class ChatbotService
 
         $kind = $listing->type ?? $listing->cuisine_type ?? $listing->specialization ?? $config['label'];
         $where = trim((string) ($listing->location ?? ''));
-        $text = str_contains(strtolower($message), 'accredit') ? "Yes, {$name} is DOT-accredited. " : '';
+        // Sample data keeps its place in answers, but is never called DOT-accredited.
+        $sample = app(\App\Support\SampleData::class)->isSample($listing);
+        $asked = str_contains(strtolower($message), 'accredit');
+        $text = $asked
+            ? ($sample
+                ? "{$name} is sample data on this platform: its accreditation number is a placeholder, so it is not verified by DOT. "
+                : "Yes, {$name} is DOT-accredited. ")
+            : '';
         $text .= $name.($where !== '' ? " is in {$where}" : '').' ('.strtolower((string) $kind).').';
 
         $hours = trim((string) ($listing->hours ?? $listing->opening_hours ?? ''));
@@ -346,7 +355,9 @@ class ChatbotService
             $text .= " Entrance: ₱{$fee}.";
         }
 
-        return $text.' Hours and prices can change, so check before you go.';
+        $note = ($sample && ! $asked) ? ' This listing is sample data, not DOT-verified.' : '';
+
+        return $text.$note.' Hours and prices can change, so check before you go.';
     }
 
     /** Something to do next when no rule fits: say what to ask, and show a few well-rated places. */
@@ -455,6 +466,9 @@ class ChatbotService
 
             if ($listing) {
                 $status = $listing->is_accredited ? 'is DOT-accredited' : 'is not currently DOT-accredited';
+                if ($listing->is_accredited && app(\App\Support\SampleData::class)->isSample($listing)) {
+                    $status = 'is sample data on this platform: its accreditation number is a placeholder, so it is not verified by DOT';
+                }
                 $this->cardListings = [[$config['model']::query()->find($listing->id), $config['route']]];
 
                 return "{$listing->name} {$status}. You can view its full accreditation details here: ".route($config['route'], $listing);

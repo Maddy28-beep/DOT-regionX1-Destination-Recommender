@@ -123,6 +123,7 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php $sampleData = app(\App\Support\SampleData::class); @endphp
                         @foreach ($rules as $rule)
                             <tr>
                                 <td>
@@ -131,6 +132,9 @@
                                     &rarr;
                                     <strong>{{ $rule['b_listing']->name }}</strong>
                                     <span class="cell-muted">({{ str_replace('_', ' ', $rule['b_kind']) }})</span>
+                                    @if ($sampleData->isSample($rule['a_listing']) || $sampleData->isSample($rule['b_listing']))
+                                        <x-sample-tag />
+                                    @endif
                                 </td>
                                 <td>{{ $rule['co_count'] }}</td>
                                 <td>{{ number_format($rule['support'] * 100, 1) }}%</td>

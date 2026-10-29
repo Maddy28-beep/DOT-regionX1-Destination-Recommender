@@ -53,6 +53,7 @@ class AccreditationSeeder extends Seeder
                     'listing_kind' => $kind,
                     'listing_id' => $listing->id,
                     'accreditation_number' => sprintf('DOT-XI-2025-%04d', $counter++),
+                    'is_placeholder' => true,
                     'status' => $status,
                     'issue_date' => $issued->toDateString(),
                     'expiration_date' => $expires->toDateString(),

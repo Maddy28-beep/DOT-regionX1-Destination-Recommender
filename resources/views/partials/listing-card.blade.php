@@ -114,7 +114,9 @@
 
         <div class="dcard__body">
             <div class="dcard__top">
-                @if ($listing->is_accredited)
+                @if ($listing->is_accredited && app(\App\Support\SampleData::class)->isSample($listing))
+                    <span class="dcard__dot is-sample" title="Its accreditation number is a placeholder, not an official DOT number."><x-icon name="shield-check" /> Sample data, not DOT-verified</span>
+                @elseif ($listing->is_accredited)
                     <span class="dcard__dot"><x-icon name="shield-check" /> DOT accredited</span>
                 @else
                     <span></span>
