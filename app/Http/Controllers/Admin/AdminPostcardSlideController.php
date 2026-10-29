@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\ModalForms;
 use App\Http\Controllers\Controller;
 use App\Models\PostcardSlide;
 use App\Services\PostcardImageService;
 use App\Support\Toast;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 /**
@@ -16,6 +19,8 @@ use Illuminate\View\View;
  */
 class AdminPostcardSlideController extends Controller
 {
+    use ModalForms;
+
     public function __construct(private readonly PostcardImageService $images)
     {
     }
@@ -27,14 +32,14 @@ class AdminPostcardSlideController extends Controller
         ]);
     }
 
-    public function create(): View
+    public function create(Request $request): View|Response
     {
-        return view('admin.postcard-slides.form', [
+        return $this->modalView($request, 'admin.postcard-slides.form', 'admin.postcard-slides._form', [
             'slide' => new PostcardSlide(['focal_x' => 50, 'focal_y' => 50, 'is_active' => true, 'sort_order' => (int) PostcardSlide::max('sort_order') + 1]),
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|JsonResponse
     {
         $data = $this->validated($request, imageRequired: true);
         $data += $this->images->process($request->file('image'));
@@ -42,16 +47,15 @@ class AdminPostcardSlideController extends Controller
 
         $slide = PostcardSlide::create($data);
 
-        return redirect()->route('admin.postcard-slides.index')
-            ->with(Toast::success('Slide added', "\"{$slide->title}\" is now on the landing page, under What Davao is known for."));
+        return $this->modalSaved($request, route('admin.postcard-slides.index'), Toast::success('Slide added', "\"{$slide->title}\" is now on the landing page, under What Davao is known for."));
     }
 
-    public function edit(PostcardSlide $postcardSlide): View
+    public function edit(Request $request, PostcardSlide $postcardSlide): View|Response
     {
-        return view('admin.postcard-slides.form', ['slide' => $postcardSlide]);
+        return $this->modalView($request, 'admin.postcard-slides.form', 'admin.postcard-slides._form', ['slide' => $postcardSlide]);
     }
 
-    public function update(Request $request, PostcardSlide $postcardSlide): RedirectResponse
+    public function update(Request $request, PostcardSlide $postcardSlide): RedirectResponse|JsonResponse
     {
         $data = $this->validated($request, imageRequired: false);
 
@@ -64,8 +68,7 @@ class AdminPostcardSlideController extends Controller
             $postcardSlide->update($data);
         }
 
-        return redirect()->route('admin.postcard-slides.index')
-            ->with(Toast::success('Slide updated', "Changes to \"{$postcardSlide->title}\" have been saved."));
+        return $this->modalSaved($request, route('admin.postcard-slides.index'), Toast::success('Slide updated', "Changes to \"{$postcardSlide->title}\" have been saved."));
     }
 
     public function destroy(PostcardSlide $postcardSlide): RedirectResponse

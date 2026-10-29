@@ -11,7 +11,7 @@
         <div>
             <h2>{{ $advisories->total() }} Advisories</h2>
         </div>
-        <a href="{{ route('admin.advisories.create') }}" class="btn btn-primary">Post Advisory</a>
+        <a href="{{ route('admin.advisories.create') }}" class="btn btn-primary" data-modal-form data-title="Post advisory">Post Advisory</a>
     </div>
 
     <div class="table-scroll">
@@ -48,7 +48,7 @@
                     <td class="cell-muted">{{ $advisory->admin?->full_name ?? '—' }}</td>
                     <td>
                         <div class="util-row">
-                            <a href="{{ route('admin.advisories.edit', $advisory) }}" class="btn btn-primary btn-xs">Edit</a>
+                            <a href="{{ route('admin.advisories.edit', $advisory) }}" class="btn btn-primary btn-xs" data-modal-form data-title="Edit advisory" data-sub="{{ $advisory->title }}">Edit</a>
                             <form method="POST" action="{{ route('admin.advisories.destroy', $advisory) }}" onsubmit="return confirm('Remove this advisory? Travelers will no longer see it.');">
                                 @csrf
                                 @method('DELETE')

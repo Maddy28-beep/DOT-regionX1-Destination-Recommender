@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\ModalForms;
 use App\Http\Controllers\Controller;
 use App\Models\Accommodation;
 use App\Models\Advisory;
@@ -10,8 +11,10 @@ use App\Models\Package;
 use App\Models\Restaurant;
 use App\Models\SouvenirCenter;
 use App\Models\TourOperator;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -26,6 +29,8 @@ use App\Support\Toast;
  */
 class AdminAdvisoryController extends Controller
 {
+    use ModalForms;
+
     /** listing_kind values an advisory can target, mapped to their model class -- same set the morph map registers. */
     private const LISTING_KINDS = [
         'destination' => Destination::class,
@@ -47,9 +52,9 @@ class AdminAdvisoryController extends Controller
         return view('admin.advisories.index', compact('advisories'));
     }
 
-    public function create(): View
+    public function create(Request $request): View|Response
     {
-        return view('admin.advisories.form', [
+        return $this->modalView($request, 'admin.advisories.form', 'admin.advisories._form', [
             'advisory' => new Advisory(),
             'listingKinds' => self::LISTING_KINDS,
             'severities' => self::SEVERITIES,
@@ -58,20 +63,19 @@ class AdminAdvisoryController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|JsonResponse
     {
         $data = $this->validated($request);
         $data['admin_id'] = Auth::guard('admin')->id();
 
         $advisory = Advisory::create($data);
 
-        return redirect()->route('admin.advisories.index')
-            ->with(Toast::success('Advisory posted', "\"{$advisory->title}\" is now visible to travelers."));
+        return $this->modalSaved($request, route('admin.advisories.index'), Toast::success('Advisory posted', "\"{$advisory->title}\" is now visible to travelers."));
     }
 
-    public function edit(Advisory $advisory): View
+    public function edit(Request $request, Advisory $advisory): View|Response
     {
-        return view('admin.advisories.form', [
+        return $this->modalView($request, 'admin.advisories.form', 'admin.advisories._form', [
             'advisory' => $advisory,
             'listingKinds' => self::LISTING_KINDS,
             'severities' => self::SEVERITIES,
@@ -80,12 +84,11 @@ class AdminAdvisoryController extends Controller
         ]);
     }
 
-    public function update(Request $request, Advisory $advisory): RedirectResponse
+    public function update(Request $request, Advisory $advisory): RedirectResponse|JsonResponse
     {
         $advisory->update($this->validated($request));
 
-        return redirect()->route('admin.advisories.index')
-            ->with(Toast::success('Advisory updated', "Changes to \"{$advisory->title}\" have been saved."));
+        return $this->modalSaved($request, route('admin.advisories.index'), Toast::success('Advisory updated', "Changes to \"{$advisory->title}\" have been saved."));
     }
 
     public function destroy(Advisory $advisory): RedirectResponse

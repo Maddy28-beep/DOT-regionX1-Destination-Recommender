@@ -90,7 +90,7 @@
                             @else
                                 <form method="POST" action="{{ route('admin.accreditation.renew', $r) }}" style="display:flex; gap:6px; align-items:center;">
                                     @csrf
-                                    <input type="date" name="expiration_date" min="{{ now()->addDay()->toDateString() }}" value="{{ now()->addYear()->toDateString() }}" style="width:140px; padding:4px 6px; font-size:.8rem;" required>
+                                    <input type="date" name="expiration_date" aria-label="New expiry date for {{ $r->listing?->name ?? 'this record' }}" min="{{ now()->addDay()->toDateString() }}" value="{{ now()->addYear()->toDateString() }}" style="width:140px; padding:4px 6px; font-size:.8rem;" required>
                                     <button type="submit" class="btn btn-danger btn-2xs">Renew</button>
                                 </form>
                             @endif

@@ -11,7 +11,7 @@
         <div>
             <h2>{{ $events->total() }} {{ ucfirst($filter) }} {{ \Illuminate\Support\Str::plural('event', $events->total()) }}</h2>
         </div>
-        <a href="{{ route('admin.events.create') }}" class="btn btn-primary">Add Event</a>
+        <a href="{{ route('admin.events.create') }}" class="btn btn-primary" data-modal-form data-title="Add event">Add Event</a>
     </div>
 
     <div class="panel-body" style="padding-bottom:0;">
@@ -52,7 +52,7 @@
                     </td>
                     <td>
                         <div class="util-row">
-                            <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-primary btn-xs">Edit</a>
+                            <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-primary btn-xs" data-modal-form data-title="Edit event" data-sub="{{ $event->title }}">Edit</a>
                             @if ($event->archived_at)
                                 <form method="POST" action="{{ route('admin.events.unarchive', $event) }}">
                                     @csrf
