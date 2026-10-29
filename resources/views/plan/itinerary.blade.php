@@ -171,6 +171,16 @@
                             </div>
                         @endif
 
+                        {{-- A trip of two or more days with no overnight stay at all: no accommodation was DOT-accredited and open for these
+                             dates, so none could be offered. Say so, instead of leaving "your accommodation" to look like a choice we made. --}}
+                        @if ($itemsByDay->count() > 1 && ! $itinerary->package && ! $itemsByDay->contains(fn ($rows) => $rows->contains('kind', 'overnight')))
+                            <div class="itin-notice" role="note" style="margin:0 0 16px; padding:12px 16px; border-radius:12px; background:#fff7e6; border:1px solid #f0c36d;">
+                                <strong>No DOT-accredited accommodation is available for your trip.</strong>
+                                We could not find an accredited place to stay that is open for your dates, so no stay is planned. Each day starts and ends
+                                wherever you are staying. Check the <a href="{{ route('accommodations.index') }}">accommodation list</a> for the latest, or contact DOT Region XI.
+                            </div>
+                        @endif
+
                         @foreach ($itemsByDay as $day => $items)
                             @php
                                 // Every place of the day, in order, deduped -- see
