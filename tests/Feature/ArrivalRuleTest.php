@@ -168,20 +168,32 @@ class ArrivalRuleTest extends TestCase
     // ---- the rule, minute by minute ------------------------------------------------------------------
 
     /**
-     * Every minute from 05:00 to 08:30 (the 5:59/6:00/6:01 and 7:29/7:30 boundaries included), checked
-     * against the rule written out here: departure, the free-time row's presence and times, and the
-     * first activity (the next quarter hour at or after departure + the 15 minute leg).
+     * Every minute from 05:00 to 08:30, checked against the rule written out here: departure, the free-time
+     * row's presence and times, and the first activity (the next quarter hour at or after departure + the 15
+     * minute leg).
+     *
+     * When "arrival + 30" falls in the breakfast window (07:00 to 08:30), breakfast comes first, from the next
+     * quarter hour and for 45 minutes, and the journey starts when it is over (never before 08:00).
      */
     public function test_departure_free_time_and_first_activity_follow_the_rule_for_every_minute(): void
     {
         $this->shortLegFixture();
         $earliest = Carbon::parse('2026-10-20 08:00');
         $previousDeparture = null;
+        $previousBreakfast = false;
 
         for ($minute = 5 * 60; $minute <= 8 * 60 + 30; $minute++) {
             $arrival = sprintf('%02d:%02d', intdiv($minute, 60), $minute % 60);
             $at = Carbon::parse("2026-10-20 {$arrival}");
-            $departure = $at->copy()->addMinutes(30)->max($earliest);
+            $ready = $at->copy()->addMinutes(30);
+            $breakfast = $ready->betweenIncluded(Carbon::parse('2026-10-20 07:00'), Carbon::parse('2026-10-20 08:30'));
+
+            if ($breakfast) {
+                $breakfastStart = $ready->minute % 15 === 0 && $ready->second === 0 ? $ready->copy() : $ready->copy()->addMinutes(15 - $ready->minute % 15);
+                $departure = $breakfastStart->addMinutes(45)->max($earliest);
+            } else {
+                $departure = $ready->copy()->max($earliest);
+            }
             $activity = $departure->copy()->addMinutes(15);
             $activity = $activity->minute % 15 === 0 ? $activity : $activity->addMinutes(15 - $activity->minute % 15);
 
@@ -191,7 +203,10 @@ class ArrivalRuleTest extends TestCase
             $this->assertSame($activity->format('H:i'), $this->firstOf($day1, 'activity')['start'], "first activity for arrival {$arrival}");
 
             $free = $this->earlyArrivalFree($day1);
-            if ($at->lessThan($earliest->copy()->subMinutes(30))) {
+            if ($breakfast) {
+                $this->assertNull($free, "breakfast, not free time, for arrival {$arrival}");
+                $this->assertSame('Breakfast', explode(' ', $this->firstOf($day1, 'meal')['title'])[0], "breakfast first for arrival {$arrival}");
+            } elseif ($at->lessThan($earliest->copy()->subMinutes(30))) {
                 $this->assertNotNull($free, "free time for arrival {$arrival}");
                 $this->assertSame([$arrival, '08:00'], [$free['start'], $free['end']], "free time spans arrival to 08:00 for {$arrival}");
             } else {
@@ -199,12 +214,14 @@ class ArrivalRuleTest extends TestCase
             }
 
             // Departure never goes backwards as the arrival gets later, and moves by at most a minute per minute.
-            if ($previousDeparture !== null) {
+            // Not across the edges of the breakfast window, where eating first is a deliberate step of up to 45 minutes.
+            if ($previousDeparture !== null && ! $breakfast && ! $previousBreakfast) {
                 $step = $departure->diffInMinutes($previousDeparture, false);
                 $this->assertGreaterThanOrEqual(0, -$step, "departure must not decrease at {$arrival}");
                 $this->assertLessThanOrEqual(1, -$step, "departure must move at most 1 minute per minute at {$arrival}");
             }
             $previousDeparture = $departure;
+            $previousBreakfast = $breakfast;
         }
     }
 
@@ -219,20 +236,29 @@ class ArrivalRuleTest extends TestCase
         }
     }
 
-    public function test_the_boundary_at_0730_and_just_after_it(): void
+    public function test_the_boundaries_of_the_breakfast_window_and_just_after_it(): void
     {
         $this->shortLegFixture();
 
-        $at0729 = $this->day($this->generate($this->preference('07:29')), 1);
-        $at0730 = $this->day($this->generate($this->preference('07:30')), 1);
-        $at0731 = $this->day($this->generate($this->preference('07:31')), 1);
+        $day = fn (string $arrival) => $this->day($this->generate($this->preference($arrival)), 1);
 
-        $this->assertSame('08:00', $this->firstOf($at0729, 'travel')['start']);
-        $this->assertNotNull($this->earlyArrivalFree($at0729));
-        $this->assertSame('08:00', $this->firstOf($at0730, 'travel')['start'], '07:30 + 30 minutes = 08:00 exactly');
-        $this->assertNull($this->earlyArrivalFree($at0730), 'nothing left to fill at 07:30');
-        $this->assertSame('08:01', $this->firstOf($at0731, 'travel')['start'], 'from 07:30 departure is arrival + 30, unrounded');
-        $this->assertNull($this->earlyArrivalFree($at0731));
+        $at0629 = $day('06:29');
+        $this->assertSame('08:00', $this->firstOf($at0629, 'travel')['start']);
+        $this->assertNotNull($this->earlyArrivalFree($at0629), '06:29 + 30 minutes is before the breakfast window: free time until 08:00');
+
+        $at0630 = $day('06:30');
+        $this->assertNull($this->earlyArrivalFree($at0630), '06:30 + 30 minutes = 07:00, the window opens: breakfast, not free time');
+        $this->assertSame(['07:00', '07:45'], [$this->firstOf($at0630, 'meal')['start'], $this->firstOf($at0630, 'meal')['end']]);
+        $this->assertSame('08:00', $this->firstOf($at0630, 'travel')['start'], 'breakfast is over by 08:00, so the 08:00 floor still sets the departure');
+
+        $at0800 = $day('08:00');
+        $this->assertSame(['08:30', '09:15'], [$this->firstOf($at0800, 'meal')['start'], $this->firstOf($at0800, 'meal')['end']], '08:00 + 30 = 08:30, the last minute of the window');
+        $this->assertSame('09:15', $this->firstOf($at0800, 'travel')['start']);
+
+        $at0801 = $day('08:01');
+        $this->assertSame('08:31', $this->firstOf($at0801, 'travel')['start'], '08:01 + 30 = 08:31 is past the window: no breakfast, departure is arrival + 30');
+        $beforeJourney = array_column(array_slice($at0801, 0, array_search('travel', array_column($at0801, 'kind'), true)), 'kind');
+        $this->assertSame(['baseline'], $beforeJourney);
     }
 
     // ---- early arrivals plan the same day as the 04:00 case ------------------------------------------
@@ -248,7 +274,7 @@ class ArrivalRuleTest extends TestCase
     }
 
     #[DataProvider('fixtures')]
-    public function test_every_arrival_before_0730_plans_the_same_day_as_0400_from_the_first_journey_on(string $fixture): void
+    public function test_every_arrival_before_0630_plans_the_same_day_as_0400_from_the_first_journey_on(string $fixture): void
     {
         $this->{$fixture}();
 
@@ -262,7 +288,7 @@ class ArrivalRuleTest extends TestCase
         $expectedDay1 = $fromJourney($this->day($reference, 1));
         $expectedDay2 = $this->day($reference, 2);
 
-        foreach (['05:59', '06:00', '06:01', '07:00', '07:29', '07:30'] as $arrival) {
+        foreach (['05:59', '06:00', '06:01', '06:29'] as $arrival) {
             $itinerary = $this->generate($this->preference($arrival));
 
             $this->assertSame($expectedDay1, $fromJourney($this->day($itinerary, 1)), "Day 1 from the first journey, arrival {$arrival}");
@@ -364,7 +390,7 @@ class ArrivalRuleTest extends TestCase
         $this->destination('Eden Park', 'Nature & Adventure', 7.03, 125.37, 'Davao City', 4.9);
         $this->inn();
 
-        foreach (['04:00', '06:00', '06:01', '07:29'] as $arrival) {
+        foreach (['04:00', '06:00', '06:01', '06:29'] as $arrival) {
             $day1 = $this->day($this->generate($this->preference($arrival)), 1);
             $lunchAt = array_search('meal', array_column($day1, 'kind'), true);
 
@@ -374,7 +400,7 @@ class ArrivalRuleTest extends TestCase
         }
     }
 
-    /** Whatever the arrival, Day 1 has at most one lunch and it starts inside the window (to the next quarter hour). */
+    /** Whatever the arrival, Day 1 has at most one lunch and it starts inside the lunch window (12:00 to 1:00 PM). */
     public function test_lunch_is_once_a_day_and_inside_the_window(): void
     {
         $this->multiFixture();
@@ -384,8 +410,8 @@ class ArrivalRuleTest extends TestCase
 
             $this->assertLessThanOrEqual(1, count($lunches), "arrival {$arrival}");
             foreach ($lunches as $lunch) {
-                $this->assertGreaterThanOrEqual('11:30', $lunch['start'], "arrival {$arrival}");
-                $this->assertLessThanOrEqual('14:15', $lunch['start'], "arrival {$arrival}");
+                $this->assertGreaterThanOrEqual('12:00', $lunch['start'], "arrival {$arrival}");
+                $this->assertLessThanOrEqual('13:00', $lunch['start'], "arrival {$arrival}");
             }
         }
     }
@@ -486,6 +512,6 @@ class ArrivalRuleTest extends TestCase
 
         $this->assertSame($expected, $stopsFor('04:00'), 'the 04:00 plan: two of the four stops, Samal and Dahican left out');
         $this->assertSame($expected, $stopsFor('06:00'), 'a 06:00 arrival now plans exactly like 04:00');
-        $this->assertSame($expected, $stopsFor('07:29'));
+        $this->assertSame($expected, $stopsFor('06:29'), 'the last arrival before the breakfast window');
     }
 }

@@ -686,16 +686,17 @@ class TripPlannerTest extends TestCase
     {
         $this->seedDestinations();
 
-        // Two exit surveys that both pair Eden Nature Park with one restaurant
+        // Two exit surveys that both pair People's Park (the stop before lunch on this plan) with one restaurant
         // clear the minimum support of 2, so a rule exists to be credited.
         $region = Region::sole();
         $restaurant = \App\Models\Restaurant::create([
             'slug' => 'tuna-place', 'name' => 'Tuna Place', 'location' => 'Davao City',
             'region_id' => $region->id, 'type' => 'Seafood', 'is_accredited' => true,
             'rating' => 4.4, 'review_count' => 6, 'price_tier' => 'Mid-range',
-            'latitude' => 7.05, 'longitude' => 125.60,
+            // Beside the park: an Apriori restaurant is only the meal stop when it is within 10 km of the place.
+            'latitude' => 7.0735, 'longitude' => 125.6130,
         ]);
-        $eden = Destination::where('slug', 'eden-nature-park')->sole();
+        $eden = Destination::where('slug', 'peoples-park')->sole();
 
         foreach (range(1, 3) as $i) {
             $survey = \App\Models\ExitSurvey::create(['submitted_at' => now()]);
