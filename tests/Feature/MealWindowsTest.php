@@ -13,7 +13,7 @@ use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 /**
- * Meals sit in fixed windows (breakfast 07:00-08:30, lunch 12:00-13:00, dinner 18:00-19:30, as START times) and are
+ * Meals sit in fixed windows (breakfast 07:00-08:30, lunch 11:30-13:00 planned for 12:00, dinner 18:00-19:30, as START times) and are
  * always somewhere to eat: the destination's own restaurant when its amenities include one, an accredited restaurant
  * within 10 km (same region, open then), or "(your choice)". A sightseeing place is never the meal.
  */
@@ -254,7 +254,7 @@ class MealWindowsTest extends TestCase
                 foreach ($this->meals($this->rows($itinerary, $day)) as $meal) {
                     $window = match (true) {
                         str_starts_with($meal['title'], 'Breakfast') => ['07:00', '08:30'],
-                        str_starts_with($meal['title'], 'Lunch') => ['12:00', '13:00'],
+                        str_starts_with($meal['title'], 'Lunch') => ['11:30', '13:00'],
                         default => ['18:00', '19:30'],
                     };
 
@@ -278,5 +278,72 @@ class MealWindowsTest extends TestCase
         $day2 = $this->rows($this->plan('09:00', [$falls, $eden], [1 => ['Morning'], 2 => ['Morning']]), 2);
 
         $this->assertSame(['Breakfast (your choice)', '07:00'], [$day2[0]['title'], $day2[0]['start']]);
+    }
+
+    // ---- lunch may start from 11:30 (planned for 12:00) ----------------------------------------------
+
+    /** A park a few minutes from the starting point, so the arrival time at it is easy to steer. */
+    private function nearbyPark(): Destination
+    {
+        return $this->place('Nearby Park', 'Davao City', 7.0489 + 0.002, 125.5736);
+    }
+
+    public function test_arriving_just_before_lunch_eats_first_and_gives_the_place_its_full_visit(): void
+    {
+        $park = $this->nearbyPark();
+
+        // 10:15 arrival: ready 10:45, at the park by 11:00, half an hour before lunch may start.
+        $rows = $this->rows($this->plan('10:15', [$park], [1 => ['Morning', 'Afternoon'], 2 => ['Morning']]));
+        $lunch = $this->meals($rows)[0];
+        $visit = $this->first($rows, 'activity');
+
+        $this->assertSame('11:30', $lunch['start'], 'lunch starts as soon as it may');
+        $this->assertSame($visit['start'], $lunch['end'], 'the visit follows lunch directly');
+        $this->assertSame(150, (strtotime($visit['end']) - strtotime($visit['start'])) / 60, 'a full visit, not an hour squeezed in before lunch');
+    }
+
+    public function test_arriving_earlier_ends_the_visit_when_lunch_is_planned(): void
+    {
+        $park = $this->nearbyPark();
+
+        // 10:00 arrival: ready 10:30, at the park by 10:45, 45 minutes before lunch may start: a 75-minute visit, then lunch.
+        $rows = $this->rows($this->plan('10:00', [$park], [1 => ['Morning', 'Afternoon'], 2 => ['Morning']]));
+        $lunch = collect($this->meals($rows))->first(fn ($m) => str_starts_with($m['title'], 'Lunch'));
+        $visit = $this->first($rows, 'activity');
+
+        $this->assertSame(['10:45', '12:00'], [$visit['start'], $visit['end']]);
+        $this->assertSame('12:00', $lunch['start']);
+    }
+
+    public function test_a_visit_that_ends_at_a_quarter_to_twelve_is_followed_by_lunch_at_once(): void
+    {
+        $park = $this->nearbyPark();
+
+        // 07:15 arrival, ready 07:45 is inside breakfast (07:45-08:30 window), so use a plain 06:00 arrival:
+        // departs 08:00, at the park by about 08:15-08:30, visit of 150 minutes ends before 11:30 or just after.
+        $rows = $this->rows($this->plan('06:00', [$park], [1 => ['Morning', 'Afternoon'], 2 => ['Morning']]));
+        $visit = $this->first($rows, 'activity');
+        $lunch = collect($this->meals($rows))->first(fn ($m) => str_starts_with($m['title'], 'Lunch'));
+
+        if ($visit['end'] >= '11:30') {
+            $this->assertSame($visit['end'], $lunch['start'], 'lunch starts when the visit ends, not at 12:00');
+        } else {
+            $this->assertNull($lunch, 'a visit that ends before 11:30 is not followed by lunch yet');
+        }
+    }
+
+    public function test_no_lunch_starts_before_1130_or_after_1300(): void
+    {
+        $park = $this->nearbyPark();
+        $far = $this->place('Far Falls', 'Davao Oriental', 7.7430, 126.2989);
+
+        foreach (['06:00', '07:30', '08:15', '09:00', '09:45', '10:15', '10:45', '11:15', '11:45', '12:30'] as $arrival) {
+            foreach ($this->meals($this->rows($this->plan($arrival, [$park, $far], [1 => ['Morning', 'Afternoon'], 2 => ['Morning', 'Afternoon']]))) as $meal) {
+                if (str_starts_with($meal['title'], 'Lunch')) {
+                    $this->assertGreaterThanOrEqual('11:30', $meal['start'], "arrival {$arrival}");
+                    $this->assertLessThanOrEqual('13:00', $meal['start'], "arrival {$arrival}");
+                }
+            }
+        }
     }
 }

@@ -55,16 +55,25 @@ class ItineraryScheduleBuilder
     private const SHORT_VISIT_MINUTES = 90;
 
     /**
-     * Meal windows, as the times a meal may START. Outside its window a meal is not planned at all (no breakfast
-     * on a noon start, no lunch after 1 PM) rather than faked at the wrong hour.
+     * Meal windows, as the times a meal may START: breakfast 07:00 to 08:30, lunch 11:30 to 13:00 (planned for 12:00
+     * unless the clock gets there first), dinner 18:00 to 19:30. Outside its window a meal is not planned at all (no
+     * breakfast on a noon start, no lunch after 1 PM) rather than faked at the wrong hour.
      */
     private const BREAKFAST_LATEST = '08:30';
 
     private const BREAKFAST_MINUTES = 45;
 
-    private const LUNCH_FROM = '12:00';
+    /** Lunch may start from here (when the clock gets there with lunch still to eat), ... */
+    private const LUNCH_EARLIEST = '11:30';
 
+    /** ... is planned for here when a time has to be chosen (waiting, a stop on the road, a visit cut to make room), ... */
+    private const LUNCH_DEFAULT = '12:00';
+
+    /** ... and may not start after here. */
     private const LUNCH_LATEST = '13:00';
+
+    /** Arriving this close to the earliest lunch time or less, eat first (a short wait) rather than squeeze in a short visit. */
+    private const EAT_FIRST_IF_WITHIN_MINUTES = 30;
 
     private const MEAL_MINUTES = 60;
 
@@ -598,7 +607,8 @@ class ItineraryScheduleBuilder
     {
         $estimate = $this->estimateLeg($from, $to);
         $total = $estimate['max_minutes'];
-        $open = Carbon::parse(self::LUNCH_FROM);
+        $earliest = Carbon::parse(self::LUNCH_EARLIEST);
+        $default = Carbon::parse(self::LUNCH_DEFAULT);
         $latest = Carbon::parse(self::LUNCH_LATEST);
         $steps = [];
         $t = $clock->copy();
@@ -620,37 +630,38 @@ class ItineraryScheduleBuilder
 
         $end = $t->copy()->addMinutes($total);
 
-        if (! $lunchTaken && $t->greaterThanOrEqualTo($open) && $t->lessThanOrEqualTo($latest)) {
+        if (! $lunchTaken && $t->greaterThanOrEqualTo($earliest) && $t->lessThanOrEqualTo($latest)) {
             $meal($t, 'start', $from);
             $lunchTaken = true;
             $travel($total);
-        } elseif (! $lunchTaken && $t->lessThan($open) && $end->greaterThan($open) && $this->minutesBetween($t, $open) <= self::EAT_FIRST_LEAD_MINUTES) {
-            $meal($open, 'start', $from);
+        } elseif (! $lunchTaken && $t->lessThan($earliest) && $end->greaterThan($earliest) && $this->minutesBetween($t, $earliest) <= self::EAT_FIRST_LEAD_MINUTES) {
+            $meal($earliest, 'start', $from);
             $lunchTaken = true;
             $travel($total);
-        } elseif (! $lunchTaken && $t->lessThan($open) && $end->greaterThan($latest)) {
-            $before = $this->minutesBetween($t, $open);
+        } elseif (! $lunchTaken && $t->lessThan($earliest) && $end->greaterThan($latest)) {
+            $before = $this->minutesBetween($t, $default);
             $travel($before);
-            $meal($open, 'road', $this->pointAt($from, $to, $total > 0 ? $before / $total : 0.5));
+            $meal($default, 'road', $this->pointAt($from, $to, $total > 0 ? $before / $total : 0.5));
             $lunchTaken = true;
             $travel($total - $before);
         } else {
             $travel($total);
 
-            if (! $lunchTaken && $t->greaterThanOrEqualTo($open) && $t->lessThanOrEqualTo($latest)) {
+            if (! $lunchTaken && $t->greaterThanOrEqualTo($earliest) && $t->lessThanOrEqualTo($latest)) {
                 $meal($t, 'arrival', $to);
                 $lunchTaken = true;
             }
         }
 
-        if (! $lunchTaken && $t->lessThan($open) && $t->copy()->addMinutes($visitMinutes)->greaterThan($latest)) {
-            $room = $this->minutesBetween($t, $open);
-
-            if ($room < self::MIN_VISIT_BEFORE_LUNCH_MINUTES) {
-                $meal($open, 'arrival', $to);
+        // Arriving before lunch with a visit that would run past it. Within 30 minutes of the earliest lunch time
+        // (arriving 11:00 to 11:30), eat first and give the place its full visit afterwards: a short wait beats a
+        // one-hour visit after a long drive. Earlier than that, end the visit at the planned lunch time (12:00).
+        if (! $lunchTaken && $t->lessThan($earliest) && $t->copy()->addMinutes($visitMinutes)->greaterThan($latest)) {
+            if ($this->minutesBetween($t, $earliest) <= self::EAT_FIRST_IF_WITHIN_MINUTES) {
+                $meal($earliest, 'arrival', $to);
                 $lunchTaken = true;
             } else {
-                $visitMinutes = $room;
+                $visitMinutes = $this->minutesBetween($t, $default);
             }
         }
 
@@ -1031,10 +1042,10 @@ class ItineraryScheduleBuilder
             : Carbon::parse(substr((string) $preference->arrival_time, 0, 5));
     }
 
-    /** Lunch is due while the clock is inside the lunch window (the times it may start): 12:00 to 1:00 PM. */
+    /** Lunch is due while the clock is inside the lunch window (the times it may start): 11:30 AM to 1:00 PM. */
     private function lunchIsDue(Carbon $clock): bool
     {
-        return $clock->greaterThanOrEqualTo(Carbon::parse(self::LUNCH_FROM))
+        return $clock->greaterThanOrEqualTo(Carbon::parse(self::LUNCH_EARLIEST))
             && $clock->lessThanOrEqualTo(Carbon::parse(self::LUNCH_LATEST));
     }
 
