@@ -3,7 +3,7 @@
    and the filter dot always agree. */
 .event-card--festival, .cal-bar--festival, .chip__dot--festival { --ev: #7a4fa0; }
 .event-card--cultural, .cal-bar--cultural, .chip__dot--cultural { --ev: #c23d25; }
-.event-card--food, .cal-bar--food, .chip__dot--food { --ev: #e8632b; }
+.event-card--food, .cal-bar--food, .chip__dot--food { --ev: #b9481a; }
 .event-card--sports, .cal-bar--sports, .chip__dot--sports { --ev: #0e6a80; }
 .event-card--nature, .cal-bar--nature, .chip__dot--nature { --ev: #1e5c43; }
 

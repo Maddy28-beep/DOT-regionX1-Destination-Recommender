@@ -35,7 +35,7 @@
 
 <aside class="filter-panel filter-panel--v2" id="filterPanel" tabindex="-1">
     <div class="filter-panel__head">
-        <h3 id="filterPanelTitle">Filters</h3>
+        <h2 id="filterPanelTitle">Filters</h2>
         @if ($filterCount)
             <a href="{{ route($route, $clearParams) }}" class="filter-panel__clear">Clear all</a>
         @endif

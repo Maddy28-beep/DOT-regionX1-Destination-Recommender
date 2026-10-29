@@ -24,7 +24,8 @@
     --primary-dark: #084d39;
     --primary-light: #e6f4ef;
     --accent: #ff6b35;
-    --accent-dark: #e2551f;
+    --accent-dark: #b4461a;      /* hover for the accent button, and accent-coloured text: 5:1 on white, 4.5:1 on the cream paper */
+    --accent-strong: #c8501f;    /* the accent button's fill: white text on it is 4.5:1, which the bright --accent (2.8:1) is not */
     --gold: #f5a623;
     --ink: #1a2420;
     --muted: #5b6b64;
@@ -46,7 +47,7 @@
     --sunset-red: #FF7A59;
     --ocean-teal: #12836F;
     --ocean-teal-dark: #0B5E52;
-    --stamp-red: #D9472C;
+    --stamp-red: #C13A20;        /* deepened from #D9472C so red text on cream and white reaches 4.5:1 */
     --sun-glow: #FFE07A;
     --paper: #FFF7E9;
     --forest: #1E5C43;
@@ -67,7 +68,7 @@
     --tone-success-ink: #0a5c3f;
     --tone-success-line: #b9e2cd;
     --tone-warn-bg: #fff3e0;
-    --tone-warn-ink: #b5680a;
+    --tone-warn-ink: #9a5708;    /* was #b5680a (4.2:1 on the warning tint); this is 5.6:1 */
     --tone-warn-line: #f4d9ae;
     --tone-danger-bg: #fdecea;
     --tone-danger-ink: #b3271b;
@@ -152,7 +153,7 @@ a { color: inherit; text-decoration: none; }
    the hero's "Search" and the featured banner's "Plan This Trip", which were
    the last two primary CTAs still rendering as plain rounded rectangles. */
 .btn-accent {
-    background: var(--accent);
+    background: var(--accent-strong);
     color: var(--white);
     border-radius: var(--btn-radius);
     clip-path: none;
@@ -1011,7 +1012,7 @@ body.info-modal-open { overflow: hidden; }
 }
 .badge-accredited { background: var(--primary-light); color: var(--primary-dark); }
 .badge-accredited img { width: 14px; height: 14px; border-radius: 50%; display: block; flex-shrink: 0; }
-.badge-rating { background: #fff3e0; color: #b5680a; }
+.badge-rating { background: #fff3e0; color: #9a5708; }
 .badge-tone-good { background: var(--tone-success-bg); color: var(--tone-success-ink); }
 .badge-tone-low { background: var(--tone-danger-bg); color: var(--tone-danger-ink); }
 
@@ -3242,7 +3243,7 @@ select.site-dropdown-native {
 
 .site-footer { background: #0d221b; color: #cfe3da; padding: 64px 0 28px; margin-top: 0; border-top: 0; }
 .footer-grid { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 28px 44px; }
-.footer-grid h4 { color: var(--gold); font-weight: 700; font-size: .85rem; text-transform: uppercase; letter-spacing: .05em; margin: 0 0 18px; }
+.footer-grid h3 { color: var(--gold); font-weight: 700; font-size: .85rem; text-transform: uppercase; letter-spacing: .05em; margin: 0 0 18px; }
 .footer-grid a, .footer-grid p { display: block; font-size: .88rem; line-height: 1.55; margin-bottom: 10px; }
 .footer-grid p { color: #93ac9f; }
 .footer-grid a { color: #b7cec2; }
@@ -3577,7 +3578,7 @@ body:has(.catalog-layout) .section-tight:has(.catalog-layout) { padding-top: 12p
 }
 /* Alfa Slab One rather than Barabara: this heading is mixed-case and Barabara
    ships no lowercase glyphs. Matches the detail-page side-card headings. */
-.filter-panel h3 {
+.filter-panel h3, .filter-panel h2 {
     margin: 0 0 14px;
     font-family: 'Alfa Slab One', serif;
     font-weight: 400;
@@ -5797,11 +5798,11 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
     .site-footer { padding-top: 40px; }
     .footer-grid { grid-template-columns: 1fr 1fr; gap: 26px 20px; }
     .footer-grid > div:nth-child(1), .footer-grid > div:nth-child(2) { grid-column: 1 / -1; }
-    .footer-grid h4 { margin-bottom: 10px; }
+    .footer-grid h3 { margin-bottom: 10px; }
     .footer-grid a, .footer-grid p { margin-bottom: 0; }
     .footer-grid a { padding: 7px 0; }
     .footer-grid > div:nth-child(2) { display: grid; grid-template-columns: 1fr 1fr; column-gap: 20px; }
-    .footer-grid > div:nth-child(2) h4 { grid-column: 1 / -1; }
+    .footer-grid > div:nth-child(2) h3 { grid-column: 1 / -1; }
     .footer-grid > div:nth-child(4) p { margin-bottom: 8px; font-size: .84rem; }
 }
 
@@ -5910,3 +5911,8 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
 .photo-illustration-tag--card { left: 8px; bottom: 8px; padding: 2px 8px; font-size: .68rem; }
 .photo-credit { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 8px 0 0; font-size: .8rem; color: var(--muted); }
 .photo-credit a { color: var(--primary-dark); font-weight: 600; }
+
+/* ---------- Skip link and the main landmark ---------- */
+.skip-link { position: absolute; left: 8px; top: -60px; z-index: 1000; padding: 10px 16px; border-radius: 10px; background: var(--primary-dark); color: #fff; font-weight: 700; text-decoration: none; transition: top .15s; }
+.skip-link:focus { top: 8px; outline: 3px solid var(--accent); outline-offset: 2px; }
+main:focus { outline: none; }

@@ -25,7 +25,7 @@
                 </div>
             </div>
             <div>
-                <h4>For Travelers</h4>
+                <h3>For Travelers</h3>
                 <a href="{{ route('plan.edit') }}">Plan a trip</a>
                 <a href="{{ route('destinations.index') }}">Browse destinations</a>
                 <a href="{{ route('accommodations.index') }}">Browse accommodations</a>
@@ -38,7 +38,7 @@
                 <a href="{{ route('events.index') }}">Browse events</a>
             </div>
             <div>
-                <h4>For Partners</h4>
+                <h3>For Partners</h3>
                 {{-- Starts the partner request here rather than bouncing straight
                      out to the national DOT system: a business that is already
                      accredited would have been sent away for nothing. The
@@ -48,7 +48,7 @@
                 <a href="{{ route('portal.login') }}">Partner / DOT login</a>
             </div>
             <div>
-                <h4>Department of Tourism</h4>
+                <h3>Department of Tourism</h3>
                 <p>DOT Region XI &mdash; Davao Region</p>
                 <p>Tourism analytics &amp; accreditation monitoring</p>
             </div>
