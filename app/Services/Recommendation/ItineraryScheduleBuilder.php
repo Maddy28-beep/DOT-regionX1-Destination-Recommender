@@ -196,8 +196,9 @@ class ItineraryScheduleBuilder
         array $origin,
         ?array $stay,
     ): void {
-        $accommodation = $stay['listing'] ?? null;
-        $stayRule = $stay['rule'] ?? null;
+        // One stay for every night (the old form: ['listing' => ..., 'rule' => ...]) or a stay per night
+        // ([night => ['listing' => ..., 'rule' => ...]]).
+        $stayByNight = $this->stayByNight($stay, $dayCapacities);
         $sortOrder = 0;
         $this->lastStart = $this->pastMidnight = [];
         // Every journey estimate this build makes is at the pace of how the traveller said they will get around.
@@ -226,7 +227,12 @@ class ItineraryScheduleBuilder
             $date = $tripStart->copy()->addDays($dayNumber - 1);
             $capacity = count($slots);
 
-            $clock = $this->openDay($itinerary, $dayNumber, $sortOrder, $preference, $origin, $accommodation, $date);
+            // The stay of tonight, and of last night (where this morning starts: breakfast, and the first journey).
+            $accommodation = $stayByNight[$dayNumber]['listing'] ?? null;
+            $stayRule = $stayByNight[$dayNumber]['rule'] ?? null;
+            $lastNight = $stayByNight[$dayNumber - 1]['listing'] ?? null;
+
+            $clock = $this->openDay($itinerary, $dayNumber, $sortOrder, $preference, $origin, $lastNight, $date);
             $lunchTaken = false;
             $scheduled = 0;
 
@@ -352,10 +358,31 @@ class ItineraryScheduleBuilder
             if ($isLastDay) {
                 $this->closeTripDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $origin, $lunchTaken, $lastDestination, $date);
             } else {
-                $this->closeOvernightDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $accommodation, $stayRule);
+                $this->closeOvernightDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $accommodation, $stayRule, $lastNight);
                 $here = $accommodation ? $this->place($accommodation) : $here;
             }
         }
+    }
+
+    /**
+     * Normalises the stay argument to one entry per night.
+     *
+     * @param  array<int|string, mixed>|null  $stay
+     * @param  array<int, array<int, string>>  $dayCapacities
+     * @return array<int, array{listing: Accommodation|null, rule: array|null}>
+     */
+    private function stayByNight(?array $stay, array $dayCapacities): array
+    {
+        if ($stay === null) {
+            return [];
+        }
+
+        // A single stay for the whole trip: the same one every night.
+        if (array_key_exists('listing', $stay)) {
+            return array_fill_keys(array_keys($dayCapacities), $stay);
+        }
+
+        return array_filter($stay, 'is_array');
     }
 
     /**
@@ -855,7 +882,7 @@ class ItineraryScheduleBuilder
     }
 
     /** Days that end at the accommodation: travel back, dinner, overnight. */
-    private function closeOvernightDay(Itinerary $itinerary, int $dayNumber, int &$sortOrder, Carbon $clock, array $here, ?Accommodation $accommodation, ?array $stayRule = null): void
+    private function closeOvernightDay(Itinerary $itinerary, int $dayNumber, int &$sortOrder, Carbon $clock, array $here, ?Accommodation $accommodation, ?array $stayRule = null, ?Accommodation $lastNight = null): void
     {
         if (! $accommodation) {
             return;
@@ -879,6 +906,7 @@ class ItineraryScheduleBuilder
                 'title' => 'Late check-in and overnight stay',
                 'starts_at' => $this->toQuarterHour($arrival),
                 'accommodation_id' => $accommodation->id,
+                'note' => $this->stayChangeNote($lastNight, $accommodation),
             ], $this->ruleColumns($stayRule)));
 
             return;
@@ -917,7 +945,16 @@ class ItineraryScheduleBuilder
             'title' => 'Overnight stay',
             'starts_at' => $overnight,
             'accommodation_id' => $accommodation->id,
+            'note' => $this->stayChangeNote($lastNight, $accommodation),
         ], $this->ruleColumns($stayRule)));
+    }
+
+    /** Says so when tonight's stay is not last night's: the traveller packs up in the morning. */
+    private function stayChangeNote(?Accommodation $lastNight, Accommodation $tonight): ?string
+    {
+        return $lastNight && $lastNight->id !== $tonight->id
+            ? "You change stays tonight. Last night you were at {$lastNight->name}; the journeys of the day are planned around where each night is spent."
+            : null;
     }
 
     /** The final day: souvenirs, a last meal if lunch has not happened, then the journey out. */
