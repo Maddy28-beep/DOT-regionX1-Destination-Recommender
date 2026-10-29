@@ -80,7 +80,8 @@ class EstablishmentPortalRendersTest extends TestCase
     {
         $partner = $this->partner();
 
-        foreach (['/portal/establishment/listing', '/portal/establishment/photos'] as $uri) {
+        // The forms open in a modal, so the selects live in the form fragments the modal loads.
+        foreach (['/portal/establishment/listing/details?modal=1', '/portal/establishment/photos/create?modal=1'] as $uri) {
             $html = $this->actingAs($partner, 'establishment')->get($uri)->getContent();
 
             preg_match_all('/<select[^>]*>/', $html, $matches);
@@ -97,7 +98,7 @@ class EstablishmentPortalRendersTest extends TestCase
     public function test_file_input_uses_the_shared_label_pattern(): void
     {
         $html = $this->actingAs($this->partner(), 'establishment')
-            ->get('/portal/establishment/photos')
+            ->get('/portal/establishment/photos/create?modal=1')
             ->getContent();
 
         $this->assertStringContainsString('file-field__btn', $html);
@@ -143,11 +144,11 @@ class EstablishmentPortalRendersTest extends TestCase
         $html = $this->actingAs($partner, 'establishment')->get('/portal/establishment')->getContent();
 
         $this->assertStringContainsString('Accreditation Expired', $html);
-        $this->assertStringContainsString('Action Required', $html);
+        $this->assertStringContainsString('adm-alert', $html);
         // The stale account-approval wording must not be presented as the status.
         $this->assertStringNotContainsString('>Approved<', $html);
-        // The portal-wide alert bar is driven by the same method.
-        $this->assertStringContainsString('portal-alert', $html);
+        // The overview alert is driven by the same method.
+        $this->assertStringContainsString('Accreditation Expired.', $html);
     }
 
     /** A healthy listing shows no action-required alert bar. */
@@ -167,7 +168,7 @@ class EstablishmentPortalRendersTest extends TestCase
         $this->assertSame('Active', $partner->fresh()->portalStatus()['label']);
 
         $html = $this->actingAs($partner, 'establishment')->get('/portal/establishment')->getContent();
-        $this->assertStringNotContainsString('portal-alert', $html);
+        $this->assertStringNotContainsString('adm-alert', $html);
     }
 
     /** The QR panel shows the URL the code actually encodes. */
@@ -182,9 +183,9 @@ class EstablishmentPortalRendersTest extends TestCase
 
         $expected = \App\Http\Controllers\QrCodeController::signedCheckInUrl('accommodations', $listing->id);
 
-        $this->assertStringContainsString('qr-frame', $html);
+        $this->assertStringContainsString('ptr-qr', $html);
         $this->assertStringContainsString(e($expected), $html);
-        $this->assertStringContainsString('Download QR Code', $html);
+        $this->assertStringContainsString('>Download<', $html);
     }
 
     /**

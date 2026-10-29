@@ -58,8 +58,9 @@ class EstablishmentLocationPickerTest extends TestCase
 
     public function test_the_picker_appears_on_the_listing_page(): void
     {
+        // The picker opens in a modal: the form it is in is what the modal loads.
         $html = $this->actingAs($this->partner(), 'establishment')
-            ->get('/portal/establishment/listing')->assertOk()->getContent();
+            ->get('/portal/establishment/listing/position?modal=1')->assertOk()->getContent();
 
         $this->assertStringContainsString('location-picker', $html);
         $this->assertStringContainsString('You have not set this yet', $html,

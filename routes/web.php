@@ -15,6 +15,7 @@ use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\Establishment\EstablishmentDashboardController;
+use App\Http\Controllers\Establishment\EstablishmentInsightsController;
 use App\Http\Controllers\Establishment\EstablishmentPhotoController;
 use App\Http\Controllers\Establishment\EstablishmentPromotionController;
 use App\Http\Controllers\EventController;
@@ -270,20 +271,30 @@ Route::prefix('portal/establishment')->name('establishment.')->middleware('auth:
     Route::get('/', [EstablishmentDashboardController::class, 'overview'])->name('overview');
     Route::get('/listing', [EstablishmentDashboardController::class, 'editListing'])->name('listing.edit');
     Route::put('/listing', [EstablishmentDashboardController::class, 'updateListing'])->name('listing.update');
+    Route::get('/listing/{section}', [EstablishmentDashboardController::class, 'form'])->whereIn('section', array_keys(EstablishmentDashboardController::SECTIONS))->name('listing.form');
     Route::get('/listing/qr-code', [QrCodeController::class, 'establishment'])->name('listing.qr-code');
     Route::get('/reviews', [EstablishmentDashboardController::class, 'reviews'])->name('reviews');
+    Route::get('/reviews/{review}/reply', [EstablishmentDashboardController::class, 'replyForm'])->name('reviews.reply.form');
     Route::post('/reviews/{review}/reply', [EstablishmentDashboardController::class, 'replyToReview'])->name('reviews.reply');
+    Route::get('/insights', [EstablishmentInsightsController::class, 'index'])->name('insights');
     Route::get('/notifications', [EstablishmentDashboardController::class, 'notifications'])->name('notifications');
     Route::post('/notifications/read-all', [EstablishmentDashboardController::class, 'markNotificationsRead'])->name('notifications.read-all');
 
     Route::get('/photos', [EstablishmentPhotoController::class, 'index'])->name('photos');
+    Route::get('/photos/create', [EstablishmentPhotoController::class, 'create'])->name('photos.create');
     Route::post('/photos', [EstablishmentPhotoController::class, 'store'])->name('photos.store');
+    Route::post('/photos/reorder', [EstablishmentPhotoController::class, 'reorderAll'])->name('photos.reorder');
+    Route::get('/photos/credit', [EstablishmentPhotoController::class, 'creditForm'])->name('photos.credit.bulk.form');
+    Route::put('/photos/credit', [EstablishmentPhotoController::class, 'saveCredit'])->name('photos.credit.bulk');
+    Route::get('/photos/{photo}/credit', [EstablishmentPhotoController::class, 'creditForm'])->whereNumber('photo')->name('photos.credit.form');
+    Route::put('/photos/{photo}/credit', [EstablishmentPhotoController::class, 'saveCredit'])->whereNumber('photo')->name('photos.credit');
     Route::post('/photos/{photo}/primary', [EstablishmentPhotoController::class, 'setPrimary'])->name('photos.primary');
     Route::delete('/photos/{photo}', [EstablishmentPhotoController::class, 'destroy'])->name('photos.destroy');
     Route::post('/photos/{photo}/up', [EstablishmentPhotoController::class, 'moveUp'])->name('photos.up');
     Route::post('/photos/{photo}/down', [EstablishmentPhotoController::class, 'moveDown'])->name('photos.down');
 
     Route::get('/promotions', [EstablishmentPromotionController::class, 'index'])->name('promotions');
+    Route::get('/promotions/create', [EstablishmentPromotionController::class, 'create'])->name('promotions.create');
     Route::post('/promotions', [EstablishmentPromotionController::class, 'store'])->name('promotions.store');
     Route::delete('/promotions/{promotion}', [EstablishmentPromotionController::class, 'destroy'])->name('promotions.destroy');
 });

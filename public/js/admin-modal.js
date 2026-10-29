@@ -114,6 +114,7 @@
         opener = link;
         title.textContent = link.dataset.title || 'Listing';
         sub.textContent = link.dataset.sub || '';
+        dialog.classList.toggle('adm-modal--narrow', link.dataset.size === 'narrow');   // short forms (a promo, a photo credit) sit in a smaller dialog
         body.innerHTML = '<p class="adm-modal__loading">Loading…</p>';
         dialog.showModal();
 

@@ -15,42 +15,23 @@
         </div>
     </div>
 @else
-    <div class="panel">
-        <div class="panel-head">
+    <div class="adm-card">
+        <div class="adm-card__head">
             <div>
-                <h2>{{ $reviews->total() }} Review{{ $reviews->total() === 1 ? '' : 's' }}</h2>
-                <p>Average rating: {{ number_format($listing->rating, 1) }} &#9733; from {{ $listing->review_count }} total ratings.</p>
+                <h2>{{ $reviews->total() }} {{ \Illuminate\Support\Str::plural('review', $reviews->total()) }}</h2>
+                <p>{{ ($listing->review_count ?? 0) > 0 ? 'Average rating '.number_format($listing->rating, 1).' ★ from '.$listing->review_count.' total ratings.' : 'Nobody has rated this listing yet.' }}</p>
             </div>
         </div>
-        <div class="panel-body">
+        <div class="adm-card__body">
             @forelse ($reviews as $review)
-                <div class="review-item">
-                    <div class="author">{{ $review->author_name ?? 'Traveler' }}</div>
-                    <div class="stars">{{ str_repeat('★', $review->rating).str_repeat('☆', 5 - $review->rating) }}</div>
-                    <p class="comment">{{ $review->comment }}</p>
-
-                    @if ($review->owner_reply)
-                        <div class="owner-reply">
-                            <div class="owner-reply-label">Your reply &middot; {{ $review->owner_replied_at->format('M d, Y') }}</div>
-                            <p class="comment">{{ $review->owner_reply }}</p>
-                        </div>
-                    @else
-                        <form method="POST" action="{{ route('establishment.reviews.reply', $review) }}" class="owner-reply-form">
-                            @csrf
-                            <div class="field">
-                                <label for="owner_reply_{{ $review->id }}">Reply to this review</label>
-                                <textarea name="owner_reply" id="owner_reply_{{ $review->id }}" rows="3" maxlength="500" required placeholder="Thank the traveler or address their feedback..."></textarea>
-                            </div>
-                            {{-- Primary: this is the submit action for its form, matching
-                                 Save Changes and Upload in the other modules. --}}
-                            <button type="submit" class="btn btn-primary">Post Reply</button>
-                        </form>
-                    @endif
-                </div>
+                @include('establishment.partials.review', ['review' => $review])
             @empty
-                <p style="color:var(--muted);">No reviews yet.</p>
+                <p class="ptr-empty">No reviews yet.</p>
             @endforelse
         </div>
+        @if ($reviews->hasPages())
+            <div class="adm-card__foot">@include('partials.pagination', ['paginator' => $reviews])</div>
+        @endif
     </div>
 @endif
 
