@@ -24,6 +24,11 @@
             <div class="group-label">My establishment</div>
             <a href="{{ route('establishment.overview') }}" class="{{ request()->routeIs('establishment.overview') ? 'active' : '' }}"><x-icon name="target" /><span>Overview</span></a>
             <a href="{{ route('establishment.listing.edit') }}" class="{{ request()->routeIs('establishment.listing.*') ? 'active' : '' }}"><x-icon name="building" /><span>My Listing</span></a>
+            @if (auth('establishment')->user()->listing_kind === 'tour_operator')
+                <a href="{{ route('establishment.packages') }}" class="{{ request()->routeIs('establishment.packages*') ? 'active' : '' }}"><x-icon name="package" /><span>My packages</span>
+                    @if ($navPackagesChanges > 0)<b class="ptr-nb" title="DOT asked for a change to {{ $navPackagesChanges }}">{{ $navPackagesChanges }}<span class="sr-only"> need your attention</span></b>@endif
+                </a>
+            @endif
             <a href="{{ route('establishment.photos') }}" class="{{ request()->routeIs('establishment.photos*') ? 'active' : '' }}"><x-icon name="camera" /><span>Photos</span></a>
             <a href="{{ route('establishment.promotions') }}" class="{{ request()->routeIs('establishment.promotions*') ? 'active' : '' }}"><x-icon name="tag" /><span>Promos &amp; Discounts</span></a>
             <a href="{{ route('establishment.reviews') }}" class="{{ request()->routeIs('establishment.reviews*') ? 'active' : '' }}"><x-icon name="chat" /><span>Guest Reviews</span>

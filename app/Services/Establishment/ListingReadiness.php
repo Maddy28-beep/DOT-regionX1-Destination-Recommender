@@ -3,6 +3,8 @@
 namespace App\Services\Establishment;
 
 use App\Models\ListingPhoto;
+use App\Services\Amenities\AmenityStore;
+use App\Support\Amenities;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -36,6 +38,7 @@ class ListingReadiness
         $checks = [
             ['key' => 'desc', 'label' => 'A full description', 'ok' => mb_strlen(trim((string) $listing->description)) >= self::MIN_DESCRIPTION, 'section' => 'details', 'action' => 'Edit'],
             ...($hoursColumn ? [['key' => 'hours', 'label' => 'Opening hours', 'ok' => trim((string) $listing->{$hoursColumn}) !== '', 'section' => 'hours', 'action' => 'Add hours']] : []),
+            ...($kind !== 'package' && Amenities::hasList($kind) ? [['key' => 'amenities', 'label' => Amenities::ENOUGH.'+ amenities', 'ok' => count(app(AmenityStore::class)->keys($kind, $listing)) >= Amenities::ENOUGH, 'section' => 'amenities', 'action' => 'Tick']] : []),
             ['key' => 'position', 'label' => 'Position on the map', 'ok' => $listing->latitude !== null && $listing->longitude !== null, 'section' => 'position', 'action' => 'Pin it'],
             ['key' => 'photos', 'label' => self::MIN_PHOTOS.'+ photos', 'ok' => $photos->count() >= self::MIN_PHOTOS, 'section' => 'photos', 'action' => 'Upload'],
             ['key' => 'credit', 'label' => 'Photos credited', 'ok' => $photos->isNotEmpty() && $photos->every(fn (ListingPhoto $p) => $this->credited($p)), 'section' => 'credit', 'action' => 'Add'],

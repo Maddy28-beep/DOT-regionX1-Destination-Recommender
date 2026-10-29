@@ -197,7 +197,7 @@ class PartnerPortalRedesignTest extends TestCase
 
         $empty = $readiness->for('accommodation', $stay->load('photos'));
         $this->assertSame(0, collect($empty['checks'])->where('key', 'hours')->count(), 'a stay has no opening hours to ask for');
-        $this->assertSame(6, $empty['total']);
+        $this->assertSame(7, $empty['total']);
         $this->assertSame(0, $empty['done']);
 
         $stay->update([
@@ -207,6 +207,8 @@ class PartnerPortalRedesignTest extends TestCase
         foreach (['a', 'b', 'c'] as $n) {
             ListingPhoto::create(['listing_kind' => 'accommodation', 'listing_id' => $stay->id, 'path' => "listings/{$n}.jpg", 'category' => 'General', 'credit_text' => 'Rey', 'source_name' => 'Rey']);
         }
+
+        app(\App\Services\Amenities\AmenityStore::class)->sync('accommodation', $stay, ['wifi', 'pool', 'ac', 'parking']);
 
         $full = $readiness->for('accommodation', $stay->fresh()->load('photos'));
         $this->assertSame(100, $full['percent']);

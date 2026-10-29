@@ -4,6 +4,7 @@
     $fixes = [
         'details' => [route('establishment.listing.form', 'details'), 'Edit details', 'What travellers read about you', null],
         'hours' => [route('establishment.listing.form', 'hours'), 'Opening hours', 'Shown to travellers and used when they plan a day', 'narrow'],
+        'amenities' => [route('establishment.listing.form', 'amenities'), 'Amenities', 'Tick what is really there', 'narrow'],
         'position' => [route('establishment.listing.form', 'position'), 'Pin your place on the map', 'Travellers use this to find you', 'narrow'],
         'photos' => [route('establishment.photos.create'), 'Upload photos', 'JPG, PNG or WebP, up to 2 MB each', 'narrow'],
         'credit' => [route('establishment.photos.credit.bulk.form'), 'Photo credit', 'Travellers see who took each photo', 'narrow'],

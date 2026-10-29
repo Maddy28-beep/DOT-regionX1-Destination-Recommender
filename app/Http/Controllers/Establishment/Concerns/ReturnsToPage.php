@@ -21,7 +21,7 @@ trait ReturnsToPage
         $previous = (string) url()->previous();
         $portal = url('/portal/establishment');
 
-        if (! str_starts_with($previous, $portal) || preg_match('#/(listing/(details|status|hours|position)|photos/(create|credit|[0-9]+/credit)|promotions/create)(/|\?|$)#', $previous)) {
+        if (! str_starts_with($previous, $portal) || preg_match('#/(listing/(details|status|hours|position|amenities)|photos/(create|credit|[0-9]+/credit)|promotions/create|packages/(create|[0-9]+/edit|[0-9]+/photos/create))(/|\?|$)#', $previous)) {
             return $fallback;
         }
 

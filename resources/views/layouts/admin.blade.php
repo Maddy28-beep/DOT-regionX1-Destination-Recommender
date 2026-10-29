@@ -35,6 +35,9 @@
 
             <div class="group-label">Accreditation</div>
             <a href="{{ route('admin.establishments') }}" class="{{ request()->routeIs('admin.establishments') ? 'active' : '' }}"><x-icon name="shield-check" /><span>Establishment Approvals</span></a>
+            <a href="{{ route('admin.package-approvals') }}" class="{{ request()->routeIs('admin.package-approvals*') ? 'active' : '' }}"><x-icon name="package" /><span>Package Approvals</span>
+                @if ($navPackagesWaiting > 0)<b class="adm-nb" title="{{ $navPackagesWaiting }} waiting for review">{{ $navPackagesWaiting }}<span class="sr-only"> waiting for review</span></b>@endif
+            </a>
             <a href="{{ route('admin.accreditation') }}" class="{{ request()->routeIs('admin.accreditation') ? 'active' : '' }}"><x-icon name="clock" /><span>Accreditation Monitoring</span></a>
 
             <div class="group-label">Insights</div>

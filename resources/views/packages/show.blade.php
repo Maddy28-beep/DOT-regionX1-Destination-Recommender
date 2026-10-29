@@ -55,6 +55,8 @@
                 'groups' => ['Package type' => [$package->type]],
             ])
 
+            @include('partials.package-accessibility-card', ['package' => $package])
+
             @if ($package->itineraryDays->isNotEmpty())
                 <div class="side-card">
                     <h3 class="mt-0">Day-by-Day Itinerary</h3>

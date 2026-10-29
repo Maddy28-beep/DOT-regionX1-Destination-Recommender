@@ -104,6 +104,7 @@ class AdminListingController extends Controller
         }
 
         $listing = $config['model']::create($data);
+        $this->syncAmenities($request, $type, $listing);
 
         if ($type === 'packages' && $request->filled('inclusions')) {
             $this->syncInclusions($listing, $request->input('inclusions'));
@@ -154,6 +155,7 @@ class AdminListingController extends Controller
         }
 
         $listing->update($data);
+        $this->syncAmenities($request, $type, $listing);
 
         if ($type === 'packages') {
             $this->syncInclusions($listing, $request->input('inclusions', ''));
@@ -164,6 +166,19 @@ class AdminListingController extends Controller
         }
 
         return $this->modalSaved($request, route('admin.listings.index', $type), Toast::success("{$config['singular']} updated", "Your changes to \"{$listing->name}\" have been saved.".$this->hoursNote($type, $listing)));
+    }
+
+    /** The ticked amenities (or, for a package, who it suits and what is on the trip), when the form carried them. */
+    private function syncAmenities(Request $request, string $type, $listing): void
+    {
+        $kind = \App\Services\Admin\DataCompleteness::TYPES[$type]['kind'] ?? null;
+
+        if (! $request->boolean('amenities_form') || ! $kind || ! \App\Support\Amenities::hasList($kind)) {
+            return;
+        }
+
+        $request->validate([($kind === 'package' ? 'features' : 'amenities') => ['nullable', 'array']]);
+        app(\App\Services\Amenities\AmenityStore::class)->sync($kind, $listing, (array) $request->input($kind === 'package' ? 'features' : 'amenities', []));
     }
 
     public function archive(string $type, int $id): RedirectResponse
@@ -423,6 +438,8 @@ class AdminListingController extends Controller
                 'latitude' => ['nullable', 'numeric', 'between:'.EstablishmentDashboardController::REGION_BOUNDS['lat'][0].','.EstablishmentDashboardController::REGION_BOUNDS['lat'][1]],
                 'longitude' => ['nullable', 'numeric', 'between:'.EstablishmentDashboardController::REGION_BOUNDS['lng'][0].','.EstablishmentDashboardController::REGION_BOUNDS['lng'][1]],
                 'featured' => ['nullable', 'boolean'],
+                'difficulty' => ['nullable', Rule::in(array_keys(\App\Support\Amenities::DIFFICULTY))],
+                'accessibility_note' => ['nullable', 'string', 'max:300'],
             ]),
             'souvenir-centers' => array_merge($common, [
                 'latitude' => ['nullable', 'numeric', 'between:'.EstablishmentDashboardController::REGION_BOUNDS['lat'][0].','.EstablishmentDashboardController::REGION_BOUNDS['lat'][1]],

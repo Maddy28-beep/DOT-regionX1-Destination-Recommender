@@ -45,6 +45,19 @@ class AdminAttention
             ];
         }
 
+        $waiting = \App\Models\Package::where('status', \App\Models\Package::STATUS_IN_REVIEW)->get();
+        if ($waiting->isNotEmpty()) {
+            $limit = \App\Http\Controllers\Admin\AdminPackageApprovalController::OVERDUE_DAYS;
+            $overdue = $waiting->filter(fn ($p) => $p->submitted_at && $p->submitted_at->diffInDays(now()) > $limit)->count();
+            $items[] = [
+                'key' => 'packages', 'tone' => 'warn', 'icon' => 'package',
+                'title' => $waiting->count().' '.($waiting->count() === 1 ? 'package waiting for review' : 'packages waiting for review'),
+                'detail' => $overdue > 0 ? ($overdue === 1 ? 'One has' : $overdue.' have')." been waiting more than {$limit} days." : 'Tour operators are waiting for a decision.',
+                'action' => 'Review',
+                'url' => route('admin.package-approvals'),
+            ];
+        }
+
         $noPosition = Destination::query()->whereNull('archived_at')
             ->where(fn ($q) => $q->whereNull('latitude')->orWhereNull('longitude'))->count();
         if ($noPosition > 0) {

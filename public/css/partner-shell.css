@@ -174,3 +174,40 @@
     .ptr-hours__row { grid-template-columns: 70px 1fr 1fr; }
     .adm-card__body { max-height: none; }
 }
+
+/* ---------- my packages (tour operators) ---------- */
+.ptr-plink { color: var(--ink); } .ptr-plink:hover strong { color: var(--primary); text-decoration: underline; }
+.ptr-warnnote { max-width: 440px; margin-top: 3px; padding: 2px 8px; border-radius: 6px; background: #fff7e0; color: #6b5200; white-space: normal; }
+.ptr-steps { display: grid; grid-template-columns: repeat(4, 1fr); padding: 16px; }
+.ptr-step { position: relative; text-align: center; font-size: .78rem; color: var(--muted); }
+.ptr-step::before { content: ''; position: absolute; top: 15px; left: -50%; width: 100%; height: 3px; background: #e8efeb; z-index: 0; } .ptr-step:first-child::before { display: none; }
+.ptr-step.done::before, .ptr-step.on::before { background: var(--primary); }
+.ptr-step i { position: relative; z-index: 1; display: grid; place-items: center; width: 32px; height: 32px; margin: 0 auto 6px; border-radius: 50%; border: 2px solid #d3ddd8; background: var(--white); color: var(--muted); font-style: normal; font-weight: 700; }
+.ptr-step i svg { width: 16px; height: 16px; stroke-width: 3; }
+.ptr-step.done i { border-color: var(--primary); background: var(--primary); color: #fff; }
+.ptr-step.on i { border-color: var(--primary); color: var(--primary); box-shadow: 0 0 0 4px rgba(11, 107, 79, .14); }
+.ptr-step.bad i { border-color: var(--danger); background: #fdecea; color: var(--danger); }
+.ptr-step b { display: block; color: var(--ink); font-size: .8rem; } .ptr-step.is-dim b { color: var(--muted); font-weight: 600; } .ptr-step small { display: block; color: var(--muted); font-size: .68rem; }
+.ptr-callout { margin: 0 16px 14px; padding: 10px 12px; border: 1px solid #f0c36d; border-radius: 10px; background: #fff7e0; color: #6b5200; font-size: .78rem; line-height: 1.5; }
+.ptr-callout.is-ok { border-color: #b7dccd; background: var(--primary-light); color: var(--primary-dark); }
+.ptr-day { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: .82rem; } .ptr-day:last-child { border-bottom: 0; }
+.ptr-day > span { padding-top: 2px; font-size: .68rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--primary-dark); }
+.ptr-day p { margin: 2px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.45; }
+.ptr-tabs { display: flex; gap: 4px; margin: 0 0 14px; border-bottom: 1px solid var(--border); }
+.ptr-tabs button { height: 38px; padding: 0 14px; border: 0; border-bottom: 3px solid transparent; background: none; font: inherit; font-size: .8rem; font-weight: 600; color: var(--muted); cursor: pointer; }
+.ptr-tabs button[aria-selected="true"] { color: var(--primary-dark); border-bottom-color: var(--primary); }
+.ptr-tabs button:focus-visible { outline: 3px solid #e98543; outline-offset: -3px; }
+.ptr-tabn { display: inline-grid; place-items: center; min-width: 18px; height: 18px; margin-left: 4px; border-radius: 99px; background: var(--primary-light); color: var(--primary-dark); font-size: .66rem; }
+.ptr-incl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ptr-chk { display: flex; align-items: center; gap: 8px; margin: 0; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: .8rem; font-weight: 600; color: var(--ink); cursor: pointer; }
+.ptr-chk input { width: 16px; height: 16px; accent-color: var(--primary); }
+.ptr-chk:has(input:checked) { border-color: var(--primary); background: var(--primary-light); }
+@media (max-width: 900px) { .ptr-incl { grid-template-columns: 1fr; } .ptr-tabs button { padding: 0 8px; font-size: .74rem; } .ptr-steps { padding: 12px 6px; } .ptr-step { font-size: .68rem; } }
+
+.ptr-choices { display: grid; gap: 8px; }
+.ptr-choices label { display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 12px; cursor: pointer; font-weight: 600; }
+.ptr-choices label small { display: block; font-weight: 400; color: var(--muted); font-size: .72rem; }
+.ptr-choices input { margin-top: 3px; accent-color: var(--primary); }
+.ptr-choices label:has(input:checked) { border-color: var(--primary); background: var(--primary-light); }
+.ptr-mini { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: .78rem; } .ptr-mini:last-child { border-bottom: 0; }
+.ptr-mini img { border-radius: 8px; object-fit: cover; } .ptr-mini small { color: var(--muted); }

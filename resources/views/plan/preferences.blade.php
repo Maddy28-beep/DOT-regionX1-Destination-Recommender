@@ -9,7 +9,8 @@
     $selectedConditions = $healthProfile ? $healthProfile->conditions->pluck('condition')->all() : [];
 
     $activityOptions = ['Beach & Island', 'Nature & Adventure', 'Cultural Heritage', 'Wildlife', 'Food Tourism', 'Shopping & Souvenirs', 'Hiking & Trekking', 'Relaxation & Wellness'];
-    $amenityOptions = ['Parking Area', 'Restaurant', 'Swimming Pool', 'Wi-Fi', 'Restroom', 'Accessibility Ramp', 'Air Conditioning'];
+    // The same list every listing ticks its amenities from, so what a traveller asks for is what a place can carry.
+    $amenityOptions = \App\Support\Amenities::plannerLabels();
     $travelTypes = ['Solo' => 'Solo', 'Couple' => 'Couple', 'Family' => 'Family', 'Friends' => 'Friends / Group', 'Business' => 'Business'];
     $travelPurposes = ['Leisure', 'Business', 'Visiting Friends/Family', 'Educational', 'Medical', 'Religious/Pilgrimage', 'Other'];
     $visitorTypes = ['First-time Visitor', 'Returning Visitor', 'Regular / Local'];

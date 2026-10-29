@@ -107,6 +107,11 @@ class AppServiceProvider extends ServiceProvider
             'establishment' => EstablishmentAccount::class,
         ]);
 
+        // The count beside "Package Approvals" in the DOT Admin sidebar: packages tour operators sent in that DOT has not decided.
+        View::composer('layouts.admin', function ($view) {
+            $view->with('navPackagesWaiting', \App\Models\Package::where('status', \App\Models\Package::STATUS_IN_REVIEW)->count());
+        });
+
         View::composer('layouts.establishment', function ($view) {
             $establishment = Auth::guard('establishment')->user();
             $listing = $establishment?->matchedListing;
@@ -117,6 +122,11 @@ class AppServiceProvider extends ServiceProvider
             // Sidebar count badge — same "needs your attention" signal the
             // Overview panel shows, surfaced on every page so it isn't missed.
             $view->with('navUnrepliedCount', $listing ? $listing->reviews()->whereNull('owner_reply')->count() : 0);
+
+            // A tour operator's packages DOT has sent back for a change: shown beside "My packages" and in the bell.
+            $view->with('navPackagesChanges', $establishment?->listing_kind === 'tour_operator' && $listing
+                ? \App\Models\Package::where('tour_operator_id', $listing->id)->where('status', \App\Models\Package::STATUS_CHANGES)->count()
+                : 0);
 
             /*
              * Portal-wide alert bar. Accreditation lapsing affects every page,
