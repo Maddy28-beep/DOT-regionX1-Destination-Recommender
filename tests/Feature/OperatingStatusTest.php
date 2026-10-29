@@ -239,10 +239,13 @@ class OperatingStatusTest extends TestCase
         $partner = $this->partnerFor($stay);
 
         $this->actingAs($partner, 'establishment')->get('/portal/establishment')
-            ->assertOk()->assertSee('Operating status')->assertSee('Change operating status');
+            ->assertOk()->assertSee('Open for visitors')->assertSee(route('establishment.listing.form', 'status'), false);
 
         $this->actingAs($partner, 'establishment')->get('/portal/establishment/listing')
-            ->assertOk()->assertSee('id="operating-status"', false)->assertSee('Is this place operating?');
+            ->assertOk()->assertSee('id="operating-status"', false);
+
+        $this->actingAs($partner, 'establishment')->get('/portal/establishment/listing/status?modal=1')
+            ->assertOk()->assertSee('Is this place operating?');
 
         $this->actingAs($partner, 'establishment')->put('/portal/establishment/listing', [
             'operating_status' => 'temporarily_closed', 'reopens_on' => '2026-11-20', 'closure_reason' => 'Renovation',

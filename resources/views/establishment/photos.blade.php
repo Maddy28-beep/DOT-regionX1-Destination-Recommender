@@ -2,65 +2,36 @@
 
 @section('title', 'Photos — Partner Dashboard')
 @section('page-title', 'Photos')
-@section('page-sub', 'Manage the photos travelers see for '.$listing->name)
+@section('page-sub', 'Drag to reorder. The cover photo is what travellers see first.')
+
+@section('page-actions')
+    <a href="{{ route('establishment.photos.create') }}" class="btn btn-primary" data-modal-form data-title="Upload photos" data-sub="JPG, PNG or WebP, up to 2 MB each" data-size="narrow"><x-icon name="camera" /> Upload photos</a>
+@endsection
 
 @section('content')
 
-<div class="panel">
-    <div class="panel-head">
+@php
+    $readiness = app(\App\Services\Establishment\ListingReadiness::class);
+    $missing = $readiness->realPhotos($listing)->reject(fn ($p) => $readiness->credited($p))->count();
+@endphp
+
+<div class="adm-card">
+    <div class="adm-card__head">
         <div>
-            <h2>Upload Photos</h2>
-            <p>JPG, PNG, or WebP &middot; up to 2MB each &middot; up to 10 at a time.</p>
+            <h2>{{ $photos->count() }} {{ \Illuminate\Support\Str::plural('photo', $photos->count()) }}</h2>
+            <p>
+                @if ($missing > 0)
+                    {{ $missing }} without a credit. Travellers see the credit under each photo.
+                    <a class="adm-link" href="{{ route('establishment.photos.credit.bulk.form') }}" data-modal-form data-title="Photo credit" data-sub="Travellers see who took each photo" data-size="narrow">Add credits</a>
+                @else
+                    Every photo is credited.
+                @endif
+            </p>
         </div>
     </div>
-    <div class="panel-body">
-        <form method="POST" action="{{ route('establishment.photos.store') }}" enctype="multipart/form-data">
-            @csrf
-            <div class="upload-dropzone">
-                <div class="upload-icon"><x-icon name="camera" /></div>
-                <p>Choose photos to upload, tag them with a category, and add them to your listing.</p>
-
-                <label class="file-field">
-                    <input type="file" name="photos[]" accept="image/png,image/jpeg,image/webp" multiple required>
-                    <span class="file-field__btn">
-                        <x-icon name="camera" />
-                        Choose photos
-                    </span>
-                    <span class="file-field__status" data-file-status>No files chosen</span>
-                </label>
-
-                <div class="upload-controls">
-                    <label for="photo_category" class="sr-only">Photo category</label>
-                    <select id="photo_category" name="category" class="form-select" required>
-                        @foreach ($categories as $cat)
-                            <option value="{{ $cat }}">{{ $cat }}</option>
-                        @endforeach
-                    </select>
-                    <button type="submit" class="btn btn-primary">Upload</button>
-                </div>
-            </div>
-            @error('photos.*')
-                <div class="alert alert-error" style="margin-top:14px;">{{ $message }}</div>
-            @enderror
-        </form>
-    </div>
-</div>
-
-<div class="panel">
-    <div class="panel-head">
-        <div>
-            <h2>{{ $photos->count() }} Photo{{ $photos->count() === 1 ? '' : 's' }}</h2>
-            <p>The cover photo is what travelers see first on cards and search results.</p>
-        </div>
-    </div>
-    <div class="panel-body">
+    <div class="adm-card__body">
         @if ($photos->isEmpty())
-            {{--
-                Shows the actual illustrated placeholder rendered on the public
-                card grid right now, at the same 4:3 the card uses, rather than
-                describing it in prose. It is a branded scene, not a flat colour
-                block -- see partials/poster-illustration.
-            --}}
+            {{-- The illustrated placeholder travellers see today, at the same 4:3 the card uses. --}}
             <div class="empty-panel" style="padding:24px;">
                 <div class="photo-empty-caption">What travelers see today</div>
                 <div class="photo-empty-preview">
@@ -70,34 +41,27 @@
                 <p>Your listing falls back to this illustration until you upload a photo. A real photo replaces it everywhere &mdash; search results, cards, and your listing page.</p>
             </div>
         @else
-            <div class="photo-grid">
+            <div class="ptr-photos" id="photo-grid" data-reorder-url="{{ route('establishment.photos.reorder') }}">
                 @foreach ($photos as $photo)
-                    <div class="photo-tile">
-                        <img src="{{ $photo->url() }}" alt="{{ $listing->name }} photo">
-                        @if ($photo->is_primary)
-                            <span class="cover-badge">Cover</span>
-                        @endif
-                        <span class="cat-badge">{{ $photo->category }}</span>
-                        <div class="photo-tile-actions">
+                    <div class="ptr-photo" draggable="true" data-id="{{ $photo->id }}">
+                        <div class="ptr-photo__img">
+                            <img src="{{ $photo->url() }}" alt="{{ $listing->name }}, {{ $photo->category }}" loading="lazy">
+                            @if ($photo->is_primary)<span class="ptr-photo__cover"><x-icon name="star" /> Cover</span>@endif
+                        </div>
+                        <div class="ptr-photo__meta">
+                            <span class="ptr-photo__grip" title="Drag to reorder" aria-hidden="true">&#8942;&#8942;</span>
+                            <strong>{{ $photo->category }}</strong>
+                            @php $credited = $readiness->credited($photo); @endphp
+                            <a href="{{ route('establishment.photos.credit.form', $photo) }}" class="ptr-credit {{ $credited ? 'is-ok' : 'is-missing' }}" data-modal-form data-title="Photo credit" data-sub="Travellers see who took each photo" data-size="narrow"
+                               aria-label="{{ $credited ? 'Credit: '.($photo->credit_text ?: $photo->source_name).'. Change it' : 'Add a credit for this '.$photo->category.' photo' }}">{{ $credited ? 'Credited' : 'Add credit' }}</a>
+                        </div>
+                        <div class="ptr-photo__acts">
                             @unless ($photo->is_primary)
-                                <form method="POST" action="{{ route('establishment.photos.primary', $photo) }}">
-                                    @csrf
-                                    <button type="submit">Set Cover</button>
-                                </form>
+                                <form method="POST" action="{{ route('establishment.photos.primary', $photo) }}">@csrf<button type="submit" class="adm-icon-btn" title="Make cover photo" aria-label="Make this {{ $photo->category }} photo the cover"><x-icon name="star" /></button></form>
                             @endunless
-                            <form method="POST" action="{{ route('establishment.photos.up', $photo) }}">
-                                @csrf
-                                <button type="submit" title="Move earlier">&uarr;</button>
-                            </form>
-                            <form method="POST" action="{{ route('establishment.photos.down', $photo) }}">
-                                @csrf
-                                <button type="submit" title="Move later">&darr;</button>
-                            </form>
-                            <form method="POST" action="{{ route('establishment.photos.destroy', $photo) }}" onsubmit="return confirm('Remove this photo?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="danger">Delete</button>
-                            </form>
+                            <form method="POST" action="{{ route('establishment.photos.up', $photo) }}">@csrf<button type="submit" class="adm-icon-btn" title="Move earlier" aria-label="Move this {{ $photo->category }} photo earlier"><x-icon name="chevron-left" /></button></form>
+                            <form method="POST" action="{{ route('establishment.photos.down', $photo) }}">@csrf<button type="submit" class="adm-icon-btn" title="Move later" aria-label="Move this {{ $photo->category }} photo later"><x-icon name="chevron-right" /></button></form>
+                            <form method="POST" action="{{ route('establishment.photos.destroy', $photo) }}" onsubmit="return confirm('Remove this photo?');" style="margin-left:auto;">@csrf @method('DELETE')<button type="submit" class="adm-icon-btn is-danger" title="Remove" aria-label="Remove this {{ $photo->category }} photo"><x-icon name="x" /></button></form>
                         </div>
                     </div>
                 @endforeach

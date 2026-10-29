@@ -48,7 +48,7 @@ class PackageItineraryTest extends TestCase
             ->put('/portal/establishment/listing', [
                 'itinerary' => "Arrival & Camp 1 | Trek to Camp 1, briefing with your guide.\nSummit Push | Pre-dawn ascent, descend after.\nDescent & Departure",
             ])
-            ->assertRedirect(route('establishment.overview'));
+            ->assertRedirect(route('establishment.listing.edit'));
 
         $days = $package->itineraryDays()->get();
         $this->assertCount(3, $days);
