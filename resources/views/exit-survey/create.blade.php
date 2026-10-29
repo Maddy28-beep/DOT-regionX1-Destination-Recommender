@@ -41,6 +41,11 @@
 
         <form method="POST" action="{{ route('exit-survey.store') }}">
             @csrf
+            {{-- Honeypot: kept off screen and out of the tab order. People never fill it; scripts that fill every field do. --}}
+            <div class="hp-field" aria-hidden="true">
+                <label for="{{ \App\Http\Controllers\ExitSurveyController::HONEYPOT_FIELD }}">Leave this field empty</label>
+                <input type="text" id="{{ \App\Http\Controllers\ExitSurveyController::HONEYPOT_FIELD }}" name="{{ \App\Http\Controllers\ExitSurveyController::HONEYPOT_FIELD }}" value="" tabindex="-1" autocomplete="off">
+            </div>
             @if ($isTest ?? false)
                 <input type="hidden" name="test" value="1">
                 <div class="alert alert-error" role="note" style="margin-bottom:18px;">

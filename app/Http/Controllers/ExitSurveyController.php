@@ -47,6 +47,9 @@ class ExitSurveyController extends Controller
      *  request can't trigger thousands of one-row-at-a-time inserts. */
     private const MAX_LIST_ITEMS = 50;
 
+    /** The name of the hidden honeypot field. Not a word a browser autofills. */
+    public const HONEYPOT_FIELD = 'survey_company_site';
+
     /** listing_kind => the group heading the tag-search picker sorts options under, in PLACE_MODELS order. */
     private const PLACE_KIND_GROUPS = [
         'destination' => 'Destinations',
@@ -167,6 +170,14 @@ class ExitSurveyController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        // Honeypot: the form carries a field no visitor can see. A script that fills every field fills it too, and
+        // is thanked without anything being saved, so it learns nothing about why it was ignored.
+        if ($request->filled(self::HONEYPOT_FIELD)) {
+            \Illuminate\Support\Facades\Log::info('Exit survey ignored: honeypot field filled', ['ip' => $request->ip()]);
+
+            return redirect()->route('exit-survey.create')->with(Toast::success('Thanks for your feedback', 'Your response helps DOT Region XI improve tourism services.'));
+        }
+
         $visitableKinds = implode('|', self::VISITABLE_KINDS);
 
         $data = $request->validate([
