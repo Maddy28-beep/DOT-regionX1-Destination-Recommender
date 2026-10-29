@@ -190,7 +190,8 @@ class ArrivalBaselineTest extends TestCase
             '07:29 (breakfast first, 08:00-08:45)' => ['07:29', '08:45', '10:15', '09:00', ['baseline', 'meal']],
             '07:30 (breakfast first, 08:00-08:45)' => ['07:30', '08:45', '10:15', '09:00', ['baseline', 'meal']],
             '08:00 (breakfast first, 08:30-09:15)' => ['08:00', '09:15', '10:45', '09:30', ['baseline', 'meal']],
-            '09:00' => ['09:00', '09:30', '11:00', '09:45', ['baseline']],
+            // Arriving at Samal at 11:00, 30 minutes before lunch may start: lunch first (11:30-12:30), then the full visit.
+            '09:00 (arrives 11:00: lunch first, then the visit)' => ['09:00', '09:30', '12:30', '09:45', ['baseline']],
         ];
     }
 

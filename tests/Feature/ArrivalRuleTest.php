@@ -400,7 +400,7 @@ class ArrivalRuleTest extends TestCase
         }
     }
 
-    /** Whatever the arrival, Day 1 has at most one lunch and it starts inside the lunch window (12:00 to 1:00 PM). */
+    /** Whatever the arrival, Day 1 has at most one lunch and it starts inside the lunch window (11:30 AM to 1:00 PM). */
     public function test_lunch_is_once_a_day_and_inside_the_window(): void
     {
         $this->multiFixture();
@@ -410,7 +410,7 @@ class ArrivalRuleTest extends TestCase
 
             $this->assertLessThanOrEqual(1, count($lunches), "arrival {$arrival}");
             foreach ($lunches as $lunch) {
-                $this->assertGreaterThanOrEqual('12:00', $lunch['start'], "arrival {$arrival}");
+                $this->assertGreaterThanOrEqual('11:30', $lunch['start'], "arrival {$arrival}");
                 $this->assertLessThanOrEqual('13:00', $lunch['start'], "arrival {$arrival}");
             }
         }
