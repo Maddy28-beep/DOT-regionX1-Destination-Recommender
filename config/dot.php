@@ -50,4 +50,15 @@ return [
     // claim this whole footer fix exists to remove.
     'office_address' => env('DOT_OFFICE_ADDRESS', 'DOT Region XI Office, Davao City, Davao Region'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Accreditation test grace period
+    |--------------------------------------------------------------------------
+    |
+    | A date (YYYY-MM-DD). Up to and including that day, accreditation:sync-status does not mark any record Expired
+    | or Expiring Soon, for any kind of listing, so nothing expires while the system is being tested. Real expiry
+    | dates are never changed. Leave it unset for normal behaviour. See App\Support\AccreditationGrace.
+    */
+    'accreditation_test_grace_until' => env('ACCREDITATION_TEST_GRACE_UNTIL'),
+
 ];

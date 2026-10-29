@@ -6,6 +6,13 @@
 
 @section('content')
 
+@if ($graceUntil ?? null)
+    <x-banner tone="warn">
+        Test period: until {{ \Illuminate\Support\Carbon::parse($graceUntil)->format('M j, Y') }} the nightly check does not mark any record Expired or Expiring Soon.
+        The expiry dates below are the real ones and have not been changed.
+    </x-banner>
+@endif
+
 <div class="stat-cards">
     <div class="stat-card">
         <div class="stat-card-val">{{ $counts['active'] }}</div>
