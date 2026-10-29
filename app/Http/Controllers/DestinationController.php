@@ -53,6 +53,9 @@ class DestinationController extends Controller
             default => $query->orderByDesc('featured')->orderByDesc('rating'),
         };
 
+        // Last, so rows that tie on the chosen sort keep one fixed order: without it a page can repeat or skip a place.
+        $query->orderBy('id');
+
         // Map results use the same filters, across all pages of the catalogue.
         $mapDestinations = (clone $query)->get()->map(fn (Destination $destination) => [
             'id' => $destination->id,

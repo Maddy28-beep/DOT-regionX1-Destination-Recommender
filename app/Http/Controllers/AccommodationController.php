@@ -37,6 +37,9 @@ class AccommodationController extends Controller
             default => $query->orderByDesc('featured')->orderByDesc('rating'),
         };
 
+        // Last, so rows that tie on the chosen sort keep one fixed order: without it a page can repeat or skip a place.
+        $query->orderBy('id');
+
         $accommodations = $query->paginate(9)->withQueryString();
         \App\Support\SearchLog::record($request, 'accommodations', $accommodations->total());
 
