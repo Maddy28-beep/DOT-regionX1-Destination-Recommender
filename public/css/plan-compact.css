@@ -1,0 +1,237 @@
+/* Plan My Trip: the four steps, tighter.
+   Each step was 950 to 1,100 pixels tall, so every step scrolled and a question and its Next button were never on
+   screen together. This sheet loads after plan-wizard.css and plan-comfort.css. It changes the form only, never the
+   page header above it: one control height, cards and chips in rows, the travel-time comparison laid out across,
+   and Back / Next kept in view. Names, values and markup are untouched, so the form posts what it always did. */
+
+@media (min-width: 761px) {
+    .plan-wizard { --pc-h: 44px; --pc-gap: 14px; padding-bottom: 12px; }
+
+    .plan-wizard-steps { gap: 12px; margin-bottom: 10px; }
+    .plan-wizard-steps button { padding: 8px 6px; font-size: .84rem; }
+    .plan-wizard .plan-step-num { width: 22px; height: 22px; font-size: .7rem; }
+
+    .plan-wizard .panel-body { padding: 16px 22px 14px; }
+    .plan-wizard-step > h2 { font-size: 1.1rem; margin: 0 0 1px; }
+    .plan-step-intro { margin: 0 0 10px; font-size: .84rem; }
+
+    /* the blocks of step 1 and the groups of the others */
+    .plan-wizard.is-wizard .pc-block { margin: 0 0 12px; padding: 0 0 12px; }
+    .plan-wizard .pc-block__head { margin: 0 0 8px; gap: 2px 12px; }
+    .plan-wizard .pc-block__head h3 { font-size: .98rem; }
+    .plan-wizard .pc-block__head p { font-size: .78rem; }
+    .plan-wizard .pc-grid { gap: 10px var(--pc-gap); }
+    .plan-wizard .pc-field > label, .plan-wizard .pc-field > legend, .plan-wizard .pc-label { margin: 0 0 5px; font-size: .8rem; }
+    .plan-wizard .pc-hint { min-height: 0; margin: 4px 2px 0; font-size: .74rem; }
+    .plan-wizard .pc-group { margin: 0 0 12px; }
+    .plan-wizard .pc-group > legend { font-size: .92rem; margin: 0 0 2px; }
+    .plan-wizard .pc-help { font-size: .78rem; margin: 0 0 8px; line-height: 1.4; }
+    .plan-wizard .plan-purpose { margin: 0 0 12px; }
+    .plan-wizard .pc-group.field { margin-bottom: 12px; }
+
+    /* controls */
+    .plan-wizard .pc-stepper button { width: 36px; height: 36px; }
+    .plan-wizard .pc-stepper.is-ready .pc-stepper__value input { text-align: center; }
+    .plan-wizard .pc-quick { min-height: var(--pc-h); gap: 6px; }
+    .plan-wizard .pc-quick button { min-height: 34px; padding: 0 12px; font-size: .8rem; }
+    .plan-wizard .pc-locate { border-radius: 10px; font-size: .84rem; }
+    .plan-wizard .pc-chips { gap: 8px; }
+    .plan-wizard .pc-chip { min-height: 34px; padding: 0 12px; font-size: .8rem; }
+    .plan-wizard .pc-chip--icon { padding: 0 11px 0 9px; gap: 5px; }
+    .plan-wizard .plan-purpose .pc-chips { gap: 6px; }
+    .plan-wizard .pc-chip--icon svg { width: 15px; height: 15px; }
+
+    /* step 1: who is coming, as one row of small cards */
+    .plan-wizard .pc-cards--5 { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+    .plan-wizard .pc-cards--5 .pc-card--center:has(.pc-card__icon) { flex-direction: column; justify-content: center; align-items: center; gap: 5px; min-width: 0; min-height: 70px; padding: 8px 6px; border-radius: 12px; overflow: hidden; }
+    .plan-wizard .pc-card--center strong { min-height: 0; max-width: 100%; font-size: .84rem; line-height: 1.2; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .plan-wizard .pc-card--center .pc-card__icon { width: 30px; height: 30px; border-radius: 9px; }
+    .plan-wizard .pc-card--center .pc-card__icon svg { width: 17px; height: 17px; }
+    .plan-wizard .pc-cards--rows { gap: 8px; }
+    .plan-wizard .pc-card--row { padding: 4px 10px; border-radius: 10px; }
+    .plan-wizard .pc-card--row .pc-card__icon { width: 28px; height: 28px; border-radius: 9px; }
+    .plan-wizard .pc-card--row .pc-card__icon svg { width: 15px; height: 15px; }
+    .plan-wizard .pc-card--row strong { font-size: .8rem; }
+
+    /* arrival time: four slim chips, the hint and exact-time field close under them */
+    .plan-wizard [data-arrival].has-slots .pc-slots { gap: 8px; }
+    .plan-wizard .pc-slot { height: 60px; padding: 4px 6px; border-radius: 10px; gap: 1px; }
+    .plan-wizard .pc-slot strong { font-size: .84rem; white-space: nowrap; }
+    .plan-wizard .pc-slot small { font-size: .72rem; white-space: nowrap; }
+    .plan-wizard .pc-slot--exact input[type="time"] { bottom: 6px; }
+    .plan-wizard .pc-slot__open small { display: block; }
+    .plan-wizard .pc-slot--exact.is-open .pc-slot__open { height: 26px; padding-top: 6px; }
+    .plan-wizard .pc-slot--exact.is-open .pc-slot__open small { display: none; }
+    .plan-wizard .pc-field .pc-slot--exact input[type="time"] { height: 24px !important; }
+
+    /* where you are from: the place list's group headings; where you start: the arrival points */
+    .plan-wizard .pc-places li { font-size: .86rem; }
+    .plan-wizard .pc-places .pc-places__group { padding: 6px 10px 2px; font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); cursor: default; pointer-events: none; }
+    .plan-wizard .pc-places .pc-places__group:hover { background: transparent; }
+    .plan-wizard .pc-arrivals[hidden] { display: none; }
+    .plan-wizard .pc-arrivals .pc-label { display: block; margin: 0 0 6px; font-size: .76rem; font-weight: 600; color: var(--muted); }
+    .plan-wizard .pc-arrivals .pc-quick { min-height: 0; flex-wrap: wrap; }
+
+    /* where you start */
+    .plan-wizard .pc-start-notes { gap: 4px; margin-top: -2px; }
+    .plan-wizard .origin-status { font-size: .78rem; }
+    .plan-wizard .pc-privacy { font-size: .74rem; line-height: 1.4; }
+    .plan-wizard .pc-privacy svg { width: 14px; height: 14px; }
+
+    /* step 2: purpose chips, then interests and amenities four to a row */
+    .plan-wizard .pc-legend { margin: 0 0 6px; font-size: .88rem; }
+    .plan-wizard .pc-checks { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .plan-wizard .pc-check { min-height: 50px; gap: 9px; padding: 6px 10px; border-radius: 10px; }
+    .plan-wizard .pc-check__icon { width: 30px; height: 30px; border-radius: 9px; }
+    .plan-wizard .pc-check__icon svg { width: 16px; height: 16px; }
+    .plan-wizard .pc-check__text { font-size: .8rem; line-height: 1.25; }
+    .plan-wizard .pc-check__box { width: 20px; height: 20px; border-radius: 6px; }
+    .plan-wizard .pc-check__box svg { width: 12px; height: 12px; }
+
+    /* steps 3 and 4: cards that read in one glance */
+    .plan-wizard .pc-cards { gap: 8px; }
+    .plan-wizard .pc-card { gap: 4px; min-height: 0; padding: 10px 12px; border-radius: 12px; }
+    .plan-wizard .pc-card:has(.pc-card__icon) { flex-direction: row; align-items: flex-start; gap: 10px; padding-right: 36px; }
+    .plan-wizard .pc-card__icon { width: 30px; height: 30px; border-radius: 9px; flex: none; }
+    .plan-wizard .pc-card__icon svg { width: 16px; height: 16px; }
+    .plan-wizard .pc-card__text { gap: 2px; }
+    .plan-wizard .pc-card strong { font-size: .86rem; }
+    .plan-wizard .pc-card small { font-size: .74rem; line-height: 1.35; }
+    .plan-wizard .pc-card em { margin-top: 2px; padding: 1px 8px; font-size: .68rem; }
+    .plan-wizard .pc-card__tick { top: 8px; right: 8px; width: 18px; height: 18px; }
+    .plan-wizard .pc-card__tick svg { width: 11px; height: 11px; }
+    .plan-wizard .pc-sub { margin-top: 8px; padding: 10px 12px; border-radius: 12px; }
+    .plan-wizard .pc-sub .pc-chips { margin-top: 6px; }
+
+    /* the travel-time comparison, laid across: one small column for each way of travelling */
+    .plan-wizard .pc-compare { margin-top: 10px; padding: 10px 12px; border-radius: 12px; }
+    .plan-wizard .pc-compare__head { margin-bottom: 6px; }
+    .plan-wizard .pc-compare__head strong { font-size: .82rem; }
+    .plan-wizard .pc-compare__head span { font-size: .72rem; }
+    .plan-wizard [data-compare-bars] { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .plan-wizard .pc-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 8px; padding: 0; font-size: .76rem; }
+    .plan-wizard .pc-bar__name { font-size: .76rem; }
+    .plan-wizard .pc-bar__track { flex: 0 0 100%; order: 3; height: 7px; }
+    .plan-wizard .pc-bar__time { font-size: .76rem; }
+    .plan-wizard .pc-compare__tip { margin: 8px 0 0; padding: 6px 10px; font-size: .74rem; }
+
+
+    /* the heading and its one line of help share a row */
+    .plan-wizard-step > h2 { display: inline; margin-right: 10px; }
+    .plan-wizard-step > .plan-step-intro { display: inline; }
+    .plan-wizard-step > .plan-step-intro::after { content: ''; display: block; margin-bottom: 10px; }
+
+    /* step 1, "When": days, date and quick picks on one line, the arrival time on its own line under them */
+    .plan-wizard .pc-block:has([data-arrival]) .pc-grid > .pc-field:nth-child(1) { grid-column: 1 / 4; grid-row: 1; }
+    .plan-wizard .pc-block:has([data-arrival]) .pc-grid > .pc-field:nth-child(2) { grid-column: 4 / 8; grid-row: 1; }
+    .plan-wizard .pc-block:has([data-arrival]) .pc-grid > [data-quick-dates] { grid-column: 8 / -1; grid-row: 1; min-width: 0; }
+    .plan-wizard .pc-block:has([data-arrival]) .pc-grid > [data-arrival] { grid-column: 1 / -1; grid-row: 2; }
+    .plan-wizard [data-quick-dates] .pc-label { display: block; }
+    .plan-wizard [data-quick-dates] .pc-hint { display: none; }
+    .plan-wizard [data-quick-dates] .pc-quick { min-height: 0; flex-wrap: wrap; align-content: flex-start; align-items: center; }
+    .plan-wizard [data-quick-dates] .pc-quick button { padding: 0 10px; white-space: nowrap; }
+
+    /* Back and Next stay on screen while a long step scrolls under them */
+    .plan-wizard .plan-wizard-actions { position: sticky; bottom: 0; z-index: 5; margin: 6px -22px -14px; padding: 10px 22px; background: var(--paper); border-radius: 0 0 20px 20px; box-shadow: 0 -6px 14px rgba(16, 40, 30, .06); }
+
+    /* optional details, and the footer */
+    .plan-wizard .plan-optional { margin-top: 10px; padding-top: 8px; }
+    .plan-wizard .plan-optional > summary { padding: 2px 0; font-size: .86rem; }
+    .plan-wizard .btn { min-height: 40px; }
+    .plan-wizard .plan-next { padding: 9px 20px; }
+    .plan-wizard .plan-wizard-actions #planStepStatus { font-size: .8rem; }
+}
+
+/* phones: the same idea. The steps were two and a half screens long, mostly because every card was a full-width row. */
+@media (max-width: 760px) {
+    .plan-wizard .panel-body { padding: 14px 14px 10px; }
+    .plan-wizard-step > h2 { font-size: 1.05rem; margin-bottom: 0; }
+    .plan-step-intro { display: none; }
+    .plan-wizard-step > h2 { margin-bottom: 8px; }
+    .plan-wizard-steps { margin-bottom: 8px; }
+    .plan-wizard-steps button { padding: 6px 2px; gap: 2px; }
+    .plan-wizard .plan-step-num { width: 20px; height: 20px; font-size: .66rem; }
+    .plan-wizard .pc-stepper { padding: 0 2px; }
+    .plan-wizard .pc-stepper button { width: 32px; height: 32px; }
+    .plan-wizard .pc-stepper__value { font-size: .95rem; gap: 4px; }
+    .plan-wizard.is-wizard .pc-block { margin: 0 0 10px; padding: 0 0 10px; }
+    .plan-wizard .pc-block__head { margin: 0 0 6px; }
+    .plan-wizard .pc-block__head h3 { font-size: .94rem; }
+    .plan-wizard .pc-block__head p { font-size: .74rem; }
+    .plan-wizard .pc-grid { gap: 8px 10px; }
+    .plan-wizard .pc-field > label, .plan-wizard .pc-field > legend, .plan-wizard .pc-label { margin: 0 0 4px; font-size: .78rem; }
+    .plan-wizard .pc-hint { min-height: 0; margin: 3px 2px 0; font-size: .7rem; }
+    .plan-wizard .pc-group { margin: 0 0 10px; }
+    .plan-wizard .pc-group > legend { font-size: .9rem; }
+    .plan-wizard .pc-help { font-size: .74rem; margin: 0 0 6px; line-height: 1.35; }
+    .plan-wizard .plan-purpose { margin: 0 0 10px; }
+    .plan-wizard .pc-group.field { margin-bottom: 10px; }
+
+    /* step 1: days and date share a row; who is coming is three across, then two */
+    .plan-wizard .pc-col-3 { grid-column: span 6; }
+    .plan-wizard .pc-quick { min-height: 0; gap: 6px; }
+    .plan-wizard .pc-quick button { min-height: 32px; padding: 0 10px; font-size: .76rem; }
+    .plan-wizard [data-quick-dates] .pc-label, .plan-wizard [data-quick-dates] .pc-hint { display: none; }
+    .plan-wizard .pc-cards--5 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+    .plan-wizard .pc-cards--5 .pc-card--center { min-height: 62px; padding: 8px 4px; gap: 4px; }
+    .plan-wizard .pc-card--center strong { min-height: 0; font-size: .74rem; }
+    .plan-wizard .pc-card--center .pc-card__icon { width: 26px; height: 26px; border-radius: 8px; }
+    .plan-wizard .pc-card--center .pc-card__icon svg { width: 15px; height: 15px; }
+    .plan-wizard .pc-cards--3.pc-cards--rows { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+    .plan-wizard .pc-card--row { flex-direction: column; justify-content: center; gap: 3px; min-height: 62px; padding: 6px 4px; text-align: center; }
+    .plan-wizard .pc-card--row strong { font-size: .7rem; text-align: center; }
+    .plan-wizard .pc-card--row .pc-card__icon { width: 24px; height: 24px; }
+    .plan-wizard [data-arrival].has-slots .pc-slots { gap: 6px; }
+    .plan-wizard .pc-slot { height: 46px; }
+    .plan-wizard .pc-slot__open small { display: none; }
+    .plan-wizard .pc-privacy { font-size: .72rem; }
+
+    /* step 2: interests and amenities two to a row */
+    .plan-wizard .pc-checks { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+    .plan-wizard .pc-check { min-height: 46px; gap: 7px; padding: 5px 8px; border-radius: 10px; }
+    .plan-wizard .pc-check__icon { width: 26px; height: 26px; border-radius: 8px; }
+    .plan-wizard .pc-check__icon svg { width: 14px; height: 14px; }
+    .plan-wizard .pc-check__text { font-size: .72rem; line-height: 1.2; }
+    .plan-wizard .pc-check__box { width: 18px; height: 18px; border-radius: 5px; }
+    .plan-wizard .pc-legend { margin: 0 0 6px; font-size: .84rem; }
+    .plan-wizard .pc-chip { min-height: 34px; padding: 0 11px; font-size: .78rem; }
+    .plan-wizard .pc-chip--icon { padding: 0 10px 0 8px; gap: 5px; }
+    .plan-wizard .plan-purpose .pc-chips, .plan-wizard .pc-chips { gap: 6px; }
+
+    /* steps 3 and 4: cards one under another, but slim */
+    .plan-wizard .pc-cards, .plan-wizard .pc-cards--4 { gap: 6px; }
+    .plan-wizard .pc-card { padding: 8px 36px 8px 10px; gap: 8px; min-height: 0; border-radius: 12px; }
+    .plan-wizard .pc-card__icon { width: 28px; height: 28px; border-radius: 9px; }
+    .plan-wizard .pc-card__icon svg { width: 15px; height: 15px; }
+    .plan-wizard .pc-card__text { gap: 1px; }
+    .plan-wizard .pc-card strong { font-size: .84rem; }
+    .plan-wizard .pc-card small { font-size: .72rem; line-height: 1.3; }
+    .plan-wizard .pc-card em { margin-top: 2px; padding: 1px 7px; font-size: .64rem; }
+    .plan-wizard .pc-card__tick { top: 8px; right: 8px; width: 18px; height: 18px; }
+    .plan-wizard .pc-sub { margin-top: 8px; padding: 10px; }
+    .plan-wizard .pc-compare { margin-top: 8px; padding: 10px; }
+    .plan-wizard .pc-compare__head { margin-bottom: 4px; }
+    .plan-wizard [data-compare-bars] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 10px; }
+    .plan-wizard .pc-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 6px; padding: 0; font-size: .72rem; }
+    .plan-wizard .pc-bar__name, .plan-wizard .pc-bar__time { font-size: .72rem; grid-column: auto; margin: 0; text-align: left; }
+    .plan-wizard .pc-bar__track { flex: 0 0 100%; order: 3; height: 6px; }
+    .plan-wizard .plan-optional { margin-top: 8px; padding-top: 6px; }
+}
+
+/* A field you are typing in is ringed in the brand green, the same colour as its border. Buttons, cards and chips keep
+   the orange keyboard ring from plan-wizard.css and plan-comfort.css. */
+.plan-wizard :is(input:not([type="radio"]):not([type="checkbox"]), select, textarea):focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+/* the days number is only as wide as its digits, so the ring goes round the whole stepper instead */
+.plan-wizard .pc-stepper .pc-stepper__value input:focus-visible { outline: none; }
+.plan-wizard .pc-stepper:has(.pc-stepper__value input:focus-visible) { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+/* Nothing on step 1 changes size when an option is chosen, so the page does not move under the pointer. The hints
+   that change their words (the dates under the days, the note under the origin) keep room for two lines, and the
+   Clear button's row is as tall with the button as without it. */
+.plan-wizard [data-trip-dates], .plan-wizard [data-origin-hint] { min-height: 2.8em; line-height: 1.4; }
+.plan-wizard .pc-start-notes .origin-control { min-height: 40px; }
+@media (max-width: 760px) {
+    .plan-wizard .pc-start-notes .origin-control { flex-wrap: nowrap; align-items: center; min-height: 40px; }
+    .plan-wizard .pc-start-notes .origin-control .btn { min-height: 32px; padding: 0 12px; }
+    .plan-wizard .pc-start-notes .origin-status { font-size: .74rem; line-height: 1.35; }
+}

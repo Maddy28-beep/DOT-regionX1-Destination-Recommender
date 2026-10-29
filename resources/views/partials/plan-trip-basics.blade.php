@@ -109,16 +109,27 @@
             </div>
         </fieldset>
 
-        <div class="field pc-field pc-col-4 @if ($isLocal) is-local @endif" data-origin-field>
+        <div class="field pc-field pc-col-4" data-origin-field>
             <label for="place_of_origin"><span data-origin-label>Where are you visiting from?</span>
                 <span class="field-help" tabindex="0" title="Helps DOT understand where visitors are travelling from." aria-label="Helps DOT understand where visitors are travelling from."><x-icon name="info" /></span>
             </label>
-            <input type="text" id="place_of_origin" name="place_of_origin"
-                   value="{{ old('place_of_origin', $preference->place_of_origin) }}"
-                   placeholder="e.g. Manila, Cebu, South Korea"
-                   @unless ($isLocal) required @endunless>
-            {{-- A local has no "visiting from": the box goes and this takes its place. --}}
-            <div class="pc-welcome" data-origin-welcome @unless ($isLocal) hidden @endunless><x-icon name="home" /> <span>Welcome home! We&rsquo;ll plan from where you are.</span></div>
+            {{-- A picker over a short list of cities and countries (plan-origin.js), grouped Philippines then abroad.
+                 Anything typed is still accepted, so the field never blocks: without JavaScript it is a plain text box.
+                 It asks for a place, never for a home address. --}}
+            <div class="address-field" data-origin-picker>
+                <x-icon name="globe" class="pc-origin__pin" />
+                <input type="text" id="place_of_origin" name="place_of_origin"
+                       value="{{ old('place_of_origin', $preference->place_of_origin) }}"
+                       placeholder="Start typing a city or country"
+                       autocomplete="off"
+                       role="combobox"
+                       aria-expanded="false"
+                       aria-autocomplete="list"
+                       aria-controls="origin-from-suggestions"
+                       @unless ($isLocal) required @endunless>
+                <ul id="origin-from-suggestions" class="address-suggestions pc-places" role="listbox" aria-label="Places" hidden></ul>
+            </div>
+            <p class="pc-hint" data-origin-hint>City, province or country is enough. We never ask for your home address.</p>
         </div>
     </div>
 </div>
