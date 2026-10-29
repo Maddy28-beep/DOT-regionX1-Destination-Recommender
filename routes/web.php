@@ -143,7 +143,7 @@ Route::post('/plan/itinerary/save', [TouristItineraryController::class, 'store']
 // Exit survey (2.2.1.7, Figures 13-15) — anonymous by design, no login required
 Route::get('/exit-survey', [ExitSurveyController::class, 'create'])->name('exit-survey.create');
 Route::post('/exit-survey', [ExitSurveyController::class, 'store'])
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:exit-survey')
     ->name('exit-survey.store');
 // The immediate trip recap shown right after submitting -- reads a
 // session-stored survey id rather than taking one in the URL, so there's
