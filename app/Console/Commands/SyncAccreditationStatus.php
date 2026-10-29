@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\AccreditationRecord;
 use App\Models\EstablishmentAccount;
 use App\Models\Notification;
+use App\Support\AccreditationGrace;
 use Illuminate\Console\Command;
 
 class SyncAccreditationStatus extends Command
@@ -35,7 +36,15 @@ class SyncAccreditationStatus extends Command
         $counts = ['Expired' => 0, 'Expiring Soon' => 0, 'Active' => 0];
         $listingsFixed = 0;
 
-        AccreditationRecord::whereNotNull('expiration_date')->chunkById(50, function ($records) use ($today, $soonThreshold, &$counts) {
+        // Testing: while the grace period is on, nothing new is marked Expired or Expiring Soon (see AccreditationGrace).
+        $grace = AccreditationGrace::active();
+        $held = 0;
+
+        if (AccreditationGrace::misconfigured()) {
+            $this->warn('ACCREDITATION_TEST_GRACE_UNTIL is set but is not a date (YYYY-MM-DD): the grace period is OFF.');
+        }
+
+        AccreditationRecord::whereNotNull('expiration_date')->chunkById(50, function ($records) use ($today, $soonThreshold, &$counts, $grace, &$held) {
             foreach ($records as $record) {
                 $expirationDate = $record->expiration_date->toDateString();
 
@@ -44,6 +53,12 @@ class SyncAccreditationStatus extends Command
                     $expirationDate <= $soonThreshold => 'Expiring Soon',
                     default => 'Active',
                 };
+
+                if ($record->status !== $targetStatus && $grace && in_array($targetStatus, ['Expired', 'Expiring Soon'], true)) {
+                    $held++;
+
+                    continue;
+                }
 
                 if ($record->status !== $targetStatus) {
                     $record->update(['status' => $targetStatus]);
@@ -79,6 +94,10 @@ class SyncAccreditationStatus extends Command
                     $listingsFixed++;
                 }
             });
+
+        if ($grace) {
+            $this->warn('TEST GRACE PERIOD ON until '.AccreditationGrace::until()." (ACCREDITATION_TEST_GRACE_UNTIL): {$held} record(s) past or near their real expiry date were left as they are.");
+        }
 
         $this->info(
             "Accreditation sync complete: {$counts['Expired']} newly expired, {$counts['Expiring Soon']} now expiring soon, "

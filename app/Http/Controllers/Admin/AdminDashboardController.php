@@ -185,7 +185,9 @@ class AdminDashboardController extends Controller
             'expired' => AccreditationRecord::where('status', 'Expired')->count(),
         ];
 
-        return view('admin.accreditation', compact('records', 'status', 'counts'));
+        $graceUntil = \App\Support\AccreditationGrace::active() ? \App\Support\AccreditationGrace::until() : null;
+
+        return view('admin.accreditation', compact('records', 'status', 'counts', 'graceUntil'));
     }
 
     public function renewAccreditation(Request $request, AccreditationRecord $accreditation): \Illuminate\Http\RedirectResponse
