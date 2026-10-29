@@ -132,8 +132,6 @@ class QrCodeController extends Controller
     private function render(mixed $listing, string $segment): Response
     {
         abort_unless($listing->is_accredited && ! $listing->archived_at, 404, 'A QR code is only available for currently DOT-accredited, active listings.');
-        // A sample place is not a real place to visit: a scan would record a visit (and unlock a review) for it.
-        abort_if(app(\App\Support\SampleData::class)->isSample($listing), 404, 'Sample data has no QR code: it is not a DOT-verified place.');
 
         // The code encodes the check-in route, not the plain detail page
         // directly: scanning it records a real visit against THIS listing --

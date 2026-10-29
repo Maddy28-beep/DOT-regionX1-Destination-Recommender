@@ -161,32 +161,26 @@ class SampleDataSurfacesTest extends TestCase
         $this->assertStringNotContainsString('including', $this->get(route('home'))->assertOk()->getContent());
     }
 
-    public function test_a_sample_has_no_qr_code_and_no_check_in_but_a_real_place_does(): void
+    public function test_a_sample_place_has_a_qr_code_and_takes_check_ins_like_any_other(): void
     {
         $real = $this->destination('real-place', false);
         $sample = $this->destination('sample-place', true);
         $admin = $this->admin();
 
         $this->actingAs($admin, 'admin')->get(route('admin.listings.qr-code', ['destinations', $real->id]))->assertOk();
-        $this->actingAs($admin, 'admin')->get(route('admin.listings.qr-code', ['destinations', $sample->id]))->assertNotFound();
+        $this->actingAs($admin, 'admin')->get(route('admin.listings.qr-code', ['destinations', $sample->id]))->assertOk();
 
         $this->get(URL::signedRoute('check-in', ['type' => 'destinations', 'id' => $real->id]))->assertRedirect();
-        $this->assertDatabaseCount('tourist_visits', 1);
-
-        $this->get(URL::signedRoute('check-in', ['type' => 'destinations', 'id' => $sample->id]))->assertNotFound();
-        $this->assertDatabaseCount('tourist_visits', 1);
+        $this->get(URL::signedRoute('check-in', ['type' => 'destinations', 'id' => $sample->id]))->assertRedirect();
+        $this->assertDatabaseCount('tourist_visits', 2);
     }
 
-    public function test_the_admin_form_says_a_sample_has_no_qr_code(): void
+    public function test_the_admin_form_offers_the_qr_code_for_a_sample_too(): void
     {
         $sample = $this->destination('sample-place', true);
-        $real = $this->destination('real-place', false);
-        $admin = $this->admin();
 
-        $edit = fn ($d) => $this->actingAs($admin, 'admin')->get(route('admin.listings.edit', ['destinations', $d->id]))->assertOk()->getContent();
+        $html = $this->actingAs($this->admin(), 'admin')->get(route('admin.listings.edit', ['destinations', $sample->id]))->assertOk()->getContent();
 
-        $this->assertStringContainsString('Sample data: no QR code', $edit($sample));
-        $this->assertStringNotContainsString('Download QR Code', $edit($sample));
-        $this->assertStringContainsString('Download QR Code', $edit($real));
+        $this->assertStringContainsString('Download QR Code', $html);
     }
 }

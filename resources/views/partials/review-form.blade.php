@@ -19,14 +19,7 @@
     $chosen = (int) old('rating', 0);
 @endphp
 
-@if (app(\App\Support\SampleData::class)->isSample($listing))
-    <div class="privacy-note">
-        <x-icon name="target" />
-        <p>
-            {{ $listing->name }} is sample data, not DOT-verified. It has no QR code and takes no reviews.
-        </p>
-    </div>
-@elseif ($alreadyReviewed)
+@if ($alreadyReviewed)
     <div class="privacy-note">
         <x-icon name="shield-check" />
         <p>You have reviewed {{ $listing->name }}. Thanks &mdash; one review per visitor keeps the ratings honest.</p>
