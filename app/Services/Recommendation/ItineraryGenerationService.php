@@ -134,6 +134,9 @@ class ItineraryGenerationService
         $maxStops = min($distinctRanked->count(), array_sum(array_map('count', $dayCapacities)));
         $topRanked = $distinctRanked->take($maxStops);
 
+        // The next few places in the ranking: used only to fill a day that would otherwise have no stop at all.
+        $reserve = $distinctRanked->slice($maxStops, self::RESERVE_STOPS)->values();
+
         $sequence = $this->sequenceByNearestNeighbor($topRanked, $originLat, $originLng);
 
         /*
@@ -180,7 +183,7 @@ class ItineraryGenerationService
         $accommodationPick = $this->pickStays($sequence, $dayCapacities, $preference, $origin)
             ?? $this->pickAccommodation($sequence, $preference);
 
-        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
+        return DB::transaction(function () use ($reserve, $preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
             $itinerary = Itinerary::create([
                 'preference_id' => $preference->id,
                 'total_days' => $totalDays,
@@ -224,6 +227,8 @@ class ItineraryGenerationService
                 $accommodationPick,
             );
 
+            $built = $sequence;
+
             if ($themedSequence === null) {
                 $build($sequence);
             } else {
@@ -242,11 +247,13 @@ class ItineraryGenerationService
                 $itinerary->unsetRelation('items');
 
                 $build($themedSequence);
+                $built = $themedSequence;
 
                 if ($placed() < $routePlaced) {
                     $itinerary->items()->delete();
                     $itinerary->unsetRelation('items');
                     $build($routeSequence);
+                    $built = $routeSequence;
 
                     $summary = $themes['summary'];
                     $summary['regrouped'] = false;
@@ -258,8 +265,84 @@ class ItineraryGenerationService
                 }
             }
 
+            $this->fillEmptyDays($itinerary, $build, $built, $reserve, $dayCapacities, $origin);
+
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);
         });
+    }
+
+    /** How many places beyond the trip's own are kept in reserve to fill an empty day. */
+    private const RESERVE_STOPS = 8;
+
+    /** How many empty days, and how many reserve places per empty day, are tried. */
+    private const FILL_DAYS_TRIED = 3;
+
+    private const FILL_PLACES_TRIED = 3;
+
+    /**
+     * A day with no sightseeing stop at all is a wasted day: usually the best-ranked places left for it were too far
+     * to reach and visit before the cutoff, and the schedule dropped them without putting anything in their place.
+     * For each such day, try the nearest reserve places (the next in the ranking) at the front of that day, and keep
+     * the change only when it does not lose a stop anywhere and leaves fewer empty days. Otherwise the plan stays
+     * exactly as it was built.
+     *
+     * @param  callable(array): mixed  $build  builds the schedule for a sequence
+     * @param  array<int, array{row: array, distance_km: float|null}>  $built  the sequence the current plan was built from
+     * @param  \Illuminate\Support\Collection<int, array>  $reserve  ranked rows not in the trip
+     * @param  array<int, array<int, string>>  $dayCapacities
+     */
+    private function fillEmptyDays(Itinerary $itinerary, callable $build, array $built, \Illuminate\Support\Collection $reserve, array $dayCapacities, array $origin): void
+    {
+        if ($reserve->isEmpty()) {
+            return;
+        }
+
+        $stopsByDay = fn () => $itinerary->items()->where('kind', 'activity')->whereNotNull('destination_id')->orderBy('day_number')->orderBy('sort_order')->get()->groupBy('day_number');
+        $emptyDays = fn () => array_values(array_diff(array_keys($dayCapacities), $stopsByDay()->keys()->all()));
+        $placed = fn () => $itinerary->items()->whereNotNull('destination_id')->where('kind', 'activity')->distinct()->count('destination_id');
+        $rebuild = function (array $sequence) use ($itinerary, $build) {
+            $itinerary->items()->delete();
+            $itinerary->unsetRelation('items');
+            $build($sequence);
+        };
+
+        $tried = 0;
+
+        foreach ($emptyDays() as $day) {
+            if ($tried++ >= self::FILL_DAYS_TRIED) {
+                break;
+            }
+
+            $byDay = $stopsByDay();
+            $before = $byDay->filter(fn ($rows, $d) => $d < $day)->flatten(1);
+            $startsAt = $before->isNotEmpty() && ($last = Destination::find($before->last()->destination_id)) && $last->latitude !== null
+                ? [(float) $last->latitude, (float) $last->longitude]
+                : [(float) $origin['lat'], (float) $origin['lng']];
+            $inTrip = array_map(fn (array $e) => $e['row']['destination']->id, $built);
+
+            $candidates = $reserve
+                ->reject(fn (array $row) => in_array($row['destination']->id, $inTrip, true) || $row['destination']->latitude === null)
+                ->sortBy(fn (array $row) => $this->haversineKm($startsAt[0], $startsAt[1], (float) $row['destination']->latitude, (float) $row['destination']->longitude))
+                ->take(self::FILL_PLACES_TRIED);
+
+            $stopsBefore = $placed();
+            $emptyBefore = count($emptyDays());
+
+            foreach ($candidates as $row) {
+                $trial = $built;
+                array_splice($trial, $before->unique('destination_id')->count(), 0, [['row' => $row, 'distance_km' => null]]);
+
+                $rebuild($trial);
+
+                if ($placed() >= $stopsBefore && count($emptyDays()) < $emptyBefore) {
+                    $built = $trial;
+
+                    continue 2;
+                }
+            }
+
+            $rebuild($built); // nothing helped: put the plan back exactly as it was
+        }
     }
 
     /**
