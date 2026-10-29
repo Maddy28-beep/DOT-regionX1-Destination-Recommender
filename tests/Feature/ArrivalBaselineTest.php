@@ -169,8 +169,10 @@ class ArrivalBaselineTest extends TestCase
 
     /**
      * The rule (ItineraryScheduleBuilder::openDay): departure = the later of (arrival + 30 minutes,
-     * unrounded) and 08:00. An arrival before 07:30 therefore departs at 08:00, and the time until
-     * then is a neutral free-time row. A blank time is planned as an 08:00 arrival. The first activity
+     * unrounded) and 08:00. An arrival before 06:30 therefore departs at 08:00, and the time until
+     * then is a neutral free-time row. When "arrival + 30" falls inside the breakfast window (07:00 to
+     * 08:30) and the traveller gave an arrival time, breakfast comes first near the starting point (45
+     * minutes, from the next quarter hour), and the journey starts when it is over. A blank time is planned as an 08:00 arrival. The first activity
      * is the next quarter hour at or after (departure + the slower travel estimate).
      *
      * columns: arrival, departure, activity (long leg), activity (short leg), row kinds before the first journey row
@@ -183,11 +185,13 @@ class ArrivalBaselineTest extends TestCase
             '05:59' => ['05:59', '08:00', '09:30', '08:15', ['baseline', 'free']],
             '06:00 (was: departed 06:30, outing at 08:00)' => ['06:00', '08:00', '09:30', '08:15', ['baseline', 'free']],
             '06:01 (was: departed 06:31)' => ['06:01', '08:00', '09:30', '08:15', ['baseline', 'free']],
-            '07:00 (was: departed 07:30)' => ['07:00', '08:00', '09:30', '08:15', ['baseline', 'free']],
-            '07:29 (was: departed 07:59)' => ['07:29', '08:00', '09:30', '08:15', ['baseline', 'free']],
-            '07:30' => ['07:30', '08:00', '09:30', '08:15', ['baseline']],
-            '08:00' => ['08:00', '08:30', '10:00', '08:45', ['baseline']],
-            '09:00' => ['09:00', '09:30', '11:00', '09:45', ['baseline']],
+            '06:30 (ready 07:00: breakfast 07:00-07:45, then the 08:00 floor)' => ['06:30', '08:00', '09:30', '08:15', ['baseline', 'meal']],
+            '07:00 (breakfast first, 07:30-08:15)' => ['07:00', '08:15', '09:45', '08:30', ['baseline', 'meal']],
+            '07:29 (breakfast first, 08:00-08:45)' => ['07:29', '08:45', '10:15', '09:00', ['baseline', 'meal']],
+            '07:30 (breakfast first, 08:00-08:45)' => ['07:30', '08:45', '10:15', '09:00', ['baseline', 'meal']],
+            '08:00 (breakfast first, 08:30-09:15)' => ['08:00', '09:15', '10:45', '09:30', ['baseline', 'meal']],
+            // Arriving at Samal at 11:00, 30 minutes before lunch may start: lunch first (11:30-12:30), then the full visit.
+            '09:00 (arrives 11:00: lunch first, then the visit)' => ['09:00', '09:30', '12:30', '09:45', ['baseline']],
         ];
     }
 

@@ -248,9 +248,13 @@ class TripPlannerController extends Controller
          * actually ran against -- a rule mined from 90 transactions and one
          * mined from 9,000 are not the same claim.
          */
+        $catalogue = app(\App\Support\SampleData::class)->split(Destination::publiclyVisible());
+
         $provenance = [
             'destinations_ranked' => $itinerary->matches()->count(),
-            'catalogue_size' => Destination::publiclyVisible()->count(),
+            'catalogue_size' => $catalogue['total'],
+            'catalogue_real' => $catalogue['real'],
+            'catalogue_sample' => $catalogue['sample'],
             'transactions' => ExitSurvey::count(),
             'transactions_demo' => ExitSurvey::where('data_source', 'demo')->count(),
             'rules_applied' => $itinerary->items()->whereNotNull('rule_basis')->count(),
@@ -477,6 +481,7 @@ class TripPlannerController extends Controller
                     'name' => $best['destination']->name,
                     'similarity' => (int) round($best['similarity'] * 100),
                     'distance_km' => $best['distance_km'],
+                    'sample' => app(\App\Support\SampleData::class)->isSample($best['destination']),
                 ] : null,
             ];
         }

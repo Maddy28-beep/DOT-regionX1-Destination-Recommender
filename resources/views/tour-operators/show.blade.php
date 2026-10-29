@@ -12,9 +12,7 @@
         'linear-gradient(135deg,#7a4fc9,#4f2f96)',
     ];
     $gradient = $gradients[$tourOperator->id % count($gradients)];
-    $mapUrl = $tourOperator->latitude && $tourOperator->longitude
-        ? "https://www.google.com/maps/search/?api=1&query={$tourOperator->latitude},{$tourOperator->longitude}"
-        : 'https://www.google.com/maps/search/?api=1&query='.urlencode($tourOperator->name.' '.$tourOperator->location);
+    $mapUrl = \App\Support\MapLinks::directionsTo($tourOperator->latitude, $tourOperator->longitude, $tourOperator->name, $tourOperator->location);
     $tierLabel = match ($tourOperator->price_tier) {
         'Budget-Friendly' => 'Budget',
         null, '' => null,

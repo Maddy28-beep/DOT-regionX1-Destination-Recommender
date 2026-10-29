@@ -425,7 +425,12 @@
                             <div>
                                 <strong>Content-Based Recommendation</strong> scored
                                 {{ $provenance['destinations_ranked'] }} of
-                                {{ $provenance['catalogue_size'] }} accredited destinations against your
+                                @if (($provenance['catalogue_sample'] ?? 0) > 0)
+                                    {{ $provenance['catalogue_size'] }} destinations ({{ $provenance['catalogue_real'] }} DOT-accredited,
+                                    {{ $provenance['catalogue_sample'] }} sample data, not DOT-verified) against your
+                                @else
+                                    {{ $provenance['catalogue_size'] }} accredited destinations against your
+                                @endif
                                 survey answers, combining five weighted factors into the Destination
                                 Recommendation Score shown above (Sec. 2.3.3, Equations 1&ndash;3).
                                 @if ($provenance['range_widened'])

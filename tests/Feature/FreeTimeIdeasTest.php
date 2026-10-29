@@ -206,9 +206,9 @@ class FreeTimeIdeasTest extends TestCase
         $this->fixture();
         $this->shop('Near Shop', 1);
 
-        [$itinerary, $preference] = $this->trip('11:00');
+        [$itinerary, $preference] = $this->trip('14:45');
 
-        $this->assertNull($this->eveningFree($itinerary), 'a 11:00 arrival leaves no gap before dinner on this fixture');
+        $this->assertNull($this->eveningFree($itinerary), 'a 14:45 arrival leaves no gap before dinner on this fixture');
         $this->assertSame([], $this->ideas($itinerary, $preference));
     }
 
@@ -217,7 +217,7 @@ class FreeTimeIdeasTest extends TestCase
         $this->fixture();
         $this->shop('Next Door', 0.3);
 
-        [$itinerary, $preference] = $this->trip('10:30');
+        [$itinerary, $preference] = $this->trip('14:15');
         $free = $this->eveningFree($itinerary);
 
         $this->assertSame(30, $this->windowOf($free));

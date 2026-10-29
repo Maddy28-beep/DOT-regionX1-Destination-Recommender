@@ -54,7 +54,7 @@
                                 <select name="matched_listing_id" title="Select the existing ExploreDVO listing that belongs to this establishment.">
                                     <option value="">Not linked</option>
                                     @foreach ($listingOptions[$e->listing_kind] ?? [] as $listing)
-                                        <option value="{{ $listing->id }}" @selected($e->matched_listing_id === $listing->id)>{{ $listing->name }}</option>
+                                        <option value="{{ $listing->id }}" @selected($e->matched_listing_id === $listing->id)>{{ $listing->name }}{{ app(\App\Support\SampleData::class)->isSample($listing) ? ' (sample data)' : '' }}</option>
                                     @endforeach
                                 </select>
                                 <button type="submit" class="btn btn-outline btn-xs">Save Match</button>
@@ -126,7 +126,7 @@
                         <select name="matched_listing_id">
                             <option value="">Not linked</option>
                             @foreach ($listingOptions[$e->listing_kind] ?? [] as $listing)
-                                <option value="{{ $listing->id }}" @selected($e->matched_listing_id === $listing->id)>{{ $listing->name }}</option>
+                                <option value="{{ $listing->id }}" @selected($e->matched_listing_id === $listing->id)>{{ $listing->name }}{{ app(\App\Support\SampleData::class)->isSample($listing) ? ' (sample data)' : '' }}</option>
                             @endforeach
                         </select>
                         <button type="submit" class="btn btn-outline btn-xs btn-block">Save Match</button>

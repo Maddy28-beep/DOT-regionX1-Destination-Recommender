@@ -5,9 +5,7 @@
 
 @section('content')
 @php
-    $mapUrl = $destination->latitude && $destination->longitude
-        ? "https://www.google.com/maps/search/?api=1&query={$destination->latitude},{$destination->longitude}"
-        : 'https://www.google.com/maps/search/?api=1&query='.urlencode($destination->name.' '.$destination->location);
+    $mapUrl = \App\Support\MapLinks::directionsTo($destination->latitude, $destination->longitude, $destination->name, $destination->location);
 @endphp
 
 <div class="container">

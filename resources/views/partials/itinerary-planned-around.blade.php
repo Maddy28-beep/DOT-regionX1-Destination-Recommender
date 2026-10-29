@@ -23,17 +23,25 @@
 @endphp
 
 @if (($operators ?? collect())->isNotEmpty())
+    @php
+        $sampleData = app(\App\Support\SampleData::class);
+        $anySampleOperator = $operators->contains(fn ($row) => $sampleData->isSample($row['operator']));
+    @endphp
     <section class="itin-side__card itin-ops" id="itin-ops" aria-labelledby="itin-ops-title">
         <h2 id="itin-ops-title"><x-icon name="van" /> Tour operators for your pick-up</h2>
-        <p class="itin-ops__lead">DOT-accredited, close to your start. They set the time, place and price, so confirm with them first.</p>
+        <p class="itin-ops__lead">
+            @if ($anySampleOperator)
+                Close to your start. Operators marked sample data are not DOT-verified. They set the time, place and price, so confirm with them first.
+            @else
+                DOT-accredited, close to your start. They set the time, place and price, so confirm with them first.
+            @endif
+        </p>
         <ul class="itin-ops__list">
             @foreach ($operators->values() as $row)
                 @php
                     $operator = $row['operator'];
                     $onMap = $operator->latitude !== null && $operator->longitude !== null;
-                    $mapsUrl = 'https://www.google.com/maps/search/?api=1&query='.($onMap
-                        ? $operator->latitude.','.$operator->longitude
-                        : rawurlencode($operator->name.' '.($operator->location ?: 'Davao')));
+                    $mapsUrl = \App\Support\MapLinks::directionsTo($operator->latitude, $operator->longitude, $operator->name, $operator->location ?: 'Davao');
                     // Some entries list two numbers ("0917... / (082) ..."): the first is the one to call.
                     $number = trim((string) preg_split('/[\/;,]/', (string) $operator->contact_number)[0]);
                     $dial = preg_replace('/[^0-9+]/', '', $number);
@@ -41,6 +49,9 @@
                 <li class="itin-op">
                     <div class="itin-op__main">
                         <a class="itin-op__name" href="{{ route('tour-operators.show', $operator) }}">{{ $operator->name }}</a>
+                        @if ($sampleData->isSample($operator))
+                            <x-sample-tag label="Sample data, not DOT-verified" title="This operator's accreditation number is a placeholder, not an official DOT number." />
+                        @endif
                         <span class="itin-op__meta">
                             {{ $row['km'] !== null ? $fmtKm($row['km']).' km away' : ($operator->location ?: 'Davao region') }}
                             &middot; <a href="{{ $mapsUrl }}" target="_blank" rel="noopener noreferrer">Map<span class="sr-only"> for {{ $operator->name }} (opens in a new tab)</span></a>

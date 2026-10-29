@@ -55,6 +55,11 @@
                 @endif
             </div>
 
+            @php $portalAccount = auth('establishment')->user(); @endphp
+            @if ($portalAccount && $portalAccount->matched_listing_id && app(\App\Support\SampleData::class)->isSampleKey($portalAccount->listing_kind, (int) $portalAccount->matched_listing_id))
+                <x-banner tone="warn">This listing is sample data, not DOT-verified. Its accreditation number is a placeholder, not an official DOT number.</x-banner>
+            @endif
+
             <div class="container" style="padding-inline:0; max-width:100%;">
                 @yield('content')
             </div>

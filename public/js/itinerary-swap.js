@@ -34,6 +34,11 @@
             link.target = '_blank';
             link.rel = 'noopener noreferrer';
             info.appendChild(link);
+            if (alt.sample) {
+                var tag = el('span', 'sample-tag', 'Sample data, not DOT-verified');
+                tag.title = 'This place's accreditation number is a placeholder, not an official DOT number.';
+                info.appendChild(tag);
+            }
 
             var meta = alt.similarity + '% similar';
             if (alt.type) meta += ' · ' + alt.type;

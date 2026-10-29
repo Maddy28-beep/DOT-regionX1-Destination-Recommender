@@ -686,16 +686,17 @@ class TripPlannerTest extends TestCase
     {
         $this->seedDestinations();
 
-        // Two exit surveys that both pair Eden Nature Park with one restaurant
+        // Two exit surveys that both pair People's Park (the stop before lunch on this plan) with one restaurant
         // clear the minimum support of 2, so a rule exists to be credited.
         $region = Region::sole();
         $restaurant = \App\Models\Restaurant::create([
             'slug' => 'tuna-place', 'name' => 'Tuna Place', 'location' => 'Davao City',
             'region_id' => $region->id, 'type' => 'Seafood', 'is_accredited' => true,
             'rating' => 4.4, 'review_count' => 6, 'price_tier' => 'Mid-range',
-            'latitude' => 7.05, 'longitude' => 125.60,
+            // Beside the park: an Apriori restaurant is only the meal stop when it is within 10 km of the place.
+            'latitude' => 7.0735, 'longitude' => 125.6130,
         ]);
-        $eden = Destination::where('slug', 'eden-nature-park')->sole();
+        $eden = Destination::where('slug', 'peoples-park')->sole();
 
         foreach (range(1, 3) as $i) {
             $survey = \App\Models\ExitSurvey::create(['submitted_at' => now()]);
@@ -1153,15 +1154,16 @@ class TripPlannerTest extends TestCase
         $this->assertStringNotContainsString('key=', $url);
     }
 
-    /** A single place is not a route, but must still open. */
-    public function test_a_one_stop_day_links_to_a_maps_search(): void
+    /** A single place is not a route between two points, but must still open: as directions to it. */
+    public function test_a_one_stop_day_links_to_directions_to_it(): void
     {
         $url = Itinerary::googleMapsUrl([
             ['label' => 'Only Stop', 'address' => 'Davao City', 'lat' => null, 'lng' => null],
         ]);
 
-        $this->assertStringContainsString('/maps/search/', $url);
-        $this->assertStringContainsString('Only+Stop', str_replace('%20', '+', $url));
+        $this->assertStringContainsString('/maps/dir/', $url);
+        $this->assertStringContainsString('destination=Only+Stop%2C+Davao+City', $url);
+        $this->assertStringNotContainsString('origin=', $url);
     }
 
     /** Rows have to run forwards within a day. */

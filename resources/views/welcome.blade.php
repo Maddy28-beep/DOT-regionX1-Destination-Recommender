@@ -389,6 +389,9 @@
             <div class="stat-item">
                 <div class="stat-num" data-count-up>{{ $stats['destinations'] }}+</div>
                 <div class="stat-label">Destinations</div>
+                @if (($stats['destinations_sample'] ?? 0) > 0)
+                    <div class="stat-note">including {{ $stats['destinations_sample'] }} sample data</div>
+                @endif
             </div>
             <div class="stat-item">
                 <div class="stat-num" data-count-up>{{ $stats['regions'] }}</div>
@@ -397,6 +400,9 @@
             <div class="stat-item">
                 <div class="stat-num" data-count-up>{{ $stats['accommodations'] }}+</div>
                 <div class="stat-label">Accommodations</div>
+                @if (($stats['accommodations_sample'] ?? 0) > 0)
+                    <div class="stat-note">including {{ $stats['accommodations_sample'] }} sample data</div>
+                @endif
             </div>
             {{-- No fabricated placeholder here: this stood at a hard-coded
                  "4.8" whenever nothing was rated yet, which is a review score

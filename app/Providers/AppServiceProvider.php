@@ -90,6 +90,13 @@ class AppServiceProvider extends ServiceProvider
         // Anything that runs the recommendation pipeline (build, regenerate, swap, save).
         RateLimiter::for('trip-build', fn (Request $request) => Limit::perMinute(30)->by('trip:'.$request->ip())->response($tooMany));
 
+        // The public exit survey takes no login, so a script can post to it. 10 an hour and 40 a day from one address
+        // (a hotel or event sharing one connection still has room); one browser can in any case answer once per 6 hours.
+        RateLimiter::for('exit-survey', fn (Request $request) => [
+            Limit::perHour(10)->by('survey-hour:'.$request->ip())->response($tooMany),
+            Limit::perDay(40)->by('survey-day:'.$request->ip())->response($tooMany),
+        ]);
+
         // Heart / unheart buttons.
         RateLimiter::for('toggle', fn (Request $request) => Limit::perMinute(60)->by('toggle:'.$request->ip())->response($tooMany));
 

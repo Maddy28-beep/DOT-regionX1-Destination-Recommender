@@ -12,9 +12,7 @@
         'linear-gradient(135deg,#7a4fc9,#4f2f96)',
     ];
     $gradient = $gradients[$accommodation->id % count($gradients)];
-    $mapUrl = $accommodation->latitude && $accommodation->longitude
-        ? "https://www.google.com/maps/search/?api=1&query={$accommodation->latitude},{$accommodation->longitude}"
-        : 'https://www.google.com/maps/search/?api=1&query='.urlencode($accommodation->name.' '.$accommodation->location);
+    $mapUrl = \App\Support\MapLinks::directionsTo($accommodation->latitude, $accommodation->longitude, $accommodation->name, $accommodation->location);
 
     $tierLabel = match ($accommodation->price_tier) {
         'Budget-Friendly' => 'Budget',
