@@ -94,7 +94,8 @@ class ItineraryGenerationService
         $origin = [
             'lat' => $originLat,
             'lng' => $originLng,
-            'label' => $preference->origin_label
+            // A typed label names the point only when it was located (see TouristPreference::startLabel()).
+            'label' => ($saved !== null ? $preference->origin_label : null)
                 ?: ($shared ? 'your starting point' : self::DEFAULT_ORIGIN_LABEL),
             'region' => null,
         ];

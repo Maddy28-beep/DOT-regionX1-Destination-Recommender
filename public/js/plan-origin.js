@@ -4,8 +4,8 @@
  *   - Where are you visiting from?  A picker over a short list of cities and countries, grouped Philippines then
  *     abroad. Anything typed is still accepted: the list only saves typing and keeps the spelling the same from one
  *     visitor to the next, which is what the visitor-origin figures need.
- *   - Common arrival points: a tap fills the start box with the place's name and leaves the coordinates empty, so the
- *     server finds them when the form is sent, exactly as for an address typed out in full.
+ *   - Common arrival points: a tap fills the start box with the place's name and its coordinates, so the plan starts
+ *     exactly there and does not depend on a lookup finding the place by name.
  *
  * Without JavaScript the origin is a plain text box and the arrival points stay hidden, so none of this is needed
  * to submit the form.
@@ -119,8 +119,8 @@
         points.hidden = false;
         points.querySelectorAll('[data-start-pick]').forEach(button => button.addEventListener('click', () => {
             start.value = button.dataset.startPick;
-            if (lat) lat.value = '';
-            if (lng) lng.value = '';
+            if (lat) lat.value = button.dataset.lat || '';
+            if (lng) lng.value = button.dataset.lng || '';
             if (clear) clear.hidden = false;
             if (status) status.textContent = `Starting from ${button.textContent.trim()}.`;
             start.focus({preventScroll: true}); // the page stays where it is

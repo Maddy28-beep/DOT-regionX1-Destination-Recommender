@@ -145,15 +145,17 @@
                                     <button type="button" class="btn btn-outline pc-locate" id="origin-btn"><x-icon name="locate" /> Use my current location</button>
                                 </div>
 
-                                {{-- Where most visitors arrive. A tap fills the box with the name only; the server finds the
-                                     coordinates when the form is sent, the same as for a typed address (plan-origin.js). --}}
+                                {{-- Where most visitors arrive. A tap fills the box and the two hidden coordinates, so the plan never depends on
+                                     a lookup finding the place by name (the geocoder does not know all of them). The
+                                     coordinates are what it returned for each place, rounded to the same 3 places the
+                                     server stores (plan-origin.js). --}}
                                 <div class="pc-col-12 pc-arrivals" data-arrival-points hidden>
                                     <span class="pc-label" id="arrivalPointsLabel">Or start from a common arrival point</span>
                                     <div class="pc-quick" role="group" aria-labelledby="arrivalPointsLabel">
-                                        <button type="button" data-start-pick="Davao International Airport">Davao Airport</button>
-                                        <button type="button" data-start-pick="Ecoland Bus Terminal, Davao City">Bus terminal</button>
-                                        <button type="button" data-start-pick="Sasa Wharf, Davao City">Seaport</button>
-                                        <button type="button" data-start-pick="San Pedro Street, Davao City">City centre</button>
+                                        <button type="button" data-start-pick="Davao International Airport" data-lat="7.130" data-lng="125.645">Davao Airport</button>
+                                        <button type="button" data-start-pick="Davao City Overland Transport Terminal, Ecoland" data-lat="7.056" data-lng="125.602">Bus terminal</button>
+                                        <button type="button" data-start-pick="Port of Sasa" data-lat="7.127" data-lng="125.663">Seaport</button>
+                                        <button type="button" data-start-pick="San Pedro Street, Davao City" data-lat="7.066" data-lng="125.607">City centre</button>
                                     </div>
                                 </div>
 
