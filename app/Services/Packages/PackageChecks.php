@@ -25,11 +25,14 @@ class PackageChecks
     {
         $package->loadMissing(['itineraryDays', 'photos', 'tourOperator.accreditationRecords']);
         [$accredited, $accreditationDetail] = $this->operator($package->tourOperator);
+        $sample = $this->isSampleOperator($package->tourOperator);
         $days = $package->itineraryDays;
         $description = trim((string) $package->description);
 
         return [
-            ['key' => 'operator', 'ok' => $accredited, 'hard' => true, 'title' => 'Operator accreditation is current', 'detail' => $accreditationDetail],
+            ['key' => 'operator', 'ok' => $accredited, 'hard' => true, 'sample' => $sample,
+                'title' => $sample ? 'Operator accreditation is a placeholder' : 'Operator accreditation is current',
+                'detail' => $sample ? 'Sample data: the number is ours, not an official DOT number. Confirm with DOT before approving.' : $accreditationDetail],
             ['key' => 'description', 'ok' => mb_strlen($description) >= self::MIN_DESCRIPTION, 'hard' => false, 'title' => 'A description of '.self::MIN_DESCRIPTION.'+ characters', 'detail' => mb_strlen($description).' characters'],
             ['key' => 'days', 'ok' => $days->isNotEmpty() && $days->every(fn ($d) => trim((string) $d->title) !== ''), 'hard' => false, 'title' => 'Every day has a title', 'detail' => $days->count().' '.($days->count() === 1 ? 'day' : 'days')],
             ['key' => 'price', 'ok' => (float) $package->price_per_pax > 0, 'hard' => false, 'title' => 'Price per person is set', 'detail' => (float) $package->price_per_pax > 0 ? '₱'.number_format($package->price_per_pax) : 'Missing'],
@@ -57,6 +60,12 @@ class PackageChecks
         return filled($package->difficulty) || $count > 0
             ? trim(($package->difficulty ? 'Difficulty: '.(\App\Support\Amenities::DIFFICULTY[$package->difficulty][0] ?? '').'. ' : '').$count.' '.($count === 1 ? 'detail' : 'details'))
             : 'Nothing filled in';
+    }
+
+    /** True when the operator's only accreditation records are placeholders, so "accredited" cannot be said of it. */
+    public function isSampleOperator(?TourOperator $operator): bool
+    {
+        return $operator !== null && app(\App\Support\SampleData::class)->isSample($operator);
     }
 
     /** @return array{0: bool, 1: string} whether the operator may have packages live, and a line saying why or why not */
