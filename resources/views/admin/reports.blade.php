@@ -32,7 +32,7 @@
     <div class="panel-body">
         <div class="chip-row" style="margin-bottom:14px;">
             @foreach ($presets as $label => [$presetFrom, $presetTo])
-                <a href="{{ route('admin.reports', ['from' => $presetFrom, 'to' => $presetTo, 'report_type' => $reportType]) }}"
+                <a href="{{ route('admin.reports', ['from' => $presetFrom, 'to' => $presetTo, 'report_type' => $reportType] + ($includeSimulated ? ['include_simulated' => 1] : [])) }}"
                    class="chip {{ $activePreset === $label ? 'active' : '' }}">{{ $label }}</a>
             @endforeach
             <span class="chip {{ $activePreset === 'Custom' ? 'active' : '' }}"
@@ -56,6 +56,13 @@
                     @endforeach
                 </select>
             </div>
+            <div class="field">
+                <label for="include_simulated">Simulated rows</label>
+                <label class="check-inline" style="font-weight:400;">
+                    <input type="checkbox" id="include_simulated" name="include_simulated" value="1" @checked($includeSimulated)>
+                    Include simulated survey rows
+                </label>
+            </div>
             <button type="submit" class="btn btn-primary">Apply Filter</button>
         </form>
     </div>
@@ -68,8 +75,8 @@
             <p>{{ $report['summary'] }}</p>
         </div>
         <div class="util-row">
-            <a href="{{ route('admin.reports.print', ['from' => $from, 'to' => $to, 'report_type' => $reportType]) }}" target="_blank" class="btn btn-outline">Export PDF</a>
-            <a href="{{ route('admin.reports.export-csv', ['from' => $from, 'to' => $to, 'report_type' => $reportType]) }}" class="btn btn-outline">Export CSV</a>
+            <a href="{{ route('admin.reports.print', ['from' => $from, 'to' => $to, 'report_type' => $reportType] + ($includeSimulated ? ['include_simulated' => 1] : [])) }}" target="_blank" class="btn btn-outline">Export PDF</a>
+            <a href="{{ route('admin.reports.export-csv', ['from' => $from, 'to' => $to, 'report_type' => $reportType] + ($includeSimulated ? ['include_simulated' => 1] : [])) }}" class="btn btn-outline">Export CSV</a>
         </div>
     </div>
     <div class="panel-body">

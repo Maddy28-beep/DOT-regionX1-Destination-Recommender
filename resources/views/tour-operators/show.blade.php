@@ -38,6 +38,7 @@
         'title' => $tourOperator->name,
         'subtitle' => $tourOperator->posterMeta(),
         'isAccredited' => $tourOperator->is_accredited,
+        'isSample' => app(\App\Support\SampleData::class)->isSample($tourOperator),
         'rating' => number_format($tourOperator->rating, 1),
         'reviewCount' => $tourOperator->review_count,
         'fallbackGradient' => $gradient,

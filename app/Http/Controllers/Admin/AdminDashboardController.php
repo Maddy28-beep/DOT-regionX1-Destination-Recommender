@@ -276,13 +276,18 @@ class AdminDashboardController extends Controller
         ];
         $hasActiveFilters = (bool) array_filter($filters);
 
+        // Real tourist responses only, unless the admin asks to see the simulated demo rows as well.
+        $includeSimulated = $request->boolean('include_simulated');
+        $sources = $includeSimulated ? ExitSurvey::RESPONDENT_SOURCES : ['real'];
+        $simulatedHidden = $includeSimulated ? 0 : ExitSurvey::where('data_source', 'demo')->count();
+
         // A closure factory, not a single built query: Eloquent builders are
         // single-use, and every metric below needs its own fresh copy of the
         // exact same filtered set so a date range or residency filter
         // applies consistently across the whole page, not just the first
         // number that reads it.
-        $filtered = function () use ($filters) {
-            return ExitSurvey::respondents()
+        $filtered = function () use ($filters, $sources) {
+            return ExitSurvey::query()->whereIn('data_source', $sources)
                 ->when($filters['from'], fn ($q) => $q->whereDate('submitted_at', '>=', $filters['from']))
                 ->when($filters['to'], fn ($q) => $q->whereDate('submitted_at', '<=', $filters['to']))
                 ->when($filters['residency'], fn ($q) => $q->where('residency_type', $filters['residency']))
@@ -458,7 +463,7 @@ class AdminDashboardController extends Controller
             'originBreakdown', 'originTotal', 'otherOriginsCount',
             'avgTotalSpend', 'spendByResidency', 'spendRespondentCount',
             'topPlaces', 'topActivities', 'insights',
-            'filters', 'hasActiveFilters',
+            'filters', 'hasActiveFilters', 'includeSimulated', 'simulatedHidden',
             'residencyOptions', 'visitorTypeOptions', 'purposeOptions'
         ));
     }
@@ -521,6 +526,7 @@ class AdminDashboardController extends Controller
         $report = $this->buildReport($reportType, $from, $to);
 
         return view('admin.reports', [
+            'includeSimulated' => $request->boolean('include_simulated'),
             'from' => $from,
             'to' => $to,
             'reportType' => $reportType,
@@ -670,9 +676,15 @@ class AdminDashboardController extends Controller
         ];
     }
 
+    /** Real responses by default; simulated demo rows only when the report is asked to include them. */
+    private function reportSurveySources(): array
+    {
+        return request()->boolean('include_simulated') ? ExitSurvey::RESPONDENT_SOURCES : ['real'];
+    }
+
     private function exitSurveyReport(string $from, string $rangeEnd): array
     {
-        $surveys = ExitSurvey::respondents()->whereBetween('submitted_at', [$from, $rangeEnd])->orderBy('submitted_at')->get();
+        $surveys = ExitSurvey::query()->whereIn('data_source', $this->reportSurveySources())->whereBetween('submitted_at', [$from, $rangeEnd])->orderBy('submitted_at')->get();
         $avg = $surveys->whereNotNull('overall_rating')->avg('overall_rating');
 
         return [
@@ -709,7 +721,7 @@ class AdminDashboardController extends Controller
     {
         $rows = ExitSurveyVisit::join('exit_surveys', 'exit_surveys.id', '=', 'exit_survey_visits.exit_survey_id')
             ->whereBetween('exit_surveys.submitted_at', [$from, $rangeEnd])
-            ->whereIn('exit_surveys.data_source', ExitSurvey::RESPONDENT_SOURCES)
+            ->whereIn('exit_surveys.data_source', $this->reportSurveySources())
             ->selectRaw('exit_survey_visits.listing_kind, exit_survey_visits.listing_id, count(*) as visits')
             ->groupBy('exit_survey_visits.listing_kind', 'exit_survey_visits.listing_id')
             ->orderByDesc('visits')

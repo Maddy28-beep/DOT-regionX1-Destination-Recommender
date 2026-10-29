@@ -1,4 +1,6 @@
 @php
+    // A listing whose accreditation number is a placeholder is shown as sample data, never as DOT-verified.
+    $isSample = $isSample ?? false;
     // Seeded SVG placeholders should not appear beside verified photographs.
     if ($photos->contains(fn ($photo) => ! str_ends_with(strtolower($photo->path), '.svg'))) {
         $photos = $photos->reject(fn ($photo) => str_ends_with(strtolower($photo->path), '.svg'))->values();
@@ -32,12 +34,12 @@
             </div>
             <div class="badges">
                 @if ($isAccredited)
-                    <span class="dpost-badge-accredited" title="DOT Accredited">
+                    <span class="dpost-badge-accredited{{ $isSample ? ' is-sample' : '' }}" title="{{ $isSample ? 'Sample data, not DOT-verified' : 'DOT Accredited' }}">
                     <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
                         <circle cx="10" cy="10" r="3.4" fill="currentColor"/>
                     </svg>
-                    DOT Accredited
+                    {{ $isSample ? 'Sample data, not DOT-verified' : 'DOT Accredited' }}
                 </span>
                 @else
                     <span></span>
@@ -80,12 +82,12 @@
             @endif
             <div class="badges">
                 @if ($isAccredited)
-                    <span class="dpost-badge-accredited" title="DOT Accredited">
+                    <span class="dpost-badge-accredited{{ $isSample ? ' is-sample' : '' }}" title="{{ $isSample ? 'Sample data, not DOT-verified' : 'DOT Accredited' }}">
                     <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
                         <circle cx="10" cy="10" r="3.4" fill="currentColor"/>
                     </svg>
-                    DOT Accredited
+                    {{ $isSample ? 'Sample data, not DOT-verified' : 'DOT Accredited' }}
                 </span>
                 @else
                     <span></span>
@@ -124,12 +126,12 @@
     <div class="detail-hero" style="background:{{ $fallbackGradient }}">
         <div class="badges">
             @if ($isAccredited)
-                <span class="dpost-badge-accredited" title="DOT Accredited">
+                <span class="dpost-badge-accredited{{ $isSample ? ' is-sample' : '' }}" title="{{ $isSample ? 'Sample data, not DOT-verified' : 'DOT Accredited' }}">
                     <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
                         <circle cx="10" cy="10" r="3.4" fill="currentColor"/>
                     </svg>
-                    DOT Accredited
+                    {{ $isSample ? 'Sample data, not DOT-verified' : 'DOT Accredited' }}
                 </span>
             @else
                 <span></span>
