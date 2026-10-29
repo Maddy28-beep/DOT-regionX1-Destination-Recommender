@@ -12,7 +12,7 @@
             <h2>{{ $slides->count() }} {{ \Illuminate\Support\Str::plural('slide', $slides->count()) }}</h2>
             <p>Shown in this order. Hidden slides stay here but do not appear on the homepage.</p>
         </div>
-        <a href="{{ route('admin.postcard-slides.create') }}" class="btn btn-primary">Add slide</a>
+        <a href="{{ route('admin.postcard-slides.create') }}" class="btn btn-primary" data-modal-form data-title="Add slide">Add slide</a>
     </div>
 
     <div class="table-scroll">
@@ -33,7 +33,7 @@
                     <td><span class="status-pill {{ $slide->is_active ? 'status-active' : 'status-expired' }}">{{ $slide->is_active ? 'Shown' : 'Hidden' }}</span></td>
                     <td>
                         <div class="util-row">
-                            <a href="{{ route('admin.postcard-slides.edit', $slide) }}" class="btn btn-primary btn-xs">Edit</a>
+                            <a href="{{ route('admin.postcard-slides.edit', $slide) }}" class="btn btn-primary btn-xs" data-modal-form data-title="Edit slide" data-sub="{{ $slide->title }}">Edit</a>
                             <form method="POST" action="{{ route('admin.postcard-slides.destroy', $slide) }}" onsubmit="return confirm('Remove this slide? Its photo files are deleted too.');">
                                 @csrf
                                 @method('DELETE')

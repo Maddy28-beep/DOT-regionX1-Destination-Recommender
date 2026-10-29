@@ -4,37 +4,45 @@
 @section('page-title', 'Manage '.$config['label'])
 @section('page-sub', 'Add, edit, and archive tourism listings shown on the public site')
 
+@section('page-actions')
+    {{-- A real link to the full-page form; with JavaScript it opens the same form in a modal instead. --}}
+    <a href="{{ route('admin.listings.create', $type) }}" class="btn btn-primary" data-modal-form data-title="Add {{ $config['singular'] }}">
+        <x-icon name="plus" /> Add {{ $config['singular'] }}
+    </a>
+@endsection
+
 @section('content')
+@php
+    // A column that has nothing to say on this page is left out, instead of a column of dashes.
+    $showTier = $listings->contains(fn ($l) => filled($l->price_tier));
+    $showRating = $listings->contains(fn ($l) => $l->review_count > 0);
+    $columns = 5 + ($showTier ? 1 : 0) + ($showRating ? 1 : 0);
+@endphp
 
-<div class="chip-row">
-    @foreach ($types as $key => $t)
-        <a href="{{ route('admin.listings.index', $key) }}" class="chip {{ $type === $key ? 'active' : '' }}">{{ $t['label'] }}</a>
-    @endforeach
-</div>
+<div class="adm-fit adm-listings">
 
-<div class="panel">
-    <div class="panel-head">
-        <div>
-            <h2>{{ $listings->total() }} {{ $config['label'] }}</h2>
-        </div>
-        <a href="{{ route('admin.listings.create', $type) }}" class="btn btn-primary">Add {{ $config['singular'] }}</a>
-    </div>
-    <div class="panel-body" style="padding-bottom:0;">
-        <form method="GET" class="filter-inline">
-            <div class="field">
-                <label for="q">Search by name</label>
-                <input type="text" id="q" name="q" value="{{ request('q') }}" placeholder="Search...">
-            </div>
-            <button type="submit" class="btn btn-outline">Search</button>
-        </form>
-        <div class="chip-row" style="margin-top:16px;">
-            @foreach (['active' => 'Active', 'archived' => 'Archived', 'all' => 'All'] as $value => $label)
-                <a href="{{ route('admin.listings.index', [$type, 'status' => $value, 'q' => request('q')]) }}" class="chip {{ $status === $value ? 'active' : '' }}">{{ $label }}</a>
+    <div class="adm-toolbar">
+        <nav class="adm-seg" aria-label="Listing type">
+            @foreach ($types as $key => $t)
+                <a href="{{ route('admin.listings.index', $key) }}" class="{{ $type === $key ? 'on' : '' }}" @if ($type === $key) aria-current="page" @endif>{{ $t['label'] }}</a>
             @endforeach
-        </div>
+        </nav>
+
+        <form method="GET" class="adm-search" role="search">
+            <x-icon name="search" />
+            <label for="q" class="sr-only">Search by name</label>
+            <input type="search" id="q" name="q" value="{{ request('q') }}" placeholder="Search by name">
+            @if ($status !== 'active')<input type="hidden" name="status" value="{{ $status }}">@endif
+        </form>
+
+        <nav class="adm-seg" aria-label="Show">
+            @foreach (['active' => 'Active', 'archived' => 'Archived', 'all' => 'All'] as $value => $label)
+                <a href="{{ route('admin.listings.index', [$type, 'status' => $value, 'q' => request('q')]) }}" class="{{ $status === $value ? 'on' : '' }}" @if ($status === $value) aria-current="true" @endif>{{ $label }}</a>
+            @endforeach
+        </nav>
     </div>
 
-    <div data-bulk>
+    <section class="adm-card adm-card--table" data-bulk aria-label="{{ $config['label'] }}">
         <div class="bulk-bar">
             <span class="bulk-bar__count" data-bulk-count>0 selected</span>
             <form method="POST" action="{{ route('admin.listings.bulk', $type) }}"
@@ -50,78 +58,86 @@
             </form>
         </div>
 
-        <div class="table-scroll">
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th class="col-check"><input type="checkbox" data-bulk-all aria-label="Select all rows"></th>
-                    <th>Name</th><th>Region</th><th>Price Tier</th><th>Accredited</th><th>Rating</th><th>Status</th><th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($listings as $listing)
+        <div class="adm-card__body">
+            <table class="data-table adm-table">
+                <caption class="sr-only">{{ $listings->total() }} {{ $config['label'] }}</caption>
+                <thead>
                     <tr>
-                        <td class="col-check">
-                            <input type="checkbox" data-bulk-row value="{{ $listing->id }}" aria-label="Select {{ $listing->name }}">
-                        </td>
-                        <td>
-                            {{ $listing->name }}
-                            {{-- Only when this name is genuinely ambiguous within
-                                 this listing type (see the controller's
-                                 $nameCounts) -- distinguishes "which Elysia
-                                 Wellness Spa is this row" without adding a
-                                 subline to every one of hundreds of rows that
-                                 don't need it. --}}
-                            @if (($nameCounts[$listing->name] ?? 0) > 1 && $listing->location)
-                                <div class="cell-sub">{{ $listing->location }}</div>
-                            @endif
-                        </td>
-                        <td class="cell-muted">{{ $listing->region?->name ?? '—' }}</td>
-                        <td class="cell-muted">{{ $listing->price_tier ?? '—' }}</td>
-                        <td>
-                            @if ($listing->is_accredited)
-                                <span class="status-pill status-active">Accredited</span>
-                            @else
-                                <span class="cell-muted">—</span>
-                            @endif
-                        </td>
-                        <td class="cell-muted">{{-- decimal:2 cast means an unrated listing yields the truthy string "0.0"; review_count is the honest test. --}}{{ $listing->review_count > 0 ? number_format($listing->rating, 1).' ★' : '—' }}</td>
-                        <td>
-                            @if ($listing->archived_at)
-                                <span class="status-pill status-expired">Archived</span>
-                            @else
-                                <span class="status-pill status-active">Live</span>
-                            @endif
-                        </td>
-                        <td>
-                            {{-- Edit is filled, Archive outlined: the primary action reads
-                                 first. Same height as before via .btn-xs, which replaced the
-                                 inline padding/font-size overrides. --}}
-                            <div class="util-row">
-                                <a href="{{ route('admin.listings.edit', [$type, $listing->id]) }}" class="btn btn-primary btn-xs">Edit</a>
-                                @if ($listing->archived_at)
-                                    <form method="POST" action="{{ route('admin.listings.unarchive', [$type, $listing->id]) }}">
-                                        @csrf
-                                        <button type="submit" class="btn btn-outline btn-xs">Restore</button>
-                                    </form>
-                                @else
-                                    <form method="POST" action="{{ route('admin.listings.archive', [$type, $listing->id]) }}" onsubmit="return confirm('Archive this listing? It will be hidden from the public site.');">
-                                        @csrf
-                                        <button type="submit" class="btn btn-outline btn-xs">Archive</button>
-                                    </form>
-                                @endif
-                            </div>
-                        </td>
+                        <th class="col-check"><input type="checkbox" data-bulk-all aria-label="Select all rows"></th>
+                        <th>Name</th><th>Region</th>
+                        @if ($showTier)<th>Price Tier</th>@endif
+                        <th>Accredited</th>
+                        @if ($showRating)<th>Rating</th>@endif
+                        <th>Status</th>
+                        <th class="adm-table__actions"><span class="sr-only">Actions</span></th>
                     </tr>
-                @empty
-                    <tr><td colspan="8" class="cell-muted">No {{ strtolower($config['label']) }} found.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse ($listings as $listing)
+                        <tr>
+                            <td class="col-check">
+                                <input type="checkbox" data-bulk-row value="{{ $listing->id }}" aria-label="Select {{ $listing->name }}">
+                            </td>
+                            <td>
+                                <strong>{{ $listing->name }}</strong>
+                                {{-- Only when this name is genuinely ambiguous within this listing type (see the
+                                     controller's $nameCounts): tells "which Elysia Wellness Spa is this row" without adding
+                                     a subline to every one of hundreds of rows that do not need it. --}}
+                                @if (($nameCounts[$listing->name] ?? 0) > 1 && $listing->location)
+                                    <div class="cell-sub">{{ $listing->location }}</div>
+                                @endif
+                            </td>
+                            <td class="cell-muted">{{ $listing->region?->name ?? '—' }}</td>
+                            @if ($showTier)<td class="cell-muted">{{ $listing->price_tier ?? '—' }}</td>@endif
+                            <td>
+                                @if ($listing->is_accredited)
+                                    <span class="status-pill status-active">Accredited</span>
+                                @else
+                                    <span class="cell-muted">Not yet</span>
+                                @endif
+                            </td>
+                            @if ($showRating)
+                                <td class="cell-muted">{{-- decimal:2 cast means an unrated listing yields the truthy string "0.0"; review_count is the honest test. --}}{{ $listing->review_count > 0 ? number_format($listing->rating, 1).' ★' : '—' }}</td>
+                            @endif
+                            <td>
+                                @if ($listing->archived_at)
+                                    <span class="status-pill status-expired">Archived</span>
+                                @else
+                                    <span class="status-pill status-active">Live</span>
+                                @endif
+                            </td>
+                            <td class="adm-table__actions">
+                                <div class="adm-actions">
+                                    <a href="{{ route('admin.listings.edit', [$type, $listing->id]) }}" class="adm-icon-btn" title="Edit {{ $listing->name }}"
+                                       data-modal-form data-title="Edit {{ $config['singular'] }}" data-sub="{{ $listing->name }}">
+                                        <x-icon name="pencil" /><span class="sr-only">Edit {{ $listing->name }}</span>
+                                    </a>
+                                    @if ($listing->archived_at)
+                                        <form method="POST" action="{{ route('admin.listings.unarchive', [$type, $listing->id]) }}">
+                                            @csrf
+                                            <button type="submit" class="adm-icon-btn" title="Restore {{ $listing->name }}"><x-icon name="rotate" /><span class="sr-only">Restore {{ $listing->name }}</span></button>
+                                        </form>
+                                    @else
+                                        <form method="POST" action="{{ route('admin.listings.archive', [$type, $listing->id]) }}" onsubmit="return confirm('Archive this listing? It will be hidden from the public site.');">
+                                            @csrf
+                                            <button type="submit" class="adm-icon-btn" title="Archive {{ $listing->name }}"><x-icon name="archive" /><span class="sr-only">Archive {{ $listing->name }}</span></button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="{{ $columns + 1 }}" class="cell-muted">No {{ strtolower($config['label']) }} found.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-    </div>
-</div>
 
-<x-admin-pagination :paginator="$listings" />
+        <div class="adm-card__foot">
+            <span>{{ $listings->total() }} {{ $config['label'] }}@if ($listings->total() > 0) · showing {{ $listings->firstItem() }}–{{ $listings->lastItem() }}@endif</span>
+            <x-admin-pagination :paginator="$listings" />
+        </div>
+    </section>
+</div>
 
 @endsection

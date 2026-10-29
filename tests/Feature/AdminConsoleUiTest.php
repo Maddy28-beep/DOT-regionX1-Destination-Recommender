@@ -117,7 +117,7 @@ class AdminConsoleUiTest extends TestCase
         $this->assertStringContainsString('Tour Operators', $html);
     }
 
-    /** Edit is the filled primary; Archive stays outlined. */
+    /** Edit is a link to the form, Archive a button that posts: icons, with a name for a screen reader. */
     public function test_edit_is_filled_and_archive_is_outline(): void
     {
         $this->seedListings();
@@ -125,8 +125,10 @@ class AdminConsoleUiTest extends TestCase
         $html = $this->actingAs($this->admin(), 'admin')
             ->get('/portal/admin/listings/destinations')->getContent();
 
-        $this->assertStringContainsString('btn btn-primary btn-xs">Edit</a>', $html);
-        $this->assertStringContainsString('btn btn-outline btn-xs">Archive</button>', $html);
+        // Both are icon buttons now; each says what it does and to which listing for a screen reader.
+        $this->assertMatchesRegularExpression('/<a href="[^"]*\/edit" class="adm-icon-btn" title="Edit Dest 0"/', $html);
+        $this->assertStringContainsString('<span class="sr-only">Edit Dest 0</span>', $html);
+        $this->assertStringContainsString('<span class="sr-only">Archive Dest 0</span>', $html);
     }
 
     /** Active rows need no action, so they get plain text instead of controls. */
@@ -329,7 +331,7 @@ class AdminConsoleUiTest extends TestCase
 
         $html = $this->actingAs($this->admin(), 'admin')->get('/portal/admin/')->getContent();
 
-        preg_match('/<div class="stat-card-val">(\d+)<\/div>\s*<div class="stat-card-label">QR Check-ins Today/', $html, $m);
+        preg_match('/<div class="adm-kpi__val">(\d+)<\/div><div class="adm-kpi__lab">QR Check-ins Today/', $html, $m);
 
         $this->assertNotEmpty($m, 'Could not read the check-ins stat card.');
         $this->assertSame('2', $m[1], "Two check-ins were recorded today but the card shows {$m[1]}.");

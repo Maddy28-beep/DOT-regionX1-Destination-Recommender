@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\ModalForms;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Establishment\EstablishmentDashboardController;
 use App\Models\Accommodation;
@@ -11,8 +12,10 @@ use App\Models\Region;
 use App\Models\Restaurant;
 use App\Models\SouvenirCenter;
 use App\Models\TourOperator;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -20,6 +23,8 @@ use App\Support\Toast;
 
 class AdminListingController extends Controller
 {
+    use ModalForms;
+
     private const TYPES = [
         'destinations' => ['model' => Destination::class, 'label' => 'Destinations', 'singular' => 'Destination'],
         'accommodations' => ['model' => Accommodation::class, 'label' => 'Accommodations', 'singular' => 'Accommodation'],
@@ -70,11 +75,11 @@ class AdminListingController extends Controller
         ]);
     }
 
-    public function create(string $type): View
+    public function create(Request $request, string $type): View|Response
     {
         $config = $this->config($type);
 
-        return view('admin.listings.form', [
+        return $this->modalView($request, 'admin.listings.form', 'admin.listings._form', [
             'type' => $type,
             'config' => $config,
             'listing' => new $config['model'],
@@ -83,7 +88,7 @@ class AdminListingController extends Controller
         ]);
     }
 
-    public function store(Request $request, string $type): RedirectResponse
+    public function store(Request $request, string $type): RedirectResponse|JsonResponse
     {
         $config = $this->config($type);
         $data = $request->validate($this->rules($type), self::LINK_MESSAGES);
@@ -108,11 +113,10 @@ class AdminListingController extends Controller
             $this->syncRoomTypes($listing, $request->input('room_types'));
         }
 
-        return redirect()->route('admin.listings.index', $type)
-            ->with(Toast::success("{$config['singular']} created", "\"{$listing->name}\" has been added to the catalog.".$this->hoursNote($type, $listing)));
+        return $this->modalSaved($request, route('admin.listings.index', $type), Toast::success("{$config['singular']} created", "\"{$listing->name}\" has been added to the catalog.".$this->hoursNote($type, $listing)));
     }
 
-    public function edit(string $type, int $id): View
+    public function edit(Request $request, string $type, int $id): View|Response
     {
         $config = $this->config($type);
         $listing = $config['model']::with('region')->findOrFail($id);
@@ -125,7 +129,7 @@ class AdminListingController extends Controller
             $listing->load('roomTypes');
         }
 
-        return view('admin.listings.form', [
+        return $this->modalView($request, 'admin.listings.form', 'admin.listings._form', [
             'type' => $type,
             'config' => $config,
             'listing' => $listing,
@@ -134,7 +138,7 @@ class AdminListingController extends Controller
         ]);
     }
 
-    public function update(Request $request, string $type, int $id): RedirectResponse
+    public function update(Request $request, string $type, int $id): RedirectResponse|JsonResponse
     {
         $config = $this->config($type);
         $listing = $config['model']::findOrFail($id);
@@ -159,8 +163,7 @@ class AdminListingController extends Controller
             $this->syncRoomTypes($listing, $request->input('room_types', ''));
         }
 
-        return redirect()->route('admin.listings.index', $type)
-            ->with(Toast::success("{$config['singular']} updated", "Your changes to \"{$listing->name}\" have been saved.".$this->hoursNote($type, $listing)));
+        return $this->modalSaved($request, route('admin.listings.index', $type), Toast::success("{$config['singular']} updated", "Your changes to \"{$listing->name}\" have been saved.".$this->hoursNote($type, $listing)));
     }
 
     public function archive(string $type, int $id): RedirectResponse

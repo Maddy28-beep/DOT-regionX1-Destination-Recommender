@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\ModalForms;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Support\Toast;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -18,6 +21,8 @@ use Illuminate\View\View;
  */
 class AdminEventController extends Controller
 {
+    use ModalForms;
+
     private const FILTERS = ['upcoming', 'past', 'archived'];
 
     public function index(Request $request): View
@@ -43,33 +48,31 @@ class AdminEventController extends Controller
         ]);
     }
 
-    public function create(): View
+    public function create(Request $request): View|Response
     {
-        return view('admin.events.form', ['event' => new Event(), 'categories' => Event::CATEGORIES]);
+        return $this->modalView($request, 'admin.events.form', 'admin.events._form', ['event' => new Event(), 'categories' => Event::CATEGORIES]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|JsonResponse
     {
         $data = $this->validated($request);
         $data['slug'] = $this->uniqueSlug($data['title']);
 
         $event = Event::create($data);
 
-        return redirect()->route('admin.events.index')
-            ->with(Toast::success('Event added', "\"{$event->title}\" is now on the public calendar."));
+        return $this->modalSaved($request, route('admin.events.index'), Toast::success('Event added', "\"{$event->title}\" is now on the public calendar."));
     }
 
-    public function edit(Event $event): View
+    public function edit(Request $request, Event $event): View|Response
     {
-        return view('admin.events.form', ['event' => $event, 'categories' => Event::CATEGORIES]);
+        return $this->modalView($request, 'admin.events.form', 'admin.events._form', ['event' => $event, 'categories' => Event::CATEGORIES]);
     }
 
-    public function update(Request $request, Event $event): RedirectResponse
+    public function update(Request $request, Event $event): RedirectResponse|JsonResponse
     {
         $event->update($this->validated($request));
 
-        return redirect()->route('admin.events.index')
-            ->with(Toast::success('Event updated', "Changes to \"{$event->title}\" have been saved."));
+        return $this->modalSaved($request, route('admin.events.index'), Toast::success('Event updated', "Changes to \"{$event->title}\" have been saved."));
     }
 
     public function archive(Event $event): RedirectResponse
