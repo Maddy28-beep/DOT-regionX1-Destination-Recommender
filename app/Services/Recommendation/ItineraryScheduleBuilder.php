@@ -131,6 +131,9 @@ class ItineraryScheduleBuilder
 
     private const DINNER = '18:30';
 
+    /** Dinner may start from here (the window is 18:00 to 19:30; 18:30 is the usual hour, DINNER above). */
+    private const DINNER_EARLIEST = '18:00';
+
     /** Arriving at the accommodation after this (the end of the dinner window), dinner is not planned: only the late check-in. */
     private const LATEST_DINNER_START = '19:30';
 
@@ -358,7 +361,7 @@ class ItineraryScheduleBuilder
             if ($isLastDay) {
                 $this->closeTripDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $origin, $lunchTaken, $lastDestination, $date);
             } else {
-                $this->closeOvernightDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $accommodation, $stayRule, $lastNight);
+                $this->closeOvernightDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $accommodation, $stayRule, $lastNight, $date);
                 $here = $accommodation ? $this->place($accommodation) : $here;
             }
         }
@@ -695,6 +698,60 @@ class ItineraryScheduleBuilder
         return ['steps' => $steps, 'arrival' => $t, 'lunchTaken' => $lunchTaken, 'visitMinutes' => $visitMinutes];
     }
 
+    /**
+     * The journey that ends a day (the way home on the last day, the drive back to the stay on the others), with
+     * dinner where the journey would otherwise carry the traveller through the whole dinner window (18:00 to 19:30)
+     * and arrive after it: dinner first when setting off inside the window, a stop on the way when the journey
+     * spans it. A journey that arrives inside the window, or that is over before it, gets no dinner row: the stay's
+     * own dinner, or home, covers it. Same shape as planLeg().
+     *
+     * @return array{steps: list<array<string, mixed>>, arrival: Carbon, lunchTaken: bool, visitMinutes: int}
+     */
+    private function planDinnerLeg(Carbon $clock, array $from, array $to): array
+    {
+        $estimate = $this->estimateLeg($from, $to);
+        $total = $estimate['max_minutes'];
+        $earliest = Carbon::parse(self::DINNER_EARLIEST);
+        $default = Carbon::parse(self::DINNER);
+        $latest = Carbon::parse(self::LATEST_DINNER_START);
+        $steps = [];
+        $t = $clock->copy();
+        $end = $t->copy()->addMinutes($total);
+
+        $travel = function (int $minutes) use (&$steps, &$t, $estimate, $total) {
+            if ($minutes <= 0) {
+                return;
+            }
+
+            $steps[] = ['type' => 'travel', 'start' => $t->copy(), 'minutes' => $minutes, 'share' => $total > 0 ? $minutes / $total : 1.0, 'estimate' => $estimate];
+            $t = $t->copy()->addMinutes($minutes);
+        };
+        $meal = function (Carbon $at, string $phase, array $near) use (&$steps, &$t) {
+            $start = $this->toQuarterHour($at);
+            $steps[] = ['type' => 'meal', 'meal' => 'Dinner', 'at' => $start, 'phase' => $phase, 'near' => $near];
+            $t = $start->copy()->addMinutes(self::MEAL_MINUTES);
+        };
+
+        if ($end->greaterThan($latest) && $t->lessThanOrEqualTo($latest)) {
+            if ($t->greaterThanOrEqualTo($earliest)) {
+                $meal($t, 'start', $from);
+                $travel($total);
+            } elseif ($this->minutesBetween($t, $earliest) <= self::EAT_FIRST_LEAD_MINUTES) {
+                $meal($earliest, 'start', $from);
+                $travel($total);
+            } else {
+                $before = $this->minutesBetween($t, $default);
+                $travel($before);
+                $meal($default, 'road', $this->pointAt($from, $to, $total > 0 ? $before / $total : 0.5));
+                $travel($total - $before);
+            }
+        } else {
+            $travel($total);
+        }
+
+        return ['steps' => $steps, 'arrival' => $t, 'lunchTaken' => true, 'visitMinutes' => 0];
+    }
+
     /** Writes the rows of a planLeg() plan and returns the clock when they are done. */
     private function commitLeg(Itinerary $itinerary, int $dayNumber, int &$sortOrder, array $plan, array $from, array $to, $destination, ?Carbon $date): Carbon
     {
@@ -704,7 +761,7 @@ class ItineraryScheduleBuilder
         foreach ($plan['steps'] as $step) {
             if ($step['type'] === 'meal') {
                 $onSite = $step['phase'] === 'arrival' ? $destination : null;
-                $this->addMeal($itinerary, $dayNumber, $sortOrder, $step['at'], 'Lunch', $step['near'], $onSite, $date, $step['phase']);
+                $this->addMeal($itinerary, $dayNumber, $sortOrder, $step['at'], $step['meal'] ?? 'Lunch', $step['near'], $onSite, $date, $step['phase']);
 
                 continue;
             }
@@ -882,19 +939,21 @@ class ItineraryScheduleBuilder
     }
 
     /** Days that end at the accommodation: travel back, dinner, overnight. */
-    private function closeOvernightDay(Itinerary $itinerary, int $dayNumber, int &$sortOrder, Carbon $clock, array $here, ?Accommodation $accommodation, ?array $stayRule = null, ?Accommodation $lastNight = null): void
+    private function closeOvernightDay(Itinerary $itinerary, int $dayNumber, int &$sortOrder, Carbon $clock, array $here, ?Accommodation $accommodation, ?array $stayRule = null, ?Accommodation $lastNight = null, ?Carbon $date = null): void
     {
         if (! $accommodation) {
             return;
         }
 
-        $arrival = $this->addTravel(
+        $arrival = $this->commitLeg(
             $itinerary,
             $dayNumber,
             $sortOrder,
-            $this->toQuarterHour($clock->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES)),
+            $this->planDinnerLeg($this->toQuarterHour($clock->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES)), $here, $this->place($accommodation)),
             $here,
             $this->place($accommodation),
+            null,
+            $date,
         );
 
         // Reaching the accommodation after the latest dinner time (a late flight, a long drive from the airport):
@@ -993,13 +1052,15 @@ class ItineraryScheduleBuilder
             $clock = $this->addMeal($itinerary, $dayNumber, $sortOrder, $clock, 'Lunch', $here, null, $date, 'after');
         }
 
-        $clock = $this->addTravel(
+        $clock = $this->commitLeg(
             $itinerary,
             $dayNumber,
             $sortOrder,
-            $this->toQuarterHour($clock->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES)),
+            $this->planDinnerLeg($this->toQuarterHour($clock->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES)), $here, $origin),
             $here,
             $origin,
+            null,
+            $date,
         );
 
         $this->row($itinerary, $dayNumber, $sortOrder, [

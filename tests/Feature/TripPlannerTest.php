@@ -471,7 +471,9 @@ class TripPlannerTest extends TestCase
         foreach (Itinerary::with('items')->sole()->items as $item) {
             $hour = (int) explode(':', (string) $item->starts_at)[0];
 
-            $this->assertLessThanOrEqual(21, $hour,
+            // 23, not 21: a long drive home that runs through dinner now includes a dinner stop (an hour), so the
+            // trip's last row can fall in the 22:00 hour. What this test guards is the small hours after midnight.
+            $this->assertLessThanOrEqual(23, $hour,
                 "'{$item->title}' is scheduled at {$item->starts_at}, which is not a time anyone travels.");
         }
     }
