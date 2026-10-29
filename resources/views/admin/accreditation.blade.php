@@ -66,7 +66,12 @@
                             <input type="checkbox" data-bulk-row value="{{ $r->id }}" aria-label="Select {{ $r->accreditation_number }}">
                         </td>
                         <td>{{ $r->accreditation_number }}</td>
-                        <td>{{ $r->listing?->name ?? 'Listing removed' }}</td>
+                        <td>
+                            {{ $r->listing?->name ?? 'Listing removed' }}
+                            @if ($r->is_placeholder)
+                                <x-sample-tag label="Sample data" title="This accreditation number is a placeholder, not an official DOT number." />
+                            @endif
+                        </td>
                         <td class="cell-muted">{{ ucfirst(str_replace('_', ' ', $r->listing_kind)) }}</td>
                         <td class="cell-muted cell-date">{{ $r->issue_date?->format('M d, Y') }}</td>
                         <td class="cell-muted cell-date">{{ $r->expiration_date?->format('M d, Y') }}</td>

@@ -210,10 +210,16 @@ class HomeController extends Controller
             ->take(3)
             ->get();
 
+        $sample = app(\App\Support\SampleData::class);
+        $destinationCount = $sample->split(Destination::publiclyVisible());
+        $accommodationCount = $sample->split(Accommodation::publiclyVisible());
+
         $stats = [
-            'destinations' => Destination::publiclyVisible()->count(),
+            'destinations' => $destinationCount['total'],
+            'destinations_sample' => $destinationCount['sample'],
             'regions' => Region::count(),
-            'accommodations' => Accommodation::publiclyVisible()->count(),
+            'accommodations' => $accommodationCount['total'],
+            'accommodations_sample' => $accommodationCount['sample'],
             /*
              * Averaged over destinations that actually carry reviews. Most of
              * the accreditation import landed with rating 0 and no reviews, so

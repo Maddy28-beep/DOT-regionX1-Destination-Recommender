@@ -147,7 +147,11 @@
         </div>
     </div>
     <div class="panel-body">
-        @if ($listing->is_accredited && ! $listing->archived_at)
+        @if (app(\App\Support\SampleData::class)->isSample($listing))
+            <x-banner tone="warn">
+                This listing is sample data, not DOT-verified, so it has no QR code.
+            </x-banner>
+        @elseif ($listing->is_accredited && ! $listing->archived_at)
             <div class="qr-block">
                 <div class="qr-frame">
                     <span class="qr-frame__tab">Scan me</span>

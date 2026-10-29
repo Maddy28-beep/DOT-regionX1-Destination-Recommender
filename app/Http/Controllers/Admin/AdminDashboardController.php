@@ -706,13 +706,14 @@ class AdminDashboardController extends Controller
 
         return [
             'summary' => $records->count().' accreditation record'.($records->count() === 1 ? '' : 's').' created in the selected range.',
-            'headers' => ['Listing Type', 'Listing Name', 'Accreditation #', 'Status', 'Issue Date', 'Expiration Date'],
+            'headers' => ['Listing Type', 'Listing Name', 'Accreditation #', 'Status', 'Issue Date', 'Expiration Date', 'Data'],
             'rows' => $records->map(fn ($r) => [
                 ucfirst(str_replace('_', ' ', $r->listing_kind)),
                 $this->resolveListingName($r->listing_kind, $r->listing_id) ?? '—',
                 $r->accreditation_number, $r->status,
                 optional($r->issue_date)->format('Y-m-d') ?? '—',
                 optional($r->expiration_date)->format('Y-m-d') ?? '—',
+                $r->is_placeholder ? 'Sample data, not DOT-verified' : 'DOT record',
             ])->all(),
         ];
     }

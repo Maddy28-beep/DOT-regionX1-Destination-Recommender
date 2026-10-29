@@ -14,6 +14,7 @@
     $gradient = $gradients[$package->id % count($gradients)];
     $operatorLinkable = $package->tourOperator && $package->tourOperator->is_accredited && ! $package->tourOperator->archived_at;
     $providerLabel = $package->tourOperator->name ?? $package->provider_name;
+    $providerIsSample = $package->tourOperator && app(\App\Support\SampleData::class)->isSample($package->tourOperator);
     $tierLabel = match ($package->price_tier) {
         'Budget-Friendly' => 'Budget',
         null, '' => null,
@@ -98,7 +99,7 @@
                 'kicker' => 'Before you book',
                 'title' => 'Plan this package',
                 'rows' => [
-                    ['icon' => 'building', 'label' => 'Provided by', 'value' => $providerLabel ?? 'DOT-accredited operator', 'href' => $operatorLinkable ? route('tour-operators.show', $package->tourOperator) : null],
+                    ['icon' => 'building', 'label' => 'Provided by', 'value' => ($providerLabel ?? 'Tour operator').($providerIsSample ? ' (sample data, not DOT-verified)' : ''), 'href' => $operatorLinkable ? route('tour-operators.show', $package->tourOperator) : null],
                 ],
                 'primary' => $hasSchedule
                     ? ['label' => 'Plan with this Package', 'icon' => 'compass', 'post' => route('packages.plan-with', $package)]
