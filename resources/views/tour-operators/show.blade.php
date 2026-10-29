@@ -22,6 +22,8 @@
     };
     $packageCount = $tourOperator->packages->count();
     $phone = $tourOperator->contact_number ?: null;
+    // A sample operator's number is not verified (it may belong to a real business), so it is shown but never offered as a call link.
+    $isSampleOperator = app(\App\Support\SampleData::class)->isSample($tourOperator);
 @endphp
 
 <div class="container">
@@ -83,7 +85,7 @@
                 'kicker' => 'Before you book',
                 'title' => 'Get in touch',
                 'rows' => [
-                    ['icon' => 'phone', 'label' => 'Contact', 'value' => $phone ?? 'Not provided', 'href' => $phone ? 'tel:'.preg_replace('/[^\d+]/', '', $phone) : null],
+                    ['icon' => 'phone', 'label' => 'Contact', 'value' => $phone ?? 'Not provided', 'href' => $phone && ! $isSampleOperator ? 'tel:'.preg_replace('/[^\d+]/', '', $phone) : null],
                 ],
             ])
         </div>
