@@ -153,9 +153,9 @@ class Itinerary extends Model
             return null;
         }
 
-        // One place is not a route; send it to search so it still opens.
+        // One place is not a route between two points: directions to it, from wherever the visitor is.
         if (count($points) === 1) {
-            return 'https://www.google.com/maps/search/?api=1&query='.rawurlencode($points[0]);
+            return 'https://www.google.com/maps/dir/?'.http_build_query(['api' => 1, 'destination' => $points[0], 'travelmode' => 'driving']);
         }
 
         $origin = array_shift($points);

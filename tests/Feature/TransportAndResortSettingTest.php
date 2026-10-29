@@ -390,8 +390,8 @@ class TransportAndResortSettingTest extends TestCase
 
         $html = $this->planThenGet('tour_operator');
 
-        $this->assertStringContainsString('https://www.google.com/maps/search/?api=1&amp;query=7.0710000,125.6110000', $html);
-        $this->assertStringContainsString('query=Unlocated%20Tours%20Davao%20City', $html);
+        $this->assertStringContainsString('https://www.google.com/maps/dir/?api=1&amp;destination=7.0710000%2C125.6110000&amp;travelmode=driving', $html);
+        $this->assertStringContainsString('destination=Unlocated+Tours+Davao+City', $html);
     }
 
     public function test_the_pick_up_has_a_planned_time_that_is_when_the_first_journey_leaves(): void

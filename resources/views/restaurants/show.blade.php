@@ -12,9 +12,7 @@
         'linear-gradient(135deg,#1d6fa5,#0b4d75)',
     ];
     $gradient = $gradients[$restaurant->id % count($gradients)];
-    $mapUrl = $restaurant->latitude && $restaurant->longitude
-        ? "https://www.google.com/maps/search/?api=1&query={$restaurant->latitude},{$restaurant->longitude}"
-        : 'https://www.google.com/maps/search/?api=1&query='.urlencode($restaurant->name.' '.$restaurant->location);
+    $mapUrl = \App\Support\MapLinks::directionsTo($restaurant->latitude, $restaurant->longitude, $restaurant->name, $restaurant->location);
 
     $tierLabel = match ($restaurant->price_tier) {
         'Budget-Friendly' => 'Budget',
