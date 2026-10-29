@@ -29,6 +29,14 @@ class AccreditationGrace
         return trim((string) config('dot.accreditation_test_grace_until')) !== '' && self::until() === null;
     }
 
+    /** Does the grace period cover this date (a night of a trip being planned)? Independent of today's date. */
+    public static function covers(\Illuminate\Support\Carbon $date): bool
+    {
+        $until = self::until();
+
+        return $until !== null && $date->toDateString() <= $until;
+    }
+
     /** Is expiry being held back today (Philippine date)? */
     public static function active(): bool
     {
