@@ -67,24 +67,24 @@ class ContentBasedRecommendationService
     /**
      * Table 5. Preference Category Weights (sum = 100).
      *
-     * EXPERIMENTAL, not yet applied: duration_of_stay and demographic always
-     * evaluate to a fixed neutral 1.0 in preferenceMatch() (visit_duration
-     * isn't populated on destinations, and multi-select demographic groups
-     * aren't part of the schema), so they never actually differentiate one
-     * destination from another -- adding the same constant to every
-     * candidate changes nothing about the ranking. Reclaiming that dead
-     * weight for 'interest' costs zero real signal and lets a tourist's
-     * stated interest actually compete with popularity.
+     * Every category that can differ from one destination to the next now carries weight:
+     *   - travel purpose, visitor type and duration of stay are scored per destination (see PreferenceFit): the
+     *     type of place against the reason for the trip, how widely visited it is against first-time or returning,
+     *     and how long it takes against how long the stay is;
+     *   - accommodation type is the same for every destination (it chooses the stay, in the itinerary), so it is
+     *     kept small and does not reorder places;
+     *   - demographic stays at 0: multi-select demographic groups are not part of the schema.
+     * Interest gave up eight points to make room. It still comes first in the ranking, see rank().
      */
     private const PM_WEIGHTS = [
         'travel_purpose' => 15,
-        'visitor_type' => 5,
+        'visitor_type' => 8,
         'budget' => 15,
-        'accommodation_type' => 10,
-        'duration_of_stay' => 0,
+        'accommodation_type' => 7,
+        'duration_of_stay' => 8,
         'distance' => 15,
         'health_accessibility' => 10,
-        'interest' => 30,
+        'interest' => 22,
         'demographic' => 0,
     ];
 
@@ -108,6 +108,9 @@ class ContentBasedRecommendationService
      * seeded places appeared in every itinerary.
      */
     private const NEUTRAL_SCORE = 3.0;
+
+    /** How many survey respondents reported visiting each candidate, as a fraction of the most visited (0 to 1). */
+    private array $visitShare = [];
 
     /** The same idea on the 0-1 scale the Preference Match categories use. */
     private const NEUTRAL_SIMILARITY = 0.5;
@@ -329,6 +332,8 @@ class ContentBasedRecommendationService
         // the vectors are not there, in which case the keyword method below is used for everything.
         $semanticFit = app(InterestEmbeddingService::class)->fitFor($selectedActivities, $candidates);
 
+        $this->visitShare = $this->visitShares($candidates);
+
         return $candidates
             ->map(function (Destination $destination) use ($preference, $maxReviewCount, $catalogueMean, $selectedActivities, $selectedAmenities, $healthProfile, $semanticFit) {
                 $pm = $this->preferenceMatch($destination, $preference, $selectedActivities, $healthProfile, $semanticFit?->get($destination->id));
@@ -385,8 +390,13 @@ class ContentBasedRecommendationService
                  * ahead of those that do not, and DRS still decides the order
                  * within each group. With no interests picked every place fits
                  * equally, so this changes nothing.
+                 *
+                 * The groups are tiers (fits well, fits somewhat, does not fit), not the raw fit. Sorting on the
+                 * raw fit, which is a different number for almost every place, made it the only thing that ever
+                 * mattered and left no room for the other answers (purpose, visitor type, stay length, budget,
+                 * distance) to change the order of places that fit the interests about equally well.
                  */
-                fn (array $a, array $b) => $b['interest_fit'] <=> $a['interest_fit'],
+                fn (array $a, array $b) => $this->interestTier($b['interest_fit']) <=> $this->interestTier($a['interest_fit']),
                 fn (array $a, array $b) => $b['drs'] <=> $a['drs'],
                 fn (array $a, array $b) => $this->tieBreak($a['destination'], $preference)
                     <=> $this->tieBreak($b['destination'], $preference),
@@ -414,6 +424,33 @@ class ContentBasedRecommendationService
         })->values();
     }
 
+    /** fits well (the upper half of the fit), fits somewhat (any fit at all), or does not fit. */
+    private function interestTier(float $fit): int
+    {
+        return $fit >= 0.5 ? 2 : ($fit > 0 ? 1 : 0);
+    }
+
+    /**
+     * Each candidate's survey visits as a fraction of the most visited candidate. Surveys from every source count
+     * except trial ones (the survey model's own scope leaves those out).
+     *
+     * @return array<int, float>
+     */
+    private function visitShares(Collection $candidates): array
+    {
+        $counts = \App\Models\ExitSurveyVisit::query()
+            ->where('listing_kind', 'destination')
+            ->whereIn('listing_id', $candidates->pluck('id'))
+            ->whereIn('exit_survey_id', \App\Models\ExitSurvey::query()->select('id'))
+            ->selectRaw('listing_id, count(*) as visits')
+            ->groupBy('listing_id')
+            ->pluck('visits', 'listing_id');
+
+        $max = (int) $counts->max();
+
+        return $max > 0 ? $counts->map(fn ($n) => $n / $max)->all() : [];
+    }
+
     /** Equation 1-2: weighted Preference Match, scaled to 1-5. */
     private function preferenceMatch(Destination $destination, TouristPreference $preference, array $selectedActivities, ?TouristHealthProfile $healthProfile, ?float $semanticInterest = null): float
     {
@@ -421,11 +458,11 @@ class ContentBasedRecommendationService
             ->map(fn ($v) => strtolower($v))->all();
 
         $similarities = [
-            'travel_purpose' => $preference->travel_purpose === 'Leisure' ? 1.0 : 0.6,
-            'visitor_type' => 1.0, // no destination-side signal; kept neutral (weight is only 5)
+            'travel_purpose' => PreferenceFit::purpose($destination->type, $destination->name, $preference->travel_purpose),
+            'visitor_type' => PreferenceFit::visitor($this->visitShare[$destination->id] ?? 0.0, $preference->visitor_type),
             'budget' => $this->budgetSimilarity($destination->price_tier, $preference->budget),
             'accommodation_type' => $preference->accommodation_pref === 'Any' ? 1.0 : 0.7,
-            'duration_of_stay' => 1.0, // visit_duration not yet populated on destinations; neutral
+            'duration_of_stay' => PreferenceFit::duration($destination->type, $destination->visit_duration, (int) $preference->travel_days),
             'distance' => $this->distanceSimilarity($destination, $preference),
             'health_accessibility' => $this->healthAccessibilitySimilarity($destination, $preference, $healthProfile),
             // By meaning when the embedding vectors are available; by the typed keyword lists otherwise.
