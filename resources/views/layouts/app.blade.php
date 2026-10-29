@@ -9,10 +9,13 @@
     @include('partials.head-assets')
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     @include('partials.header')
     @include('partials.survey-invite-banner')
 
-    @yield('content')
+    <main id="main-content" tabindex="-1">
+        @yield('content')
+    </main>
 
     @include('partials.footer')
     @include('partials.chatbot-widget')

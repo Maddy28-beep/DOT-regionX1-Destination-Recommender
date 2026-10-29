@@ -22,7 +22,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use App\Support\ItineraryCalendar;
 use App\Support\Toast;
+use Illuminate\Http\Response;
 
 /**
  * The travel-preference survey and AI itinerary.
@@ -279,6 +281,36 @@ class TripPlannerController extends Controller
             : collect();
 
         return view('plan.itinerary', compact('itinerary', 'preference', 'provenance', 'swap', 'ideas', 'operators'));
+    }
+
+    /**
+     * The current itinerary as a calendar file. It needs the arrival date, since a stop with no date cannot be put
+     * in a calendar; without one the traveller is sent to add it.
+     */
+    public function calendar(Request $request): Response|RedirectResponse
+    {
+        $preference = $this->currentPreference($request);
+        $itinerary = $this->currentItinerary($request);
+
+        if (! $preference || ! $itinerary) {
+            return redirect()->route('plan.edit');
+        }
+
+        $itinerary->load([
+            'items.destination', 'items.accommodation', 'items.restaurant', 'items.souvenirCenter',
+        ]);
+
+        $file = app(ItineraryCalendar::class)->build($itinerary, $preference->start_date);
+
+        if ($file === null) {
+            return redirect()->route('plan.edit')
+                ->with(Toast::success('Add an arrival date', 'A calendar needs the day your trip starts. Add it, then download again.'));
+        }
+
+        return response($file, 200, [
+            'Content-Type' => 'text/calendar; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="exploredavao-itinerary.ics"',
+        ]);
     }
 
     public function regenerate(Request $request): RedirectResponse

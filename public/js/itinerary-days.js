@@ -12,6 +12,11 @@
     var root = document.querySelector('.itin');
     if (!root) return;
 
+    // ---- print / save as PDF: every day is printed, not only the tab that is showing (see the print rules in itinerary-redesign.css)
+    root.querySelectorAll('[data-print]').forEach(function (button) {
+        button.addEventListener('click', function () { window.print(); });
+    });
+
     // ---- day tabs
     var tabs = Array.prototype.slice.call(root.querySelectorAll('[data-day-tab]'));
     var panels = Array.prototype.slice.call(root.querySelectorAll('[data-day-panel]'));

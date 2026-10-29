@@ -171,7 +171,6 @@
     .itinerary-feedback img { width:72px; height:100px; }
 }
 @media(max-width:400px) { .itinerary-feedback { flex-direction:column; } }
-@media print { .itin-hero, .itin-overview__map, .itin-tabs, .itinerary-refine, .itinerary-feedback { display: none; } .itin.js-days .itin-day:not(.is-active) { display: block; } }
 
 /* ---- phones ----
    The timeline kept a 58px time column beside the rail, so a card got only ~215px and "8:45 AM to 11:15 AM"
@@ -393,4 +392,28 @@
     .tl-card__media { grid-column: 1 / -1; }
     .tl-card__actions { grid-column: 2; grid-row: 2; }
     .tl-card .swap-toggle { top: auto; bottom: 12px; }
+}
+
+/* ---- print / save as PDF: the plan on paper, every day, no controls ----
+   Last in the file on purpose: it has to come after the rules it overrides. */
+@media print {
+    @page { margin: 14mm; }
+    body { background: #fff !important; }
+    .site-header, .site-footer, footer, .chatbot-widget, .chatbot-launcher, #chatbot, .survey-invite, .toast-stack, .toast-region,
+    .itin-banner__actions, .itin-banner__davo, .itin-bar, .itin-side, .itin-day__head .itinerary-back-top, .day-actions, .day-unmapped,
+    .tl-card__actions, .swap, .tl-ideas, .itinerary-refine, .itinerary-feedback, .itinerary-support-panel, .itinerary-method-note,
+    .itin-longday, .itin-banner .plan-badge { display: none !important; }
+    .itin .dash-body { padding: 0 !important; }
+    .itin-banner { margin: 0 0 10mm; padding: 0; border: 0; background: none; display: block; }
+    .itin-banner__title { font-size: 20pt; }
+    .itin-layout { display: block; }
+    /* every day, whichever tab is open; each new day starts a new page */
+    .itin.js-days .itin-day:not(.is-active) { display: block; }
+    .itin-day { margin: 0 0 8mm; break-inside: auto; }
+    .itin-day + .itin-day { break-before: page; }
+    .itin-day__head { break-after: avoid; }
+    .tl-row, .tl-card { break-inside: avoid; }
+    .tl-card { box-shadow: none; border-color: #999; }
+    .tl-card__media img { max-height: 28mm; }
+    a { color: inherit; text-decoration: none; }
 }

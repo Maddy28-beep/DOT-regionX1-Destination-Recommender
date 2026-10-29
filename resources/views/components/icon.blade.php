@@ -310,6 +310,42 @@
         <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
         @break
 
+    @case('printer')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        @break
+
+    @case('pencil')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+        @break
+
+    @case('archive')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 002 2h12a2 2 0 002-2V8M10 12h4"/></svg>
+        @break
+
+    @case('rotate')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9 9.7 9.7 0 00-6.7 2.7L3 8"/><path d="M3 3v5h5"/></svg>
+        @break
+
+    @case('x')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        @break
+
+    @case('database')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>
+        @break
+
+    @case('sparkles')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>
+        @break
+
+    @case('text')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        @break
+
+    @case('image')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        @break
+
     @case('van')
         <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V7a1 1 0 011-1h10l5 5v5"/><path d="M3 16h18"/><circle cx="7.5" cy="17.5" r="1.8"/><circle cx="16.5" cy="17.5" r="1.8"/><path d="M14 6v5h5"/></svg>
         @break

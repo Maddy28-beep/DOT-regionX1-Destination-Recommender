@@ -137,6 +137,11 @@
                                 How was this made?
                             </button>
                             <a href="#itinerary-recommendations" class="itin-more"><x-icon name="compass" /> More ideas</a>
+                            <button type="button" class="itin-more" data-print><x-icon name="printer" /> Print / PDF</button>
+                            <a href="{{ route('plan.itinerary.calendar') }}" class="itin-more"
+                               @unless (filled($preference?->start_date)) title="Add an arrival date in your preferences first; a calendar needs the day your trip starts." @endunless>
+                                <x-icon name="calendar" /> Add to calendar
+                            </a>
                         </div>
                     @endunless
                 </div>

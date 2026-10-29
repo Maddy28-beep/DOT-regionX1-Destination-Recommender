@@ -17,6 +17,7 @@
     @endif
 </head>
 <body class="hero-page">
+<a class="skip-link" href="#main-content">Skip to main content</a>
 
 @include('partials.header')
 @include('partials.survey-invite-banner')
@@ -29,6 +30,7 @@
      video, and the <noscript> block does the same when there is no script at
      all. --}}
 {{-- The picture and the card beneath it are one screen: on a tall display the next section must not peek in under the cue. --}}
+<main id="main-content" tabindex="-1">
 <div class="hero-screen">
 <section class="poster-hero{{ $heroVideo ? ' has-footage' : '' }}"
     @if ($heroVideo && $heroVideo['poster'])
@@ -736,6 +738,7 @@
         </div>
     </div>
 </section>
+</main>
 
 @include('partials.footer')
 @include('partials.chatbot-widget')

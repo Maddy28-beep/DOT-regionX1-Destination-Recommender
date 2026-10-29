@@ -125,6 +125,7 @@ Route::get('/plan/address-suggest', AddressSuggestionController::class)
     ->name('plan.address-suggest');
 Route::post('/plan', [TripPlannerController::class, 'update'])->middleware('throttle:trip-build')->name('plan.update');
 Route::get('/plan/itinerary', [TripPlannerController::class, 'itinerary'])->name('plan.itinerary');
+Route::get('/plan/itinerary/calendar.ics', [TripPlannerController::class, 'calendar'])->name('plan.itinerary.calendar');
 Route::post('/plan/itinerary/regenerate', [TripPlannerController::class, 'regenerate'])->middleware('throttle:trip-build')->name('plan.regenerate');
 
 // Similar-place swaps (pretrained embeddings): suggestions for one stop, and the swap itself.
