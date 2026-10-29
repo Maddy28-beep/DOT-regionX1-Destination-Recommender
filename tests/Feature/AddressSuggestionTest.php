@@ -209,7 +209,8 @@ class AddressSuggestionTest extends TestCase
             'Where are you visiting from? is a picker over cities and countries.');
         $this->assertStringContainsString('name="place_of_origin"', $html,
             'The picker is still the same field, so what is submitted does not change.');
-        $this->assertStringContainsString('data-start-pick="Davao International Airport"', $html);
+        $this->assertStringContainsString('data-start-pick="Davao International Airport" data-lat="7.130" data-lng="125.645"', $html,
+            'An arrival point carries its own coordinates: the geocoder does not find every one of them by name.');
         $this->assertStringContainsString('js/plan-origin.js', $html);
         $this->assertStringNotContainsString('Welcome home', $html,
             'A regular or local still sees the origin box (optional); the starting point is its own, separate question.');
@@ -278,7 +279,9 @@ class AddressSuggestionTest extends TestCase
         $this->assertSame('somewhere that does not exist', $preference->origin_label);
         $this->assertNull($preference->origin_lat, 'An unplaceable address must not invent coordinates.');
 
-        $this->get('/plan/itinerary')->assertOk();
+        $this->get('/plan/itinerary')->assertOk()
+            ->assertSee('starting from Davao City centre', false)
+            ->assertDontSee('somewhere that does not exist');
     }
 
     /** Leaving the field blank clears any previous starting point. */

@@ -48,7 +48,7 @@
                  nothing here claims more than "your plan is ready". --}}
             @php
                 $pickedInterests = $itinerary->package ? collect() : ($preference?->activities?->pluck('activity')->filter()->values() ?? collect());
-                $startingFrom = $preference?->origin_label ?: 'Davao City centre';
+                $startingFrom = $preference?->startLabel() ?? 'Davao City centre';
             @endphp
             <section class="itin-banner" aria-label="Your itinerary is ready">
                 <img class="itin-banner__davo" src="{{ asset('images/davo-adventure-ready.webp') }}" alt="Davo celebrating with a travel map" width="450" height="478">

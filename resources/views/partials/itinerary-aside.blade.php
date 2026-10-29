@@ -26,7 +26,7 @@
     $origin = $itinerary->package ? null : [
         'lat' => $preference?->origin_lat !== null ? (float) $preference->origin_lat : \App\Services\Recommendation\ContentBasedRecommendationService::DEFAULT_ORIGIN_LAT,
         'lng' => $preference?->origin_lng !== null ? (float) $preference->origin_lng : \App\Services\Recommendation\ContentBasedRecommendationService::DEFAULT_ORIGIN_LNG,
-        'label' => $preference?->origin_label ?: 'Davao City centre',
+        'label' => $preference?->startLabel() ?? 'Davao City centre',
     ];
     $fmtKm = fn ($km) => rtrim(rtrim(number_format((float) $km, 1), '0'), '.');
 @endphp

@@ -209,7 +209,7 @@
                 <span class="tl-line__icon"><x-icon :name="$icon" /></span>
                 <span>
                     @if ($kind === 'baseline' && $preference)
-                        <strong>Start in {{ $preference->origin_label ?: 'Davao City centre' }}</strong>
+                        <strong>Start in {{ $preference->startLabel() }}</strong>
                         <small>
                             @if (blank($preference->arrival_time))
                                 No arrival time set, so we assumed {{ $start?->format('g:i A') }}. <a href="{{ route('plan.edit') }}">Set arrival time</a>

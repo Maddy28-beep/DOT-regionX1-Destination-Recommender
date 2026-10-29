@@ -50,6 +50,18 @@ class TouristPreference extends Model
         return ['lat' => (float) $this->origin_lat, 'lng' => (float) $this->origin_lng];
     }
 
+    /**
+     * What to call the starting point on the page.
+     *
+     * The label the traveller typed is only the truth when it was located: an address the geocoder could not place
+     * leaves the plan sequenced from the regional baseline, and the page must say that rather than "starting from"
+     * a place the distances were never measured from.
+     */
+    public function startLabel(): string
+    {
+        return $this->origin() !== null && filled($this->origin_label) ? $this->origin_label : 'Davao City centre';
+    }
+
     /** Health and accessibility needs stated while planning this trip, if any. */
     public function healthProfile(): HasOne
     {
