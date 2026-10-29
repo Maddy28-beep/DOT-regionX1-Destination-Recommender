@@ -100,17 +100,13 @@ class StableListSortAndSampleReviewTest extends TestCase
         $this->assertCount(12, array_unique($seen), 'No place repeats across pages.');
     }
 
-    public function test_a_sample_place_does_not_tell_visitors_to_scan_a_qr_code(): void
+    public function test_a_sample_place_asks_for_a_qr_scan_like_any_other_place(): void
     {
         $sample = $this->place('sample-place', true);
-        $real = $this->place('real-place', false);
 
-        $sampleHtml = $this->get(route('destinations.show', $sample))->assertOk()->getContent();
-        $this->assertStringContainsString('is sample data, not DOT-verified. It has no QR code and takes no reviews.', $sampleHtml);
-        $this->assertStringNotContainsString('Scan the DOT QR code', $sampleHtml);
+        $html = $this->get(route('destinations.show', $sample))->assertOk()->getContent();
 
-        $realHtml = $this->get(route('destinations.show', $real))->assertOk()->getContent();
-        $this->assertStringContainsString('Scan the DOT QR code displayed at the entrance to leave a review.', $realHtml);
-        $this->assertStringNotContainsString('takes no reviews', $realHtml);
+        $this->assertStringContainsString('Scan the DOT QR code displayed at the entrance to leave a review.', $html);
+        $this->assertStringNotContainsString('takes no reviews', $html);
     }
 }

@@ -95,9 +95,7 @@
                 <div><h2>Your QR code</h2><p>Guests scan it to check in</p></div>
             </div>
             <div class="adm-card__body">
-                @if (app(\App\Support\SampleData::class)->isSample($listing))
-                    <p class="ptr-note">This listing is sample data, not DOT-verified, so it has no QR code.</p>
-                @elseif ($listing->is_accredited && ! $listing->archived_at)
+                @if ($listing->is_accredited && ! $listing->archived_at)
                     <div class="ptr-qr">
                         <div class="ptr-qr__img"><img src="{{ route('establishment.listing.qr-code') }}" alt="QR code linking to {{ $listing->name }}"></div>
                         <div>

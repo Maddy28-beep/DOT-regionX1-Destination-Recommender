@@ -49,8 +49,6 @@ class CheckInController extends Controller
 
         $listing = $config['model']::findOrFail($id);
         abort_unless($listing->is_accredited && ! $listing->archived_at, 404, 'Check-in is only available for currently DOT-accredited, active listings.');
-        // Sample data is not a real place, so it cannot collect real visits or unlock reviews.
-        abort_if(app(\App\Support\SampleData::class)->isSample($listing), 404, 'Check-in is not available for sample data.');
 
         // Only the link printed in the QR code is signed. A plain /check-in/... address, typed in or loaded by
         // another page, would otherwise count a visit (and unlock a review) for someone who was never there.
