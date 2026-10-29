@@ -198,6 +198,7 @@
         input.setAttribute('aria-expanded', 'true');
     }
     function closeSearch() {
+        if (!input || !list) return;   // the partner portal's bar has no search; its menus still call this
         list.hidden = true;
         input.setAttribute('aria-expanded', 'false');
         input.removeAttribute('aria-activedescendant');
