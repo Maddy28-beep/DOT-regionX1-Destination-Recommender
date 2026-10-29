@@ -10,26 +10,7 @@
 </head>
 <body class="admin">
     <a class="skip-link" href="#admin-main">Skip to main content</a>
-    <header class="site-header">
-        <div class="container bar">
-            <a href="{{ route('admin.overview') }}" class="brand">Explore<span class="dot">DVO</span> <span class="brand-badge" style="font-size:.7rem; font-weight:700; color:var(--muted); margin-left:6px;">DOT ADMIN</span></a>
-            <div class="header-actions">
-                <button type="button" class="admin-menu-toggle" onclick="document.getElementById('adminSidebar').classList.toggle('open')"><x-icon name="menu" /> <span class="menu-toggle-label">Menu</span></button>
-                <span class="header-account-chip">
-                    <span class="header-account-chip__name">
-                        <x-icon name="user" />
-                        <span>{{ auth('admin')->user()->full_name }}</span>
-                    </span>
-                    <form method="POST" action="{{ route('portal.logout') }}" class="header-account-chip__logout-form">
-                        @csrf
-                        <button type="submit" class="header-account-chip__logout" aria-label="Log out" title="Log out">
-                            <x-icon name="log-out" />
-                        </button>
-                    </form>
-                </span>
-            </div>
-        </div>
-    </header>
+    @include('partials.admin-topbar')
 
     <div class="admin-shell">
         <aside class="admin-sidebar" id="adminSidebar">
@@ -90,6 +71,7 @@
         <div class="adm-modal__body" id="adminModalBody" aria-live="polite"></div>
     </dialog>
     <script src="{{ asset('js/admin-modal.js') }}?v={{ filemtime(public_path('js/admin-modal.js')) }}" defer></script>
+    <script src="{{ asset('js/admin-topbar.js') }}?v={{ filemtime(public_path('js/admin-topbar.js')) }}" defer></script>
 
     {{-- Shared behaviours (bulk row selection). Everything in app.js is
          guarded by element lookups, so the public-site code is inert here. --}}

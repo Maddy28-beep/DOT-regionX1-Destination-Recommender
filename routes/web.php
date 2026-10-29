@@ -217,6 +217,7 @@ Route::prefix('portal/admin')->name('admin.')->middleware(['auth:admin', \App\Ht
     Route::get('/exit-surveys/qr.svg', [QrCodeController::class, 'exitSurveyImage'])->name('exit-survey-qr.svg');
     Route::get('/association-rules', [AdminDashboardController::class, 'associationRules'])->name('association-rules');
     Route::get('/audit-log', [\App\Http\Controllers\Admin\AdminAuditLogController::class, 'index'])->name('audit-log');
+    Route::get('/search', \App\Http\Controllers\Admin\AdminSearchController::class)->middleware('throttle:90,1')->name('search');
     Route::get('/data-completeness', [\App\Http\Controllers\Admin\AdminDataCompletenessController::class, 'index'])->name('data-completeness');
     Route::post('/data-completeness/{type}/{id}', [\App\Http\Controllers\Admin\AdminDataCompletenessController::class, 'fix'])->name('data-completeness.fix');
     Route::get('/reports', [AdminDashboardController::class, 'reports'])->name('reports');
