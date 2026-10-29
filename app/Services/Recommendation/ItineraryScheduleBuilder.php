@@ -450,14 +450,14 @@ class ItineraryScheduleBuilder
         $visitMinutes = $plan['visitMinutes'];
         $start = $this->toQuarterHour($plan['arrival']);
 
-        // The sightseeing cutoff, on the full visit as it always was. The one exception: when a meal on this very
-        // journey is what pushed the visit past the cutoff, a short visit that still fits is better than losing the
-        // stop (a long transfer with lunch on the way would otherwise empty the day).
+        // The sightseeing cutoff. A visit that does not fit before it in full is shortened to what does fit, as long
+        // as that is still a proper visit (at least SHORT_VISIT_MINUTES, or the whole visit if that is shorter).
+        // Without this, arriving at 15:45 with 135 minutes left dropped a place 15 km away and left the arrival day
+        // with nothing but the drive to the stay.
         if ($start->copy()->addMinutes($visitMinutes)->greaterThan(Carbon::parse(self::LAST_ACTIVITY_END))) {
             $fit = $this->minutesBetween($start, Carbon::parse(self::LAST_ACTIVITY_END));
-            $hasMeal = count(array_filter($plan['steps'], fn (array $step) => $step['type'] === 'meal')) > 0;
 
-            if (! $hasMeal || $fit < min($visitMinutes, self::SHORT_VISIT_MINUTES)) {
+            if ($fit < min($visitMinutes, self::SHORT_VISIT_MINUTES)) {
                 return null;
             }
 

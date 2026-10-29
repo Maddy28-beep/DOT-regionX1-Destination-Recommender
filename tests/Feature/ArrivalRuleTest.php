@@ -508,9 +508,12 @@ class ArrivalRuleTest extends TestCase
             ];
         };
 
-        $expected = [1 => ['Mount Apo Natural Park 10:15-12:45'], 2 => ['Bemwa Farm Fresh Inc. 10:15-12:45']];
+        // A visit that does not fit before 18:00 in full is now shortened to what fits (at least 90 minutes), so Samal
+        // (09:30-12:00) and a 105-minute Mount Apo (16:15-18:00) both fit on Day 1, where the full Mount Apo visit used to
+        // be the only stop. The point of this test is unchanged: every early arrival plans the same day as 04:00 does.
+        $expected = [1 => ['Samal Island 09:30-12:00', 'Mount Apo Natural Park 16:15-18:00'], 2 => ['Bemwa Farm Fresh Inc. 10:15-12:45']];
 
-        $this->assertSame($expected, $stopsFor('04:00'), 'the 04:00 plan: two of the four stops, Samal and Dahican left out');
+        $this->assertSame($expected, $stopsFor('04:00'), 'the 04:00 plan: three of the four stops, Dahican left out');
         $this->assertSame($expected, $stopsFor('06:00'), 'a 06:00 arrival now plans exactly like 04:00');
         $this->assertSame($expected, $stopsFor('06:29'), 'the last arrival before the breakfast window');
     }
