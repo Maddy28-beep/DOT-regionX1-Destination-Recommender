@@ -41,9 +41,7 @@
                 @php
                     $operator = $row['operator'];
                     $onMap = $operator->latitude !== null && $operator->longitude !== null;
-                    $mapsUrl = 'https://www.google.com/maps/search/?api=1&query='.($onMap
-                        ? $operator->latitude.','.$operator->longitude
-                        : rawurlencode($operator->name.' '.($operator->location ?: 'Davao')));
+                    $mapsUrl = \App\Support\MapLinks::directionsTo($operator->latitude, $operator->longitude, $operator->name, $operator->location ?: 'Davao');
                     // Some entries list two numbers ("0917... / (082) ..."): the first is the one to call.
                     $number = trim((string) preg_split('/[\/;,]/', (string) $operator->contact_number)[0]);
                     $dial = preg_replace('/[^0-9+]/', '', $number);

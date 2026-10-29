@@ -1154,15 +1154,16 @@ class TripPlannerTest extends TestCase
         $this->assertStringNotContainsString('key=', $url);
     }
 
-    /** A single place is not a route, but must still open. */
-    public function test_a_one_stop_day_links_to_a_maps_search(): void
+    /** A single place is not a route between two points, but must still open: as directions to it. */
+    public function test_a_one_stop_day_links_to_directions_to_it(): void
     {
         $url = Itinerary::googleMapsUrl([
             ['label' => 'Only Stop', 'address' => 'Davao City', 'lat' => null, 'lng' => null],
         ]);
 
-        $this->assertStringContainsString('/maps/search/', $url);
-        $this->assertStringContainsString('Only+Stop', str_replace('%20', '+', $url));
+        $this->assertStringContainsString('/maps/dir/', $url);
+        $this->assertStringContainsString('destination=Only+Stop%2C+Davao+City', $url);
+        $this->assertStringNotContainsString('origin=', $url);
     }
 
     /** Rows have to run forwards within a day. */

@@ -12,9 +12,7 @@
         'linear-gradient(135deg,#1d6fa5,#0b4d75)',
     ];
     $gradient = $gradients[$souvenirCenter->id % count($gradients)];
-    $mapUrl = $souvenirCenter->latitude && $souvenirCenter->longitude
-        ? "https://www.google.com/maps/search/?api=1&query={$souvenirCenter->latitude},{$souvenirCenter->longitude}"
-        : 'https://www.google.com/maps/search/?api=1&query='.urlencode($souvenirCenter->name.' '.$souvenirCenter->location);
+    $mapUrl = \App\Support\MapLinks::directionsTo($souvenirCenter->latitude, $souvenirCenter->longitude, $souvenirCenter->name, $souvenirCenter->location);
 @endphp
 
 <div class="container">
