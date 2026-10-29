@@ -79,7 +79,7 @@
                                 <input type="checkbox" data-bulk-row value="{{ $listing->id }}" aria-label="Select {{ $listing->name }}">
                             </td>
                             <td>
-                                <strong>{{ $listing->name }}</strong>
+                                <strong>{{ $listing->name }}</strong>@if (app(\App\Support\SampleData::class)->isSample($listing))<x-sample-tag label="Sample data" title="This accreditation number is a placeholder, not an official DOT number." />@endif
                                 {{-- Only when this name is genuinely ambiguous within this listing type (see the
                                      controller's $nameCounts): tells "which Elysia Wellness Spa is this row" without adding
                                      a subline to every one of hundreds of rows that do not need it. --}}

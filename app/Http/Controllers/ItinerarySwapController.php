@@ -213,6 +213,7 @@ class ItinerarySwapController extends Controller
             'similarity' => (int) round($row['similarity'] * 100),
             'distance_km' => $row['distance_km'],
             'reason' => implode(' · ', $reason),
+            'sample' => app(\App\Support\SampleData::class)->isSample($d),
             'url' => route('destinations.show', $d),
         ];
     }

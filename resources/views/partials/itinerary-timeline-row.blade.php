@@ -182,7 +182,7 @@
                                     <strong>Not available on your dates:</strong> {{ $closed['advisory'] }}.
                                     @if ($closed['substitute'])
                                         Closest open substitute:
-                                        <strong>{{ $closed['substitute']['name'] }}</strong>
+                                        <strong>{{ $closed['substitute']['name'] }}</strong>@if ($closed['substitute']['sample'] ?? false)<x-sample-tag label="Sample data, not DOT-verified" title="This place's accreditation number is a placeholder, not an official DOT number." />@endif
                                         ({{ $closed['substitute']['similarity'] }}% similar{{ $closed['substitute']['distance_km'] !== null ? ', '.$closed['substitute']['distance_km'].' km away' : '' }}).
                                         <form method="POST" action="{{ route('plan.swap') }}" class="swap-inline">
                                             @csrf

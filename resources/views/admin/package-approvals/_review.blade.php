@@ -49,10 +49,11 @@
         <h3>Checks</h3>
         <ul class="adm-rv2__checks">
             @foreach ($checks as $check)
-                <li class="{{ $check['ok'] ? 'is-ok' : 'is-no' }}">
-                    <span class="adm-rv2__ic" aria-hidden="true"><x-icon :name="$check['ok'] ? 'check' : 'x'" /></span>
-                    <span><b>{{ $check['title'] }}</b><small>{{ $check['detail'] }}</small></span>
-                    <span class="sr-only">{{ $check['ok'] ? 'passes' : 'fails' }}</span>
+                @php $isSample = $check['sample'] ?? false; @endphp
+                <li class="{{ $check['ok'] ? 'is-ok' : 'is-no' }}{{ $isSample ? ' is-sample' : '' }}">
+                    <span class="adm-rv2__ic" aria-hidden="true"><x-icon :name="$isSample ? 'info' : ($check['ok'] ? 'check' : 'x')" /></span>
+                    <span><b>{{ $check['title'] }}</b>@if ($isSample)<x-sample-tag label="Sample data, not DOT-verified" title="This operator's accreditation number is a placeholder, not an official DOT number." />@endif<small>{{ $check['detail'] }}</small></span>
+                    <span class="sr-only">{{ $isSample ? 'sample data, not verified' : ($check['ok'] ? 'passes' : 'fails') }}</span>
                 </li>
             @endforeach
         </ul>

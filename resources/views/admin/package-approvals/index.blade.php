@@ -49,10 +49,12 @@
                         $st = $stat[$package->status] ?? ['status-pending', $package->statusLabel()];
                         $fails = $failing[$package->id] ?? 0;
                         $accredited = app(\App\Services\Packages\PackageChecks::class)->operator($package->tourOperator)[0];
+                        $sampleOperator = app(\App\Services\Packages\PackageChecks::class)->isSampleOperator($package->tourOperator);
                     @endphp
                     <tr>
                         <td><strong>{{ $package->name }}</strong><div class="cell-sub">{{ $package->itineraryDays->count() }} {{ \Illuminate\Support\Str::plural('day', $package->itineraryDays->count()) }} &middot; {{ $package->price_per_pax ? '₱'.number_format($package->price_per_pax).' per person' : 'no price' }}</div></td>
-                        <td>{{ $package->tourOperator?->name ?? $package->provider_name }}@unless ($accredited)<div class="cell-sub" style="color:var(--danger); font-weight:600;">Not accredited</div>@endunless</td>
+                        <td>{{ $package->tourOperator?->name ?? $package->provider_name }}@if ($sampleOperator) <x-sample-tag label="Sample data" title="This operator has a placeholder accreditation number, not an official DOT number." /> @endif
+                            @unless ($accredited)<div class="cell-sub" style="color:var(--danger); font-weight:600;">Not accredited</div>@endunless</td>
                         <td>
                             @if ($waiting)
                                 {{ $package->submitted_at->timezone('Asia/Manila')->format('M j') }}<div class="cell-sub" @if ($days > \App\Http\Controllers\Admin\AdminPackageApprovalController::OVERDUE_DAYS) style="color:var(--danger); font-weight:700;" @endif>{{ $days }} {{ \Illuminate\Support\Str::plural('day', $days) }} waiting{{ $days > \App\Http\Controllers\Admin\AdminPackageApprovalController::OVERDUE_DAYS ? ' · overdue' : '' }}</div>

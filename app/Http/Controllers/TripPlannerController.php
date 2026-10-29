@@ -481,6 +481,7 @@ class TripPlannerController extends Controller
                     'name' => $best['destination']->name,
                     'similarity' => (int) round($best['similarity'] * 100),
                     'distance_km' => $best['distance_km'],
+                    'sample' => app(\App\Support\SampleData::class)->isSample($best['destination']),
                 ] : null,
             ];
         }
