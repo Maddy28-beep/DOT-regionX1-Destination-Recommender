@@ -127,8 +127,9 @@ class DemoExitSurveySeeder extends Seeder
 
     private function clearOwnRows(): void
     {
-        // visits and activities go with their survey (cascade).
-        ExitSurvey::where('data_source', 'demo')->delete();
+        // visits and activities go with their survey (cascade). Rows with a batch belong to someone else (a
+        // generator run, the researchers' relabelled tests) and are left alone.
+        ExitSurvey::where('data_source', 'demo')->whereNull('batch')->delete();
     }
 
     /* ------------------------------------------------------------------ */
