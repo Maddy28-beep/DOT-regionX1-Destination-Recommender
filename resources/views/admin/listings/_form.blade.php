@@ -343,7 +343,9 @@
     <div class="util-row" style="margin-top:22px;">
         <button type="submit" class="btn btn-primary">{{ $listing->exists ? 'Save Changes' : 'Create '.$config['singular'] }}</button>
         <a href="{{ route('admin.listings.index', $type) }}" class="btn btn-ghost" data-modal-close>Cancel</a>
-        @if ($listing->exists && $listing->is_accredited && ! $listing->archived_at)
+        @if ($listing->exists && app(\App\Support\SampleData::class)->isSample($listing))
+            <x-sample-tag label="Sample data: no QR code" title="Sample data is not DOT-verified, so it has no QR code or check-in." />
+        @elseif ($listing->exists && $listing->is_accredited && ! $listing->archived_at)
             <a href="{{ route('admin.listings.qr-code', [$type, $listing->id]) }}" target="_blank" class="btn btn-outline">Download QR Code</a>
         @endif
     </div>

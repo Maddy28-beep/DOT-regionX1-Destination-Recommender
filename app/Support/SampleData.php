@@ -37,6 +37,21 @@ class SampleData
         return array_key_exists($kind.':'.$id, $this->load());
     }
 
+    /**
+     * How many of the listings a query returns are sample data, so a count that says "accredited" can be split
+     * instead of hard-coded.
+     *
+     * @return array{total: int, sample: int, real: int}
+     */
+    public function split(\Illuminate\Database\Eloquent\Builder $query): array
+    {
+        $kind = $query->getModel()->getMorphClass();
+        $ids = $query->pluck($query->getModel()->getQualifiedKeyName());
+        $sample = $ids->filter(fn ($id) => $this->isSampleKey($kind, (int) $id))->count();
+
+        return ['total' => $ids->count(), 'sample' => $sample, 'real' => $ids->count() - $sample];
+    }
+
     /** True when a listing with this name is sample data. For rows that only store the name of the place a rule started from. */
     public function isSampleName(?string $name): bool
     {
