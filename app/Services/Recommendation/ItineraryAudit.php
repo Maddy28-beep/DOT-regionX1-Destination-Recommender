@@ -92,10 +92,11 @@ final class ItineraryAudit
     private function journeysMeasured($items): array
     {
         $label = 'Every journey has a distance and a time';
-        $unmeasured = $items->where('kind', 'travel')->filter(fn ($i) => $i->distance_km === null)->count();
+        $unmeasured = $items->where('kind', 'travel')->filter(fn ($i) => $i->distance_km === null);
 
-        return $unmeasured === 0 ? $this->check('journeys', $label, 'pass')
-            : $this->check('journeys', $label, 'fail', "{$unmeasured} journey(s) show \"Travel time varies\"");
+        return $unmeasured->isEmpty() ? $this->check('journeys', $label, 'pass')
+            : $this->check('journeys', $label, 'fail', $unmeasured->count().' journey(s) show "Travel time varies": '
+                .$unmeasured->map(fn ($i) => (string) $i->title)->unique()->implode('; '));
     }
 
     private function openAtVisit($activities, $start): array
@@ -175,21 +176,8 @@ final class ItineraryAudit
 
         $souvenirStop = $items->where('kind', 'activity')->whereNotNull('souvenir_center_id')->isNotEmpty();
 
-        $uncovered = $wanted->reject(function (string $interest) use ($activities, $souvenirStop) {
-            if ($interest === 'Shopping & Souvenirs' && $souvenirStop) {
-                return true;
-            }
-            $types = ContentBasedRecommendationService::typesForInterest($interest);
-            $keywords = ContentBasedRecommendationService::tagsForInterest($interest);
-
-            return $activities->contains(function ($i) use ($types, $keywords) {
-                $own = $i->destination->tags->where('kind', 'category')->pluck('value')->map(fn ($v) => mb_strtolower($v));
-
-                // The same test the ranking uses: a tag that contains the interest's keyword.
-                return in_array($i->destination->type, $types, true)
-                    || $own->contains(fn ($tag) => collect($keywords)->contains(fn ($k) => str_contains($tag, $k)));
-            });
-        });
+        $uncovered = $wanted->reject(fn (string $interest) => ($interest === 'Shopping & Souvenirs' && $souvenirStop)
+            || $activities->contains(fn ($i) => InterestCoverage::covers($i->destination, $interest)));
 
         return $uncovered->isEmpty() ? $this->check('interests', $label, 'pass')
             : $this->check('interests', $label, 'fail', 'no stop for '.$uncovered->implode(', '));

@@ -133,10 +133,13 @@ class ItineraryGenerationService
         // be summed per day rather than assumed uniform.
         $dayCapacities = $this->dayCapacities($preference, $totalDays);
         $maxStops = min($distinctRanked->count(), array_sum(array_map('count', $dayCapacities)));
-        $topRanked = $distinctRanked->take($maxStops);
+        // The best places for the trip, except that an interest the traveller chose gets a stop when anything can offer one.
+        $topRanked = (new InterestCoverage())->select($distinctRanked, $maxStops, $preference->activities->pluck('activity')->all());
 
         // The next few places in the ranking: used only to fill a day that would otherwise have no stop at all.
-        $reserve = $distinctRanked->slice($maxStops, self::RESERVE_STOPS)->values();
+        $chosenIds = $topRanked->pluck('destination.id')->all();
+        $reserve = $distinctRanked->reject(fn (array $row) => in_array($row['destination']->id, $chosenIds, true))
+            ->take(self::RESERVE_STOPS)->values();
 
         $sequence = $this->sequenceByNearestNeighbor($topRanked, $originLat, $originLng);
 
