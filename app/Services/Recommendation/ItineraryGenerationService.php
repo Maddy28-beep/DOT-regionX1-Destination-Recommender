@@ -221,15 +221,12 @@ class ItineraryGenerationService
              * builder's job. Keeping that separate stops this method from
              * owning both "which places" and "at what o'clock".
              */
+            // Shared by reference on purpose: settleStays() replaces the stays and builds again, and a closure that copied
+            // them (an arrow function does) would build the first stays every time.
             $stays = $accommodationPick;
-            $build = fn (array $stops) => $this->schedule->build(
-                $itinerary,
-                $stops,
-                $preference,
-                $dayCapacities,
-                $origin,
-                $stays,
-            );
+            $build = function (array $stops) use (&$stays, $itinerary, $preference, $dayCapacities, $origin): void {
+                $this->schedule->build($itinerary, $stops, $preference, $dayCapacities, $origin, $stays);
+            };
 
             $built = $sequence;
 
