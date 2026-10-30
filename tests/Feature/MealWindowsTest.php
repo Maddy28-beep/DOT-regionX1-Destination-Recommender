@@ -346,4 +346,68 @@ class MealWindowsTest extends TestCase
             }
         }
     }
+
+    // ---- dinner on the closing journey ---------------------------------------------------------------
+
+    /** @return array{steps: list<array>, arrival: Carbon} */
+    private function dinnerLeg(string $setsOff, float $driveKm): array
+    {
+        $from = ['lat' => 7.07, 'lng' => 125.61, 'label' => 'Here', 'region' => 'Davao City'];
+        $to = ['lat' => 7.07 + $driveKm / 111.2, 'lng' => 125.61, 'label' => 'There', 'region' => 'Davao City'];
+        $method = new \ReflectionMethod(ItineraryScheduleBuilder::class, 'planDinnerLeg');
+
+        return $method->invoke(app(ItineraryScheduleBuilder::class), Carbon::parse($setsOff), $from, $to);
+    }
+
+    private function kinds(array $plan): array
+    {
+        return array_map(fn ($s) => $s['type'] === 'meal' ? 'dinner@'.$s['at']->format('H:i').'('.$s['phase'].')' : 'travel@'.$s['start']->format('H:i').'+'.$s['minutes'], $plan['steps']);
+    }
+
+    public function test_setting_off_inside_the_dinner_window_on_a_long_journey_eats_first(): void
+    {
+        // About 4 hours home from 18:30: dinner first, then the drive.
+        $plan = $this->dinnerLeg('18:30', 100);
+
+        $this->assertSame('dinner@18:30(start)', $this->kinds($plan)[0]);
+        $this->assertStringStartsWith('travel@19:30', $this->kinds($plan)[1]);
+    }
+
+    public function test_a_journey_that_spans_the_dinner_window_stops_on_the_way_at_half_past_six(): void
+    {
+        // Sets off at 16:30 for a 4-hour drive: travel until 18:30, dinner on the way, then the rest.
+        $kinds = $this->kinds($this->dinnerLeg('16:30', 100));
+
+        $this->assertCount(3, $kinds);
+        $this->assertSame('travel@16:30+120', $kinds[0]);
+        $this->assertSame('dinner@18:30(road)', $kinds[1]);
+        $this->assertStringStartsWith('travel@19:30', $kinds[2]);
+    }
+
+    public function test_setting_off_a_little_before_the_window_waits_and_eats_first(): void
+    {
+        // 17:30 is 30 minutes before the window opens: eat first at 18:00.
+        $this->assertSame('dinner@18:00(start)', $this->kinds($this->dinnerLeg('17:30', 100))[0]);
+    }
+
+    public function test_a_short_journey_or_one_that_ends_before_the_window_gets_no_dinner(): void
+    {
+        $this->assertSame(['travel@15:00+60'], $this->kinds($this->dinnerLeg('15:00', 15)), 'over before dinner time');
+        $this->assertCount(1, $this->kinds($this->dinnerLeg('18:30', 8)), 'home within the hour of setting off at dinner time: eat at home');
+        $this->assertCount(1, $this->kinds($this->dinnerLeg('19:45', 100)), 'already past the window');
+    }
+
+    public function test_a_day_that_ends_with_a_long_drive_home_now_has_a_dinner_row(): void
+    {
+        $far = $this->place('Aliwagwag Falls', 'Davao Oriental', 7.7430, 126.2989);
+
+        $rows = $this->rows($this->plan('09:00', [$far], [1 => ['Afternoon']]));
+        $dinner = collect($this->meals($rows))->first(fn ($m) => str_starts_with($m['title'], 'Dinner'));
+
+        $this->assertNotNull($dinner, 'the visit ends at 18:00 and the drive home takes hours: dinner is planned');
+        $this->assertGreaterThanOrEqual('18:00', $dinner['start']);
+        $this->assertLessThanOrEqual('19:30', $dinner['start']);
+        $this->assertNull($dinner['destination'], 'a place is never the dinner');
+        $this->assertStringContainsString('(your choice)', $dinner['title']);
+    }
 }

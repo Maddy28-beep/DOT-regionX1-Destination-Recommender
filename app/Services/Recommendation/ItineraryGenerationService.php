@@ -3,6 +3,7 @@
 namespace App\Services\Recommendation;
 
 use App\Models\Accommodation;
+use App\Support\AccreditationGrace;
 use App\Models\Destination;
 use App\Models\Itinerary;
 use App\Models\TouristPreference;
@@ -134,6 +135,9 @@ class ItineraryGenerationService
         $maxStops = min($distinctRanked->count(), array_sum(array_map('count', $dayCapacities)));
         $topRanked = $distinctRanked->take($maxStops);
 
+        // The next few places in the ranking: used only to fill a day that would otherwise have no stop at all.
+        $reserve = $distinctRanked->slice($maxStops, self::RESERVE_STOPS)->values();
+
         $sequence = $this->sequenceByNearestNeighbor($topRanked, $originLat, $originLng);
 
         /*
@@ -175,9 +179,12 @@ class ItineraryGenerationService
          * below see the same accommodation hint the schedule will actually
          * use, without querying for it twice.
          */
-        $accommodationPick = $this->pickAccommodation($sequence, $preference);
+        // One stay per night, each near that day's last stop; falls back to the single trip-wide pick when there
+        // is no night to plan (a one-day trip) or no mapped stay is available for the dates.
+        $accommodationPick = $this->pickStays($sequence, $dayCapacities, $preference, $origin)
+            ?? $this->pickAccommodation($sequence, $preference);
 
-        return DB::transaction(function () use ($preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
+        return DB::transaction(function () use ($reserve, $preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
             $itinerary = Itinerary::create([
                 'preference_id' => $preference->id,
                 'total_days' => $totalDays,
@@ -221,6 +228,8 @@ class ItineraryGenerationService
                 $accommodationPick,
             );
 
+            $built = $sequence;
+
             if ($themedSequence === null) {
                 $build($sequence);
             } else {
@@ -239,11 +248,13 @@ class ItineraryGenerationService
                 $itinerary->unsetRelation('items');
 
                 $build($themedSequence);
+                $built = $themedSequence;
 
                 if ($placed() < $routePlaced) {
                     $itinerary->items()->delete();
                     $itinerary->unsetRelation('items');
                     $build($routeSequence);
+                    $built = $routeSequence;
 
                     $summary = $themes['summary'];
                     $summary['regrouped'] = false;
@@ -255,8 +266,84 @@ class ItineraryGenerationService
                 }
             }
 
+            $this->fillEmptyDays($itinerary, $build, $built, $reserve, $dayCapacities, $origin);
+
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);
         });
+    }
+
+    /** How many places beyond the trip's own are kept in reserve to fill an empty day. */
+    private const RESERVE_STOPS = 8;
+
+    /** How many empty days, and how many reserve places per empty day, are tried. */
+    private const FILL_DAYS_TRIED = 3;
+
+    private const FILL_PLACES_TRIED = 3;
+
+    /**
+     * A day with no sightseeing stop at all is a wasted day: usually the best-ranked places left for it were too far
+     * to reach and visit before the cutoff, and the schedule dropped them without putting anything in their place.
+     * For each such day, try the nearest reserve places (the next in the ranking) at the front of that day, and keep
+     * the change only when it does not lose a stop anywhere and leaves fewer empty days. Otherwise the plan stays
+     * exactly as it was built.
+     *
+     * @param  callable(array): mixed  $build  builds the schedule for a sequence
+     * @param  array<int, array{row: array, distance_km: float|null}>  $built  the sequence the current plan was built from
+     * @param  \Illuminate\Support\Collection<int, array>  $reserve  ranked rows not in the trip
+     * @param  array<int, array<int, string>>  $dayCapacities
+     */
+    private function fillEmptyDays(Itinerary $itinerary, callable $build, array $built, \Illuminate\Support\Collection $reserve, array $dayCapacities, array $origin): void
+    {
+        if ($reserve->isEmpty()) {
+            return;
+        }
+
+        $stopsByDay = fn () => $itinerary->items()->where('kind', 'activity')->whereNotNull('destination_id')->orderBy('day_number')->orderBy('sort_order')->get()->groupBy('day_number');
+        $emptyDays = fn () => array_values(array_diff(array_keys($dayCapacities), $stopsByDay()->keys()->all()));
+        $placed = fn () => $itinerary->items()->whereNotNull('destination_id')->where('kind', 'activity')->distinct()->count('destination_id');
+        $rebuild = function (array $sequence) use ($itinerary, $build) {
+            $itinerary->items()->delete();
+            $itinerary->unsetRelation('items');
+            $build($sequence);
+        };
+
+        $tried = 0;
+
+        foreach ($emptyDays() as $day) {
+            if ($tried++ >= self::FILL_DAYS_TRIED) {
+                break;
+            }
+
+            $byDay = $stopsByDay();
+            $before = $byDay->filter(fn ($rows, $d) => $d < $day)->flatten(1);
+            $startsAt = $before->isNotEmpty() && ($last = Destination::find($before->last()->destination_id)) && $last->latitude !== null
+                ? [(float) $last->latitude, (float) $last->longitude]
+                : [(float) $origin['lat'], (float) $origin['lng']];
+            $inTrip = array_map(fn (array $e) => $e['row']['destination']->id, $built);
+
+            $candidates = $reserve
+                ->reject(fn (array $row) => in_array($row['destination']->id, $inTrip, true) || $row['destination']->latitude === null)
+                ->sortBy(fn (array $row) => $this->haversineKm($startsAt[0], $startsAt[1], (float) $row['destination']->latitude, (float) $row['destination']->longitude))
+                ->take(self::FILL_PLACES_TRIED);
+
+            $stopsBefore = $placed();
+            $emptyBefore = count($emptyDays());
+
+            foreach ($candidates as $row) {
+                $trial = $built;
+                array_splice($trial, $before->unique('destination_id')->count(), 0, [['row' => $row, 'distance_km' => null]]);
+
+                $rebuild($trial);
+
+                if ($placed() >= $stopsBefore && count($emptyDays()) < $emptyBefore) {
+                    $built = $trial;
+
+                    continue 2;
+                }
+            }
+
+            $rebuild($built); // nothing helped: put the plan back exactly as it was
+        }
     }
 
     /**
@@ -433,6 +520,163 @@ class ItineraryGenerationService
         }
 
         return (int) explode(':', (string) $time)[0];
+    }
+
+    /** Staying put another night is worth up to this many minutes of extra driving over the best stay for that night. */
+    private const STAY_KEEP_TOLERANCE_MINUTES = 30;
+
+    /** An Apriori-suggested stay is preferred over the best one when it costs no more than this many extra minutes. */
+    private const STAY_APRIORI_BAND_MINUTES = 15;
+
+    /**
+     * A stay for each night of the trip, chosen for that night alone.
+     *
+     * Night d is spent between day d's last stop and day d+1's first stop, so a stay is scored by the journey time
+     * from the one plus the journey time to the other, estimated the way the schedule estimates every journey
+     * (detour factor, the Samal ferry, the traveller's way of getting around). Straight-line kilometres are not used:
+     * they made a stay on Samal look close to Davao City stops that need a ferry to reach.
+     *
+     * Staying where the traveller already is wins unless another stay saves more than STAY_KEEP_TOLERANCE_MINUTES,
+     * because changing stays costs the traveller something too. A stay that past travellers paired with one of the
+     * stops (an Apriori rule) is preferred when it is within STAY_APRIORI_BAND_MINUTES of the best.
+     *
+     * A stay is only offered for a night it is accredited on: not marked Expired, and either without an expiry date,
+     * expiring on or after that night, or covered by the test grace period (AccreditationGrace) for that night.
+     *
+     * @param  array<int, array{row: array, distance_km: float|null}>  $sequence
+     * @param  array<int, array<int, string>>  $dayCapacities  day number => slot names
+     * @return array<int, array{listing: Accommodation, rule: array|null}|null>|null  night => stay, or null when there is nothing to plan
+     */
+    private function pickStays(array $sequence, array $dayCapacities, TouristPreference $preference, array $origin): ?array
+    {
+        $lastDay = array_key_last($dayCapacities);
+
+        if (count($dayCapacities) < 2 || $sequence === []) {
+            return null;
+        }
+
+        $regions = \App\Models\Region::pluck('name', 'id');
+        $placeOf = fn ($listing): array => [
+            'lat' => $listing->latitude === null ? null : (float) $listing->latitude,
+            'lng' => $listing->longitude === null ? null : (float) $listing->longitude,
+            'region' => $regions[$listing->region_id] ?? null,
+        ];
+
+        // The stops of each day, as the schedule will fill them: in order, up to the day's slots.
+        $byDay = [];
+        $offset = 0;
+        foreach ($dayCapacities as $day => $slots) {
+            $take = min(count($slots), max(0, count($sequence) - $offset));
+            $byDay[$day] = array_map(fn (array $e) => $placeOf($e['row']['destination']), array_slice($sequence, $offset, $take));
+            $offset += $take;
+        }
+
+        $here = ['lat' => $origin['lat'], 'lng' => $origin['lng'], 'region' => null];
+        $anchors = [];
+        foreach ($byDay as $day => $places) {
+            $first = $places[0] ?? $here;
+            $last = $places !== [] ? $places[array_key_last($places)] : $here;
+            $anchors[$day] = ['first' => $first, 'last' => $last];
+            $here = $last;
+        }
+
+        $wanted = $preference->accommodation_pref;
+        $wanted = ($wanted && $wanted !== 'Any') ? $wanted : null;
+        $setting = $this->wantedResortSetting($preference);
+
+        $query = Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip()
+            ->whereNotNull('latitude')->whereNotNull('longitude');
+        if ($setting !== null) {
+            $query->whereIn('type', self::RESORT_TYPES)->withResortSetting($setting);
+        } elseif ($wanted !== null) {
+            $query->where('type', $wanted);
+        }
+        $candidates = $query->with('accreditationRecords')->orderBy('id')->get();
+
+        if ($candidates->isEmpty()) {
+            return null;
+        }
+
+        // Apriori: stays that past travellers paired with one of this trip's stops, strongest rule per stay.
+        $suggested = [];
+        foreach ($sequence as $stop) {
+            $destination = $stop['row']['destination'];
+            foreach ($this->apriori->suggestionsFor('destination', $destination->id, 3, 'accommodation') as $rule) {
+                if ($this->fitsStayPreference($rule['listing'], $wanted, $setting)
+                    && (! isset($suggested[$rule['listing_id']]) || $rule['confidence'] > $suggested[$rule['listing_id']]['confidence'])) {
+                    $suggested[$rule['listing_id']] = $rule + ['basis' => $destination->name];
+                }
+            }
+        }
+
+        $estimator = app(TravelTimeEstimator::class);
+        $minutes = fn (array $a, array $b): int => $estimator->estimate(
+            $this->haversineKm($a['lat'], $a['lng'], $b['lat'], $b['lng']), $a['region'], $b['region'], $preference->transport_pref,
+        )['max_minutes'];
+
+        $tripStart = $preference->travelWindow()[0];
+        $stays = [];
+        $current = null;
+
+        for ($night = 1; $night < $lastDay; $night++) {
+            $date = $tripStart->copy()->addDays($night - 1);
+            $a = $anchors[$night]['last'];
+            $b = $anchors[$night + 1]['first'];
+
+            $scored = $candidates
+                ->filter(fn (Accommodation $s) => $this->accreditedOn($s, $date))
+                ->map(function (Accommodation $s) use ($placeOf, $a, $b, $minutes) {
+                    $p = $placeOf($s);
+
+                    return ['stay' => $s, 'cost' => $minutes($a, $p) + $minutes($p, $b)];
+                })->values();
+
+            if ($scored->isEmpty()) {
+                $stays[$night] = null;
+                $current = null;
+
+                continue;
+            }
+
+            $best = (int) $scored->min('cost');
+            $kept = $current ? $scored->first(fn (array $r) => $r['stay']->id === $current['listing']->id) : null;
+
+            if ($kept && $kept['cost'] <= $best + self::STAY_KEEP_TOLERANCE_MINUTES) {
+                $stays[$night] = $current;
+
+                continue;
+            }
+
+            $band = $scored->filter(fn (array $r) => $r['cost'] <= $best + self::STAY_APRIORI_BAND_MINUTES && isset($suggested[$r['stay']->id]));
+
+            if ($band->isNotEmpty()) {
+                $rule = $this->weightedPick($band->map(fn (array $r) => $suggested[$r['stay']->id])->values(), $preference);
+                $stay = $band->first(fn (array $r) => $r['stay']->id === $rule['listing_id'])['stay'];
+                $current = ['listing' => $stay, 'rule' => [
+                    'basis' => $rule['basis'], 'support' => $rule['support'], 'confidence' => $rule['confidence'], 'co_count' => $rule['co_count'],
+                ]];
+            } else {
+                $stay = $scored->sort(fn (array $x, array $y) => [$x['cost'], -(float) $x['stay']->rating, $x['stay']->id] <=> [$y['cost'], -(float) $y['stay']->rating, $y['stay']->id])->first()['stay'];
+                $current = ['listing' => $stay, 'rule' => null];
+            }
+
+            $stays[$night] = $current;
+        }
+
+        return array_filter($stays) === [] ? null : $stays;
+    }
+
+    /** Is this stay accredited on the given night? See pickStays. A stay with no record at all is not ruled out here. */
+    private function accreditedOn(Accommodation $stay, \Illuminate\Support\Carbon $night): bool
+    {
+        $records = $stay->accreditationRecords;
+
+        if ($records->isEmpty()) {
+            return true;
+        }
+
+        return $records->contains(fn ($r) => $r->status !== 'Expired'
+            && ($r->expiration_date === null || $r->expiration_date->toDateString() >= $night->toDateString() || AccreditationGrace::covers($night)));
     }
 
     /** How much the stop farthest from a candidate stay counts, next to the total of all stops (see pickAccommodation). */
