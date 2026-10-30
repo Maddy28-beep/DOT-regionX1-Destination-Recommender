@@ -172,6 +172,17 @@ class ContentBasedRecommendationService
         return array_values(array_unique($types));
     }
 
+    /**
+     * The category tags that count as a given tourist-facing interest (lower case), the same words the ranking
+     * matches, exposed so a plan can be checked against the interests it was asked to cover.
+     *
+     * @return array<int, string>
+     */
+    public static function tagsForInterest(string $interest): array
+    {
+        return self::INTEREST_TAG_MAP[$interest] ?? [];
+    }
+
     /** Distance buckets (km) backing both the PM "Distance" category and the DS factor (Table 6). */
     private const DISTANCE_BUCKETS = [
         'near' => [0, 15],

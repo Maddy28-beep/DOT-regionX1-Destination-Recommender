@@ -610,9 +610,13 @@ class ItineraryGenerationService
         }
 
         $estimator = app(TravelTimeEstimator::class);
-        $minutes = fn (array $a, array $b): int => $estimator->estimate(
-            $this->haversineKm($a['lat'], $a['lng'], $b['lat'], $b['lng']), $a['region'], $b['region'], $preference->transport_pref,
-        )['max_minutes'];
+        // A stop with no coordinates cannot be measured, so its journey adds nothing to the choice of stay
+        // (the schedule still says "Travel time varies" for it) instead of failing the whole plan.
+        $minutes = fn (array $a, array $b): int => in_array(null, [$a['lat'], $a['lng'], $b['lat'], $b['lng']], true)
+            ? 0
+            : $estimator->estimate(
+                $this->haversineKm($a['lat'], $a['lng'], $b['lat'], $b['lng']), $a['region'], $b['region'], $preference->transport_pref,
+            )['max_minutes'];
 
         $tripStart = $preference->travelWindow()[0];
         $stays = [];
