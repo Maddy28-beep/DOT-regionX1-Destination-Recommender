@@ -121,15 +121,37 @@ class ItineraryAuditTest extends TestCase
         PreferenceActivity::create(['preference_id' => $p->id, 'activity' => 'Cultural Heritage']);
         PreferenceActivity::create(['preference_id' => $p->id, 'activity' => 'Food Tourism']);
         $museum = $this->destination('Old Museum', ['type' => 'Cultural Heritage']);
+        // A place within the trip's range that offers Food Tourism, which the plan did not use.
+        $farm = $this->destination('Tasting Farm', ['type' => 'Farm Tourism', 'latitude' => 7.10, 'longitude' => 125.62]);
+        $farm->tags()->create(['kind' => 'category', 'value' => 'Food Tasting']);
         $this->item($it, 1, 1, 'activity', ['destination_id' => $museum->id, 'starts_at' => '10:00', 'ends_at' => '12:00']);
 
         $checks = $this->audited($p, $it);
-        $this->assertSame('fail', $checks['interests']['status']);
+        $this->assertSame('fail', $checks['interests']['status'], 'Something in range offered it and the plan missed it.');
         $this->assertSame('no stop for Food Tourism', $checks['interests']['detail']);
 
         // The ranking matches a tag that contains the keyword, so "Food Tasting" covers Food Tourism.
         $museum->tags()->create(['kind' => 'category', 'value' => 'Food Tasting']);
         $this->assertSame('pass', $this->audited($p, $it)['interests']['status']);
+    }
+
+    public function test_an_interest_nothing_in_the_trips_range_offers_is_unknown_not_a_failure(): void
+    {
+        // A close-proximity trip (5 km) that asks for Nature: the only nature place is 30 km away.
+        [$p, $it] = $this->plan(['distance_pref' => 'near', 'origin_lat' => 7.0731, 'origin_lng' => 125.6128]);
+        PreferenceActivity::create(['preference_id' => $p->id, 'activity' => 'Nature & Adventure']);
+        $museum = $this->destination('Old Museum', ['type' => 'Cultural Heritage', 'latitude' => 7.08, 'longitude' => 125.61]);
+        $this->destination('Far Falls', ['type' => 'Nature & Adventure', 'latitude' => 7.34, 'longitude' => 125.61]);
+        $this->item($it, 1, 1, 'activity', ['destination_id' => $museum->id, 'starts_at' => '10:00', 'ends_at' => '12:00']);
+
+        $checks = $this->audited($p, $it);
+        $this->assertSame('unknown', $checks['interests']['status']);
+        $this->assertStringContainsString('Nature & Adventure', $checks['interests']['detail']);
+        $this->assertTrue(app(ItineraryAudit::class)->clean(array_values($checks)) || $checks['interests']['status'] !== 'fail');
+
+        // The same trip, remote: there is no range, so the missing stop counts.
+        $p->update(['distance_pref' => 'far']);
+        $this->assertSame('fail', $this->audited($p->fresh(), $it)['interests']['status']);
     }
 
     public function test_an_empty_day_fails_except_a_first_day_after_a_late_arrival(): void
@@ -259,6 +281,34 @@ class ItineraryAuditTest extends TestCase
             ->assertSuccessful();
 
         $this->assertSame($before, TouristPreference::count(), 'The audit trips are rolled back, so it is safe on live data.');
+    }
+
+    public function test_the_extended_set_is_deterministic_unique_and_covers_every_distance_choice_and_way_of_travelling(): void
+    {
+        $first = \App\Console\Commands\AuditItineraries::scenarios(true);
+        $this->assertSame($first, \App\Console\Commands\AuditItineraries::scenarios(true), 'No chance: the same trips every run.');
+        $this->assertCount(41, $first);
+        $this->assertCount(12, \App\Console\Commands\AuditItineraries::scenarios(), 'The core set stays 12.');
+        $this->assertCount(41, array_unique(array_column($first, 'name')));
+
+        $combos = collect($first)->filter(fn ($s) => str_starts_with($s['name'], 'Ext '))
+            ->map(fn ($s) => $s['distance_pref'].'/'.$s['transport_pref'])->unique();
+        $this->assertCount(15, $combos, 'Three distance choices by five ways of travelling.');
+        $this->assertSame(['jeep', 'personal_car', 'rental_car', 'taxi', 'tour_operator'], $combos->map(fn ($c) => explode('/', $c)[1])->unique()->sort()->values()->all());
+
+        $single = collect($first)->filter(fn ($s) => str_starts_with($s['name'], 'Only '))->pluck('activities.0')->sort()->values()->all();
+        $this->assertCount(8, $single, 'Each interest on its own.');
+        $this->assertGreaterThanOrEqual(1, count(array_filter($first, fn ($s) => $s['travel_days'] >= 8)), 'A long trip is in the set.');
+        $this->assertGreaterThanOrEqual(1, count(array_filter($first, fn ($s) => $s['travel_days'] === 1)), 'A one-day trip is in the set.');
+    }
+
+    public function test_the_extended_run_reports_how_many_trips_are_clean_and_fully_verified(): void
+    {
+        $this->destination('Eden Nature Park');
+
+        $this->artisan('itinerary:audit', ['--extended' => true, '--scenario' => 'Only Wildlife'])
+            ->expectsOutputToContain('clean AND fully verified')
+            ->assertSuccessful();
     }
 
     public function test_the_command_can_fail_a_run_below_a_minimum_pass_rate(): void

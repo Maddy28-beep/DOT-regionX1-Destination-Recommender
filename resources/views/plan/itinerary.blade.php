@@ -181,6 +181,13 @@
                             </div>
                         @endif
 
+                        @unless ($itinerary->package)
+                            @include('partials.itinerary-stay-notices', [
+                                'itinerary' => $itinerary,
+                                'hasOvernight' => $itemsByDay->contains(fn ($rows) => $rows->contains('kind', 'overnight')),
+                            ])
+                        @endunless
+
                         @foreach ($itemsByDay as $day => $items)
                             @php
                                 // Every place of the day, in order, deduped -- see

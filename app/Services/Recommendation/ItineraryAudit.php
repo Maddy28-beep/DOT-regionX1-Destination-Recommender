@@ -2,6 +2,7 @@
 
 namespace App\Services\Recommendation;
 
+use App\Models\Destination;
 use App\Models\Itinerary;
 use App\Models\ItineraryItem;
 use App\Models\TouristPreference;
@@ -56,8 +57,8 @@ final class ItineraryAudit
             $this->journeysMeasured($items),
             $this->openAtVisit($activities, $start),
             $this->dayDistance($items, $itinerary, $preference),
-            $this->travelShare($items),
-            $this->interestCoverage($items, $activities, $preference),
+            $this->travelShare($items, $preference),
+            $this->interestCoverage($itinerary, $items, $activities, $preference),
             $this->everyDayHasAStop($items, $activities, $itinerary, $preference),
             $this->arrivalRespected($activities, $preference),
             $this->mealTimes($items),
@@ -168,12 +169,17 @@ final class ItineraryAudit
         return $over ? $this->check('day_km', $label, 'fail', implode('; ', $over)) : $this->check('day_km', $label, 'pass');
     }
 
-    private function travelShare($items): array
+    private function travelShare($items, TouristPreference $preference): array
     {
         $label = 'No day spends more than '.(int) (self::MAX_TRAVEL_SHARE * 100).'% of its time travelling';
         $over = [];
 
         foreach ($items->groupBy('day_number') as $day => $rows) {
+            // A deadline-driven transfer-only departure day is expected to be mostly travelling.
+            if (filled($preference->departure_time) && $rows->contains('kind', 'departure')
+                && $rows->where('kind', 'activity')->whereNotNull('destination_id')->isEmpty()) {
+                continue;
+            }
             $times = $rows->flatMap(fn ($r) => [$this->minutes($r->starts_at), $this->minutes($r->ends_at)])->filter(fn ($m) => $m !== null);
             $span = $times->isEmpty() ? 0 : $times->max() - $times->min();
             $travel = (int) $rows->where('kind', 'travel')->sum('travel_max_minutes');
@@ -185,7 +191,7 @@ final class ItineraryAudit
         return $over ? $this->check('travel_share', $label, 'fail', implode('; ', $over)) : $this->check('travel_share', $label, 'pass');
     }
 
-    private function interestCoverage($items, $activities, TouristPreference $preference): array
+    private function interestCoverage(Itinerary $itinerary, $items, $activities, TouristPreference $preference): array
     {
         $label = 'Every interest the traveller chose has a stop';
         $wanted = $preference->activities->pluck('activity')->filter()->values();
@@ -198,8 +204,40 @@ final class ItineraryAudit
         $uncovered = $wanted->reject(fn (string $interest) => ($interest === 'Shopping & Souvenirs' && $souvenirStop)
             || $activities->contains(fn ($i) => InterestCoverage::covers($i->destination, $interest)));
 
-        return $uncovered->isEmpty() ? $this->check('interests', $label, 'pass')
-            : $this->check('interests', $label, 'fail', 'no stop for '.$uncovered->implode(', '));
+        if ($uncovered->isEmpty()) {
+            return $this->check('interests', $label, 'pass');
+        }
+
+        // An interest nothing inside the trip's own range offers is a limit of the catalogue and the range the traveller
+        // chose, not a miss by the planner, so it is "unknown", not a failure. Remote has no range, so it always counts.
+        $outOfRange = $this->interestsNothingInRangeOffers($uncovered, $itinerary, $preference);
+        $missed = $uncovered->reject(fn ($i) => $outOfRange->contains($i));
+
+        if ($missed->isNotEmpty()) {
+            return $this->check('interests', $label, 'fail', 'no stop for '.$missed->implode(', '));
+        }
+
+        return $this->check('interests', $label, 'unknown', 'nothing within the trip\'s range offers '.$outOfRange->implode(', '));
+    }
+
+    /** The interests, of those given, that no place within the trip's range (from where it starts) could cover. */
+    private function interestsNothingInRangeOffers($interests, Itinerary $itinerary, TouristPreference $preference)
+    {
+        $radius = ContentBasedRecommendationService::radiusKm($itinerary->range_tier_used ?: $preference->distance_pref, $preference->transport_pref);
+        if ($radius === null) {
+            return collect();
+        }
+
+        $origin = $preference->origin() ?? ['lat' => ContentBasedRecommendationService::DEFAULT_ORIGIN_LAT, 'lng' => ContentBasedRecommendationService::DEFAULT_ORIGIN_LNG];
+        [$from, $to] = $preference->travelWindow();
+
+        $inRange = Destination::query()->where('is_accredited', true)->whereNull('archived_at')
+            ->where(fn ($q) => $q->whereNull('itinerary_role')->orWhere('itinerary_role', '!=', 'excluded'))
+            ->whereNotNull('latitude')->whereNotNull('longitude')
+            ->availableDuring($from, $to)->with('tags')->get()
+            ->filter(fn (Destination $d) => $this->km($origin['lat'], $origin['lng'], (float) $d->latitude, (float) $d->longitude) <= $radius);
+
+        return $interests->filter(fn (string $interest) => ! $inRange->contains(fn (Destination $d) => InterestCoverage::covers($d, $interest)))->values();
     }
 
     private function everyDayHasAStop($items, $activities, Itinerary $itinerary, TouristPreference $preference): array
@@ -209,6 +247,10 @@ final class ItineraryAudit
         $empty = [];
 
         foreach (range(1, max(1, (int) $itinerary->total_days)) as $day) {
+            if ($day === (int) $itinerary->total_days && filled($preference->departure_time)
+                && substr((string) $preference->departure_time, 0, 5) <= ItineraryScheduleBuilder::EARLIEST_DEPARTURE) {
+                continue;
+            }
             if ($day === 1 && $late) {
                 continue;
             }
