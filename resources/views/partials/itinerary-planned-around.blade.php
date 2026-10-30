@@ -18,7 +18,7 @@
         default => $stay,
     };
     $distanceNames = ['near' => 'Close Proximity', 'moderate' => 'Commutable', 'far' => 'Remote'];
-    $radius = \App\Services\Recommendation\ContentBasedRecommendationService::RANGE_RADIUS_KM[$preference?->distance_pref] ?? null;
+    $radius = \App\Services\Recommendation\ContentBasedRecommendationService::radiusKm($preference?->distance_pref, $preference?->transport_pref);
     $transport = $preference?->transport_pref;
 @endphp
 
