@@ -86,6 +86,30 @@ class Destination extends Model
     }
 
     /**
+     * How far this place is from the city centre the planner starts from, in km, for the "km from city" line on a
+     * card and on the detail page. The distance an editor recorded wins (it is usually a road figure); without one it
+     * is the straight line from the place's coordinates, as dining cards already show. Null when the place has
+     * neither, so nothing is invented.
+     */
+    public function distanceFromCityCentreKm(): ?float
+    {
+        if ($this->distance_km !== null) {
+            return (float) $this->distance_km;
+        }
+
+        if ($this->latitude === null || $this->longitude === null) {
+            return null;
+        }
+
+        $lat1 = deg2rad(\App\Services\Recommendation\ContentBasedRecommendationService::DEFAULT_ORIGIN_LAT);
+        $lat2 = deg2rad((float) $this->latitude);
+        $dLng = deg2rad((float) $this->longitude - \App\Services\Recommendation\ContentBasedRecommendationService::DEFAULT_ORIGIN_LNG);
+        $a = sin(($lat2 - $lat1) / 2) ** 2 + cos($lat1) * cos($lat2) * sin($dLng / 2) ** 2;
+
+        return round(6371 * 2 * asin(min(1, sqrt($a))), 1);
+    }
+
+    /**
      * The entry fee for the listing card, without the peso sign (the card adds its own): "150" for a
      * single price, "150–450" for a range, "50 max" when the minimum is free, each per person. Null when the fee is free or not known,
      * so the card keeps saying "Free entry" or shows the price-band meter instead.

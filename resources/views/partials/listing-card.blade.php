@@ -60,8 +60,8 @@
 
     // Right side of the footer.
     $meta = null;
-    if ($isDestination && $listing->distance_km) {
-        $meta = ['swap', rtrim(rtrim(number_format((float) $listing->distance_km, 1), '0'), '.').' km', ' from city'];
+    if ($isDestination && ($destinationKm = $listing->distanceFromCityCentreKm())) {
+        $meta = ['swap', rtrim(rtrim(number_format($destinationKm, 1), '0'), '.').' km', ' from city'];
     } elseif ($isPackage && $listing->duration_label) {
         $meta = ['clock', $listing->duration_label, null];
     }
