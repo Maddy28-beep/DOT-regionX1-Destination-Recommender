@@ -84,7 +84,8 @@ class DistanceFromDefaultOriginTest extends TestCase
 
         $this->assertTrue($rows->has('Far Farm'), 'Better a farther place than an empty trip.');
         $this->assertTrue($service->lastRangeWidened);
-        $this->assertSame('moderate', $service->lastRangeTierUsed);
+        // 70 km is beyond the 50 km a car reaches on a commutable trip, so the gate widens all the way.
+        $this->assertSame('far', $service->lastRangeTierUsed);
     }
 
     public function test_the_distance_score_now_tells_near_from_far_for_places_with_no_stored_distance(): void
@@ -102,8 +103,8 @@ class DistanceFromDefaultOriginTest extends TestCase
     public function test_a_stored_distance_still_wins_over_the_coordinates(): void
     {
         $this->nearby(3);
-        // stored as 10 km from the city although its coordinates are far out: the recorded figure is trusted, as before
-        $this->place('Recorded Near', 6.85, 125.18, 10.0);
+        // stored as 3 km from the city although its coordinates are far out: the recorded figure is trusted, as before
+        $this->place('Recorded Near', 6.85, 125.18, 3.0);
 
         $rows = $this->ranked($this->preference('near'));
 
