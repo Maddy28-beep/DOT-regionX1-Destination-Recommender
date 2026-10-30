@@ -190,6 +190,9 @@ class ItineraryGenerationService
             : $this->pickAccommodation($sequence, $preference);
 
         return DB::transaction(function () use ($reserve, $preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
+            // The schedule builder keeps why it turned each place away, per build; start this trip with none.
+            $this->schedule->forgetRecordedAttempts();
+
             $itinerary = Itinerary::create([
                 'preference_id' => $preference->id,
                 'total_days' => $totalDays,
@@ -274,6 +277,19 @@ class ItineraryGenerationService
             // From two days up the stay is chosen again for the stops that made it into the days (see settleStays).
             if ($totalDays >= 2) {
                 $itinerary->update(['stay_plan' => $this->settleStays($itinerary, $build, $stays, $built, $sequence, $preference, $dayCapacities, $origin)]);
+            } else {
+                // A one-day trip has no night to settle, but a place it set out to visit and could not fit is still said so.
+                $placedIds = $itinerary->items()->where('kind', 'activity')->whereNotNull('destination_id')->pluck('destination_id')->all();
+                $left = $this->unplacedNotices($placedIds, $sequence, $this->schedule->recordedAttempts($built, $stays, $dayCapacities));
+                if ($left !== []) {
+                    $itinerary->update(['stay_plan' => [
+                        'version' => 1,
+                        'mode' => $this->stayMode($preference),
+                        'continuity' => ['nights' => 0, 'distinct_stays' => 0, 'transfers' => 0],
+                        'notices' => $left,
+                        'guard' => null,
+                    ]]);
+                }
             }
 
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);
@@ -1034,7 +1050,7 @@ class ItineraryGenerationService
                 'distinct_stays' => count(array_unique($final['stays'])),
                 'transfers' => $final['transfers'],
             ],
-            'notices' => $this->stayNotices($final, $planned, $preference, $days, $mode),
+            'notices' => $this->stayNotices($final, $planned, $days, $mode, $this->schedule->recordedAttempts($built, $stays, $dayCapacities)),
             'guard' => $guard,
         ];
     }
@@ -1043,10 +1059,15 @@ class ItineraryGenerationService
      * What the traveller should be told: nights with no accredited stay, a Close Proximity trip that could not use one
      * stay all the way, and every destination the trip set out to visit but could not place, with the reason.
      *
+     * A reason is only ever one the schedule builder recorded when it turned the place away (see
+     * ItineraryScheduleBuilder::recordedAttempts). A place it never turned away on a recorded ground, or a build that
+     * was not recorded, gets the reason 'not_recorded' and no attempts: the page then says only that it was not added.
+     *
      * @param  array<int, array{row: array, distance_km: float|null}>  $planned
+     * @param  array<int, array<int, array<string, mixed>>>|null  $attempts  the kept build's recorded attempts, by destination id
      * @return array<int, array<string, mixed>>
      */
-    private function stayNotices(array $final, array $planned, TouristPreference $preference, int $days, string $mode): array
+    private function stayNotices(array $final, array $planned, int $days, string $mode, ?array $attempts = null): array
     {
         $notices = [];
         foreach (range(1, $days - 1) as $night) {
@@ -1058,24 +1079,51 @@ class ItineraryGenerationService
             $notices[] = ['type' => 'no_single_stay_covers_trip'];
         }
 
-        $stayPlaces = Accommodation::whereIn('id', array_unique($final['stays']))->get()->map(fn ($s) => $this->placeOf($s));
-        $budget = ItineraryScheduleBuilder::DRIVE_BUDGET_MINUTES[$mode] ?? ItineraryScheduleBuilder::DEFAULT_DRIVE_BUDGET_MINUTES;
+        return array_merge($notices, $this->unplacedNotices($final['placed'], $planned, $attempts));
+    }
+
+    /**
+     * One notice for every planned destination that is not among the placed ones, so none leaves the trip unmentioned.
+     *
+     * @param  array<int, int>  $placedIds
+     * @param  array<int, array{row: array, distance_km: float|null}>  $planned
+     * @param  array<int, array<int, array<string, mixed>>>|null  $attempts
+     * @return array<int, array<string, mixed>>
+     */
+    private function unplacedNotices(array $placedIds, array $planned, ?array $attempts): array
+    {
+        $notices = [];
         foreach ($planned as $entry) {
             $destination = $entry['row']['destination'];
-            if (in_array($destination->id, $final['placed'], true)) {
+            if (in_array($destination->id, $placedIds, true)) {
                 continue;
             }
-            $notice = ['type' => 'unplaced_destination', 'destination_id' => $destination->id, 'name' => $destination->name, 'reason' => 'no_time_before_cutoff', 'minutes' => null];
-            if ($stayPlaces->isNotEmpty() && $destination->latitude !== null) {
-                $there = $this->placeOf($destination);
-                $roundTrip = $stayPlaces->map(fn (array $stay) => $this->stayMinutes($stay, $there, $preference) + $this->stayMinutes($there, $stay, $preference))->min();
-                $notice['minutes'] = $roundTrip;
-                $notice['reason'] = $roundTrip > $budget ? 'over_daily_driving_limit' : 'no_time_before_cutoff';
-            }
-            $notices[] = $notice;
+            $found = $attempts[$destination->id] ?? [];
+            $notices[] = [
+                'type' => 'unplaced_destination',
+                'destination_id' => $destination->id,
+                'name' => $destination->name,
+                'reason' => $found === [] ? 'not_recorded' : $this->mainCause($found),
+                'attempts' => $found,
+            ];
         }
 
         return $notices;
+    }
+
+    /** The most telling of the recorded causes: a place that is shut says more than a day that was full. */
+    private function mainCause(array $attempts): string
+    {
+        $order = ['closed_that_day', 'outside_opening_hours', 'would_end_after_cutoff', 'drive_budget_reached', 'day_full', 'no_sightseeing_time_that_day'];
+        $causes = array_column($attempts, 'cause');
+
+        foreach ($order as $cause) {
+            if (in_array($cause, $causes, true)) {
+                return $cause;
+            }
+        }
+
+        return 'not_recorded';
     }
 
     /** Is this stay accredited on the given night? See pickStays. A stay with no record at all is not ruled out here. */

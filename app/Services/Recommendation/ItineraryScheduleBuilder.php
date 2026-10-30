@@ -204,6 +204,10 @@ class ItineraryScheduleBuilder
         $stayByNight = $this->stayByNight($stay, $dayCapacities);
         $sortOrder = 0;
         $this->lastStart = $this->pastMidnight = [];
+        $this->attempts = [];
+        $this->planRejection = null;
+        $this->failedNotes = [];
+        $this->noteFailure = false;
         // Every journey estimate this build makes is at the pace of how the traveller said they will get around.
         $this->transport = $preference->transport_pref;
         $this->mealRestaurants = null;
@@ -267,6 +271,8 @@ class ItineraryScheduleBuilder
                     $visit = $this->planVisit($clock, $here, $there, $visitMinutes, $lunchTaken, $destination, $date);
 
                     if ($visit === null) {
+                        $this->note($destination->id, $dayNumber, (string) $this->planRejection);
+
                         continue;
                     }
 
@@ -275,6 +281,8 @@ class ItineraryScheduleBuilder
                     $back = $dayEnd ? $this->estimateLeg($there, $dayEnd)['max_minutes'] : 0;
 
                     if ($scheduled > 0 && $driven + $leg + $back > $this->driveBudget($preference)) {
+                        $this->note($destination->id, $dayNumber, 'drive_budget_reached', $driven + $leg + $back, $this->driveBudget($preference));
+
                         continue;
                     }
 
@@ -316,6 +324,8 @@ class ItineraryScheduleBuilder
                         $freshMorning = Carbon::parse(self::EARLIEST_DEPARTURE);
 
                         if ($this->planVisit($freshMorning, $here, $this->place($front), self::VISIT_MINUTES, false, $front, $date) === null) {
+                            $freshRejection = (string) $this->planRejection;
+
                             // Closed only on today's weekday: keep it for a later day instead of dropping it.
                             $closedToday = OpeningHours::windowsOn($front->hours ?? null, $date) === [];
 
@@ -323,6 +333,7 @@ class ItineraryScheduleBuilder
                                 break;
                             }
 
+                            $this->note($front->id, $dayNumber, $freshRejection, null, null, true);
                             array_shift($queue);
 
                             continue;
@@ -358,12 +369,150 @@ class ItineraryScheduleBuilder
                 }
             }
 
+            // The day took as many stops as it holds, and the queue still had some: they wait for the next day.
+            if ($scheduled >= $capacity) {
+                $this->noteLeftovers($queue, $dayNumber, $capacity);
+            }
+
             if ($isLastDay) {
                 $this->closeTripDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $origin, $lunchTaken, $lastDestination, $date);
             } else {
                 $this->closeOvernightDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $accommodation, $stayRule, $lastNight, $date);
                 $here = $accommodation ? $this->place($accommodation) : $here;
             }
+        }
+
+        $this->storeAttempts($sequence, $stayByNight);
+    }
+
+    /**
+     * Why a stop was not placed, as the build decided it. These are records of decisions the build already makes; reading
+     * them changes nothing about what is built. One entry per day and cause, per destination:
+     * ['day' => int, 'cause' => string, 'minutes' => int|null, 'limit' => int|null, 'fresh' => bool].
+     * Causes: would_end_after_cutoff, closed_that_day, outside_opening_hours, drive_budget_reached, day_full.
+     * 'fresh' means the stop could not be done even starting that day fresh (so it was set aside).
+     *
+     * @var array<int, array<int, array<string, mixed>>>
+     */
+    private array $attempts = [];
+
+    /** @var array<string, array<int, array<int, array<string, mixed>>>> the attempts of each build, by what it was built from */
+    private array $recorded = [];
+
+    /** Why the last planVisit() returned null (set just before it does). */
+    private ?string $planRejection = null;
+
+    /** @var array<int|string, true> destinations whose note could not be taken in this build (they get the neutral wording) */
+    private array $failedNotes = [];
+
+    /** Set when a failure could not be tied to one destination: this build's notes are then all left out. */
+    private bool $noteFailure = false;
+
+    /**
+     * Takes one note for the page. Taking a note never decides anything and must never stop a build: if it fails for any
+     * reason the place simply has no recorded reason, and the page says only that it was not added to the plan.
+     */
+    private function note(mixed $destinationId, mixed $day, mixed $cause, mixed $minutes = null, mixed $limit = null, mixed $fresh = false): void
+    {
+        // Untyped on purpose: a bad value must be caught below, not fail as the call is made.
+        try {
+            $this->recordAttempt($destinationId, $day, $cause, $minutes, $limit, $fresh);
+        } catch (\Throwable $e) {
+            if (is_int($destinationId) || is_string($destinationId)) {
+                $this->failedNotes[$destinationId] = true;
+            } else {
+                $this->noteFailure = true;
+            }
+            $this->reportNoteFailure($e);
+        }
+    }
+
+    /** One note for every stop still waiting when a day is full (or has no sightseeing time at all). */
+    private function noteLeftovers(array $queue, int $day, int $capacity): void
+    {
+        foreach ($queue as $leftover) {
+            try {
+                $id = $leftover['row']['destination']->id;
+            } catch (\Throwable $e) {
+                $this->noteFailure = true;
+                $this->reportNoteFailure($e);
+
+                continue;
+            }
+
+            $this->note($id, $day, $capacity === 0 ? 'no_sightseeing_time_that_day' : 'day_full', null, $capacity);
+        }
+    }
+
+    /** Keeps this build's notes for later, under what the build was made from. A failure leaves the build without notes. */
+    private function storeAttempts(array $sequence, array $stayByNight): void
+    {
+        try {
+            $kept = $this->noteFailure ? [] : array_diff_key($this->attempts, $this->failedNotes);
+            $this->recorded[$this->attemptsKey($sequence, $stayByNight)] = $kept;
+        } catch (\Throwable $e) {
+            $this->reportNoteFailure($e);
+        }
+    }
+
+    private function reportNoteFailure(\Throwable $e): void
+    {
+        try {
+            report($e);
+        } catch (\Throwable) {
+            // Even reporting is not allowed to stop a build.
+        }
+    }
+
+    protected function recordAttempt(int|string $destinationId, int $day, string $cause, ?int $minutes = null, ?int $limit = null, bool $fresh = false): void
+    {
+        if ($cause === '') {
+            return;
+        }
+
+        foreach ($this->attempts[$destinationId] ?? [] as $i => $known) {
+            if ($known['day'] === $day && $known['cause'] === $cause) {
+                $this->attempts[$destinationId][$i] = ['day' => $day, 'cause' => $cause, 'minutes' => $minutes, 'limit' => $limit, 'fresh' => $known['fresh'] || $fresh];
+
+                return;
+            }
+        }
+
+        $this->attempts[$destinationId][] = ['day' => $day, 'cause' => $cause, 'minutes' => $minutes, 'limit' => $limit, 'fresh' => $fresh];
+    }
+
+    /** What a build is identified by: the stops in order and the stay of each night. Preference, dates and origin are fixed within one trip. */
+    protected function attemptsKey(array $sequence, array $stayByNight): string
+    {
+        return md5(json_encode([
+            array_map(fn ($entry) => $entry['row']['destination']->id, array_values($sequence)),
+            array_map(fn ($night) => ($night['listing'] ?? null)?->id, $stayByNight),
+        ]));
+    }
+
+    /** Forget every recorded build; called when a new trip starts. */
+    public function forgetRecordedAttempts(): void
+    {
+        $this->recorded = [];
+        $this->attempts = [];
+    }
+
+    /**
+     * The recorded attempts of the build made from this sequence and these stays, keyed by destination id; null when no such
+     * build was recorded, or when the lookup itself failed (the page then gives every omission the neutral wording).
+     *
+     * @param  array<int, array{row: array, distance_km: float|null}>  $sequence
+     * @param  array<int, array<int, string>>  $dayCapacities
+     * @return array<int, array<int, array<string, mixed>>>|null
+     */
+    public function recordedAttempts(array $sequence, ?array $stay, array $dayCapacities): ?array
+    {
+        try {
+            return $this->recorded[$this->attemptsKey($sequence, $this->stayByNight($stay, $dayCapacities))] ?? null;
+        } catch (\Throwable $e) {
+            $this->reportNoteFailure($e);
+
+            return null;
         }
     }
 
@@ -461,6 +610,8 @@ class ItineraryScheduleBuilder
             $fit = $this->minutesBetween($start, Carbon::parse(self::LAST_ACTIVITY_END));
 
             if ($fit < min($visitMinutes, self::SHORT_VISIT_MINUTES)) {
+                $this->planRejection = 'would_end_after_cutoff';
+
                 return null;
             }
 
@@ -473,6 +624,8 @@ class ItineraryScheduleBuilder
 
         // Closed all day on this weekday ("Closed Mondays", "Mon–Sat ..." on a Sunday).
         if ($windows === []) {
+            $this->planRejection = 'closed_that_day';
+
             return null;
         }
 
@@ -501,6 +654,8 @@ class ItineraryScheduleBuilder
                 ];
             }
         }
+
+        $this->planRejection = 'outside_opening_hours';
 
         return null;
     }

@@ -190,7 +190,6 @@ class StayCommutableTransferTest extends TestCase
         $this->assertSame(0, $r['plan']['guard']['extra_builds'], 'no alternative stay plan is even tried');
         $unplaced = collect($r['plan']['notices'])->where('type', 'unplaced_destination')->values();
         $this->assertSame(['Area Two B'], $unplaced->pluck('name')->all(), 'the stop that could not be placed is named');
-        $this->assertSame('over_daily_driving_limit', $unplaced[0]['reason']);
-        $this->assertGreaterThan(210, $unplaced[0]['minutes'], 'with the minutes it would need against the Close Proximity limit');
+        $this->assertSame('not_recorded', $unplaced[0]['reason'], 'this stand-in schedule records no decisions, so no cause is claimed');
     }
 }
