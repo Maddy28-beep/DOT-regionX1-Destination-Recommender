@@ -100,13 +100,13 @@ class ItineraryAuditTest extends TestCase
 
     public function test_a_long_day_of_driving_fails_the_distance_and_the_travel_share_checks(): void
     {
-        [$p, $it] = $this->plan();
+        [$p, $it] = $this->plan();   // commutable by the default personal car: a 50 km reach, so up to 110 km a day
         $this->item($it, 1, 1, 'travel', ['starts_at' => '08:00', 'distance_km' => 70, 'travel_min_minutes' => 90, 'travel_max_minutes' => 120]);
-        $this->item($it, 1, 2, 'travel', ['starts_at' => '13:00', 'distance_km' => 40, 'travel_min_minutes' => 60, 'travel_max_minutes' => 90, 'ends_at' => '16:00']);
+        $this->item($it, 1, 2, 'travel', ['starts_at' => '13:00', 'distance_km' => 60, 'travel_min_minutes' => 60, 'travel_max_minutes' => 90, 'ends_at' => '16:00']);
 
         $checks = $this->audited($p, $it);
         $this->assertSame('fail', $checks['day_km']['status']);
-        $this->assertStringContainsString('day 1 is 110 km', $checks['day_km']['detail']);
+        $this->assertStringContainsString('day 1 is 130 km', $checks['day_km']['detail']);
         $this->assertSame('fail', $checks['travel_share']['status']);
 
         ItineraryItem::query()->update(['distance_km' => 10, 'travel_max_minutes' => 20]);
@@ -193,6 +193,50 @@ class ItineraryAuditTest extends TestCase
 
         $p->update(['origin_lat' => 7.13, 'origin_lng' => 125.645]);
         $this->assertSame('pass', $this->audited($p->fresh(), $it)['start']['status']);
+    }
+
+    public function test_the_day_distance_limit_follows_the_reach_of_the_trip(): void
+    {
+        $audit = app(ItineraryAudit::class);
+        $limit = fn (array $pref) => $audit->dayKmLimit(new TouristPreference($pref));
+
+        $this->assertSame(20, $limit(['distance_pref' => 'near']), 'A round trip to the edge of 5 km, plus slack.');
+        $this->assertSame(40, $limit(['distance_pref' => 'moderate', 'transport_pref' => 'jeep']));
+        $this->assertSame(70, $limit(['distance_pref' => 'moderate', 'transport_pref' => 'taxi']));
+        $this->assertSame(110, $limit(['distance_pref' => 'moderate', 'transport_pref' => 'rental_car']));
+        $this->assertSame(110, $limit(['distance_pref' => 'moderate']), 'No answer is the personal car.');
+        $this->assertSame(150, $limit(['distance_pref' => 'far']), 'A remote trip has no radius, so a fixed cap.');
+    }
+
+    public function test_a_widened_trip_is_held_to_the_tier_it_was_built_with(): void
+    {
+        $audit = app(ItineraryAudit::class);
+        $near = new TouristPreference(['distance_pref' => 'near', 'transport_pref' => 'rental_car']);
+
+        $this->assertSame(20, $audit->dayKmLimit($near));
+        $this->assertSame(110, $audit->dayKmLimit($near, 'moderate'), 'It asked for close proximity but ran short, so it was built commutable.');
+        $this->assertSame(150, $audit->dayKmLimit($near, 'far'));
+
+        [$p, $it] = $this->plan(['distance_pref' => 'near', 'transport_pref' => 'rental_car']);
+        $this->item($it, 1, 1, 'travel', ['starts_at' => '08:00', 'distance_km' => 66, 'travel_min_minutes' => 60, 'travel_max_minutes' => 90]);
+        $this->assertSame('fail', $this->audited($p, $it)['day_km']['status']);
+
+        $it->update(['range_tier_used' => 'moderate', 'range_widened' => true]);
+        $this->assertSame('pass', $this->audited($p, $it->fresh())['day_km']['status']);
+    }
+
+    public function test_the_same_day_of_driving_passes_by_car_and_fails_for_a_close_proximity_trip(): void
+    {
+        [$p, $it] = $this->plan(['distance_pref' => 'moderate', 'transport_pref' => 'rental_car']);
+        $this->item($it, 1, 1, 'travel', ['starts_at' => '08:00', 'distance_km' => 90, 'travel_min_minutes' => 90, 'travel_max_minutes' => 120]);
+
+        $this->assertSame('pass', $this->audited($p, $it)['day_km']['status'], '90 km is inside the 110 km a 50 km reach allows.');
+
+        $p->update(['distance_pref' => 'near']);
+        $this->assertSame('fail', $this->audited($p->fresh(), $it)['day_km']['status'], '90 km is far beyond a 5 km trip.');
+
+        $p->update(['distance_pref' => 'moderate', 'transport_pref' => 'jeep']);
+        $this->assertSame('fail', $this->audited($p->fresh(), $it)['day_km']['status'], 'A jeep rider reaches 15 km, so 40 km is the limit.');
     }
 
     public function test_a_plan_with_no_failing_check_is_clean(): void
