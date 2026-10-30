@@ -16,8 +16,15 @@ use App\Support\OpeningHours;
  */
 final class ItineraryAudit
 {
-    /** A day's journeys add up to no more than this many km. */
-    public const MAX_DAY_KM = 60;
+    /**
+     * A day's driving is held to a round trip to the edge of the trip's own reach: twice the radius of the distance the
+     * traveller chose (5 km close, 15 to 50 km commutable by transport mode), plus slack for moving between stops.
+     * A flat limit would contradict the choice itself, since one stop 50 km out is already a 100 km day. A remote trip
+     * has no radius, so it is held to REMOTE_DAY_KM and, above all, to the travel-share check.
+     */
+    public const DAY_KM_SLACK = 10;
+
+    public const REMOTE_DAY_KM = 150;
 
     /** A day's journeys take no more than this share of the time from its first to its last item. */
     public const MAX_TRAVEL_SHARE = 0.40;
@@ -48,7 +55,7 @@ final class ItineraryAudit
             $this->stopsLocated($activities),
             $this->journeysMeasured($items),
             $this->openAtVisit($activities, $start),
-            $this->dayDistance($items),
+            $this->dayDistance($items, $itinerary, $preference),
             $this->travelShare($items),
             $this->interestCoverage($items, $activities, $preference),
             $this->everyDayHasAStop($items, $activities, $itinerary, $preference),
@@ -135,13 +142,25 @@ final class ItineraryAudit
             : $this->check('open', $label, 'pass');
     }
 
-    private function dayDistance($items): array
+    /**
+     * The most a day may drive on this trip, in km. A trip that ran short of places and was widened is held to the
+     * tier it was actually built with (the itinerary records it), not the one it asked for: the traveller was told.
+     */
+    public function dayKmLimit(TouristPreference $preference, ?string $tierUsed = null): int
     {
-        $label = 'No day drives more than '.self::MAX_DAY_KM.' km';
+        $radius = ContentBasedRecommendationService::radiusKm($tierUsed ?: $preference->distance_pref, $preference->transport_pref);
+
+        return $radius === null ? self::REMOTE_DAY_KM : (int) (2 * $radius + self::DAY_KM_SLACK);
+    }
+
+    private function dayDistance($items, Itinerary $itinerary, TouristPreference $preference): array
+    {
+        $limit = $this->dayKmLimit($preference, $itinerary->range_tier_used);
+        $label = "No day drives more than {$limit} km (a round trip to the edge of the trip's reach)";
         $over = [];
         foreach ($items->where('kind', 'travel')->groupBy('day_number') as $day => $legs) {
             $km = (float) $legs->sum(fn ($l) => (float) $l->distance_km);
-            if ($km > self::MAX_DAY_KM) {
+            if ($km > $limit) {
                 $over[] = sprintf('day %d is %.0f km', $day, $km);
             }
         }
