@@ -192,20 +192,39 @@ class SampleParticipationTest extends TestCase
         $this->assertGreaterThan(0, count($plan['matches']));
     }
 
-    public function test_a_sample_destination_appears_in_the_recommended_list_of_the_itinerary_page(): void
+    public function test_the_stop_the_planner_chooses_first_is_still_chosen_and_shown_when_it_is_a_sample(): void
     {
         $places = $this->catalogue();
-        $this->record($places[0], 'sample');
-        foreach (array_slice($places, 1) as $d) {
+        foreach ($places as $d) {
             $this->record($d, 'official');
         }
-        $trip = $this->plan()['trip'];
+        $firstStopId = $this->plan()['stops'][1][0];
+        $chosen = Destination::findOrFail($firstStopId);
 
-        $html = $this->withSession([TripPlannerController::ITINERARY_KEY => $trip->id, TripPlannerController::PREFERENCE_KEY => $trip->preference_id])
+        // The planner's own first choice becomes a sample record: it must still be the first choice, and be on the page.
+        $this->record($chosen, 'sample');
+        $plan = $this->plan();
+
+        $this->assertSame($firstStopId, $plan['stops'][1][0], 'a sample record is chosen exactly as an official one was');
+        $html = $this->withSession([TripPlannerController::ITINERARY_KEY => $plan['trip']->id, TripPlannerController::PREFERENCE_KEY => $plan['trip']->preference_id])
             ->get(route('plan.itinerary'))->assertOk()->getContent();
+        $this->assertStringContainsString($chosen->name, $html, 'and it is on the itinerary page');
+        $this->assertTrue($plan['trip']->matches()->where('destination_id', $chosen->id)->exists(), 'and in the ranking behind it');
+        $this->assertGreaterThan(0, count($plan['matches']));
+    }
 
-        $this->assertStringContainsString($places[0]->name, $html, 'the sample place is on the page');
-        $this->assertTrue($trip->matches()->where('destination_id', $places[0]->id)->exists(), 'and in the ranking behind it');
+    public function test_every_sample_destination_that_fits_the_traveller_is_ranked_not_just_the_chosen_ones(): void
+    {
+        $places = $this->catalogue();
+        foreach ($places as $i => $d) {
+            $this->record($d, $i < 4 ? 'sample' : 'official');
+        }
+
+        $rankedIds = collect($this->plan()['matches'])->pluck('destination_id')->all();
+
+        foreach ($places as $d) {
+            $this->assertContains($d->id, $rankedIds, $d->name.' is ranked whatever its provenance');
+        }
     }
 
     public function test_sample_and_unrecorded_destinations_stay_eligible_for_the_catalogue_and_the_planner(): void
