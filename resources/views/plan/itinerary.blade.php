@@ -263,17 +263,18 @@
                                         }
                                     }
                                     $mergedNights = collect($stayAfterDinner)->pluck('id')->all();
+                                    // The pick-up happens when the day's first journey leaves, so it sits just above that journey
+                                    // (after any breakfast before it). A day with no journey shows it above its first row.
+                                    $pickupBeforeId = $rows->firstWhere('kind', 'travel')?->id
+                                        ?? $rows->first(fn ($row) => $row->kind !== 'baseline')?->id;
                                 @endphp
                                 <div class="tl">
                                     @foreach ($rows as $item)
                                         @continue(in_array($item->id, $mergedNights, true))
-                                        @if ($byOperator && $loop->first && $item->kind !== 'baseline')
+                                        @if ($byOperator && $item->id === $pickupBeforeId)
                                             @include('partials.itinerary-pickup-row', ['at' => $pickupAt])
                                         @endif
                                         @include('partials.itinerary-timeline-row', ['item' => $item, 'swap' => $swap, 'ideas' => ($ideas ?? [])[$item->id] ?? [], 'preference' => $preference, 'stay' => $stayAfterDinner[$item->id] ?? null])
-                                        @if ($byOperator && $item->kind === 'baseline')
-                                            @include('partials.itinerary-pickup-row', ['at' => $pickupAt])
-                                        @endif
                                     @endforeach
                                 </div>
 
