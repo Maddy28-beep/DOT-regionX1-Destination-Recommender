@@ -1131,6 +1131,32 @@ class TripPlannerTest extends TestCase
         }
     }
 
+    /**
+     * Choosing where to sleep measures each night's journey from the day's last stop to the next day's first. A stop with
+     * no coordinates (as the accreditation import leaves many) used to make that measurement fail with a TypeError, so a
+     * multi-day plan that included one, with a mapped hotel to choose from, was a server error instead of a plan.
+     */
+    public function test_a_multi_day_plan_with_an_unmapped_stop_and_a_mapped_hotel_still_builds(): void
+    {
+        $this->seedDestinations();
+        $region = Region::sole();
+
+        foreach (Destination::all() as $destination) {
+            $destination->update(['latitude' => null, 'longitude' => null]);
+        }
+        \App\Models\Accommodation::create([
+            'slug' => 'mapped-hotel', 'name' => 'Mapped Hotel', 'location' => 'Davao City',
+            'region_id' => $region->id, 'type' => 'Hotel', 'is_accredited' => true,
+            'rating' => 4.6, 'review_count' => 8, 'price_tier' => 'Mid-range',
+            'latitude' => 7.07, 'longitude' => 125.61,
+        ]);
+
+        $this->post('/plan', $this->surveyPayload(['travel_days' => 3, 'arrival_time' => '08:00']))
+            ->assertRedirect(route('plan.itinerary'));
+
+        $this->get('/plan/itinerary')->assertOk();
+    }
+
     /** The Google Maps link has to carry the whole day, in order. */
     public function test_the_google_maps_link_carries_every_stop(): void
     {
