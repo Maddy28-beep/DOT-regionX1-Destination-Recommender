@@ -36,7 +36,7 @@
             info.appendChild(link);
             if (alt.sample) {
                 var tag = el('span', 'sample-tag', 'Sample data, not DOT-verified');
-                tag.title = 'This place's accreditation number is a placeholder, not an official DOT number.';
+                tag.title = "This place's accreditation number is a placeholder, not an official DOT number.";
                 info.appendChild(tag);
             }
 
