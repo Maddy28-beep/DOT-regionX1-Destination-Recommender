@@ -33,7 +33,8 @@ class DiningCardTest extends TestCase
         $html = $this->get('/restaurants')->assertOk()->getContent();
 
         $this->assertStringContainsString('class="dcard__name">Marina Tuna Restaurant<', $html, 'The name sits below the photo, as on the other cards.');
-        $this->assertStringContainsString('DOT accredited', $html);
+        // No accreditation record is on file for this test place, so it is never read as official: 'Not Yet Verified'.
+        $this->assertStringContainsString('Not Yet Verified', $html);
         $this->assertStringContainsString('Filipino Seafood', $html);
         $this->assertStringContainsString('dcard__new', $html, 'A listing with no reviews yet carries the New tag.');
         $this->assertStringNotContainsString('dpost-card__name', $html, 'No more name printed over the photo.');

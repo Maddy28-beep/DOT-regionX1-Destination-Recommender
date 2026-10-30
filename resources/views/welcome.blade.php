@@ -226,7 +226,7 @@
     <div class="poster-hero__content">
         <span class="poster-kicker poster-hero__kicker">welcome to</span>
         <h1 class="poster-title poster-hero__title">DAVAO REGION</h1>
-        <p class="poster-hero__subhead">Sun-warmed islands, misty highlands, and the Philippine Eagle's home &mdash; discover DOT-accredited stays, tours, and eats across Region XI.</p>
+        <p class="poster-hero__subhead">Sun-warmed islands, misty highlands, and the Philippine Eagle's home &mdash; discover stays, tours, and eats across Region XI.</p>
     </div>
 
     {{-- The picture ends on a soft curve, not a ruler-straight line: it bulges down behind the search card and
@@ -448,9 +448,12 @@
                      to the DOT-featured flag -- which is what the alternative
                      copy describes. --}}
                 @if ($stats['avg_rating'])
-                    <p>Verified DOT-accredited spots across the Davao Region, ranked by traveler ratings.</p>
+                    <p>Spots across the Davao Region, ranked by traveler ratings.</p>
                 @else
-                    <p>Verified DOT-accredited spots across the Davao Region.</p>
+                    <p>Spots across the Davao Region.</p>
+                @endif
+                @if (($stats['destinations_sample'] ?? 0) > 0)
+                    <p><small>Places marked <strong>DOT Accredited</strong> are official DOT records; places marked <strong>Sample Data</strong> are temporary demonstration records.</small></p>
                 @endif
             </div>
             <div class="dpost-head__right">
@@ -481,7 +484,14 @@
                 <div class="dpost-banner__copy">
                     <span class="dpost-banner__kicker poster-kicker">the crown jewel of</span>
                     <h3 class="poster-title dpost-banner__name">{{ $featuredDestination->name }}</h3>
-                    <p class="dpost-banner__blurb">Region XI's highest-rated destination &mdash; a DOT-verified must-see that sets the bar for every other stop on your itinerary.</p>
+                    @php $featuredProvenance = app(\App\Support\SampleData::class)->status($featuredDestination); @endphp
+                    @if ($featuredProvenance === \App\Support\SampleData::OFFICIAL)
+                        <p class="dpost-banner__blurb">Region XI's highest-rated destination &mdash; a DOT-accredited must-see that sets the bar for every other stop on your itinerary.</p>
+                    @elseif ($featuredProvenance === \App\Support\SampleData::SAMPLE)
+                        <p class="dpost-banner__blurb">A featured sample place &mdash; a temporary demonstration record, shown while the official DOT list is being completed.</p>
+                    @else
+                        <p class="dpost-banner__blurb">A featured place whose DOT accreditation is not yet verified.</p>
+                    @endif
                     <div class="dpost-banner__meta">
                         @if ($featuredDestination->review_count > 0)
                             <span class="dpost-banner__rating">&#9733; {{ number_format($featuredDestination->rating, 1) }}</span>
@@ -512,7 +522,7 @@
             <div>
                 <span class="dpost-kicker poster-kicker">ready when you are</span>
                 <h2 class="poster-title" style="color:var(--ocean-teal-dark);">Featured Tour Packages</h2>
-                <p>All-inclusive, DOT-accredited experiences worth planning around.</p>
+                <p>All-inclusive experiences worth planning around.</p>
             </div>
             <a href="{{ route('packages.index') }}" class="btn dpost-cta">See all packages</a>
         </div>
@@ -533,7 +543,7 @@
             <div>
                 <span class="poster-kicker">how this works</span>
                 <h2 class="poster-title" style="color:var(--ocean-teal-dark);">Plan smarter, not harder</h2>
-                <p>ExploreDVO connects travelers directly with DOT-verified destinations, stays, and experiences across the Davao Region.</p>
+                <p>ExploreDVO connects travelers directly with destinations, stays, and experiences across the Davao Region. Official DOT records are marked DOT Accredited; temporary demonstration records are marked Sample Data.</p>
             </div>
         </div>
 
@@ -564,8 +574,8 @@
                         <path fill="none" style="stroke:var(--stamp-ink)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" d="m8.3 12.1 2.6 2.6 4.8-5.3"/>
                     </svg>
                 </div>
-                <h3>Verified Accreditation</h3>
-                <p>Every listing is checked against official DOT Region XI accreditation records.</p>
+                <h3>Clear Accreditation Labels</h3>
+                <p>Official DOT Region XI records are marked DOT Accredited, temporary demonstration records are marked Sample Data, and anything we cannot confirm is marked Not Yet Verified.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-stamp feature-stamp--ocean">
@@ -718,7 +728,7 @@
                 <h2 class="poster-title">Plan Your Davao Trip</h2>
                 <p>
                     Two ways to get started &mdash; build a day-by-day plan around your own
-                    preferences, or pick a ready-made itinerary from a DOT-accredited tour operator.
+                    preferences, or pick a ready-made itinerary from a tour operator.
                 </p>
             </div>
 

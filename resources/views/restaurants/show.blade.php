@@ -49,6 +49,7 @@
         'subtitle' => $restaurant->posterMeta(),
         'isAccredited' => $restaurant->is_accredited,
         'isSample' => app(\App\Support\SampleData::class)->isSample($restaurant),
+        'provenance' => app(\App\Support\SampleData::class)->status($restaurant),
         'rating' => number_format($restaurant->rating, 1),
         'reviewCount' => $restaurant->review_count,
         'fallbackGradient' => $gradient,

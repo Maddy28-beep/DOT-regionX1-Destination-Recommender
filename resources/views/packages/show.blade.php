@@ -38,6 +38,7 @@
         'subtitle' => $package->posterMeta(),
         'isAccredited' => $package->is_accredited,
         'isSample' => app(\App\Support\SampleData::class)->isSample($package),
+        'provenance' => app(\App\Support\SampleData::class)->status($package),
         'rating' => number_format($package->rating, 1),
         'reviewCount' => $package->review_count,
         'fallbackGradient' => $gradient,

@@ -40,7 +40,7 @@
         {{-- The radius is the recommender's own gate (RANGE_RADIUS_KM), not a number written here, so what a
              traveller reads is what their results are filtered by. "about" is deliberate: when a radius holds
              too few places the gate widens, and the itinerary says so. --}}
-        <p class="pc-help">Measured from your starting point. If there aren't enough DOT-accredited places in range, we widen the search and tell you on the itinerary.</p>
+        <p class="pc-help">Measured from your starting point. If there aren't enough places in range, we widen the search and tell you on the itinerary.</p>
         <div class="pc-cards">
             @foreach ($distanceCards as $value => [$name, $note, $icon])
                 <label class="pc-card">

@@ -67,14 +67,14 @@
                     <h3>Tour Packages</h3>
                     <p class="pcx-lead">
                         Already know you want a guided trip? Browse ready-made, day-by-day
-                        itineraries offered directly by DOT-accredited tour operators.
+                        itineraries offered directly by tour operators.
                     </p>
                     <ul class="pcx-meta">
                         <li>Browse in seconds</li>
                         <li>Price per person shown</li>
                     </ul>
                     <ul class="pcx-get">
-                        <li>{!! $tick !!} Trips run by DOT-accredited operators</li>
+                        <li>{!! $tick !!} Trips run by tour operators, each marked as an official DOT record or sample data</li>
                         <li>{!! $tick !!} Inclusions and the day-by-day schedule up front</li>
                         <li>{!! $tick !!} Open any package to see who provides it</li>
                     </ul>

@@ -114,10 +114,9 @@
 
         <div class="dcard__body">
             <div class="dcard__top">
-                @if ($listing->is_accredited && app(\App\Support\SampleData::class)->isSample($listing))
-                    <span class="dcard__dot is-sample" title="Its accreditation number is a placeholder, not an official DOT number."><x-icon name="shield-check" /> Sample data, not DOT-verified</span>
-                @elseif ($listing->is_accredited)
-                    <span class="dcard__dot"><x-icon name="shield-check" /> DOT accredited</span>
+                @if ($listing->is_accredited)
+                    @php $provenance = app(\App\Support\SampleData::class)->status($listing); @endphp
+                    <span class="dcard__dot is-{{ $provenance }}" title="{{ \App\Support\SampleData::title($provenance) }}"><x-icon name="shield-check" /> {{ \App\Support\SampleData::label($provenance) }}</span>
                 @else
                     <span></span>
                 @endif
