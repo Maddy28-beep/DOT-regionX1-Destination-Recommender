@@ -108,7 +108,11 @@ class TripPlannerController extends Controller
              * rather than restated here: a label that quietly disagreed with
              * the gate would be worse than no label at all.
              */
-            'distanceRadii' => ContentBasedRecommendationService::RANGE_RADIUS_KM,
+            'distanceLabels' => [
+                'near' => ContentBasedRecommendationService::rangeLabel('near'),
+                'moderate' => ContentBasedRecommendationService::rangeLabel('moderate'),
+                'far' => ContentBasedRecommendationService::rangeLabel('far'),
+            ],
             // Only the resort settings a listing actually has, so no card leads to an empty answer.
             'resortSettings' => $this->availableResortSettings(),
             'transportComparison' => TransportMode::comparison(),

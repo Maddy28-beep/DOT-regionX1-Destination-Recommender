@@ -1222,15 +1222,15 @@ class TripPlannerTest extends TestCase
     {
         $region = Region::create(['name' => 'Davao City']);
 
-        // ~7.8 km from the baseline -- comfortably inside the 25 km "near" tier.
+        // ~4 km from the baseline -- inside the 5 km "near" tier.
         $near = Destination::create([
             'slug' => 'near-park', 'name' => 'Near Park', 'location' => 'Davao City',
             'region_id' => $region->id, 'type' => 'Nature & Leisure', 'is_accredited' => true,
             'rating' => 3.5, 'review_count' => 2, 'price_tier' => 'Mid-range',
-            'latitude' => 7.1231, 'longitude' => 125.6628,
+            'latitude' => 7.1031, 'longitude' => 125.6328,
         ]);
 
-        // ~120.6 km away -- outside even the 75 km "moderate" tier -- but the
+        // ~120.6 km away -- outside even the 50 km "commutable" tier -- but the
         // most rated, most reviewed place in the whole set.
         Destination::create([
             'slug' => 'far-popular', 'name' => 'Far Popular Resort', 'location' => 'Mati City',
@@ -1279,12 +1279,12 @@ class TripPlannerTest extends TestCase
             'latitude' => 7.1231, 'longitude' => 125.6628,
         ]);
 
-        // ~50 km away -- outside "near" (25 km) but inside "moderate" (75 km).
+        // ~40 km away -- outside "near" (5 km) but inside "commutable" (50 km by car, the default).
         Destination::create([
             'slug' => 'moderate-town-spot', 'name' => 'Moderate Town Spot', 'location' => 'Tagum City',
             'region_id' => $region->id, 'type' => 'Cultural Heritage', 'is_accredited' => true,
             'rating' => 4.0, 'review_count' => 3, 'price_tier' => 'Mid-range',
-            'latitude' => 7.3931, 'longitude' => 125.9328,
+            'latitude' => 7.3331, 'longitude' => 125.8728,
         ]);
 
         // ~120 km away -- outside "moderate" too.
@@ -1416,7 +1416,8 @@ class TripPlannerTest extends TestCase
                 'region_id' => Region::create(['name' => "Davao City {$i}"])->id,
                 'type' => 'Nature & Leisure', 'is_accredited' => true,
                 'rating' => 4.0, 'review_count' => 4, 'price_tier' => 'Mid-range',
-                'latitude' => 7.07 + $i * 0.01, 'longitude' => 125.61 + $i * 0.01,
+                // ~40 km from the Mati origin below: past the 5 km "near" tier, inside the 50 km "commutable" one
+            'latitude' => 6.95 + $i * 0.01, 'longitude' => 125.85 + $i * 0.01,
             ]);
         }
 
