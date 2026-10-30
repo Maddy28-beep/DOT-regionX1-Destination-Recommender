@@ -187,7 +187,11 @@ class ChatbotService
                 ->orderByDesc('rating')
                 ->limit(10)
                 ->get(['id', 'name'])
-                ->map(fn ($l) => $l->name.($sampleData->isSample($l) ? ' [sample data, not DOT-verified]' : '')." ({$config['label']})");
+                ->map(fn ($l) => $l->name.match ($sampleData->status($l)) {
+                    \App\Support\SampleData::SAMPLE => ' [sample data, not DOT-verified]',
+                    \App\Support\SampleData::UNVERIFIED => ' [not yet verified]',
+                    default => '',
+                }." ({$config['label']})");
         })->implode('; ');
 
         return <<<PROMPT
@@ -201,6 +205,7 @@ class ChatbotService
             Rules:
             - Keep replies short (2-4 sentences), friendly, and specific to Davao Region tourism.
             - A listing marked [sample data, not DOT-verified] has a placeholder accreditation number. You may mention it, but never call it DOT-accredited or verified; say it is sample data.
+            - A listing marked [not yet verified] has no DOT accreditation record on file. You may mention it, but never call it DOT-accredited or verified; say its accreditation is not yet verified.
             - Never invent a listing that isn't in the list above. If nothing fits, say so and suggest browsing the site.
             - You do not handle bookings, reservations, or payments — say so if asked.
             - For personalized itineraries, point people at Plan My Trip. No account or sign-in is needed anywhere on this site.
@@ -337,12 +342,16 @@ class ChatbotService
         $kind = $listing->type ?? $listing->cuisine_type ?? $listing->specialization ?? $config['label'];
         $where = trim((string) ($listing->location ?? ''));
         // Sample data keeps its place in answers, but is never called DOT-accredited.
-        $sample = app(\App\Support\SampleData::class)->isSample($listing);
+        $provenance = app(\App\Support\SampleData::class)->status($listing);
+        $sample = $provenance === \App\Support\SampleData::SAMPLE;
+        $unverified = $provenance === \App\Support\SampleData::UNVERIFIED;
         $asked = str_contains(strtolower($message), 'accredit');
         $text = $asked
             ? ($sample
                 ? "{$name} is sample data on this platform: its accreditation number is a placeholder, so it is not verified by DOT. "
-                : "Yes, {$name} is DOT-accredited. ")
+                : ($unverified
+                    ? "{$name}'s DOT accreditation is not yet verified: there is no accreditation record on file for it. "
+                    : "Yes, {$name} is DOT-accredited. "))
             : '';
         $text .= $name.($where !== '' ? " is in {$where}" : '').' ('.strtolower((string) $kind).').';
 
@@ -355,7 +364,7 @@ class ChatbotService
             $text .= " Entrance: ₱{$fee}.";
         }
 
-        $note = ($sample && ! $asked) ? ' This listing is sample data, not DOT-verified.' : '';
+        $note = ! $asked ? ($sample ? ' This listing is sample data, not DOT-verified.' : ($unverified ? ' Its DOT accreditation is not yet verified.' : '')) : '';
 
         return $text.$note.' Hours and prices can change, so check before you go.';
     }
@@ -468,6 +477,8 @@ class ChatbotService
                 $status = $listing->is_accredited ? 'is DOT-accredited' : 'is not currently DOT-accredited';
                 if ($listing->is_accredited && app(\App\Support\SampleData::class)->isSample($listing)) {
                     $status = 'is sample data on this platform: its accreditation number is a placeholder, so it is not verified by DOT';
+                } elseif ($listing->is_accredited && app(\App\Support\SampleData::class)->status($listing) === \App\Support\SampleData::UNVERIFIED) {
+                    $status = 'has no DOT accreditation record on file, so its accreditation is not yet verified';
                 }
                 $this->cardListings = [[$config['model']::query()->find($listing->id), $config['route']]];
 

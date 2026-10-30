@@ -31,6 +31,7 @@
         'subtitle' => $souvenirCenter->posterMeta(),
         'isAccredited' => $souvenirCenter->is_accredited,
         'isSample' => app(\App\Support\SampleData::class)->isSample($souvenirCenter),
+        'provenance' => app(\App\Support\SampleData::class)->status($souvenirCenter),
         'rating' => number_format($souvenirCenter->rating, 1),
         'reviewCount' => $souvenirCenter->review_count,
         'fallbackGradient' => $gradient,

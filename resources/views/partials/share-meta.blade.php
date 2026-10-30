@@ -5,7 +5,7 @@
 --}}
 @php
     $metaTitle = $metaTitle ?? trim($__env->yieldContent('title', 'ExploreDVO'));
-    $metaDescription = trim($__env->yieldContent('meta_description', 'ExploreDVO is the Department of Tourism Region XI platform for the Davao Region: DOT-accredited destinations, stays, restaurants and tour packages, with a personalized day-by-day itinerary and no sign-up needed.'));
+    $metaDescription = trim($__env->yieldContent('meta_description', 'ExploreDVO is the Department of Tourism Region XI platform for the Davao Region: destinations, stays, restaurants and tour packages, with a personalized day-by-day itinerary and no sign-up needed.'));
     $metaImage = trim($__env->yieldContent('meta_image')) ?: asset(file_exists(public_path('video/hero-poster.jpg')) ? 'video/hero-poster.jpg' : 'images/davo.webp');
 @endphp
 <meta name="description" content="{{ $metaDescription }}">

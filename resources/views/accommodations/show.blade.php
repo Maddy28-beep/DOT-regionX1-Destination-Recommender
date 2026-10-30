@@ -37,6 +37,7 @@
         'subtitle' => $accommodation->posterMeta(),
         'isAccredited' => $accommodation->is_accredited,
         'isSample' => app(\App\Support\SampleData::class)->isSample($accommodation),
+        'provenance' => app(\App\Support\SampleData::class)->status($accommodation),
         'rating' => number_format($accommodation->rating, 1),
         'reviewCount' => $accommodation->review_count,
         'fallbackGradient' => $gradient,

@@ -124,12 +124,14 @@ class SampleDataLabelsTest extends TestCase
         $real = $this->dest('Real Falls');
 
         $this->get(route('destinations.show', $sample))->assertOk()
+            ->assertSee('Sample Data')
             ->assertSee('Sample data, not DOT-verified')
-            ->assertDontSee('DOT Accredited');
+            ->assertDontSee('dpost-badge-accredited is-official', false);
 
         // The sample place also appears as a nearby card on this page, and rightly carries its own label there.
         $this->get(route('destinations.show', $real))->assertOk()
-            ->assertSee('title="DOT Accredited"', false)
+            ->assertSee('dpost-badge-accredited is-official', false)
+            ->assertSee('DOT Accredited')
             ->assertDontSee('dpost-badge-accredited is-sample', false);
     }
 

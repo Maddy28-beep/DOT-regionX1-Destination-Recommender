@@ -138,7 +138,7 @@ class SampleDataSurfacesTest extends TestCase
         $this->destination('real-two', false);
         $this->destination('sample-one', true);
 
-        $this->assertSame(['total' => 3, 'sample' => 1, 'real' => 2], app(SampleData::class)->split(Destination::publiclyVisible()));
+        $this->assertSame(['total' => 3, 'sample' => 1, 'real' => 2, 'unverified' => 0], app(SampleData::class)->split(Destination::publiclyVisible()));
 
         $home = $this->get(route('home'))->assertOk()->getContent();
         $this->assertStringContainsString('including 1 sample data', $home);
@@ -151,7 +151,7 @@ class SampleDataSurfacesTest extends TestCase
 
         $plan = $this->withSession([TripPlannerController::ITINERARY_KEY => $trip->id, TripPlannerController::PREFERENCE_KEY => $pref->id])
             ->get(route('plan.itinerary'))->assertOk()->getContent();
-        $this->assertMatchesRegularExpression('/3 destinations \(2 DOT-accredited,\s+1 sample data, not DOT-verified\)/', $plan);
+        $this->assertMatchesRegularExpression('/3 destinations \(2 DOT Accredited,\s+1 Sample Data\)/', $plan);
     }
 
     public function test_a_catalogue_with_no_samples_keeps_the_plain_wording(): void

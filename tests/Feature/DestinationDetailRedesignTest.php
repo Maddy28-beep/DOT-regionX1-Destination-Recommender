@@ -341,7 +341,8 @@ class DestinationDetailRedesignTest extends TestCase
         $this->assertStringContainsString('<span class="dcard__new">New</span>', $html);
         $this->assertStringNotContainsString('dcard__rating', $html);
         $this->assertStringContainsString('28 km<span class="dcard__dist-more"> from city</span>', $html);
-        $this->assertStringContainsString('DOT accredited', $html);
+        // No accreditation record is on file for this test place, so it is never read as official: 'Not Yet Verified'.
+        $this->assertStringContainsString('Not Yet Verified', $html);
     }
 
     public function test_a_reviewed_destination_card_shows_rating_and_count_instead_of_the_new_tag(): void

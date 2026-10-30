@@ -39,7 +39,8 @@ class LandingPackageCardsTest extends TestCase
 
         $this->assertStringContainsString('Featured Tour Packages', $html);
         $this->assertStringContainsString('class="dcard__name">Samal Island Hopping', $html);
-        $this->assertStringContainsString('DOT accredited', $html);
+        // No accreditation record is on file for this test place, so it is never read as official: 'Not Yet Verified'.
+        $this->assertStringContainsString('Not Yet Verified', $html);
         $this->assertStringContainsString('by Island Explorers', $html);
         $this->assertStringContainsString('1,500', $html);
         $this->assertStringContainsString('1 Day', $html);
