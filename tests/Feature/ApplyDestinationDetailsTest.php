@@ -111,18 +111,38 @@ class ApplyDestinationDetailsTest extends TestCase
         $this->assertEqualsWithDelta(7.0322, (float) $d->fresh()->latitude, 0.00001, 'The good row must not be applied alone.');
     }
 
-    public function test_the_researched_file_in_the_repository_is_well_formed(): void
+    public function test_a_category_tag_is_added_once(): void
     {
-        // Every row of the shipped CSV has a source and a field the command accepts, whatever database it is run on.
-        $rows = array_map('str_getcsv', file(base_path('database/data/destination-details-2026-10-30.csv'), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES));
-        $header = array_shift($rows);
-        $this->assertSame(['id', 'name', 'field', 'value', 'source'], $header);
+        $d = $this->destination('Lon Wa Buddhist Temple [SAMPLE]');
+        $d->tags()->create(['kind' => 'category', 'value' => 'Nature']);
+        $file = $this->csv([
+            [$d->id, 'Lon Wa Buddhist Temple [SAMPLE]', 'category_tag', 'Cultural Heritage', self::SOURCE],
+            [$d->id, 'Lon Wa Buddhist Temple [SAMPLE]', 'category_tag', 'nature', self::SOURCE],
+        ]);
 
-        foreach ($rows as $row) {
-            $this->assertCount(5, $row);
-            $this->assertGreaterThan(20, strlen($row[4]), "row for {$row[1]} / {$row[2]} needs a real source");
-            $this->assertContains($row[2], ['latitude', 'longitude', 'hours', 'visit_duration', 'best_time', 'price_tier', 'entry_fee_min', 'entry_fee_max']);
-            $this->assertNotSame('', $row[3]);
+        $this->artisan('destinations:apply-details', ['file' => $file, '--apply' => true])->expectsOutputToContain('Updated 1 values')->assertSuccessful();
+
+        $this->assertSame(['Cultural Heritage', 'Nature'], $d->tags()->where('kind', 'category')->orderBy('value')->pluck('value')->all(),
+            'A tag the place already has, in any letter case, is not added twice.');
+
+        $this->artisan('destinations:apply-details', ['file' => $this->csv([[$d->id, 'Lon Wa Buddhist Temple [SAMPLE]', 'category_tag', 'Nature; Beach', self::SOURCE]])])
+            ->expectsOutputToContain('short word or phrase')->assertFailed();
+    }
+
+    public function test_the_researched_files_in_the_repository_are_well_formed(): void
+    {
+        // Every row of the shipped CSVs has a source and a field the command accepts, whatever database it is run on.
+        foreach (['destination-details-2026-10-30.csv', 'destination-details-2026-10-30-b.csv'] as $name) {
+            $rows = array_map('str_getcsv', file(base_path("database/data/{$name}"), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES));
+            $header = array_shift($rows);
+            $this->assertSame(['id', 'name', 'field', 'value', 'source'], $header, $name);
+
+            foreach ($rows as $row) {
+                $this->assertCount(5, $row, $name);
+                $this->assertGreaterThan(20, strlen($row[4]), "{$name}: row for {$row[1]} / {$row[2]} needs a real source");
+                $this->assertContains($row[2], ['latitude', 'longitude', 'hours', 'visit_duration', 'best_time', 'price_tier', 'entry_fee_min', 'entry_fee_max', 'category_tag']);
+                $this->assertNotSame('', $row[3]);
+            }
         }
     }
 }

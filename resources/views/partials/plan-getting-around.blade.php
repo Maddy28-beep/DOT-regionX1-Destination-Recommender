@@ -20,8 +20,8 @@
     $kindNow = old('public_kind', TransportMode::isPublic($stored) ? $stored : TransportMode::JEEP);
 
     $distanceCards = [
-        'near' => ['Close Proximity', 'Around the city. Short rides between stops.', 'map-pin'],
-        'moderate' => ['Commutable', 'A neighbouring city or province. An easy day trip.', 'target'],
+        'near' => ['Close Proximity', 'Right around your starting point. Short rides between stops.', 'map-pin'],
+        'moderate' => ['Commutable', 'Nearby towns and farms, an easy day trip. How far depends on how you travel.', 'target'],
         'far' => ['Remote', 'Mountains, islands and far coasts. Worth a longer journey.', 'compass'],
     ];
     $transportCards = [
@@ -37,7 +37,7 @@
 
     <fieldset class="pc-group">
         <legend>How far will you go?</legend>
-        {{-- The radius is the recommender's own gate (RANGE_RADIUS_KM), not a number written here, so what a
+        {{-- The distance is the recommender's own gate (RANGE_RADIUS_KM, COMMUTABLE_RADIUS_KM), not a number written here, so what a
              traveller reads is what their results are filtered by. "about" is deliberate: when a radius holds
              too few places the gate widens, and the itinerary says so. --}}
         <p class="pc-help">Measured from your starting point. If there aren't enough places in range, we widen the search and tell you on the itinerary.</p>
@@ -49,7 +49,7 @@
                     <span class="pc-card__text">
                         <strong>{{ $name }}</strong>
                         <small>{{ $note }}</small>
-                        <em>@if ($distanceRadii[$value] === null)no limit @else about {{ (int) $distanceRadii[$value] }} km @endif</em>
+                        <em>{{ $distanceLabels[$value] }}</em>
                     </span>
                     <span class="pc-card__tick" aria-hidden="true"><x-icon name="check" /></span>
                 </label>

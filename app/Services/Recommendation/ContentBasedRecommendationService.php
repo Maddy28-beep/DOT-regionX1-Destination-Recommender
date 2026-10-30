@@ -172,12 +172,16 @@ class ContentBasedRecommendationService
         return array_values(array_unique($types));
     }
 
-    /** Distance buckets (km) backing both the PM "Distance" category and the DS factor (Table 6). */
-    private const DISTANCE_BUCKETS = [
-        'near' => [0, 15],
-        'moderate' => [15, 40],
-        'far' => [40, PHP_FLOAT_MAX],
-    ];
+    /**
+     * The category tags that count as a given tourist-facing interest (lower case), the same words the ranking
+     * matches, exposed so a plan can be checked against the interests it was asked to cover.
+     *
+     * @return array<int, string>
+     */
+    public static function tagsForInterest(string $interest): array
+    {
+        return self::INTEREST_TAG_MAP[$interest] ?? [];
+    }
 
     /**
      * Stage 1's hard range gates, keyed the same way as distance_pref.
@@ -186,24 +190,51 @@ class ContentBasedRecommendationService
      * -eligible destination's distance suits the preference; these decide
      * eligibility in the first place, before scoring runs at all.
      *
-     * Radii are grounded in real distances measured against this catalogue:
-     *   - Davao City centre -> Eden Nature Park (same city, rural fringe): ~25 km
-     *   - Davao City centre -> Tagum City (a genuinely different city):    ~50 km
-     *   - Davao City centre -> Dahican Beach (Mati City, Davao Oriental): ~109 km
-     * 25 km keeps a baseline's own city -- including the outlying, commonly
-     * marketed day-trip spots every Davao City tourist already treats as
-     * local -- inside "within the city," while still cleanly excluding a
-     * genuinely different city like Tagum or Digos. 75 km reaches a
-     * neighbouring city or province without crossing the whole region.
-     * "Willing to travel" is left uncapped: the catalogue holds nothing
-     * outside Davao Region to begin with, so no cap already means exactly
-     * what was asked for -- the whole region, nothing more.
+     * Close proximity is 5 km: the places around the traveller's start, a short ride between stops. Commutable is
+     * a day trip to a nearby town, and how far that is depends on how the traveller gets about (see
+     * COMMUTABLE_RADIUS_KM): a jeepney rider reaches 15 km in a day without it being all travelling, a car 50 km.
+     * Remote is left uncapped: the catalogue holds nothing outside Davao Region to begin with, so no cap already
+     * means exactly what was asked for -- the whole region, nothing more. The same radii grade the distance score,
+     * so a place counts as "near" or "commutable" by the same measure that lets it into the trip.
      */
     public const RANGE_RADIUS_KM = [
-        'near' => 25.0,
-        'moderate' => 75.0,
+        'near' => 5.0,
+        'moderate' => 50.0,   // the widest commutable radius; the one in force depends on the transport mode
         'far' => null,
     ];
+
+    /**
+     * The commutable radius by how the traveller gets about: the slowest mode reaches 15 km, a private vehicle or a
+     * tour operator 50 km, a taxi in between (the fare, more than the pace, limits it). An unanswered or unknown
+     * mode is the personal car, as everywhere else (TransportMode::resolve()).
+     */
+    public const COMMUTABLE_RADIUS_KM = [
+        TransportMode::JEEP => 15.0,
+        TransportMode::TAXI => 30.0,
+        TransportMode::TOUR_OPERATOR => 50.0,
+        TransportMode::PERSONAL_CAR => 50.0,
+        TransportMode::RENTAL_CAR => 50.0,
+    ];
+
+    /** The radius in km that a distance choice allows with this way of travelling, or null for no limit. */
+    public static function radiusKm(?string $tier, ?string $mode = null): ?float
+    {
+        if ($tier === 'moderate') {
+            return self::COMMUTABLE_RADIUS_KM[TransportMode::resolve($mode)] ?? self::RANGE_RADIUS_KM['moderate'];
+        }
+
+        return self::RANGE_RADIUS_KM[$tier] ?? null;
+    }
+
+    /** What a distance choice means in words, for the form: the numbers the gate really applies. */
+    public static function rangeLabel(string $tier): string
+    {
+        return match ($tier) {
+            'near' => 'about '.(int) self::RANGE_RADIUS_KM['near'].' km',
+            'moderate' => (int) min(self::COMMUTABLE_RADIUS_KM).'–'.(int) max(self::COMMUTABLE_RADIUS_KM).' km, by how you travel',
+            default => 'no limit',
+        };
+    }
 
     /**
      * Rough target for how many destinations a trip needs, used only to
@@ -500,7 +531,7 @@ class ContentBasedRecommendationService
             return self::NEUTRAL_SIMILARITY;
         }
 
-        $matches = $this->distanceBucket($distance['km']) === $preference->distance_pref;
+        $matches = $this->distanceBucket($distance['km'], $preference->transport_pref) === $preference->distance_pref;
 
         if (! $distance['approximate']) {
             return $matches ? 1.0 : 0.0;
@@ -669,7 +700,7 @@ class ContentBasedRecommendationService
 
         for ($i = $start; $i < count($tiers); $i++) {
             $tier = $tiers[$i];
-            $radius = self::RANGE_RADIUS_KM[$tier];
+            $radius = self::radiusKm($tier, $preference->transport_pref);
 
             $eligible = $radius === null
                 ? $candidates
@@ -708,7 +739,7 @@ class ContentBasedRecommendationService
             return self::NEUTRAL_SCORE;
         }
 
-        $bucket = $this->distanceBucket($distance['km']);
+        $bucket = $this->distanceBucket($distance['km'], $preference->transport_pref);
         $order = ['near' => 0, 'moderate' => 1, 'far' => 2];
         $diff = abs($order[$bucket] - $order[$preference->distance_pref]);
 
@@ -850,15 +881,14 @@ class ContentBasedRecommendationService
         return 6371.0 * 2 * atan2(sqrt($a), sqrt(1 - $a));
     }
 
-    private function distanceBucket(float $km): string
+    /** Which choice a distance falls under, by the same radii that decide who is let into the trip. */
+    private function distanceBucket(float $km, ?string $mode = null): string
     {
-        foreach (self::DISTANCE_BUCKETS as $bucket => [$min, $max]) {
-            if ($km >= $min && $km < $max) {
-                return $bucket;
-            }
-        }
-
-        return 'far';
+        return match (true) {
+            $km <= self::RANGE_RADIUS_KM['near'] => 'near',
+            $km <= self::radiusKm('moderate', $mode) => 'moderate',
+            default => 'far',
+        };
     }
 
     /** Equation 6: Amenities Score = proportion of tourist-selected amenities present at the destination, scaled to 1-5. */

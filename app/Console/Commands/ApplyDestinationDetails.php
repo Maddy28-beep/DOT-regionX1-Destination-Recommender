@@ -3,14 +3,16 @@
 namespace App\Console\Commands;
 
 use App\Models\Destination;
+use App\Models\DestinationTag;
 use App\Support\OpeningHours;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Applies researched details (coordinates, hours, fees, durations) to destinations from a CSV, one change per row,
- * each with the source it came from.
+ * Applies researched details (coordinates, hours, fees, durations, category tags) to destinations from a CSV, one
+ * change per row, each with the source it came from. A category_tag row adds that tag (the words the planner matches
+ * against a traveller's interests, such as "Nature" or "Museum") if the place does not have it already.
  *
  * Meant for filling gaps in the catalogue safely: a change is only accepted with a source, only for a place whose id
  * AND name both match (so a file prepared against one copy of the data cannot rewrite the wrong row on another),
@@ -27,7 +29,7 @@ class ApplyDestinationDetails extends Command
 
     protected $description = 'Apply sourced coordinate, hours, fee and duration details to destinations from a CSV (dry run by default).';
 
-    private const FIELDS = ['latitude', 'longitude', 'hours', 'visit_duration', 'best_time', 'price_tier', 'entry_fee_min', 'entry_fee_max'];
+    private const FIELDS = ['latitude', 'longitude', 'hours', 'visit_duration', 'best_time', 'price_tier', 'entry_fee_min', 'entry_fee_max', 'category_tag'];
 
     private const TIERS = ['Free', 'Budget-Friendly', 'Mid-range', 'Premium'];
 
@@ -77,7 +79,9 @@ class ApplyDestinationDetails extends Command
                 $errors = $this->checkValue($row['field'], $row['value'], $destination);
             }
 
-            $current = $destination?->{$row['field']} ?? null;
+            $current = $row['field'] === 'category_tag'
+                ? $this->tagIfPresent($destination, $row['value'])
+                : ($destination?->{$row['field']} ?? null);
             $bad += $errors ? 1 : 0;
             $plan[] = ['line' => $line, 'destination' => $destination, 'row' => $row, 'current' => $current, 'errors' => $errors];
         }
@@ -109,9 +113,18 @@ class ApplyDestinationDetails extends Command
                     continue;
                 }
                 $destination = $p['destination'];
-                $before = $destination->{$p['row']['field']};
-                $destination->{$p['row']['field']} = $p['row']['value'];
-                $destination->save();
+                if ($p['row']['field'] === 'category_tag') {
+                    // a file may list the same tag twice; the second is already there by now
+                    if ($this->tagIfPresent($destination, $p['row']['value']) !== null) {
+                        continue;
+                    }
+                    $before = null;
+                    DestinationTag::create(['destination_id' => $destination->id, 'kind' => 'category', 'value' => $p['row']['value']]);
+                } else {
+                    $before = $destination->{$p['row']['field']};
+                    $destination->{$p['row']['field']} = $p['row']['value'];
+                    $destination->save();
+                }
                 $changed++;
 
                 Log::info('destinations:apply-details', [
@@ -144,9 +157,24 @@ class ApplyDestinationDetails extends Command
             case 'entry_fee_min':
             case 'entry_fee_max':
                 return (! is_numeric($value) || $value < 0) ? ["{$field} must be a number of pesos, 0 or more"] : [];
+            case 'category_tag':
+                return preg_match('/^[A-Za-z][A-Za-z &\-]{1,39}$/', $value) ? [] : ['category_tag must be a short word or phrase, such as Nature or Cultural Heritage'];
             default:
                 return strlen($value) > 60 ? ["{$field} is longer than 60 characters"] : [];
         }
+    }
+
+    /** The tag as the place already has it (any letter case), or null. */
+    private function tagIfPresent(?Destination $destination, string $value): ?string
+    {
+        if (! $destination) {
+            return null;
+        }
+
+        $found = DestinationTag::where('destination_id', $destination->id)->where('kind', 'category')
+            ->get()->first(fn ($tag) => mb_strtolower($tag->value) === mb_strtolower($value));
+
+        return $found ? $value : null;
     }
 
     /** 7.0282000 (as stored) and 7.0282 (as written in the file) are the same value. */

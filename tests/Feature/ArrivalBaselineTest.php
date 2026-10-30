@@ -333,6 +333,9 @@ class ArrivalBaselineTest extends TestCase
      * pool can contain different places: 16:59 and 17:00 are one minute apart and Day 2 gets a
      * different pair. That is existing behaviour (separate from the arrival rule) and must not move
      * as a side effect of the arrival-scheduling or midnight changes.
+     *
+     * The trimmed pools (12:00 to 16:59) follow the distance rules: this trip is "Commutable", which now means 5 to
+     * 50 km by car, so the Museum, on the starting point itself, scores a bucket below the Zoo and Beach One.
      */
     private const EXPECTED_STOPS = [
         '04:00' => [['Museum', 'Zoo'], ['Beach One', 'Eden Park']],
@@ -343,9 +346,9 @@ class ArrivalBaselineTest extends TestCase
         '08:00' => [['Museum', 'Zoo'], ['Beach One', 'Eden Park']],
         '09:00' => [['Museum', 'Zoo'], ['Beach One', 'Eden Park']],
         'blank' => [['Museum', 'Zoo'], ['Beach One', 'Eden Park']],
-        '12:00' => [['Museum'], ['Zoo', 'Eden Park']],
-        '14:00' => [['Museum'], ['Zoo', 'Eden Park']],
-        '16:59' => [[], ['Museum', 'Zoo']],
+        '12:00' => [['Zoo'], ['Beach One', 'Eden Park']],
+        '14:00' => [['Zoo'], ['Beach One', 'Eden Park']],
+        '16:59' => [[], ['Zoo', 'Beach One']],
         '17:00' => [[], ['Zoo', 'Eden Park']],
         '22:00' => [[], ['Zoo', 'Eden Park']],
     ];

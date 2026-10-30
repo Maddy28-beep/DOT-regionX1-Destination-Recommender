@@ -32,8 +32,9 @@
         };
     }
 
-    $distance = $destination->distance_km
-        ? rtrim(rtrim(number_format((float) $destination->distance_km, 1), '0'), '.').' km'
+    $distanceKm = $destination->distanceFromCityCentreKm();
+    $distance = $distanceKm
+        ? rtrim(rtrim(number_format($distanceKm, 1), '0'), '.').' km'
         : '—';
 @endphp
 

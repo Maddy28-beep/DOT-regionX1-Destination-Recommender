@@ -1,0 +1,4 @@
+table,id,name,reason
+souvenir_centers,1,Davao Local Products & Souvenir Center,"No map location (address is only ""Davao City""), so it cannot be placed on a route; every itinerary that includes it shows ""Travel time varies"" (itinerary audit, 2026-10-30). Restore when a street address is known."
+souvenir_centers,3,Kadayawan Souvenir Shop,"No map location (address is only ""Davao City""), so it cannot be placed on a route; every itinerary that includes it shows ""Travel time varies"" (itinerary audit, 2026-10-30). Restore when a street address is known."
+restaurants,2,Kublai Khan Mongolian Restaurant,"No map location (address is only ""Davao City""), so it cannot be placed near a stop or on a route (coordinate audit, 2026-10-30). Restore when a street address is known."
