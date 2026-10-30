@@ -121,15 +121,37 @@ class ItineraryAuditTest extends TestCase
         PreferenceActivity::create(['preference_id' => $p->id, 'activity' => 'Cultural Heritage']);
         PreferenceActivity::create(['preference_id' => $p->id, 'activity' => 'Food Tourism']);
         $museum = $this->destination('Old Museum', ['type' => 'Cultural Heritage']);
+        // A place within the trip's range that offers Food Tourism, which the plan did not use.
+        $farm = $this->destination('Tasting Farm', ['type' => 'Farm Tourism', 'latitude' => 7.10, 'longitude' => 125.62]);
+        $farm->tags()->create(['kind' => 'category', 'value' => 'Food Tasting']);
         $this->item($it, 1, 1, 'activity', ['destination_id' => $museum->id, 'starts_at' => '10:00', 'ends_at' => '12:00']);
 
         $checks = $this->audited($p, $it);
-        $this->assertSame('fail', $checks['interests']['status']);
+        $this->assertSame('fail', $checks['interests']['status'], 'Something in range offered it and the plan missed it.');
         $this->assertSame('no stop for Food Tourism', $checks['interests']['detail']);
 
         // The ranking matches a tag that contains the keyword, so "Food Tasting" covers Food Tourism.
         $museum->tags()->create(['kind' => 'category', 'value' => 'Food Tasting']);
         $this->assertSame('pass', $this->audited($p, $it)['interests']['status']);
+    }
+
+    public function test_an_interest_nothing_in_the_trips_range_offers_is_unknown_not_a_failure(): void
+    {
+        // A close-proximity trip (5 km) that asks for Nature: the only nature place is 30 km away.
+        [$p, $it] = $this->plan(['distance_pref' => 'near', 'origin_lat' => 7.0731, 'origin_lng' => 125.6128]);
+        PreferenceActivity::create(['preference_id' => $p->id, 'activity' => 'Nature & Adventure']);
+        $museum = $this->destination('Old Museum', ['type' => 'Cultural Heritage', 'latitude' => 7.08, 'longitude' => 125.61]);
+        $this->destination('Far Falls', ['type' => 'Nature & Adventure', 'latitude' => 7.34, 'longitude' => 125.61]);
+        $this->item($it, 1, 1, 'activity', ['destination_id' => $museum->id, 'starts_at' => '10:00', 'ends_at' => '12:00']);
+
+        $checks = $this->audited($p, $it);
+        $this->assertSame('unknown', $checks['interests']['status']);
+        $this->assertStringContainsString('Nature & Adventure', $checks['interests']['detail']);
+        $this->assertTrue(app(ItineraryAudit::class)->clean(array_values($checks)) || $checks['interests']['status'] !== 'fail');
+
+        // The same trip, remote: there is no range, so the missing stop counts.
+        $p->update(['distance_pref' => 'far']);
+        $this->assertSame('fail', $this->audited($p->fresh(), $it)['interests']['status']);
     }
 
     public function test_an_empty_day_fails_except_a_first_day_after_a_late_arrival(): void
