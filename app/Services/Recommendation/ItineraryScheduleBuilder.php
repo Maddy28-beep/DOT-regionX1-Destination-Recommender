@@ -107,10 +107,10 @@ class ItineraryScheduleBuilder
      * on the last day). A day's first stop is always allowed, so a far-flung stop still gets a day of its own
      * instead of never being scheduled.
      */
-    private const DRIVE_BUDGET_MINUTES = ['near' => 210, 'moderate' => 300, 'far' => 420];
+    public const DRIVE_BUDGET_MINUTES = ['near' => 210, 'moderate' => 300, 'far' => 420];
 
     /** Used when the traveller's distance preference is missing or unknown. */
-    private const DEFAULT_DRIVE_BUDGET_MINUTES = 300;
+    public const DEFAULT_DRIVE_BUDGET_MINUTES = 300;
 
     /**
      * The souvenir stop is a short extra at the end of the trip, not a second excursion: it has to be near
