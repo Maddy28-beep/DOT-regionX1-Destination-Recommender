@@ -54,4 +54,23 @@ return [
          */
         'force_mode' => env('ITINERARY_STAY_FORCE_MODE'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notes on a saved itinerary
+    |--------------------------------------------------------------------------
+    |
+    | Wording the itinerary page and the followability report (itinerary:followability) show about a plan that already
+    | exists. These are MESSAGE-ONLY lines: nothing under app/Services/Recommendation reads them, no stop is moved or
+    | removed because of them, and they are never a cap on driving.
+    |
+    */
+
+    'notes' => [
+        /*
+         * A day whose slow-end driving adds up to more than this many minutes (8 h) is called a long driving day. The page
+         * has always carried a gentler tip from 4 h of travel; this is the stronger wording above 8 h.
+         */
+        'long_driving_day_minutes' => 480,
+    ],
 ];

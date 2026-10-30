@@ -275,8 +275,10 @@ class StayContinuityTest extends TestCase
         $trip = Itinerary::create(['preference_id' => $pref->id, 'total_days' => 3, 'generated_at' => now(), 'stay_plan' => [
             'version' => 1, 'mode' => 'near', 'continuity' => ['nights' => 2, 'distinct_stays' => 1, 'transfers' => 0],
             'notices' => [
-                ['type' => 'unplaced_destination', 'destination_id' => 1, 'name' => 'Faraway Falls', 'reason' => 'over_daily_driving_limit', 'minutes' => 360],
-                ['type' => 'unplaced_destination', 'destination_id' => 2, 'name' => 'Late Lagoon', 'reason' => 'no_time_before_cutoff', 'minutes' => 60],
+                ['type' => 'unplaced_destination', 'destination_id' => 1, 'name' => 'Faraway Falls', 'reason' => 'drive_budget_reached',
+                    'attempts' => [['day' => 2, 'cause' => 'drive_budget_reached', 'minutes' => 360, 'limit' => 210, 'fresh' => false]]],
+                ['type' => 'unplaced_destination', 'destination_id' => 2, 'name' => 'Late Lagoon', 'reason' => 'would_end_after_cutoff',
+                    'attempts' => [['day' => 2, 'cause' => 'would_end_after_cutoff', 'minutes' => null, 'limit' => null, 'fresh' => false]]],
             ],
             'guard' => ['decision' => 'not_needed'],
         ]]);
@@ -290,9 +292,9 @@ class StayContinuityTest extends TestCase
         $this->assertStringContainsString('2 places we set out to include could not be fitted into your plan.', $html);
         $this->assertStringContainsString('keeps the same place to stay for the whole trip', $html);
         $this->assertStringContainsString('Faraway Falls', $html);
-        $this->assertStringContainsString('about 360 minutes of driving from your stay and back', $html);
+        $this->assertStringContainsString('On day 2 it would have taken the day to about 6 h of driving, over the 3 h 30 min limit for your range.', $html);
         $this->assertStringContainsString('Late Lagoon', $html);
-        $this->assertStringContainsString('18:00 sightseeing cutoff', $html);
+        $this->assertStringContainsString('On day 2 the visit would have ended after the 18:00 sightseeing cutoff.', $html);
     }
 
     public function test_an_itinerary_made_before_the_column_existed_still_renders(): void
@@ -307,21 +309,22 @@ class StayContinuityTest extends TestCase
         $this->assertStringNotContainsString('could not be fitted into your plan', $html);
     }
 
-    public function test_unplaced_places_are_explained_by_the_driving_they_would_need(): void
+    public function test_unplaced_places_carry_the_reasons_the_builder_recorded_and_nothing_else(): void
     {
         $stay = $this->stay('Home Base', 5);
         $near = $this->place('Close Cove', 8);
         $far = $this->place('Distant Peak', 150);
-        $preference = $this->preference('near', 3);
         $final = ['placed' => [], 'stays' => [1 => $stay->id, 2 => $stay->id]];
         $planned = [['row' => ['destination' => $near->load('region')], 'distance_km' => null], ['row' => ['destination' => $far->load('region')], 'distance_km' => null]];
+        $recorded = [$near->id => [['day' => 2, 'cause' => 'would_end_after_cutoff', 'minutes' => null, 'limit' => null, 'fresh' => false]]];
 
         $method = new \ReflectionMethod(ItineraryGenerationService::class, 'stayNotices');
-        $notices = collect($method->invoke(app(ItineraryGenerationService::class), $final, $planned, $preference, 3, 'near'))->keyBy('name');
+        $notices = collect($method->invoke(app(ItineraryGenerationService::class), $final, $planned, 3, 'near', $recorded))->keyBy('name');
 
-        $this->assertSame('no_time_before_cutoff', $notices['Close Cove']['reason']);
-        $this->assertSame('over_daily_driving_limit', $notices['Distant Peak']['reason']);
-        $this->assertGreaterThan(210, $notices['Distant Peak']['minutes'], 'more than a Close Proximity day of driving');
+        $this->assertSame('would_end_after_cutoff', $notices['Close Cove']['reason']);
+        $this->assertSame($recorded[$near->id], $notices['Close Cove']['attempts']);
+        $this->assertSame('not_recorded', $notices['Distant Peak']['reason'], 'no recorded decision, so no cause is claimed, however far it is');
+        $this->assertSame([], $notices['Distant Peak']['attempts']);
     }
 
     // ---- the guarded rebuild, with a stand-in schedule so each branch can be forced --------------------------------
