@@ -84,6 +84,11 @@
             <span class="pc-help">We suggest accredited operators near your starting point and show how to reach them. Pick-up time, place and price are set by the operator, so confirm with them before you travel.</span>
         </div>
 
+        <div class="pc-sub" data-transport-rental @unless ($transportNow === TransportMode::RENTAL_CAR) hidden @endunless>
+            <strong>How car rental works here</strong>
+            <span class="pc-help">We suggest accredited rent-a-car and tourist transport operators near your starting point and show how to reach them. Vehicle availability, time, place and price are set by the operator, so confirm with them before you travel.</span>
+        </div>
+
         <div class="pc-compare" data-transport-compare
              data-modes='@json($transportComparison)'
              data-samples='@json(['near' => 18, 'moderate' => 55, 'far' => 110])'

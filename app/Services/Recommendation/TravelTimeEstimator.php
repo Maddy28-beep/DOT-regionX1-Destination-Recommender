@@ -6,8 +6,8 @@ namespace App\Services\Recommendation;
  * Turns a straight-line distance between two points into the road distance and
  * journey time a traveller can actually plan around.
  *
- * Haversine gives the distance a bird flies. Nobody drives that, so every
- * figure here is derived from it rather than reported as it:
+ * Checked coordinate pairs use dated road-network snapshots. Other pairs use
+ * Haversine with a detour allowance:
  *
  *   - Road distance is the straight line times a detour factor. Real routes
  *     bend around coastline, river and mountain, and Davao Region has all
@@ -18,11 +18,13 @@ namespace App\Services\Recommendation;
  *   - A crossing to Samal adds the ferry, which no distance calculation can
  *     see. That is the one hard-coded special case, and it is named as such.
  *
- * These are planning estimates, not routing. They exist so a schedule can say
+ * Times remain planning estimates, without live traffic or ferry queues. They let a schedule say
  * "leave at 1:15" instead of leaving the traveller to guess.
  */
 class TravelTimeEstimator
 {
+    private ?array $roadDistances = null;
+
     /** Road distance vs straight line. 1.3 is the usual planning figure for mixed terrain. */
     private const DETOUR_FACTOR = 1.3;
 
@@ -45,11 +47,13 @@ class TravelTimeEstimator
      * @param  string|null  $fromRegion  region name of the origin, when known
      * @param  string|null  $toRegion    region name of the destination, when known
      * @param  string|null  $mode        a TransportMode value; null (or unknown) plans as a personal car
+     * @param  array{lat: float, lng: float}|null  $from  optional mapped endpoint for a checked road distance
+     * @param  array{lat: float, lng: float}|null  $to  optional mapped endpoint for a checked road distance
      * @return array{distance_km: float, min_minutes: int, max_minutes: int, ferry: bool}
      */
-    public function estimate(float $straightLineKm, ?string $fromRegion = null, ?string $toRegion = null, ?string $mode = null): array
+    public function estimate(float $straightLineKm, ?string $fromRegion = null, ?string $toRegion = null, ?string $mode = null, ?array $from = null, ?array $to = null): array
     {
-        $roadKm = $straightLineKm * self::DETOUR_FACTOR;
+        $roadKm = $this->checkedRoadKm($from, $to) ?? $straightLineKm * self::DETOUR_FACTOR;
 
         // A ferry leg is one that starts or ends on the island, not one that
         // stays on it -- travelling between two Samal beaches involves no boat.
@@ -66,6 +70,27 @@ class TravelTimeEstimator
             'max_minutes' => $this->toQuarterHour($slow),
             'ferry' => $ferry,
         ];
+    }
+
+    /** Use a checked road distance only for its directed coordinate pair; other legs remain estimates. */
+    private function checkedRoadKm(?array $from, ?array $to): ?float
+    {
+        if (! isset($from['lat'], $from['lng'], $to['lat'], $to['lng'])) {
+            return null;
+        }
+        $key = fn (array $point): string => sprintf('%.5F,%.5F', $point['lat'], $point['lng']);
+        if ($this->roadDistances === null) {
+            $this->roadDistances = [];
+            $path = dirname(__DIR__, 3).'/database/data/planner-road-routes-2026-11-01.json';
+            if (is_file($path)) {
+                $manifest = json_decode(file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
+                foreach ($manifest['routes'] as $route) {
+                    $this->roadDistances[$key($route['from']).'>'.$key($route['to'])] = (float) $route['road_km'];
+                }
+            }
+        }
+
+        return $this->roadDistances[$key($from).'>'.$key($to)] ?? null;
     }
 
     /**

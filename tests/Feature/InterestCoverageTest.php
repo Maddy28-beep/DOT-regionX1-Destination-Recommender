@@ -54,6 +54,37 @@ class InterestCoverageTest extends TestCase
         $this->assertNotContains('Falls', $this->names($chosen), 'The duplicate nature stop makes room.');
     }
 
+    public function test_one_remaining_slot_can_use_a_venue_covering_both_interests(): void
+    {
+        $ranked = collect([
+            $this->row('Beach only', 'Beach & Leisure'),
+            $this->row('Zoo only', 'Wildlife'),
+            $this->row('Beach with aviary', 'Beach & Leisure', ['Wildlife (aviary)']),
+        ]);
+        $chosen = (new InterestCoverage())->select($ranked, 1, ['Beach & Island', 'Wildlife']);
+
+        $this->assertSame(['Beach with aviary'], $this->names($chosen));
+        $this->assertTrue(InterestCoverage::covers($chosen[0]['destination'], 'Beach & Island'));
+        $this->assertTrue(InterestCoverage::covers($chosen[0]['destination'], 'Wildlife'));
+    }
+
+    public function test_a_new_interest_cannot_displace_the_only_cover_of_another_interest(): void
+    {
+        $ranked = collect([$this->row('Beach only', 'Beach & Leisure'), $this->row('Zoo only', 'Wildlife')]);
+
+        $this->assertSame(['Beach only'], $this->names((new InterestCoverage())->select($ranked, 1, ['Beach & Island', 'Wildlife'])));
+    }
+
+    public function test_relaxation_is_covered_by_a_spa_or_a_relaxation_tag_but_not_by_a_family_or_chocolate_tag(): void
+    {
+        $covers = fn (array $row) => InterestCoverage::covers($row['destination'], 'Relaxation & Wellness');
+
+        $this->assertTrue($covers($this->row('Spa', 'Wellness & Spa')));
+        $this->assertTrue($covers($this->row('Retreat', 'Nature & Leisure', ['relaxation'])));
+        $this->assertFalse($covers($this->row('Eagle Center', 'Wildlife', ['family friendly'])), 'Who a place suits is not what it offers.');
+        $this->assertFalse($covers($this->row('Chocolate Museum', 'Cultural Heritage', ['chocolate experience'])));
+    }
+
     public function test_a_tag_that_contains_the_interests_keyword_covers_it(): void
     {
         $ranked = collect([

@@ -85,10 +85,21 @@ final class OpeningHours
 
         $weekday = $date->dayOfWeekIso;
         $closed = [];
+        $appointmentDays = [];
         $timed = [];   // [ [days|null, open, close], ... ]
 
         foreach (explode(';', $text) as $part) {
             $part = trim($part);
+
+            if (preg_match('/^(.+?)\s+by\s+appointment$/iu', $part, $m)) {
+                $days = self::days($m[1]);
+                if ($days === null) {
+                    return null;
+                }
+                $appointmentDays = array_merge($appointmentDays, $days);
+
+                continue;
+            }
 
             if (preg_match('/^closed(?:\s+on)?\s+(.+)$/iu', $part, $m)) {
                 $days = self::days($m[1]);
@@ -119,6 +130,9 @@ final class OpeningHours
 
         if (in_array($weekday, $closed, true)) {
             return [];
+        }
+        if (in_array($weekday, $appointmentDays, true)) {
+            return null; // No booking or service window has been confirmed for this date.
         }
 
         $today = [];

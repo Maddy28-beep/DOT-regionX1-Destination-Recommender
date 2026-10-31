@@ -23,6 +23,7 @@ class AuditItineraries extends Command
     protected $signature = 'itinerary:audit
         {--scenario= : Run only the scenario whose name contains this text}
         {--extended : Also run the generated set: every distance choice with every way of travelling, one-interest trips, budget extremes and final-day departures}
+        {--holdout : Run the hold-out set: 30 trips that differ from the others in start day, start point, length, arrival and interests (alone, or with --extended, in addition to the others)}
         {--details : Print why each failing check failed}
         {--min-pass= : Exit with an error when fewer than this percentage of trips are clean}';
 
@@ -80,8 +81,50 @@ class AuditItineraries extends Command
         return $out;
     }
 
+    /**
+     * The hold-out set. Whoever tunes the planner against the core and extended trips has seen those; these are the
+     * trips they have not. They differ in what the others hold fixed: they start on a Monday, Wednesday or Friday
+     * (not a Saturday), from the Ecoland terminal, the Sasa port or the city centre as well as the airport or nowhere,
+     * with three interests each, and with lengths, arrivals and budgets taken in a different order. A plan that is
+     * only good on the trips it was tuned on scores worse here, so this is the score to trust.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function holdoutScenarios(): array
+    {
+        $interests = ['Beach & Island', 'Nature & Adventure', 'Cultural Heritage', 'Wildlife', 'Food Tourism', 'Shopping & Souvenirs', 'Hiking & Trekking', 'Relaxation & Wellness'];
+        $modes = ['jeep', 'taxi', 'personal_car', 'tour_operator', 'rental_car'];
+        $tiers = ['near', 'moderate', 'far'];
+        $budgets = ['Budget-Friendly', 'Mid-range', 'Premium'];
+        $types = ['Solo', 'Couple', 'Family', 'Friends', 'Business'];
+        $arrivals = ['07:30', '12:00', '15:30', '19:00', null, '10:30'];
+        $days = [2, 3, 4, 7, 9, 5];
+        $starts = ['Wednesday', 'Friday', 'Monday'];
+        $origins = [
+            null,
+            ['lat' => self::AIRPORT['lat'], 'lng' => self::AIRPORT['lng'], 'label' => self::AIRPORT['label']],
+            ['lat' => 7.056, 'lng' => 125.602, 'label' => 'Davao City Overland Transport Terminal, Ecoland'],
+            ['lat' => 7.127, 'lng' => 125.663, 'label' => 'Port of Sasa'],
+            ['lat' => 7.066, 'lng' => 125.607, 'label' => 'San Pedro Street, Davao City'],
+        ];
+
+        $out = [];
+        for ($i = 0; $i < 30; $i++) {
+            $tier = $tiers[$i % 3];
+            $mode = $modes[($i * 2 + 1) % 5];
+            $n = $days[$i % 6];
+            $wanted = [$interests[($i * 3) % 8], $interests[($i * 3 + 2) % 8], $interests[($i * 3 + 5) % 8]];
+            $out[] = ['name' => sprintf('Hold-out %02d %s/%s, %d days, %s', $i + 1, $tier, $mode, $n, implode(' + ', $wanted)),
+                'travel_days' => $n, 'travel_type' => $types[($i + 3) % 5], 'budget' => $budgets[($i + 1) % 3], 'distance_pref' => $tier,
+                'transport_pref' => $mode, 'arrival_time' => $arrivals[($i + 2) % 6], 'origin' => $origins[$i % 5],
+                'start' => $starts[$i % 3], 'activities' => $wanted];
+        }
+
+        return $out;
+    }
+
     /** @return array<int, array<string, mixed>> */
-    public static function scenarios(bool $extended = false): array
+    public static function scenarios(bool $extended = false, bool $holdout = false): array
     {
         $base = self::BASE;
 
@@ -100,14 +143,18 @@ class AuditItineraries extends Command
             ['name' => 'Long trip, seven days', 'travel_days' => 7, 'travel_type' => 'Couple', 'budget' => 'Mid-range', 'distance_pref' => 'far', 'arrival_time' => '09:00', 'airport' => true, 'activities' => ['Nature & Adventure', 'Cultural Heritage', 'Beach & Island', 'Wildlife']],
         ];
 
-        return array_map(fn (array $s) => $s + $base, $extended ? array_merge($core, self::extendedScenarios()) : $core);
+        $set = $holdout && ! $extended ? [] : $core;
+        $set = $extended ? array_merge($set, self::extendedScenarios()) : $set;
+        $set = $holdout ? array_merge($set, self::holdoutScenarios()) : $set;
+
+        return array_map(fn (array $s) => $s + $base, $set);
     }
 
     public function handle(ItineraryGenerationService $generator, ItineraryAudit $audit): int
     {
         $filter = (string) $this->option('scenario');
         $canDepart = Schema::hasColumn('tourist_preferences', 'departure_time');
-        $scenarios = array_values(array_filter(self::scenarios((bool) $this->option('extended')),
+        $scenarios = array_values(array_filter(self::scenarios((bool) $this->option('extended'), (bool) $this->option('holdout')),
             fn ($s) => ($filter === '' || stripos($s['name'], $filter) !== false) && ($canDepart || empty($s['departure_time']))));
         if ($scenarios === []) {
             $this->error('No scenario matches that name.');
@@ -115,12 +162,13 @@ class AuditItineraries extends Command
             return self::FAILURE;
         }
 
-        // Next Saturday, so every trip meets a weekend and the weekdays after it.
-        $start = now('Asia/Manila')->next('Saturday')->startOfDay();
+        // Next Saturday unless a trip says otherwise, so every trip meets a weekend and the weekdays after it.
+        $nextDay = fn (string $day) => now('Asia/Manila')->next($day)->startOfDay();
         $rows = [];
         $perCheck = [];
         $clean = 0;
         $verified = 0;
+        $refused = 0;
 
         foreach ($scenarios as $scenario) {
             DB::beginTransaction();
@@ -129,10 +177,10 @@ class AuditItineraries extends Command
                     'travel_days' => $scenario['travel_days'], 'travel_type' => $scenario['travel_type'], 'travel_purpose' => $scenario['travel_purpose'],
                     'visitor_type' => $scenario['visitor_type'], 'budget' => $scenario['budget'], 'accommodation_pref' => $scenario['accommodation_pref'],
                     'distance_pref' => $scenario['distance_pref'], 'transport_pref' => $scenario['transport_pref'],
-                    'start_date' => $start->toDateString(), 'arrival_time' => $scenario['arrival_time'],
-                    'origin_lat' => ! empty($scenario['airport']) ? self::AIRPORT['lat'] : null,
-                    'origin_lng' => ! empty($scenario['airport']) ? self::AIRPORT['lng'] : null,
-                    'origin_label' => ! empty($scenario['airport']) ? self::AIRPORT['label'] : null,
+                    'start_date' => $nextDay($scenario['start'] ?? 'Saturday')->toDateString(), 'arrival_time' => $scenario['arrival_time'],
+                    'origin_lat' => $scenario['origin']['lat'] ?? (! empty($scenario['airport']) ? self::AIRPORT['lat'] : null),
+                    'origin_lng' => $scenario['origin']['lng'] ?? (! empty($scenario['airport']) ? self::AIRPORT['lng'] : null),
+                    'origin_label' => $scenario['origin']['label'] ?? (! empty($scenario['airport']) ? self::AIRPORT['label'] : null),
                 ]);
                 if (! empty($scenario['departure_time'])) {
                     $preference->forceFill(['departure_time' => $scenario['departure_time'], 'departure_lat' => self::AIRPORT['lat'],
@@ -147,6 +195,10 @@ class AuditItineraries extends Command
                 $preference->load('activities', 'amenities');
 
                 $checks = $audit->audit($generator->generate($preference), $preference);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                $refused++;
+                $checks = [['key' => 'feasibility', 'label' => 'The requested trip can be fulfilled', 'status' => 'fail',
+                    'detail' => 'No itinerary saved: '.implode(' ', \Illuminate\Support\Arr::flatten($e->errors()))]];
             } catch (\Throwable $e) {
                 $checks = [['key' => 'built', 'label' => 'The plan could be built', 'status' => 'fail', 'detail' => class_basename($e).': '.$e->getMessage()]];
             } finally {
@@ -159,7 +211,11 @@ class AuditItineraries extends Command
             $verified += $isClean && $unknown === 0 ? 1 : 0;
             foreach ($checks as $c) {
                 // the day-distance limit differs from trip to trip, so the summary names the rule, not one trip's number
-                $perCheck[$c['key']]['label'] = $c['key'] === 'day_km' ? "No day drives further than a round trip to the edge of the trip's reach" : $c['label'];
+                $perCheck[$c['key']]['label'] = match ($c['key']) {
+                    'day_km' => "No day drives further than a round trip to the edge of the trip's reach",
+                    'travel_share' => 'No day spends more than 40% of its time travelling',
+                    default => $c['label'],
+                };
                 $perCheck[$c['key']][$c['status']] = ($perCheck[$c['key']][$c['status']] ?? 0) + 1;
             }
             $rows[] = [$scenario['name'], $isClean ? 'clean' : 'NOT clean', $unknown, implode(', ', array_column(array_filter($checks, fn ($c) => $c['status'] === 'fail'), 'key'))];
@@ -185,6 +241,7 @@ class AuditItineraries extends Command
         $rate = round($clean / $total * 100);
         $this->info("{$clean} of {$total} trips are clean ({$rate}%). \"Unknown\" means the data could not say, and is not counted as a failure.");
         $this->info("{$verified} of {$total} are clean AND fully verified (no unknown check). A trip that is clean only because checks could not be decided is not counted here.");
+        $this->info("{$refused} request(s) were declined as infeasible; these are not saved as successful itineraries.");
 
         $min = $this->option('min-pass');
 

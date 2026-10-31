@@ -57,3 +57,4 @@
         Check the <a href="{{ route('accommodations.index') }}">accommodation list</a> for the latest, or contact DOT Region XI.
     </div>
 @endif
+

@@ -22,7 +22,7 @@ class Accommodation extends Model
      * The settings a resort can be filed under, in the order the planner offers them. A resort may carry
      * more than one ("Lake" and "All-Inclusive"); see resort_settings.
      */
-    public const RESORT_SETTINGS = ['Mountain', 'Inland', 'Island', 'Lake', 'Hot Spring', 'All-Inclusive'];
+    public const RESORT_SETTINGS = ['Beach', 'Mountain', 'Inland', 'Island', 'Lake', 'Hot Spring', 'All-Inclusive'];
 
     protected $fillable = [
         'slug', 'name', 'location', 'region_id', 'type', 'resort_settings', 'dot_classification',
@@ -51,6 +51,13 @@ class Accommodation extends Model
      */
     public function scopeWithResortSetting(Builder $query, string $setting): Builder
     {
+        if ($setting === 'Beach') {
+            return $query->where(fn (Builder $q) => $q
+                ->where('type', 'Beach Resort')
+                ->orWhere('resort_settings', 'like', '%|Beach|%')
+                ->orWhere('name', 'like', '%Beach%'));
+        }
+
         return $query->where('resort_settings', 'like', '%|'.$setting.'|%');
     }
 

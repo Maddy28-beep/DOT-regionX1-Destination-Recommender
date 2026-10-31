@@ -158,6 +158,8 @@ class StayContinuityTest extends TestCase
 
     public function test_remote_changes_stay_only_between_far_apart_areas_and_not_every_day(): void
     {
+        // This synthetic 100 km fixture exercises hotel continuity, independently of route feasibility.
+        config(['itinerary.planner.reject_incomplete_trips' => false]);
         $this->manyPlaces([6, 8, 10, 12]);
         foreach ([100, 102, 104, 106] as $i => $km) {
             $this->place('Northern '.($i + 1), $km, 4.2 - $i * 0.1);
@@ -357,7 +359,7 @@ class StayContinuityTest extends TestCase
                         'title' => 'Visit — '.$destination->name, 'starts_at' => '10:00:00', 'ends_at' => '12:00:00', 'destination_id' => $destination->id]);
                 }
                 ItineraryItem::create(['itinerary_id' => $trip->id, 'day_number' => $day, 'sort_order' => ++$order, 'slot' => 'Afternoon', 'kind' => 'travel', 'title' => 'Travel',
-                    'starts_at' => '12:00:00', 'travel_min_minutes' => 30, 'travel_max_minutes' => 60]);
+                    'starts_at' => '12:00:00', 'ends_at' => '13:00:00', 'travel_min_minutes' => 30, 'travel_max_minutes' => 60]);
                 if ($day < $days && isset($stays[$day])) {
                     ItineraryItem::create(['itinerary_id' => $trip->id, 'day_number' => $day, 'sort_order' => ++$order, 'slot' => 'Evening', 'kind' => 'overnight',
                         'title' => 'Overnight stay', 'starts_at' => '20:00:00', 'accommodation_id' => $stays[$day]['listing']->id]);

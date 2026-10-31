@@ -8,6 +8,7 @@ use App\Models\TouristPreference;
 use App\Services\Recommendation\ItineraryGenerationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use ReflectionMethod;
 use Tests\TestCase;
 
@@ -45,17 +46,17 @@ class RemoteNeighbourhoodTest extends TestCase
         ]);
     }
 
-    private function rows(Destination ...$destinations): \Illuminate\Support\Collection
+    private function rows(Destination ...$destinations): Collection
     {
         return collect($destinations)->values()->map(fn (Destination $d, int $i) => ['destination' => $d, 'drs' => 5.0 - $i * 0.1]);
     }
 
-    private function order(\Illuminate\Support\Collection $rows): array
+    private function order(Collection $rows): array
     {
         return $rows->map(fn (array $row) => $row['destination']->name)->all();
     }
 
-    private function neighbourhood(\Illuminate\Support\Collection $ranked, int $stops): \Illuminate\Support\Collection
+    private function neighbourhood(Collection $ranked, int $stops): Collection
     {
         $method = new ReflectionMethod(ItineraryGenerationService::class, 'withinOneNeighbourhood');
 
@@ -116,13 +117,16 @@ class RemoteNeighbourhoodTest extends TestCase
 
     private function plan(string $distance, int $days = 2)
     {
+        // Start on the northern approach, so this tests grouping with a
+        // feasible access journey rather than an impossible remote transfer.
+        $originLat = 7.07 + 40 / 111.2;
         $preference = TouristPreference::create([
             'travel_days' => $days, 'travel_type' => 'Family', 'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => $distance,
             'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time Visitor', 'place_of_origin' => 'Davao City', 'start_date' => '2026-10-28',
-            'arrival_time' => '07:00', 'origin_lat' => 7.07, 'origin_lng' => 125.61, 'origin_label' => 'Start',
+            'arrival_time' => '07:00', 'origin_lat' => $originLat, 'origin_lng' => 125.61, 'origin_label' => 'Northern approach',
         ]);
 
-        return app(ItineraryGenerationService::class)->generate($preference->load('activities', 'amenities'), 7.07, 125.61);
+        return app(ItineraryGenerationService::class)->generate($preference->load('activities', 'amenities'), $originLat, 125.61);
     }
 
     private function visited($itinerary): array

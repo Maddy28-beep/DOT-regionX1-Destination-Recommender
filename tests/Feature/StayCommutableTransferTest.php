@@ -17,7 +17,8 @@ use Tests\TestCase;
 /**
  * The one path the 48-trip audit never exercised: a Commutable trip changing stay because keeping one is impractical.
  *
- * A five-day trip: three days in one area, then two days 70 km away. Staying in the first area all trip cannot reach the last
+ * A five-day trip: three days in one area, then two days 35 km away. Both hotels remain inside the local 40 km stay limit.
+ * Staying in the first area all trip cannot reach the last
  * day's stop (the stand-in schedule below loses it, as the real one does when the drive back is over the daily limit);
  * moving for the last night can. Each test forces one branch of the decision with a stand-in schedule, so the outcome does
  * not depend on the data: the real settle logic, the real evaluator, the real stay planner.
@@ -74,10 +75,10 @@ class StayCommutableTransferTest extends TestCase
     private function scenario(): array
     {
         $areaOne = [$this->place('Area One A', 5), $this->place('Area One B', 6), $this->place('Area One C', 5.5)];
-        $areaTwo = [$this->place('Area Two A', 70), $this->place('Area Two B', 71)];
+        $areaTwo = [$this->place('Area Two A', 35), $this->place('Area Two B', 36)];
 
         return [
-            'areaOne' => $areaOne, 'areaTwo' => $areaTwo, 'home' => $this->stay('Home Stay', 5.5), 'away' => $this->stay('Away Stay', 70.5),
+            'areaOne' => $areaOne, 'areaTwo' => $areaTwo, 'home' => $this->stay('Home Stay', 5.5), 'away' => $this->stay('Away Stay', 35.5),
             'placed' => [1 => [$areaOne[0]], 2 => [$areaOne[1]], 3 => [$areaOne[2]], 4 => [$areaTwo[0]], 5 => [$areaTwo[1]]],
             'planned' => array_map([$this, 'entry'], [...$areaOne, ...$areaTwo]),
         ];
@@ -109,7 +110,7 @@ class StayCommutableTransferTest extends TestCase
                         'title' => 'Visit — '.$destination->name, 'starts_at' => '10:00:00', 'ends_at' => '12:00:00', 'destination_id' => $destination->id]);
                 }
                 ItineraryItem::create(['itinerary_id' => $trip->id, 'day_number' => $day, 'sort_order' => ++$order, 'slot' => 'Afternoon', 'kind' => 'travel', 'title' => 'Travel',
-                    'starts_at' => '12:00:00', 'travel_min_minutes' => 30, 'travel_max_minutes' => 60]);
+                    'starts_at' => '12:00:00', 'ends_at' => '13:00:00', 'travel_min_minutes' => 30, 'travel_max_minutes' => 60]);
                 if ($day < $days && isset($stays[$day])) {
                     ItineraryItem::create(['itinerary_id' => $trip->id, 'day_number' => $day, 'sort_order' => ++$order, 'slot' => 'Evening', 'kind' => 'overnight',
                         'title' => 'Overnight stay', 'starts_at' => '20:00:00', 'accommodation_id' => $stays[$day]['listing']->id]);
@@ -142,7 +143,7 @@ class StayCommutableTransferTest extends TestCase
         // Staying at the home stay for the last night loses the last day's stop; sleeping away places it.
         $r = $this->settle('moderate', $s, fn (array $stays) => $stays[4]['listing']->id === $s['home']->id ? [5] : []);
 
-        $this->assertSame('accepted_flexible', $r['plan']['guard']['decision']);
+        $this->assertSame('accepted_flexible', $r['plan']['guard']['decision'], json_encode($r['plan']['guard']));
         $this->assertStringContainsString('misses a destination', $r['plan']['guard']['failed']);
         $this->assertSame([1 => $s['home']->id, 2 => $s['home']->id, 3 => $s['home']->id, 4 => $s['away']->id], $this->nights($r['trip']), 'one change, before the last night');
         $this->assertSame(1, $r['plan']['continuity']['transfers']);

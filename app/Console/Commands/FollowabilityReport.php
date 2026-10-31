@@ -81,8 +81,11 @@ class FollowabilityReport extends Command
         foreach ($indexes as $i) {
             $s = self::scenario($i);
             [$label, $lat, $lng] = $s['origin'];
+            $rejectIncomplete = config('itinerary.planner.reject_incomplete_trips');
             DB::beginTransaction();
             try {
+                // This diagnostic measures omissions and long journeys too; it never publishes these plans.
+                config(['itinerary.planner.reject_incomplete_trips' => false]);
                 $preference = TouristPreference::create([
                     'travel_days' => $s['travel_days'], 'travel_type' => $s['travel_type'], 'travel_purpose' => $s['travel_purpose'],
                     'visitor_type' => $s['visitor_type'], 'budget' => $s['budget'], 'accommodation_pref' => 'Any',
@@ -97,6 +100,7 @@ class FollowabilityReport extends Command
                 $figures['trip'] = $i;
                 $byBand[$s['distance_pref']][] = $figures;
             } finally {
+                config(['itinerary.planner.reject_incomplete_trips' => $rejectIncomplete]);
                 DB::rollBack();
             }
         }
@@ -107,6 +111,7 @@ class FollowabilityReport extends Command
             ? '<options=bold>HELD-OUT SET (trips 48-95): report only. These figures are not for tuning anything.</>'
             : '<options=bold>CALIBRATION SET (trips 0-47)</>');
         $this->line('Trips start '.$start.'. Nothing is saved and no figure here is a rule.');
+        $this->line('Diagnostic partial plans may contain omissions or over-limit days. Use itinerary:audit to check correctness.');
         $this->table(['', ...array_values(self::BANDS)], $this->rows($summary));
 
         if ($this->option('details')) {
@@ -120,7 +125,7 @@ class FollowabilityReport extends Command
         }
 
         if ($path = (string) $this->option('json')) {
-            file_put_contents($path, json_encode(['set' => $set, 'start' => $start, 'summary' => $summary, 'trips' => $byBand], JSON_PRETTY_PRINT));
+            file_put_contents($path, json_encode(['set' => $set, 'start' => $start, 'mode' => 'diagnostic_partial_plans', 'summary' => $summary, 'trips' => $byBand], JSON_PRETTY_PRINT));
             $this->line("Figures written to $path");
         }
 
@@ -166,3 +171,4 @@ class FollowabilityReport extends Command
         ];
     }
 }
+

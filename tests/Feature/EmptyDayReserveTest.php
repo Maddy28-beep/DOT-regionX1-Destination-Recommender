@@ -61,7 +61,7 @@ class EmptyDayReserveTest extends TestCase
 
     public function test_a_day_the_far_places_cannot_fill_gets_the_nearest_reserve_place(): void
     {
-        // Three well-ranked places 150 km away (a 4-hour drive each way): none can be visited on a 15:00 arrival.
+        // Three well-ranked places 150 km away (a 4-hour drive each way): none can be visited on a 14:00 arrival.
         foreach (['Far One', 'Far Two', 'Far Three'] as $i => $name) {
             $this->place($name, 150 + $i * 5, 5.0);
         }
@@ -70,7 +70,7 @@ class EmptyDayReserveTest extends TestCase
         $this->place('Near Two', 12, 2.0);
         $this->place('Near Three', 15, 2.0);
 
-        $stops = $this->stopsByDay($this->plan('15:00'));
+        $stops = $this->stopsByDay($this->plan('14:00'));
 
         $this->assertArrayHasKey(1, $stops, 'the arrival day has a stop');
         $this->assertStringStartsWith('Near', $stops[1][0], 'and it is a place that can actually be reached that afternoon');
@@ -91,6 +91,8 @@ class EmptyDayReserveTest extends TestCase
 
     public function test_when_the_reserve_cannot_help_the_plan_is_unchanged_and_nothing_is_lost(): void
     {
+        // Exercise partial-plan scheduling explicitly; the default rejects infeasible requests.
+        config(['itinerary.planner.reject_incomplete_trips' => false]);
         // Everything is about 3 hours away: no reserve place can be reached on the arrival afternoon either.
         foreach (['Far A', 'Far B', 'Far C', 'Far D', 'Far E'] as $i => $name) {
             $this->place($name, 55 + $i * 4, 5.0 - $i * 0.1);
@@ -100,5 +102,9 @@ class EmptyDayReserveTest extends TestCase
 
         $this->assertNotEmpty($stops, 'the trip still has stops');
         $this->assertSame(count(array_merge(...array_values($stops))), count(array_unique(array_merge(...array_values($stops)))), 'no place twice');
+
+        config(['itinerary.planner.reject_incomplete_trips' => true]);
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->plan('15:00');
     }
 }

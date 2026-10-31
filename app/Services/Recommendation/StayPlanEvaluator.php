@@ -52,7 +52,8 @@ class StayPlanEvaluator
         $items = $itinerary->items()->with(['destination.region', 'accommodation.region'])->orderBy('day_number')->orderBy('sort_order')->get();
         $days = max(1, (int) $itinerary->total_days);
         $byDay = $items->groupBy('day_number');
-        $budget = ItineraryScheduleBuilder::DRIVE_BUDGET_MINUTES[$preference->distance_pref] ?? ItineraryScheduleBuilder::DEFAULT_DRIVE_BUDGET_MINUTES;
+        $budget = ItineraryScheduleBuilder::DRIVE_BUDGET_MINUTES[$itinerary->range_tier_used ?: $preference->distance_pref]
+            ?? ItineraryScheduleBuilder::DRIVE_BUDGET_MINUTES['moderate'];
 
         $activities = $items->where('kind', 'activity')->whereNotNull('destination_id');
         $placed = $activities->pluck('destination_id')->map(fn ($id) => (int) $id)->unique()->sort()->values()->all();
@@ -203,7 +204,7 @@ class StayPlanEvaluator
             $km = 6371 * 2 * asin(min(1, sqrt(sin(deg2rad($b['lat'] - $a['lat']) / 2) ** 2
                 + cos(deg2rad($a['lat'])) * cos(deg2rad($b['lat'])) * sin(deg2rad($b['lng'] - $a['lng']) / 2) ** 2)));
 
-            return $this->estimator->estimate($km, $a['region'], $b['region'], $preference->transport_pref)['max_minutes'];
+            return $this->estimator->estimate($km, $a['region'], $b['region'], $preference->transport_pref, $a, $b)['max_minutes'];
         };
 
         $total = 0;
