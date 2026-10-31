@@ -35,20 +35,21 @@ class VisitTrimTest extends TestCase
     }
 
     /** One park 15 minutes from the start, on day 1 of a two-day trip (so it is not the last day's shortened visit). @return array{start: ?string, end: ?string}|null the visit, or null when none was planned */
-    private function visitWhenArriving(string $arrival): ?array
+    private function visitWhenArriving(string $arrival, ?string $duration = null, ?string $hours = null, int $days = 2): ?array
     {
         $park = Destination::create([
             'slug' => 'near-park', 'name' => 'Near Park', 'location' => 'Davao City', 'region_id' => Region::firstOrCreate(['name' => 'Davao City'])->id,
             'type' => 'Nature & Leisure', 'is_accredited' => true, 'rating' => 0, 'review_count' => 0, 'latitude' => 7.0489 + 0.002, 'longitude' => 125.5736,
+            'visit_duration' => $duration, 'hours' => $hours,
         ]);
         $preference = TouristPreference::create([
-            'travel_days' => 2, 'travel_type' => 'Family', 'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => 'far',
+            'travel_days' => $days, 'travel_type' => 'Family', 'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => 'far',
             'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time Visitor', 'place_of_origin' => 'Davao City', 'start_date' => '2026-10-28', 'arrival_time' => $arrival,
         ]);
-        $itinerary = Itinerary::create(['preference_id' => $preference->id, 'total_days' => 2, 'generated_at' => now()]);
+        $itinerary = Itinerary::create(['preference_id' => $preference->id, 'total_days' => $days, 'generated_at' => now()]);
 
         app(ItineraryScheduleBuilder::class)->build(
-            $itinerary, [['row' => ['destination' => $park->load('region', 'tags'), 'drs' => 4.0], 'distance_km' => 1.0]], $preference, [1 => ['Afternoon'], 2 => ['Morning']],
+            $itinerary, [['row' => ['destination' => $park->load('region', 'tags'), 'drs' => 4.0], 'distance_km' => 1.0]], $preference, $days === 1 ? [1 => ['Afternoon']] : [1 => ['Afternoon'], 2 => ['Morning']],
             ['lat' => 7.0489, 'lng' => 125.5736, 'label' => 'Ma-a, Talomo, Davao City'], null,
         );
 
@@ -83,6 +84,58 @@ class VisitTrimTest extends TestCase
         $this->assertNotNull($visit);
 
         $this->assertSame(150, (strtotime($visit['end']) - strtotime($visit['start'])) / 60);
+    }
+
+    public function test_a_recorded_short_visit_uses_its_actual_duration(): void
+    {
+        $visit = $this->visitWhenArriving('09:00', '45 minutes');
+        $this->assertNotNull($visit);
+        $this->assertSame(45, (strtotime($visit['end']) - strtotime($visit['start'])) / 60);
+    }
+
+    public function test_the_final_stop_keeps_its_recorded_duration(): void
+    {
+        $visit = $this->visitWhenArriving('09:00', '180 minutes', null, 1);
+        $this->assertNotNull($visit);
+        $this->assertSame(180, (strtotime($visit['end']) - strtotime($visit['start'])) / 60);
+    }
+
+    public function test_a_recorded_long_visit_shrinks_to_its_floor_for_a_late_arrival_but_no_further(): void
+    {
+        // Half the recorded time, and never under two hours: 135 minutes are left before the cutoff, so it fits.
+        $visit = $this->visitWhenArriving('15:00', '240 minutes');
+        $this->assertNotNull($visit);
+        $minutes = (strtotime($visit['end']) - strtotime($visit['start'])) / 60;
+        $this->assertGreaterThanOrEqual(120, $minutes);
+        $this->assertLessThan(240, $minutes);
+    }
+
+    public function test_a_recorded_long_visit_is_left_out_when_even_its_floor_does_not_fit(): void
+    {
+        // Less than two hours remain before the cutoff: the place is left out rather than reduced to a token visit.
+        $this->assertNull($this->visitWhenArriving('16:30', '240 minutes'));
+    }
+
+    public function test_a_recorded_long_visit_keeps_its_duration_when_lunch_is_due(): void
+    {
+        $visit = $this->visitWhenArriving('09:00', '240 minutes');
+        $this->assertNotNull($visit);
+        $this->assertSame(240, (strtotime($visit['end']) - strtotime($visit['start'])) / 60);
+    }
+
+    public function test_an_overnight_trek_is_not_scheduled_as_a_short_activity(): void
+    {
+        $this->assertNull($this->visitWhenArriving('09:00', '2 days / 1 night'));
+    }
+
+    public function test_waiting_for_opening_does_not_extend_a_visit_past_the_cutoff(): void
+    {
+        $this->assertNull($this->visitWhenArriving('09:00', '120 minutes', '5:00 PM–10:00 PM'));
+    }
+
+    public function test_a_recorded_visit_must_fit_before_closing(): void
+    {
+        $this->assertNull($this->visitWhenArriving('09:00', '120 minutes', '10:00 AM–11:00 AM'));
     }
 
     public function test_no_visit_ever_ends_after_the_cutoff(): void

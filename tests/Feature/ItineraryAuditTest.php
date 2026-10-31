@@ -115,6 +115,31 @@ class ItineraryAuditTest extends TestCase
         $this->assertSame('pass', $checks['travel_share']['status']);
     }
 
+    public function test_remote_and_nearer_trips_use_the_same_forty_percent_limit(): void
+    {
+        $legs = function (TouristPreference $p, Itinerary $it, int $secondLegMax) {
+            $this->item($it, 1, 1, 'travel', ['starts_at' => '08:00', 'distance_km' => 40, 'travel_min_minutes' => 90, 'travel_max_minutes' => 120]);
+            $this->item($it, 1, 2, 'travel', ['starts_at' => '13:00', 'ends_at' => '16:00', 'distance_km' => 40, 'travel_min_minutes' => 90, 'travel_max_minutes' => $secondLegMax]);
+
+            return $this->audited($p, $it);
+        };
+
+        // 240 of 480 minutes on the road is 50%: over the 40% a Commutable trip allows...
+        [$p, $it] = $this->plan();
+        $checks = $legs($p, $it, 120);
+        $this->assertSame('fail', $checks['travel_share']['status']);
+        $this->assertStringContainsString('40%', $checks['travel_share']['label']);
+
+        // Remote trips use exactly the same check, rather than a looser allowance.
+        [$p, $it] = $this->plan(['distance_pref' => 'far']);
+        $checks = $legs($p, $it, 120);
+        $this->assertSame('fail', $checks['travel_share']['status']);
+        $this->assertStringContainsString('40%', $checks['travel_share']['label']);
+
+        ItineraryItem::query()->where('sort_order', 2)->where('itinerary_id', $it->id)->update(['travel_max_minutes' => 150]);
+        $this->assertSame('fail', $this->audited($p, $it)['travel_share']['status']);
+    }
+
     public function test_an_interest_with_no_stop_fails_and_a_matching_tag_or_type_covers_it(): void
     {
         [$p, $it] = $this->plan();
@@ -300,6 +325,42 @@ class ItineraryAuditTest extends TestCase
         $this->assertCount(8, $single, 'Each interest on its own.');
         $this->assertGreaterThanOrEqual(1, count(array_filter($first, fn ($s) => $s['travel_days'] >= 8)), 'A long trip is in the set.');
         $this->assertGreaterThanOrEqual(1, count(array_filter($first, fn ($s) => $s['travel_days'] === 1)), 'A one-day trip is in the set.');
+    }
+
+    public function test_the_holdout_set_is_deterministic_and_differs_from_the_trips_a_planner_is_tuned_on(): void
+    {
+        $holdout = \App\Console\Commands\AuditItineraries::holdoutScenarios();
+        $this->assertSame($holdout, \App\Console\Commands\AuditItineraries::holdoutScenarios(), 'No chance: the same trips every run.');
+        $this->assertCount(30, $holdout);
+        $this->assertCount(30, array_unique(array_column($holdout, 'name')));
+
+        $seen = collect(\App\Console\Commands\AuditItineraries::scenarios(true));
+        $key = fn ($s) => implode('|', [$s['distance_pref'], $s['transport_pref'], $s['travel_days'], $s['arrival_time'], implode(',', $s['activities'])]);
+        $this->assertSame([], $seen->map($key)->intersect(collect($holdout)->map($key))->values()->all(), 'No hold-out trip repeats a trip the others run.');
+
+        $this->assertSame(['Friday', 'Monday', 'Wednesday'], collect($holdout)->pluck('start')->unique()->sort()->values()->all(), 'None starts on a Saturday.');
+        $this->assertGreaterThanOrEqual(4, collect($holdout)->pluck('origin.label')->unique()->count(), 'Several different start points, including none.');
+        $this->assertSame([3], collect($holdout)->map(fn ($s) => count($s['activities']))->unique()->values()->all(), 'Three interests each.');
+        $this->assertSame(['near', 'moderate', 'far'], collect($holdout)->pluck('distance_pref')->unique()->values()->all());
+    }
+
+    public function test_the_holdout_flag_runs_only_the_holdout_trips_unless_combined_with_extended(): void
+    {
+        $count = fn (bool $extended, bool $holdout) => count(\App\Console\Commands\AuditItineraries::scenarios($extended, $holdout));
+
+        $this->assertSame(12, $count(false, false));
+        $this->assertSame(41, $count(true, false));
+        $this->assertSame(30, $count(false, true), 'Hold-out alone is just the hold-out trips.');
+        $this->assertSame(71, $count(true, true));
+    }
+
+    public function test_the_holdout_run_builds_and_reports(): void
+    {
+        $this->destination('Eden Nature Park');
+
+        $this->artisan('itinerary:audit', ['--holdout' => true, '--scenario' => 'Hold-out 01'])
+            ->expectsOutputToContain('trips are clean')
+            ->assertSuccessful();
     }
 
     public function test_the_extended_run_reports_how_many_trips_are_clean_and_fully_verified(): void

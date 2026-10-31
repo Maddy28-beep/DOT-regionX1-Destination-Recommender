@@ -130,7 +130,8 @@ class TransportAndResortSettingTest extends TestCase
     {
         $region = Region::create(['name' => 'Davao City']);
 
-        foreach ([['a', 7.07, 125.61], ['b', 7.18, 125.45], ['c', 7.02, 125.41]] as [$slug, $lat, $lng]) {
+        // All options fit both modes' limits, so this comparison measures pace on the same route.
+        foreach ([['a', 7.14, 125.61], ['b', 7.15, 125.61], ['c', 7.16, 125.61]] as [$slug, $lat, $lng]) {
             Destination::create([
                 'slug' => $slug, 'name' => 'Place '.$slug, 'location' => 'Davao City', 'region_id' => $region->id,
                 'type' => 'Nature & Leisure', 'is_accredited' => true, 'rating' => 4.5, 'review_count' => 10,
@@ -415,20 +416,14 @@ class TransportAndResortSettingTest extends TestCase
 
     public function test_a_leg_with_no_coordinates_is_allowed_time_at_the_pace_of_the_way_of_travelling(): void
     {
-        $region = Region::firstOrCreate(['name' => 'Davao City']);
-        foreach (['u1', 'u2', 'u3'] as $slug) {
-            Destination::create([
-                'slug' => $slug, 'name' => 'Unlocated '.$slug, 'location' => 'Davao City', 'region_id' => $region->id,
-                'type' => 'Nature & Leisure', 'is_accredited' => true, 'rating' => 4.5, 'review_count' => 10,
-                'price_tier' => 'Mid-range', 'distance_km' => 14,
-            ]);
-        }
-
+        // Legacy plans still need conservative transfer allowances even when the planner finds a mapped replacement.
         $unmeasuredAllowance = function (?string $mode) {
-            $this->post('/plan', $this->surveyPayload(['travel_days' => 1, 'arrival_time' => '08:00', 'transport_pref' => $mode]))->assertRedirect();
+            $builder = app(\App\Services\Recommendation\ItineraryScheduleBuilder::class);
+            (new \ReflectionProperty($builder, 'transport'))->setValue($builder, $mode);
+            $estimate = (new \ReflectionMethod($builder, 'estimateLeg'))->invoke($builder,
+                ['lat' => null, 'lng' => null], ['lat' => 7.07, 'lng' => 125.61]);
 
-            return TouristPreference::latest('id')->first()->itineraries()->latest('id')->first()
-                ->items()->where('kind', 'travel')->whereNull('distance_km')->pluck('travel_max_minutes')->unique()->values()->all();
+            return [$estimate['max_minutes']];
         };
 
         $this->assertSame([45], $unmeasuredAllowance('personal_car'));

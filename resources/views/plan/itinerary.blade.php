@@ -105,6 +105,19 @@
                 </div>
             </section>
 
+            @if (collect($planningChecks ?? [])->contains(fn ($check) => $check['status'] !== 'pass'))
+                <div class="privacy-note" role="status">
+                    <div>
+                        <strong>Things to confirm before your trip</strong>
+                        <ul>
+                            @foreach (collect($planningChecks)->whereIn('status', ['fail', 'unknown']) as $check)
+                                <li>{{ $check['label'] }}@if ($check['detail'] !== ''): {{ $check['detail'] }}@endif</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            @endif
+
             @if (session('pending_save_itinerary'))
                 <div class="privacy-note" role="status">
                     <x-icon name="shield-check" />
@@ -256,17 +269,18 @@
                                         }
                                     }
                                     $mergedNights = collect($stayAfterDinner)->pluck('id')->all();
+                                    // The pick-up happens when the day's first journey leaves, so it sits just above that journey
+                                    // (after any breakfast before it). A day with no journey shows it above its first row.
+                                    $pickupBeforeId = $rows->firstWhere('kind', 'travel')?->id
+                                        ?? $rows->first(fn ($row) => $row->kind !== 'baseline')?->id;
                                 @endphp
                                 <div class="tl">
                                     @foreach ($rows as $item)
                                         @continue(in_array($item->id, $mergedNights, true))
-                                        @if ($byOperator && $loop->first && $item->kind !== 'baseline')
+                                        @if ($byOperator && $item->id === $pickupBeforeId)
                                             @include('partials.itinerary-pickup-row', ['at' => $pickupAt])
                                         @endif
                                         @include('partials.itinerary-timeline-row', ['item' => $item, 'swap' => $swap, 'ideas' => ($ideas ?? [])[$item->id] ?? [], 'preference' => $preference, 'stay' => $stayAfterDinner[$item->id] ?? null])
-                                        @if ($byOperator && $item->kind === 'baseline')
-                                            @include('partials.itinerary-pickup-row', ['at' => $pickupAt])
-                                        @endif
                                     @endforeach
                                 </div>
 
@@ -426,10 +440,13 @@
                                 <strong>Content-Based Recommendation</strong> scored
                                 {{ $provenance['destinations_ranked'] }} of
                                 @if (($provenance['catalogue_sample'] ?? 0) > 0)
-                                    {{ $provenance['catalogue_size'] }} destinations ({{ $provenance['catalogue_real'] }} DOT-accredited,
+                                    {{ $provenance['catalogue_size'] }} destinations ({{ $provenance['catalogue_real'] - ($provenance['catalogue_public'] ?? 0) }} DOT-accredited,
+                                    @if (($provenance['catalogue_public'] ?? 0) > 0)
+                                        {{ $provenance['catalogue_public'] }} verified visitor places without confirmed DOT accreditation,
+                                    @endif
                                     {{ $provenance['catalogue_sample'] }} sample data, not DOT-verified) against your
                                 @else
-                                    {{ $provenance['catalogue_size'] }} accredited destinations against your
+                                    {{ $provenance['catalogue_size'] }} eligible destinations against your
                                 @endif
                                 survey answers, combining five weighted factors into the Destination
                                 Recommendation Score shown above (Sec. 2.3.3, Equations 1&ndash;3).

@@ -54,6 +54,16 @@ class InterestCoverageTest extends TestCase
         $this->assertNotContains('Falls', $this->names($chosen), 'The duplicate nature stop makes room.');
     }
 
+    public function test_relaxation_is_covered_by_a_spa_or_a_relaxation_tag_but_not_by_a_family_or_chocolate_tag(): void
+    {
+        $covers = fn (array $row) => InterestCoverage::covers($row['destination'], 'Relaxation & Wellness');
+
+        $this->assertTrue($covers($this->row('Spa', 'Wellness & Spa')));
+        $this->assertTrue($covers($this->row('Retreat', 'Nature & Leisure', ['relaxation'])));
+        $this->assertFalse($covers($this->row('Eagle Center', 'Wildlife', ['family friendly'])), 'Who a place suits is not what it offers.');
+        $this->assertFalse($covers($this->row('Chocolate Museum', 'Cultural Heritage', ['chocolate experience'])));
+    }
+
     public function test_a_tag_that_contains_the_interests_keyword_covers_it(): void
     {
         $ranked = collect([

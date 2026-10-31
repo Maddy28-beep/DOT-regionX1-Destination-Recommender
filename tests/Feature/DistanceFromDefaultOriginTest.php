@@ -100,15 +100,16 @@ class DistanceFromDefaultOriginTest extends TestCase
         $this->assertSame(5.0, $rows['Far Farm']['ds']);
     }
 
-    public function test_a_stored_distance_still_wins_over_the_coordinates(): void
+    public function test_a_stale_stored_distance_cannot_override_the_mapped_default_origin_radius(): void
     {
         $this->nearby(3);
-        // stored as 3 km from the city although its coordinates are far out: the recorded figure is trusted, as before
+        // A legacy distance says 3 km while the mapped place is 70 km out.
+        // Ranking and the itinerary audit must use the same mapped baseline.
         $this->place('Recorded Near', 6.85, 125.18, 3.0);
 
         $rows = $this->ranked($this->preference('near'));
 
-        $this->assertTrue($rows->has('Recorded Near'));
+        $this->assertFalse($rows->has('Recorded Near'));
     }
 
     public function test_a_shared_position_still_measures_from_that_position(): void

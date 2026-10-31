@@ -252,13 +252,14 @@ class TripPlannerController extends Controller
          * actually ran against -- a rule mined from 90 transactions and one
          * mined from 9,000 are not the same claim.
          */
-        $catalogue = app(\App\Support\SampleData::class)->split(Destination::publiclyVisible());
+        $catalogue = app(\App\Support\SampleData::class)->split(Destination::plannerEligible()->whereNull('archived_at'));
 
         $provenance = [
             'destinations_ranked' => $itinerary->matches()->count(),
             'catalogue_size' => $catalogue['total'],
             'catalogue_real' => $catalogue['real'],
             'catalogue_sample' => $catalogue['sample'],
+            'catalogue_public' => Destination::plannerEligible()->whereNull('archived_at')->where('is_accredited', false)->count(),
             'transactions' => ExitSurvey::count(),
             'transactions_demo' => ExitSurvey::where('data_source', 'demo')->count(),
             'rules_applied' => $itinerary->items()->whereNotNull('rule_basis')->count(),
@@ -288,7 +289,9 @@ class TripPlannerController extends Controller
             )
             : collect();
 
-        return view('plan.itinerary', compact('itinerary', 'preference', 'provenance', 'swap', 'ideas', 'operators'));
+        $planningChecks = $itinerary->package_id ? [] : app(\App\Services\Recommendation\ItineraryAudit::class)->audit($itinerary, $preference);
+
+        return view('plan.itinerary', compact('itinerary', 'preference', 'provenance', 'swap', 'ideas', 'operators', 'planningChecks'));
     }
 
     /**

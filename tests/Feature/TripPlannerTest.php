@@ -335,6 +335,7 @@ class TripPlannerTest extends TestCase
         // test would pass or fail for the wrong reason.
         Accommodation::create([
             'slug' => 'airport-hotel', 'name' => 'Airport Hotel', 'location' => 'Davao City',
+            'latitude' => 7.0731, 'longitude' => 125.6128,
             'region_id' => Region::sole()->id, 'type' => 'Hotel', 'is_accredited' => true,
             'rating' => 4.0, 'review_count' => 5, 'price_tier' => 'Mid-range',
         ]);
@@ -451,7 +452,7 @@ class TripPlannerTest extends TestCase
      * souvenir shopping at 1:45 AM, departure at 3:30 AM. Nothing may start
      * after the evening.
      */
-    public function test_no_schedule_row_runs_into_the_small_hours(): void
+    public function test_an_infeasible_distant_plan_is_rejected_before_it_can_run_into_the_small_hours(): void
     {
         $region = Region::create(['name' => 'Davao Region']);
 
@@ -466,16 +467,9 @@ class TripPlannerTest extends TestCase
             ]);
         }
 
-        $this->post('/plan', $this->surveyPayload(['travel_days' => 2, 'arrival_time' => '08:00']));
-
-        foreach (Itinerary::with('items')->sole()->items as $item) {
-            $hour = (int) explode(':', (string) $item->starts_at)[0];
-
-            // 23, not 21: a long drive home that runs through dinner now includes a dinner stop (an hour), so the
-            // trip's last row can fall in the 22:00 hour. What this test guards is the small hours after midnight.
-            $this->assertLessThanOrEqual(23, $hour,
-                "'{$item->title}' is scheduled at {$item->starts_at}, which is not a time anyone travels.");
-        }
+        $this->from('/plan/start')->post('/plan', $this->surveyPayload(['travel_days' => 2, 'arrival_time' => '08:00']))
+            ->assertRedirect('/plan/start')->assertSessionHasErrors('distance_pref');
+        $this->assertSame(0, Itinerary::count());
     }
 
     /** A day that spans midday has to feed the traveller. */
@@ -832,12 +826,14 @@ class TripPlannerTest extends TestCase
 
         $resort = \App\Models\Accommodation::create([
             'slug' => 'co-visited-resort', 'name' => 'Co-Visited Beach Resort', 'location' => 'Davao City',
+            'latitude' => 7.0731, 'longitude' => 125.6128,
             'region_id' => $region->id, 'type' => 'Beach Resort', 'is_accredited' => true,
             'rating' => 4.9, 'review_count' => 50, 'price_tier' => 'Mid-range',
         ]);
 
         $hotel = \App\Models\Accommodation::create([
             'slug' => 'plain-city-hotel', 'name' => 'Plain City Hotel', 'location' => 'Davao City',
+            'latitude' => 7.0731, 'longitude' => 125.6128,
             'region_id' => $region->id, 'type' => 'Hotel', 'is_accredited' => true,
             'rating' => 4.0, 'review_count' => 5, 'price_tier' => 'Mid-range',
         ]);
@@ -1104,13 +1100,17 @@ class TripPlannerTest extends TestCase
         $region = Region::sole();
 
         // No coordinates, exactly as the accreditation import leaves them.
-        Accommodation::create([
+        $unmappedHotel = Accommodation::create([
             'slug' => 'unmapped-hotel', 'name' => 'Unmapped Hotel', 'location' => 'Davao City',
             'region_id' => $region->id, 'type' => 'Hotel', 'is_accredited' => true,
             'rating' => 4.6, 'review_count' => 8, 'price_tier' => 'Mid-range',
         ]);
 
         $this->post('/plan', $this->surveyPayload(['travel_days' => 2, 'arrival_time' => '08:00']));
+
+        // Historical/manual plans may contain an unlocated stay, even though the planner now requires proximity evidence.
+        Itinerary::sole()->items()->create(['kind' => 'overnight', 'day_number' => 1, 'sort_order' => 999,
+            'slot' => 'Evening', 'title' => 'Overnight stay', 'starts_at' => '20:00', 'accommodation_id' => $unmappedHotel->id]);
 
         $stops = Itinerary::with(['items.destination', 'items.accommodation', 'items.restaurant', 'items.souvenirCenter'])
             ->sole()->routeStops();
@@ -1134,9 +1134,10 @@ class TripPlannerTest extends TestCase
     /**
      * Choosing where to sleep measures each night's journey from the day's last stop to the next day's first. A stop with
      * no coordinates (as the accreditation import leaves many) used to make that measurement fail with a TypeError, so a
-     * multi-day plan that included one, with a mapped hotel to choose from, was a server error instead of a plan.
+     * multi-day plan that included one was a server error. A catalogue consisting only of unmapped destinations
+     * must now return a validation message rather than pretending it can produce a measured itinerary.
      */
-    public function test_a_multi_day_plan_with_an_unmapped_stop_and_a_mapped_hotel_still_builds(): void
+    public function test_an_entirely_unmapped_catalogue_returns_a_validation_message_instead_of_an_unmeasured_plan(): void
     {
         $this->seedDestinations();
         $region = Region::sole();
@@ -1151,10 +1152,9 @@ class TripPlannerTest extends TestCase
             'latitude' => 7.07, 'longitude' => 125.61,
         ]);
 
-        $this->post('/plan', $this->surveyPayload(['travel_days' => 3, 'arrival_time' => '08:00']))
-            ->assertRedirect(route('plan.itinerary'));
-
-        $this->get('/plan/itinerary')->assertOk();
+        $this->from('/plan/start')->post('/plan', $this->surveyPayload(['travel_days' => 3, 'arrival_time' => '08:00']))
+            ->assertRedirect('/plan/start')->assertSessionHasErrors('distance_pref');
+        $this->assertSame(0, Itinerary::count(), 'No itinerary with fabricated or unknown route geometry is saved.');
     }
 
     /** The Google Maps link has to carry the whole day, in order. */

@@ -433,7 +433,7 @@ class ArrivalBaselineTest extends TestCase
     {
         $this->multiFixture();
 
-        foreach ([1, 2, 3] as $days) {
+        foreach ([2, 3] as $days) {
             $itinerary = $this->generate($this->preference('23:30', $days));
 
             $this->assertSame([], $this->wrappedTitles($itinerary, $days), "{$days}-day trip, arrival 23:30");
@@ -451,9 +451,16 @@ class ArrivalBaselineTest extends TestCase
     {
         $this->multiFixture();
 
-        foreach ([[1, '21:00'], [3, '21:00'], [3, '20:00']] as [$days, $arrival]) {
+        foreach ([[2, '21:00'], [3, '21:00'], [3, '20:00']] as [$days, $arrival]) {
             $this->assertSame([], $this->wrappedTitles($this->generate($this->preference($arrival, $days)), $days), "{$days}-day, {$arrival}");
         }
+    }
+
+    public function test_a_one_day_late_arrival_cannot_promise_a_wildlife_visit(): void
+    {
+        $this->multiFixture();
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->generate($this->preference('23:30', 1));
     }
 
     // ---------------------------------------------------------------------------------------------

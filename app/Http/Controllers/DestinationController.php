@@ -77,7 +77,7 @@ class DestinationController extends Controller
 
     public function show(Destination $destination): View
     {
-        abort_if($destination->archived_at || ! $destination->is_accredited, 404);
+        abort_unless(Destination::plannerEligible()->whereNull('archived_at')->whereKey($destination->id)->exists(), 404);
 
         $destination->load(['region', 'tags', 'photos', 'reviews' => fn ($q) => $q->latest()->take(10)]);
 

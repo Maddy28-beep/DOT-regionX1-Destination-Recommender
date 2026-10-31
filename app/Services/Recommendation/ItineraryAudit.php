@@ -46,7 +46,7 @@ final class ItineraryAudit
     /** @return array<int, array{key: string, label: string, status: string, detail: string}> */
     public function audit(Itinerary $itinerary, TouristPreference $preference): array
     {
-        $items = $itinerary->items()->with(['destination.tags', 'accommodation'])
+        $items = $itinerary->items()->with(['destination.tags', 'accommodation.accreditationRecords', 'restaurant'])
             ->orderBy('day_number')->orderBy('sort_order')->get();
         $start = $preference->travelWindow()[0];
         $activities = $items->where('kind', 'activity')->filter(fn (ItineraryItem $i) => $i->destination !== null);
@@ -56,13 +56,17 @@ final class ItineraryAudit
             $this->stopsLocated($activities),
             $this->journeysMeasured($items),
             $this->openAtVisit($activities, $start),
+            $this->visitDurations($activities),
+            $this->scheduleOrder($items),
             $this->dayDistance($items, $itinerary, $preference),
-            $this->travelShare($items, $preference),
+            $this->travelShare($items, $preference, $itinerary->range_tier_used),
             $this->interestCoverage($itinerary, $items, $activities, $preference),
             $this->everyDayHasAStop($items, $activities, $itinerary, $preference),
             $this->arrivalRespected($activities, $preference),
             $this->mealTimes($items),
+            $this->mealVenues($items, $start),
             $this->stayClose($items, $activities),
+            $this->stayCompleteness($items, $itinerary, $preference),
             $this->budgetFit($activities, $preference),
         ];
     }
@@ -83,7 +87,7 @@ final class ItineraryAudit
         $label = 'The start point the traveller gave is the one used';
 
         return filled($p->origin_label) && $p->origin() === null
-            ? $this->check('start', $label, 'fail', "'{$p->origin_label}' could not be located, so the plan starts from the city centre")
+            ? $this->check('start', $label, 'fail', 'The provided start point could not be located, so the plan starts from Davao City centre')
             : $this->check('start', $label, 'pass');
     }
 
@@ -100,7 +104,9 @@ final class ItineraryAudit
     private function journeysMeasured($items): array
     {
         $label = 'Every journey has a distance and a time';
-        $unmeasured = $items->where('kind', 'travel')->filter(fn ($i) => $i->distance_km === null);
+        $unmeasured = $items->where('kind', 'travel')->filter(fn ($i) => $i->distance_km === null
+            || $i->travel_min_minutes === null || $i->travel_max_minutes === null
+            || $i->travel_min_minutes < 0 || $i->travel_max_minutes < $i->travel_min_minutes);
 
         return $unmeasured->isEmpty() ? $this->check('journeys', $label, 'pass')
             : $this->check('journeys', $label, 'fail', $unmeasured->count().' journey(s) show "Travel time varies": '
@@ -154,13 +160,25 @@ final class ItineraryAudit
         return $radius === null ? self::REMOTE_DAY_KM : (int) (2 * $radius + self::DAY_KM_SLACK);
     }
 
+    /** Shared by the auditor and planner; optional gaps never pad the day's measured span. */
+    public function dayTravelMetrics($rows): array
+    {
+        $times = $rows->flatMap(fn ($r) => [$this->minutes($r->starts_at), $this->minutes($r->ends_at)])->filter(fn ($m) => $m !== null);
+        $span = $times->isEmpty() ? 0 : $times->max() - $times->min();
+        $legs = $rows->where('kind', 'travel');
+        $minutes = (int) $legs->sum('travel_max_minutes');
+
+        return ['km' => (float) $legs->sum('distance_km'), 'minutes' => $minutes, 'span' => $span,
+            'share' => $span > 0 ? $minutes / $span : 0, 'unknown' => $legs->contains(fn ($r) => $r->distance_km === null)];
+    }
+
     private function dayDistance($items, Itinerary $itinerary, TouristPreference $preference): array
     {
         $limit = $this->dayKmLimit($preference, $itinerary->range_tier_used);
         $label = "No day drives more than {$limit} km (a round trip to the edge of the trip's reach)";
         $over = [];
         foreach ($items->where('kind', 'travel')->groupBy('day_number') as $day => $legs) {
-            $km = (float) $legs->sum(fn ($l) => (float) $l->distance_km);
+            $km = $this->dayTravelMetrics($legs)['km'];
             if ($km > $limit) {
                 $over[] = sprintf('day %d is %.0f km', $day, $km);
             }
@@ -169,9 +187,16 @@ final class ItineraryAudit
         return $over ? $this->check('day_km', $label, 'fail', implode('; ', $over)) : $this->check('day_km', $label, 'pass');
     }
 
-    private function travelShare($items, TouristPreference $preference): array
+    /** One standard for the generator and audit, including remote trips. */
+    public function travelShareLimit(TouristPreference $preference, ?string $tierUsed = null): float
     {
-        $label = 'No day spends more than '.(int) (self::MAX_TRAVEL_SHARE * 100).'% of its time travelling';
+        return self::MAX_TRAVEL_SHARE;
+    }
+
+    private function travelShare($items, TouristPreference $preference, ?string $tierUsed = null): array
+    {
+        $max = $this->travelShareLimit($preference, $tierUsed);
+        $label = 'No day spends more than '.(int) round($max * 100).'% of its time travelling';
         $over = [];
 
         foreach ($items->groupBy('day_number') as $day => $rows) {
@@ -180,10 +205,10 @@ final class ItineraryAudit
                 && $rows->where('kind', 'activity')->whereNotNull('destination_id')->isEmpty()) {
                 continue;
             }
-            $times = $rows->flatMap(fn ($r) => [$this->minutes($r->starts_at), $this->minutes($r->ends_at)])->filter(fn ($m) => $m !== null);
-            $span = $times->isEmpty() ? 0 : $times->max() - $times->min();
-            $travel = (int) $rows->where('kind', 'travel')->sum('travel_max_minutes');
-            if ($span > 0 && $travel / $span > self::MAX_TRAVEL_SHARE) {
+            $metrics = $this->dayTravelMetrics($rows);
+            $span = $metrics['span'];
+            $travel = $metrics['minutes'];
+            if ($span > 0 && $travel / $span > $max) {
                 $over[] = sprintf('day %d is %d%% (%d of %d min)', $day, round($travel / $span * 100), $travel, $span);
             }
         }
@@ -209,7 +234,8 @@ final class ItineraryAudit
         }
 
         // An interest nothing inside the trip's own range offers is a limit of the catalogue and the range the traveller
-        // chose, not a miss by the planner, so it is "unknown", not a failure. Remote has no range, so it always counts.
+        // chose, not a miss by the planner, so it is "unknown", not a failure. The same applies when only higher
+        // spending tiers offer it. An eligible place the planner missed still produces a failure.
         $outOfRange = $this->interestsNothingInRangeOffers($uncovered, $itinerary, $preference);
         $missed = $uncovered->reject(fn ($i) => $outOfRange->contains($i));
 
@@ -217,25 +243,28 @@ final class ItineraryAudit
             return $this->check('interests', $label, 'fail', 'no stop for '.$missed->implode(', '));
         }
 
-        return $this->check('interests', $label, 'unknown', 'nothing within the trip\'s range offers '.$outOfRange->implode(', '));
+        return $this->check('interests', $label, 'unknown', 'No eligible mapped place within the trip\'s range and spending tier offers '.$outOfRange->implode(', '));
     }
 
     /** The interests, of those given, that no place within the trip's range (from where it starts) could cover. */
     private function interestsNothingInRangeOffers($interests, Itinerary $itinerary, TouristPreference $preference)
     {
         $radius = ContentBasedRecommendationService::radiusKm($itinerary->range_tier_used ?: $preference->distance_pref, $preference->transport_pref);
-        if ($radius === null) {
-            return collect();
-        }
-
         $origin = $preference->origin() ?? ['lat' => ContentBasedRecommendationService::DEFAULT_ORIGIN_LAT, 'lng' => ContentBasedRecommendationService::DEFAULT_ORIGIN_LNG];
         [$from, $to] = $preference->travelWindow();
 
-        $inRange = Destination::query()->where('is_accredited', true)->whereNull('archived_at')
+        $inRange = Destination::query()->plannerEligible()->whereNull('archived_at')
             ->where(fn ($q) => $q->whereNull('itinerary_role')->orWhere('itinerary_role', '!=', 'excluded'))
             ->whereNotNull('latitude')->whereNotNull('longitude')
             ->availableDuring($from, $to)->with('tags')->get()
-            ->filter(fn (Destination $d) => $this->km($origin['lat'], $origin['lng'], (float) $d->latitude, (float) $d->longitude) <= $radius);
+            ->filter(function (Destination $d) use ($origin, $radius, $preference) {
+                $price = self::BUDGET_ORDER[$d->price_tier] ?? null;
+                $budget = self::BUDGET_ORDER[$preference->budget] ?? null;
+
+                return (\App\Support\VisitDuration::minutes($d->visit_duration) ?? 0) < 1440
+                    && ($price === null || $budget === null || $price <= $budget)
+                    && ($radius === null || $this->km($origin['lat'], $origin['lng'], (float) $d->latitude, (float) $d->longitude) <= $radius);
+            });
 
         return $interests->filter(fn (string $interest) => ! $inRange->contains(fn (Destination $d) => InterestCoverage::covers($d, $interest)))->values();
     }
@@ -243,17 +272,9 @@ final class ItineraryAudit
     private function everyDayHasAStop($items, $activities, Itinerary $itinerary, TouristPreference $preference): array
     {
         $label = 'Every day has at least one stop';
-        $late = $preference->arrival_time && (int) substr((string) $preference->arrival_time, 0, 2) >= self::LATE_ARRIVAL_HOUR;
         $empty = [];
 
-        foreach (range(1, max(1, (int) $itinerary->total_days)) as $day) {
-            if ($day === (int) $itinerary->total_days && filled($preference->departure_time)
-                && substr((string) $preference->departure_time, 0, 5) <= ItineraryScheduleBuilder::EARLIEST_DEPARTURE) {
-                continue;
-            }
-            if ($day === 1 && $late) {
-                continue;
-            }
+        foreach ($this->sightseeingDays($itinerary, $preference) as $day) {
             if ($activities->where('day_number', $day)->isEmpty()) {
                 $empty[] = "day {$day}";
             }
@@ -261,6 +282,19 @@ final class ItineraryAudit
 
         return $empty ? $this->check('stops_per_day', $label, 'fail', implode(', ', $empty).' has nothing to see')
             : $this->check('stops_per_day', $label, 'pass');
+    }
+
+    public function sightseeingDays(Itinerary $itinerary, TouristPreference $preference): array
+    {
+        return array_values(array_filter(range(1, max(1, (int) $itinerary->total_days)), function ($day) use ($itinerary, $preference) {
+            if ($day === 1 && filled($preference->arrival_time)
+                && (int) substr((string) $preference->arrival_time, 0, 2) >= self::LATE_ARRIVAL_HOUR) {
+                return false;
+            }
+
+            return ! ($day === (int) $itinerary->total_days && filled($preference->departure_time)
+                && substr((string) $preference->departure_time, 0, 5) <= ItineraryScheduleBuilder::EARLIEST_DEPARTURE);
+        }));
     }
 
     private function arrivalRespected($activities, TouristPreference $preference): array
@@ -325,6 +359,122 @@ final class ItineraryAudit
         }
 
         return $unknown ? $this->check('stay', $label, 'unknown', 'a stay has no coordinates') : $this->check('stay', $label, 'pass');
+    }
+
+    private function stayCompleteness($items, Itinerary $trip, TouristPreference $preference): array
+    {
+        $label = 'Every required night has a mapped accommodation';
+        $missing = [];
+        for ($night = 1; $night < $trip->total_days; $night++) {
+            $date = $preference->travelWindow()[0]->copy()->addDays($night - 1);
+            $rows = $items->where('kind', 'overnight')->where('day_number', $night);
+            if (! $rows->contains(function ($row) use ($date) {
+                $stay = $row->accommodation;
+                if (! $stay || ! $stay->is_accredited || $stay->archived_at !== null || $stay->latitude === null || $stay->longitude === null) {
+                    return false;
+                }
+                if (! \App\Models\Accommodation::whereKey($stay->id)->availableDuring($date, $date)->exists()) {
+                    return false;
+                }
+                $records = $stay->accreditationRecords;
+
+                return $records->isEmpty() || $records->contains(fn ($r) => $r->status !== 'Expired'
+                    && ($r->expiration_date === null || $r->expiration_date->toDateString() >= $date->toDateString()
+                        || \App\Support\AccreditationGrace::covers($date)));
+            })) {
+                $missing[] = $night;
+            }
+        }
+
+        return $missing ? $this->check('stay_complete', $label, 'fail', 'No mapped eligible accommodation planned for night(s) '.implode(', ', $missing).'. Confirm availability and accreditation on the trip dates.')
+            : $this->check('stay_complete', $label, 'pass');
+    }
+
+    private function visitDurations($activities): array
+    {
+        $label = 'Visits respect recorded durations and exclude multi-day treks';
+        $bad = [];
+        $unknown = [];
+        foreach ($activities as $item) {
+            $recorded = \App\Support\VisitDuration::minutes($item->destination->visit_duration);
+            $start = $this->minutes($item->starts_at);
+            $end = $this->minutes($item->ends_at);
+            if ($recorded === null) {
+                $unknown[] = $item->destination->name;
+            } elseif ($recorded >= 1440 || $start === null || $end === null || $end - $start < \App\Support\VisitDuration::minimumMinutes($recorded) || $end - $start > $recorded) {
+                $bad[] = $item->destination->name;
+            }
+        }
+
+        return $bad ? $this->check('duration', $label, 'fail', implode(', ', array_unique($bad)))
+            : ($unknown ? $this->check('duration', $label, 'unknown', 'No readable visit duration for '.implode(', ', array_unique($unknown)))
+                : $this->check('duration', $label, 'pass'));
+    }
+
+    private function scheduleOrder($items): array
+    {
+        $label = 'Timed activities, meals and journeys do not overlap';
+        $bad = [];
+        foreach ($items->groupBy('day_number') as $day => $rows) {
+            $previous = null;
+            $offset = 0;
+            foreach ($rows as $row) {
+                if (! in_array($row->kind, ['activity', 'meal', 'travel'], true)) {
+                    continue;
+                }
+                $from = $this->minutes($row->starts_at);
+                $to = $this->minutes($row->ends_at);
+                // Existing saved travel rows recorded a duration but no end.
+                if ($to === null && $row->kind === 'travel' && $from !== null && $row->travel_max_minutes !== null) {
+                    $to = $from + $row->travel_max_minutes;
+                }
+                if ($from === null || $to === null) {
+                    $bad[] = 'day '.$day.': missing times for '.$row->title;
+                    continue;
+                }
+                if ($previous !== null && $previous >= 20 * 60 && $from + $offset < 6 * 60) {
+                    $offset = 1440;
+                }
+                $from += $offset;
+                $to += $offset;
+                if ($to < $from && $from % 1440 >= 20 * 60 && $to % 1440 < 6 * 60) {
+                    $to += 1440;
+                }
+                if ($to < $from || ($previous !== null && $from < $previous)) {
+                    $bad[] = 'day '.$day.': '.$row->title;
+                }
+                $previous = max($previous ?? 0, $to);
+            }
+        }
+
+        return $bad ? $this->check('schedule', $label, 'fail', implode('; ', $bad)) : $this->check('schedule', $label, 'pass');
+    }
+
+    private function mealVenues($items, $start): array
+    {
+        $label = 'Named meal venues are open for the planned meal';
+        $bad = [];
+        $unknown = [];
+        foreach ($items->where('kind', 'meal') as $meal) {
+            if (! $meal->restaurant) {
+                $unknown[] = $meal->title;
+                continue;
+            }
+            $windows = OpeningHours::windowsOn($meal->restaurant->opening_hours, $start->copy()->addDays($meal->day_number - 1));
+            if ($windows === null) {
+                $unknown[] = $meal->restaurant->name;
+                continue;
+            }
+            $from = $this->minutes($meal->starts_at);
+            $to = $this->minutes($meal->ends_at);
+            if ($from === null || $to === null || ! collect($windows)->contains(fn ($w) => $from >= $w[0] && $to <= $w[1])) {
+                $bad[] = $meal->restaurant->name;
+            }
+        }
+
+        return $bad ? $this->check('meal_venues', $label, 'fail', implode(', ', array_unique($bad)))
+            : ($unknown ? $this->check('meal_venues', $label, 'unknown', 'Dining location or hours need confirmation for '.implode('; ', array_unique($unknown)))
+                : $this->check('meal_venues', $label, 'pass'));
     }
 
     private function budgetFit($activities, TouristPreference $preference): array

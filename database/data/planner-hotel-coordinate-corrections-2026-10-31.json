@@ -1,0 +1,10 @@
+{
+  "checked_on": "2026-10-31",
+  "note": "Coordinates only. Accreditation status, expiry, room availability and rates are unchanged. Map feature centres are approximate property locations, not independently surveyed entrances.",
+  "hotels": [
+    {"id": 11, "name": "Dusit D2 Davao", "latitude": 7.109531, "longitude": 125.650671, "source": "https://www.dusit.com/dusitd2-davao/spa/ publishes property GPS; https://www.openstreetmap.org/way/660689947 corroborates property"},
+    {"id": 12, "name": "GoHotels Davao", "latitude": 7.1023308, "longitude": 125.639323, "source": "https://gohotels.ph/branch/lanang-davao confirms Km 7 J.P. Laurel Avenue; https://www.openstreetmap.org/way/437953635 matched Go Hotels Lanang-Davao property centre"},
+    {"id": 21, "name": "Microtel by Wyndham - Davao", "latitude": 7.1024461, "longitude": 125.6324846, "source": "https://www.microtel-davao.com/contact confirms Damosa Gateway / Angliongto (Mamay) Road; https://www.openstreetmap.org/way/116291281 matched Microtel property centre"},
+    {"id": 36, "name": "Waterfront Insular Hotel Davao", "latitude": 7.1061793, "longitude": 125.6504982, "source": "https://www.waterfronthotels.com.ph/wihd_contact/ confirms Lanang property; https://www.openstreetmap.org/node/308729289 matched Waterfront Insular Hotel map point"}
+  ]
+}
