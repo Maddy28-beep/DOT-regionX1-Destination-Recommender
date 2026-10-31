@@ -1,0 +1,92 @@
+[
+  {
+    "id": "26",
+    "name": "Mount Hamiguitan Range Wildlife Sanctuary [SAMPLE]",
+    "field": "visit_duration",
+    "value": "3 days / 2 nights",
+    "source": "https://www.mtapoadventures.com/other-mountains-for-trekking/mt-hamiguitan-adventure-trekking/",
+    "checked_on": "2026-10-30",
+    "evidence_class": "operator_published_itinerary",
+    "notes": "Published standard trek duration for beginner/average participants, not a universal minimum or confirmation of current permit availability. The source explicitly separates the trek from its transfers. Package prices are not entrance fees and were not imported. Multi-day visits are rejected by the current single-activity scheduler."
+  },
+  {
+    "id": "33",
+    "name": "Lon Wa Buddhist Temple [SAMPLE]",
+    "field": "visit_duration",
+    "value": "30 minutes",
+    "source": "https://www.tripadvisor.ca/AttractionProductReview-g298459-d12957736-Davao_City_Sightseeing_Tour_with_Lunch-Davao_City_Davao_del_Sur_Province_Mindanao.html",
+    "checked_on": "2026-10-30",
+    "evidence_class": "operator_published_itinerary",
+    "notes": "Gray Line Philippines product itinerary explicitly lists a 30-minute Lon Wa stop. Published planning allowance, not a mandatory or measured visit duration. Search index exposed the itinerary and operator; direct page fetch failed. Corroborating product: https://www.tripadvisor.co.za/AttractionProductReview-g298459-d12957737-Davao_City_Sights_Tour-Davao_City_Davao_del_Sur_Province_Mindanao.html"
+  },
+  {
+    "id": "33",
+    "name": "Lon Wa Buddhist Temple [SAMPLE]",
+    "field": "entry_fee_min",
+    "value": "0.00",
+    "source": "https://www.escapemanila.com/must-visit-davao-city-tourist-attractions/ | https://www.reddit.com/r/davao/comments/1qbb6jt/exploring_davao_as_a_tourist/",
+    "checked_on": "2026-10-30",
+    "evidence_class": "corroborated_reports_not_operator_confirmed",
+    "notes": "Ordinary temple admission reported free by Escape Manila (2024-11-10), corroborated by a first-person visitor post dated 2026-01-12. The Reddit text was accessible via search index, not direct fetch. Excludes donations, transport and packaged tours. No conflicting admission charge found. This is online corroboration, not a current official tariff."
+  },
+  {
+    "id": "33",
+    "name": "Lon Wa Buddhist Temple [SAMPLE]",
+    "field": "entry_fee_max",
+    "value": "0.00",
+    "source": "https://www.escapemanila.com/must-visit-davao-city-tourist-attractions/ | https://www.reddit.com/r/davao/comments/1qbb6jt/exploring_davao_as_a_tourist/",
+    "checked_on": "2026-10-30",
+    "evidence_class": "corroborated_reports_not_operator_confirmed",
+    "notes": "Same ordinary-admission scope and verification limits as entry_fee_min. Do not interpret as a free tour or free transport."
+  },
+  {
+    "id": "33",
+    "name": "Lon Wa Buddhist Temple [SAMPLE]",
+    "field": "price_tier",
+    "value": "Free",
+    "source": "https://www.escapemanila.com/must-visit-davao-city-tourist-attractions/ | https://www.reddit.com/r/davao/comments/1qbb6jt/exploring_davao_as_a_tourist/",
+    "checked_on": "2026-10-30",
+    "evidence_class": "derived_from_corroborated_free_admission",
+    "notes": "Derived from reported zero ordinary admission. Other paid price tiers were not guessed because the application has no documented peso bands."
+  },
+  {
+    "id": "36",
+    "name": "Monfort Bat Cave [SAMPLE]",
+    "field": "visit_duration",
+    "value": "45 minutes",
+    "source": "https://kembalivistavilla.com/en/nearby-attractions",
+    "checked_on": "2026-10-30",
+    "evidence_class": "local_accommodation_published_recommendation",
+    "notes": "Kembali Vista Villa recommends 45 minutes for a typical sanctuary stop. This is a sourced daylight planning allowance, not a sanctuary rule or a sunset-viewing duration. Other guides suggest longer visits; visitor pace varies. Does not confirm existing hours or fees, which need separate review."
+  }
+  ,{
+    "id": "25",
+    "name": "Aliwagwag Falls [SAMPLE]",
+    "field": "visit_duration",
+    "value": "180 minutes",
+    "source": "https://wayph.com/package/aliwagwag-falls-tour-package/",
+    "checked_on": "2026-10-30",
+    "evidence_class": "derived_from_operator_published_itinerary",
+    "notes": "Planning allowance derived from the Tinuy-an/Aliwagwag itinerary: Aliwagwag at 07:00 and departure for Tinuy-an at 10:00. Search index exposed the itinerary; direct fetch timed out. Publication date unknown. Does not confirm reopening, hours or current tour availability; operational status unchanged."
+  },
+  {
+    "id": "32",
+    "name": "Campawan Curtain Falls [SAMPLE]",
+    "field": "visit_duration",
+    "value": "180 minutes",
+    "source": "https://wayph.com/package/aliwagwag-falls-tour-package/",
+    "checked_on": "2026-10-30",
+    "evidence_class": "derived_from_operator_published_itinerary",
+    "notes": "Planning block derived from the optional Campawan stop at 11:00 and departure for Davao at 14:00. May include a meal or breaks; not three hours of measured activity. Search-index evidence; direct fetch timed out. Publication date unknown. Does not establish opening hours or current tour availability."
+  },
+  {
+    "id": "31",
+    "name": "Subangan Museum [SAMPLE]",
+    "field": "visit_duration",
+    "value": "30 minutes",
+    "source": "https://www.taraletsanywhere.com/best-mati-city-tourist-spots/",
+    "checked_on": "2026-10-30",
+    "evidence_class": "travel_guide_published_recommendation",
+    "notes": "Guide updated 2025-01-28 explicitly estimates approximately 30 minutes. Quick overview allowance, not an official museum standard; longer visits are possible. Predates the 2026 reopening and does not verify post-renovation tour length. PIA independently confirms reopening on 2026-01-12: https://pia.gov.ph/news/museums-in-davao-region-reopen/"
+  }
+]
