@@ -19,7 +19,7 @@
 
     // How the traveller said they get around, for the strip, the pick-up rows and the long-day note.
     $transport = $preference?->transport_pref;
-    $byOperator = ! $itinerary->package && \App\Services\Recommendation\TransportMode::isTourOperator($transport);
+    $byOperator = ! $itinerary->package && \App\Services\Recommendation\TransportMode::suggestsOperators($transport);
     $fmtMinutes = fn (int $m) => $m >= 60 ? intdiv($m, 60).' h'.($m % 60 ? ' '.($m % 60).' min' : '') : $m.' min';
     $longDayMinutes = 240;
 
@@ -104,6 +104,19 @@
                     @endunless
                 </div>
             </section>
+
+            @if (collect($planningChecks ?? [])->contains(fn ($check) => $check['status'] !== 'pass'))
+                <div class="privacy-note" role="status">
+                    <div>
+                        <strong>Things to confirm before your trip</strong>
+                        <ul>
+                            @foreach (collect($planningChecks)->whereIn('status', ['fail', 'unknown']) as $check)
+                                <li>{{ $check['label'] }}@if ($check['detail'] !== ''): {{ $check['detail'] }}@endif</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            @endif
 
             @if (session('pending_save_itinerary'))
                 <div class="privacy-note" role="status">
@@ -285,7 +298,7 @@
                                     @foreach ($rows as $item)
                                         @continue(in_array($item->id, $mergedNights, true))
                                         @if ($byOperator && $item->id === $pickupBeforeId)
-                                            @include('partials.itinerary-pickup-row', ['at' => $pickupAt])
+                                            @include('partials.itinerary-pickup-row', ['at' => $pickupAt, 'transport' => $transport])
                                         @endif
                                         @include('partials.itinerary-timeline-row', ['item' => $item, 'swap' => $swap, 'ideas' => ($ideas ?? [])[$item->id] ?? [], 'preference' => $preference, 'stay' => $stayAfterDinner[$item->id] ?? null])
                                     @endforeach

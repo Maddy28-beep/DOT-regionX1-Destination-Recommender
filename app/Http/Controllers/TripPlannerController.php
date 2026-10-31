@@ -252,14 +252,15 @@ class TripPlannerController extends Controller
          * actually ran against -- a rule mined from 90 transactions and one
          * mined from 9,000 are not the same claim.
          */
-        $catalogue = app(\App\Support\SampleData::class)->split(Destination::publiclyVisible());
+        $catalogue = app(\App\Support\SampleData::class)->split(Destination::plannerEligible()->whereNull('archived_at'));
 
         $provenance = [
             'destinations_ranked' => $itinerary->matches()->count(),
             'catalogue_size' => $catalogue['total'],
             'catalogue_real' => $catalogue['real'],
             'catalogue_sample' => $catalogue['sample'],
-            'catalogue_unverified' => $catalogue['unverified'],
+            'catalogue_unverified' => $catalogue['unverified'] ?? 0,
+            'catalogue_public' => Destination::plannerEligible()->whereNull('archived_at')->where('is_accredited', false)->count(),
             'transactions' => ExitSurvey::count(),
             'transactions_demo' => ExitSurvey::where('data_source', 'demo')->count(),
             'rules_applied' => $itinerary->items()->whereNotNull('rule_basis')->count(),
@@ -280,16 +281,20 @@ class TripPlannerController extends Controller
         // Optional ideas for Day 1's free time before dinner: read-only, never part of the schedule.
         $ideas = app(FreeTimeIdeas::class)->forItinerary($itinerary, $preference);
 
-        // Someone picked up by a tour operator is shown who is near their starting point. A package already
-        // names its own operator, so it needs no suggestions.
-        $operators = ! $itinerary->package_id && TransportMode::isTourOperator($preference->transport_pref)
+        // Someone picked up by a tour operator or renting a car is shown who is near their starting point.
+        // A package already names its own operator, so it needs no suggestions.
+        $operators = ! $itinerary->package_id && TransportMode::suggestsOperators($preference->transport_pref)
             ? app(TourOperatorSuggester::class)->near(
                 $preference->origin_lat !== null ? (float) $preference->origin_lat : null,
                 $preference->origin_lng !== null ? (float) $preference->origin_lng : null,
+                TourOperatorSuggester::LIMIT,
+                $preference->transport_pref,
             )
             : collect();
 
-        return view('plan.itinerary', compact('itinerary', 'preference', 'provenance', 'swap', 'ideas', 'operators'));
+        $planningChecks = $itinerary->package_id ? [] : app(\App\Services\Recommendation\ItineraryAudit::class)->audit($itinerary, $preference);
+
+        return view('plan.itinerary', compact('itinerary', 'preference', 'provenance', 'swap', 'ideas', 'operators', 'planningChecks'));
     }
 
     /**
@@ -508,6 +513,10 @@ class TripPlannerController extends Controller
             ->flatMap(fn ($encoded) => array_filter(explode('|', (string) $encoded)))
             ->unique()
             ->all();
+
+        if (Accommodation::query()->where('is_accredited', true)->whereNull('archived_at')->where('type', 'Beach Resort')->exists()) {
+            $filed[] = 'Beach';
+        }
 
         return array_values(array_filter(Accommodation::RESORT_SETTINGS, fn ($setting) => in_array($setting, $filed, true)));
     }

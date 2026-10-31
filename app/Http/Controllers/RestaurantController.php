@@ -49,7 +49,7 @@ class RestaurantController extends Controller
 
     public function show(Restaurant $restaurant): View
     {
-        abort_if($restaurant->archived_at || ! $restaurant->is_accredited, 404);
+        abort_unless(Restaurant::plannerEligible()->whereNull('archived_at')->whereKey($restaurant->id)->exists(), 404);
 
         $restaurant->load(['region', 'photos', 'reviews' => fn ($q) => $q->latest()->take(10)]);
 
