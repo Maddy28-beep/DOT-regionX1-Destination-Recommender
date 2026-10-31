@@ -128,6 +128,8 @@ class ItineraryScheduleBuilder
 
     private bool $remoteTrip = false;
 
+    private bool $nearTrip = false;
+
     /**
      * How long the traveller may wait outside a place for it to open before the stop is put off until
      * later in the day. A place that opens at 1 pm is not a morning stop; it goes after lunch.
@@ -232,6 +234,7 @@ class ItineraryScheduleBuilder
         // Every journey estimate this build makes is at the pace of how the traveller said they will get around.
         $this->transport = $preference->transport_pref;
         $this->remoteTrip = $preference->distance_pref === 'far';
+        $this->nearTrip = ($itinerary->range_tier_used ?? $preference->distance_pref) === 'near';
         $this->requestedInterests = $preference->activities->pluck('activity')->all();
         $this->mealWindow = $preference->travelWindow();
         $this->mealRestaurants = null;
@@ -1330,6 +1333,16 @@ class ItineraryScheduleBuilder
     {
         $suggestion = $this->souvenirStop($here, $lastDestination, $clock);
         $souvenirs = $suggestion['listing'] ?? null;
+
+        if ($souvenirs && $this->nearTrip && ! in_array('Shopping & Souvenirs', $this->requestedInterests, true)) {
+            $shop = $this->place($souvenirs);
+            $dayKmSoFar = (float) $itinerary->items()->where('day_number', $dayNumber)->where('kind', 'travel')->sum('distance_km');
+            $toShopKm = (float) ($this->estimateLeg($here, $shop)['distance_km'] ?? 0);
+            $homeKm = (float) ($this->estimateLeg($shop, $origin)['distance_km'] ?? 0);
+            if ($dayKmSoFar + $toShopKm + $homeKm > 20.0) {
+                $souvenirs = null;
+            }
+        }
 
         if ($souvenirs && $this->remoteTrip) {
             $shop = $this->place($souvenirs);
