@@ -34,6 +34,14 @@ class ItineraryGenerationService
     private const DESTINATIONS_PER_DAY = 2;
 
     /**
+     * How far apart (slow-end journey, in minutes) two places of one Remote trip may be and still count as the same
+     * neighbourhood. Davao Region's places fall into tight groups (the Mati coast, the north, the south-west): inside
+     * a group the journey is at most about 150 minutes, between groups it is over 255, so a trip drawn from one group
+     * is a trip of days, and a trip drawn from several is a trip of drives.
+     */
+    private const REMOTE_NEIGHBOURHOOD_MINUTES = 150;
+
+    /**
      * When each sightseeing slot opens. A slot is only offered on arrival day
      * if the traveller is on the ground before it starts -- landing at 18:00
      * and being handed a morning stop is the bug this exists to prevent.
@@ -134,6 +142,9 @@ class ItineraryGenerationService
         // be summed per day rather than assumed uniform.
         $dayCapacities = $this->dayCapacities($preference, $totalDays);
         $maxStops = min($distinctRanked->count(), array_sum(array_map('count', $dayCapacities)));
+        if ($preference->distance_pref === 'far') {
+            $distinctRanked = $this->withinOneNeighbourhood($distinctRanked, $maxStops, $preference);
+        }
         // The best places for the trip, except that an interest the traveller chose gets a stop when anything can offer one.
         $topRanked = (new InterestCoverage())->select($distinctRanked, $maxStops, $preference->activities->pluck('activity')->all());
 
@@ -294,6 +305,69 @@ class ItineraryGenerationService
 
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);
         });
+    }
+
+    /**
+     * Puts the places of the best neighbourhood first, so the trip is drawn from one part of the region.
+     *
+     * A Remote trip has no distance limit, and the ranking alone does not care where the best places are: it picked a
+     * stop in the north, one on the coast and one in the south-west, and the days that followed were mostly driving. The
+     * neighbourhood of a place is every place within REMOTE_NEIGHBOURHOOD_MINUTES of it. The best one is the one whose
+     * best places (as many as the trip has stops) add up to the most score, so the traveller's interests still decide
+     * where the trip goes. Its places come first in the ranking's own order, then everything else nearest first, which
+     * is what fills the trip when its neighbourhood holds too few places.
+     *
+     * Only the order changes: nothing is removed from the pool, and the interest coverage, the reserve and the rest of
+     * the plan work from it as before. Places without a position cannot be placed in a neighbourhood and go last.
+     *
+     * @param  \Illuminate\Support\Collection<int, array{destination: Destination, drs: float}>  $ranked  best first
+     * @return \Illuminate\Support\Collection<int, array{destination: Destination, drs: float}>
+     */
+    private function withinOneNeighbourhood(\Illuminate\Support\Collection $ranked, int $stops, TouristPreference $preference): \Illuminate\Support\Collection
+    {
+        $rows = $ranked->values()->all();
+        $minutes = fn (Destination $a, Destination $b): int => $this->stayMinutes($this->placeOf($a), $this->placeOf($b), $preference);
+        $mapped = fn (array $row): bool => $row['destination']->latitude !== null && $row['destination']->longitude !== null;
+
+        $seed = null;
+        $bestScore = -1.0;
+        foreach ($rows as $candidate) {
+            if (! $mapped($candidate)) {
+                continue;
+            }
+            $scores = [];
+            foreach ($rows as $row) {
+                if ($mapped($row) && $minutes($candidate['destination'], $row['destination']) <= self::REMOTE_NEIGHBOURHOOD_MINUTES) {
+                    $scores[] = $row['drs'];
+                }
+            }
+            rsort($scores);
+            $score = array_sum(array_slice($scores, 0, $stops));
+            // Strictly greater: of equal neighbourhoods the one reached first in the ranking wins.
+            if ($score > $bestScore) {
+                $bestScore = $score;
+                $seed = $candidate['destination'];
+            }
+        }
+
+        if ($seed === null) {
+            return $ranked;
+        }
+
+        $inside = [];
+        $outside = [];
+        foreach ($rows as $row) {
+            $away = $mapped($row) ? $minutes($seed, $row['destination']) : PHP_INT_MAX;
+            if ($away <= self::REMOTE_NEIGHBOURHOOD_MINUTES) {
+                $inside[] = $row;
+            } else {
+                $outside[] = ['away' => $away, 'row' => $row];
+            }
+        }
+        // Stable for equal distances (PHP 8 sorts are stable), so the ranking's order breaks ties.
+        usort($outside, fn (array $x, array $y) => $x['away'] <=> $y['away']);
+
+        return collect(array_merge($inside, array_column($outside, 'row')))->values();
     }
 
     /** How many places beyond the trip's own are kept in reserve to fill an empty day. */
