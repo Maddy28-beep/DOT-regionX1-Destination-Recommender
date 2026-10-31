@@ -121,6 +121,12 @@ class ItineraryScheduleBuilder
     private const SOUVENIR_LATEST_END = '19:00';
 
     /**
+     * On a Remote trip the journey home is already long, so the souvenir stop is only added when the traveller
+     * is still back by this hour once it, and the dinner break the late journey then needs, are counted.
+     */
+    private const SOUVENIR_LATEST_ARRIVAL_HOME = '20:00';
+
+    /**
      * How long the traveller may wait outside a place for it to open before the stop is put off until
      * later in the day. A place that opens at 1 pm is not a morning stop; it goes after lunch.
      */
@@ -210,6 +216,7 @@ class ItineraryScheduleBuilder
         $this->noteFailure = false;
         // Every journey estimate this build makes is at the pace of how the traveller said they will get around.
         $this->transport = $preference->transport_pref;
+        $this->remoteTrip = $preference->distance_pref === 'far';
         $this->mealRestaurants = null;
         $lastDay = array_key_last($dayCapacities);
 
@@ -1177,6 +1184,18 @@ class ItineraryScheduleBuilder
         $suggestion = $this->souvenirStop($here, $lastDestination, $clock);
         $souvenirs = $suggestion['listing'] ?? null;
 
+        if ($souvenirs && $this->remoteTrip) {
+            // souvenirFits() only looks at the shop; here the whole journey home is counted, dinner break included.
+            $shop = $this->place($souvenirs);
+            $shopping = $this->toQuarterHour($this->toQuarterHour($clock->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES))
+                ->addMinutes($this->estimateLeg($here, $shop)['max_minutes']))->addMinutes(self::MEAL_MINUTES);
+            $home = $this->planDinnerLeg($this->toQuarterHour($shopping->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES)), $shop, $origin)['arrival'];
+
+            if ($home->greaterThan(Carbon::parse(self::SOUVENIR_LATEST_ARRIVAL_HOME))) {
+                $souvenirs = null;
+            }
+        }
+
         if ($souvenirs) {
             $clock = $this->addTravel(
                 $itinerary,
@@ -1227,6 +1246,9 @@ class ItineraryScheduleBuilder
 
     /** The TransportMode the current build() is planning for; null plans as a personal car. */
     private ?string $transport = null;
+
+    /** Whether the current build() is planning a Remote (distance_pref 'far') trip. */
+    private bool $remoteTrip = false;
 
     /**
      * The latest stored start time of each day, and the days whose clock has run past midnight, both keyed
