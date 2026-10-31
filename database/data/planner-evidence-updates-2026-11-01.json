@@ -1,0 +1,115 @@
+{
+  "checked_on": "2026-11-01",
+  "destinations": [
+    {
+      "slug": "peoples-park",
+      "name": "People's Park",
+      "tags": ["Wildlife (urban birdwatching)"],
+      "fields": {
+        "planning_notes": "When Wildlife is selected, include quiet urban birdwatching around the mini-forest and planted areas during public visiting hours. This is observation of free-ranging city birds, not a zoo, Philippine-eagle encounter or guaranteed sighting. The published 2022 bird survey used observations from October-December 2019 and recorded 15 species here; that historical count is not a promise for this visit. Observe without feeding, chasing or handling birds. The survey's early-morning research access does not override the park's public opening hours. Visit duration remains a planning allowance, not a published fixed tour length."
+      },
+      "source": "https://tourism.davaocity.gov.ph/explore-the-city/attractions/man-made-nature-parks/peoples-park/ — official city tourism page confirms free public entry, mini-forest and resident birds. Banzon et al., Philippine Journal of Science 151(5), 2022, Table 1 records 15 bird species at People's Park from October-December 2019 fieldwork: https://doi.org/10.56899/151.05.32 ; author-uploaded full text https://www.researchgate.net/publication/362788802_Diversity_of_Bird_Species_in_Urban_Green_Spaces_of_Davao_City_Mindanao_Philippines . Checked online 2026-11-01. Supports an explicitly scheduled urban birdwatching component, not guaranteed species or unrestricted morning entry. Existing entrance coordinates, price, public hours and accreditation are preserved."
+    },
+    {
+      "slug": "belviz-farm",
+      "name": "Belviz Farm",
+      "fields": {
+        "hours": "9:00 AM-4:00 PM",
+        "planning_notes": "Allow visits only within the conservative 09:00-16:00 window. Mirrored operator information gives 09:00-17:00; mapped listings close at 16:00. Confirm farm-tour access, fruit season and tour length directly before visiting; retail opening hours do not guarantee a guided tour."
+      },
+      "source": "https://www.findglocal.com/PH/Davao-City/1936581723323193/Belviz-Durian-Farms (mirrored operator page, Wangan/Calinan, checked 2026-11-01, 09:00-17:00) and https://coffeeshopdavao.com/davao-cafes-by-area/ (mapped Wangan listing 09:00-16:00). Conservative common visitor window; full closing-time conflict and guided-tour availability remain unconfirmed. No fixed visit duration was published."
+    },
+    {
+      "slug": "imin-the-philippine-japan-historical-museum",
+      "name": "IMIN The Philippine-Japan Historical Museum",
+      "fields": {
+        "hours": "Mon-Sat 8:00 AM-12:00 PM; Mon-Sat 1:00 PM-5:00 PM; Sun by appointment",
+        "planning_notes": "Published government visitor schedule has a noon closure: Monday-Saturday 08:00-12:00 and 13:00-17:00; Sunday visits require advance booking. The source report is from 2024, rechecked online 2026-11-01; reconfirm current Saturday access and holiday arrangements because older reports required weekend bookings. No fixed guided-visit duration or reservation is established here."
+      },
+      "source": "https://pia.gov.ph/features/imin-museum-remembering-the-near-forgotten-little-tokyo/ (2024 government report quoting the museum curator; schedule re-read 2026-11-01). Older 2022 reports differ on Saturday booking. Sunday remains appointment-dependent, not automatically confirmed open or closed."
+    },
+    {
+      "slug": "malagos-garden-resort",
+      "name": "Malagos Garden Resort",
+      "fields": {
+        "visit_duration": "Variable park visit; 60-90 minutes applies only to the pre-booked Tree-to-Bar tour",
+        "planning_notes": "General garden, wildlife and museum visits have no single published duration. The separate Tree-to-Bar guided farm experience takes 60-90 minutes and requires advance booking; published starts are Monday-Saturday at 10:00 and 13:00, excluding Sundays and holidays. The itinerary does not book that tour or apply its length to the entire park. Viewdeck Cafe serves daytime food 08:00-17:00; Koi Cafe serves breakfast 06:00-10:00 and dinner 17:00-21:00. Admission and meal charges require confirmation."
+      },
+      "source": "https://malagoschocolate.com/pages/malagos-chocolate-museum (operator FAQ distinguishes the 60-90 minute pre-booked Tree-to-Bar programme from the general park/museum); https://www.malagos.com/dine (current named restaurant windows). Checked 2026-11-01."
+    },
+    {
+      "slug": "paradise-island-park-beach-resort",
+      "name": "Paradise Island Park & Beach Resort",
+      "fields": {
+        "planning_notes": "The operator's own boat service publishes first trip 05:45 and last trip 16:00. This is a boat timetable, not the resort gate or restaurant schedule. A later return needs a separately confirmed public-ferry/road transfer. Exact Resto-Beach service hours, day-pass conditions and visit duration remain to be confirmed; a beach stay has no single published length. When wildlife is selected, include the operator-listed aviary and permitted fish-viewing/feeding activities alongside the beach visit; confirm access with staff. A beach swim alone does not count as the wildlife component."
+      },
+      "source": "https://paradiseislandsamal.com/ (operator boat timetable) and https://paradiseislandsamal.com/dining/ (named dining venues without exact service windows), checked 2026-11-01. https://paradiseislandsamal.com/activities/ explicitly lists the aviary, fish feeding and Paradise Reef; these support a combined beach/wildlife visit, not an invented zoo.",
+      "tags": [
+        "Wildlife (aviary)"
+      ]
+    },
+    {
+      "slug": "eden-nature-park",
+      "name": "Eden Nature Park",
+      "tags": [
+        "Wildlife (Birdwalk and Deer Park)"
+      ],
+      "fields": {
+        "planning_notes": "For a selected wildlife interest, include Birdwalk and Deer Park in the visit, rather than treating hiking alone as wildlife viewing. The operator describes an aviary and a Philippine-deer enclosure; confirm access and conditions on the visit date. Combined hiking/animal-viewing visit time remains a planning allowance, not a published fixed tour duration."
+      },
+      "source": "https://www.edennaturepark.com.ph/ — operator specifically names Birdwalk (aviaries), Deer Park (Philippine deer), Butterfly Garden and the Hiking Trail. Checked 2026-11-01. Wildlife coverage is tied to these actual visitor activities, not a generic nature tag."
+    }
+  ],
+  "restaurant_updates": [
+    {
+      "slug": "jacks-ridge-resort-and-restaurant",
+      "name": "Jack's Ridge Resort and Restaurant",
+      "fields": {
+        "opening_hours": "10:30 AM-10:00 PM",
+        "website_url": "https://www.jacksridgedavao.com/",
+        "description": "For meals, this Shrine Hills listing uses Taklobo Restaurant's published daily 10:30-22:00 service window. Karlo's cafe, the Tap Room and the separate North/Buhangin branch have different schedules. Confirm reservations, menu prices and holiday changes."
+      },
+      "source": "https://www.jacksridgedavao.com/amenities.php identifies Taklobo as the main restaurant. https://www.findglocal.com/PH/Davao-City/203463719818075/Jack%27s-Ridge-Resort-and-Restaurant mirrors the operator's September 2026 posts and distinguishes Taklobo Shrine Hills 10:30-22:00 from other outlets. This uses current mirrored operator information; old 2021 PDF and directory hours differ. Checked 2026-11-01; direct telephone confirmation not performed."
+    }
+  ],
+  "restaurants": [
+    {
+      "slug": "viewdeck-cafe-malagos",
+      "name": "Viewdeck Cafe — Malagos Garden Resort",
+      "host_destination_slug": "malagos-garden-resort",
+      "opening_hours": "8:00 AM-5:00 PM",
+      "website_url": "https://www.malagos.com/dine",
+      "description": "Operator-named daytime cafe inside Malagos Garden Resort. Open daily 08:00-17:00. Confirm admission, meal availability and charges; a park ticket does not imply an included meal. Coordinates locate the host property, not a surveyed cafe entrance.",
+      "source": "https://www.malagos.com/dine — current operator dining page names Viewdeck Cafe and daily 08:00-17:00. Checked 2026-11-01."
+    },
+    {
+      "slug": "koi-cafe-malagos",
+      "name": "Koi Cafe — Malagos Garden Resort",
+      "host_destination_slug": "malagos-garden-resort",
+      "opening_hours": "6:00 AM-10:00 AM; 5:00 PM-9:00 PM",
+      "website_url": "https://www.malagos.com/dine",
+      "description": "Operator-named breakfast and dinner cafe inside Malagos Garden Resort. Daily 06:00-10:00 and 17:00-21:00; it is not offered for lunch. Confirm visitor access and meal charges. Coordinates identify the host property.",
+      "source": "https://www.malagos.com/dine — operator specifically publishes split Koi Cafe windows 06:00-10:00 and 17:00-21:00, not the resort-wide 06:00-21:00 span. Checked 2026-11-01."
+    },
+    {
+      "slug": "kusina-dabaw-san-pedro",
+      "name": "Kusina Dabaw — San Pedro Street",
+      "location": "178 San Pedro Street, Poblacion District, Davao City",
+      "coordinates": [
+        7.0665613,
+        125.6067022
+      ],
+      "opening_hours": "Open 24 hours",
+      "website_url": "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/restaurants/new-kusina-dabaw/",
+      "description": "Named San Pedro Street restaurant serving breakfast, lunch and dinner. Government reporting describes 24-hour daily operation. Confirm menu, charges and date-specific changes. This is the San Pedro branch, not Kusina Dabaw Express in Buhangin. No accreditation claim or meal inclusion is inferred.",
+      "source": "https://pia.gov.ph/features/exploring-davao-citys-homegrown-food-scene/ (2026-04-17 government food-crawl report: daily 24-hour operation); https://tourism.davaocity.gov.ph/explore-the-city/restaurants/restaurants/new-kusina-dabaw/ (city tourism identity/address); https://www.waze.com/live-map/directions/ph/davao-region/davao-city/kusina-dabaw?to=place.ChIJFcTstnlt-TIR_iO4eL6Ku_M (San Pedro branch coordinates and 24-hour schedule). Checked 2026-11-01."
+    }
+  ],
+  "unresolved": [
+    "Bankerohan Public Market, Osmena Park and San Pedro Cathedral: no current authoritative uniform tourist access window or fixed visitor duration verified; stall hours, business-office hours and worship-service schedules are not substitutes.",
+    "Agriya, Isla Agri-Ventures, Kaputian Beach and Bukid Amara Davao: identity is known but exact current tourist service windows and fixed visit lengths remain unsupported. Bukid Amara Lucban hours must not be imported into its Davao branch.",
+    "Rhapsody/Aria, Vista/Eden and Resto-Beach/Paradise: operator confirms the restaurant but does not publish a complete precise daily service timetable. Promotional Sunday buffet hours and boat timetables do not establish daily restaurant operation.",
+    "Elysia Obrero: treatment length depends on the booked treatment. Ecoland reviews and similarly named overseas spas do not verify the Obrero appointment duration.",
+    "A generic sightseeing allowance is not a measured or operator-prescribed visit length. Published programme durations are retained with their booking conditions rather than used to force whole-trip verification passes."
+  ]
+}

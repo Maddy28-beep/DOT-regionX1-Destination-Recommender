@@ -11,7 +11,8 @@ class ItineraryConstraintRepair
 {
     public function __construct(private readonly ItineraryAudit $audit) {}
 
-    public function repair(Itinerary $trip, TouristPreference $preference, Collection $ranked, array $capacities, callable $build, array $origin): void
+    /** True only when a repaired build replaces the initial schedule. */
+    public function repair(Itinerary $trip, TouristPreference $preference, Collection $ranked, array $capacities, callable $build, array $origin): bool
     {
         $pool = $ranked->keyBy(fn ($r) => $r['destination']->id);
         $wanted = $preference->activities->pluck('activity')->filter(fn ($i) => $pool->contains(fn ($r) => InterestCoverage::covers($r['destination'], $i)))->values()->all();
@@ -19,7 +20,7 @@ class ItineraryConstraintRepair
         $rows = $read();
         $score = $this->score($trip, $preference, $rows, $wanted);
         if (array_sum(array_slice($score, 0, 3)) == 0) {
-            return;
+            return false;
         }
         $initialRows = $trip->items()->orderBy('sort_order')->get();
         $sequence = $rows->where('kind', 'activity')->whereNotNull('destination_id')
@@ -41,6 +42,35 @@ class ItineraryConstraintRepair
             $offers = [];
             // Stops on the days that break a limit are tried first, so the few trials go where they can help.
             $bad = $this->badDays($trip, $preference, $rows);
+            $seen = [];
+            $offer = function (array $trial, array $assignments) use (&$offers, &$seen, $bad, $sequence, $days): void {
+                $append = function (array $ordered) use (&$offers, &$seen, $assignments): void {
+                    $key = implode(',', array_map(fn ($e) => $e['row']['destination']->id.'@'.$assignments[$e['row']['destination']->id], $ordered));
+                    if (! isset($seen[$key])) {
+                        $seen[$key] = true;
+                        $offers[] = [$ordered, $assignments];
+                    }
+                };
+                $append($trial);
+                foreach (array_unique($assignments) as $day) {
+                    $positions = array_keys(array_filter($trial, fn ($e) => $assignments[$e['row']['destination']->id] === $day));
+                    $original = array_values(array_map(fn ($e) => $e['row']['destination']->id, array_filter($sequence, fn ($e) => $days[$e['row']['destination']->id] === $day)));
+                    $next = array_map(fn ($i) => $trial[$i]['row']['destination']->id, $positions);
+                    if (count($positions) < 2 || (! isset($bad[$day]) && $original === $next)) {
+                        continue;
+                    }
+                    // A new visit may fit only before its same-day neighbour closes. Keep both orders in the search.
+                    $reversed = $trial;
+                    foreach ($positions as $i => $position) {
+                        $reversed[$position] = $trial[$positions[count($positions) - 1 - $i]];
+                    }
+                    $append($reversed);
+                }
+            };
+            if ($bad) {
+                $offer($sequence, $days);
+            }
+
             $order = array_keys($sequence);
             usort($order, fn ($a, $b) => (int) isset($bad[$days[$sequence[$b]['row']['destination']->id] ?? 0]) <=> (int) isset($bad[$days[$sequence[$a]['row']['destination']->id] ?? 0]));
             $candidates = $pool->reject(fn ($r, $id) => in_array($id, $ids, true)
@@ -60,7 +90,7 @@ class ItineraryConstraintRepair
                     $assignments[$id] = $day;
                     $trial = $sequence;
                     usort($trial, fn ($a, $b) => $assignments[$a['row']['destination']->id] <=> $assignments[$b['row']['destination']->id]);
-                    $offers[] = [$trial, $assignments];
+                    $offer($trial, $assignments);
                 }
             }
             // Two visits on different days trade places: a far stop on a long day for a nearer one elsewhere.
@@ -79,7 +109,7 @@ class ItineraryConstraintRepair
                         [$assignments[$a], $assignments[$b]] = [$days[$b], $days[$a]];
                         $trial = $sequence;
                         usort($trial, fn ($x, $y) => $assignments[$x['row']['destination']->id] <=> $assignments[$y['row']['destination']->id]);
-                        $offers[] = [$trial, $assignments];
+                        $offer($trial, $assignments);
                     }
                 }
             }
@@ -104,7 +134,7 @@ class ItineraryConstraintRepair
                     $assignments = $days;
                     unset($assignments[$entry['row']['destination']->id]);
                     $assignments[$r['destination']->id] = $day;
-                    $offers[] = [$trial, $assignments];
+                    $offer($trial, $assignments);
                 }
             }
             foreach ($capacities as $day => $slots) {
@@ -119,7 +149,7 @@ class ItineraryConstraintRepair
                     $trial[] = ['row' => $r, 'distance_km' => null];
                     $assignments = $days + [$r['destination']->id => $day];
                     usort($trial, fn ($a, $b) => $assignments[$a['row']['destination']->id] <=> $assignments[$b['row']['destination']->id]);
-                    $offers[] = [$trial, $assignments];
+                    $offer($trial, $assignments);
                 }
             }
             $dayKmLimit = $this->audit->dayKmLimit($preference, $trip->range_tier_used);
@@ -136,7 +166,7 @@ class ItineraryConstraintRepair
                 array_splice($trial, $index, 1);
                 $assignments = $days;
                 unset($assignments[$entry['row']['destination']->id]);
-                $offers[] = [$trial, $assignments];
+                $offer($trial, $assignments);
             }
             $improved = false;
             // Do not spend the bounded search on moves that cannot cover a
@@ -186,6 +216,7 @@ class ItineraryConstraintRepair
         }
         // The caller checks remaining() before saving a successful itinerary;
         // exhaustion of this bounded search is not proof that a route is valid.
+        return $changed;
     }
 
     /**

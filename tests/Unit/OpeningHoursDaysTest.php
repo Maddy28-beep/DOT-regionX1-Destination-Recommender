@@ -45,6 +45,16 @@ class OpeningHoursDaysTest extends TestCase
         $this->assertSame([[480, 720]], $this->on($text, '2026-10-18'));
     }
 
+    public function test_appointment_days_do_not_hide_known_weekday_windows_or_claim_a_booking(): void
+    {
+        $text = 'Mon-Sat 8:00 AM-12:00 PM; Mon-Sat 1:00 PM-5:00 PM; Sun by appointment';
+
+        $this->assertSame([[480, 720], [780, 1020]], $this->on($text, self::MONDAY));
+        $this->assertSame([[480, 720], [780, 1020]], $this->on($text, '2026-10-17'));
+        $this->assertNull($this->on($text, '2026-10-18'));
+        $this->assertNull($this->on('Sat-Sun by appointment', '2026-10-17'));
+    }
+
     public function test_a_range_may_wrap_past_sunday(): void
     {
         $this->assertSame([[480, 1020]], $this->on('Sat–Mon 8:00 AM–5:00 PM', self::MONDAY));

@@ -53,6 +53,39 @@ class PlannerAuditLimitsTest extends TestCase
         $this->assertTrue($trip->items->where('kind', 'activity')->contains('destination_id', $near->id));
     }
 
+    public function test_an_afternoon_request_can_cover_beach_and_wildlife_at_one_verified_combined_venue(): void
+    {
+        $this->place(Destination::class, ['type' => 'Beach & Leisure', 'rating' => 5]);
+        $this->place(Destination::class, ['type' => 'Wildlife', 'rating' => 5]);
+        $combined = $this->place(Destination::class, ['type' => 'Beach & Leisure', 'rating' => 2]);
+        $combined->tags()->create(['kind' => 'category', 'value' => 'Wildlife (aviary)']);
+        $p = $this->preference(['Beach & Island', 'Wildlife'], ['arrival_time' => '13:00']);
+        $trip = app(ItineraryGenerationService::class)->generate($p);
+        $visits = $trip->items->where('kind', 'activity')->whereNotNull('destination_id');
+
+        $this->assertCount(1, $visits);
+        $this->assertSame($combined->id, $visits->first()->destination_id);
+        $this->assertStringContainsString('Beach and wildlife', $visits->first()->title);
+        $this->assertSame('pass', collect(app(ItineraryAudit::class)->audit($trip, $p))->keyBy('key')['interests']['status']);
+    }
+
+    public function test_a_missing_interest_can_be_added_before_the_other_stop_when_its_gate_closes_early(): void
+    {
+        $this->place(Destination::class, ['type' => 'Cultural Heritage', 'visit_duration' => '90 minutes']);
+        $this->place(Destination::class, ['type' => 'Beach & Leisure', 'latitude' => 7.071, 'visit_duration' => '150 minutes']);
+        $early = $this->place(Destination::class, ['type' => 'Adventure & Hiking', 'latitude' => 7.072, 'visit_duration' => '150 minutes', 'hours' => '8:00 AM-12:00 PM']);
+        $this->place(Accommodation::class);
+        $p = $this->preference(['Cultural Heritage', 'Beach & Island', 'Hiking & Trekking'], ['travel_days' => 2, 'arrival_time' => '15:00']);
+        $trip = app(ItineraryGenerationService::class)->generate($p);
+        $dayTwo = $trip->items->where('day_number', 2)->where('kind', 'activity')->whereNotNull('destination_id')->sortBy('sort_order');
+
+        $this->assertSame($early->id, $dayTwo->first()->destination_id);
+        $checks = collect(app(ItineraryAudit::class)->audit($trip, $p))->keyBy('key');
+        $this->assertSame('pass', $checks['interests']['status']);
+        $this->assertSame('pass', $checks['open']['status']);
+        $this->assertSame('pass', $checks['duration']['status']);
+    }
+
     public function test_a_hotel_outside_forty_kilometres_is_not_used_as_a_fallback(): void
     {
         $this->place(Destination::class);
@@ -66,6 +99,30 @@ class PlannerAuditLimitsTest extends TestCase
         $near->delete();
         $trip = app(ItineraryGenerationService::class)->generate($p);
         $this->assertFalse($trip->items->contains('accommodation_id', $far->id));
+    }
+
+    public function test_hotel_selection_counts_the_breakfast_transfer_instead_of_choosing_an_equally_close_stay(): void
+    {
+        $this->place(Destination::class, ['latitude' => 7.071, 'visit_duration' => '150 minutes']);
+        $this->place(Destination::class, ['latitude' => 7.072, 'visit_duration' => '150 minutes']);
+        $withoutDining = $this->place(Accommodation::class);
+        $withDining = $this->place(Accommodation::class);
+        $restaurant = \App\Models\Restaurant::create([
+            'slug' => 'hotel-breakfast', 'name' => 'Named hotel dining venue', 'location' => 'Davao City',
+            'region_id' => $withDining->region_id, 'latitude' => $withDining->latitude, 'longitude' => $withDining->longitude,
+            'is_accredited' => true, 'opening_hours' => '6:00 AM-10:00 PM', 'host_accommodation_id' => $withDining->id,
+        ]);
+        $p = $this->preference(['Nature & Adventure'], ['travel_days' => 2, 'distance_pref' => 'near']);
+        $costs = app(\App\Services\Recommendation\ItineraryScheduleBuilder::class)
+            ->breakfastTransferCosts([$withoutDining, $withDining], $p, \Illuminate\Support\Carbon::parse('2026-11-01'));
+        $this->assertSame(30, $costs[$withoutDining->id]);
+        $this->assertSame(0, $costs[$withDining->id]);
+
+        $trip = app(ItineraryGenerationService::class)->generate($p);
+        $this->assertSame($withDining->id, $trip->items->firstWhere('kind', 'overnight')->accommodation_id);
+        $breakfast = $trip->items->first(fn ($item) => $item->day_number === 2 && str_starts_with($item->title, 'Breakfast'));
+        $this->assertSame($restaurant->id, $breakfast->restaurant_id);
+        $this->assertSame('pass', collect(app(ItineraryAudit::class)->audit($trip, $p))->keyBy('key')['travel_share']['status']);
     }
 
     public function test_an_interest_lost_to_opening_hours_gets_a_feasible_replacement(): void
@@ -124,6 +181,7 @@ class PlannerAuditLimitsTest extends TestCase
 
     public function test_a_catalogue_entirely_above_budget_does_not_produce_an_empty_successful_plan(): void
     {
+        config(['itinerary.planner.reject_incomplete_trips' => false]);
         $this->place(Destination::class, ['price_tier' => 'Premium']);
         $p = $this->preference(['Nature & Adventure'], ['budget' => 'Budget-Friendly']);
 
@@ -142,12 +200,13 @@ class PlannerAuditLimitsTest extends TestCase
         }
     }
 
-    public function test_an_unavoidable_over_limit_trip_returns_best_plan_by_default_and_rejects_when_configured(): void
+    public function test_an_unavoidable_over_limit_trip_returns_best_plan_only_when_explicitly_configured(): void
     {
+        config(['itinerary.planner.reject_incomplete_trips' => false]);
         $this->place(Destination::class, ['latitude' => 8.0]);
         $p = $this->preference(['Nature & Adventure']);
 
-        // Default: traveller receives the best available itinerary rather than an error page.
+        // Explicit partial-plan mode retains its existing behavior.
         $trip = app(ItineraryGenerationService::class)->generate($p);
         $this->assertNotNull($trip->id);
         $trip->items()->delete();

@@ -79,16 +79,16 @@ return [
     | Deliberate trip rejection
     |--------------------------------------------------------------------------
     |
-    | When false (the default), a trip whose available time or catalogue cannot
+    | When false, a trip whose available time or catalogue cannot
     | cover every selected interest or stay within every distance/travel-share
     | limit after bounded repair still returns the best itinerary built, with
-    | omission and day notices explaining what was left out. Set to true only
-    | when incomplete itineraries should be rejected with a ValidationException.
+    | omission and day notices explaining what was left out. By default, reject
+    | infeasible trips with a ValidationException after bounded repair.
     |
     */
 
     'planner' => [
-        'reject_incomplete_trips' => (bool) env('ITINERARY_REJECT_INCOMPLETE_TRIPS', false),
+        'reject_incomplete_trips' => (bool) env('ITINERARY_REJECT_INCOMPLETE_TRIPS', true),
     ],
 ];
 

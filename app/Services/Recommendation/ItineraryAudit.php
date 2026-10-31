@@ -193,6 +193,22 @@ final class ItineraryAudit
         return self::MAX_TRAVEL_SHARE;
     }
 
+    /** Transfer-only boundary days have no sightseeing time to compare with driving. */
+    public function travelShareApplies($rows, TouristPreference $preference): bool
+    {
+        if ($rows->contains('kind', 'activity')) {
+            return true;
+        }
+        if (filled($preference->departure_time) && $rows->contains('kind', 'departure')) {
+            return false;
+        }
+
+        return ! ((int) $rows->first()?->day_number === 1
+            && filled($preference->arrival_time)
+            && (int) substr((string) $preference->arrival_time, 0, 2) >= self::LATE_ARRIVAL_HOUR
+            && $rows->contains('kind', 'overnight'));
+    }
+
     private function travelShare($items, TouristPreference $preference, ?string $tierUsed = null): array
     {
         $max = $this->travelShareLimit($preference, $tierUsed);
@@ -200,9 +216,7 @@ final class ItineraryAudit
         $over = [];
 
         foreach ($items->groupBy('day_number') as $day => $rows) {
-            // A deadline-driven transfer-only departure day is expected to be mostly travelling.
-            if (filled($preference->departure_time) && $rows->contains('kind', 'departure')
-                && $rows->where('kind', 'activity')->whereNotNull('destination_id')->isEmpty()) {
+            if (! $this->travelShareApplies($rows, $preference)) {
                 continue;
             }
             $metrics = $this->dayTravelMetrics($rows);

@@ -130,6 +130,8 @@ class ItineraryScheduleBuilder
 
     private bool $nearTrip = false;
 
+    private ?string $rangeTier = null;
+
     /**
      * How long the traveller may wait outside a place for it to open before the stop is put off until
      * later in the day. A place that opens at 1 pm is not a morning stop; it goes after lunch.
@@ -233,6 +235,7 @@ class ItineraryScheduleBuilder
         $this->noteFailure = false;
         // Every journey estimate this build makes is at the pace of how the traveller said they will get around.
         $this->transport = $preference->transport_pref;
+        $this->rangeTier = $itinerary->range_tier_used ?: $preference->distance_pref;
         $this->remoteTrip = $preference->distance_pref === 'far';
         $this->nearTrip = ($itinerary->range_tier_used ?? $preference->distance_pref) === 'near';
         $this->requestedInterests = $preference->activities->pluck('activity')->all();
@@ -587,6 +590,8 @@ class ItineraryScheduleBuilder
             $from['region'] ?? null,
             $to['region'] ?? null,
             $this->transport,
+            $from,
+            $to,
         );
     }
 
@@ -692,10 +697,35 @@ class ItineraryScheduleBuilder
         return null;
     }
 
-    /** Minutes a day may spend driving, by the traveller's distance preference. */
+    /** Use the already-disclosed effective tier, as the completed itinerary audit does. */
     private function driveBudget(TouristPreference $preference): int
     {
-        return self::DRIVE_BUDGET_MINUTES[$preference->distance_pref] ?? self::DEFAULT_DRIVE_BUDGET_MINUTES;
+        return self::DRIVE_BUDGET_MINUTES[$this->rangeTier ?? $preference->distance_pref] ?? self::DEFAULT_DRIVE_BUDGET_MINUTES;
+    }
+
+    /** Price the exact breakfast detour that openDay would select, without changing builder state. */
+    public function breakfastTransferCosts(iterable $stays, TouristPreference $preference, Carbon $date): array
+    {
+        $probe = clone $this;
+        $probe->transport = $preference->transport_pref;
+        $probe->mealWindow = $preference->travelWindow();
+        $probe->mealRestaurants = null;
+        $costs = [];
+        foreach ($stays as $stay) {
+            $costs[$stay->id] = 0;
+            $host = $probe->hostRestaurant('host_accommodation_id', $stay->id, Carbon::parse(self::BREAKFAST), self::BREAKFAST_MINUTES, $date);
+            if ($host && OpeningHours::windows($host->opening_hours) !== null) {
+                continue;
+            }
+            $near = $probe->place($stay);
+            $stop = $probe->mealStop(Carbon::parse(self::EARLIEST_DEPARTURE), self::MEAL_MINUTES, $near, null, $date);
+            if ($stop['kind'] === 'restaurant' && OpeningHours::windowsOn($stop['listing']->opening_hours, $date) !== null) {
+                $there = $probe->place($stop['listing']);
+                $costs[$stay->id] = $probe->estimateLeg($near, $there)['max_minutes'] + $probe->estimateLeg($there, $near)['max_minutes'];
+            }
+        }
+
+        return $costs;
     }
 
     /** Arrival day opens where the traveller lands; every other day opens with breakfast. */
@@ -807,12 +837,24 @@ class ItineraryScheduleBuilder
     {
         $start = $this->toQuarterHour($clock);
         $end = $start->copy()->addMinutes($minutes);
+        $hiking = in_array('Hiking & Trekking', $this->requestedInterests, true) && InterestCoverage::covers($destination, 'Hiking & Trekking');
+        $wildlife = in_array('Wildlife', $this->requestedInterests, true) && InterestCoverage::covers($destination, 'Wildlife');
+        $beach = in_array('Beach & Island', $this->requestedInterests, true) && InterestCoverage::covers($destination, 'Beach & Island');
+        $urbanBirdwatching = $wildlife && $destination->tags->contains(
+            fn ($tag) => $tag->kind === 'category' && $tag->value === 'Wildlife (urban birdwatching)'
+        );
+        $title = match (true) {
+            $hiking && $wildlife => 'Hiking trail and wildlife visit — '.$destination->name,
+            $beach && $wildlife => 'Beach and wildlife visit — '.$destination->name,
+            $hiking => 'Hiking trail visit — '.$destination->name,
+            $urbanBirdwatching => 'Urban birdwatching and park visit — '.$destination->name,
+            $wildlife && $destination->type !== 'Wildlife' => 'Wildlife visit — '.$destination->name,
+            default => self::ACTIVITY_BY_TYPE[$destination->type] ?? ('Explore '.$destination->name),
+        };
 
         $this->row($itinerary, $dayNumber, $sortOrder, [
             'kind' => 'activity',
-            'title' => in_array('Hiking & Trekking', $this->requestedInterests, true) && InterestCoverage::covers($destination, 'Hiking & Trekking')
-                ? 'Hiking trail visit — '.$destination->name
-                : (self::ACTIVITY_BY_TYPE[$destination->type] ?? ('Explore '.$destination->name)),
+            'title' => $title,
             'starts_at' => $start,
             'ends_at' => $end,
             'destination_id' => $destination->id,
@@ -1053,7 +1095,8 @@ class ItineraryScheduleBuilder
             $attributes += ['title' => $meal.' — '.$stop['listing']->name, 'restaurant_id' => $stop['listing']->id,
                 'note' => $this->mealVenueNote($stop['listing'])];
         } elseif ($stop['kind'] === 'onsite') {
-            $attributes += ['title' => $meal.' — '.$onSite->name.' Restaurant', 'destination_id' => $onSite->id];
+            $attributes += ['title' => $meal.' at '.$onSite->name.' (venue to confirm)', 'destination_id' => $onSite->id,
+                'note' => 'A restaurant amenity is listed here, but its name and service hours have not been verified. Confirm the dining venue and meal charges before visiting.'];
         } elseif ($stop['kind'] === 'restaurant') {
             // Fit the outbound journey, a meaningful meal and the return in
             // the slot already reserved by planLeg; subsequent visits keep
@@ -1081,7 +1124,7 @@ class ItineraryScheduleBuilder
         } else {
             $attributes += [
                 'title' => $meal.' break'.($phase === 'road' ? ' on the way' : '').' (your choice)',
-                'note' => 'No accredited restaurant within '.self::MEAL_SEARCH_KM.' km that is open then. Choose where to eat.',
+                'note' => 'No confirmed meal venue fits the service hours and travel allowance within '.self::MEAL_SEARCH_KM.' km. Choose where to eat and confirm availability.',
             ];
         }
 

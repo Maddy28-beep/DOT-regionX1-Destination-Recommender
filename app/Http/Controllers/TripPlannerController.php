@@ -281,12 +281,14 @@ class TripPlannerController extends Controller
         // Optional ideas for Day 1's free time before dinner: read-only, never part of the schedule.
         $ideas = app(FreeTimeIdeas::class)->forItinerary($itinerary, $preference);
 
-        // Someone picked up by a tour operator is shown who is near their starting point. A package already
-        // names its own operator, so it needs no suggestions.
-        $operators = ! $itinerary->package_id && TransportMode::isTourOperator($preference->transport_pref)
+        // Someone picked up by a tour operator or renting a car is shown who is near their starting point.
+        // A package already names its own operator, so it needs no suggestions.
+        $operators = ! $itinerary->package_id && TransportMode::suggestsOperators($preference->transport_pref)
             ? app(TourOperatorSuggester::class)->near(
                 $preference->origin_lat !== null ? (float) $preference->origin_lat : null,
                 $preference->origin_lng !== null ? (float) $preference->origin_lng : null,
+                TourOperatorSuggester::LIMIT,
+                $preference->transport_pref,
             )
             : collect();
 
@@ -511,6 +513,10 @@ class TripPlannerController extends Controller
             ->flatMap(fn ($encoded) => array_filter(explode('|', (string) $encoded)))
             ->unique()
             ->all();
+
+        if (Accommodation::query()->where('is_accredited', true)->whereNull('archived_at')->where('type', 'Beach Resort')->exists()) {
+            $filed[] = 'Beach';
+        }
 
         return array_values(array_filter(Accommodation::RESORT_SETTINGS, fn ($setting) => in_array($setting, $filed, true)));
     }

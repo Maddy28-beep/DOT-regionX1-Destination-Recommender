@@ -431,6 +431,8 @@ class ArrivalBaselineTest extends TestCase
 
     public function test_a_2330_arrival_no_longer_stores_times_that_run_backwards(): void
     {
+        // Exercise partial-plan scheduling explicitly; the default rejects infeasible requests.
+        config(['itinerary.planner.reject_incomplete_trips' => false]);
         $this->multiFixture();
 
         foreach ([1, 2, 3] as $days) {
@@ -449,6 +451,8 @@ class ArrivalBaselineTest extends TestCase
 
     public function test_an_evening_arrival_before_the_wrap_threshold_is_chronological(): void
     {
+        // Exercise partial-plan scheduling explicitly; the default rejects infeasible requests.
+        config(['itinerary.planner.reject_incomplete_trips' => false]);
         $this->multiFixture();
 
         foreach ([[1, '21:00'], [2, '21:00'], [3, '21:00'], [3, '20:00']] as [$days, $arrival]) {

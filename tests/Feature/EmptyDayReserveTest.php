@@ -91,6 +91,8 @@ class EmptyDayReserveTest extends TestCase
 
     public function test_when_the_reserve_cannot_help_the_plan_is_unchanged_and_nothing_is_lost(): void
     {
+        // Exercise partial-plan scheduling explicitly; the default rejects infeasible requests.
+        config(['itinerary.planner.reject_incomplete_trips' => false]);
         // Everything is about 3 hours away: no reserve place can be reached on the arrival afternoon either.
         foreach (['Far A', 'Far B', 'Far C', 'Far D', 'Far E'] as $i => $name) {
             $this->place($name, 55 + $i * 4, 5.0 - $i * 0.1);
