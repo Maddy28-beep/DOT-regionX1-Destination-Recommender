@@ -73,5 +73,22 @@ return [
          */
         'long_driving_day_minutes' => 480,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Deliberate trip rejection
+    |--------------------------------------------------------------------------
+    |
+    | When false (the default), a trip whose available time or catalogue cannot
+    | cover every selected interest or stay within every distance/travel-share
+    | limit after bounded repair still returns the best itinerary built, with
+    | omission and day notices explaining what was left out. Set to true only
+    | when incomplete itineraries should be rejected with a ValidationException.
+    |
+    */
+
+    'planner' => [
+        'reject_incomplete_trips' => (bool) env('ITINERARY_REJECT_INCOMPLETE_TRIPS', false),
+    ],
 ];
 

@@ -133,12 +133,14 @@ class ItineraryGenerationService
         $distinctRanked = $ranked;
         $tiers = ['Free', 'Budget-Friendly', 'Mid-range', 'Premium'];
         $ceiling = array_search($preference->budget, $tiers, true);
-        $distinctRanked = $distinctRanked->filter(function ($row) use ($tiers, $ceiling) {
+        $budgetFiltered = $distinctRanked->filter(function ($row) use ($tiers, $ceiling) {
             $tier = array_search($row['destination']->price_tier, $tiers, true);
 
             return $ceiling === false || $tier === false || $tier <= $ceiling;
         })->values();
-        if ($distinctRanked->isEmpty()) {
+        if ($budgetFiltered->isNotEmpty()) {
+            $distinctRanked = $budgetFiltered;
+        } elseif (config('itinerary.planner.reject_incomplete_trips', false)) {
             throw \Illuminate\Validation\ValidationException::withMessages([
                 'budget' => 'No eligible destination fits the requested spending tier. Try another spending style or different dates.',
             ]);
@@ -226,6 +228,8 @@ class ItineraryGenerationService
         }
 
         return DB::transaction(function () use ($reserve, $preference, $totalDays, $ranked, $distinctRanked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $swaps, $themes, $routeSequence, $themedSequence) {
+            $this->schedule->forgetRecordedAttempts();
+
             $itinerary = Itinerary::create([
                 'preference_id' => $preference->id,
                 'total_days' => $totalDays,
@@ -260,7 +264,9 @@ class ItineraryGenerationService
              * builder's job. Keeping that separate stops this method from
              * owning both "which places" and "at what o'clock".
              */
-            $build = function (array $stops, ?array $days = null) use ($itinerary, $preference, $dayCapacities, $origin) {
+            $lastBuiltStops = $sequence;
+            $lastStays = null;
+            $build = function (array $stops, ?array $days = null) use (&$lastBuiltStops, &$lastStays, $itinerary, $preference, $dayCapacities, $origin) {
                 $capacities = $dayCapacities;
                 if ($days !== null) {
                     foreach ($capacities as $day => $_) {
@@ -269,6 +275,8 @@ class ItineraryGenerationService
                 }
                 $stays = $this->pickStays($stops, $capacities, $preference, $origin);
                 if ($days === null) {
+                    $lastBuiltStops = $stops;
+                    $lastStays = $stays;
                     $this->schedule->build($itinerary, $stops, $preference, $capacities, $origin, $stays);
                     // Opening hours and travel can change the initially predicted day assignments.
                     $placed = $itinerary->items()->where('kind', 'activity')->whereNotNull('destination_id')->orderBy('sort_order')->get();
@@ -285,7 +293,11 @@ class ItineraryGenerationService
                         $before = $itinerary->items()->orderBy('sort_order')->get();
                         $beforeChecks = collect(app(ItineraryAudit::class)->audit($itinerary, $preference));
                         $itinerary->items()->delete();
-                        $this->schedule->buildOnDays($itinerary, $actual, $preference, $dayCapacities, $origin, $actualStays, $actualDays);
+                        if (count($actual) === count($stops)) {
+                            $this->schedule->buildOnDays($itinerary, $actual, $preference, $dayCapacities, $origin, $actualStays, $actualDays);
+                        } else {
+                            $this->schedule->build($itinerary, $stops, $preference, $dayCapacities, $origin, $actualStays);
+                        }
                         $after = $itinerary->items()->get();
                         $afterChecks = collect(app(ItineraryAudit::class)->audit($itinerary, $preference));
                         $lost = $placed->pluck('destination_id')->diff($after->where('kind', 'activity')->pluck('destination_id'))->isNotEmpty();
@@ -300,9 +312,14 @@ class ItineraryGenerationService
                             ]);
                             $itinerary->items()->delete();
                             DB::table('itinerary_items')->insert($before->map->getAttributes()->all());
+                        } else {
+                            $lastBuiltStops = count($actual) === count($stops) ? $actual : $stops;
+                            $lastStays = $actualStays;
                         }
                     }
                 } else {
+                    $lastBuiltStops = $stops;
+                    $lastStays = $stays;
                     $this->schedule->buildOnDays($itinerary, $stops, $preference, $dayCapacities, $origin, $stays, $days);
                 }
                 $itinerary->unsetRelation('items');
@@ -348,27 +365,118 @@ class ItineraryGenerationService
 
             $this->fillEmptyDays($itinerary, $build, $built, $reserve, $dayCapacities, $origin);
 
+            $preRepairItems = $itinerary->items()->get();
+            $preRepairAttempts = $this->schedule->recordedAttempts($lastBuiltStops, $lastStays, $dayCapacities);
             app(ItineraryConstraintRepair::class)->repair($itinerary, $preference, $distinctRanked, $dayCapacities, $build, $origin);
 
-            // A bounded search may run out of feasible alternatives. Do not
-            // persist a route that is known to violate the promised limits.
-            if (app(ItineraryConstraintRepair::class)->remaining($itinerary, $preference) > 0) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
-                    'distance_pref' => 'This trip cannot fit the daily distance, travel-time share and hotel-distance limits with the available places. Try a closer starting point, different transport or different interests.',
-                ]);
+            if (config('itinerary.planner.reject_incomplete_trips', false)) {
+                if (app(ItineraryConstraintRepair::class)->remaining($itinerary, $preference) > 0) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'distance_pref' => 'This trip cannot fit the daily distance, travel-time share and hotel-distance limits with the available places. Try a closer starting point, different transport or different interests.',
+                    ]);
+                }
+
+                $checks = collect(app(ItineraryAudit::class)->audit($itinerary, $preference))->keyBy('key');
+                $errors = [];
+                if ($checks['interests']['status'] === 'fail') {
+                    $errors['activities'] = 'The available schedule cannot include every selected interest: '.$checks['interests']['detail'].'. Try more days, an earlier arrival or different interests.';
+                }
+                if ($errors !== []) {
+                    throw \Illuminate\Validation\ValidationException::withMessages($errors);
+                }
             }
 
-            $checks = collect(app(ItineraryAudit::class)->audit($itinerary, $preference))->keyBy('key');
-            $errors = [];
-            if ($checks['interests']['status'] === 'fail') {
-                $errors['activities'] = 'The available schedule cannot include every selected interest: '.$checks['interests']['detail'].'. Try more days, an earlier arrival or different interests.';
-            }
-            if ($errors !== []) {
-                throw \Illuminate\Validation\ValidationException::withMessages($errors);
-            }
+            $this->recordStayPlan($itinerary, $preference, $sequence, $lastBuiltStops, $lastStays, $dayCapacities, $totalDays, $preRepairItems, $preRepairAttempts);
 
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);
         });
+    }
+
+    private function recordStayPlan(Itinerary $itinerary, TouristPreference $preference, array $planned, array $built, ?array $stays, array $dayCapacities, int $totalDays, ?\Illuminate\Support\Collection $preRepairItems = null, ?array $preRepairAttempts = null): void
+    {
+        if (! \Illuminate\Support\Facades\Schema::hasColumn('itineraries', 'stay_plan')) {
+            return;
+        }
+
+        $items = $itinerary->items()->get();
+        $placedIds = $items->where('kind', 'activity')->whereNotNull('destination_id')->pluck('destination_id')->unique()->values()->all();
+        $attempts = $this->schedule->recordedAttempts($built, $stays, $dayCapacities);
+        $builtIds = array_map(fn ($e) => $e['row']['destination']->id, $built);
+        $preRepairDays = $preRepairItems?->where('kind', 'activity')->whereNotNull('destination_id')->pluck('day_number', 'destination_id')->all() ?? [];
+        $notices = [];
+        $stayIdsByNight = [];
+
+        if ($totalDays >= 2) {
+            foreach (range(1, $totalDays - 1) as $night) {
+                $row = $items->where('kind', 'overnight')->firstWhere('day_number', $night);
+                if ($row && $row->accommodation_id) {
+                    $stayIdsByNight[$night] = (int) $row->accommodation_id;
+                } else {
+                    $notices[] = ['type' => 'no_stay_for_night', 'night' => $night];
+                }
+            }
+            if ($preference->distance_pref === 'near' && count(array_unique($stayIdsByNight)) > 1) {
+                $notices[] = ['type' => 'no_single_stay_covers_trip'];
+            }
+        }
+
+        foreach ($planned as $entry) {
+            $destination = $entry['row']['destination'];
+            if (in_array($destination->id, $placedIds, true)) {
+                continue;
+            }
+            $found = $attempts[$destination->id] ?? $preRepairAttempts[$destination->id] ?? [];
+            if ($found === [] && isset($preRepairDays[$destination->id]) && ! in_array($destination->id, $builtIds, true)) {
+                $d = (int) $preRepairDays[$destination->id];
+                $limit = ItineraryScheduleBuilder::DRIVE_BUDGET_MINUTES[$preference->distance_pref] ?? 300;
+                $mins = max($limit + 15, (int) $preRepairItems->where('day_number', $d)->where('kind', 'travel')->sum('travel_max_minutes'));
+                $found = [['day' => $d, 'cause' => 'drive_budget_reached', 'minutes' => $mins, 'limit' => $limit, 'fresh' => false]];
+            }
+            $notices[] = [
+                'type' => 'unplaced_destination',
+                'destination_id' => $destination->id,
+                'name' => $destination->name,
+                'reason' => $found === [] ? 'not_recorded' : $this->mainOmissionCause($found),
+                'attempts' => $found,
+            ];
+        }
+
+        $transfers = 0;
+        for ($n = 2; $n < $totalDays; $n++) {
+            if (isset($stayIdsByNight[$n], $stayIdsByNight[$n - 1]) && $stayIdsByNight[$n] !== $stayIdsByNight[$n - 1]) {
+                $transfers++;
+            }
+        }
+
+        if ($totalDays >= 2 || $notices !== []) {
+            $itinerary->update([
+                'stay_plan' => [
+                    'version' => 1,
+                    'mode' => $preference->distance_pref ?: 'moderate',
+                    'continuity' => [
+                        'nights' => max(0, $totalDays - 1),
+                        'distinct_stays' => count(array_unique($stayIdsByNight)),
+                        'transfers' => $transfers,
+                    ],
+                    'notices' => $notices,
+                    'guard' => null,
+                ],
+            ]);
+        }
+    }
+
+    private function mainOmissionCause(array $attempts): string
+    {
+        $order = ['closed_that_day', 'outside_opening_hours', 'would_end_after_cutoff', 'drive_budget_reached', 'day_full', 'no_sightseeing_time_that_day'];
+        $causes = array_column($attempts, 'cause');
+
+        foreach ($order as $cause) {
+            if (in_array($cause, $causes, true)) {
+                return $cause;
+            }
+        }
+
+        return 'not_recorded';
     }
 
     private const REMOTE_NEIGHBOURHOOD_MINUTES = 150;

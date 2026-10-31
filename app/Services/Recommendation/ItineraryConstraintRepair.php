@@ -18,9 +18,10 @@ class ItineraryConstraintRepair
         $read = fn () => $trip->items()->with('destination.tags', 'accommodation')->orderBy('sort_order')->get();
         $rows = $read();
         $score = $this->score($trip, $preference, $rows, $wanted);
-        if (array_sum(array_slice($score, 0, 4)) == 0) {
+        if (array_sum(array_slice($score, 0, 3)) == 0) {
             return;
         }
+        $initialRows = $trip->items()->orderBy('sort_order')->get();
         $sequence = $rows->where('kind', 'activity')->whereNotNull('destination_id')
             ->map(fn ($r) => ['row' => $pool[$r->destination_id] ?? ['destination' => $r->destination], 'distance_km' => null])->values()->all();
         $days = $rows->where('kind', 'activity')->whereNotNull('destination_id')->pluck('day_number', 'destination_id')->all();
@@ -121,7 +122,16 @@ class ItineraryConstraintRepair
                     $offers[] = [$trial, $assignments];
                 }
             }
+            $dayKmLimit = $this->audit->dayKmLimit($preference, $trip->range_tier_used);
+            $canDropStop = $candidates->count() > 1 || $rows->groupBy('day_number')->contains(
+                fn ($dayRows) => $dayRows->where('kind', 'activity')->whereNotNull('destination_id')->isNotEmpty()
+                    && $this->audit->dayTravelMetrics($dayRows)['km'] > $dayKmLimit
+            );
             foreach ($sequence as $index => $entry) {
+                $day = $days[$entry['row']['destination']->id] ?? 0;
+                if (! $canDropStop && $this->audit->dayTravelMetrics($rows->where('day_number', $day))['km'] <= $dayKmLimit) {
+                    continue;
+                }
                 $trial = $sequence;
                 array_splice($trial, $index, 1);
                 $assignments = $days;
@@ -148,7 +158,8 @@ class ItineraryConstraintRepair
                 $next = $this->score($trip, $preference, $trialRows, $wanted);
                 // A repair never gives up something the traveller asked for (an interest) or leaves a day with nothing
                 // to do in order to shorten a journey: those stay as they were and the audit reports the long day.
-                if ($next[2] <= $score[2] && $next[3] <= $score[3] && array_slice($next, 0, 5) < array_slice($score, 0, 5)) {
+                $keepsStops = $canDropStop || $next[0] < $score[0] || $next[2] < $score[2] || $next[4] < $score[4] || $next[5] <= $score[5];
+                if ($keepsStops && $next[2] <= $score[2] && $next[3] <= $score[3] && array_slice($next, 0, 5) < array_slice($score, 0, 5)) {
                     // Keep only visits actually placed, so a closed visit cannot consume a repair slot.
                     $days = $trialRows->where('kind', 'activity')->whereNotNull('destination_id')->pluck('day_number', 'destination_id')->all();
                     $sequence = array_values(array_filter($trial, fn ($e) => isset($days[$e['row']['destination']->id])));
@@ -159,13 +170,19 @@ class ItineraryConstraintRepair
                     break;
                 }
             }
-            if (! $improved || array_sum(array_slice($score, 0, 4)) == 0) {
+            if (! $improved || array_sum(array_slice($score, 0, 3)) == 0) {
                 break;
             }
         }
-        $rebuild($sequence, $days);
-        if ($changed && $trip->day_themes !== null) {
-            $trip->update(['day_themes' => null]); // Original grouping measurements no longer describe these days.
+        if ($changed) {
+            $rebuild($sequence, $days);
+            if ($trip->day_themes !== null) {
+                $trip->update(['day_themes' => null]); // Original grouping measurements no longer describe these days.
+            }
+        } elseif ($trials > 0) {
+            $trip->items()->delete();
+            \Illuminate\Support\Facades\DB::table('itinerary_items')->insert($initialRows->map->getAttributes()->all());
+            $trip->unsetRelation('items');
         }
         // The caller checks remaining() before saving a successful itinerary;
         // exhaustion of this bounded search is not proof that a route is valid.
@@ -188,6 +205,9 @@ class ItineraryConstraintRepair
         $bad = [];
         $limit = $this->audit->dayKmLimit($preference, $trip->range_tier_used);
         foreach ($rows->groupBy('day_number') as $day => $dayRows) {
+            if ($dayRows->where('kind', 'activity')->whereNotNull('destination_id')->isEmpty()) {
+                continue;
+            }
             $metrics = $this->audit->dayTravelMetrics($dayRows);
             if ($metrics['km'] > $limit || $metrics['share'] > $this->audit->travelShareLimit($preference, $trip->range_tier_used)) {
                 $bad[$day] = true;
@@ -205,6 +225,9 @@ class ItineraryConstraintRepair
         $hard = 0;
         $limit = $this->audit->dayKmLimit($preference, $trip->range_tier_used);
         foreach ($rows->groupBy('day_number') as $day) {
+            if ($day->where('kind', 'activity')->whereNotNull('destination_id')->isEmpty()) {
+                continue;
+            }
             $metrics = $this->audit->dayTravelMetrics($day);
             $hard += max(0, $metrics['km'] / $limit - 1) + max(0, $metrics['share'] / $this->audit->travelShareLimit($preference, $trip->range_tier_used) - 1);
         }

@@ -89,16 +89,27 @@ class VerifiedPublicPlannerTest extends TestCase
         $this->assertSame('fail',$checks['stops_per_day']['status']);
     }
 
-    public function test_an_unfillable_available_interest_is_declined_and_the_transaction_is_rolled_back(): void
+    public function test_an_unfillable_available_interest_records_omission_by_default_and_declines_when_configured(): void
     {
         $this->place(1,['type'=>'Wildlife']);
         $this->place(2,['type'=>'Beach & Leisure']);
         $p=$this->preference(1);
         $p->update(['arrival_time'=>'13:00']);
         foreach(['Wildlife','Beach & Island'] as $interest)$p->activities()->create(['activity'=>$interest]);
+
+        // Default: builds the 1-stop afternoon plan and audit reports the uncovered interest.
+        $trip = app(ItineraryGenerationService::class)->generate($p);
+        $this->assertCount(1, $trip->items->where('kind', 'activity')->whereNotNull('destination_id'));
+        $this->assertSame('fail', collect(app(ItineraryAudit::class)->audit($trip, $p))->keyBy('key')['interests']['status']);
+        $trip->items()->delete();
+        $trip->matches()->delete();
+        $trip->delete();
+
+        // Deliberate rejection mode: declines and rolls back.
+        config(['itinerary.planner.reject_incomplete_trips' => true]);
         try {
             app(ItineraryGenerationService::class)->generate($p);
-            $this->fail('One remaining slot cannot cover two distinct interests.');
+            $this->fail('One remaining slot cannot cover two distinct interests when reject_incomplete_trips is enabled.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->assertArrayHasKey('activities',$e->errors());
             $this->assertDatabaseCount('itineraries',0);

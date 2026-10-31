@@ -81,9 +81,21 @@ class ChatbotPlaceAnswersTest extends TestCase
 
     public function test_asking_about_accreditation_gets_a_plain_yes(): void
     {
-        $this->place('Eden Nature Park');
+        $park = $this->place('Eden Nature Park');
+        \App\Models\AccreditationRecord::create(['listing_kind' => 'destination', 'listing_id' => $park->id, 'accreditation_number' => 'DOT-R11-TST-00001-2026',
+            'status' => 'Active', 'issue_date' => '2026-01-01', 'expiration_date' => '2028-01-01', 'is_placeholder' => false]);
 
         $this->assertStringStartsWith('Yes, Eden Nature Park is DOT-accredited.', $this->ask('Is Eden Nature Park accredited?')['response']);
+    }
+
+    public function test_a_place_with_no_accreditation_record_is_never_called_accredited(): void
+    {
+        $this->place('Eden Nature Park');
+
+        $reply = $this->ask('Is Eden Nature Park accredited?')['response'];
+
+        $this->assertStringContainsString('not yet verified', $reply);
+        $this->assertStringNotContainsString('is DOT-accredited', $reply);
     }
 
     public function test_a_greeting_is_not_mistaken_for_a_place_called_hello(): void

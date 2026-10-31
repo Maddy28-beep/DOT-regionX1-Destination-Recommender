@@ -58,14 +58,13 @@ class PlannerVerifiedDataSeeder extends Seeder
                 continue;
             }
             [, $name, $field, $value] = $row;
-            $dest = Destination::where('name', $name)->first();
-            if (! $dest) {
-                continue;
-            }
-            if ($field === 'category_tag') {
-                $dest->tags()->firstOrCreate(['kind' => 'category', 'value' => $value]);
-            } elseif (in_array($field, ['hours', 'latitude', 'longitude', 'entry_fee_min', 'entry_fee_max', 'visit_duration'], true)) {
-                $dest->update([$field => $value]);
+            $names = $name === 'Davao Crocodile Park Inc' ? ['Davao Crocodile Park Inc', 'Davao Crocodile Park'] : [$name];
+            foreach (Destination::whereIn('name', $names)->get() as $dest) {
+                if ($field === 'category_tag') {
+                    $dest->tags()->firstOrCreate(['kind' => 'category', 'value' => $value]);
+                } elseif (in_array($field, ['hours', 'latitude', 'longitude', 'entry_fee_min', 'entry_fee_max', 'visit_duration'], true)) {
+                    $dest->update([$field => $value]);
+                }
             }
         }
     }
@@ -110,11 +109,11 @@ class PlannerVerifiedDataSeeder extends Seeder
         }
 
         foreach ($manifest['destinations'] ?? [] as $row) {
-            $query = Destination::where('name', $row['name']);
-            if ($row['name'] === 'Elysia Wellness Spa') {
-                $query->where(fn ($q) => $q->where('location', 'like', '%Obrero%')->orWhere('id', $row['id'] ?? 0));
-            }
-            $dest = $query->first() ?? Destination::where('name', $row['name'])->first();
+            $dest = (! empty($row['slug']) ? Destination::where('slug', $row['slug'])->first() : null)
+                ?? ($row['name'] === 'Elysia Wellness Spa'
+                    ? Destination::where('name', $row['name'])->where('location', 'like', '%Obrero%')->first()
+                    : null)
+                ?? Destination::where('name', $row['name'])->first();
             if ($dest && isset($row['coordinates'])) {
                 $dest->update([
                     'latitude' => $row['coordinates'][0],
@@ -214,11 +213,11 @@ class PlannerVerifiedDataSeeder extends Seeder
         $checkedAt = ($manifest['checked_on'] ?? '2026-10-31').' 12:00:00';
 
         foreach ($manifest['destinations'] ?? [] as $row) {
-            $query = Destination::where('name', $row['name']);
-            if ($row['name'] === 'Elysia Wellness Spa') {
-                $query->whereNotNull('latitude');
-            }
-            $dest = $query->first() ?? Destination::where('name', $row['name'])->first();
+            $dest = (! empty($row['slug']) ? Destination::where('slug', $row['slug'])->first() : null)
+                ?? ($row['name'] === 'Elysia Wellness Spa'
+                    ? Destination::where('name', $row['name'])->whereNotNull('latitude')->first()
+                    : null)
+                ?? Destination::where('name', $row['name'])->first();
             if (! $dest) {
                 continue;
             }

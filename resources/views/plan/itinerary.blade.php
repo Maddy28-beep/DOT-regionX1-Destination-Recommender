@@ -459,14 +459,11 @@
                             <div>
                                 <strong>Content-Based Recommendation</strong> scored
                                 {{ $provenance['destinations_ranked'] }} of
-                                @if (($provenance['catalogue_sample'] ?? 0) > 0)
-                                    {{ $provenance['catalogue_size'] }} destinations ({{ $provenance['catalogue_real'] - ($provenance['catalogue_public'] ?? 0) }} DOT-accredited,
-                                    @if (($provenance['catalogue_public'] ?? 0) > 0)
-                                        {{ $provenance['catalogue_public'] }} verified visitor places without confirmed DOT accreditation,
-                                    @endif
-                                    {{ $provenance['catalogue_sample'] }} sample data, not DOT-verified) against your
+                                @if (($provenance['catalogue_sample'] ?? 0) > 0 || ($provenance['catalogue_unverified'] ?? 0) > 0)
+                                    {{ $provenance['catalogue_size'] }} destinations ({{ $provenance['catalogue_real'] }} DOT Accredited,
+                                    {{ $provenance['catalogue_sample'] }} Sample Data{{ ($provenance['catalogue_unverified'] ?? 0) > 0 ? ', '.$provenance['catalogue_unverified'].' Not Yet Verified' : '' }}) against your
                                 @else
-                                    {{ $provenance['catalogue_size'] }} eligible destinations against your
+                                    {{ $provenance['catalogue_size'] }} accredited destinations against your
                                 @endif
                                 survey answers, combining five weighted factors into the Destination
                                 Recommendation Score shown above (Sec. 2.3.3, Equations 1&ndash;3).

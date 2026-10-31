@@ -452,7 +452,7 @@ class TripPlannerTest extends TestCase
      * souvenir shopping at 1:45 AM, departure at 3:30 AM. Nothing may start
      * after the evening.
      */
-    public function test_an_infeasible_distant_plan_is_rejected_before_it_can_run_into_the_small_hours(): void
+    public function test_no_schedule_row_runs_into_the_small_hours(): void
     {
         $region = Region::create(['name' => 'Davao Region']);
 
@@ -467,6 +467,15 @@ class TripPlannerTest extends TestCase
             ]);
         }
 
+        $this->post('/plan', $this->surveyPayload(['travel_days' => 2, 'arrival_time' => '08:00']));
+
+        foreach (Itinerary::with('items')->sole()->items as $item) {
+            $hour = (int) explode(':', (string) $item->starts_at)[0];
+            $this->assertLessThanOrEqual(23, $hour, "'{$item->title}' is scheduled at {$item->starts_at}, which is not a time anyone travels.");
+        }
+
+        Itinerary::query()->delete();
+        config(['itinerary.planner.reject_incomplete_trips' => true]);
         $this->from('/plan/start')->post('/plan', $this->surveyPayload(['travel_days' => 2, 'arrival_time' => '08:00']))
             ->assertRedirect('/plan/start')->assertSessionHasErrors('distance_pref');
         $this->assertSame(0, Itinerary::count());

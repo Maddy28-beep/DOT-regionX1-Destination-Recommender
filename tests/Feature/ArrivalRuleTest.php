@@ -508,8 +508,14 @@ class ArrivalRuleTest extends TestCase
             ];
         };
 
-        // Earlier arrivals must not bypass the shared departure floor or let
-        // an infeasible far-flung itinerary escape the final audit limits.
+        $expected = [1 => ['Samal Island 09:30-12:00', 'Mount Apo Natural Park 16:15-18:00'], 2 => ['Bemwa Farm Fresh Inc. 10:15-12:45']];
+
+        $this->assertSame($expected, $stopsFor('04:00'), 'the 04:00 plan: three of the four stops, Dahican left out');
+        $this->assertSame($expected, $stopsFor('06:00'), 'a 06:00 arrival now plans exactly like 04:00');
+        $this->assertSame($expected, $stopsFor('06:29'), 'the last arrival before the breakfast window');
+
+        // When deliberate trip rejection is enabled, an over-limit itinerary is rejected.
+        config(['itinerary.planner.reject_incomplete_trips' => true]);
         foreach (['04:00', '06:00', '06:29'] as $arrival) {
             try {
                 $stopsFor($arrival);

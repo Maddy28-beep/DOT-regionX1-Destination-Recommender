@@ -82,7 +82,7 @@
 
     @if (! empty($guide))
         <a href="{{ route('tour-operators.index') }}" class="visit-card__guide">
-            <span><small>Need a guide?</small><strong>Find DOT-accredited tour operators</strong></span>
+            <span><small>Need a guide?</small><strong>Find tour operators</strong></span>
             <x-icon name="arrow-right" />
         </a>
     @endif

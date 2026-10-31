@@ -22,14 +22,14 @@
     <div class="halftone"></div>
     <div class="dpost-card__scrim"></div>
 
-    @php $isSample = app(\App\Support\SampleData::class)->isSample($destination); @endphp
+    @php $provenance = app(\App\Support\SampleData::class)->status($destination); @endphp
     @if ($destination->is_accredited)
-        <span class="dpost-badge-accredited{{ $isSample ? ' is-sample' : '' }}" title="{{ $isSample ? 'Sample data, not DOT-verified' : 'DOT Accredited' }}">
+        <span class="dpost-badge-accredited is-{{ $provenance }}" title="{{ \App\Support\SampleData::title($provenance) }}">
             <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
                 <circle cx="10" cy="10" r="3.4" fill="currentColor"/>
             </svg>
-            {{ $isSample ? 'Sample data, not DOT-verified' : 'DOT Accredited' }}
+            {{ \App\Support\SampleData::label($provenance) }}
         </span>
     @endif
 

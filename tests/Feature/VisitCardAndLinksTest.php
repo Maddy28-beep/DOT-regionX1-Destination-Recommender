@@ -107,7 +107,7 @@ class VisitCardAndLinksTest extends TestCase
             ->assertSee('Plan your visit')
             ->assertSee('Open now')
             ->assertSee('About 4 hours')
-            ->assertSee('Find DOT-accredited tour operators')
+            ->assertSee('Find tour operators')
             ->assertSee(route('tour-operators.index'), false)
             ->assertSee('save-square', false);
 

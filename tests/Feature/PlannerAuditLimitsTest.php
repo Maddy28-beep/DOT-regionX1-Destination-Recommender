@@ -127,21 +127,38 @@ class PlannerAuditLimitsTest extends TestCase
         $this->place(Destination::class, ['price_tier' => 'Premium']);
         $p = $this->preference(['Nature & Adventure'], ['budget' => 'Budget-Friendly']);
 
+        $trip = app(ItineraryGenerationService::class)->generate($p);
+        $this->assertSame('fail', collect(app(ItineraryAudit::class)->audit($trip, $p))->keyBy('key')['budget']['status']);
+        $trip->items()->delete();
+        $trip->matches()->delete();
+        $trip->delete();
+
+        config(['itinerary.planner.reject_incomplete_trips' => true]);
         try {
             app(ItineraryGenerationService::class)->generate($p);
-            $this->fail('A budget-incompatible catalogue must be reported.');
+            $this->fail('A budget-incompatible catalogue must be reported when reject_incomplete_trips is enabled.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->assertArrayHasKey('budget', $e->errors());
         }
     }
 
-    public function test_an_unavoidable_over_limit_trip_is_rejected_without_saving_a_partial_plan(): void
+    public function test_an_unavoidable_over_limit_trip_returns_best_plan_by_default_and_rejects_when_configured(): void
     {
         $this->place(Destination::class, ['latitude' => 8.0]);
         $p = $this->preference(['Nature & Adventure']);
+
+        // Default: traveller receives the best available itinerary rather than an error page.
+        $trip = app(ItineraryGenerationService::class)->generate($p);
+        $this->assertNotNull($trip->id);
+        $trip->items()->delete();
+        $trip->matches()->delete();
+        $trip->delete();
+
+        // Deliberate rejection mode: rejects and rolls back without saving a partial plan.
+        config(['itinerary.planner.reject_incomplete_trips' => true]);
         try {
             app(ItineraryGenerationService::class)->generate($p);
-            $this->fail('An over-limit route must not be returned as a successful plan.');
+            $this->fail('An over-limit route must be rejected when reject_incomplete_trips is enabled.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->assertArrayHasKey('distance_pref', $e->errors());
             $this->assertSame(0, \App\Models\Itinerary::count());
@@ -150,6 +167,7 @@ class PlannerAuditLimitsTest extends TestCase
 
     public function test_the_audit_distinguishes_declined_requests_from_successful_plans(): void
     {
+        config(['itinerary.planner.reject_incomplete_trips' => true]);
         $this->place(Destination::class, ['latitude' => 8.0]);
         $this->artisan('itinerary:audit', ['--scenario' => 'Solo day trip'])
             ->expectsOutputToContain('1 request(s) were declined as infeasible')

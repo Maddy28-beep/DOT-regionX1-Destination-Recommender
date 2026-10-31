@@ -89,13 +89,19 @@ class EmptyDayReserveTest extends TestCase
         $this->assertNotContains('Reserve Place', array_merge(...array_values($stops)), 'the reserve is not used when no day is empty');
     }
 
-    public function test_when_every_reserve_option_exceeds_the_limits_no_invalid_success_is_returned(): void
+    public function test_when_the_reserve_cannot_help_the_plan_is_unchanged_and_nothing_is_lost(): void
     {
         // Everything is about 3 hours away: no reserve place can be reached on the arrival afternoon either.
         foreach (['Far A', 'Far B', 'Far C', 'Far D', 'Far E'] as $i => $name) {
             $this->place($name, 55 + $i * 4, 5.0 - $i * 0.1);
         }
 
+        $stops = $this->stopsByDay($this->plan('15:00'));
+
+        $this->assertNotEmpty($stops, 'the trip still has stops');
+        $this->assertSame(count(array_merge(...array_values($stops))), count(array_unique(array_merge(...array_values($stops)))), 'no place twice');
+
+        config(['itinerary.planner.reject_incomplete_trips' => true]);
         $this->expectException(\Illuminate\Validation\ValidationException::class);
         $this->plan('15:00');
     }

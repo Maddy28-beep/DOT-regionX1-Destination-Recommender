@@ -19,7 +19,7 @@
                 <div>
                     <span class="dpost-kicker poster-kicker">a quick postcard tour</span>
                     <h2 class="poster-title" id="moodsTitle" style="color:var(--ocean-teal-dark);">What Davao is known for</h2>
-                    <p>Pick a mood and we'll show you every DOT-accredited spot that fits.</p>
+                    <p>Pick a mood and we'll show you every spot that fits.</p>
                 </div>
             </div>
 

@@ -259,6 +259,7 @@ class TripPlannerController extends Controller
             'catalogue_size' => $catalogue['total'],
             'catalogue_real' => $catalogue['real'],
             'catalogue_sample' => $catalogue['sample'],
+            'catalogue_unverified' => $catalogue['unverified'] ?? 0,
             'catalogue_public' => Destination::plannerEligible()->whereNull('archived_at')->where('is_accredited', false)->count(),
             'transactions' => ExitSurvey::count(),
             'transactions_demo' => ExitSurvey::where('data_source', 'demo')->count(),

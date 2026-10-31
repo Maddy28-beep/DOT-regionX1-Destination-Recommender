@@ -11,11 +11,11 @@ id,name,field,value,source
 4,People's Park,category_tag,Nature,https://tourism.davaocity.gov.ph/explore-the-city/attractions/man-made-nature-parks/peoples-park/ confirms mini-forest and garden; checked 2026-10-31
 4,People's Park,entry_fee_min,0,https://tourism.davaocity.gov.ph/explore-the-city/attractions/man-made-nature-parks/peoples-park/ free entry; checked 2026-10-31
 4,People's Park,entry_fee_max,0,https://tourism.davaocity.gov.ph/explore-the-city/attractions/man-made-nature-parks/peoples-park/ free entry; checked 2026-10-31
-5,Davao Crocodile Park,hours,8:00 AM-5:00 PM,https://www.experiencedavao.com/destinations/davao-city/attractions/davao-crocodile-park ; checked 2026-10-31
-5,Davao Crocodile Park,latitude,7.0972103,https://www.openstreetmap.org/way/81347693 zoo feature centre approximate visitor location; checked 2026-10-30
-5,Davao Crocodile Park,longitude,125.5989760,https://www.openstreetmap.org/way/81347693 zoo feature centre approximate visitor location; checked 2026-10-30
-6,Malagos Garden Resort,hours,8:00 AM-5:00 PM,https://malagoschocolate.com/pages/malagos-chocolate-museum museum visitor hours (not hotel or dining hours); checked 2026-10-31
-6,Malagos Garden Resort,latitude,7.1910411,https://www.openstreetmap.org/way/976238615 resort feature centre approximate visitor location; checked 2026-10-30
-6,Malagos Garden Resort,longitude,125.4276581,https://www.openstreetmap.org/way/976238615 resort feature centre approximate visitor location; checked 2026-10-30
-6,Malagos Garden Resort,category_tag,Food Tasting,https://malagoschocolate.com/pages/malagos-chocolate-museum chocolate bar and chocolate-making experiences; checked 2026-10-31
-7,Mount Apo Natural Park,visit_duration,2-3 days,https://www.mtapoadventures.com/atour-packages-2/mac-05-mt-apo-summit-via-sta-cruz-trail-backtrack-3d2n/ operator summit itineraries include 2D1N and 3D2N; checked 2026-10-31
+15,Davao Crocodile Park Inc,hours,8:00 AM-5:00 PM,https://www.experiencedavao.com/destinations/davao-city/attractions/davao-crocodile-park ; checked 2026-10-31
+15,Davao Crocodile Park Inc,latitude,7.0972103,https://www.openstreetmap.org/way/81347693 zoo feature centre approximate visitor location; checked 2026-10-30
+15,Davao Crocodile Park Inc,longitude,125.5989760,https://www.openstreetmap.org/way/81347693 zoo feature centre approximate visitor location; checked 2026-10-30
+5,Malagos Garden Resort,hours,8:00 AM-5:00 PM,https://malagoschocolate.com/pages/malagos-chocolate-museum museum visitor hours (not hotel or dining hours); checked 2026-10-31
+5,Malagos Garden Resort,latitude,7.1910411,https://www.openstreetmap.org/way/976238615 resort feature centre approximate visitor location; checked 2026-10-30
+5,Malagos Garden Resort,longitude,125.4276581,https://www.openstreetmap.org/way/976238615 resort feature centre approximate visitor location; checked 2026-10-30
+5,Malagos Garden Resort,category_tag,Food Tasting,https://malagoschocolate.com/pages/malagos-chocolate-museum chocolate bar and chocolate-making experiences; checked 2026-10-31
+6,Mount Apo Natural Park,visit_duration,2-3 days,https://www.mtapoadventures.com/atour-packages-2/mac-05-mt-apo-summit-via-sta-cruz-trail-backtrack-3d2n/ operator summit itineraries include 2D1N and 3D2N; checked 2026-10-31

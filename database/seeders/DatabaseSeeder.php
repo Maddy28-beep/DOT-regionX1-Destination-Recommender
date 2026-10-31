@@ -36,9 +36,9 @@ class DatabaseSeeder extends Seeder
             ListingPhotoSeeder::class,
             VerifiedListingPhotoSeeder::class,
             SampleListingPhotoSeeder::class,
+            PlannerVerifiedDataSeeder::class,
             RecommendationDataSeeder::class,
             DestinationEmbeddingSeeder::class,
-            PlannerVerifiedDataSeeder::class,
         ]);
     }
 }
