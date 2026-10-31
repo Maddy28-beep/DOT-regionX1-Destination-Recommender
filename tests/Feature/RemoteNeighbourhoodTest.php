@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Destination;
+use App\Models\PreferenceActivity;
 use App\Models\Region;
 use App\Models\TouristPreference;
 use App\Services\Recommendation\ItineraryGenerationService;
@@ -36,11 +37,11 @@ class RemoteNeighbourhoodTest extends TestCase
     }
 
     /** A place at an offset from the start, in km north and east (about 111 km to a degree). */
-    private function place(string $name, float $northKm, float $eastKm, float $rating, ?float $lat = null): Destination
+    private function place(string $name, float $northKm, float $eastKm, float $rating, ?float $lat = null, string $type = 'Nature & Leisure'): Destination
     {
         return Destination::create([
             'slug' => str($name)->slug()->toString(), 'name' => $name, 'location' => 'Davao Region', 'region_id' => Region::firstOrCreate(['name' => 'Davao City'])->id,
-            'type' => 'Nature & Leisure', 'is_accredited' => true, 'rating' => $rating, 'review_count' => 20, 'price_tier' => 'Mid-range',
+            'type' => $type, 'is_accredited' => true, 'rating' => $rating, 'review_count' => 20, 'price_tier' => 'Mid-range',
             'latitude' => $lat ?? 7.07 + $northKm / 111.2, 'longitude' => 125.61 + $eastKm / 110.3,
         ]);
     }
@@ -55,11 +56,113 @@ class RemoteNeighbourhoodTest extends TestCase
         return $rows->map(fn (array $row) => $row['destination']->name)->all();
     }
 
-    private function neighbourhood(\Illuminate\Support\Collection $ranked, int $stops): \Illuminate\Support\Collection
+    /** The same, with each place's score given instead of derived from its position in the list. */
+    private function scoredRows(array $scored): \Illuminate\Support\Collection
+    {
+        return collect($scored)->values()->map(fn (array $pair) => ['destination' => $pair[0], 'drs' => $pair[1]]);
+    }
+
+    /** The start defaults to the origin the offsets in place() are measured from. */
+    private function neighbourhood(\Illuminate\Support\Collection $ranked, int $stops, float $originLat = 7.07, float $originLng = 125.61, array $interests = []): \Illuminate\Support\Collection
     {
         $method = new ReflectionMethod(ItineraryGenerationService::class, 'withinOneNeighbourhood');
+        $preference = TouristPreference::make(['distance_pref' => 'far'])
+            ->setRelation('activities', collect($interests)->map(fn (string $interest) => new PreferenceActivity(['activity' => $interest])));
 
-        return $method->invoke(app(ItineraryGenerationService::class), $ranked, $stops, TouristPreference::make(['distance_pref' => 'far']));
+        return $method->invoke(app(ItineraryGenerationService::class), $ranked, $stops, $preference, $originLat, $originLng);
+    }
+
+    /** Two neighbourhoods 100 km apart, the one by the start scoring a little less. */
+    private function twoNeighbourhoods(): array
+    {
+        $home = [$this->place('Home One', 0, 0, 4.0), $this->place('Home Two', 3, 3, 4.0), $this->place('Home Three', 5, 1, 4.0)];
+        $away = [$this->place('Away One', 0, 100, 4.0), $this->place('Away Two', 3, 103, 4.0), $this->place('Away Three', 5, 101, 4.0)];
+
+        return [
+            $this->scoredRows(array_merge(array_map(fn ($d) => [$d, 3.0], $home), array_map(fn ($d) => [$d, 3.2], $away))),
+            ['Home One', 'Home Two', 'Home Three'], ['Away One', 'Away Two', 'Away Three'],
+        ];
+    }
+
+    /** A neighbourhood by the start and a clearly better one 100 km off whose places are all beaches. */
+    private function homeAndBeaches(float $awayScore): array
+    {
+        $home = [$this->place('Home One', 0, 0, 4.0), $this->place('Home Two', 3, 3, 4.0), $this->place('Home Three', 5, 1, 4.0)];
+        $beaches = [
+            $this->place('Beach One', 0, 100, 4.0, null, 'Beach & Island'), $this->place('Beach Two', 3, 103, 4.0, null, 'Beach & Island'),
+            $this->place('Beach Three', 5, 101, 4.0, null, 'Beach & Island'),
+        ];
+
+        return [
+            $this->scoredRows(array_merge(array_map(fn ($d) => [$d, 3.0], $home), array_map(fn ($d) => [$d, $awayScore], $beaches))),
+            ['Home One', 'Home Two', 'Home Three'], ['Beach One', 'Beach Two', 'Beach Three'],
+        ];
+    }
+
+    public function test_a_neighbourhood_by_the_start_beats_a_slightly_better_one_a_long_way_off(): void
+    {
+        [$ranked, $home] = $this->twoNeighbourhoods();
+
+        $ordered = $this->order($this->neighbourhood($ranked, 3));
+
+        $this->assertSame($home, array_slice($ordered, 0, 3));
+    }
+
+    public function test_the_better_neighbourhood_still_wins_when_the_start_is_beside_it(): void
+    {
+        [$ranked, , $away] = $this->twoNeighbourhoods();
+
+        // Starting at the far neighbourhood's own corner of the map.
+        $ordered = $this->order($this->neighbourhood($ranked, 3, 7.07, 125.61 + 100 / 110.3));
+
+        $this->assertSame($away, array_slice($ordered, 0, 3));
+    }
+
+    public function test_a_far_neighbourhood_is_not_ruled_out_when_it_is_much_better(): void
+    {
+        // One mediocre place by the start against a strong neighbourhood hours away: distance costs points, it never forbids.
+        $near = $this->place('Lone Near', 0, 0, 4.0);
+        $away = [$this->place('Strong One', 0, 100, 4.0), $this->place('Strong Two', 3, 103, 4.0), $this->place('Strong Three', 5, 101, 4.0)];
+
+        $ordered = $this->order($this->neighbourhood($this->scoredRows([[$near, 1.0], [$away[0], 5.0], [$away[1], 5.0], [$away[2], 5.0]]), 3));
+
+        $this->assertSame(['Strong One', 'Strong Two', 'Strong Three'], array_slice($ordered, 0, 3));
+        $this->assertSame('Lone Near', $ordered[3], 'the place by the start is not dropped, it only goes behind');
+    }
+
+    public function test_a_far_neighbourhood_that_serves_the_chosen_interest_is_worth_the_journey(): void
+    {
+        [$ranked, $home, $beaches] = $this->homeAndBeaches(4.5);
+
+        $noInterest = $this->order($this->neighbourhood($ranked, 3));
+        $beachTraveller = $this->order($this->neighbourhood($ranked, 3, 7.07, 125.61, ['Beach & Island']));
+
+        $this->assertSame($home, array_slice($noInterest, 0, 3), 'with no reason to go far the trip stays by the start');
+        $this->assertSame($beaches, array_slice($beachTraveller, 0, 3), 'the beaches are what the traveller asked for');
+    }
+
+    public function test_a_far_neighbourhood_that_does_not_serve_the_chosen_interest_is_not_worth_it(): void
+    {
+        [$ranked, $home] = $this->homeAndBeaches(4.5);
+
+        // The traveller wants hiking; the far neighbourhood is all beaches, so it pays the full price of the way there.
+        $ordered = $this->order($this->neighbourhood($ranked, 3, 7.07, 125.61, ['Hiking & Trekking']));
+
+        $this->assertSame($home, array_slice($ordered, 0, 3));
+    }
+
+    public function test_a_shorter_trip_pays_more_for_the_way_to_a_neighbourhood(): void
+    {
+        // The same two neighbourhoods; the far one is better by 7 points a stop.
+        [$ranked, $home, $away] = $this->twoNeighbourhoods();
+        $scored = $ranked->map(fn (array $row) => ['destination' => $row['destination'], 'drs' => in_array($row['destination']->name, $away, true) ? 10.0 : 3.0]);
+
+        $oneStop = $this->order($this->neighbourhood($scored, 1));
+        $threeStops = $this->order($this->neighbourhood($scored, 3));
+
+        $this->assertSame('Home One', $oneStop[0], 'a one-stop trip does not travel hours for one better place');
+        $this->assertSame($away, array_slice($threeStops, 0, 3), 'a trip of three stops does');
+        $this->assertSame($home, array_slice($threeStops, 3, 3));
     }
 
     public function test_the_neighbourhood_with_the_most_score_comes_first_whatever_the_single_best_place(): void

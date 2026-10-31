@@ -42,6 +42,39 @@ class ItineraryGenerationService
     private const REMOTE_NEIGHBOURHOOD_MINUTES = 150;
 
     /**
+     * What each hour of slow-end journey from where the traveller starts to a Remote trip's neighbourhood costs when
+     * the neighbourhoods are compared, in ranking-score points, before it is adapted to the trip: the penalty per hour
+     * is this times REMOTE_ORIGIN_STOP_FACTOR for the trip's number of stops, times what is left after
+     * REMOTE_ORIGIN_INTEREST_RELIEF of it is taken off for a neighbourhood that fits the traveller's interests.
+     *
+     * Compared on score alone, a traveller starting in Mati was sent to Davao City for the score of its places, a day's
+     * drive away. One fixed price does not suit every trip: low enough to leave a Davao traveller the east coast it
+     * wants, it does not keep a Mati traveller's three days on the Mati coast. So the price follows the trip.
+     */
+    private const REMOTE_ORIGIN_PENALTY_PER_HOUR = 2.0;
+
+    /**
+     * How much of the price of getting there is waived for a neighbourhood that serves the traveller's interests: at
+     * 0.85 a neighbourhood that covers every chosen interest as well as the trip needs pays 15% of the price, and one
+     * that covers none pays all of it. This is why a hiking or beach traveller can still be sent to the east coast
+     * while a traveller with no particular reason to travel far stays near the start.
+     */
+    private const REMOTE_ORIGIN_INTEREST_RELIEF = 0.85;
+
+    /**
+     * What a neighbourhood's fit counts as when the traveller chose no interest, so nothing tells one neighbourhood
+     * from another: halfway.
+     */
+    private const REMOTE_ORIGIN_NEUTRAL_FIT = 0.5;
+
+    /**
+     * The price of getting there, by the number of stops the trip has (1, 2, ... 8, and 8 for any longer trip), as a
+     * multiple of REMOTE_ORIGIN_PENALTY_PER_HOUR. A short trip has few stops to spread the journey over, so it must
+     * stay close to the start; a longer one can afford a longer way to a better neighbourhood.
+     */
+    private const REMOTE_ORIGIN_STOP_FACTOR = [2.0, 2.0, 1.5, 1.0, 0.9, 0.8, 0.7, 0.6];
+
+    /**
      * When each sightseeing slot opens. A slot is only offered on arrival day
      * if the traveller is on the ground before it starts -- landing at 18:00
      * and being handed a morning stop is the bug this exists to prevent.
@@ -143,7 +176,7 @@ class ItineraryGenerationService
         $dayCapacities = $this->dayCapacities($preference, $totalDays);
         $maxStops = min($distinctRanked->count(), array_sum(array_map('count', $dayCapacities)));
         if ($preference->distance_pref === 'far') {
-            $distinctRanked = $this->withinOneNeighbourhood($distinctRanked, $maxStops, $preference);
+            $distinctRanked = $this->withinOneNeighbourhood($distinctRanked, $maxStops, $preference, $originLat, $originLng);
         }
         // The best places for the trip, except that an interest the traveller chose gets a stop when anything can offer one.
         $topRanked = (new InterestCoverage())->select($distinctRanked, $maxStops, $preference->activities->pluck('activity')->all());
@@ -317,32 +350,45 @@ class ItineraryGenerationService
      * where the trip goes. Its places come first in the ranking's own order, then everything else nearest first, which
      * is what fills the trip when its neighbourhood holds too few places.
      *
+     * Where the traveller starts counts too: a neighbourhood's score is reduced by originPenaltyPerHour() for every
+     * hour (slow end) from the start to its centre place, and that price is lower the better the neighbourhood serves
+     * the interests the traveller chose and the more stops the trip has. The radius of a neighbourhood is unchanged,
+     * and no place is ruled out for being far from the start.
+     *
      * Only the order changes: nothing is removed from the pool, and the interest coverage, the reserve and the rest of
      * the plan work from it as before. Places without a position cannot be placed in a neighbourhood and go last.
      *
      * @param  \Illuminate\Support\Collection<int, array{destination: Destination, drs: float}>  $ranked  best first
      * @return \Illuminate\Support\Collection<int, array{destination: Destination, drs: float}>
      */
-    private function withinOneNeighbourhood(\Illuminate\Support\Collection $ranked, int $stops, TouristPreference $preference): \Illuminate\Support\Collection
+    private function withinOneNeighbourhood(\Illuminate\Support\Collection $ranked, int $stops, TouristPreference $preference, float $originLat, float $originLng): \Illuminate\Support\Collection
     {
         $rows = $ranked->values()->all();
         $minutes = fn (Destination $a, Destination $b): int => $this->stayMinutes($this->placeOf($a), $this->placeOf($b), $preference);
         $mapped = fn (array $row): bool => $row['destination']->latitude !== null && $row['destination']->longitude !== null;
 
+        $start = ['lat' => $originLat, 'lng' => $originLng, 'region' => null];
+        $interests = $preference->activities->pluck('activity')->filter()->unique()->values()->all();
+        $covers = [];
+
         $seed = null;
-        $bestScore = -1.0;
+        $bestScore = -INF;
         foreach ($rows as $candidate) {
             if (! $mapped($candidate)) {
                 continue;
             }
-            $scores = [];
+            $members = [];
             foreach ($rows as $row) {
                 if ($mapped($row) && $minutes($candidate['destination'], $row['destination']) <= self::REMOTE_NEIGHBOURHOOD_MINUTES) {
-                    $scores[] = $row['drs'];
+                    $members[] = $row;
                 }
             }
-            rsort($scores);
-            $score = array_sum(array_slice($scores, 0, $stops));
+            // Stable for equal scores, so the ranking's order decides which of them the trip takes.
+            usort($members, fn (array $x, array $y) => $y['drs'] <=> $x['drs']);
+            $best = array_slice($members, 0, $stops);
+            $fit = $this->interestFit($best, $stops, $interests, $covers);
+            $hours = $this->stayMinutes($start, $this->placeOf($candidate['destination']), $preference) / 60;
+            $score = array_sum(array_column($best, 'drs')) - $this->originPenaltyPerHour($stops, $fit) * $hours;
             // Strictly greater: of equal neighbourhoods the one reached first in the ranking wins.
             if ($score > $bestScore) {
                 $bestScore = $score;
@@ -368,6 +414,44 @@ class ItineraryGenerationService
         usort($outside, fn (array $x, array $y) => $x['away'] <=> $y['away']);
 
         return collect(array_merge($inside, array_column($outside, 'row')))->values();
+    }
+
+    /**
+     * How well a neighbourhood's best places serve the interests the traveller chose, from 0 to 1: for each interest,
+     * how many of those places cover it against half of the trip's stops (all of an interest's due when half the trip is
+     * that interest), averaged over the interests. REMOTE_ORIGIN_NEUTRAL_FIT when none was chosen.
+     *
+     * @param  array<int, array{destination: Destination, drs: float}>  $best  the neighbourhood's best places, as many as the trip has stops
+     * @param  array<int, string>  $interests
+     * @param  array<string, bool>  $covers  whether a place covers an interest, kept across neighbourhoods ("<id>|<interest>")
+     */
+    private function interestFit(array $best, int $stops, array $interests, array &$covers): float
+    {
+        if ($interests === []) {
+            return self::REMOTE_ORIGIN_NEUTRAL_FIT;
+        }
+
+        $due = max(1, (int) ceil($stops / 2));
+        $fits = array_map(function (string $interest) use ($best, $due, &$covers): float {
+            $covering = 0;
+            foreach ($best as $row) {
+                $key = $row['destination']->id.'|'.$interest;
+                $covers[$key] ??= InterestCoverage::covers($row['destination'], $interest);
+                $covering += $covers[$key] ? 1 : 0;
+            }
+
+            return min(1.0, $covering / $due);
+        }, $interests);
+
+        return array_sum($fits) / count($fits);
+    }
+
+    /** What an hour of getting to a neighbourhood costs in score points, for a trip of this many stops and a neighbourhood of this fit. */
+    private function originPenaltyPerHour(int $stops, float $fit): float
+    {
+        $factor = self::REMOTE_ORIGIN_STOP_FACTOR[min(max(1, $stops), count(self::REMOTE_ORIGIN_STOP_FACTOR)) - 1];
+
+        return self::REMOTE_ORIGIN_PENALTY_PER_HOUR * $factor * (1 - self::REMOTE_ORIGIN_INTEREST_RELIEF * $fit);
     }
 
     /** How many places beyond the trip's own are kept in reserve to fill an empty day. */
