@@ -194,6 +194,19 @@
                             </div>
                         @endif
 
+                        @unless ($itinerary->package)
+                            @include('partials.itinerary-stay-notices', [
+                                'itinerary' => $itinerary,
+                                'hasOvernight' => $itemsByDay->contains(fn ($rows) => $rows->contains('kind', 'overnight')),
+                            ])
+                        @endunless
+
+                        @php
+                            // Facts about days that are not obvious from the timeline: arrival/transfer day, late check-in, lunch not arranged.
+                            $dayNotes = $itinerary->package ? [] : \App\Support\ItineraryDayNotes::forItinerary($itemsByDay, (int) $itinerary->total_days);
+                            $dayNoteIcons = ['arrival_transfer' => 'info', 'late_checkin' => 'clock', 'lunch_not_arranged' => 'utensils'];
+                        @endphp
+
                         @foreach ($itemsByDay as $day => $items)
                             @php
                                 // Every place of the day, in order, deduped -- see
@@ -252,10 +265,17 @@
                                 @if (! $itinerary->package && $dayTravelMax > $longDayMinutes)
                                     <p class="itin-longday" role="note">
                                         <x-icon name="alert-triangle" />
-                                        <span>This day has up to {{ $fmtMinutes($dayTravelMax) }} of travel {{ \App\Services\Recommendation\TransportMode::phrase($transport) }}.
+                                        <span>@if ($dayTravelMax > \App\Support\ItineraryDayNotes::longDrivingMinutes())<strong>Long driving day.</strong> @endif This day has up to {{ $fmtMinutes($dayTravelMax) }} of travel {{ \App\Services\Recommendation\TransportMode::phrase($transport) }}.
                                         You can swap a stop below, or change how you travel in <a href="{{ route('plan.edit') }}">your preferences</a>.</span>
                                     </p>
                                 @endif
+
+                                @foreach ($dayNotes[$day] ?? [] as $note)
+                                    <p class="itin-longday" role="note" data-day-note="{{ $note['type'] }}">
+                                        <x-icon name="{{ $dayNoteIcons[$note['type']] ?? 'info' }}" />
+                                        <span>{{ $note['text'] }}</span>
+                                    </p>
+                                @endforeach
 
                                 @php
                                     // Dinner at the place you sleep, followed by the night there: one card, "Dinner & overnight stay".

@@ -378,7 +378,11 @@ class ItineraryScheduleBuilder
                 $scheduled++;
 
                 if (! $lunchTaken && $this->lunchIsDue($clock)) {
-                    $clock = $this->addMeal($itinerary, $dayNumber, $sortOrder, $clock, 'Lunch', $there, $destination, $date, 'after');
+                    $mealLocation = ($scheduled < $capacity && $queue !== []) ? $here : null;
+                    $clock = $this->addMeal($itinerary, $dayNumber, $sortOrder, $clock, 'Lunch', $there, $destination, $date, 'after', null, null, null, $mealLocation);
+                    if ($mealLocation !== null) {
+                        $here = $mealLocation;
+                    }
                     $lunchTaken = true;
                 }
             }
@@ -818,10 +822,26 @@ class ItineraryScheduleBuilder
     /** Writes the rows of a planLeg() plan and returns the clock when they are done. */
     private function commitLeg(Itinerary $itinerary, int $dayNumber, int &$sortOrder, array $plan, array $from, array $to, $destination, ?Carbon $date): Carbon
     {
-        $travelSteps = count(array_filter($plan['steps'], fn (array $step) => $step['type'] === 'travel'));
+        $steps = $plan['steps'];
+        // When an arrival-phase lunch follows a travel step directly (arriving just before or inside the lunch window,
+        // before visiting the destination) and uses an off-site restaurant detour, route directly from $from to the
+        // restaurant and then from the restaurant to $to so the traveller does not travel to $to twice.
+        if (count($steps) === 2
+            && $steps[0]['type'] === 'travel'
+            && $steps[1]['type'] === 'meal'
+            && ($steps[1]['phase'] ?? null) === 'arrival'
+        ) {
+            $mealStart = $this->toQuarterHour($steps[1]['at']);
+            $stop = $this->mealStop($mealStart, self::MEAL_MINUTES, $steps[1]['near'], $destination, $date);
+            if ($stop['kind'] === 'restaurant') {
+                return $this->addMeal($itinerary, $dayNumber, $sortOrder, $steps[1]['at'], $steps[1]['meal'] ?? 'Lunch', $to, $destination, $date, 'arrival', null, $from, $steps[0]['start']);
+            }
+        }
+
+        $travelSteps = count(array_filter($steps, fn (array $step) => $step['type'] === 'travel'));
         $seen = 0;
 
-        foreach ($plan['steps'] as $step) {
+        foreach ($steps as $step) {
             if ($step['type'] === 'meal') {
                 $onSite = $step['phase'] === 'arrival' ? $destination : null;
                 $this->addMeal($itinerary, $dayNumber, $sortOrder, $step['at'], $step['meal'] ?? 'Lunch', $step['near'], $onSite, $date, $step['phase']);
@@ -879,9 +899,10 @@ class ItineraryScheduleBuilder
      *
      * @param  array{lat: float|null, lng: float|null, label: string, region?: string|null}  $near
      * @param  string  $phase  'start' (before setting off), 'road' (on the way), 'arrival' or 'after' (at a place)
+     * @param  array{lat: float|null, lng: float|null, label: string, region?: string|null}|null  $departFrom  origin for outbound restaurant transfer when routing directly from a prior stop
      * @return Carbon the clock when the meal is over
      */
-    private function addMeal(Itinerary $itinerary, int $dayNumber, int &$sortOrder, Carbon $at, string $meal, array $near, ?Destination $onSite, ?Carbon $date, string $phase, ?int $slotMinutes = null): Carbon
+    private function addMeal(Itinerary $itinerary, int $dayNumber, int &$sortOrder, Carbon $at, string $meal, array $near, ?Destination $onSite, ?Carbon $date, string $phase, ?int $slotMinutes = null, ?array $departFrom = null, ?Carbon $travelStart = null, ?array &$returnTo = null): Carbon
     {
         $start = $this->toQuarterHour($at);
         $minutes = $slotMinutes ?? ($meal === 'Breakfast' ? self::BREAKFAST_MINUTES : self::MEAL_MINUTES);
@@ -899,11 +920,21 @@ class ItineraryScheduleBuilder
             // the slot already reserved by planLeg; subsequent visits keep
             // the exact clock used to decide whether they fit.
             $there = $this->place($stop['listing']);
-            $out = $this->estimateLeg($near, $there)['max_minutes'];
+            $originPoint = $departFrom ?? $near;
+            $out = $this->estimateLeg($originPoint, $there)['max_minutes'];
             $back = $this->estimateLeg($there, $near)['max_minutes'];
-            $start = $this->addTravel($itinerary, $dayNumber, $sortOrder, $start, $near, $there);
+            $depart = $travelStart ? $this->toQuarterHour($travelStart) : $start;
+            if ($departFrom !== null) {
+                $earliestMeal = Carbon::parse(self::LUNCH_EARLIEST);
+                $minDepart = $earliestMeal->copy()->subMinutes($out);
+                if ($minDepart->greaterThan($depart)) {
+                    $depart = $this->toQuarterHour($minDepart);
+                }
+            }
+            $start = $this->addTravel($itinerary, $dayNumber, $sortOrder, $depart, $originPoint, $there);
+            $diningMinutes = max(30, $minutes - $this->estimateLeg($near, $there)['max_minutes'] - $back);
             $attributes['starts_at'] = $start;
-            $attributes['ends_at'] = $start->copy()->addMinutes($minutes - $out - $back);
+            $attributes['ends_at'] = $start->copy()->addMinutes($diningMinutes);
             $attributes += [
                 'title' => $meal.' — '.$stop['listing']->name.($phase === 'road' ? ' (on the way)' : ''),
                 'restaurant_id' => $stop['listing']->id,
@@ -918,6 +949,12 @@ class ItineraryScheduleBuilder
         $this->row($itinerary, $dayNumber, $sortOrder, $attributes);
 
         if ($stop['kind'] === 'restaurant') {
+            if ($returnTo !== null) {
+                $returnTo = $there;
+
+                return $attributes['ends_at']->copy();
+            }
+
             return $this->addTravel($itinerary, $dayNumber, $sortOrder, $attributes['ends_at'], $there, $near);
         }
 
@@ -953,7 +990,7 @@ class ItineraryScheduleBuilder
             $km = $this->haversineKm($near['lat'], $near['lng'], (float) $restaurant->latitude, (float) $restaurant->longitude);
 
             $quality = [OpeningHours::windowsOn($restaurant->opening_hours, $date ?? $start) === null ? 1 : 0,
-                $restaurant->planner_verified_at === null ? 1 : 0, $km];
+                ($restaurant->is_accredited || $restaurant->planner_verified_at !== null) ? 0 : 1, $km];
             if ($bestQuality === null || $quality < $bestQuality) {
                 $best = $restaurant;
                 $bestQuality = $quality;
