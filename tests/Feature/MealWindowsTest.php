@@ -184,7 +184,8 @@ class MealWindowsTest extends TestCase
     {
         $far = $this->place('Aliwagwag Falls', 'Davao Oriental', 7.7430, 126.2989);
 
-        $rows = $this->rows($this->plan('09:00', [$far], [1 => ['Afternoon']]));
+        // Meal timing is inspected on an outbound day; a same-day return would violate the 20:00 remote limit.
+        $rows = $this->rows($this->plan('09:00', [$far], [1 => ['Afternoon'], 2 => []]));
         $travel = array_values(array_filter($rows, fn ($r) => $r['kind'] === 'travel'));
         $lunch = $this->meals($rows)[0];
 
@@ -402,17 +403,12 @@ class MealWindowsTest extends TestCase
         $this->assertCount(1, $this->kinds($this->dinnerLeg('19:45', 100)), 'already past the window');
     }
 
-    public function test_a_day_that_ends_with_a_long_drive_home_now_has_a_dinner_row(): void
+    public function test_a_remote_visit_is_skipped_when_even_a_dinner_break_cannot_make_the_return_feasible(): void
     {
         $far = $this->place('Aliwagwag Falls', 'Davao Oriental', 7.7430, 126.2989);
 
         $rows = $this->rows($this->plan('09:00', [$far], [1 => ['Afternoon']]));
-        $dinner = collect($this->meals($rows))->first(fn ($m) => str_starts_with($m['title'], 'Dinner'));
-
-        $this->assertNotNull($dinner, 'the visit ends at 18:00 and the drive home takes hours: dinner is planned');
-        $this->assertGreaterThanOrEqual('18:00', $dinner['start']);
-        $this->assertLessThanOrEqual('19:30', $dinner['start']);
-        $this->assertNull($dinner['destination'], 'a place is never the dinner');
-        $this->assertStringContainsString('(your choice)', $dinner['title']);
+        $this->assertSame([], array_values(array_filter($rows, fn ($row) => $row['kind'] === 'activity')));
+        $this->assertLessThan('20:00', $this->first($rows, 'departure')['start']);
     }
 }

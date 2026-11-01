@@ -70,6 +70,9 @@ class LookupSpyBuilder extends ItineraryScheduleBuilder
         // The first build "loses" the last two days' stops, as the real one does when they cannot be reached.
         if (self::$call++ === 0) {
             $itinerary->items()->whereIn('day_number', [3, 4])->where('kind', 'activity')->delete();
+        } else {
+            // Make every later trial unambiguously worse, regardless of improved stay/return heuristics.
+            $itinerary->items()->where('kind', 'activity')->delete();
         }
     }
 

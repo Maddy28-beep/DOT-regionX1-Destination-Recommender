@@ -410,7 +410,8 @@ class ItineraryGenerationService
             }
 
             if (config('itinerary.planner.reject_incomplete_trips', true)) {
-                if (app(ItineraryConstraintRepair::class)->remaining($itinerary, $preference) > 0) {
+                if (app(ItineraryConstraintRepair::class)->remaining($itinerary, $preference) > 0
+                    || $itinerary->items()->where('kind', 'activity')->whereNotNull('destination_id')->doesntExist()) {
                     throw ValidationException::withMessages([
                         'distance_pref' => 'This trip cannot fit the daily distance, travel-time share and hotel-distance limits with the available places. Try a closer starting point, different transport or different interests.',
                     ]);
