@@ -143,6 +143,7 @@ class FollowabilityReport extends Command
             $row('COVERAGE: destinations placed', fn ($x) => $x['coverage']['placed']),
             $row('  omitted (every one is listed on the page)', fn ($x) => $x['coverage']['omitted']),
             $row('    would end after the 18:00 cutoff', $cause('would_end_after_cutoff')),
+            $row('    would get home at or after 20:00', $cause('would_return_after_2000')),
             $row('    the day\'s driving limit was reached', $cause('drive_budget_reached')),
             $row('    the day already held its places', $cause('day_full')),
             $row('    closed / outside opening hours', fn ($x) => ($x['coverage']['causes']['closed_that_day'] ?? 0) + ($x['coverage']['causes']['outside_opening_hours'] ?? 0)),

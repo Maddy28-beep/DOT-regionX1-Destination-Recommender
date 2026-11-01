@@ -233,7 +233,15 @@ class ItineraryGenerationService
             ? $this->pickStays($sequence, $dayCapacities, $preference, $origin)
             : $this->pickAccommodation($sequence, $preference);
 
-        return DB::transaction(function () use ($reserve, $preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
+        // On Remote trips the plain route order is judged with the stays picked for that order, not the themed order's: a night anchored
+        // near a themed day's last stop says nothing about how the route order would be lived.
+        $routeAccommodationPick = ($themedSequence !== null && $preference->distance_pref === 'far')
+            ? ($totalDays >= 2
+                ? $this->pickStays($routeSequence, $dayCapacities, $preference, $origin)
+                : $this->pickAccommodation($routeSequence, $preference))
+            : null;
+
+        return DB::transaction(function () use ($routeAccommodationPick, $reserve, $preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
             // The schedule builder keeps why it turned each place away, per build; start this trip with none.
             $this->schedule->forgetRecordedAttempts();
 
@@ -292,17 +300,30 @@ class ItineraryGenerationService
                  */
                 $placed = fn (): int => $itinerary->items()->whereNotNull('destination_id')->distinct()->count('destination_id');
 
+                $themedStays = $stays;
+                $routeStays = $routeAccommodationPick ?? $stays;
+
+                $stays = $routeStays;
                 $build($routeSequence);
                 $routePlaced = $placed();
+                $routeCost = $preference->distance_pref === 'far' ? $this->feasibilityCost($itinerary) : 0;
                 $itinerary->items()->delete();
                 $itinerary->unsetRelation('items');
 
+                $stays = $themedStays;
                 $build($themedSequence);
                 $built = $themedSequence;
+                $themedPlaced = $placed();
 
-                if ($placed() < $routePlaced) {
+                // Never fewer stops than the route order. On equal stops, the plan with fewer late check-ins,
+                // empty days and days over the driving ceiling wins; a tie keeps the themed plan.
+                $routeWins = $themedPlaced < $routePlaced
+                    || ($preference->distance_pref === 'far' && $themedPlaced === $routePlaced && $this->feasibilityCost($itinerary) > $routeCost);
+
+                if ($routeWins) {
                     $itinerary->items()->delete();
                     $itinerary->unsetRelation('items');
+                    $stays = $routeStays;
                     $build($routeSequence);
                     $built = $routeSequence;
 
@@ -316,7 +337,11 @@ class ItineraryGenerationService
                 }
             }
 
-            $built = $this->fillEmptyDays($itinerary, $build, $built, $reserve, $dayCapacities, $origin);
+            if ($totalDays >= 2 && $this->stayMode($preference) === 'far') {
+                $this->settleEmptyLastDay($itinerary, $build, $stays, $built, $reserve, $preference, $dayCapacities, $origin);
+            }
+
+            $built = $this->fillEmptyDays($itinerary, $build, $built, $reserve, $dayCapacities, $origin, $preference, $stays);
 
             // From two days up the stay is chosen again for the stops that made it into the days (see settleStays).
             if ($totalDays >= 2) {
@@ -338,6 +363,30 @@ class ItineraryGenerationService
 
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);
         });
+    }
+
+    /**
+     * How infeasible a built plan is, for the Theme Guard's tie-break: late check-ins, plus days with no sightseeing
+     * stop, plus days whose driving is over the daily ceiling. Lower is better.
+     */
+    private function feasibilityCost(Itinerary $itinerary): int
+    {
+        $items = $itinerary->items()->get();
+        $late = $items->where('kind', 'overnight')->filter(fn ($i) => str_contains(strtolower((string) $i->title), 'late check-in'))->count();
+        $byDay = $items->groupBy('day_number');
+        $empty = 0;
+        $over = 0;
+        for ($d = 1; $d <= (int) $itinerary->total_days; $d++) {
+            $rows = $byDay->get($d, collect());
+            if ($rows->where('kind', 'activity')->whereNotNull('destination_id')->isEmpty()) {
+                $empty++;
+            }
+            if ((int) $rows->where('kind', 'travel')->sum('travel_max_minutes') > ItineraryScheduleBuilder::MAX_DAILY_DRIVE_MINUTES) {
+                $over++;
+            }
+        }
+
+        return $late + $empty + $over;
     }
 
     /**
@@ -475,7 +524,7 @@ class ItineraryGenerationService
      * @param  array<int, array<int, string>>  $dayCapacities
      * @return array<int, array{row: array, distance_km: float|null}>  the sequence the plan is now built from
      */
-    private function fillEmptyDays(Itinerary $itinerary, callable $build, array $built, \Illuminate\Support\Collection $reserve, array $dayCapacities, array $origin): array
+    private function fillEmptyDays(Itinerary $itinerary, callable $build, array $built, \Illuminate\Support\Collection $reserve, array $dayCapacities, array $origin, ?TouristPreference $preference = null, ?array &$stays = null): array
     {
         if ($reserve->isEmpty()) {
             return $built;
@@ -491,6 +540,9 @@ class ItineraryGenerationService
         };
 
         $tried = 0;
+        $lastDay = array_key_last($dayCapacities);
+        $originPlace = ['lat' => $origin['lat'], 'lng' => $origin['lng'], 'region' => null];
+        $evaluator = app(StayPlanEvaluator::class);
 
         foreach ($emptyDays() as $day) {
             if ($tried++ >= self::FILL_DAYS_TRIED) {
@@ -499,23 +551,45 @@ class ItineraryGenerationService
 
             $byDay = $stopsByDay();
             $before = $byDay->filter(fn ($rows, $d) => $d < $day)->flatten(1);
-            $startsAt = $before->isNotEmpty() && ($last = Destination::find($before->last()->destination_id)) && $last->latitude !== null
-                ? [(float) $last->latitude, (float) $last->longitude]
+            $lastDest = $before->isNotEmpty() ? Destination::find($before->last()->destination_id) : null;
+            $startsAt = $lastDest !== null && $lastDest->latitude !== null
+                ? [(float) $lastDest->latitude, (float) $lastDest->longitude]
                 : [(float) $origin['lat'], (float) $origin['lng']];
+            $startsAtPlace = $lastDest !== null && $lastDest->latitude !== null
+                ? $this->placeOf($lastDest)
+                : $originPlace;
             $inTrip = array_map(fn (array $e) => $e['row']['destination']->id, $built);
 
             $candidates = $reserve
                 ->reject(fn (array $row) => in_array($row['destination']->id, $inTrip, true) || $row['destination']->latitude === null)
-                ->sortBy(fn (array $row) => $this->haversineKm($startsAt[0], $startsAt[1], (float) $row['destination']->latitude, (float) $row['destination']->longitude))
+                ->when($day === $lastDay && $preference !== null && $this->stayMode($preference) === 'far', fn ($c) => $c->filter(
+                    fn (array $row) => $this->stayMinutes($this->placeOf($row['destination']), $originPlace, $preference) < ItineraryScheduleBuilder::MAX_DAILY_DRIVE_MINUTES
+                ))
+                ->sortBy(function (array $row) use ($day, $lastDay, $preference, $startsAt, $startsAtPlace, $originPlace) {
+                    $dist = $this->haversineKm($startsAt[0], $startsAt[1], (float) $row['destination']->latitude, (float) $row['destination']->longitude);
+                    if ($day === $lastDay && $preference !== null && $this->stayMode($preference) === 'far') {
+                        $place = $this->placeOf($row['destination']);
+                        $mins = $this->stayMinutes($startsAtPlace, $place, $preference) + $this->stayMinutes($place, $originPlace, $preference);
+
+                        return $mins * 1000 + $dist;
+                    }
+
+                    return $dist;
+                })
                 ->take(self::FILL_PLACES_TRIED);
 
             $stopsBefore = $placed();
             $emptyBefore = count($emptyDays());
+            $savedStays = $stays;
+            $beforeMetrics = ($day === $lastDay && $preference !== null && $stays !== null)
+                ? $evaluator->metrics($itinerary, $preference, $origin)
+                : null;
 
             foreach ($candidates as $row) {
                 $trial = $built;
                 array_splice($trial, $before->unique('destination_id')->count(), 0, [['row' => $row, 'distance_km' => null]]);
 
+                $stays = $savedStays;
                 $rebuild($trial);
 
                 if ($placed() >= $stopsBefore && count($emptyDays()) < $emptyBefore) {
@@ -523,12 +597,181 @@ class ItineraryGenerationService
 
                     continue 2;
                 }
+
+                if ($day === $lastDay && $preference !== null && $savedStays !== null && $this->stayMode($preference) === 'far' && count($dayCapacities) >= 2) {
+                    $eligible = $this->eligibleStays($preference, count($dayCapacities) - 1);
+                    if (array_filter($eligible, fn ($s) => $s->isNotEmpty()) !== []) {
+                        $destModels = Destination::whereIn('id', $before->pluck('destination_id')->unique())->get()->keyBy('id');
+                        $trialByDay = [];
+                        foreach (range(1, $lastDay - 1) as $dNum) {
+                            $trialByDay[$dNum] = ($byDay->get($dNum) ?? collect())->map(fn ($r) => $this->placeOf($destModels[$r->destination_id]))->values()->all();
+                        }
+                        $trialByDay[$lastDay] = [$this->placeOf($row['destination'])];
+                        $anchors = $this->anchorsFromDays($trialByDay, $origin, true);
+                        $suggested = $this->suggestedStays($trial, $preference);
+                        $fullPlan = $this->planStays($anchors, $eligible, $preference, $suggested, true, $origin);
+                        $lastNightOnly = $savedStays;
+                        $lastNightOnly[$lastDay - 1] = $fullPlan[$lastDay - 1] ?? $savedStays[$lastDay - 1];
+
+                        foreach ([$lastNightOnly, $fullPlan] as $candStays) {
+                            if ($this->stayIds($candStays) === $this->stayIds($savedStays)) {
+                                continue;
+                            }
+                            $stays = $candStays;
+                            $rebuild($trial);
+                            $candMetrics = $evaluator->metrics($itinerary, $preference, $origin);
+                            if ($placed() >= $stopsBefore
+                                && count($emptyDays()) < $emptyBefore
+                                && $candMetrics['violations'] === 0
+                                && $candMetrics['lateCount'] <= $beforeMetrics['lateCount']) {
+                                $built = $trial;
+
+                                continue 3;
+                            }
+                        }
+                    }
+                }
             }
 
+            $stays = $savedStays;
             $rebuild($built); // nothing helped: put the plan back exactly as it was
         }
 
         return $built;
+    }
+
+    /**
+     * When Pass-0 scheduling leaves the final day empty on a multi-day Remote trip (for instance because Day 1 had no
+     * sightseeing and shifted stops forward, or because the pre-pass final-night stay was anchored around a distant stop
+     * that exceeded the 480-minute daily driving ceiling), re-anchor the stays using the stops actually placed on Days
+     * 1..N-1 and any reachable unplaced or reserve stop (or the return to origin) before fillEmptyDays() runs.
+     */
+    private function settleEmptyLastDay(Itinerary $itinerary, callable $build, ?array &$stays, array $built, \Illuminate\Support\Collection $reserve, TouristPreference $preference, array $dayCapacities, array $origin): void
+    {
+        $days = count($dayCapacities);
+        if ($days < 2 || $stays === null) {
+            return;
+        }
+
+        $rows = $itinerary->items()->where('kind', 'activity')->whereNotNull('destination_id')->orderBy('day_number')->orderBy('sort_order')->get();
+        if ($rows->where('day_number', $days)->isNotEmpty()) {
+            return;
+        }
+
+        $eligible = $this->eligibleStays($preference, $days - 1);
+        if (array_filter($eligible, fn ($s) => $s->isNotEmpty()) === []) {
+            return;
+        }
+
+        $evaluator = app(StayPlanEvaluator::class);
+        $snapshot = fn (): array => $itinerary->items()->orderBy('id')->get()->map(fn ($r) => $r->getAttributes())->all();
+        $restore = function (array $saved) use ($itinerary): void {
+            $itinerary->items()->delete();
+            $itinerary->unsetRelation('items');
+            foreach (array_chunk($saved, 50) as $chunk) {
+                \App\Models\ItineraryItem::insert($chunk);
+            }
+        };
+
+        $initialRows = $snapshot();
+        $initialStays = $stays;
+        $initialMetrics = $evaluator->metrics($itinerary, $preference, $origin);
+
+        $destinations = Destination::whereIn('id', $rows->pluck('destination_id')->unique())->get()->keyBy('id');
+        $byDay = [];
+        foreach (range(1, $days - 1) as $day) {
+            $byDay[$day] = $rows->where('day_number', $day)->map(fn ($r) => $this->placeOf($destinations[$r->destination_id]))->values()->all();
+        }
+
+        $originPlace = ['lat' => $origin['lat'], 'lng' => $origin['lng'], 'region' => null];
+        $placedIds = $initialMetrics['placed'];
+        $reachableUnplaced = [];
+        foreach ($built as $entry) {
+            $dest = $entry['row']['destination'];
+            if (! in_array((int) $dest->id, $placedIds, true) && $dest->latitude !== null) {
+                $toOrig = $this->stayMinutes($this->placeOf($dest), $originPlace, $preference);
+                if ($toOrig < ItineraryScheduleBuilder::MAX_DAILY_DRIVE_MINUTES) {
+                    $reachableUnplaced[] = ['place' => $this->placeOf($dest), 'to_orig' => $toOrig];
+                }
+            }
+        }
+        usort($reachableUnplaced, fn (array $a, array $b): int => $a['to_orig'] <=> $b['to_orig']);
+
+        $trials = [];
+        if ($reachableUnplaced !== []) {
+            $trials[] = [$reachableUnplaced[0]['place']];
+        }
+        $inTrip = array_map(fn (array $e) => (int) $e['row']['destination']->id, $built);
+        $reachableReserve = $reserve
+            ->reject(fn (array $row) => in_array((int) $row['destination']->id, $inTrip, true) || $row['destination']->latitude === null)
+            ->map(fn (array $row) => [
+                'place' => $this->placeOf($row['destination']),
+                'to_orig' => $this->stayMinutes($this->placeOf($row['destination']), $originPlace, $preference),
+            ])
+            ->filter(fn (array $item) => $item['to_orig'] < ItineraryScheduleBuilder::MAX_DAILY_DRIVE_MINUTES)
+            ->sortBy('to_orig')
+            ->values();
+        if ($reachableReserve->isNotEmpty()) {
+            $trials[] = [$reachableReserve->first()['place']];
+        }
+        $trials[] = [];
+
+        $suggested = $this->suggestedStays($built, $preference);
+        $triedStayIds = [$this->stayIds($initialStays)];
+        $bestFallback = null;
+
+        foreach ($trials as $lastDayPlaces) {
+            $trialByDay = $byDay + [$days => $lastDayPlaces];
+            $anchors = $this->anchorsFromDays($trialByDay, $origin, true);
+            $fullPlan = $this->planStays($anchors, $eligible, $preference, $suggested, true, $origin);
+            $lastNightOnly = $initialStays;
+            $lastNightOnly[$days - 1] = $fullPlan[$days - 1] ?? $initialStays[$days - 1];
+
+            foreach ([$fullPlan, $lastNightOnly] as $candidateStays) {
+                $ids = $this->stayIds($candidateStays);
+                if (in_array($ids, $triedStayIds, true)) {
+                    continue;
+                }
+                $triedStayIds[] = $ids;
+
+                $stays = $candidateStays;
+                $itinerary->items()->delete();
+                $itinerary->unsetRelation('items');
+                $build($built);
+
+                $candMetrics = $evaluator->metrics($itinerary, $preference, $origin);
+                $noStopLost = count($candMetrics['placed']) >= count($initialMetrics['placed']);
+                $noRuleBroken = $candMetrics['violations'] === 0 && $candMetrics['lateCount'] <= $initialMetrics['lateCount'];
+                $filledLastDay = $candMetrics['empty'] < $initialMetrics['empty'] || count($candMetrics['placed']) > count($initialMetrics['placed']);
+
+                if ($noStopLost && $noRuleBroken && $filledLastDay) {
+                    return;
+                }
+
+                $reducedLate = $candMetrics['lateCount'] < $initialMetrics['lateCount'];
+                $reducedExcess = $candMetrics['excess'] < $initialMetrics['excess'];
+                $lastNightStay = $candidateStays[$days - 1]['listing'] ?? null;
+                $prevLastNightStay = $initialStays[$days - 1]['listing'] ?? null;
+                $improvedLastNight = $lastNightStay !== null
+                    && $prevLastNightStay !== null
+                    && $this->stayMinutes($this->placeOf($lastNightStay), $originPlace, $preference) < $this->stayMinutes($this->placeOf($prevLastNightStay), $originPlace, $preference)
+                    && $candMetrics['excess'] <= $initialMetrics['excess'];
+
+                if ($noStopLost && $noRuleBroken && ($reducedLate || $reducedExcess || $improvedLastNight) && $bestFallback === null) {
+                    $bestFallback = ['stays' => $candidateStays, 'rows' => $snapshot()];
+                }
+            }
+        }
+
+        if ($bestFallback !== null) {
+            $stays = $bestFallback['stays'];
+            $restore($bestFallback['rows']);
+
+            return;
+        }
+
+        $stays = $initialStays;
+        $restore($initialRows);
     }
 
     /**
@@ -686,6 +929,14 @@ class ItineraryGenerationService
         // check-in, which is the only thing that can honestly happen that night.
         $capacities[1] = array_slice($remaining, 0, self::DESTINATIONS_PER_DAY);
 
+        // Stage C1: a Remote trip with a night to plan, landing so late that not even the shortest proper visit fits
+        // before the sightseeing cutoff (the day starts at arrival + 30 minutes, at the earliest 08:00), has no
+        // sightseeing on its arrival day. Say so up front, so Pass-0 stays are planned around an arrival day that
+        // is only a journey to the stay, and a stop is not counted against a slot that can never be used.
+        if ($preference->distance_pref === 'far' && $totalDays >= 2 && ! $this->schedule->arrivalDayHasRoomForAVisit($preference)) {
+            $capacities[1] = [];
+        }
+
         return $capacities;
     }
 
@@ -772,7 +1023,7 @@ class ItineraryGenerationService
      *
      * @return array<int, array{first: array, last: array}>
      */
-    private function placedAnchors(Itinerary $itinerary, int $days, array $origin): array
+    private function placedAnchors(Itinerary $itinerary, int $days, array $origin, bool $emptyLastDayToOrigin = false): array
     {
         $rows = $itinerary->items()->where('kind', 'activity')->whereNotNull('destination_id')->orderBy('day_number')->orderBy('sort_order')->get();
         $destinations = Destination::whereIn('id', $rows->pluck('destination_id')->unique())->get()->keyBy('id');
@@ -781,17 +1032,20 @@ class ItineraryGenerationService
             $byDay[$day] = $rows->where('day_number', $day)->map(fn ($r) => $this->placeOf($destinations[$r->destination_id]))->values()->all();
         }
 
-        return $this->anchorsFromDays($byDay, $origin);
+        return $this->anchorsFromDays($byDay, $origin, $emptyLastDayToOrigin);
     }
 
     /** @param  array<int, array<int, array>>  $byDay */
-    private function anchorsFromDays(array $byDay, array $origin): array
+    private function anchorsFromDays(array $byDay, array $origin, bool $emptyLastDayToOrigin = false): array
     {
-        $here = ['lat' => $origin['lat'], 'lng' => $origin['lng'], 'region' => null];
+        $originPlace = ['lat' => $origin['lat'], 'lng' => $origin['lng'], 'region' => null];
+        $here = $originPlace;
+        $lastDay = array_key_last($byDay);
         $anchors = [];
         foreach ($byDay as $day => $places) {
-            $first = $places[0] ?? $here;
-            $last = $places !== [] ? $places[array_key_last($places)] : $here;
+            $fallback = ($emptyLastDayToOrigin && $day === $lastDay && count($byDay) >= 2) ? $originPlace : $here;
+            $first = $places[0] ?? $fallback;
+            $last = $places !== [] ? $places[array_key_last($places)] : $fallback;
             $anchors[$day] = ['first' => $first, 'last' => $last];
             $here = $last;
         }
@@ -918,20 +1172,44 @@ class ItineraryGenerationService
      * @param  array<int, array>  $suggested  stay id => Apriori rule
      * @return array<int, array{listing: Accommodation, rule: array|null}|null>  night => stay, null where nothing is eligible
      */
-    private function planStays(array $anchors, array $eligible, TouristPreference $preference, array $suggested, bool $flexible): array
+    private function planStays(array $anchors, array $eligible, TouristPreference $preference, array $suggested, bool $flexible, ?array $origin = null, ?callable $firstNightLate = null): array
     {
         $penalty = $flexible ? (int) config('itinerary.stays.transfer_penalty_minutes.far', 30) : self::STRICT_STAY_PENALTY;
         $band = (int) config('itinerary.stays.apriori_band_minutes', 15);
+        $lastNight = array_key_last($eligible);
+        $originPlace = $origin !== null ? ['lat' => $origin['lat'], 'lng' => $origin['lng'], 'region' => null] : null;
 
         $costs = [];
-        $cost = function (int $night, Accommodation $stay) use (&$costs, $anchors, $preference): int {
-            return $costs[$night][$stay->id] ??= $this->stayMinutes($anchors[$night]['last'], $this->placeOf($stay), $preference)
-                + $this->stayMinutes($this->placeOf($stay), $anchors[$night + 1]['first'], $preference);
+        $cost = function (int $night, Accommodation $stay) use (&$costs, $anchors, $preference, $flexible, $lastNight, $originPlace, $firstNightLate): int {
+            if (isset($costs[$night][$stay->id])) {
+                return $costs[$night][$stay->id];
+            }
+            $place = $this->placeOf($stay);
+            $c = $this->stayMinutes($anchors[$night]['last'], $place, $preference)
+                + $this->stayMinutes($place, $anchors[$night + 1]['first'], $preference);
+            if ($flexible && $originPlace !== null && $night === $lastNight && $this->stayMode($preference) === 'far') {
+                $finalDayDrive = $this->stayMinutes($place, $anchors[$night + 1]['first'], $preference)
+                    + $this->stayMinutes($anchors[$night + 1]['first'], $originPlace, $preference);
+                if ($finalDayDrive > ItineraryScheduleBuilder::MAX_DAILY_DRIVE_MINUTES) {
+                    $c += self::STRICT_STAY_PENALTY + ($finalDayDrive - ItineraryScheduleBuilder::MAX_DAILY_DRIVE_MINUTES);
+                }
+            }
+
+            // Stage C2: on an arrival day with no sightseeing, a stay the traveller would only reach after the latest dinner
+            // time costs the minutes it is late plus one change of stay -- a late check-in is worth a transfer, but
+            // a transfer is not worth a few minutes.
+            if ($firstNightLate !== null && $night === 1) {
+                $late = $firstNightLate($stay);
+                if ($late > 0) {
+                    $c += $late + (int) config('itinerary.stays.transfer_penalty_minutes.far', 30);
+                }
+            }
+
+            return $costs[$night][$stay->id] = $c;
         };
         // A plan is compared by total minutes, then by fewer changes of stay, then by changing later rather than earlier
         // (the traveller keeps the stay they have as long as it costs nothing extra), then by rating and id.
         $order = fn (array $x, array $y): int => [...$x['key'], -(float) $x['stay']->rating, $x['stay']->id] <=> [...$y['key'], -(float) $y['stay']->rating, $y['stay']->id];
-        $lastNight = array_key_last($eligible);
         // The eligible stays of each night by id, so nothing below searches a list.
         $stayById = array_map(fn ($stays) => $stays->keyBy('id')->all(), $eligible);
 
@@ -1063,9 +1341,25 @@ class ItineraryGenerationService
             $preference,
             $this->suggestedStays($sequence, $preference),
             $flexible ?? $this->stayMode($preference) === 'far',
+            null,
+            ($this->stayMode($preference) === 'far' && ($dayCapacities[1] ?? []) === []) ? $this->firstNightLateness($preference, $origin) : null,
         );
 
         return array_filter($plan) === [] ? null : $plan;
+    }
+
+    /**
+     * Stage C2: minutes late a stay would be checked into on an arrival day with no sightseeing, for a Remote trip
+     * (0 when on time). The projection is the builder's own (see ItineraryScheduleBuilder::projectArrivalDayCheckIn).
+     */
+    private function firstNightLateness(TouristPreference $preference, array $origin): callable
+    {
+        return function (Accommodation $stay) use ($preference, $origin): int {
+            $checkIn = $this->schedule->projectArrivalDayCheckIn($preference, $origin, $stay);
+            $limit = \Illuminate\Support\Carbon::parse(ItineraryScheduleBuilder::latestDinnerStart());
+
+            return max(0, (int) round(($checkIn->getTimestamp() - $limit->getTimestamp()) / 60));
+        };
     }
 
     /** @param  array<int, array|null>|null  $plan  @return array<int, int|null> night => stay id */
@@ -1139,15 +1433,35 @@ class ItineraryGenerationService
         if ($stays !== null && array_filter($eligible, fn ($s) => $s->isNotEmpty()) !== []) {
             $current['rows'] = $snapshot();
             $chosen = $current;
-            $anchors = $this->placedAnchors($itinerary, $days, $origin);
+            $guardLastNight = $mode === 'far' && (
+                ($first['drive'][$days] ?? 0) > ItineraryScheduleBuilder::MAX_DAILY_DRIVE_MINUTES
+                || $itinerary->items()->where('day_number', $days)->where('kind', 'activity')->whereNotNull('destination_id')->doesntExist()
+            );
+            $anchors = $this->placedAnchors($itinerary, $days, $origin, $guardLastNight);
             $suggested = $this->suggestedStays($built, $preference);
 
+            // Stage C2: a Remote trip whose arrival day holds no sightseeing and whose first night is a late check-in.
+            $firstDayEmpty = $itinerary->items()->where('day_number', 1)->where('kind', 'activity')->whereNotNull('destination_id')->doesntExist();
+            $nightOneLate = $mode === 'far' && $firstDayEmpty
+                && $itinerary->items()->where('day_number', 1)->where('kind', 'overnight')->where('title', 'like', '%Late check-in%')->exists();
+            $lateness = $nightOneLate ? $this->firstNightLateness($preference, $origin) : null;
+
             if ($mode !== 'moderate') {
-                $plan = $this->planStays($anchors, $eligible, $preference, $suggested, $mode === 'far');
+                $plan = $this->planStays($anchors, $eligible, $preference, $suggested, $mode === 'far', $guardLastNight ? $origin : null, $lateness);
                 if ($this->stayIds($plan) !== $this->stayIds($current['stays'])) {
                     $candidate = $try($plan);
                     [$ok, $failed] = $evaluator->accepts($first, $candidate['m'], $mode);
                     $guard['decision'] = $ok ? 'accepted' : (str_starts_with((string) $failed, 'H5') ? 'no_gain' : 'rejected');
+                    // A late check-in the new stay removes is worth more than the cost comparison alone shows, as long
+                    // as nothing else is worse (see StayPlanEvaluator::acceptsLateRepair).
+                    if (! $ok && $lateness !== null && str_starts_with((string) $failed, 'H5')) {
+                        [$repaired, $why] = $evaluator->acceptsLateRepair($first, $candidate['m']);
+                        if ($repaired) {
+                            $ok = true;
+                            $failed = null;
+                            $guard['decision'] = 'accepted_late_repair';
+                        }
+                    }
                     $guard['failed'] = $failed;
                     $chosen = $ok ? $candidate : $current;
                 }
@@ -1272,7 +1586,7 @@ class ItineraryGenerationService
     /** The most telling of the recorded causes: a place that is shut says more than a day that was full. */
     private function mainCause(array $attempts): string
     {
-        $order = ['closed_that_day', 'outside_opening_hours', 'would_end_after_cutoff', 'drive_budget_reached', 'day_full', 'no_sightseeing_time_that_day'];
+        $order = ['closed_that_day', 'outside_opening_hours', 'would_end_after_cutoff', 'would_return_after_2000', 'drive_budget_reached', 'day_full', 'no_sightseeing_time_that_day'];
         $causes = array_column($attempts, 'cause');
 
         foreach ($order as $cause) {
