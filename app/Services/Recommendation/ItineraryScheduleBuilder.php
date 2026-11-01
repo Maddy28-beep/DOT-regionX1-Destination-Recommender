@@ -4,11 +4,14 @@ namespace App\Services\Recommendation;
 
 use App\Models\Accommodation;
 use App\Models\Destination;
-use App\Models\Restaurant;
-use App\Support\OpeningHours;
 use App\Models\Itinerary;
+use App\Models\Restaurant;
+use App\Models\SouvenirCenter;
 use App\Models\TouristPreference;
+use App\Support\OpeningHours;
+use App\Support\VisitDuration;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 /**
  * Turns an ordered list of stops into an hour-by-hour schedule.
@@ -35,6 +38,7 @@ class ItineraryScheduleBuilder
     private array $requestedInterests = [];
 
     private ?array $mealWindow = null;
+
     /** Non-arrival days start with breakfast at this hour. */
     private const BREAKFAST = '07:00';
 
@@ -107,13 +111,15 @@ class ItineraryScheduleBuilder
      * each on the same day.
      *
      * The count includes the journey back to where the day ends (the accommodation, or the departure point
-     * on the last day). This preliminary clock allowance lets a first stop be tried. The generation service then
-     * checks the completed schedule against the auditor's distance and travel-share limits, without this exemption.
+     * on the last day). Even a day's first stop may not push total daily driving above MAX_DAILY_DRIVE_MINUTES.
      */
     public const DRIVE_BUDGET_MINUTES = ['near' => 210, 'moderate' => 300, 'far' => 420];
 
     /** Used when the traveller's distance preference is missing or unknown. */
     private const DEFAULT_DRIVE_BUDGET_MINUTES = 300;
+
+    /** Hard ceiling on total daily road time (including the first stop and return leg to accommodation or origin). */
+    public const MAX_DAILY_DRIVE_MINUTES = 480;
 
     /**
      * The souvenir stop is a short extra at the end of the trip, not a second excursion: it has to be near
@@ -123,8 +129,13 @@ class ItineraryScheduleBuilder
 
     private const SOUVENIR_LATEST_END = '19:00';
 
-    /** Skip optional remote-trip shopping when the return, including dinner, would finish later. */
-    private const SOUVENIR_LATEST_ARRIVAL_HOME = '20:00';
+    /**
+     * On a Remote trip the journey home is already long, so a last-day stop (or the souvenir stop after it) is only
+     * added when the traveller is still back before this hour once it, and the dinner break a late journey needs, are counted.
+     */
+    public const LATEST_ARRIVAL_HOME = '20:00';
+
+    private const SOUVENIR_LATEST_ARRIVAL_HOME = self::LATEST_ARRIVAL_HOME;
 
     private bool $remoteTrip = false;
 
@@ -290,8 +301,16 @@ class ItineraryScheduleBuilder
                  */
                 $choice = null;
                 $waiting = null;
+                // The last day, and the arrival day while nothing is placed yet, look past the first few: the best
+                // stop that can actually be reached and visited today is promoted to the front instead of the day
+                // staying empty behind stops that are too far to reach.
+                $widen = $this->remoteTrip && ($isLastDay || ($dayNumber === 1 && $scheduled === 0));
+                $lookahead = $widen ? array_keys($queue) : array_slice(array_keys($queue), 0, self::LOOKAHEAD);
 
-                foreach (array_slice(array_keys($queue), 0, self::LOOKAHEAD) as $index) {
+                foreach ($lookahead as $pos => $index) {
+                    if ($pos >= self::LOOKAHEAD && $waiting !== null) {
+                        break;
+                    }
                     $destination = $queue[$index]['row']['destination'];
                     $there = $this->place($destination);
 
@@ -313,6 +332,20 @@ class ItineraryScheduleBuilder
 
                     if ($scheduled > 0 && $driven + $leg + $back > $this->driveBudget($preference)) {
                         $this->note($destination->id, $dayNumber, 'drive_budget_reached', $driven + $leg + $back, $this->driveBudget($preference));
+
+                        continue;
+                    }
+
+                    // On a Remote trip's last day, even the first stop is skipped when the return home (dinner included)
+                    // would reach the starting point at or after LATEST_ARRIVAL_HOME.
+                    if ($isLastDay && $this->remoteTrip && $this->projectVisitHomeArrival($visit, $there, $origin)->greaterThanOrEqualTo(Carbon::parse(self::LATEST_ARRIVAL_HOME))) {
+                        $this->note($destination->id, $dayNumber, 'would_return_after_2000');
+
+                        continue;
+                    }
+
+                    if ($scheduled === 0 && $this->remoteTrip && $driven + $leg + $back > self::MAX_DAILY_DRIVE_MINUTES) {
+                        $this->note($destination->id, $dayNumber, 'drive_budget_reached', $driven + $leg + $back, self::MAX_DAILY_DRIVE_MINUTES);
 
                         continue;
                     }
@@ -398,7 +431,7 @@ class ItineraryScheduleBuilder
                     $mealLocation = ($scheduled < $capacity && $queue !== []) ? $here : null;
                     $clock = $this->addMeal($itinerary, $dayNumber, $sortOrder, $clock, 'Lunch', $there, $destination, $date, 'after', null, null, null, $mealLocation);
                     if ($mealLocation !== null) {
-                    $here = $mealLocation;
+                        $here = $mealLocation;
                     }
                     $lunchTaken = true;
                 }
@@ -410,7 +443,7 @@ class ItineraryScheduleBuilder
             }
 
             if ($isLastDay) {
-                $this->closeTripDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $origin, $lunchTaken, $lastDestination, $date);
+                $this->closeTripDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $origin, $lunchTaken, $lastDestination, $date, $driven);
             } else {
                 $this->closeOvernightDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $accommodation, $stayRule, $lastNight, $date);
                 $here = $accommodation ? $this->place($accommodation) : $here;
@@ -422,7 +455,11 @@ class ItineraryScheduleBuilder
 
     /**
      * Why a stop was not placed, as the build decided it. These are records of decisions the build already makes; reading
-     * them changes nothing about what is built.
+     * them changes nothing about what is built. One entry per day and cause, per destination:
+     * ['day' => int, 'cause' => string, 'minutes' => int|null, 'limit' => int|null, 'fresh' => bool].
+     * Causes: would_end_after_cutoff, would_return_after_2000, closed_that_day, outside_opening_hours, drive_budget_reached, day_full.
+     * 'fresh' means the stop could not be done even starting that day fresh (so it was set aside).
+
      *
      * @var array<int, array<int, array<string, mixed>>>
      */
@@ -606,13 +643,13 @@ class ItineraryScheduleBuilder
      * Mirrors what build() then does (slow travel estimate, lunch on arrival if it is due, quarter-hour
      * rounding), so a stop that passes here is scheduled exactly as checked.
      *
-     * @return array{minutes: int, starts_at: Carbon|null, wait: int, plan: array}|null  null when the stop cannot be done
-     *                                                                       today; starts_at and wait are set
-     *                                                                       only when the visit has to wait for opening
+     * @return array{minutes: int, starts_at: Carbon|null, wait: int, plan: array}|null null when the stop cannot be done
+     *                                                                                  today; starts_at and wait are set
+     *                                                                                  only when the visit has to wait for opening
      */
     private function planVisit(Carbon $clock, array $from, array $to, int $visitMinutes, bool $lunchTaken, $destination, ?Carbon $date = null): ?array
     {
-        $recordedMinutes = \App\Support\VisitDuration::minutes($destination->visit_duration ?? null);
+        $recordedMinutes = VisitDuration::minutes($destination->visit_duration ?? null);
         if ($recordedMinutes !== null) {
             // Never compress an overnight trek or a recorded full visit into a short final stop.
             if ($recordedMinutes >= 1440) {
@@ -629,7 +666,7 @@ class ItineraryScheduleBuilder
         // A recorded visit is kept whole when the day allows. When it does not, it may shrink to half (never under two
         // hours) rather than the place being left out altogether: a six-hour island visit squeezed into a shorter
         // stop still serves the traveller who asked for a beach; a plan without it does not.
-        $floor = $recordedMinutes === null ? null : \App\Support\VisitDuration::minimumMinutes($recordedMinutes);
+        $floor = $recordedMinutes === null ? null : VisitDuration::minimumMinutes($recordedMinutes);
         if ($floor !== null && $visitMinutes < $floor) {
             $this->planRejection = 'would_end_after_cutoff';
 
@@ -1070,7 +1107,7 @@ class ItineraryScheduleBuilder
         ];
     }
 
-    /** @var \Illuminate\Support\Collection<int, Restaurant>|null  accredited, mapped restaurants, loaded once per build */
+    /** @var Collection<int, Restaurant>|null  accredited, mapped restaurants, loaded once per build */
     private $mealRestaurants = null;
 
     /**
@@ -1372,7 +1409,7 @@ class ItineraryScheduleBuilder
     }
 
     /** The final day: souvenirs, a last meal if lunch has not happened, then the journey out. */
-    private function closeTripDay(Itinerary $itinerary, int $dayNumber, int &$sortOrder, Carbon $clock, array $here, array $origin, bool $lunchTaken, $lastDestination = null, ?Carbon $date = null): void
+    private function closeTripDay(Itinerary $itinerary, int $dayNumber, int &$sortOrder, Carbon $clock, array $here, array $origin, bool $lunchTaken, $lastDestination = null, ?Carbon $date = null, int $driven = 0): void
     {
         $suggestion = $this->souvenirStop($here, $lastDestination, $clock);
         $souvenirs = $suggestion['listing'] ?? null;
@@ -1389,12 +1426,19 @@ class ItineraryScheduleBuilder
 
         if ($souvenirs && $this->remoteTrip) {
             $shop = $this->place($souvenirs);
-            $shopping = $this->toQuarterHour($this->toQuarterHour($clock->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES))
-                ->addMinutes($this->estimateLeg($here, $shop)['max_minutes']))->addMinutes(self::MEAL_MINUTES);
-            $home = $this->planDinnerLeg($this->toQuarterHour($shopping->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES)), $shop, $origin)['arrival'];
+            $shopLeg = $this->estimateLeg($here, $shop)['max_minutes'];
+            $homeLeg = $this->estimateLeg($shop, $origin)['max_minutes'];
 
-            if ($home->greaterThan(Carbon::parse(self::SOUVENIR_LATEST_ARRIVAL_HOME))) {
+            if ($driven + $shopLeg + $homeLeg > self::MAX_DAILY_DRIVE_MINUTES) {
                 $souvenirs = null;
+            } else {
+                $shopping = $this->toQuarterHour($this->toQuarterHour($clock->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES))
+                    ->addMinutes($shopLeg))->addMinutes(self::MEAL_MINUTES);
+                $home = $this->projectHomeArrival($shopping, $shop, $origin, $lunchTaken);
+
+                if ($home->greaterThanOrEqualTo(Carbon::parse(self::LATEST_ARRIVAL_HOME))) {
+                    $souvenirs = null;
+                }
             }
         }
 
@@ -1444,6 +1488,93 @@ class ItineraryScheduleBuilder
             'title' => 'Departure',
             'starts_at' => $this->toQuarterHour($clock),
         ]);
+    }
+
+    /**
+     * When the traveller would reach the starting point if the last day ended with this candidate visit.
+     *
+     * Mirrors the steps build() writes for an accepted stop (commitLeg, waiting for opening time when needed,
+     * the activity row, and a post-visit lunch when the visit ends inside the lunch window), then delegates to
+     * projectHomeArrival() for the return leg.
+     */
+    private function projectVisitHomeArrival(array $visit, array $there, array $origin): Carbon
+    {
+        $afterLeg = $visit['plan']['arrival']->copy();
+        if ($visit['starts_at'] !== null && $visit['starts_at']->greaterThan($afterLeg)) {
+            $afterLeg = $visit['starts_at']->copy();
+        }
+        $afterVisit = $this->toQuarterHour($afterLeg)->addMinutes($visit['minutes']);
+
+        return $this->projectHomeArrival($afterVisit, $there, $origin, (bool) $visit['plan']['lunchTaken']);
+    }
+
+    /**
+     * When the traveller would reach the starting point if the trip ended after finishing at $from at $clock:
+     * lunch first when the stop ended inside the lunch window without lunch yet taken, the departure buffer,
+     * and the way home with the dinner break a late return needs (the same steps closeTripDay() writes).
+     */
+    private function projectHomeArrival(Carbon $clock, array $from, array $origin, bool $lunchTaken): Carbon
+    {
+        if (! $lunchTaken && $this->lunchIsDue($clock)) {
+            $clock = $this->toQuarterHour($clock)->addMinutes(self::MEAL_MINUTES);
+        }
+
+        $depart = $this->toQuarterHour($clock->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES));
+        $arrival = $this->planDinnerLeg($depart, $from, $origin)['arrival'];
+
+        return $this->toQuarterHour($arrival);
+    }
+
+    /**
+     * When the traveller would check in tonight if the arrival day had no sightseeing stop at all: the day opens as
+     * openDay() opens it, then they go straight from the starting point to the stay (departure buffer and any dinner
+     * break included, exactly as closeOvernightDay() plans it). Used by the stay plan to see a late check-in coming
+     * before the day is built; the built itinerary stays the judge.
+     */
+    public function projectArrivalDayCheckIn(TouristPreference $preference, array $origin, Accommodation $stay): Carbon
+    {
+        $previous = $this->transport;
+        $this->transport = $preference->transport_pref;
+
+        try {
+            $earliest = Carbon::parse(self::EARLIEST_DEPARTURE);
+            $ready = $this->arrivalTime($preference)->copy()->addMinutes(self::ARRIVAL_PREPARATION_MINUTES);
+
+            if (filled($preference->arrival_time)
+                && $ready->greaterThanOrEqualTo(Carbon::parse(self::BREAKFAST))
+                && $ready->lessThanOrEqualTo(Carbon::parse(self::BREAKFAST_LATEST))) {
+                $clock = $ready->copy()->addMinutes(self::BREAKFAST_MINUTES);
+                $clock = $clock->lessThan($earliest) ? $earliest : $clock;
+            } else {
+                $clock = $ready->lessThan($earliest) ? $earliest : $ready;
+            }
+
+            $depart = $this->toQuarterHour($clock->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES));
+
+            return $this->toQuarterHour($this->planDinnerLeg($depart, $origin, $this->place($stay))['arrival']);
+        } finally {
+            $this->transport = $previous;
+        }
+    }
+
+    /**
+     * Whether the arrival day has room for even the shortest proper visit: the day starts at the later of arrival plus
+     * preparation and the earliest departure (the arrival rule, unchanged), and a visit needs at least
+     * SHORT_VISIT_MINUTES before the sightseeing cutoff. A blank arrival time is planned as the earliest departure.
+     */
+    public function arrivalDayHasRoomForAVisit(TouristPreference $preference): bool
+    {
+        $ready = $this->arrivalTime($preference)->copy()->addMinutes(self::ARRIVAL_PREPARATION_MINUTES);
+        $earliest = Carbon::parse(self::EARLIEST_DEPARTURE);
+        $start = $ready->lessThan($earliest) ? $earliest : $ready;
+
+        return $this->minutesBetween($start, Carbon::parse(self::LAST_ACTIVITY_END)) >= self::SHORT_VISIT_MINUTES;
+    }
+
+    /** Whether a check-in at this time is "late": after the latest dinner start, when no dinner is planned. */
+    public static function latestDinnerStart(): string
+    {
+        return self::LATEST_DINNER_START;
     }
 
     /** The TransportMode the current build() is planning for; null plans as a personal car. */
@@ -1640,12 +1771,12 @@ class ItineraryScheduleBuilder
         }
 
         if ($here['lat'] === null || $here['lng'] === null) {
-            $listing = \App\Models\SouvenirCenter::publiclyVisible()->availableForTrip()->orderByDesc('rating')->first();
+            $listing = SouvenirCenter::publiclyVisible()->availableForTrip()->orderByDesc('rating')->first();
 
             return $listing ? [...$candidates, ['listing' => $listing, 'rule' => null]] : $candidates;
         }
 
-        $listing = \App\Models\SouvenirCenter::publiclyVisible()
+        $listing = SouvenirCenter::publiclyVisible()
             ->availableForTrip()
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
