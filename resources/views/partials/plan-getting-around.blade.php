@@ -93,8 +93,28 @@
              data-modes='@json($transportComparison)'
              data-samples='@json(['near' => 18, 'moderate' => 55, 'far' => 110])'
              aria-live="polite">
-            <div class="pc-compare__head"><strong data-compare-title></strong><span>Estimate only, for planning</span></div>
-            <div data-compare-bars></div>
+            <div class="pc-compare__head">
+                <span class="pc-compare__route" aria-hidden="true"><x-icon name="map-pin" /></span>
+                <div class="pc-compare__heading">
+                    <h4>Compare travel options</h4>
+                    <p data-compare-title></p>
+                </div>
+                <span class="pc-compare__estimate">Planning estimate</span>
+            </div>
+            <div class="pc-compare__grid">
+                @foreach ($transportComparison as $mode => $profile)
+                    <div class="pc-option" data-compare-mode="{{ $mode }}">
+                        <div class="pc-option__top">
+                            <span class="pc-option__icon" aria-hidden="true"><x-icon :name="['tour_operator' => 'van', 'jeep' => 'bus', 'taxi' => 'car', 'personal_car' => 'car'][$mode]" /></span>
+                            <span class="pc-option__selected" hidden><x-icon name="check" aria-hidden="true" /> Selected</span>
+                        </div>
+                        <strong class="pc-option__name">{{ $profile['label'] }}</strong>
+                        <span class="pc-option__time" data-compare-time></span>
+                        <span class="pc-option__caption">Estimated travel time</span>
+                    </div>
+                @endforeach
+            </div>
+            <p class="pc-compare__foot"><x-icon name="info" aria-hidden="true" /><span>Travel times vary with traffic, stops and road conditions.</span></p>
             <p class="pc-compare__tip" data-compare-tip hidden></p>
         </div>
     </fieldset>
