@@ -47,8 +47,20 @@ final class InterestCoverage
                 continue;
             }
 
-            $incoming = $pool->first(fn ($row) => self::covers($row['destination'], $interest));
-            $out = $incoming ? $this->lowestRankedNobodyNeeds($chosen, $interests) : null;
+            $incoming = null;
+            $out = null;
+            foreach ($pool as $candidate) {
+                if (! self::covers($candidate['destination'], $interest)) {
+                    continue;
+                }
+                // A combined-interest venue can replace a sole cover only when it preserves that coverage.
+                $replace = $this->lowestRankedReplaceable($chosen, $interests, $candidate['destination']);
+                if ($replace !== null) {
+                    $incoming = $candidate;
+                    $out = $replace;
+                    break;
+                }
+            }
             if ($incoming === null || $out === null) {
                 continue;
             }
@@ -60,13 +72,14 @@ final class InterestCoverage
         return $chosen;
     }
 
-    /** The position of the lowest-ranked chosen stop that is not the only cover of an interest, or null. */
-    private function lowestRankedNobodyNeeds(Collection $chosen, array $interests): ?int
+    /** The lowest-ranked stop whose required coverage the incoming venue preserves, or null. */
+    private function lowestRankedReplaceable(Collection $chosen, array $interests, Destination $incoming): ?int
     {
         for ($i = $chosen->count() - 1; $i >= 0; $i--) {
             $others = $chosen->reject(fn ($row, $k) => $k === $i);
             $needed = collect($interests)->contains(fn ($interest) => self::covers($chosen[$i]['destination'], $interest)
-                && ! $others->contains(fn ($row) => self::covers($row['destination'], $interest)));
+                && ! $others->contains(fn ($row) => self::covers($row['destination'], $interest))
+                && ! self::covers($incoming, $interest));
 
             if (! $needed) {
                 return $i;

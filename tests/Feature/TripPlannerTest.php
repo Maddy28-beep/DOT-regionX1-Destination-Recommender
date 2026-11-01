@@ -454,6 +454,8 @@ class TripPlannerTest extends TestCase
      */
     public function test_no_schedule_row_runs_into_the_small_hours(): void
     {
+        // Exercise partial-plan scheduling explicitly; the default rejects infeasible requests.
+        config(['itinerary.planner.reject_incomplete_trips' => false]);
         $region = Region::create(['name' => 'Davao Region']);
 
         // A nearby stop and one hours away, so the day cannot hold both.

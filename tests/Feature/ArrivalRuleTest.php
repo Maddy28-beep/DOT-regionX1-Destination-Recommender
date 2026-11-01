@@ -466,6 +466,8 @@ class ArrivalRuleTest extends TestCase
      */
     public function test_early_arrivals_consistently_reject_a_far_flung_plan_outside_the_audit_limits(): void
     {
+        // Exercise partial-plan scheduling explicitly; the default rejects infeasible requests.
+        config(['itinerary.planner.reject_incomplete_trips' => false]);
         $this->destination('Samal Island', 'Beach & Leisure', 7.1553, 125.708, 'Island Garden City of Samal', 4.4);
         $this->destination('Mount Apo Natural Park', 'Adventure & Hiking', 6.9847, 125.2725, 'Davao del Sur', 4.3);
         $this->destination('Bemwa Farm Fresh Inc.', 'Farm Tourism', 7.481914, 125.259499, 'Davao City', 4.2);

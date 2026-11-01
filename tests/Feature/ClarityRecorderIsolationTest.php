@@ -95,6 +95,9 @@ class ClarityRecorderIsolationTest extends TestCase
     {
         parent::setUp();
 
+        // Notice characterization uses deliberately incomplete plans, not the default rejection flow.
+        config(['itinerary.planner.reject_incomplete_trips' => false]);
+
         Carbon::setTestNow('2026-10-20 12:00:00');
     }
 

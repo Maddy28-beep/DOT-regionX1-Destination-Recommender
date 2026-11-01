@@ -303,6 +303,20 @@ class TransportAndResortSettingTest extends TestCase
         $this->assertStringContainsString('1 operator near you', $html);
     }
 
+    public function test_rent_a_car_shows_rental_car_operators_just_like_tour_operator(): void
+    {
+        $this->operator('Aldimel Car Express Rent A Car', 7.0569, 125.5888, 'Davao City', ['specialization' => 'Tourist Transport', 'contact_number' => '0917 3001436']);
+        $this->operator('Near Tours', 7.071, 125.611, 'Davao City', ['specialization' => 'General Travel & Tours', 'contact_number' => '082 555 0100']);
+
+        $html = $this->planThenGet('rental_car');
+
+        $this->assertStringContainsString('Car rental / pick-up by your operator', $html);
+        $this->assertStringContainsString('Rent-a-car operators near you', $html);
+        $this->assertStringContainsString('Aldimel Car Express Rent A Car', $html);
+        $this->assertStringContainsString('confirm with them first', $html);
+        $this->assertStringContainsString('2 operators near you', $html);
+    }
+
     public function test_commuting_on_your_own_shows_no_pick_up_and_no_operators(): void
     {
         $this->operator('Near Tours', 7.071, 125.611);
@@ -478,6 +492,20 @@ class TransportAndResortSettingTest extends TestCase
         $this->assertSame(['Listed'], $names);
     }
 
+    public function test_rental_car_suggestions_prioritize_tourist_transport_and_car_rental_operators(): void
+    {
+        $this->operator('Near General Tours', 7.0735, 125.6130, 'Davao City', ['specialization' => 'General Travel & Tours']);
+        $this->operator('Ecotrans Car Rentals Transport OPC', 7.0958, 125.6038, 'Davao City', ['specialization' => 'Tourist Transport']);
+        $this->operator('Aldimel Car Express Rent A Car', 7.0569, 125.5888, 'Davao City', ['specialization' => 'Tourist Transport']);
+
+        $picked = (new TourOperatorSuggester())->near(7.0731, 125.6128, TourOperatorSuggester::LIMIT, TransportMode::RENTAL_CAR);
+
+        $this->assertSame(
+            ['Ecotrans Car Rentals Transport OPC', 'Aldimel Car Express Rent A Car', 'Near General Tours'],
+            $picked->map(fn ($row) => $row['operator']->name)->all()
+        );
+    }
+
     // ── Resort setting ────────────────────────────────────────────────────
 
     private function resort(string $name, string $type, ?array $settings, float $lat = 7.07, float $lng = 125.61): Accommodation
@@ -525,6 +553,19 @@ class TransportAndResortSettingTest extends TestCase
         $this->resort('City Hotel', 'Hotel', ['Island']);
 
         $this->assertSame($island->id, $this->pick(['resort_setting' => 'Island'])['listing']->id);
+    }
+
+    public function test_beach_resort_is_inside_resort_settings_and_picks_a_beach_resort(): void
+    {
+        $this->resort('Valley Resort', 'Resort', ['Inland']);
+        $beach = $this->resort('Sunset Shores', 'Beach Resort', null);
+
+        $html = $this->get('/plan')->assertOk()->getContent();
+        $this->assertStringNotContainsString('name="accommodation_pref" value="Beach Resort"', $html);
+        $this->assertStringContainsString('name="resort_setting" value="Beach"', $html);
+        $this->assertStringContainsString('Beach Resort', $html);
+
+        $this->assertSame($beach->id, $this->pick(['resort_setting' => 'Beach'])['listing']->id);
     }
 
     public function test_inland_does_not_match_a_resort_that_is_only_on_an_island(): void

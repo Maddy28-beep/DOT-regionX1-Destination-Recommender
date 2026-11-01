@@ -101,6 +101,18 @@ final class TransportMode
         return $mode === self::TOUR_OPERATOR;
     }
 
+    /** The traveller is renting a car (with or without a driver) from an operator near their starting point. */
+    public static function isRentalCar(?string $mode): bool
+    {
+        return $mode === self::RENTAL_CAR;
+    }
+
+    /** Modes where the itinerary suggests accredited operators near the traveller's starting point. */
+    public static function suggestsOperators(?string $mode): bool
+    {
+        return self::isTourOperator($mode) || self::isRentalCar($mode);
+    }
+
     /** Jeep and taxi are the two public modes the form groups under "Public Transport". */
     public static function isPublic(?string $mode): bool
     {

@@ -26,9 +26,10 @@
     @php
         $sampleData = app(\App\Support\SampleData::class);
         $anySampleOperator = $operators->contains(fn ($row) => $sampleData->isSample($row['operator']));
+        $isRentalCar = TransportMode::isRentalCar($transport);
     @endphp
     <section class="itin-side__card itin-ops" id="itin-ops" aria-labelledby="itin-ops-title">
-        <h2 id="itin-ops-title"><x-icon name="van" /> Tour operators for your pick-up</h2>
+        <h2 id="itin-ops-title"><x-icon :name="$isRentalCar ? 'key' : 'van'" /> {{ $isRentalCar ? 'Rent-a-car operators near you' : 'Tour operators for your pick-up' }}</h2>
         <p class="itin-ops__lead">
             @if ($anySampleOperator)
                 Close to your start. Operators marked sample data are not DOT-verified. They set the time, place and price, so confirm with them first.
@@ -63,7 +64,7 @@
                 </li>
             @endforeach
         </ul>
-        <a class="itin-ops__more" href="{{ route('tour-operators.index') }}">See all tour operators &rarr;</a>
+        <a class="itin-ops__more" href="{{ $isRentalCar ? route('tour-operators.index', ['specialization' => 'Tourist Transport']) : route('tour-operators.index') }}">{{ $isRentalCar ? 'See all transport & tour operators' : 'See all tour operators' }} &rarr;</a>
     </section>
 @endif
 

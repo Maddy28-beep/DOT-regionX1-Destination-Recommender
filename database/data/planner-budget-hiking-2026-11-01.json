@@ -1,0 +1,29 @@
+{
+  "checked_on": "2026-11-01",
+  "note": "Source-backed short forest hike. A source review is not a booking, current operator tariff, DOT accreditation or confirmation of unpublished hours. Unknown fields remain unknown.",
+  "places": [
+    {
+      "slug": "magongawon-falls-forest-trail",
+      "name": "Magongawon Falls — Forest Trail",
+      "region": "Island Garden City of Samal",
+      "location": "Tagbaobo, Kaputian District, Island Garden City of Samal",
+      "type": "Adventure & Hiking",
+      "tags": ["Hiking (forest descent and return)", "Nature"],
+      "price_tier": "Budget-Friendly",
+      "coordinates": [7.0076941, 125.7780075],
+      "coordinate_role": "Mapped service-road endpoint adjoining the walking trail; not the waterfall itself",
+      "road_way": 1320769026,
+      "road_endpoint_node": 12222635631,
+      "walking_way": 1320769027,
+      "waterfall_node": 546211882,
+      "source": "https://meanttogo.com/two-days-samal-adventure/ ; https://thetravelintern.com/davao-guide/ ; https://www.openstreetmap.org/way/1320769026 ; https://www.openstreetmap.org/way/1320769027 ; https://www.openstreetmap.org/node/546211882",
+      "description": "Short forest hike down to Magongawon (Tagbaobo) Falls and back uphill. Steep, uneven and slippery sections make this different from a paved park walk. The itinerary location is the mapped road endpoint where walking begins.",
+      "planning_notes": "An August 2026 visitor account reports PHP 30 admission; an earlier 2026 guide lists free entry. Budget-Friendly is inferred from these reports, not a verified all-in price. Confirm current admission, any guide requirement, environmental fees and return local transport before visiting. Road travel ends at the mapped trail start; descend and return on foot within the visit slot. Hours and full visit duration are unverified. Heavy rain can make the trail slippery and the water turbid; confirm conditions locally. No swimming, meal service or direct jeep service is promised.",
+      "evidence": [
+        {"url": "https://meanttogo.com/two-days-samal-adventure/", "published_on": "2026-08-14", "kind": "First-person visitor account", "supports": "Recent forest hike, local vehicle access and reported PHP 30 admission; not an operator tariff."},
+        {"url": "https://thetravelintern.com/davao-guide/", "kind": "First-person travel feature", "supports": "Tagbaobo alias and steep forest approach; descent-only time is not recorded as full visit duration. Its free-entry and 24-hour claims are not adopted."},
+        {"url": "https://www.openstreetmap.org/way/1320769026", "kind": "Mapped road geometry", "supports": "Service-road endpoint shared with walking way 1320769027. Trail identification is inferred from geometry near the named falls, not an operator-certified entrance."}
+      ]
+    }
+  ]
+}

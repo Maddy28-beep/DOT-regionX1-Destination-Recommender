@@ -1,0 +1,577 @@
+{
+  "checked_on": "2026-11-01",
+  "provider": "OSRM public routing service / OpenStreetMap car profile",
+  "notes": "Directed route snapshots at the listed coordinates. Distances are road-network routes, not live traffic or jeepney routes. OSM snap distances under 200 m were accepted for host-property map points. Reverse directions were queried separately. Ferry queueing remains an unverified planning allowance.",
+  "routes": [
+    {
+      "from": {
+        "lat": 7.13,
+        "lng": 125.645,
+        "label": "Davao International Airport"
+      },
+      "to": {
+        "lat": 7.0731829,
+        "lng": 125.6044565,
+        "label": "Rogen Inn"
+      },
+      "road_km": 10.419,
+      "uncongested_minutes": 19.37,
+      "snap_metres": [
+        76.8,
+        15.7
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.645,7.13;125.6044565,7.0731829?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0731829,
+        "lng": 125.6044565,
+        "label": "Rogen Inn"
+      },
+      "to": {
+        "lat": 7.0687119,
+        "lng": 125.6007434,
+        "label": "Bankerohan Public Market"
+      },
+      "road_km": 1.078,
+      "uncongested_minutes": 3.08,
+      "snap_metres": [
+        15.7,
+        58.3
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.6044565,7.0731829;125.6007434,7.0687119?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0731829,
+        "lng": 125.6044565,
+        "label": "Rogen Inn"
+      },
+      "to": {
+        "lat": 7.0972103,
+        "lng": 125.598976,
+        "label": "Davao Crocodile Park"
+      },
+      "road_km": 6.646,
+      "uncongested_minutes": 14.9,
+      "snap_metres": [
+        15.7,
+        46
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.6044565,7.0731829;125.598976,7.0972103?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0972103,
+        "lng": 125.598976,
+        "label": "Davao Crocodile Park"
+      },
+      "to": {
+        "lat": 7.0304604,
+        "lng": 125.3979848,
+        "label": "Eden Nature Park"
+      },
+      "road_km": 30.494,
+      "uncongested_minutes": 40.53,
+      "snap_metres": [
+        46,
+        20.2
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.598976,7.0972103;125.3979848,7.0304604?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0304604,
+        "lng": 125.3979848,
+        "label": "Eden Nature Park"
+      },
+      "to": {
+        "lat": 7.1910411,
+        "lng": 125.4276581,
+        "label": "Malagos Garden Resort"
+      },
+      "road_km": 37.461,
+      "uncongested_minutes": 51.85,
+      "snap_metres": [
+        20.2,
+        169.8
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.3979848,7.0304604;125.4276581,7.1910411?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0731829,
+        "lng": 125.6044565,
+        "label": "Rogen Inn"
+      },
+      "to": {
+        "lat": 7.0304604,
+        "lng": 125.3979848,
+        "label": "Eden Nature Park"
+      },
+      "road_km": 28.829,
+      "uncongested_minutes": 40.28,
+      "snap_metres": [
+        15.7,
+        20.2
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.6044565,7.0731829;125.3979848,7.0304604?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0731829,
+        "lng": 125.6044565,
+        "label": "Rogen Inn"
+      },
+      "to": {
+        "lat": 7.1848752,
+        "lng": 125.415287,
+        "label": "Philippine Eagle Center"
+      },
+      "road_km": 31.889,
+      "uncongested_minutes": 47.9,
+      "snap_metres": [
+        15.7,
+        30.3
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.6044565,7.0731829;125.415287,7.1848752?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0731829,
+        "lng": 125.6044565,
+        "label": "Rogen Inn"
+      },
+      "to": {
+        "lat": 7.2939628,
+        "lng": 125.6841463,
+        "label": "Damosa Land Inc. / Agriya Naturetainment"
+      },
+      "road_km": 31.413,
+      "uncongested_minutes": 42.58,
+      "snap_metres": [
+        15.7,
+        14.2
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.6044565,7.0731829;125.6841463,7.2939628?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0924712,
+        "lng": 125.611615,
+        "label": "Aria Hotel & Residences"
+      },
+      "to": {
+        "lat": 7.0304604,
+        "lng": 125.3979848,
+        "label": "Eden Nature Park"
+      },
+      "road_km": 32.931,
+      "uncongested_minutes": 45.98,
+      "snap_metres": [
+        32.6,
+        20.2
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.611615,7.0924712;125.3979848,7.0304604?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.1012868,
+        "lng": 125.664575,
+        "label": "Paradise Island Park & Beach Resort"
+      },
+      "to": {
+        "lat": 6.9651131,
+        "lng": 125.7231251,
+        "label": "Kaputian Beach"
+      },
+      "road_km": 25.855,
+      "uncongested_minutes": 26.59,
+      "snap_metres": [
+        77.6,
+        49.3
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.664575,7.1012868;125.7231251,6.9651131?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.13,
+        "lng": 125.645,
+        "label": "Davao International Airport"
+      },
+      "to": {
+        "lat": 7.1012868,
+        "lng": 125.664575,
+        "label": "Paradise Island Park & Beach Resort"
+      },
+      "road_km": 8.108,
+      "uncongested_minutes": 31.32,
+      "snap_metres": [
+        76.8,
+        77.6
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.645,7.13;125.664575,7.1012868?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0731829,
+        "lng": 125.6044565,
+        "label": "Rogen Inn"
+      },
+      "to": {
+        "lat": 6.9651131,
+        "lng": 125.7231251,
+        "label": "Kaputian Beach"
+      },
+      "road_km": 35.672,
+      "uncongested_minutes": 69.4,
+      "snap_metres": [
+        15.7,
+        49.3
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.6044565,7.0731829;125.7231251,6.9651131?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0731829,
+        "lng": 125.6044565,
+        "label": "Rogen Inn"
+      },
+      "to": {
+        "lat": 7.1882392,
+        "lng": 125.4603218,
+        "label": "IMIN The Philippine-Japan Historical Museum"
+      },
+      "road_km": 26.887,
+      "uncongested_minutes": 39.77,
+      "snap_metres": [
+        15.7,
+        21.9
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.6044565,7.0731829;125.4603218,7.1882392?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0450475,
+        "lng": 125.5147347,
+        "label": "Bukid Amara Tourism Agriventures Corporation"
+      },
+      "to": {
+        "lat": 7.0304604,
+        "lng": 125.3979848,
+        "label": "Eden Nature Park"
+      },
+      "road_km": 17.804,
+      "uncongested_minutes": 25.12,
+      "snap_metres": [
+        112.8,
+        20.2
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.5147347,7.0450475;125.3979848,7.0304604?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0924712,
+        "lng": 125.611615,
+        "label": "Aria Hotel & Residences"
+      },
+      "to": {
+        "lat": 7.1910411,
+        "lng": 125.4276581,
+        "label": "Malagos Garden Resort"
+      },
+      "road_km": 32.123,
+      "uncongested_minutes": 45.61,
+      "snap_metres": [
+        32.6,
+        169.8
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.611615,7.0924712;125.4276581,7.1910411?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0731829,
+        "lng": 125.6044565,
+        "label": "Rogen Inn"
+      },
+      "to": {
+        "lat": 7.13,
+        "lng": 125.645,
+        "label": "Davao International Airport"
+      },
+      "road_km": 10.026,
+      "uncongested_minutes": 18.12,
+      "snap_metres": [
+        15.7,
+        76.8
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.6044565,7.0731829;125.645,7.13?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0687119,
+        "lng": 125.6007434,
+        "label": "Bankerohan Public Market"
+      },
+      "to": {
+        "lat": 7.0731829,
+        "lng": 125.6044565,
+        "label": "Rogen Inn"
+      },
+      "road_km": 1.258,
+      "uncongested_minutes": 3.92,
+      "snap_metres": [
+        58.3,
+        15.7
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.6007434,7.0687119;125.6044565,7.0731829?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0972103,
+        "lng": 125.598976,
+        "label": "Davao Crocodile Park"
+      },
+      "to": {
+        "lat": 7.0731829,
+        "lng": 125.6044565,
+        "label": "Rogen Inn"
+      },
+      "road_km": 6.74,
+      "uncongested_minutes": 14.85,
+      "snap_metres": [
+        46,
+        15.7
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.598976,7.0972103;125.6044565,7.0731829?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0304604,
+        "lng": 125.3979848,
+        "label": "Eden Nature Park"
+      },
+      "to": {
+        "lat": 7.0972103,
+        "lng": 125.598976,
+        "label": "Davao Crocodile Park"
+      },
+      "road_km": 30.425,
+      "uncongested_minutes": 40.33,
+      "snap_metres": [
+        20.2,
+        46
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.3979848,7.0304604;125.598976,7.0972103?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.1910411,
+        "lng": 125.4276581,
+        "label": "Malagos Garden Resort"
+      },
+      "to": {
+        "lat": 7.0304604,
+        "lng": 125.3979848,
+        "label": "Eden Nature Park"
+      },
+      "road_km": 37.503,
+      "uncongested_minutes": 52.02,
+      "snap_metres": [
+        169.8,
+        20.2
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.4276581,7.1910411;125.3979848,7.0304604?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0304604,
+        "lng": 125.3979848,
+        "label": "Eden Nature Park"
+      },
+      "to": {
+        "lat": 7.0731829,
+        "lng": 125.6044565,
+        "label": "Rogen Inn"
+      },
+      "road_km": 28.969,
+      "uncongested_minutes": 40.44,
+      "snap_metres": [
+        20.2,
+        15.7
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.3979848,7.0304604;125.6044565,7.0731829?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.1848752,
+        "lng": 125.415287,
+        "label": "Philippine Eagle Center"
+      },
+      "to": {
+        "lat": 7.0731829,
+        "lng": 125.6044565,
+        "label": "Rogen Inn"
+      },
+      "road_km": 31.973,
+      "uncongested_minutes": 48.41,
+      "snap_metres": [
+        30.3,
+        15.7
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.415287,7.1848752;125.6044565,7.0731829?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.2939628,
+        "lng": 125.6841463,
+        "label": "Damosa Land Inc. / Agriya Naturetainment"
+      },
+      "to": {
+        "lat": 7.0731829,
+        "lng": 125.6044565,
+        "label": "Rogen Inn"
+      },
+      "road_km": 31.6,
+      "uncongested_minutes": 43.31,
+      "snap_metres": [
+        14.2,
+        15.7
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.6841463,7.2939628;125.6044565,7.0731829?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0304604,
+        "lng": 125.3979848,
+        "label": "Eden Nature Park"
+      },
+      "to": {
+        "lat": 7.0924712,
+        "lng": 125.611615,
+        "label": "Aria Hotel & Residences"
+      },
+      "road_km": 32.906,
+      "uncongested_minutes": 45.79,
+      "snap_metres": [
+        20.2,
+        32.6
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.3979848,7.0304604;125.611615,7.0924712?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 6.9651131,
+        "lng": 125.7231251,
+        "label": "Kaputian Beach"
+      },
+      "to": {
+        "lat": 7.1012868,
+        "lng": 125.664575,
+        "label": "Paradise Island Park & Beach Resort"
+      },
+      "road_km": 25.831,
+      "uncongested_minutes": 26.9,
+      "snap_metres": [
+        49.3,
+        77.6
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.7231251,6.9651131;125.664575,7.1012868?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.1012868,
+        "lng": 125.664575,
+        "label": "Paradise Island Park & Beach Resort"
+      },
+      "to": {
+        "lat": 7.13,
+        "lng": 125.645,
+        "label": "Davao International Airport"
+      },
+      "road_km": 8.699,
+      "uncongested_minutes": 31.27,
+      "snap_metres": [
+        77.6,
+        76.8
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.664575,7.1012868;125.645,7.13?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 6.9651131,
+        "lng": 125.7231251,
+        "label": "Kaputian Beach"
+      },
+      "to": {
+        "lat": 7.0731829,
+        "lng": 125.6044565,
+        "label": "Rogen Inn"
+      },
+      "road_km": 35.667,
+      "uncongested_minutes": 69.49,
+      "snap_metres": [
+        49.3,
+        15.7
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.7231251,6.9651131;125.6044565,7.0731829?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.1882392,
+        "lng": 125.4603218,
+        "label": "IMIN The Philippine-Japan Historical Museum"
+      },
+      "to": {
+        "lat": 7.0731829,
+        "lng": 125.6044565,
+        "label": "Rogen Inn"
+      },
+      "road_km": 26.951,
+      "uncongested_minutes": 40.18,
+      "snap_metres": [
+        21.9,
+        15.7
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.4603218,7.1882392;125.6044565,7.0731829?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.0304604,
+        "lng": 125.3979848,
+        "label": "Eden Nature Park"
+      },
+      "to": {
+        "lat": 7.0450475,
+        "lng": 125.5147347,
+        "label": "Bukid Amara Tourism Agriventures Corporation"
+      },
+      "road_km": 17.78,
+      "uncongested_minutes": 25.04,
+      "snap_metres": [
+        20.2,
+        112.8
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.3979848,7.0304604;125.5147347,7.0450475?overview=false&steps=false"
+    },
+    {
+      "from": {
+        "lat": 7.1910411,
+        "lng": 125.4276581,
+        "label": "Malagos Garden Resort"
+      },
+      "to": {
+        "lat": 7.0924712,
+        "lng": 125.611615,
+        "label": "Aria Hotel & Residences"
+      },
+      "road_km": 32.161,
+      "uncongested_minutes": 45.84,
+      "snap_metres": [
+        169.8,
+        32.6
+      ],
+      "source": "https://router.project-osrm.org/route/v1/driving/125.4276581,7.1910411;125.611615,7.0924712?overview=false&steps=false"
+    }
+  ]
+}

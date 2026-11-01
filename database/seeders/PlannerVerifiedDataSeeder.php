@@ -33,6 +33,8 @@ class PlannerVerifiedDataSeeder extends Seeder
             $this->applyPlannerCompletion();
             $this->applyPublicPlaces();
             $this->applyVerifiedExperiences();
+            $this->call(PlannerEvidenceUpdatesSeeder::class);
+            $this->call(PlannerBudgetHikingSeeder::class);
         });
     }
 
@@ -59,7 +61,10 @@ class PlannerVerifiedDataSeeder extends Seeder
             }
             [, $name, $field, $value] = $row;
             $names = $name === 'Davao Crocodile Park Inc' ? ['Davao Crocodile Park Inc', 'Davao Crocodile Park'] : [$name];
-            foreach (Destination::whereIn('name', $names)->get() as $dest) {
+            $dest = Destination::whereIn('name', $names)->whereNotNull('latitude')->first()
+                ?? Destination::where('name', $name)->first()
+                ?? Destination::whereIn('name', $names)->first();
+            if ($dest) {
                 if ($field === 'category_tag') {
                     $dest->tags()->firstOrCreate(['kind' => 'category', 'value' => $value]);
                 } elseif (in_array($field, ['hours', 'latitude', 'longitude', 'entry_fee_min', 'entry_fee_max', 'visit_duration'], true)) {

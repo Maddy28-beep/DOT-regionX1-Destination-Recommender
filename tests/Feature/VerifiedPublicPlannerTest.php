@@ -89,15 +89,16 @@ class VerifiedPublicPlannerTest extends TestCase
         $this->assertSame('fail',$checks['stops_per_day']['status']);
     }
 
-    public function test_an_unfillable_available_interest_records_omission_by_default_and_declines_when_configured(): void
+    public function test_an_unfillable_available_interest_records_omission_only_in_explicit_partial_plan_mode(): void
     {
+        config(['itinerary.planner.reject_incomplete_trips' => false]);
         $this->place(1,['type'=>'Wildlife']);
         $this->place(2,['type'=>'Beach & Leisure']);
         $p=$this->preference(1);
         $p->update(['arrival_time'=>'13:00']);
         foreach(['Wildlife','Beach & Island'] as $interest)$p->activities()->create(['activity'=>$interest]);
 
-        // Default: builds the 1-stop afternoon plan and audit reports the uncovered interest.
+        // Explicit partial-plan mode builds the afternoon plan and reports the uncovered interest.
         $trip = app(ItineraryGenerationService::class)->generate($p);
         $this->assertCount(1, $trip->items->where('kind', 'activity')->whereNotNull('destination_id'));
         $this->assertSame('fail', collect(app(ItineraryAudit::class)->audit($trip, $p))->keyBy('key')['interests']['status']);
@@ -114,6 +115,27 @@ class VerifiedPublicPlannerTest extends TestCase
             $this->assertArrayHasKey('activities',$e->errors());
             $this->assertDatabaseCount('itineraries',0);
             $this->assertDatabaseCount('itinerary_items',0);
+        }
+    }
+
+    public function test_the_default_mode_rejects_an_unfillable_interest_and_rolls_back_the_partial_itinerary(): void
+    {
+        $this->assertTrue(config('itinerary.planner.reject_incomplete_trips'));
+        $this->place(1, ['type' => 'Wildlife']);
+        $this->place(2, ['type' => 'Beach & Leisure']);
+        $p = $this->preference(1);
+        $p->update(['arrival_time' => '13:00']);
+        foreach (['Wildlife', 'Beach & Island'] as $interest) {
+            $p->activities()->create(['activity' => $interest]);
+        }
+        try {
+            app(ItineraryGenerationService::class)->generate($p);
+            $this->fail('An infeasible request must not return a partial success by default.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->assertArrayHasKey('activities', $e->errors());
+            $this->assertDatabaseCount('itineraries', 0);
+            $this->assertDatabaseCount('itinerary_items', 0);
+            $this->assertSame(0, \App\Models\ItineraryMatch::count());
         }
     }
 

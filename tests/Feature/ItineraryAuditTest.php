@@ -53,6 +53,30 @@ class ItineraryAuditTest extends TestCase
         return collect(app(ItineraryAudit::class)->audit($it, $p->load('activities')))->keyBy('key')->all();
     }
 
+    public function test_a_late_arrival_transfer_to_the_hotel_is_not_a_sightseeing_travel_share_failure(): void
+    {
+        [$p, $it] = $this->plan(['arrival_time' => '19:00'], 2);
+        $this->item($it, 1, 1, 'baseline', ['starts_at' => '19:00']);
+        $this->item($it, 1, 2, 'travel', ['starts_at' => '19:45', 'ends_at' => '20:30',
+            'distance_km' => 15, 'travel_min_minutes' => 30, 'travel_max_minutes' => 45]);
+        $this->item($it, 1, 3, 'overnight', ['starts_at' => '20:30']);
+        $this->assertSame('pass', $this->audited($p, $it)['travel_share']['status']);
+
+        // Late arrival cannot hide driving on a day containing an optional activity.
+        $this->item($it, 1, 4, 'activity', ['starts_at' => '20:30', 'ends_at' => '20:30']);
+        $this->assertSame('fail', $this->audited($p, $it)['travel_share']['status']);
+    }
+
+    public function test_an_early_transfer_only_day_still_fails_the_travel_share_limit(): void
+    {
+        [$p, $it] = $this->plan(['arrival_time' => '14:00'], 2);
+        $this->item($it, 1, 1, 'baseline', ['starts_at' => '14:00']);
+        $this->item($it, 1, 2, 'travel', ['starts_at' => '14:30', 'ends_at' => '15:15',
+            'distance_km' => 15, 'travel_min_minutes' => 30, 'travel_max_minutes' => 45]);
+        $this->item($it, 1, 3, 'overnight', ['starts_at' => '15:15']);
+        $this->assertSame('fail', $this->audited($p, $it)['travel_share']['status']);
+    }
+
     public function test_a_stop_visited_after_closing_fails_and_one_inside_hours_passes(): void
     {
         [$p, $it] = $this->plan();

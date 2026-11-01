@@ -61,6 +61,9 @@
     // A resort stay's settings, and whether they include the one the traveller asked for.
     $isStay = $kind === 'overnight' || $merged;
     $stayTags = $isStay && $listing instanceof \App\Models\Accommodation ? $listing->resortSettingList() : [];
+    if ($isStay && $listing instanceof \App\Models\Accommodation && $listing->type === 'Beach Resort' && ! in_array('Beach', $stayTags, true)) {
+        array_unshift($stayTags, 'Beach');
+    }
     $askedSetting = ($preference?->accommodation_pref ?? null) === 'Resort' ? ($preference->resort_setting ?? null) : null;
     $stayMatches = $askedSetting && in_array($askedSetting, $stayTags, true);
 

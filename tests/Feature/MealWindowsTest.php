@@ -204,13 +204,13 @@ class MealWindowsTest extends TestCase
     {
         $eden = $this->place('Eden Nature Park', 'Davao City', 7.0206, 125.4103);
         $eden->tags()->create(['kind' => 'amenity', 'value' => 'Restaurant']);
-        // Another restaurant is nearby, but the park's own is the one named.
+        // A restaurant amenity does not establish a dining venue's actual name or service hours.
         $this->restaurant('Kapehan sa Tambacan', 'Davao City', 7.0250, 125.4150);
 
         $rows = $this->rows($this->plan('09:00', [$eden], [1 => ['Morning', 'Afternoon']]));
         $lunch = $this->meals($rows)[0];
 
-        $this->assertSame('Lunch — Eden Nature Park Restaurant', $lunch['title']);
+        $this->assertSame('Lunch at Eden Nature Park (venue to confirm)', $lunch['title']);
         $this->assertSame($eden->id, $lunch['destination']);
         $this->assertNull($lunch['restaurant']);
         $this->assertGreaterThanOrEqual('12:00', $lunch['start']);
@@ -266,9 +266,9 @@ class MealWindowsTest extends TestCase
                     $this->assertGreaterThanOrEqual($window[0], $meal['start'], "arrival {$arrival}, day {$day}: {$meal['title']}");
                     $this->assertLessThanOrEqual($window[1], $meal['start'], "arrival {$arrival}, day {$day}: {$meal['title']}");
 
-                    // A destination is attached only as its own restaurant (the title says so).
+                    // An unnamed on-site amenity stays explicitly unconfirmed.
                     if ($meal['destination'] !== null) {
-                        $this->assertStringEndsWith('Restaurant', $meal['title'], "arrival {$arrival}, day {$day}");
+                        $this->assertStringEndsWith('(venue to confirm)', $meal['title'], "arrival {$arrival}, day {$day}");
                     }
                 }
             }
