@@ -15,13 +15,17 @@
     $budgetNow = old('budget', $preference->budget) ?: 'Mid-range';
     $stayNow = old('accommodation_pref', $preference->accommodation_pref) ?: 'Any';
     $settingNow = (string) old('resort_setting', $preference->resort_setting);
+    if ($stayNow === 'Beach Resort') {
+        $stayNow = 'Resort';
+        $settingNow = $settingNow !== '' ? $settingNow : 'Beach';
+    }
 
     $budgetNotes = [
         'Budget-Friendly' => 'Simple stays, local eats, free or low-fee attractions.',
         'Mid-range' => 'A comfortable balance of value and experience.',
         'Premium' => 'Top-rated stays and signature experiences.',
     ];
-    $stayNames = ['Any' => 'Any', 'Hotel' => 'Hotel', 'Resort' => 'Resort', 'Beach Resort' => 'Beach Resort', 'Homestay' => 'Homestay / Self-catering'];
+    $stayNames = ['Any' => 'Any', 'Hotel' => 'Hotel', 'Resort' => 'Resort', 'Homestay' => 'Homestay / Self-catering'];
 @endphp
 
 <div class="plan-section">

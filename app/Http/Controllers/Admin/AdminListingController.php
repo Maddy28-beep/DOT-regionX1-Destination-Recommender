@@ -373,7 +373,8 @@ class AdminListingController extends Controller
     private function withEncodedResortSettings(string $type, array $data): array
     {
         if ($type === 'accommodations') {
-            $data['resort_settings'] = Accommodation::encodeResortSettings($data['resort_settings'] ?? []);
+            // Explicitly clearing the checkboxes is a manual decision, not an invitation to reseed defaults.
+            $data['resort_settings'] = Accommodation::encodeResortSettings($data['resort_settings'] ?? []) ?? '';
         }
 
         return $data;

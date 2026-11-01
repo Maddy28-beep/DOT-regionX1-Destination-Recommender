@@ -11,6 +11,7 @@
 @php
     $planned = filled($at ?? null) ? \Illuminate\Support\Carbon::parse($at)->format('g:i A') : null;
     $operatorCount = ($operators ?? collect())->count();
+    $isRentalCar = \App\Services\Recommendation\TransportMode::isRentalCar($transport ?? null);
 @endphp
 <div class="tl-row tl-row--pickup">
     <div class="tl-time">
@@ -25,9 +26,9 @@
 
     <div class="tl-content">
         <p class="tl-line">
-            <span class="tl-line__icon"><x-icon name="van" /></span>
+            <span class="tl-line__icon"><x-icon :name="$isRentalCar ? 'key' : 'van'" /></span>
             <span>
-                <strong>Pick-up by your tour operator</strong>
+                <strong>{{ $isRentalCar ? 'Car rental / pick-up by your operator' : 'Pick-up by your tour operator' }}</strong>
                 <small>
                     The operator confirms the exact time and place.
                     @if ($operatorCount > 0)<a href="#itin-ops">{{ $operatorCount }} {{ \Illuminate\Support\Str::plural('operator', $operatorCount) }} near you</a>@endif

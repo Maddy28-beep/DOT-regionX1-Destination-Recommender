@@ -19,6 +19,7 @@
 @php
     $listing = $item->listing();
     $route = match (true) {
+        $item->kind === 'meal' && (bool) $item->restaurant_id => 'restaurants.show',
         (bool) $item->destination_id => 'destinations.show',
         (bool) $item->accommodation_id => 'accommodations.show',
         (bool) $item->restaurant_id => 'restaurants.show',
@@ -60,6 +61,9 @@
     // A resort stay's settings, and whether they include the one the traveller asked for.
     $isStay = $kind === 'overnight' || $merged;
     $stayTags = $isStay && $listing instanceof \App\Models\Accommodation ? $listing->resortSettingList() : [];
+    if ($isStay && $listing instanceof \App\Models\Accommodation && $listing->type === 'Beach Resort' && ! in_array('Beach', $stayTags, true)) {
+        array_unshift($stayTags, 'Beach');
+    }
     $askedSetting = ($preference?->accommodation_pref ?? null) === 'Resort' ? ($preference->resort_setting ?? null) : null;
     $stayMatches = $askedSetting && in_array($askedSetting, $stayTags, true);
 
@@ -126,12 +130,18 @@
                         <p class="tl-card__what"><a href="{{ route($route, $listing) }}">{{ $listing->name }}</a></p>
                     @elseif ($kind === 'activity')
                         <h4><a href="{{ route($route, $listing) }}">{{ $listing->name }}</a></h4>
+                        @if ($item->destination_id)
+                            <p class="tl-card__label">{{ $listing->is_accredited ? 'DOT accreditation listed' : 'DOT accreditation not verified' }}</p>
+                        @endif
                         <p class="tl-card__what">{{ $what }}</p>
                     @elseif ($isStay && $route)
                         {{-- The night's stay is named, like every other stop, instead of only "Overnight stay". --}}
                         <h4><a href="{{ route($route, $listing) }}">{{ $listing->name }}</a></h4>
                         @if ($merged)
                             <p class="tl-card__what"><x-icon name="building" /> Dinner {{ $start?->format('g:i A') }} &middot; check in for the night</p>
+                            @if ($item->restaurant_id && $item->accommodation)
+                                <p class="tl-card__what">Overnight at <a href="{{ route('accommodations.show', $item->accommodation) }}">{{ $item->accommodation->name }}</a></p>
+                            @endif
                         @endif
                         @if ($stayTags !== [] || $stayMatches)
                             <p class="tl-card__tags">
@@ -146,6 +156,9 @@
                         <p class="tl-card__what">{{ $item->travelSummary() }}</p>
                     @endif
 
+                    @if ($kind === 'meal' && $item->restaurant_id && ! $listing->is_accredited)
+                        <p class="tl-card__label">DOT accreditation not verified</p>
+                    @endif
                     @if ($item->durationShort() && in_array($kind, ['activity', 'meal'], true))
                         <p class="tl-card__meta"><x-icon name="timer" /> About {{ $item->durationShort() }}</p>
                     @endif

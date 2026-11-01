@@ -1,0 +1,89 @@
+[
+  {
+    "name": "Solo day trip, budget, near",
+    "travel_days": 1,
+    "travel_type": "Solo",
+    "budget": "Budget-Friendly",
+    "distance_pref": "near",
+    "arrival_time": "08:00",
+    "activities": [
+      "Cultural Heritage",
+      "Food Tourism"
+    ],
+    "travel_purpose": "Leisure",
+    "visitor_type": "First-time Visitor",
+    "transport_pref": "rental_car",
+    "accommodation_pref": "Any"
+  },
+  {
+    "name": "Family three days, wildlife and nature",
+    "travel_days": 3,
+    "travel_type": "Family",
+    "budget": "Mid-range",
+    "distance_pref": "moderate",
+    "arrival_time": "09:00",
+    "airport": true,
+    "activities": [
+      "Wildlife",
+      "Nature & Adventure",
+      "Beach & Island"
+    ],
+    "travel_purpose": "Leisure",
+    "visitor_type": "First-time Visitor",
+    "transport_pref": "rental_car",
+    "accommodation_pref": "Any"
+  },
+  {
+    "name": "Friends four days, far, adventure",
+    "travel_days": 4,
+    "travel_type": "Friends",
+    "budget": "Mid-range",
+    "distance_pref": "far",
+    "arrival_time": "10:00",
+    "activities": [
+      "Hiking & Trekking",
+      "Nature & Adventure",
+      "Beach & Island"
+    ],
+    "travel_purpose": "Leisure",
+    "visitor_type": "First-time Visitor",
+    "transport_pref": "rental_car",
+    "accommodation_pref": "Any"
+  },
+  {
+    "name": "Business traveller, late arrival",
+    "travel_days": 2,
+    "travel_type": "Business",
+    "budget": "Premium",
+    "distance_pref": "near",
+    "arrival_time": "18:30",
+    "airport": true,
+    "activities": [
+      "Shopping & Souvenirs",
+      "Cultural Heritage"
+    ],
+    "travel_purpose": "Leisure",
+    "visitor_type": "First-time Visitor",
+    "transport_pref": "rental_car",
+    "accommodation_pref": "Any"
+  },
+  {
+    "name": "Hold-out 01 near/taxi, 2 days, Beach & Island + Cultural Heritage + Shopping & Souvenirs",
+    "travel_days": 2,
+    "travel_type": "Friends",
+    "budget": "Mid-range",
+    "distance_pref": "near",
+    "transport_pref": "taxi",
+    "arrival_time": "15:30",
+    "origin": null,
+    "start": "Wednesday",
+    "activities": [
+      "Beach & Island",
+      "Cultural Heritage",
+      "Shopping & Souvenirs"
+    ],
+    "travel_purpose": "Leisure",
+    "visitor_type": "First-time Visitor",
+    "accommodation_pref": "Any"
+  }
+]

@@ -18,15 +18,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('itineraries', function (Blueprint $table) {
-            $table->json('stay_plan')->nullable();
-        });
+        if (! Schema::hasColumn('itineraries', 'stay_plan')) {
+            Schema::table('itineraries', function (Blueprint $table) {
+                $table->json('stay_plan')->nullable();
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('itineraries', function (Blueprint $table) {
-            $table->dropColumn('stay_plan');
-        });
+        if (Schema::hasColumn('itineraries', 'stay_plan')) {
+            Schema::table('itineraries', function (Blueprint $table) {
+                $table->dropColumn('stay_plan');
+            });
+        }
     }
 };
+

@@ -51,10 +51,17 @@
                 ['icon' => 'map-pin', 'label' => 'From city center', 'text' => $accommodation->distance_km ? rtrim(rtrim(number_format((float) $accommodation->distance_km, 1), '0'), '.').' km' : '—'],
             ]])
 
+            @php
+                $aboutGroups = ['Property type' => [$accommodation->type]];
+                if ($accommodation->resortClassificationLabels() !== []) {
+                    $aboutGroups['Resort setting'] = $accommodation->resortClassificationLabels();
+                }
+                $aboutGroups['DOT classification'] = [$accommodation->dot_classification];
+            @endphp
             @include('partials.listing-about-card', [
                 'listing' => $accommodation,
                 'noun' => 'accommodation',
-                'groups' => ['Property type' => [$accommodation->type], 'DOT classification' => [$accommodation->dot_classification]],
+                'groups' => $aboutGroups,
             ])
 
             @include('partials.listing-amenities-card', ['listing' => $accommodation, 'kind' => 'accommodation'])

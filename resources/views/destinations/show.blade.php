@@ -10,6 +10,9 @@
 
 <div class="container">
     @include('partials.operating-status-notice', ['listing' => $destination])
+    @if (! $destination->is_accredited)
+        <p class="alert">Verified visitor place. DOT accreditation has not been verified.</p>
+    @endif
     <nav class="breadcrumb">
         <a href="{{ route('home') }}">Home</a> /
         <a href="{{ route('destinations.index') }}">Destinations</a> /

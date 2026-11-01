@@ -75,6 +75,8 @@ class FollowabilityCommandRunTest extends TestCase
 
         $this->assertStringContainsString('CALIBRATION SET (trips 0-47)', $output);
         $this->assertStringContainsString('no figure here is a rule', $output);
+        $this->assertStringContainsString('Diagnostic partial plans', $output);
+        $this->assertTrue(config('itinerary.planner.reject_incomplete_trips'), 'reporting restores the normal rejection policy');
         $this->assertMatchesRegularExpression('/\|\s*Close Proximity\s*\|\s*Commutable\s*\|\s*Remote\s*\|/', $output);
         $this->assertMatchesRegularExpression('/Trips \/ days\s*\|\s*16 \/ \d+\s*\|\s*16 \/ \d+\s*\|\s*16 \/ \d+\s*\|/', $output, 'sixteen trips in each range');
         foreach (['COVERAGE: destinations placed', 'DRIVING: average per day', 'STAYS: nights / changes of stay', 'LATE CHECK-INS', 'MEALS:', 'ARRIVAL / TRANSFER DAYS', 'IDLE:'] as $row) {
@@ -83,6 +85,7 @@ class FollowabilityCommandRunTest extends TestCase
 
         $figures = json_decode((string) file_get_contents($json), true);
         $this->assertSame('calibration', $figures['set']);
+        $this->assertSame('diagnostic_partial_plans', $figures['mode']);
         $this->assertSame(['near', 'moderate', 'far'], array_keys($figures['summary']));
         foreach (['near', 'moderate', 'far'] as $band) {
             $this->assertSame(16, $figures['summary'][$band]['trips']);

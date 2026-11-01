@@ -33,6 +33,8 @@ class RemoteLastDaySouvenirTest extends TestCase
         return Destination::create([
             'slug' => str($name)->slug()->toString(), 'name' => $name, 'location' => 'Davao City',
             'region_id' => $this->region(), 'type' => 'Nature & Adventure', 'is_accredited' => true,
+            // Fix the experience length so the test isolates the optional-shopping rule.
+            'visit_duration' => '90 minutes',
             'rating' => 4, 'review_count' => 10, 'price_tier' => 'Mid-range',
             'latitude' => self::ORIGIN_LAT + $northKm / 111.0, 'longitude' => self::ORIGIN_LNG,
         ]);
@@ -120,5 +122,18 @@ class RemoteLastDaySouvenirTest extends TestCase
 
         $this->assertFalse($this->hasSouvenirStop($this->schedule($stop, 'far', '09:00')));
         $this->assertTrue($this->hasSouvenirStop($this->schedule($stop, 'moderate', '09:00')), 'the same builder, planning a moderate trip straight after, adds it');
+    }
+
+    public function test_the_guard_drops_optional_shopping_without_shortening_the_recorded_visit(): void
+    {
+        $stop = $this->setUpStopAndShop();
+        $stop->update(['visit_duration' => '150 minutes']);
+
+        $itinerary = $this->schedule($stop, 'far', '07:00');
+        $visit = $itinerary->items->first(fn ($item) => $item->kind === 'activity' && $item->destination_id === $stop->id);
+
+        $this->assertNotNull($visit);
+        $this->assertSame(150, (int) \Illuminate\Support\Carbon::parse($visit->starts_at)->diffInMinutes(\Illuminate\Support\Carbon::parse($visit->ends_at)));
+        $this->assertFalse($this->hasSouvenirStop($itinerary));
     }
 }

@@ -1,0 +1,66 @@
+{
+  "checked_on": "2026-11-01",
+  "status": "Research only. No new planner destination or interest tag is enabled by this file.",
+  "finding": "Replaying the range gate with the exact three profiles shows all three remain near at 5 km. The jeep moderate allowance of 15 km is not the effective radius for Hold-out 13. No verified, eligible, mapped place covering the missing interest was found within those radii. This is not proof that no such physical place exists; current public visitor access and identity must be verified before adding one.",
+  "profiles": [
+    {
+      "name_prefix": "Hold-out 01 near/taxi",
+      "missing_interest": "Beach & Island",
+      "origin": [7.0731, 125.6128],
+      "effective_radius_km": 5,
+      "nearest_current_eligible_catalogue_place": "Paradise Island Park & Beach Resort",
+      "straight_line_km": 6.516
+    },
+    {
+      "name_prefix": "Hold-out 13 near/jeep",
+      "missing_interest": "Hiking & Trekking",
+      "origin": [7.056, 125.602],
+      "effective_radius_km": 5,
+      "nearest_current_eligible_catalogue_place": "Magongawon Falls — Forest Trail",
+      "straight_line_km": 20.153
+    },
+    {
+      "name_prefix": "Hold-out 25 near/rental_car",
+      "missing_interest": "Beach & Island",
+      "origin": [7.066, 125.607],
+      "effective_radius_km": 5,
+      "nearest_current_eligible_catalogue_place": "Paradise Island Park & Beach Resort",
+      "straight_line_km": 7.467
+    }
+  ],
+  "distance_note": "These are distances from the exact profile origins to stored destination access coordinates, using the existing straight-line range gate. They are not road distances, ferry distances or travel-time estimates. No origin, coordinate or radius was altered to admit an out-of-range place.",
+  "additional_candidates_reviewed": [
+    {
+      "name": "Bravo Farm / Langub trail-event routes",
+      "planner_enabled": false,
+      "evidence": "UTMB records confirm the Adobo Urban Trail Run was held in Barangay Langub on 9 August 2026. This verifies an organised event, not walk-in public hiking access on 4-5 November. The specific public trailhead, non-event permission, visitor hours, return route and fees remain unconfirmed. Do not turn an event course into an automatically available short hike.",
+      "sources": ["https://utmb.world/utmb-index/races/58818.adobourbantrailrunadobourbantrailrun.2026", "https://runph.org/events/adobo-utr26-edition"]
+    },
+    {
+      "name": "Devil's Trail — Long",
+      "planner_enabled": false,
+      "evidence": "A contributor route record documents a very difficult downhill mountain-bike singletrack. It does not establish current public hiking permission, visitor facilities or a suitable short hiking product. A bike route must not be relabelled as a verified tourist hike merely to cover the requested interest.",
+      "sources": ["https://www.mtbproject.com/trail/7045271/devils-trail-long"]
+    },
+    {
+      "name": "Shrine Hills proposed eco-tourism trails",
+      "planner_enabled": false,
+      "evidence": "The advocacy and development documents describe proposed canopy walks and hiking connectors. They do not verify that those visitor trails were built and are currently open. Existing shrine and viewpoint visits remain distinct from a verified hiking trail.",
+      "sources": ["https://idisphil.org/wp-content/uploads/2015/01/Bantay-Kinaiyahan-No.1-Series-of-2015.pdf", "https://cpdo.davaocity.gov.ph/wp-content/uploads/2016/10/Vol1CLUP2013-202220151215084007.pdf"]
+    },
+    {
+      "name": "Times Beach / coastal-road frontage",
+      "planner_enabled": false,
+      "evidence": "A Philippine Reclamation Authority site report describes loss of the former bathing area. Recent government reporting identifies the Times Beach-Roxas coastal-road segment. A surf-clothing retailer's current Times Beach address confirms a shop, not an accessible swimming/sandy beach. No new beach entrance was verified.",
+      "sources": ["https://www.pea.gov.ph/wp-content/uploads/2024/04/CY_2023_Gender_and_Development_Committee_Programs_Projects_and_Activities_d.pdf", "https://pia.gov.ph/news/davao-city-coastal-road-sta-ana-wharf-segment-nears-completion/", "https://www.findglocal.com/PH/Davao-City/191106110927727/Reefside-Surf-Co."]
+    }
+  ],
+  "previous_candidate_log": "planner-interest-gap-research-2026-11-01.json",
+  "enablement_requirements": [
+    "A named real beach or hiking trail within the exact 5 km origin radius, not a neighborhood centroid or an inaccessible summit point",
+    "Recent operator, land-manager or public-authority evidence of visitor access on the requested dates, including any appointment or permit requirement",
+    "A road-accessible entrance and honest onward walking/ferry transfers",
+    "Budget eligibility that includes mandatory admission, guides and permits; unknown tariffs remain unknown",
+    "Visit scheduling that preserves opening windows, meal breaks, daily travel limits and hotel proximity"
+  ]
+}

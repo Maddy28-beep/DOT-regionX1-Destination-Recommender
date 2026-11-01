@@ -27,12 +27,38 @@ class TourOperatorSuggester
     /**
      * @return Collection<int, array{operator: TourOperator, km: float|null}>
      */
-    public function near(?float $lat, ?float $lng, int $limit = self::LIMIT): Collection
+    public function near(?float $lat, ?float $lng, int $limit = self::LIMIT, ?string $transport = null): Collection
     {
         $lat ??= ContentBasedRecommendationService::DEFAULT_ORIGIN_LAT;
         $lng ??= ContentBasedRecommendationService::DEFAULT_ORIGIN_LNG;
 
         $operators = TourOperator::publiclyVisible()->where('is_accredited', true)->with('region')->get();
+
+        if (TransportMode::isRentalCar($transport)) {
+            $rentalPool = $operators->filter(fn (TourOperator $o) => $this->isRentalOrTransportOperator($o))->values();
+            $picked = $this->pickFromPool($rentalPool, $lat, $lng, $limit);
+
+            if ($picked->count() < $limit) {
+                $taken = $picked->pluck('operator.id');
+                $remainingPool = $operators->reject(fn (TourOperator $o) => $taken->contains($o->id))->values();
+                $picked = $picked->concat($this->pickFromPool($remainingPool, $lat, $lng, $limit - $picked->count()));
+            }
+
+            return $picked->values();
+        }
+
+        return $this->pickFromPool($operators, $lat, $lng, $limit);
+    }
+
+    /**
+     * @param  Collection<int, TourOperator>  $operators
+     * @return Collection<int, array{operator: TourOperator, km: float|null}>
+     */
+    private function pickFromPool(Collection $operators, float $lat, float $lng, int $limit): Collection
+    {
+        if ($limit <= 0 || $operators->isEmpty()) {
+            return collect();
+        }
 
         $located = $operators
             ->filter(fn (TourOperator $o) => $o->latitude !== null && $o->longitude !== null)
@@ -60,6 +86,21 @@ class TourOperatorSuggester
         }
 
         return $picked->values();
+    }
+
+    private function isRentalOrTransportOperator(TourOperator $operator): bool
+    {
+        if (strcasecmp((string) $operator->specialization, 'Tourist Transport') === 0) {
+            return true;
+        }
+
+        if (strcasecmp((string) $operator->specialization, 'Island Cruises') === 0) {
+            return false;
+        }
+
+        $haystack = $operator->name.' '.($operator->specialization ?? '').' '.($operator->description ?? '');
+
+        return preg_match('/\b(rent[\s-]*a[\s-]*car|car\s+rentals?|vehicle\s+rentals?|tourist\s+transport)\b/i', $haystack) === 1;
     }
 
     private function haversineKm(float $lat1, float $lng1, float $lat2, float $lng2): float

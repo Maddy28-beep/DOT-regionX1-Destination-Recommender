@@ -13,6 +13,8 @@ use App\Services\Recommendation\ItineraryGenerationService;
 use App\Services\Recommendation\ItineraryScheduleBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 /**
@@ -26,6 +28,7 @@ use Tests\TestCase;
 class StageCNightOneArrivalTest extends TestCase
 {
     use RefreshDatabase;
+
     private const ORIGIN_LAT = 7.0731;
 
     private const ORIGIN_LNG = 125.6128;
@@ -33,6 +36,9 @@ class StageCNightOneArrivalTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // These synthetic long-drive fixtures inspect arrival repair in isolation.
+        config(['itinerary.planner.reject_incomplete_trips' => false]);
 
         Carbon::setTestNow('2026-10-20 12:00:00');
     }
@@ -188,7 +194,7 @@ class StageCNightOneArrivalTest extends TestCase
         return $stay;
     }
 
-    private function overnightRows(Itinerary $trip): \Illuminate\Support\Collection
+    private function overnightRows(Itinerary $trip): Collection
     {
         return $trip->items->where('kind', 'overnight')->sortBy('day_number')->values();
     }
@@ -269,6 +275,13 @@ class StageCNightOneArrivalTest extends TestCase
         $preference = $this->preference($days, 'far', $arrival);
 
         return app(ItineraryGenerationService::class)->generate($preference->load('activities', 'amenities'))->fresh('items');
+    }
+
+    public function test_strict_generation_rejects_the_infeasible_late_arrival_hub_request(): void
+    {
+        config(['itinerary.planner.reject_incomplete_trips' => true]);
+        $this->expectException(ValidationException::class);
+        $this->hubTrip(3, '16:30', [['Hub Inn', 140.0, false], ['Roadside Inn', 10.0, false]]);
     }
 
     public function test_c2_a_late_night_one_stay_is_replaced_by_one_the_traveller_reaches_on_time(): void

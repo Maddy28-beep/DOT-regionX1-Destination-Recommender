@@ -1,0 +1,61 @@
+{
+  "reviewed_on": "2026-11-01",
+  "purpose": "Research queue for the remaining Budget-Friendly Hiking & Trekking catalogue gap. Review-only: not consumed by any seeder or recommendation service.",
+  "status": "These four candidates remain pending. A later review added Magongawon Falls Forest Trail separately in planner-budget-hiking-2026-11-01.json, with unknown hours, duration and exact current fees retained.",
+  "rules": [
+    "A source review date is not an operator confirmation of current access or rates.",
+    "Do not copy a summit coordinate into the road-routing destination point.",
+    "Hike duration must include ascent, descent and required registration; an ascent-only time is insufficient.",
+    "Include mandatory guide and permit costs when assessing affordability, especially for solo visitors.",
+    "Do not assign DOT accreditation, numeric hours, fees or durations without supporting evidence.",
+    "Keep the existing audit limits and strict rejection policy. These candidates do not satisfy selected-interest coverage."
+  ],
+  "candidates": [
+    {
+      "name": "Mount Puting Bato — Tayapok trail",
+      "location": "Island Garden City of Samal",
+      "planner_enabled": false,
+      "findings": "Genuine short hiking candidate near Samal beach attractions. Accounts disagree on weekday access and trail details. The mountain club's September 2025 programme confirms a Sunday hike, not Monday–Thursday availability.",
+      "sources": [
+        {"url": "https://www.findglocal.com/PH/Davao-City/941939912490881/Sandawa-Apo-Mountaineering-%26-Ecology-Club-UM-Chapter", "kind": "Third-party mirror of a participating mountaineering club", "event_date": "2025-09-14", "supports": "Completed hike; programme listed environmental, trail and summit charges separately, plus transport. Not a current operator tariff."},
+        {"url": "https://www.gunungbagging.com/puting-bato/", "kind": "Independent hiking reference", "supports": "Reports weekend-only public access. This restriction has not been reconciled with a current site manager."},
+        {"url": "https://samalguide.com/destination/puting-bato-the-highest-peak-in-samal-island/", "kind": "Local visitor guide", "published_on": "2019-02-13", "supports": "Tayapok approach and shorter ascent; does not establish present access, full round-trip duration or prices."}
+      ],
+      "needed_before_enablement": ["Site-manager confirmation of visit-day access and complete fees", "Named mapped road-accessible Tayapok trailhead", "Conservative full return-hike duration", "Return transport arrangement; a jeep preference is not proof of direct jeep service"]
+    },
+    {
+      "name": "Bamboo Peak / Buntod Ta Laya",
+      "location": "Barangay Jose Rizal, Santa Cruz, Davao del Sur",
+      "planner_enabled": false,
+      "findings": "Genuine community hiking destination. A provider reported a completed September 2026 day hike. The detailed December 2025 visitor article actually describes a November 2022 trip: its low registration price is not a verified 2026 total. The same account took approximately six hours for the return hike and charged a solo visitor the entire guide fee.",
+      "sources": [
+        {"url": "https://www.findglocal.com/PH/Santa-Cruz/110510101549851/Ken-TraveL", "kind": "Third-party mirror of a tour provider", "event_date": "2026-09-20", "supports": "Recent completed day-hike report; published inclusions include guide and permits, but no complete package price."},
+        {"url": "https://lexicalcrown.blogspot.com/2025/12/bamboo-peak-ancestral-land-of-bagobo.html", "kind": "First-person visitor account", "published_on": "2025-12-23", "visit_date": "2022-11-06", "historical_costs_php": {"registration_per_person": 50, "guide_for_up_to_five": 500}, "supports": "Historic costs and 06:00–12:00 return-hike chronology. Fees are historical observations, not current catalogue prices."},
+        {"url": "https://logsac.blogspot.com/2021/06/hiking-barangay-jose-rizals-bamboo-peak.html", "kind": "First-person exploration report", "supports": "Trail identity and Sitio Centro approach. A 2021 exploration report does not establish current visitor permissions."}
+      ],
+      "needed_before_enablement": ["Current solo and group total guide/permit charges", "Confirmed road-accessible registration/jump-off coordinates", "Current access and booking rules", "Full hike scheduling with meals, transport and a suitable nearby eligible hotel"]
+    },
+    {
+      "name": "Tagaytay Peak of Sinoron",
+      "location": "Barangay Sinoron, Santa Cruz, Davao del Sur",
+      "planner_enabled": false,
+      "findings": "Promising shorter community day-hike candidate. The launch account identifies Sinoron barangay hall as registration point, a 2.8 km outward trail and a compulsory local guide. Current charges, complete hike duration and road-accessible registration geometry remain unverified.",
+      "sources": [
+        {"url": "https://logsac.blogspot.com/2023/02/", "kind": "Local launch report", "published_on": "2023-02-24", "historical_costs_php": {"registration_per_person": 50, "guide_starting_price_for_five": 500}, "supports": "Launched February 17, 2023 with tribal/community management; no unaccompanied visitors. Historical starting rates need reconfirmation."}
+      ],
+      "needed_before_enablement": ["STWA / barangay confirmation of access and current complete charges", "Mapped Sinoron registration point and any onward transfer", "Full round-trip duration and permitted start times"]
+    },
+    {
+      "name": "Mount Loay — single-peak return hike",
+      "location": "Santa Cruz, Davao del Sur",
+      "planner_enabled": false,
+      "findings": "Established hiking destination with recent provider activity. Available accounts disagree on guide rules, registration charges and time required. A race entry price is not ordinary visitor admission. Do not turn a long mountain hike into a short sightseeing slot.",
+      "sources": [
+        {"url": "https://www.findglocal.com/PH/Santa-Cruz/110510101549851/Ken-TraveL", "kind": "Third-party mirror of a tour provider", "supports": "2026 Loay activity reports refer to a five-peak programme, not a priced single-peak walk-in offer."},
+        {"url": "https://akyat.app/mountains/mt-loay", "kind": "Community hiking catalogue", "supports": "Fee and ascent-time observations; the page explicitly lacks confirmed open status."},
+        {"url": "https://maristasia.com/2025/05/15/climbing-mt-loay-and-community-year-end-evaluation/", "kind": "First-person group visit report", "visit_date": "2025-05-03", "supports": "Guided day hike with an early start and afternoon descent; no current tariff or opening window."}
+      ],
+      "needed_before_enablement": ["Tourism/community confirmation of current single-peak access and fees", "Road-accessible trailhead and registration location", "Realistic complete hike duration, meals and return transport"]
+    }
+  ]
+}
