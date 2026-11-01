@@ -21,12 +21,14 @@ class Restaurant extends Model
         'image_path', 'is_accredited', 'rating', 'review_count', 'price_tier',
         'opening_hours', 'contact_number', 'latitude', 'longitude',
         'website_url', 'facebook_url', 'instagram_url', 'tiktok_url',
+        'planner_verified_at', 'planner_verification_source', 'host_destination_id', 'host_accommodation_id',
     ];
 
     protected function casts(): array
     {
         return [
             'is_accredited' => 'boolean',
+            'planner_verified_at' => 'datetime',
             'rating' => 'decimal:1',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
@@ -36,6 +38,12 @@ class Restaurant extends Model
     public function posterUrl(): string
     {
         return route('restaurants.show', $this);
+    }
+
+    public function scopePlannerEligible(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query->where(fn ($q) => $q->where('is_accredited', true)
+            ->orWhere(fn ($v) => $v->whereNotNull('planner_verified_at')->whereNotNull('planner_verification_source')));
     }
 
     public function posterScene(): string

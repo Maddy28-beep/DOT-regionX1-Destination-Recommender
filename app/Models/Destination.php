@@ -34,6 +34,8 @@ class Destination extends Model
         'entry_fee_min', 'entry_fee_max', 'distance_km', 'visit_duration',
         'best_time', 'hours', 'latitude', 'longitude', 'featured',
         'website_url', 'facebook_url', 'instagram_url', 'tiktok_url',
+        'planner_verified_at', 'planner_verification_source',
+        'planning_notes',
     ];
 
     protected function casts(): array
@@ -41,6 +43,7 @@ class Destination extends Model
         return [
             'is_accredited' => 'boolean',
             'featured' => 'boolean',
+            'planner_verified_at' => 'datetime',
             'rating' => 'decimal:1',
             'entry_fee_min' => 'decimal:2',
             'entry_fee_max' => 'decimal:2',
@@ -53,6 +56,13 @@ class Destination extends Model
     public function region(): BelongsTo
     {
         return $this->belongsTo(Region::class);
+    }
+
+    /** Independently checked visitor sites may be planned without claiming DOT accreditation. */
+    public function scopePlannerEligible(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query->where(fn ($q) => $q->where('is_accredited', true)
+            ->orWhere(fn ($verified) => $verified->whereNotNull('planner_verified_at')->whereNotNull('planner_verification_source')));
     }
 
     public function tags(): HasMany

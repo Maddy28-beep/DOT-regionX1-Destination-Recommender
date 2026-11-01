@@ -4,6 +4,9 @@
 @section('meta_description', \Illuminate\Support\Str::limit(trim(strip_tags((string) ($restaurant->description ?? $restaurant->name.' on ExploreDVO, the DOT Region XI tourism platform.'))), 155))
 
 @section('content')
+@if (! $restaurant->is_accredited)
+    <div class="container"><p class="alert">Verified dining venue. DOT accreditation has not been verified.</p></div>
+@endif
 @php
     $gradients = [
         'linear-gradient(135deg,#c9932f,#916b19)',
