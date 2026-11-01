@@ -30,4 +30,3 @@ class PublicJsSyntaxTest extends TestCase
         }
     }
 }
-

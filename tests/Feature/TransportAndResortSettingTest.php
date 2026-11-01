@@ -5,16 +5,14 @@ namespace Tests\Feature;
 use App\Models\Accommodation;
 use App\Models\Destination;
 use App\Models\Region;
-use App\Models\TouristPreference;
 use App\Models\TourOperator;
+use App\Models\TouristPreference;
 use App\Services\Recommendation\ItineraryGenerationService;
-use App\Services\Recommendation\ItineraryScheduleBuilder;
 use App\Services\Recommendation\TourOperatorSuggester;
 use App\Services\Recommendation\TransportMode;
 use App\Services\Recommendation\TravelTimeEstimator;
 use Database\Seeders\ResortSettingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 /**
@@ -30,7 +28,7 @@ class TransportAndResortSettingTest extends TestCase
 
     public function test_an_unanswered_mode_is_planned_as_a_personal_car(): void
     {
-        $estimator = new TravelTimeEstimator;
+        $estimator = new TravelTimeEstimator();
 
         // 20 km straight -> 26 km by road: 39–62 min of driving + 10 min overhead, to the quarter hour.
         $unanswered = $estimator->estimate(20.0);
@@ -43,7 +41,7 @@ class TransportAndResortSettingTest extends TestCase
 
     public function test_a_jeep_takes_longer_than_a_car_over_the_same_distance(): void
     {
-        $estimator = new TravelTimeEstimator;
+        $estimator = new TravelTimeEstimator();
 
         $car = $estimator->estimate(20.0, null, null, TransportMode::PERSONAL_CAR);
         $jeep = $estimator->estimate(20.0, null, null, TransportMode::JEEP);
@@ -56,7 +54,7 @@ class TransportAndResortSettingTest extends TestCase
 
     public function test_a_taxi_and_a_rented_car_move_at_the_pace_of_a_private_car(): void
     {
-        $estimator = new TravelTimeEstimator;
+        $estimator = new TravelTimeEstimator();
         $car = $estimator->estimate(15.0, null, null, TransportMode::PERSONAL_CAR);
 
         $this->assertSame($car, $estimator->estimate(15.0, null, null, TransportMode::TAXI));
@@ -65,7 +63,7 @@ class TransportAndResortSettingTest extends TestCase
 
     public function test_the_ferry_to_samal_is_added_whatever_the_mode(): void
     {
-        $estimator = new TravelTimeEstimator;
+        $estimator = new TravelTimeEstimator();
 
         foreach (TransportMode::keys() as $mode) {
             $crossing = $estimator->estimate(10.0, 'Davao City', 'Island Garden City of Samal', $mode);
@@ -132,8 +130,7 @@ class TransportAndResortSettingTest extends TestCase
     {
         $region = Region::create(['name' => 'Davao City']);
 
-        // All options fit both modes' limits, so this comparison measures pace on the same route.
-        foreach ([['a', 7.14, 125.61], ['b', 7.15, 125.61], ['c', 7.16, 125.61]] as [$slug, $lat, $lng]) {
+        foreach ([['a', 7.07, 125.61], ['b', 7.18, 125.45], ['c', 7.02, 125.41]] as [$slug, $lat, $lng]) {
             Destination::create([
                 'slug' => $slug, 'name' => 'Place '.$slug, 'location' => 'Davao City', 'region_id' => $region->id,
                 'type' => 'Nature & Leisure', 'is_accredited' => true, 'rating' => 4.5, 'review_count' => 10,
@@ -165,7 +162,7 @@ class TransportAndResortSettingTest extends TestCase
 
     public function test_a_tour_operator_pick_up_is_a_private_vehicle_with_a_little_more_overhead(): void
     {
-        $estimator = new TravelTimeEstimator;
+        $estimator = new TravelTimeEstimator();
         $car = $estimator->estimate(20.0, null, null, TransportMode::PERSONAL_CAR);
         $operator = $estimator->estimate(20.0, null, null, TransportMode::TOUR_OPERATOR);
 
@@ -244,7 +241,7 @@ class TransportAndResortSettingTest extends TestCase
     {
         $region = Region::firstOrCreate(['name' => 'Davao City']);
 
-        foreach ([['a', 7.08, 125.61], ['b', 7.18, 125.45], ['c', 7.02, 125.41]] as [$slug, $lat, $lng]) {
+        foreach ([['a', 7.07, 125.61], ['b', 7.18, 125.45], ['c', 7.02, 125.41]] as [$slug, $lat, $lng]) {
             Destination::firstOrCreate(['slug' => $slug], [
                 'name' => 'Place '.$slug, 'location' => 'Davao City', 'region_id' => $region->id,
                 'type' => 'Nature & Leisure', 'is_accredited' => true, 'rating' => 4.5, 'review_count' => 10,
@@ -303,20 +300,6 @@ class TransportAndResortSettingTest extends TestCase
         $this->assertStringContainsString('Near Tours', $html);
         $this->assertStringContainsString('confirm with them first', $html);
         $this->assertStringContainsString('1 operator near you', $html);
-    }
-
-    public function test_rent_a_car_shows_rental_car_operators_just_like_tour_operator(): void
-    {
-        $this->operator('Aldimel Car Express Rent A Car', 7.0569, 125.5888, 'Davao City', ['specialization' => 'Tourist Transport', 'contact_number' => '0917 3001436']);
-        $this->operator('Near Tours', 7.071, 125.611, 'Davao City', ['specialization' => 'General Travel & Tours', 'contact_number' => '082 555 0100']);
-
-        $html = $this->planThenGet('rental_car');
-
-        $this->assertStringContainsString('Car rental / pick-up by your operator', $html);
-        $this->assertStringContainsString('Rent-a-car operators near you', $html);
-        $this->assertStringContainsString('Aldimel Car Express Rent A Car', $html);
-        $this->assertStringContainsString('confirm with them first', $html);
-        $this->assertStringContainsString('2 operators near you', $html);
     }
 
     public function test_commuting_on_your_own_shows_no_pick_up_and_no_operators(): void
@@ -416,7 +399,7 @@ class TransportAndResortSettingTest extends TestCase
         $html = $this->planThenGet('tour_operator', ['arrival_time' => '09:00']);
 
         $itinerary = TouristPreference::latest('id')->first()->itineraries()->latest('id')->first();
-        $leaves = Carbon::parse($itinerary->items()->where('day_number', 1)->where('kind', 'travel')->orderBy('sort_order')->first()->starts_at)->format('g:i A');
+        $leaves = \Illuminate\Support\Carbon::parse($itinerary->items()->where('day_number', 1)->where('kind', 'travel')->orderBy('sort_order')->first()->starts_at)->format('g:i A');
 
         $this->assertMatchesRegularExpression('/tl-row--pickup.*?<strong>'.preg_quote($leaves, '/').'<\/strong>/s', $html);
         $this->assertStringContainsString('The operator confirms the exact time and place', $html);
@@ -432,14 +415,20 @@ class TransportAndResortSettingTest extends TestCase
 
     public function test_a_leg_with_no_coordinates_is_allowed_time_at_the_pace_of_the_way_of_travelling(): void
     {
-        // Legacy plans still need conservative transfer allowances even when the planner finds a mapped replacement.
-        $unmeasuredAllowance = function (?string $mode) {
-            $builder = app(ItineraryScheduleBuilder::class);
-            (new \ReflectionProperty($builder, 'transport'))->setValue($builder, $mode);
-            $estimate = (new \ReflectionMethod($builder, 'estimateLeg'))->invoke($builder,
-                ['lat' => null, 'lng' => null], ['lat' => 7.07, 'lng' => 125.61]);
+        $region = Region::firstOrCreate(['name' => 'Davao City']);
+        foreach (['u1', 'u2', 'u3'] as $slug) {
+            Destination::create([
+                'slug' => $slug, 'name' => 'Unlocated '.$slug, 'location' => 'Davao City', 'region_id' => $region->id,
+                'type' => 'Nature & Leisure', 'is_accredited' => true, 'rating' => 4.5, 'review_count' => 10,
+                'price_tier' => 'Mid-range', 'distance_km' => 14,
+            ]);
+        }
 
-            return [$estimate['max_minutes']];
+        $unmeasuredAllowance = function (?string $mode) {
+            $this->post('/plan', $this->surveyPayload(['travel_days' => 1, 'arrival_time' => '08:00', 'transport_pref' => $mode]))->assertRedirect();
+
+            return TouristPreference::latest('id')->first()->itineraries()->latest('id')->first()
+                ->items()->where('kind', 'travel')->whereNull('distance_km')->pluck('travel_max_minutes')->unique()->values()->all();
         };
 
         $this->assertSame([45], $unmeasuredAllowance('personal_car'));
@@ -464,7 +453,7 @@ class TransportAndResortSettingTest extends TestCase
         $this->operator('Near Tours', 7.074, 125.613);
         $this->operator('Mid Tours', 7.12, 125.66);
 
-        $picked = (new TourOperatorSuggester)->near(7.0731, 125.6128);
+        $picked = (new TourOperatorSuggester())->near(7.0731, 125.6128);
 
         $this->assertSame(['Near Tours', 'Mid Tours', 'Far Tours'], $picked->map(fn ($row) => $row['operator']->name)->all());
         $this->assertNotNull($picked->first()['km']);
@@ -477,7 +466,7 @@ class TransportAndResortSettingTest extends TestCase
         $this->operator('Davao Unlocated B', null, null, 'Davao City', ['rating' => 3.0]);
         $this->operator('Samal Unlocated', null, null, 'Island Garden City of Samal', ['rating' => 5.0]);
 
-        $picked = (new TourOperatorSuggester)->near(7.0731, 125.6128);
+        $picked = (new TourOperatorSuggester())->near(7.0731, 125.6128);
 
         $this->assertSame(['Located', 'Davao Unlocated A', 'Davao Unlocated B'], $picked->map(fn ($row) => $row['operator']->name)->all());
         $this->assertNull($picked[1]['km'], 'A distance is never made up for an operator whose position is unknown.');
@@ -489,23 +478,9 @@ class TransportAndResortSettingTest extends TestCase
         $this->operator('Not Accredited', 7.074, 125.613, 'Davao City', ['is_accredited' => false]);
         $this->operator('Archived', 7.074, 125.613, 'Davao City', ['archived_at' => now()]);
 
-        $names = (new TourOperatorSuggester)->near(null, null)->map(fn ($row) => $row['operator']->name)->all();
+        $names = (new TourOperatorSuggester())->near(null, null)->map(fn ($row) => $row['operator']->name)->all();
 
         $this->assertSame(['Listed'], $names);
-    }
-
-    public function test_rental_car_suggestions_prioritize_tourist_transport_and_car_rental_operators(): void
-    {
-        $this->operator('Near General Tours', 7.0735, 125.6130, 'Davao City', ['specialization' => 'General Travel & Tours']);
-        $this->operator('Ecotrans Car Rentals Transport OPC', 7.0958, 125.6038, 'Davao City', ['specialization' => 'Tourist Transport']);
-        $this->operator('Aldimel Car Express Rent A Car', 7.0569, 125.5888, 'Davao City', ['specialization' => 'Tourist Transport']);
-
-        $picked = (new TourOperatorSuggester)->near(7.0731, 125.6128, TourOperatorSuggester::LIMIT, TransportMode::RENTAL_CAR);
-
-        $this->assertSame(
-            ['Ecotrans Car Rentals Transport OPC', 'Aldimel Car Express Rent A Car', 'Near General Tours'],
-            $picked->map(fn ($row) => $row['operator']->name)->all()
-        );
     }
 
     // ── Resort setting ────────────────────────────────────────────────────
@@ -555,19 +530,6 @@ class TransportAndResortSettingTest extends TestCase
         $this->resort('City Hotel', 'Hotel', ['Island']);
 
         $this->assertSame($island->id, $this->pick(['resort_setting' => 'Island'])['listing']->id);
-    }
-
-    public function test_beach_resort_is_inside_resort_settings_and_picks_a_beach_resort(): void
-    {
-        $this->resort('Valley Resort', 'Resort', ['Inland']);
-        $beach = $this->resort('Sunset Shores', 'Beach Resort', null);
-
-        $html = $this->get('/plan')->assertOk()->getContent();
-        $this->assertStringNotContainsString('name="accommodation_pref" value="Beach Resort"', $html);
-        $this->assertStringContainsString('name="resort_setting" value="Beach"', $html);
-        $this->assertStringContainsString('Beach Resort', $html);
-
-        $this->assertSame($beach->id, $this->pick(['resort_setting' => 'Beach'])['listing']->id);
     }
 
     public function test_inland_does_not_match_a_resort_that_is_only_on_an_island(): void
@@ -622,14 +584,6 @@ class TransportAndResortSettingTest extends TestCase
         $this->assertSame(['Mountain'], ResortSettingSeeder::settingsFor('Eden View Mountain Resort', null, 'Resort'));
     }
 
-    public function test_inland_requires_explicit_evidence_and_is_not_a_default_for_plain_resorts(): void
-    {
-        $this->assertSame([], ResortSettingSeeder::settingsFor('Green Valley Resort', null, 'Resort'));
-        $this->assertSame(['Inland'], ResortSettingSeeder::settingsFor('Green Valley Inland Resort', null, 'Resort'));
-        $this->assertSame([], ResortSettingSeeder::settingsFor('Dahican Resort', null, 'Resort'), 'Dahican is on the coast');
-        $this->assertSame([], ResortSettingSeeder::settingsFor('Casa Julieta', null, 'Hotel'), 'a hotel is never called inland');
-        $this->assertSame([], ResortSettingSeeder::settingsFor('Sunset Resort', null, 'Beach Resort'), 'a beach resort is not inland');
-    }
 
     public function test_the_seeder_fills_only_unclassified_resorts(): void
     {
@@ -637,7 +591,7 @@ class TransportAndResortSettingTest extends TestCase
         $corrected = $this->resort('Lake Sebu Resort', 'Resort', ['Hot Spring']);
         $hotel = $this->resort('Casa Julieta', 'Hotel', null);
 
-        (new ResortSettingSeeder)->run();
+        (new ResortSettingSeeder())->run();
 
         $this->assertSame(['Mountain'], $fresh->fresh()->resortSettingList());
         $this->assertSame(['Hot Spring'], $corrected->fresh()->resortSettingList(), 'a hand-set value is never overwritten');
@@ -649,5 +603,55 @@ class TransportAndResortSettingTest extends TestCase
         $this->assertSame('|Lake|All-Inclusive|', Accommodation::encodeResortSettings(['All-Inclusive', 'Lake', 'Bogus']));
         $this->assertNull(Accommodation::encodeResortSettings(['Bogus']));
         $this->assertSame(['Lake', 'All-Inclusive'], (new Accommodation(['resort_settings' => '|Lake|All-Inclusive|']))->resortSettingList());
+    }
+
+    public function test_rent_a_car_shows_rental_car_operators_just_like_tour_operator(): void
+    {
+        $this->operator('Aldimel Car Express Rent A Car', 7.0569, 125.5888, 'Davao City', ['specialization' => 'Tourist Transport', 'contact_number' => '0917 3001436']);
+        $this->operator('Near Tours', 7.071, 125.611, 'Davao City', ['specialization' => 'General Travel & Tours', 'contact_number' => '082 555 0100']);
+
+        $html = $this->planThenGet('rental_car');
+
+        $this->assertStringContainsString('Car rental / pick-up by your operator', $html);
+        $this->assertStringContainsString('Rent-a-car operators near you', $html);
+        $this->assertStringContainsString('Aldimel Car Express Rent A Car', $html);
+        $this->assertStringContainsString('confirm with them first', $html);
+        $this->assertStringContainsString('2 operators near you', $html);
+    }
+
+    public function test_rental_car_suggestions_prioritize_tourist_transport_and_car_rental_operators(): void
+    {
+        $this->operator('Near General Tours', 7.0735, 125.6130, 'Davao City', ['specialization' => 'General Travel & Tours']);
+        $this->operator('Ecotrans Car Rentals Transport OPC', 7.0958, 125.6038, 'Davao City', ['specialization' => 'Tourist Transport']);
+        $this->operator('Aldimel Car Express Rent A Car', 7.0569, 125.5888, 'Davao City', ['specialization' => 'Tourist Transport']);
+
+        $picked = (new TourOperatorSuggester)->near(7.0731, 125.6128, TourOperatorSuggester::LIMIT, TransportMode::RENTAL_CAR);
+
+        $this->assertSame(
+            ['Ecotrans Car Rentals Transport OPC', 'Aldimel Car Express Rent A Car', 'Near General Tours'],
+            $picked->map(fn ($row) => $row['operator']->name)->all()
+        );
+    }
+
+    public function test_beach_resort_is_inside_resort_settings_and_picks_a_beach_resort(): void
+    {
+        $this->resort('Valley Resort', 'Resort', ['Inland']);
+        $beach = $this->resort('Sunset Shores', 'Beach Resort', null);
+
+        $html = $this->get('/plan')->assertOk()->getContent();
+        $this->assertStringNotContainsString('name="accommodation_pref" value="Beach Resort"', $html);
+        $this->assertStringContainsString('name="resort_setting" value="Beach"', $html);
+        $this->assertStringContainsString('Beach Resort', $html);
+
+        $this->assertSame($beach->id, $this->pick(['resort_setting' => 'Beach'])['listing']->id);
+    }
+
+    public function test_inland_requires_explicit_evidence_and_is_not_a_default_for_plain_resorts(): void
+    {
+        $this->assertSame([], ResortSettingSeeder::settingsFor('Green Valley Resort', null, 'Resort'));
+        $this->assertSame(['Inland'], ResortSettingSeeder::settingsFor('Green Valley Inland Resort', null, 'Resort'));
+        $this->assertSame([], ResortSettingSeeder::settingsFor('Dahican Resort', null, 'Resort'), 'Dahican is on the coast');
+        $this->assertSame([], ResortSettingSeeder::settingsFor('Casa Julieta', null, 'Hotel'), 'a hotel is never called inland');
+        $this->assertSame([], ResortSettingSeeder::settingsFor('Sunset Resort', null, 'Beach Resort'), 'a beach resort is not inland');
     }
 }

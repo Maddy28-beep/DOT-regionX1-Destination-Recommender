@@ -105,19 +105,6 @@
                 </div>
             </section>
 
-            @if (collect($planningChecks ?? [])->contains(fn ($check) => $check['status'] !== 'pass'))
-                <div class="privacy-note" role="status">
-                    <div>
-                        <strong>Things to confirm before your trip</strong>
-                        <ul>
-                            @foreach (collect($planningChecks)->whereIn('status', ['fail', 'unknown']) as $check)
-                                <li>{{ $check['label'] }}@if ($check['detail'] !== ''): {{ $check['detail'] }}@endif</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-            @endif
-
             @if (session('pending_save_itinerary'))
                 <div class="privacy-note" role="status">
                     <x-icon name="shield-check" />

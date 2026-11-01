@@ -186,4 +186,3 @@ class ItineraryFollowability
         return is_string($time) && preg_match('/^(\d{1,2}):(\d{2})/', $time, $m) ? (int) $m[1] * 60 + (int) $m[2] : null;
     }
 }
-

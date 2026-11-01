@@ -119,11 +119,8 @@ class MealWindowsTest extends TestCase
         $meals = $this->meals($rows);
 
         $this->assertCount(1, $meals);
-        $this->assertSame(['Lunch — Matina Swiss Deli', '12:45', '13:15', $deli->id, null], [$meals[0]['title'], $meals[0]['start'], $meals[0]['end'], $meals[0]['restaurant'], $meals[0]['destination']]);
-        $travel = array_values(array_filter($rows, fn ($r) => $r['kind'] === 'travel'));
-        $this->assertSame('12:30', $travel[0]['start'], 'outbound restaurant travel is included');
-        $this->assertSame('13:15', $travel[1]['start'], 'return travel is included');
-        $this->assertSame('13:30', $travel[2]['start'], 'sightseeing travel starts after the complete meal detour');
+        $this->assertSame(['Lunch — Matina Swiss Deli', '12:30', '13:30', $deli->id, null], [$meals[0]['title'], $meals[0]['start'], $meals[0]['end'], $meals[0]['restaurant'], $meals[0]['destination']]);
+        $this->assertSame('13:30', $this->first($rows, 'travel')['start'], 'the journey starts once lunch is over');
         $this->assertSame($falls->id, $this->first($rows, 'activity')['destination']);
         $this->assertLessThanOrEqual('18:00', $this->first($rows, 'activity')['end']);
     }
@@ -184,7 +181,7 @@ class MealWindowsTest extends TestCase
     {
         $far = $this->place('Aliwagwag Falls', 'Davao Oriental', 7.7430, 126.2989);
 
-        // Meal timing is inspected on an outbound day; a same-day return would violate the 20:00 remote limit.
+        // Test the outbound meal on a multi-day trip; a same-day return would exceed the existing 20:00 cutoff.
         $rows = $this->rows($this->plan('09:00', [$far], [1 => ['Afternoon'], 2 => []]));
         $travel = array_values(array_filter($rows, fn ($r) => $r['kind'] === 'travel'));
         $lunch = $this->meals($rows)[0];
@@ -205,35 +202,33 @@ class MealWindowsTest extends TestCase
     {
         $eden = $this->place('Eden Nature Park', 'Davao City', 7.0206, 125.4103);
         $eden->tags()->create(['kind' => 'amenity', 'value' => 'Restaurant']);
-        // A restaurant amenity does not establish a dining venue's actual name or service hours.
+        // Another restaurant is nearby, but the park's own is the one named.
         $this->restaurant('Kapehan sa Tambacan', 'Davao City', 7.0250, 125.4150);
 
         $rows = $this->rows($this->plan('09:00', [$eden], [1 => ['Morning', 'Afternoon']]));
         $lunch = $this->meals($rows)[0];
 
-        $this->assertSame('Lunch at Eden Nature Park (venue to confirm)', $lunch['title']);
+        $this->assertSame('Lunch — Eden Nature Park Restaurant', $lunch['title']);
         $this->assertSame($eden->id, $lunch['destination']);
         $this->assertNull($lunch['restaurant']);
         $this->assertGreaterThanOrEqual('12:00', $lunch['start']);
         $this->assertLessThanOrEqual('13:00', $lunch['start']);
     }
 
-    public function test_a_nearby_restaurant_must_fit_round_trip_travel_and_dining_in_the_meal_slot(): void
+    public function test_a_nearby_restaurant_is_used_within_ten_km_and_not_beyond(): void
     {
         $park = $this->place('Hilltop Park', 'Davao City', 7.0206, 125.4103);
-        $near = $this->restaurant('Ridge Cafe', 'Davao City', 7.0206 + 0.005, 125.4103);
-        $this->restaurant('Too Much Driving', 'Davao City', 7.0206 + 0.07, 125.4103); // Within 10 km, but cannot fit.
+        $near = $this->restaurant('Ridge Cafe', 'Davao City', 7.0206 + 0.07, 125.4103);   // about 7.8 km
         $this->restaurant('Far Grill', 'Davao City', 7.0206 + 0.12, 125.4103);              // about 13 km
 
-        $rows = $this->rows($this->plan('07:00', [$park], [1 => ['Morning', 'Afternoon']]));
-        $lunch = collect($this->meals($rows))->first(fn ($r) => str_starts_with($r['title'], 'Lunch'));
+        $lunch = $this->meals($this->rows($this->plan('09:00', [$park], [1 => ['Morning', 'Afternoon']])))[0];
         $this->assertSame('Lunch — Ridge Cafe', $lunch['title']);
         $this->assertSame($near->id, $lunch['restaurant']);
 
         $near->delete();
 
-        $lunch = collect($this->meals($this->rows($this->plan('07:00', [$park], [1 => ['Morning', 'Afternoon']]))))->first(fn ($r) => str_starts_with($r['title'], 'Lunch'));
-        $this->assertSame('Lunch break (your choice)', $lunch['title'], 'closer than 10 km alone is insufficient when the journey consumes the meal slot');
+        $lunch = $this->meals($this->rows($this->plan('09:00', [$park], [1 => ['Morning', 'Afternoon']])))[0];
+        $this->assertSame('Lunch break (your choice)', $lunch['title'], 'nothing within 10 km');
     }
 
     public function test_a_restaurant_that_is_closed_at_that_hour_is_not_offered(): void
@@ -267,9 +262,9 @@ class MealWindowsTest extends TestCase
                     $this->assertGreaterThanOrEqual($window[0], $meal['start'], "arrival {$arrival}, day {$day}: {$meal['title']}");
                     $this->assertLessThanOrEqual($window[1], $meal['start'], "arrival {$arrival}, day {$day}: {$meal['title']}");
 
-                    // An unnamed on-site amenity stays explicitly unconfirmed.
+                    // A destination is attached only as its own restaurant (the title says so).
                     if ($meal['destination'] !== null) {
-                        $this->assertStringEndsWith('(venue to confirm)', $meal['title'], "arrival {$arrival}, day {$day}");
+                        $this->assertStringEndsWith('Restaurant', $meal['title'], "arrival {$arrival}, day {$day}");
                     }
                 }
             }
@@ -403,7 +398,7 @@ class MealWindowsTest extends TestCase
         $this->assertCount(1, $this->kinds($this->dinnerLeg('19:45', 100)), 'already past the window');
     }
 
-    public function test_a_remote_visit_is_skipped_when_even_a_dinner_break_cannot_make_the_return_feasible(): void
+    public function test_a_remote_visit_is_skipped_when_a_dinner_break_cannot_make_the_return_feasible(): void
     {
         $far = $this->place('Aliwagwag Falls', 'Davao Oriental', 7.7430, 126.2989);
 
