@@ -138,6 +138,40 @@ class StayPlanEvaluator
     }
 
     /**
+     * Stage C2: should the rebuild $r replace the first build $f because it removes a late check-in, even though the
+     * cost comparison of accepts() is not better by the tolerance? Only when nothing else is worse: no rule broken, no
+     * destination lost, no extra empty day, no more driving over the daily budget, no day over the driving ceiling, and
+     * at most one more change of stay. The late check-ins must actually be fewer in the built itinerary.
+     *
+     * @return array{0: bool, 1: string|null}
+     */
+    public function acceptsLateRepair(array $f, array $r): array
+    {
+        if ($r['violations'] > $f['violations'] || $r['violations'] > 0) {
+            return [false, 'H1 rule broken'];
+        }
+        if (array_diff($f['placed'], $r['placed']) !== []) {
+            return [false, 'H2 destination lost'];
+        }
+        if ($r['empty'] > $f['empty']) {
+            return [false, 'H3 empty day'];
+        }
+        if ($r['excess'] > $f['excess']) {
+            return [false, 'L1 more driving over the daily budget'];
+        }
+        if (max($r['drive'] ?: [0]) > ItineraryScheduleBuilder::MAX_DAILY_DRIVE_MINUTES) {
+            return [false, 'L2 a day over the driving ceiling'];
+        }
+        if ($r['transfers'] > $f['transfers'] + 1) {
+            return [false, 'L3 more than one extra change of stay'];
+        }
+        if ($r['lateCount'] >= $f['lateCount']) {
+            return [false, 'L4 no late check-in removed'];
+        }
+
+        return [true, null];
+    }
+    /**
      * Is the one-stay build $one impractical next to the flexible build $flex? Only then does a Commutable trip
      * change stay. Everything here is a plain comparison of the two builds: nothing is judged against a fixed limit
      * of its own (the driving limit appears only through `excess`, which is the schedule's own budget).
@@ -186,13 +220,15 @@ class StayPlanEvaluator
             'lng' => $model?->longitude === null ? null : (float) $model->longitude,
             'region' => $model?->region?->name,
         ];
-        $here = ['lat' => (float) $origin['lat'], 'lng' => (float) $origin['lng'], 'region' => null];
+        $originPlace = ['lat' => (float) $origin['lat'], 'lng' => (float) $origin['lng'], 'region' => null];
+        $here = $originPlace;
         $firsts = [];
         $lasts = [];
         foreach (range(1, $days) as $d) {
             $stops = $items->where('day_number', $d)->where('kind', 'activity')->whereNotNull('destination_id')->pluck('destination')->filter()->values();
-            $firsts[$d] = $stops->isNotEmpty() ? $place($stops->first()) : $here;
-            $lasts[$d] = $stops->isNotEmpty() ? $place($stops->last()) : $here;
+            $fallback = ($preference->distance_pref === 'far' && $d === $days && $days >= 2) ? $originPlace : $here;
+            $firsts[$d] = $stops->isNotEmpty() ? $place($stops->first()) : $fallback;
+            $lasts[$d] = $stops->isNotEmpty() ? $place($stops->last()) : $fallback;
             $here = $lasts[$d];
         }
 

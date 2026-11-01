@@ -45,6 +45,7 @@ class OmissionReason
 
         return match ($cause) {
             'would_end_after_cutoff' => "on $days the visit would have ended after the ".ItineraryScheduleBuilder::LAST_ACTIVITY_END." sightseeing cutoff$fresh",
+            'would_return_after_2000' => "on $days the journey back would have reached your starting point at or after ".ItineraryScheduleBuilder::LATEST_ARRIVAL_HOME."$fresh",
             'closed_that_day' => "it is closed on $days$fresh",
             'outside_opening_hours' => "on $days it would not have been open long enough for a visit$fresh",
             'drive_budget_reached' => 'on '.$days.' it would have taken the day to about '.self::duration((int) ($first['minutes'] ?? 0)).' of driving, over the '.self::duration((int) ($first['limit'] ?? 0)).' limit for your range',

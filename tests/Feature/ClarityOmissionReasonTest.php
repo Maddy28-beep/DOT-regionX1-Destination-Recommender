@@ -48,6 +48,9 @@ class ClarityOmissionReasonTest extends TestCase
         $cutoff = OmissionReason::sentence(['attempts' => [['day' => 2, 'cause' => 'would_end_after_cutoff', 'minutes' => null, 'limit' => null, 'fresh' => false]]]);
         $this->assertSame('On day 2 the visit would have ended after the 18:00 sightseeing cutoff.', $cutoff);
 
+        $lateHome = OmissionReason::sentence(['attempts' => [['day' => 3, 'cause' => 'would_return_after_2000', 'minutes' => null, 'limit' => null, 'fresh' => false]]]);
+        $this->assertSame('On day 3 the journey back would have reached your starting point at or after 20:00.', $lateHome);
+
         $budget = OmissionReason::sentence(['attempts' => [['day' => 3, 'cause' => 'drive_budget_reached', 'minutes' => 345, 'limit' => 300, 'fresh' => false]]]);
         $this->assertSame('On day 3 it would have taken the day to about 5 h 45 min of driving, over the 5 h limit for your range.', $budget);
 
@@ -124,7 +127,7 @@ class ClarityOmissionReasonTest extends TestCase
                     $this->assertGreaterThan($attempt['limit'], $attempt['minutes']);
                 }
             }
-            $this->assertContains($notice['reason'], ['would_end_after_cutoff', 'drive_budget_reached', 'day_full', 'closed_that_day', 'outside_opening_hours', 'no_sightseeing_time_that_day']);
+            $this->assertContains($notice['reason'], ['would_end_after_cutoff', 'would_return_after_2000', 'drive_budget_reached', 'day_full', 'closed_that_day', 'outside_opening_hours', 'no_sightseeing_time_that_day']);
             // The old default invented a cutoff for everything; the sentence now follows the recorded cause.
             $this->assertSame(in_array('would_end_after_cutoff', array_column($notice['attempts'], 'cause'), true), str_contains(OmissionReason::sentence($notice), '18:00'));
         }
