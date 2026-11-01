@@ -1,0 +1,1498 @@
+{
+    "format": 1,
+    "prepared_at": "2026-11-01",
+    "baseline_sha256": "6abe7af944143e736d78281837edbb4f18e9afcf2b10ad0f6ee490bd134c6dbb",
+    "policy": "Selective sourced public catalogue updates. Preserve live closures, certificates, room rates, hotel check-in/out and private operational records. Abort on changed edited fields; no deletion.",
+    "required_columns": {
+        "destinations": [
+            "planner_verified_at",
+            "planner_verification_source",
+            "planning_notes"
+        ],
+        "restaurants": [
+            "planner_verified_at",
+            "planner_verification_source",
+            "host_destination_id",
+            "host_accommodation_id"
+        ]
+    },
+    "withheld": [
+        "Accreditation renewals/new hotel claims: require current certificate confirmation.",
+        "Magongawon trail: mixed access evidence; hold pending operator confirmation.",
+        "No invented near-5km beach or hiking venue. Existing three interest gaps remain disclosed."
+    ],
+    "records": [
+        {
+            "table": "destinations",
+            "slug": "samal-island",
+            "name": "Samal Island",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "subangan-museum-sample",
+            "name": "Subangan Museum [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "campawan-curtain-falls-sample",
+            "name": "Campawan Curtain Falls [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "mount-hamiguitan-range-wildlife-sanctuary-sample",
+            "name": "Mount Hamiguitan Range Wildlife Sanctuary [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "optional"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "aliwagwag-falls-sample",
+            "name": "Aliwagwag Falls [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "pujada-bay-and-pujada-island-sample",
+            "name": "Pujada Bay and Pujada Island [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "oak-island-sample",
+            "name": "Oak Island [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "guang-guang-mangrove-forest-sample",
+            "name": "Guang-guang Mangrove Forest [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "sleeping-dinosaur-sample",
+            "name": "Sleeping Dinosaur [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "lon-wa-buddhist-temple-sample",
+            "name": "Lon Wa Buddhist Temple [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "davao-chinatown-sample",
+            "name": "Davao Chinatown [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "national-museum-of-the-philippines-davao-sample",
+            "name": "National Museum of the Philippines Davao [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "monfort-bat-cave-sample",
+            "name": "Monfort Bat Cave [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "hagimit-falls-sample",
+            "name": "Hagimit Falls [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "tagbibinta-falls-sample",
+            "name": "Tagbibinta Falls [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "panas-eco-cultural-park-sample",
+            "name": "Panas Eco-cultural Park [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "linow-tu-gabon-ocean-of-fogs-sample",
+            "name": "Linow tu Gabon (Ocean of Fogs) [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "urayas-peak-sample",
+            "name": "Uraya's Peak [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "tudaya-falls-sample",
+            "name": "Tudaya Falls [SAMPLE]",
+            "insert_if_missing": false,
+            "fields": {
+                "itinerary_role": "excluded"
+            },
+            "expected": {
+                "itinerary_role": "sightseeing"
+            },
+            "sources": [
+                "Catalogue audit: sample fixture or non-routable island-wide locality; exclude from itinerary selection without deleting the record."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "eden-nature-park",
+            "name": "Eden Nature Park",
+            "insert_if_missing": false,
+            "fields": {
+                "hours": "9:00 AM-5:00 PM",
+                "planner_verified_at": null,
+                "planner_verification_source": "https://www.edennaturepark.com.ph/ — operator specifically names Birdwalk (aviaries), Deer Park (Philippine deer), Butterfly Garden and the Hiking Trail. Checked 2026-11-01. Wildlife coverage is tied to these actual visitor activities, not a generic nature tag.",
+                "latitude": 7.0304604,
+                "longitude": 125.3979848,
+                "planning_notes": "Hiking visitors: use the park's ravine and boulder-path hiking trail; confirm trail access and weather with staff. The separate guided shuttle is 45 minutes and is not the hiking activity. Trail and general park visit durations vary. For a selected wildlife interest, include Birdwalk and Deer Park in the visit, rather than treating hiking alone as wildlife viewing. The operator describes an aviary and a Philippine-deer enclosure; confirm access and conditions on the visit date. Combined hiking/animal-viewing visit time remains a planning allowance, not a published fixed tour duration."
+            },
+            "expected": {
+                "hours": "9:00 AM–5:00 PM",
+                "planner_verified_at": null,
+                "planner_verification_source": null,
+                "latitude": "7.0282000",
+                "longitude": "125.4018000",
+                "planning_notes": null
+            },
+            "sources": [
+                "https://www.edennaturepark.com.ph/ resort hours (not reservations office); checked 2026-10-31",
+                "https://www.openstreetmap.org/way/538858577 reception area; map checked 2026-10-30",
+                "https://www.edennaturepark.com.ph/ — current operator page explicitly describes Hiking Trail; do not substitute the 45-minute shuttle duration for a hike.",
+                "https://www.edennaturepark.com.ph/ — operator specifically names Birdwalk (aviaries), Deer Park (Philippine deer), Butterfly Garden and the Hiking Trail. Checked 2026-11-01. Wildlife coverage is tied to these actual visitor activities, not a generic nature tag."
+            ],
+            "tags": [
+                "Hiking",
+                "Wildlife (Birdwalk and Deer Park)"
+            ]
+        },
+        {
+            "table": "destinations",
+            "slug": "philippine-eagle-center",
+            "name": "Philippine Eagle Center",
+            "insert_if_missing": false,
+            "fields": {
+                "hours": "8:00 AM-5:00 PM",
+                "planner_verified_at": null,
+                "planner_verification_source": null,
+                "latitude": 7.1848752,
+                "longitude": 125.415287,
+                "visit_duration": "45 minutes",
+                "planning_notes": "Plan the operator's 45-minute Into the Wild guided tour. Arrange availability with the Philippine Eagle Foundation before travel; this itinerary is not a reservation. Additional self-guided time is separate."
+            },
+            "expected": {
+                "hours": "8:00 AM–5:00 PM",
+                "planner_verified_at": null,
+                "planner_verification_source": null,
+                "latitude": "7.1849000",
+                "longitude": "125.4153000",
+                "visit_duration": "120 minutes",
+                "planning_notes": null
+            },
+            "sources": [
+                "https://www.experiencedavao.com/destinations/davao-city/attractions/philippine-eagle-center ; checked 2026-10-31",
+                "https://www.openstreetmap.org/node/747886405 ; checked 2026-10-30",
+                "https://www.philippineeaglefoundation.org/service-page/into-the-wild-tour — published named guided experience, 45 minutes; not a universal duration for every type of PEC visit."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "peoples-park",
+            "name": "People's Park",
+            "insert_if_missing": false,
+            "fields": {
+                "hours": "1:00 PM-10:00 PM",
+                "planner_verified_at": null,
+                "planner_verification_source": "https://tourism.davaocity.gov.ph/explore-the-city/attractions/man-made-nature-parks/peoples-park/ — official city tourism page confirms free public entry, mini-forest and resident birds. Banzon et al., Philippine Journal of Science 151(5), 2022, Table 1 records 15 bird species at People's Park from October-December 2019 fieldwork: https://doi.org/10.56899/151.05.32 ; author-uploaded full text https://www.researchgate.net/publication/362788802_Diversity_of_Bird_Species_in_Urban_Green_Spaces_of_Davao_City_Mindanao_Philippines . Checked online 2026-11-01. Supports an explicitly scheduled urban birdwatching component, not guaranteed species or unrestricted morning entry. Existing entrance coordinates, price, public hours and accreditation are preserved.",
+                "latitude": 7.070676,
+                "longitude": 125.607847,
+                "entry_fee_min": 0,
+                "entry_fee_max": 0,
+                "planning_notes": "When Wildlife is selected, include quiet urban birdwatching around the mini-forest and planted areas during public visiting hours. This is observation of free-ranging city birds, not a zoo, Philippine-eagle encounter or guaranteed sighting. The published 2022 bird survey used observations from October-December 2019 and recorded 15 species here; that historical count is not a promise for this visit. Observe without feeding, chasing or handling birds. The survey's early-morning research access does not override the park's public opening hours. Visit duration remains a planning allowance, not a published fixed tour length."
+            },
+            "expected": {
+                "hours": "1:00 PM–10:00 PM",
+                "planner_verified_at": null,
+                "planner_verification_source": null,
+                "latitude": "7.0644000",
+                "longitude": "125.6079000",
+                "entry_fee_min": "0.00",
+                "entry_fee_max": "0.00",
+                "planning_notes": null
+            },
+            "sources": [
+                "https://tourism.davaocity.gov.ph/explore-the-city/attractions/man-made-nature-parks/peoples-park/ ; checked 2026-10-31",
+                "https://www.openstreetmap.org/node/420911356 pedestrian entrance; checked 2026-10-30",
+                "https://tourism.davaocity.gov.ph/explore-the-city/attractions/man-made-nature-parks/peoples-park/ free entry; checked 2026-10-31",
+                "https://tourism.davaocity.gov.ph/explore-the-city/attractions/man-made-nature-parks/peoples-park/ — official city tourism page confirms free public entry, mini-forest and resident birds. Banzon et al., Philippine Journal of Science 151(5), 2022, Table 1 records 15 bird species at People's Park from October-December 2019 fieldwork: https://doi.org/10.56899/151.05.32 ; author-uploaded full text https://www.researchgate.net/publication/362788802_Diversity_of_Bird_Species_in_Urban_Green_Spaces_of_Davao_City_Mindanao_Philippines . Checked online 2026-11-01. Supports an explicitly scheduled urban birdwatching component, not guaranteed species or unrestricted morning entry. Existing entrance coordinates, price, public hours and accreditation are preserved."
+            ],
+            "tags": [
+                "Wildlife (urban birdwatching)"
+            ]
+        },
+        {
+            "table": "destinations",
+            "slug": "davao-crocodile-park-inc",
+            "name": "Davao Crocodile Park Inc",
+            "insert_if_missing": false,
+            "fields": {
+                "hours": "8:00 AM-5:00 PM",
+                "planner_verified_at": null,
+                "planner_verification_source": null,
+                "latitude": 7.0972103,
+                "longitude": 125.598976
+            },
+            "expected": {
+                "hours": "8:00 AM–7:00 PM",
+                "planner_verified_at": null,
+                "planner_verification_source": null,
+                "latitude": "7.0974000",
+                "longitude": "125.5990000"
+            },
+            "sources": [
+                "https://www.experiencedavao.com/destinations/davao-city/attractions/davao-crocodile-park ; checked 2026-10-31",
+                "https://www.openstreetmap.org/way/81347693 zoo feature centre approximate visitor location; checked 2026-10-30"
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "malagos-garden-resort",
+            "name": "Malagos Garden Resort",
+            "insert_if_missing": false,
+            "fields": {
+                "hours": "8:00 AM-5:00 PM",
+                "planner_verified_at": null,
+                "planner_verification_source": "https://malagoschocolate.com/pages/malagos-chocolate-museum (operator FAQ distinguishes the 60-90 minute pre-booked Tree-to-Bar programme from the general park/museum); https://www.malagos.com/dine (current named restaurant windows). Checked 2026-11-01.",
+                "latitude": 7.1910411,
+                "longitude": 125.4276581,
+                "visit_duration": "Variable; confirm selected activity",
+                "planning_notes": "General garden, wildlife and museum visits have no single published duration. The separate Tree-to-Bar guided farm experience takes 60-90 minutes and requires advance booking; published starts are Monday-Saturday at 10:00 and 13:00, excluding Sundays and holidays. The itinerary does not book that tour or apply its length to the entire park. Viewdeck Cafe serves daytime food 08:00-17:00; Koi Cafe serves breakfast 06:00-10:00 and dinner 17:00-21:00. Admission and meal charges require confirmation."
+            },
+            "expected": {
+                "hours": "8:00 AM–5:00 PM",
+                "planner_verified_at": null,
+                "planner_verification_source": null,
+                "latitude": "7.1910000",
+                "longitude": "125.4277000",
+                "visit_duration": "240 minutes",
+                "planning_notes": null
+            },
+            "sources": [
+                "https://malagoschocolate.com/pages/malagos-chocolate-museum museum visitor hours (not hotel or dining hours); checked 2026-10-31",
+                "https://www.openstreetmap.org/way/976238615 resort feature centre approximate visitor location; checked 2026-10-30",
+                "https://malagoschocolate.com/pages/malagos-chocolate-museum (operator FAQ distinguishes the 60-90 minute pre-booked Tree-to-Bar programme from the general park/museum); https://www.malagos.com/dine (current named restaurant windows). Checked 2026-11-01."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "mount-apo-natural-park",
+            "name": "Mount Apo Natural Park",
+            "insert_if_missing": false,
+            "fields": {
+                "visit_duration": "2-3 days",
+                "planner_verified_at": null,
+                "planner_verification_source": null
+            },
+            "expected": {
+                "visit_duration": "2 days / 1 night",
+                "planner_verified_at": null,
+                "planner_verification_source": null
+            },
+            "sources": [
+                "https://www.mtapoadventures.com/atour-packages-2/mac-05-mt-apo-summit-via-sta-cruz-trail-backtrack-3d2n/ operator summit itineraries include 2D1N and 3D2N; checked 2026-10-31"
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "belviz-farm",
+            "name": "Belviz Farm",
+            "insert_if_missing": false,
+            "fields": {
+                "latitude": 7.178217,
+                "longitude": 125.4445152,
+                "planner_verified_at": null,
+                "planner_verification_source": "https://www.findglocal.com/PH/Davao-City/1936581723323193/Belviz-Durian-Farms (mirrored operator page, Wangan/Calinan, checked 2026-11-01, 09:00-17:00) and https://coffeeshopdavao.com/davao-cafes-by-area/ (mapped Wangan listing 09:00-16:00). Conservative common visitor window; full closing-time conflict and guided-tour availability remain unconfirmed. No fixed visit duration was published.",
+                "hours": "9:00 AM-4:00 PM",
+                "planning_notes": "Allow visits only within the conservative 09:00-16:00 window. Mirrored operator information gives 09:00-17:00; mapped listings close at 16:00. Confirm farm-tour access, fruit season and tour length directly before visiting; retail opening hours do not guarantee a guided tour."
+            },
+            "expected": {
+                "latitude": "7.1782282",
+                "longitude": "125.4445414",
+                "planner_verified_at": null,
+                "planner_verification_source": null,
+                "hours": "8:00 AM–5:00 PM",
+                "planning_notes": null
+            },
+            "sources": [
+                "https://www.experiencedavao.com/destinations/davao-city/attractions/belviz-durian-farms ; https://www.openstreetmap.org/way/1225348812 — farm visitor location, not the downtown Belviz store. Published hours conflict; leave hours unknown.",
+                "https://www.findglocal.com/PH/Davao-City/1936581723323193/Belviz-Durian-Farms (mirrored operator page, Wangan/Calinan, checked 2026-11-01, 09:00-17:00) and https://coffeeshopdavao.com/davao-cafes-by-area/ (mapped Wangan listing 09:00-16:00). Conservative common visitor window; full closing-time conflict and guided-tour availability remain unconfirmed. No fixed visit duration was published."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "bemwa-farm-fresh-inc",
+            "name": "Bemwa Farm Fresh Inc.",
+            "insert_if_missing": false,
+            "fields": {
+                "latitude": 7.4820425,
+                "longitude": 125.2598409,
+                "planner_verified_at": null,
+                "planner_verification_source": null
+            },
+            "expected": {
+                "latitude": "7.4819140",
+                "longitude": "125.2594990",
+                "planner_verified_at": null,
+                "planner_verification_source": null
+            },
+            "sources": [
+                "Supplied DOT address Datu Salumay / Marilog and https://www.openstreetmap.org/way/1095279031 named farm boundary. Hours require operator confirmation; not copied from map."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "bukid-amara-tourism-agriventures-corporation",
+            "name": "Bukid Amara Tourism Agriventures Corporation",
+            "insert_if_missing": false,
+            "fields": {
+                "latitude": 7.0450475,
+                "longitude": 125.5147347,
+                "planner_verified_at": null,
+                "planner_verification_source": null
+            },
+            "expected": {
+                "latitude": "7.1850000",
+                "longitude": "125.4808300",
+                "planner_verified_at": null,
+                "planner_verification_source": null
+            },
+            "sources": [
+                "https://mb.com.ph/2024/8/2/article-2579 identifies the Davao farm near Deca/Talomo; https://www.openstreetmap.org/way/1470781676. This is not the Lucban Quezon farm or its corporate/registration address. Hours unknown."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "damosa-land-inc-agriya-naturetainment",
+            "name": "Damosa Land Inc. / Agriya Naturetainment",
+            "insert_if_missing": false,
+            "fields": {
+                "latitude": 7.2939628,
+                "longitude": 125.6841463,
+                "planner_verified_at": null,
+                "planner_verification_source": null
+            },
+            "expected": {
+                "latitude": "7.2939600",
+                "longitude": "125.6841500",
+                "planner_verified_at": null,
+                "planner_verification_source": null
+            },
+            "sources": [
+                "https://damosaland.com/home_new/damosaland-360/project-gallery/agriya-gallery/ and https://www.openstreetmap.org/node/9205138314 — naturetainment entrance in New Pandan, Panabo; hours unknown."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "imin-the-philippine-japan-historical-museum",
+            "name": "IMIN The Philippine-Japan Historical Museum",
+            "insert_if_missing": false,
+            "fields": {
+                "latitude": 7.1882392,
+                "longitude": 125.4603218,
+                "planner_verified_at": null,
+                "planner_verification_source": "https://pia.gov.ph/features/imin-museum-remembering-the-near-forgotten-little-tokyo/ (2024 government report quoting the museum curator; schedule re-read 2026-11-01). Older 2022 reports differ on Saturday booking. Sunday remains appointment-dependent, not automatically confirmed open or closed.",
+                "hours": "Mon-Sat 8:00 AM-12:00 PM; Mon-Sat 1:00 PM-5:00 PM; Sun by appointment",
+                "planning_notes": "Published government visitor schedule has a noon closure: Monday-Saturday 08:00-12:00 and 13:00-17:00; Sunday visits require advance booking. The source report is from 2024, rechecked online 2026-11-01; reconfirm current Saturday access and holiday arrangements because older reports required weekend bookings. No fixed guided-visit duration or reservation is established here."
+            },
+            "expected": {
+                "latitude": "7.1902484",
+                "longitude": "125.4524905",
+                "planner_verified_at": null,
+                "planner_verification_source": null,
+                "hours": "Mon–Sat 8:00 AM–12:00 PM; 1:00 PM–5:00 PM; Sun by booking",
+                "planning_notes": null
+            },
+            "sources": [
+                "https://tourism.davaocity.gov.ph/explore-the-city/attractions/musuems/imin-philippine-japan-historical-museum/ ; https://www.openstreetmap.org/way/845891019. Current hours not independently confirmed; retain unknown instead of adopting an old schedule.",
+                "https://pia.gov.ph/features/imin-museum-remembering-the-near-forgotten-little-tokyo/ (2024 government report quoting the museum curator; schedule re-read 2026-11-01). Older 2022 reports differ on Saturday booking. Sunday remains appointment-dependent, not automatically confirmed open or closed."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "elysia-wellness-spa-2",
+            "name": "Elysia Wellness Spa",
+            "insert_if_missing": false,
+            "fields": {
+                "latitude": 7.0872384,
+                "longitude": 125.6147067,
+                "planner_verified_at": null,
+                "planner_verification_source": null,
+                "hours": "1:00 PM-12:00 AM",
+                "planning_notes": "Obrero branch, corner Lacson and Cervantes. Current brand posts list daily 13:00–00:00; reserve the desired treatment and reconfirm its length. Older directories list different times."
+            },
+            "expected": {
+                "latitude": "7.0872000",
+                "longitude": "125.6147000",
+                "planner_verified_at": null,
+                "planner_verification_source": null,
+                "hours": "10:00 AM–9:00 PM",
+                "planning_notes": null
+            },
+            "sources": [
+                "Supplied DOT branch address Lacson/Cervantes, Obrero matches https://www.openstreetmap.org/node/12357464061. Not the Quimpo/Ecoland branch. Published branch schedules conflict; hours unknown.",
+                "https://www.findhealthclinics.org/PH/Davao-City/302618053225984/Elysia-Wellness-Spa — mirror of operator posts, including 2026-09-28 daily 13:00–00:00 and Obrero contact 0917-625-3040. Direct operator site unavailable; current operator-post evidence, not direct telephone confirmation."
+            ],
+            "tags": []
+        },
+        {
+            "table": "destinations",
+            "slug": "bankerohan-public-market",
+            "name": "Bankerohan Public Market",
+            "insert_if_missing": true,
+            "fields": {
+                "slug": "bankerohan-public-market",
+                "name": "Bankerohan Public Market",
+                "location": "Davao City",
+                "type": "Food Tourism",
+                "description": "Public produce and food market. Vendor hours and purchases vary; confirm the selected stall before promising a meal. Visitor hours and current prices are unverified.",
+                "price_tier": null,
+                "entry_fee_min": null,
+                "entry_fee_max": null,
+                "visit_duration": null,
+                "hours": null,
+                "latitude": 7.0687119,
+                "longitude": 125.6007434,
+                "itinerary_role": "sightseeing",
+                "planner_verified_at": "2026-10-31 12:00:00",
+                "planner_verification_source": "https://davaocity.gov.ph/uncategorized/palengqr-ph-launched-in-bankerohan-public-market/ ; https://www.openstreetmap.org/way/504130920",
+                "planning_notes": null,
+                "region_id": {
+                    "table": "regions",
+                    "name": "Davao City"
+                },
+                "is_accredited": false
+            },
+            "expected": [],
+            "sources": [
+                "https://davaocity.gov.ph/uncategorized/palengqr-ph-launched-in-bankerohan-public-market/ ; https://www.openstreetmap.org/way/504130920"
+            ],
+            "tags": [
+                "Food",
+                "Shopping"
+            ]
+        },
+        {
+            "table": "destinations",
+            "slug": "cacao-culture-poblacion",
+            "name": "Cacao Culture Chocolate Shop - Poblacion Market Central",
+            "insert_if_missing": true,
+            "fields": {
+                "slug": "cacao-culture-poblacion",
+                "name": "Cacao Culture Chocolate Shop - Poblacion Market Central",
+                "location": "Davao City",
+                "type": "Food Tourism",
+                "description": "Shop for locally produced chocolate at the operator's Poblacion branch. Published hours apply to this shop, not every market tenant. Purchases vary; guided tastings or tours require separate confirmation.",
+                "price_tier": null,
+                "entry_fee_min": null,
+                "entry_fee_max": null,
+                "visit_duration": null,
+                "hours": "9:00 AM-7:00 PM",
+                "latitude": 7.0745253,
+                "longitude": 125.6108403,
+                "itinerary_role": "sightseeing",
+                "planner_verified_at": "2026-10-31 12:00:00",
+                "planner_verification_source": "https://www.cacaoculture.ph/pages/store-locations ; https://www.openstreetmap.org/way/35933072",
+                "planning_notes": null,
+                "region_id": {
+                    "table": "regions",
+                    "name": "Davao City"
+                },
+                "is_accredited": false
+            },
+            "expected": [],
+            "sources": [
+                "https://www.cacaoculture.ph/pages/store-locations ; https://www.openstreetmap.org/way/35933072"
+            ],
+            "tags": [
+                "Food",
+                "Shopping"
+            ]
+        },
+        {
+            "table": "destinations",
+            "slug": "national-museum-davao",
+            "name": "National Museum of the Philippines - Davao",
+            "insert_if_missing": true,
+            "fields": {
+                "slug": "national-museum-davao",
+                "name": "National Museum of the Philippines - Davao",
+                "location": "Davao City",
+                "type": "Cultural Heritage",
+                "description": "National Museum branch at People's Park with Davao and Mindanao heritage exhibitions. Free general admission. Confirm visit-date opening hours and holiday closures; groups may require advance booking. The park's outdoor hours are separate.",
+                "price_tier": "Free",
+                "entry_fee_min": 0,
+                "entry_fee_max": 0,
+                "visit_duration": "120 minutes",
+                "hours": "9:00 AM-6:00 PM",
+                "latitude": 7.070155,
+                "longitude": 125.6091426,
+                "itinerary_role": "sightseeing",
+                "planner_verified_at": "2026-10-31 12:00:00",
+                "planner_verification_source": "https://www.nationalmuseum.gov.ph/nmp-davao/ ; https://reservation.nationalmuseum.gov.ph/reservation/book/region-museum ; https://www.openstreetmap.org/way/1153418558",
+                "planning_notes": "Allow two hours for the regional museum's comprehensive gallery tour, as allocated in the 2026 Citizen's Charter. Guided services require advance booking; allow additional registration/feedback time and confirm visit-date closures. Self-guided visits vary. This itinerary does not reserve a guide.",
+                "region_id": {
+                    "table": "regions",
+                    "name": "Davao City"
+                },
+                "is_accredited": false
+            },
+            "expected": [],
+            "sources": [
+                "https://www.nationalmuseum.gov.ph/nmp-davao/ ; https://reservation.nationalmuseum.gov.ph/reservation/book/region-museum ; https://www.openstreetmap.org/way/1153418558",
+                "https://reservation.nationalmuseum.gov.ph/reservation/book/region-museum explicitly lists Davao daily 09:00–18:00; https://weblinks.nationalmuseum.gov.ph/wp-content/uploads/2026/03/31132441/NMP-CC_FY2026_1stEdition.pdf pp136–137 allocates 2h to the regional comprehensive guided tour, separately from administration. Replaces older 09:00–17:00 reports; not a fixed mandatory self-guided duration."
+            ],
+            "tags": [
+                "Culture"
+            ]
+        },
+        {
+            "table": "destinations",
+            "slug": "san-pedro-cathedral",
+            "name": "San Pedro Cathedral",
+            "insert_if_missing": true,
+            "fields": {
+                "slug": "san-pedro-cathedral",
+                "name": "San Pedro Cathedral",
+                "location": "Davao City",
+                "type": "Cultural Heritage",
+                "description": "Historic cathedral on San Pedro Street. Obtain visitor permission and respect services. Mass schedules are not tourist opening hours; visitor access hours and fees remain unverified.",
+                "price_tier": null,
+                "entry_fee_min": null,
+                "entry_fee_max": null,
+                "visit_duration": null,
+                "hours": null,
+                "latitude": 7.064723,
+                "longitude": 125.6094791,
+                "itinerary_role": "sightseeing",
+                "planner_verified_at": "2026-10-31 12:00:00",
+                "planner_verification_source": "https://www.sanpedrocathedral.com/history ; https://www.openstreetmap.org/way/115947432",
+                "planning_notes": null,
+                "region_id": {
+                    "table": "regions",
+                    "name": "Davao City"
+                },
+                "is_accredited": false
+            },
+            "expected": [],
+            "sources": [
+                "https://www.sanpedrocathedral.com/history ; https://www.openstreetmap.org/way/115947432"
+            ],
+            "tags": [
+                "Culture"
+            ]
+        },
+        {
+            "table": "destinations",
+            "slug": "osmena-park",
+            "name": "Osmeña Park",
+            "insert_if_missing": true,
+            "fields": {
+                "slug": "osmena-park",
+                "name": "Osmeña Park",
+                "location": "Davao City",
+                "type": "Nature & Leisure",
+                "description": "Small civic district public park for a walk or rest stop. Confirm current gate hours and access rules; current admission charges are unverified.",
+                "price_tier": null,
+                "entry_fee_min": null,
+                "entry_fee_max": null,
+                "visit_duration": null,
+                "hours": null,
+                "latitude": 7.0636104,
+                "longitude": 125.6092838,
+                "itinerary_role": "sightseeing",
+                "planner_verified_at": "2026-10-31 12:00:00",
+                "planner_verification_source": "https://davaocity.gov.ph/environment/six-new-public-parks-to-open-in-davao-city/ ; https://www.openstreetmap.org/way/32974258",
+                "planning_notes": null,
+                "region_id": {
+                    "table": "regions",
+                    "name": "Davao City"
+                },
+                "is_accredited": false
+            },
+            "expected": [],
+            "sources": [
+                "https://davaocity.gov.ph/environment/six-new-public-parks-to-open-in-davao-city/ ; https://www.openstreetmap.org/way/32974258"
+            ],
+            "tags": [
+                "Nature"
+            ]
+        },
+        {
+            "table": "destinations",
+            "slug": "kaputian-beach",
+            "name": "Kaputian Beach",
+            "insert_if_missing": true,
+            "fields": {
+                "slug": "kaputian-beach",
+                "name": "Kaputian Beach",
+                "location": "Island Garden City of Samal, Davao del Norte",
+                "type": "Beach & Leisure",
+                "description": "Named Kaputian beach park on Samal. Confirm current visitor access, environmental charges and ferry availability. Hours and admission rates remain unverified.",
+                "price_tier": null,
+                "entry_fee_min": null,
+                "entry_fee_max": null,
+                "visit_duration": null,
+                "hours": null,
+                "latitude": 6.9651131,
+                "longitude": 125.7231251,
+                "itinerary_role": "sightseeing",
+                "planner_verified_at": "2026-10-31 12:00:00",
+                "planner_verification_source": "https://turismo.samalcity.gov.ph/tour_pass ; https://www.openstreetmap.org/way/1270374055",
+                "planning_notes": null,
+                "region_id": {
+                    "table": "regions",
+                    "name": "Island Garden City of Samal"
+                },
+                "is_accredited": false
+            },
+            "expected": [],
+            "sources": [
+                "https://turismo.samalcity.gov.ph/tour_pass ; https://www.openstreetmap.org/way/1270374055"
+            ],
+            "tags": [
+                "Beach"
+            ]
+        },
+        {
+            "table": "destinations",
+            "slug": "paradise-island-park-beach-resort",
+            "name": "Paradise Island Park & Beach Resort",
+            "insert_if_missing": true,
+            "fields": {
+                "slug": "paradise-island-park-beach-resort",
+                "name": "Paradise Island Park & Beach Resort",
+                "location": "Island Garden City of Samal",
+                "type": "Beach & Leisure",
+                "description": "Named Samal beach resort accepting visitors. Confirm day-pass access and prices. Operator publishes boat trips from 05:45 to 16:00; those are boat hours, not resort opening hours. Arrange return transport separately if staying later.",
+                "price_tier": null,
+                "entry_fee_min": null,
+                "entry_fee_max": null,
+                "visit_duration": null,
+                "hours": null,
+                "latitude": 7.1012868,
+                "longitude": 125.664575,
+                "itinerary_role": "sightseeing",
+                "planner_verified_at": "2026-10-31 12:00:00",
+                "planner_verification_source": "https://paradiseislandsamal.com/ ; https://www.openstreetmap.org/relation/9472621 https://paradiseislandsamal.com/ (operator boat timetable) and https://paradiseislandsamal.com/dining/ (named dining venues without exact service windows), checked 2026-11-01. https://paradiseislandsamal.com/ (operator boat timetable) and https://paradiseislandsamal.com/dining/ (named dining venues without exact service windows), checked 2026-11-01. https://paradiseislandsamal.com/activities/ explicitly lists the aviary, fish feeding and Paradise Reef; these support a combined beach/wildlife visit, not an invented zoo.",
+                "planning_notes": "The operator's own boat service publishes first trip 05:45 and last trip 16:00. This is a boat timetable, not the resort gate or restaurant schedule. A later return needs a separately confirmed public-ferry/road transfer. Exact Resto-Beach service hours, day-pass conditions and visit duration remain to be confirmed; a beach stay has no single published length. The operator's own boat service publishes first trip 05:45 and last trip 16:00. This is a boat timetable, not the resort gate or restaurant schedule. A later return needs a separately confirmed public-ferry/road transfer. Exact Resto-Beach service hours, day-pass conditions and visit duration remain to be confirmed; a beach stay has no single published length. When wildlife is selected, include the operator-listed aviary and permitted fish-viewing/feeding activities alongside the beach visit; confirm access with staff. A beach swim alone does not count as the wildlife component.",
+                "region_id": {
+                    "table": "regions",
+                    "name": "Island Garden City of Samal"
+                },
+                "is_accredited": false
+            },
+            "expected": [],
+            "sources": [
+                "https://paradiseislandsamal.com/ ; https://www.openstreetmap.org/relation/9472621",
+                "https://paradiseislandsamal.com/ (operator boat timetable) and https://paradiseislandsamal.com/dining/ (named dining venues without exact service windows), checked 2026-11-01. https://paradiseislandsamal.com/activities/ explicitly lists the aviary, fish feeding and Paradise Reef; these support a combined beach/wildlife visit, not an invented zoo."
+            ],
+            "tags": [
+                "Beach",
+                "Wildlife (aviary)"
+            ]
+        },
+        {
+            "table": "accommodations",
+            "slug": "dusit-d2-davao",
+            "name": "Dusit D2 Davao",
+            "insert_if_missing": false,
+            "fields": {
+                "latitude": 7.109531,
+                "longitude": 125.650671
+            },
+            "expected": {
+                "latitude": "7.1190572",
+                "longitude": "125.6486787"
+            },
+            "sources": [
+                "https://www.dusit.com/dusitd2-davao/spa/ publishes property GPS; https://www.openstreetmap.org/way/660689947 corroborates property"
+            ],
+            "tags": []
+        },
+        {
+            "table": "accommodations",
+            "slug": "gohotels-davao",
+            "name": "GoHotels Davao",
+            "insert_if_missing": false,
+            "fields": {
+                "latitude": 7.1023308,
+                "longitude": 125.639323
+            },
+            "expected": {
+                "latitude": "7.1023300",
+                "longitude": "125.6393200"
+            },
+            "sources": [
+                "https://gohotels.ph/branch/lanang-davao confirms Km 7 J.P. Laurel Avenue; https://www.openstreetmap.org/way/437953635 matched Go Hotels Lanang-Davao property centre"
+            ],
+            "tags": []
+        },
+        {
+            "table": "accommodations",
+            "slug": "microtel-by-wyndham-davao",
+            "name": "Microtel by Wyndham - Davao",
+            "insert_if_missing": false,
+            "fields": {
+                "latitude": 7.1024461,
+                "longitude": 125.6324846
+            },
+            "expected": {
+                "latitude": "7.1025420",
+                "longitude": "125.6325750"
+            },
+            "sources": [
+                "https://www.microtel-davao.com/contact confirms Damosa Gateway / Angliongto (Mamay) Road; https://www.openstreetmap.org/way/116291281 matched Microtel property centre"
+            ],
+            "tags": []
+        },
+        {
+            "table": "accommodations",
+            "slug": "waterfront-insular-hotel-davao",
+            "name": "Waterfront Insular Hotel Davao",
+            "insert_if_missing": false,
+            "fields": {
+                "latitude": 7.1061793,
+                "longitude": 125.6504982
+            },
+            "expected": {
+                "latitude": "7.1061793",
+                "longitude": "125.6504982"
+            },
+            "sources": [
+                "https://www.waterfronthotels.com.ph/wihd_contact/ confirms Lanang property; https://www.openstreetmap.org/node/308729289 matched Waterfront Insular Hotel map point"
+            ],
+            "tags": []
+        },
+        {
+            "table": "accommodations",
+            "slug": "park-inn-by-radisson-davao",
+            "name": "Park Inn by Radisson Davao",
+            "insert_if_missing": false,
+            "fields": {
+                "latitude": 7.0973602,
+                "longitude": 125.6304876
+            },
+            "expected": {
+                "latitude": "7.0973900",
+                "longitude": "125.6305900"
+            },
+            "sources": [
+                "https://www.radissonhotels.com/en-us/hotels/park-inn-davao ; https://www.openstreetmap.org/way/916376203"
+            ],
+            "tags": []
+        },
+        {
+            "table": "accommodations",
+            "slug": "rogen-inn",
+            "name": "Rogen Inn",
+            "insert_if_missing": false,
+            "fields": {
+                "latitude": 7.0731829,
+                "longitude": 125.6044565
+            },
+            "expected": {
+                "latitude": "7.0731829",
+                "longitude": "125.6044565"
+            },
+            "sources": [
+                "https://tourism.davaocity.gov.ph/explore-the-city/nightlife/spa/davao-cwn-development-corporation-rogen-inn/ ; https://www.openstreetmap.org/node/10613129217"
+            ],
+            "tags": []
+        },
+        {
+            "table": "accommodations",
+            "slug": "crown-regency-residences-davao",
+            "name": "Crown Regency Residences Davao",
+            "insert_if_missing": false,
+            "fields": {
+                "latitude": 7.0916026,
+                "longitude": 125.6238498
+            },
+            "expected": {
+                "latitude": "7.0915967",
+                "longitude": "125.6238582"
+            },
+            "sources": [
+                "https://www.crownregency.com/contact ; https://www.openstreetmap.org/way/171217200"
+            ],
+            "tags": []
+        },
+        {
+            "table": "accommodations",
+            "slug": "aguakan-resort",
+            "name": "Aguakan Resort",
+            "insert_if_missing": false,
+            "fields": {
+                "resort_settings": "|Inland|"
+            },
+            "expected": {
+                "resort_settings": "|Inland|"
+            },
+            "sources": [
+                "https://www.ombudsman.gov.ph/UNDP4/wp-content/uploads/2012/12/Chap2_CoopLGU.pdf",
+                "https://www.openstreetmap.org/node/6033152427"
+            ],
+            "tags": []
+        },
+        {
+            "table": "accommodations",
+            "slug": "montefrio-garden-resort",
+            "name": "Montefrio Garden Resort",
+            "insert_if_missing": false,
+            "fields": {
+                "resort_settings": "|Mountain|"
+            },
+            "expected": {
+                "resort_settings": "|Inland|"
+            },
+            "sources": [
+                "https://montefriogardenresort.com/"
+            ],
+            "tags": []
+        },
+        {
+            "table": "accommodations",
+            "slug": "discovery-samal",
+            "name": "Discovery Samal",
+            "insert_if_missing": false,
+            "fields": {
+                "resort_settings": "|Beach|Island|"
+            },
+            "expected": {
+                "resort_settings": "|Island|"
+            },
+            "sources": [
+                "https://www.discoverysamal.com/offers/bdo-online-travel"
+            ],
+            "tags": []
+        },
+        {
+            "table": "accommodations",
+            "slug": "eden-mountain-resort",
+            "name": "Eden Mountain Resort",
+            "insert_if_missing": false,
+            "fields": {
+                "resort_settings": "|Mountain|Inland|"
+            },
+            "expected": {
+                "resort_settings": "|Mountain|"
+            },
+            "sources": [
+                "https://www.edennaturepark.com.ph/recreational-activities/",
+                "https://www.edennaturepark.com.ph/rooms/mountain-villa-2/"
+            ],
+            "tags": []
+        },
+        {
+            "table": "accommodations",
+            "slug": "malagos-garden-resort",
+            "name": "Malagos Garden Resort",
+            "insert_if_missing": false,
+            "fields": {
+                "resort_settings": "|Inland|"
+            },
+            "expected": {
+                "resort_settings": "|Inland|"
+            },
+            "sources": [
+                "https://www.malagos.com/termsandconditions",
+                "https://www.malagos.com/new-normal-faqs"
+            ],
+            "tags": []
+        },
+        {
+            "table": "accommodations",
+            "slug": "dusit-thani-lubi-plantation-resort",
+            "name": "Dusit Thani Lubi Plantation Resort",
+            "insert_if_missing": false,
+            "fields": {
+                "resort_settings": "|Beach|Island|"
+            },
+            "expected": {
+                "resort_settings": "|Inland|"
+            },
+            "sources": [
+                "https://www.dusit.com/dusitthani-lubiplantationresort/",
+                "https://www.dusit.com/dusitthani-lubiplantationresort/specialoffers/elevate-mornings-with-a-floating-breakfast/"
+            ],
+            "tags": []
+        },
+        {
+            "table": "accommodations",
+            "slug": "d-leonor-inland-resort-adventure-park",
+            "name": "D' Leonor Inland Resort & Adventure Park",
+            "insert_if_missing": false,
+            "fields": {
+                "resort_settings": "|Inland|"
+            },
+            "expected": {
+                "resort_settings": "|Inland|"
+            },
+            "sources": [
+                "https://tourism.davaocity.gov.ph/explore-the-city/attractions/man-made-nature-parks/dleonor-inland-resort/",
+                "https://dleonorinland.wordpress.com/amenities-and-services/"
+            ],
+            "tags": []
+        },
+        {
+            "table": "accommodations",
+            "slug": "hijo-resorts-davao",
+            "name": "Hijo Resorts Davao",
+            "insert_if_missing": false,
+            "fields": {
+                "resort_settings": "|Beach|"
+            },
+            "expected": {
+                "resort_settings": "|Inland|"
+            },
+            "sources": [
+                "https://tieza.gov.ph/hijo-davao/"
+            ],
+            "tags": []
+        },
+        {
+            "table": "restaurants",
+            "slug": "new-davao-famous-restaurant-corp",
+            "name": "New Davao Famous Restaurant Corp",
+            "insert_if_missing": false,
+            "fields": {
+                "opening_hours": "7:30 AM-9:00 PM",
+                "website_url": "https://www.newdavaofamous.com/",
+                "planner_verified_at": "2026-10-31 12:00:00",
+                "planner_verification_source": "https://www.newdavaofamous.com/ and https://www.newdavaofamous.com/contact-us — Magsaysay main branch. Homepage lists 07:30–21:30 and contact page 07:00–21:00: use only the common service window 07:30–21:00; full branch schedule still needs operator reconciliation."
+            },
+            "expected": {
+                "opening_hours": "7:00 AM–9:00 PM",
+                "website_url": null,
+                "planner_verified_at": null,
+                "planner_verification_source": null
+            },
+            "sources": [
+                "https://www.newdavaofamous.com/ and https://www.newdavaofamous.com/contact-us — Magsaysay main branch. Homepage lists 07:30–21:30 and contact page 07:00–21:00: use only the common service window 07:30–21:00; full branch schedule still needs operator reconciliation."
+            ],
+            "tags": []
+        },
+        {
+            "table": "restaurants",
+            "slug": "vanda-park-inn-davao",
+            "name": "VANDA — Park Inn by Radisson Davao",
+            "insert_if_missing": true,
+            "fields": {
+                "slug": "vanda-park-inn-davao",
+                "name": "VANDA — Park Inn by Radisson Davao",
+                "location": "SM Lanang Complex, J.P. Laurel Ave., Lanang, Davao City",
+                "description": "Named dining venue checked against the recorded sources. Confirm service, availability and meal charges; this itinerary is not a booking.",
+                "opening_hours": "6:00 AM-11:00 PM",
+                "latitude": 7.0973602,
+                "longitude": 125.6304876,
+                "website_url": null,
+                "planner_verified_at": "2026-10-31 12:00:00",
+                "planner_verification_source": "https://www.radissonhotels.com/en-us/hotels/park-inn-davao/dining — operator names VANDA, daily breakfast buffet 06:00–10:00 and a la carte 06:00–23:00; walk-ins available. Property coordinates inherited from the verified hotel point.",
+                "region_id": {
+                    "table": "regions",
+                    "name": "Davao City"
+                },
+                "host_accommodation_id": {
+                    "table": "accommodations",
+                    "slug": "park-inn-by-radisson-davao",
+                    "name": "Park Inn by Radisson Davao"
+                },
+                "is_accredited": false
+            },
+            "expected": [],
+            "sources": [
+                "https://www.radissonhotels.com/en-us/hotels/park-inn-davao/dining — operator names VANDA, daily breakfast buffet 06:00–10:00 and a la carte 06:00–23:00; walk-ins available. Property coordinates inherited from the verified hotel point."
+            ],
+            "tags": []
+        },
+        {
+            "table": "restaurants",
+            "slug": "marinatuna-rogen-inn",
+            "name": "Marinatuna — Rogen Inn Compound",
+            "insert_if_missing": true,
+            "fields": {
+                "slug": "marinatuna-rogen-inn",
+                "name": "Marinatuna — Rogen Inn Compound",
+                "location": "Mt Apo St Corner Lopez Jaena St., Brgy 7-A, Davao City",
+                "description": "Named dining venue checked against the recorded sources. Confirm service, availability and meal charges; this itinerary is not a booking.",
+                "opening_hours": "6:30 AM-10:00 PM",
+                "latitude": 7.0731829,
+                "longitude": 125.6044565,
+                "website_url": null,
+                "planner_verified_at": "2026-10-31 12:00:00",
+                "planner_verification_source": "https://newsinfo.inquirer.net/1704721/davao-inn-houses-davaos-best-food-brands identifies the compound's breakfast provider; https://www.hotels.com/ho2540623552/rogen-inn-davao-philippines/ and https://ph.trip.com/hotels/davao-hotel-detail-95449117/rogen-inn/ corroborate guest breakfast 06:30–10:00; https://app.wanderlog.com/place/details/9154016/marina-tuna-rogen-inn-compound lists daily 06:00–22:00 and https://restaurantguru.com/grilled-tuna-Davao-City-m800/3 corroborates 22:00 closing. Conservative common window 06:30–22:00. Mixed property-policy and directory evidence; current direct operator confirmation unavailable. No free meal or room inclusion promised.",
+                "region_id": {
+                    "table": "regions",
+                    "name": "Davao City"
+                },
+                "host_accommodation_id": {
+                    "table": "accommodations",
+                    "slug": "rogen-inn",
+                    "name": "Rogen Inn"
+                },
+                "is_accredited": false
+            },
+            "expected": [],
+            "sources": [
+                "https://newsinfo.inquirer.net/1704721/davao-inn-houses-davaos-best-food-brands identifies the compound's breakfast provider; https://www.hotels.com/ho2540623552/rogen-inn-davao-philippines/ and https://ph.trip.com/hotels/davao-hotel-detail-95449117/rogen-inn/ corroborate guest breakfast 06:30–10:00; https://app.wanderlog.com/place/details/9154016/marina-tuna-rogen-inn-compound lists daily 06:00–22:00 and https://restaurantguru.com/grilled-tuna-Davao-City-m800/3 corroborates 22:00 closing. Conservative common window 06:30–22:00. Mixed property-policy and directory evidence; current direct operator confirmation unavailable. No free meal or room inclusion promised."
+            ],
+            "tags": []
+        },
+        {
+            "table": "restaurants",
+            "slug": "rhapsody-aria-davao",
+            "name": "Rhapsody Asian Fusion — Aria Hotel & Residences",
+            "insert_if_missing": true,
+            "fields": {
+                "slug": "rhapsody-aria-davao",
+                "name": "Rhapsody Asian Fusion — Aria Hotel & Residences",
+                "location": "JP Laurel Ave., Bajada, Davao City",
+                "description": "Named dining venue checked against the recorded sources. Confirm service, availability and meal charges; this itinerary is not a booking.",
+                "opening_hours": null,
+                "latitude": 7.0924712,
+                "longitude": 125.611615,
+                "website_url": null,
+                "planner_verified_at": "2026-10-31 12:00:00",
+                "planner_verification_source": "https://ariahotel.com.ph/dining/ identifies Rhapsody as all-day dining. Exact service hours not published; remain unknown. Hotel coordinates identify the host building, not an independently surveyed restaurant door.",
+                "region_id": {
+                    "table": "regions",
+                    "name": "Davao City"
+                },
+                "host_accommodation_id": {
+                    "table": "accommodations",
+                    "slug": "aria-hotel-residences",
+                    "name": "Aria Hotel & Residences"
+                },
+                "is_accredited": false
+            },
+            "expected": [],
+            "sources": [
+                "https://ariahotel.com.ph/dining/ identifies Rhapsody as all-day dining. Exact service hours not published; remain unknown. Hotel coordinates identify the host building, not an independently surveyed restaurant door."
+            ],
+            "tags": []
+        },
+        {
+            "table": "restaurants",
+            "slug": "jollibee-davao-bolton",
+            "name": "Jollibee Davao Bolton",
+            "insert_if_missing": true,
+            "fields": {
+                "slug": "jollibee-davao-bolton",
+                "name": "Jollibee Davao Bolton",
+                "location": "Bolton Street corner J.P. Rizal Street, Barangay 12-B, Davao City",
+                "description": "Named dining venue checked against the recorded sources. Confirm service, availability and meal charges; this itinerary is not a booking.",
+                "opening_hours": "12:00 AM-12:00 AM",
+                "latitude": 7.066192,
+                "longitude": 125.609328,
+                "website_url": null,
+                "planner_verified_at": "2026-10-31 12:00:00",
+                "planner_verification_source": "https://order.jollibee.com/en/ph/stores/jollibee-davao-bolton — operator lists dine-in and daily 24-hour opening. Operator Directions link supplies 7.066192,125.609328. Fulfilment schedules may vary; purchases are not included.",
+                "region_id": {
+                    "table": "regions",
+                    "name": "Davao City"
+                },
+                "is_accredited": false
+            },
+            "expected": [],
+            "sources": [
+                "https://order.jollibee.com/en/ph/stores/jollibee-davao-bolton — operator lists dine-in and daily 24-hour opening. Operator Directions link supplies 7.066192,125.609328. Fulfilment schedules may vary; purchases are not included."
+            ],
+            "tags": []
+        },
+        {
+            "table": "restaurants",
+            "slug": "vista-restaurant-eden",
+            "name": "Vista Restaurant — Eden Nature Park",
+            "insert_if_missing": true,
+            "fields": {
+                "slug": "vista-restaurant-eden",
+                "name": "Vista Restaurant — Eden Nature Park",
+                "location": "Toril, Davao City",
+                "description": "Named dining venue checked against the recorded sources. Confirm service, availability and meal charges; this itinerary is not a booking.",
+                "opening_hours": null,
+                "latitude": 7.0304604,
+                "longitude": 125.3979848,
+                "website_url": null,
+                "planner_verified_at": "2026-10-31 12:00:00",
+                "planner_verification_source": "https://www.edennaturepark.com.ph/ explicitly names Vista Restaurant. Restaurant-specific service hours not published on the page; park gate hours are not copied as dining hours. Park admission and buffet arrangements require confirmation.",
+                "region_id": {
+                    "table": "regions",
+                    "name": "Davao City"
+                },
+                "host_destination_id": {
+                    "table": "destinations",
+                    "slug": "eden-nature-park",
+                    "name": "Eden Nature Park"
+                },
+                "is_accredited": false
+            },
+            "expected": [],
+            "sources": [
+                "https://www.edennaturepark.com.ph/ explicitly names Vista Restaurant. Restaurant-specific service hours not published on the page; park gate hours are not copied as dining hours. Park admission and buffet arrangements require confirmation."
+            ],
+            "tags": []
+        },
+        {
+            "table": "restaurants",
+            "slug": "resto-beach-paradise",
+            "name": "Resto-Beach — Paradise Island Park & Beach Resort",
+            "insert_if_missing": true,
+            "fields": {
+                "slug": "resto-beach-paradise",
+                "name": "Resto-Beach — Paradise Island Park & Beach Resort",
+                "location": "Island Garden City of Samal",
+                "description": "Named dining venue checked against the recorded sources. Confirm service, availability and meal charges; this itinerary is not a booking.",
+                "opening_hours": null,
+                "latitude": 7.1012868,
+                "longitude": 125.664575,
+                "website_url": null,
+                "planner_verified_at": "2026-10-31 12:00:00",
+                "planner_verification_source": "https://paradiseislandsamal.com/dining/ names Resto-Beach and describes lunch/dinner and Island Cafe breakfast. Exact restaurant service hours remain unknown; private boat timetable is not substituted for dining hours. Confirm day-pass access.",
+                "region_id": {
+                    "table": "regions",
+                    "name": "Island Garden City of Samal"
+                },
+                "host_destination_id": {
+                    "table": "destinations",
+                    "slug": "paradise-island-park-beach-resort",
+                    "name": "Paradise Island Park & Beach Resort"
+                },
+                "is_accredited": false
+            },
+            "expected": [],
+            "sources": [
+                "https://paradiseislandsamal.com/dining/ names Resto-Beach and describes lunch/dinner and Island Cafe breakfast. Exact restaurant service hours remain unknown; private boat timetable is not substituted for dining hours. Confirm day-pass access."
+            ],
+            "tags": []
+        },
+        {
+            "table": "restaurants",
+            "slug": "jacks-ridge-resort-and-restaurant",
+            "name": "Jack's Ridge Resort and Restaurant",
+            "insert_if_missing": false,
+            "fields": {
+                "description": "Jack's Ridge Resort and Restaurant is a DOT Region XI-accredited restaurant in Davao City (accreditation no. DOT-R11-RST-00211-2021). For meals, this Shrine Hills listing uses Taklobo Restaurant's published daily 10:30-22:00 service window. Karlo's cafe, the Tap Room and the separate North/Buhangin branch have different schedules. Confirm reservations, menu prices and holiday changes.",
+                "opening_hours": "10:30 AM-10:00 PM",
+                "website_url": "https://www.jacksridgedavao.com/",
+                "planner_verified_at": "2026-11-01 12:00:00",
+                "planner_verification_source": "https://www.jacksridgedavao.com/amenities.php identifies Taklobo as the main restaurant. https://www.findglocal.com/PH/Davao-City/203463719818075/Jack%27s-Ridge-Resort-and-Restaurant mirrors the operator's September 2026 posts and distinguishes Taklobo Shrine Hills 10:30-22:00 from other outlets. This uses current mirrored operator information; old 2021 PDF and directory hours differ. Checked 2026-11-01; direct telephone confirmation not performed."
+            },
+            "expected": {
+                "description": "Jack's Ridge Resort and Restaurant is a dining stop in Davao City. Its listed food category is Filipino & International. Contact the restaurant for the current menu.",
+                "opening_hours": "10:00 AM–9:00 PM",
+                "website_url": null,
+                "planner_verified_at": null,
+                "planner_verification_source": null
+            },
+            "sources": [
+                "https://www.jacksridgedavao.com/amenities.php identifies Taklobo as the main restaurant. https://www.findglocal.com/PH/Davao-City/203463719818075/Jack%27s-Ridge-Resort-and-Restaurant mirrors the operator's September 2026 posts and distinguishes Taklobo Shrine Hills 10:30-22:00 from other outlets. This uses current mirrored operator information; old 2021 PDF and directory hours differ. Checked 2026-11-01; direct telephone confirmation not performed."
+            ],
+            "tags": []
+        },
+        {
+            "table": "restaurants",
+            "slug": "viewdeck-cafe-malagos",
+            "name": "Viewdeck Cafe — Malagos Garden Resort",
+            "insert_if_missing": true,
+            "fields": {
+                "slug": "viewdeck-cafe-malagos",
+                "name": "Viewdeck Cafe — Malagos Garden Resort",
+                "location": "Malagos, Baguio District, Davao City",
+                "description": "Operator-named daytime cafe inside Malagos Garden Resort. Open daily 08:00-17:00. Confirm admission, meal availability and charges; a park ticket does not imply an included meal. Coordinates locate the host property, not a surveyed cafe entrance.",
+                "opening_hours": "8:00 AM-5:00 PM",
+                "latitude": 7.1910411,
+                "longitude": 125.4276581,
+                "website_url": "https://www.malagos.com/dine",
+                "planner_verified_at": "2026-11-01 12:00:00",
+                "planner_verification_source": "https://www.malagos.com/dine — current operator dining page names Viewdeck Cafe and daily 08:00-17:00. Checked 2026-11-01.",
+                "region_id": {
+                    "table": "regions",
+                    "name": "Davao City"
+                },
+                "host_destination_id": {
+                    "table": "destinations",
+                    "slug": "malagos-garden-resort",
+                    "name": "Malagos Garden Resort"
+                },
+                "is_accredited": false
+            },
+            "expected": [],
+            "sources": [
+                "https://www.malagos.com/dine — current operator dining page names Viewdeck Cafe and daily 08:00-17:00. Checked 2026-11-01."
+            ],
+            "tags": []
+        },
+        {
+            "table": "restaurants",
+            "slug": "koi-cafe-malagos",
+            "name": "Koi Cafe — Malagos Garden Resort",
+            "insert_if_missing": true,
+            "fields": {
+                "slug": "koi-cafe-malagos",
+                "name": "Koi Cafe — Malagos Garden Resort",
+                "location": "Malagos, Baguio District, Davao City",
+                "description": "Operator-named breakfast and dinner cafe inside Malagos Garden Resort. Daily 06:00-10:00 and 17:00-21:00; it is not offered for lunch. Confirm visitor access and meal charges. Coordinates identify the host property.",
+                "opening_hours": "6:00 AM-10:00 AM; 5:00 PM-9:00 PM",
+                "latitude": 7.1910411,
+                "longitude": 125.4276581,
+                "website_url": "https://www.malagos.com/dine",
+                "planner_verified_at": "2026-11-01 12:00:00",
+                "planner_verification_source": "https://www.malagos.com/dine — operator specifically publishes split Koi Cafe windows 06:00-10:00 and 17:00-21:00, not the resort-wide 06:00-21:00 span. Checked 2026-11-01.",
+                "region_id": {
+                    "table": "regions",
+                    "name": "Davao City"
+                },
+                "host_destination_id": {
+                    "table": "destinations",
+                    "slug": "malagos-garden-resort",
+                    "name": "Malagos Garden Resort"
+                },
+                "is_accredited": false
+            },
+            "expected": [],
+            "sources": [
+                "https://www.malagos.com/dine — operator specifically publishes split Koi Cafe windows 06:00-10:00 and 17:00-21:00, not the resort-wide 06:00-21:00 span. Checked 2026-11-01."
+            ],
+            "tags": []
+        },
+        {
+            "table": "restaurants",
+            "slug": "kusina-dabaw-san-pedro",
+            "name": "Kusina Dabaw — San Pedro Street",
+            "insert_if_missing": true,
+            "fields": {
+                "slug": "kusina-dabaw-san-pedro",
+                "name": "Kusina Dabaw — San Pedro Street",
+                "location": "178 San Pedro Street, Poblacion District, Davao City",
+                "description": "Named San Pedro Street restaurant serving breakfast, lunch and dinner. Government reporting describes 24-hour daily operation. Confirm menu, charges and date-specific changes. This is the San Pedro branch, not Kusina Dabaw Express in Buhangin. No accreditation claim or meal inclusion is inferred.",
+                "opening_hours": "Open 24 hours",
+                "latitude": 7.0665613,
+                "longitude": 125.6067022,
+                "website_url": "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/restaurants/new-kusina-dabaw/",
+                "planner_verified_at": "2026-11-01 12:00:00",
+                "planner_verification_source": "https://pia.gov.ph/features/exploring-davao-citys-homegrown-food-scene/ (2026-04-17 government food-crawl report: daily 24-hour operation); https://tourism.davaocity.gov.ph/explore-the-city/restaurants/restaurants/new-kusina-dabaw/ (city tourism identity/address); https://www.waze.com/live-map/directions/ph/davao-region/davao-city/kusina-dabaw?to=place.ChIJFcTstnlt-TIR_iO4eL6Ku_M (San Pedro branch coordinates and 24-hour schedule). Checked 2026-11-01.",
+                "region_id": {
+                    "table": "regions",
+                    "name": "Davao City"
+                },
+                "is_accredited": false
+            },
+            "expected": [],
+            "sources": [
+                "https://pia.gov.ph/features/exploring-davao-citys-homegrown-food-scene/ (2026-04-17 government food-crawl report: daily 24-hour operation); https://tourism.davaocity.gov.ph/explore-the-city/restaurants/restaurants/new-kusina-dabaw/ (city tourism identity/address); https://www.waze.com/live-map/directions/ph/davao-region/davao-city/kusina-dabaw?to=place.ChIJFcTstnlt-TIR_iO4eL6Ku_M (San Pedro branch coordinates and 24-hour schedule). Checked 2026-11-01."
+            ],
+            "tags": []
+        }
+    ]
+}

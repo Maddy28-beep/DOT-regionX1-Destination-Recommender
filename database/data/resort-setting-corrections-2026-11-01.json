@@ -1,0 +1,82 @@
+{
+  "checked_on": "2026-11-01",
+  "scope": "Targeted setting corrections, not a claim that every resort fact or offer is verified. Geographic labels describe a property; All-Inclusive requires a documented overnight product. Fishing ponds, lagoons, pools and heated jacuzzis alone do not establish Lake or Hot Spring resorts. No accreditation, coordinates, prices or planner limits are changed.",
+  "corrections": [
+    {
+      "slug": "aguakan-resort",
+      "name": "Aguakan Resort",
+      "expected_settings": ["Mountain", "Inland", "Hot Spring"],
+      "settings": ["Inland"],
+      "reason": "Government water-resource documentation identifies Aguacan Inland Resort's swimming water as cold springs. A town's mountain backdrop does not establish a mountain resort. Cold Spring is not currently an available setting, so retain the supported Inland label without substituting Hot Spring.",
+      "sources": ["https://www.ombudsman.gov.ph/UNDP4/wp-content/uploads/2012/12/Chap2_CoopLGU.pdf", "https://www.openstreetmap.org/node/6033152427"]
+    },
+    {
+      "slug": "montefrio-garden-resort",
+      "name": "Montefrio Garden Resort",
+      "expected_settings": ["Mountain", "Hot Spring"],
+      "settings": ["Mountain"],
+      "reason": "The operator locates the resort in Kapatagan's highlands and describes infinity pools and heated jacuzzis. Heating does not establish a natural geothermal spring; no qualifying spring was verified.",
+      "sources": ["https://montefriogardenresort.com/"]
+    },
+    {
+      "slug": "discovery-samal",
+      "name": "Discovery Samal",
+      "expected_settings": ["Beach", "Island", "All-Inclusive"],
+      "settings": ["Beach", "Island"],
+      "reason": "The operator's current Tranquil Escape offer includes breakfast, transfers and discounts on dining, not inclusive full-board meals. Remove the unsupported blanket All-Inclusive label; this does not rule out a separately verified future package.",
+      "sources": ["https://www.discoverysamal.com/offers/bdo-online-travel"]
+    },
+    {
+      "slug": "eden-mountain-resort",
+      "name": "Eden Mountain Resort",
+      "expected_settings": ["Mountain", "Inland", "Lake", "All-Inclusive"],
+      "settings": ["Mountain", "Inland"],
+      "reason": "The operator describes Fishing Village as stocked ponds, with catch weighed and charged separately. That supports neither a lakeside setting nor an all-inclusive overnight product. Preserve the geographic Mountain/Inland labels.",
+      "sources": ["https://www.edennaturepark.com.ph/recreational-activities/", "https://www.edennaturepark.com.ph/rooms/mountain-villa-2/"]
+    },
+    {
+      "slug": "malagos-garden-resort",
+      "name": "Malagos Garden Resort",
+      "expected_settings": ["Inland", "All-Inclusive"],
+      "settings": ["Inland"],
+      "reason": "The operator's published terms distinguish accommodation, breakfast and additional charges. Cafes and activities on a property are not proof that all meals/activities are included in its ordinary overnight rate. Retain Inland; remove unsupported All-Inclusive.",
+      "sources": ["https://www.malagos.com/termsandconditions", "https://www.malagos.com/new-normal-faqs"]
+    },
+    {
+      "slug": "dusit-thani-lubi-plantation-resort",
+      "name": "Dusit Thani Lubi Plantation Resort",
+      "expected_settings": ["Beach", "Island", "All-Inclusive"],
+      "settings": ["Beach", "Island"],
+      "reason": "The operator confirms an island beachfront resort and publishes separate dining offers, credits and paid breakfast experiences. A general All-Inclusive overnight classification is not established; retain the supported Beach/Island settings.",
+      "sources": ["https://www.dusit.com/dusitthani-lubiplantationresort/", "https://www.dusit.com/dusitthani-lubiplantationresort/specialoffers/elevate-mornings-with-a-floating-breakfast/"]
+    },
+    {
+      "slug": "d-leonor-inland-resort-adventure-park",
+      "name": "D' Leonor Inland Resort & Adventure Park",
+      "expected_settings": ["Inland", "Lake"],
+      "settings": ["Inland"],
+      "reason": "Official city tourism identifies an inland resort. A fishing village/amenity is insufficient evidence for a lakeside resort. No qualifying lake setting was verified, so remove Lake rather than infer it from fishing.",
+      "sources": ["https://tourism.davaocity.gov.ph/explore-the-city/attractions/man-made-nature-parks/dleonor-inland-resort/", "https://dleonorinland.wordpress.com/amenities-and-services/"]
+    },
+    {
+      "slug": "hijo-resorts-davao",
+      "name": "Hijo Resorts Davao",
+      "expected_settings": ["Beach", "Inland", "Lake"],
+      "settings": ["Beach"],
+      "reason": "TIEZA documents Banana Beach and a fishing village named The Spot within the wider plantation. A fishing amenity is not enough to classify the accommodation as Lake; a plantation containing inland features is not enough to promise a separate Inland resort product. Keep the directly documented Beach setting.",
+      "sources": ["https://tieza.gov.ph/hijo-davao/"]
+    }
+  ],
+  "retained_all_inclusive": [
+    {
+      "slug": "pearl-farm-beach-resort",
+      "source": "https://pearlfarmresort.com/experience/",
+      "reason": "The operator explicitly advertises an all-inclusive experience with overnight accommodation, full-board meals and transfers. Extra experiences can still cost more; classification is not a booking confirmation."
+    },
+    {
+      "slug": "buenavista-island-resort",
+      "source": "https://buenavistaislandresort.com/overnight/",
+      "reason": "The documented exclusive-island overnight package includes accommodation, three meals and two snacks per day, boat transfers and listed leisure activities. It is a whole-island group package with advance booking, not an ordinary per-person walk-in room rate. Extras are not universally included."
+    }
+  ]
+}

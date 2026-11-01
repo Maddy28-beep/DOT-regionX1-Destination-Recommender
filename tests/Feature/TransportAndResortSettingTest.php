@@ -620,9 +620,10 @@ class TransportAndResortSettingTest extends TestCase
         $this->assertSame(['Mountain'], ResortSettingSeeder::settingsFor('Eden View Mountain Resort', null, 'Resort'));
     }
 
-    public function test_inland_is_claimed_only_for_a_plain_resort_with_nothing_pointing_to_the_coast(): void
+    public function test_inland_requires_explicit_evidence_and_is_not_a_default_for_plain_resorts(): void
     {
-        $this->assertSame(['Inland'], ResortSettingSeeder::settingsFor('Green Valley Resort', null, 'Resort'));
+        $this->assertSame([], ResortSettingSeeder::settingsFor('Green Valley Resort', null, 'Resort'));
+        $this->assertSame(['Inland'], ResortSettingSeeder::settingsFor('Green Valley Inland Resort', null, 'Resort'));
         $this->assertSame([], ResortSettingSeeder::settingsFor('Dahican Resort', null, 'Resort'), 'Dahican is on the coast');
         $this->assertSame([], ResortSettingSeeder::settingsFor('Casa Julieta', null, 'Hotel'), 'a hotel is never called inland');
         $this->assertSame([], ResortSettingSeeder::settingsFor('Sunset Resort', null, 'Beach Resort'), 'a beach resort is not inland');
