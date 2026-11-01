@@ -22,7 +22,24 @@ class AccommodationController extends Controller
         }
 
         if ($request->filled('type')) {
-            $query->where('type', $request->string('type'));
+            $typeFilter = $request->string('type')->toString();
+            $settingMap = [
+                'Beach Resort' => 'Beach',
+                'Mountain Resort' => 'Mountain',
+                'Inland Resort' => 'Inland',
+                'Island Resort' => 'Island',
+                'Lake Resort' => 'Lake',
+                'Hot Spring Resort' => 'Hot Spring',
+                'All Inclusive Resort' => 'All-Inclusive',
+                'All-Inclusive Resort' => 'All-Inclusive',
+            ];
+            if (isset($settingMap[$typeFilter])) {
+                $query->whereIn('type', ['Resort', 'Beach Resort'])->withResortSetting($settingMap[$typeFilter]);
+            } elseif ($typeFilter === 'Resort') {
+                $query->whereIn('type', ['Resort', 'Beach Resort']);
+            } else {
+                $query->where('type', $typeFilter);
+            }
         }
 
         if ($request->filled('price_tier')) {
@@ -44,7 +61,18 @@ class AccommodationController extends Controller
         \App\Support\SearchLog::record($request, 'accommodations', $accommodations->total());
 
         $regions = Region::orderBy('name')->get();
-        $types = Accommodation::query()->whereNotNull('type')->distinct()->orderBy('type')->pluck('type');
+        $baseTypes = Accommodation::query()->whereNotNull('type')->distinct()->orderBy('type')->pluck('type');
+        $filedSettings = Accommodation::query()
+            ->where('is_accredited', true)->whereNull('archived_at')
+            ->whereNotNull('resort_settings')
+            ->pluck('resort_settings')
+            ->flatMap(fn ($encoded) => array_filter(explode('|', (string) $encoded)))
+            ->unique()
+            ->all();
+        $resortCategoryTypes = collect(Accommodation::RESORT_SETTINGS)
+            ->filter(fn ($s) => in_array($s, $filedSettings, true))
+            ->map(fn ($s) => ($s === 'All-Inclusive' ? 'All Inclusive' : $s).' Resort');
+        $types = $baseTypes->merge($resortCategoryTypes)->unique()->values();
 
         return view('accommodations.index', compact('accommodations', 'regions', 'types'));
     }

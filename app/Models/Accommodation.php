@@ -22,7 +22,7 @@ class Accommodation extends Model
      * The settings a resort can be filed under, in the order the planner offers them. A resort may carry
      * more than one ("Lake" and "All-Inclusive"); see resort_settings.
      */
-    public const RESORT_SETTINGS = ['Mountain', 'Inland', 'Island', 'Lake', 'Hot Spring', 'All-Inclusive'];
+    public const RESORT_SETTINGS = ['Beach', 'Mountain', 'Inland', 'Island', 'Lake', 'Hot Spring', 'All-Inclusive'];
 
     protected $fillable = [
         'slug', 'name', 'location', 'region_id', 'type', 'resort_settings', 'dot_classification',
@@ -51,6 +51,13 @@ class Accommodation extends Model
      */
     public function scopeWithResortSetting(Builder $query, string $setting): Builder
     {
+        if ($setting === 'Beach') {
+            return $query->where(fn (Builder $q) => $q
+                ->where('type', 'Beach Resort')
+                ->orWhere('resort_settings', 'like', '%|Beach|%')
+                ->orWhere('name', 'like', '%Beach%'));
+        }
+
         return $query->where('resort_settings', 'like', '%|'.$setting.'|%');
     }
 
@@ -68,6 +75,20 @@ class Accommodation extends Model
         return array_values(array_filter(explode('|', (string) $this->resort_settings)));
     }
 
+    /** @return list<string> human-readable resort classifications (e.g. "Mountain Resort", "Inland Resort") */
+    public function resortClassificationLabels(): array
+    {
+        $settings = $this->resortSettingList();
+        if ($this->type === 'Beach Resort' && ! in_array('Beach', $settings, true)) {
+            array_unshift($settings, 'Beach');
+        }
+
+        return array_map(
+            fn (string $s) => ($s === 'All-Inclusive' ? 'All Inclusive' : $s).' Resort',
+            $settings
+        );
+    }
+
     public function posterUrl(): string
     {
         return route('accommodations.show', $this);
@@ -80,7 +101,10 @@ class Accommodation extends Model
 
     public function posterTags(): array
     {
-        return array_values(array_filter([$this->type, $this->dot_classification]));
+        $classifications = $this->resortClassificationLabels();
+        $primary = $classifications !== [] ? implode(' · ', array_slice($classifications, 0, 2)) : $this->type;
+
+        return array_values(array_filter([$primary, $this->dot_classification]));
     }
 
     public function posterPriceAmount(): ?string

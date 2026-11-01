@@ -32,6 +32,7 @@
 
     const publicBox = form.querySelector('[data-transport-public]');
     const operatorBox = form.querySelector('[data-transport-operator]');
+    const rentalBox = form.querySelector('[data-transport-rental]');
     const title = box.querySelector('[data-compare-title]');
     const bars = box.querySelector('[data-compare-bars]');
     const tip = box.querySelector('[data-compare-tip]');
@@ -49,6 +50,7 @@
         const transport = checked('transport_pref')?.value;
         if (publicBox) publicBox.hidden = transport !== 'public';
         if (operatorBox) operatorBox.hidden = transport !== 'tour_operator';
+        if (rentalBox) rentalBox.hidden = transport !== 'rental_car';
 
         const distance = checked('distance_pref')?.value || 'moderate';
         const km = samples[distance] || samples.moderate;
