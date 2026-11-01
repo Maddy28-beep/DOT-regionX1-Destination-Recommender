@@ -3,7 +3,7 @@
  * transport card, and draws what a sample trip would take in each way of travelling.
  *
  * The speeds, and the overhead of each leg, are read from the page (TransportMode::comparison()) so the
- * bars use the same table the planner times journeys with. A sample is a road distance for each choice of
+ * cards use the same table the planner times journeys with. A sample is a road distance for each choice of
  * "how far"; the times are rounded to the quarter hour like the planner's own.
  */
 (() => {
@@ -34,9 +34,9 @@
     const operatorBox = form.querySelector('[data-transport-operator]');
     const rentalBox = form.querySelector('[data-transport-rental]');
     const title = box.querySelector('[data-compare-title]');
-    const bars = box.querySelector('[data-compare-bars]');
+    const cards = box.querySelectorAll('[data-compare-mode]');
     const tip = box.querySelector('[data-compare-tip]');
-    const names = { near: 'a trip around the city', moderate: 'a trip to a neighbouring city', far: 'a long trip across the region' };
+    const names = { near: 'Around the city', moderate: 'Neighbouring city', far: 'Across the region' };
 
     function chosenMode() {
         const transport = checked('transport_pref')?.value;
@@ -55,28 +55,21 @@
         const distance = checked('distance_pref')?.value || 'moderate';
         const km = samples[distance] || samples.moderate;
         const mine = chosenMode();
-        title.textContent = `What ${names[distance] || names.moderate} (about ${km} km) would take`;
+        title.textContent = `${names[distance] || names.moderate} · About ${km} km`;
 
-        const rows = Object.entries(modes).map(([key, mode]) => ({ key, mode, time: range(km, mode) }));
-        const longest = Math.max(...rows.map(row => row.time[1]));
-        bars.replaceChildren(...rows.map(row => {
-            const line = document.createElement('div');
-            line.className = 'pc-bar' + (row.key === mine ? ' is-yours' : '');
-            const name = document.createElement('span');
-            name.className = 'pc-bar__name';
-            name.textContent = row.mode.label;
-            const track = document.createElement('span');
-            track.className = 'pc-bar__track';
-            const fill = document.createElement('span');
-            fill.className = 'pc-bar__fill';
-            fill.style.width = `${Math.round(row.time[1] / longest * 100)}%`;
-            track.append(fill);
-            const time = document.createElement('span');
-            time.className = 'pc-bar__time';
-            time.textContent = `${format(row.time[0])} – ${format(row.time[1])}`;
-            line.append(name, track, time);
-            return line;
-        }));
+        cards.forEach(card => {
+            const key = card.dataset.compareMode;
+            const time = range(km, modes[key]);
+            card.classList.toggle('is-yours', key === mine);
+            card.querySelector('.pc-option__selected').hidden = key !== mine;
+            card.querySelector('.pc-option__name').textContent = key === 'personal_car' && transport === 'rental_car'
+                ? 'Rental car' : modes[key].label;
+            const from = document.createElement('span');
+            from.textContent = format(time[0]);
+            const to = document.createElement('span');
+            to.textContent = `– ${format(time[1])}`;
+            card.querySelector('[data-compare-time]').replaceChildren(from, document.createTextNode(' '), to);
+        });
 
         const own = mine ? range(km, modes[mine]) : null;
         if (own && own[1] >= 180) {
