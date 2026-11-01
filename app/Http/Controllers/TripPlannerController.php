@@ -252,15 +252,14 @@ class TripPlannerController extends Controller
          * actually ran against -- a rule mined from 90 transactions and one
          * mined from 9,000 are not the same claim.
          */
-        $catalogue = app(\App\Support\SampleData::class)->split(Destination::plannerEligible()->whereNull('archived_at'));
+        $catalogue = app(\App\Support\SampleData::class)->split(Destination::publiclyVisible());
 
         $provenance = [
             'destinations_ranked' => $itinerary->matches()->count(),
             'catalogue_size' => $catalogue['total'],
             'catalogue_real' => $catalogue['real'],
             'catalogue_sample' => $catalogue['sample'],
-            'catalogue_unverified' => $catalogue['unverified'] ?? 0,
-            'catalogue_public' => Destination::plannerEligible()->whereNull('archived_at')->where('is_accredited', false)->count(),
+            'catalogue_unverified' => $catalogue['unverified'],
             'transactions' => ExitSurvey::count(),
             'transactions_demo' => ExitSurvey::where('data_source', 'demo')->count(),
             'rules_applied' => $itinerary->items()->whereNotNull('rule_basis')->count(),
@@ -281,8 +280,7 @@ class TripPlannerController extends Controller
         // Optional ideas for Day 1's free time before dinner: read-only, never part of the schedule.
         $ideas = app(FreeTimeIdeas::class)->forItinerary($itinerary, $preference);
 
-        // Someone picked up by a tour operator or renting a car is shown who is near their starting point.
-        // A package already names its own operator, so it needs no suggestions.
+        // Suggest nearby operators for tour pick-up or car rental; packages already name their provider.
         $operators = ! $itinerary->package_id && TransportMode::suggestsOperators($preference->transport_pref)
             ? app(TourOperatorSuggester::class)->near(
                 $preference->origin_lat !== null ? (float) $preference->origin_lat : null,
@@ -292,9 +290,7 @@ class TripPlannerController extends Controller
             )
             : collect();
 
-        $planningChecks = $itinerary->package_id ? [] : app(\App\Services\Recommendation\ItineraryAudit::class)->audit($itinerary, $preference);
-
-        return view('plan.itinerary', compact('itinerary', 'preference', 'provenance', 'swap', 'ideas', 'operators', 'planningChecks'));
+        return view('plan.itinerary', compact('itinerary', 'preference', 'provenance', 'swap', 'ideas', 'operators'));
     }
 
     /**

@@ -241,4 +241,3 @@ class ClarityDayNotesTest extends TestCase
         $this->assertSame(['near', 'moderate', 'far'], array_slice(array_column($calibration, 'distance_pref'), 0, 3));
     }
 }
-

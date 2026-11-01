@@ -71,7 +71,7 @@ class LookupSpyBuilder extends ItineraryScheduleBuilder
         if (self::$call++ === 0) {
             $itinerary->items()->whereIn('day_number', [3, 4])->where('kind', 'activity')->delete();
         } else {
-            // Make every later trial unambiguously worse, regardless of improved stay/return heuristics.
+            // Ensure a later trial is worse, independent of which stay the legacy optimizer proposes.
             $itinerary->items()->where('kind', 'activity')->delete();
         }
     }
@@ -97,9 +97,6 @@ class ClarityRecorderIsolationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        // Notice characterization uses deliberately incomplete plans, not the default rejection flow.
-        config(['itinerary.planner.reject_incomplete_trips' => false]);
 
         Carbon::setTestNow('2026-10-20 12:00:00');
     }

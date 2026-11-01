@@ -1,5 +1,7 @@
 # Selective planner data publication
 
+The selective logic rollback described in `docs/Planner_Logic_Rollback.md` restores the pre-PR #179 planner while retaining rental-car suggestions and resort classifications. These data-publication files and applied migrations are preserved; publishing the patch is a separate operation and is not required to deploy the logic rollback. The verification results below describe the original patch rehearsal, not a new audit of the restored planner.
+
 The reviewed `database/data/live-planner-patch-2026-11-01.json` adds seven public attractions and nine meal venues, updates selected existing listings, and excludes sample stops from planning. Sources and expected old values are included per listing. New public venues do not claim accreditation. Existing closures, certificates, hotel prices and check-in/out times are preserved.
 
 Build the catalogue-only bundle from the project root:

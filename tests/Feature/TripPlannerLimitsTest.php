@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Accommodation;
 use App\Models\Destination;
 use App\Models\Itinerary;
 use App\Models\Region;
@@ -10,7 +9,6 @@ use App\Models\SouvenirCenter;
 use App\Models\TouristPreference;
 use App\Services\Recommendation\ItineraryScheduleBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 /**
@@ -64,6 +62,7 @@ class TripPlannerLimitsTest extends TestCase
 
     /**
      * @param  list<Destination>  $stops
+     * @param  int  $slotsPerDay
      */
     private function schedule(array $stops, int $days = 1, string $distancePref = 'moderate', ?string $arrival = null, int $slotsPerDay = 3): Itinerary
     {
@@ -195,7 +194,7 @@ class TripPlannerLimitsTest extends TestCase
     public function test_a_day_does_not_take_a_second_stop_that_would_mean_too_much_driving(): void
     {
         $near = $this->destination('Near Park', 10);
-        $far = $this->destination('Far Park', 28.75, 40.9);   // 45 km beyond the first stop and 50 km from the centre
+        $far = $this->destination('Far Park', 0, 40);   // Above the moderate drive budget, but home before 20:00 if allowed.
 
         $itinerary = $this->schedule([$near, $far], distancePref: 'moderate');
 
@@ -206,10 +205,7 @@ class TripPlannerLimitsTest extends TestCase
     public function test_a_traveller_who_is_willing_to_go_far_gets_the_longer_day(): void
     {
         $near = $this->destination('Near Park', 10);
-        $far = $this->destination('Far Park', 28.75, 40.9);
-        // Explicit short visits leave time for the remote return-home safeguard as well as the drive budget.
-        $near->forceFill(['visit_duration' => '90 minutes'])->save();
-        $far->forceFill(['visit_duration' => '90 minutes'])->save();
+        $far = $this->destination('Far Park', 0, 40);
 
         $itinerary = $this->schedule([$near, $far], distancePref: 'far');
 
@@ -273,7 +269,7 @@ class TripPlannerLimitsTest extends TestCase
 
     public function test_dinner_waits_for_the_traveller_when_the_drive_back_runs_long(): void
     {
-        $stay = Accommodation::create([
+        $stay = \App\Models\Accommodation::create([
             'slug' => 'far-resort', 'name' => 'Far Resort', 'location' => 'Davao City', 'region_id' => $this->region(),
             'type' => 'Resort', 'is_accredited' => true, 'rating' => 0, 'review_count' => 0,
             'latitude' => $this->at(80, 0)[0], 'longitude' => $this->at(80, 0)[1],
@@ -304,7 +300,7 @@ class TripPlannerLimitsTest extends TestCase
         $dinner = $items->firstWhere('title', 'Dinner — Far Resort');
         $overnight = $items->firstWhere('kind', 'overnight');
 
-        $arrives = Carbon::parse($travelBack->starts_at)->addMinutes($travelBack->travel_max_minutes)->format('H:i:s');
+        $arrives = \Illuminate\Support\Carbon::parse($travelBack->starts_at)->addMinutes($travelBack->travel_max_minutes)->format('H:i:s');
 
         $this->assertGreaterThan('18:30:00', $arrives, 'The scenario needs a drive that gets in after the usual dinner hour.');
         $this->assertGreaterThanOrEqual($arrives, $dinner->starts_at, 'Dinner is not served before the traveller arrives.');

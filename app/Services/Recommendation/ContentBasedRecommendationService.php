@@ -290,9 +290,7 @@ class ContentBasedRecommendationService
         'Food Tourism' => ['food', 'culinary'],
         'Shopping & Souvenirs' => ['shopping', 'souvenir'],
         'Hiking & Trekking' => ['hiking', 'highest peak', 'trekking'],
-        // Not "family friendly" or "chocolate experience": those say who a place suits or what it sells, and a zoo or a
-        // chocolate museum is not what a traveller choosing relaxation is asking for.
-        'Relaxation & Wellness' => ['relaxation', 'wellness', 'spa'],
+        'Relaxation & Wellness' => ['chocolate experience', 'family friendly', 'relaxation'],
     ];
 
     private const BUDGET_ORDER = ['Free' => 0, 'Budget-Friendly' => 1, 'Mid-range' => 2, 'Premium' => 3];
@@ -320,7 +318,7 @@ class ContentBasedRecommendationService
         // Places closed on the traveller's dates (their own status, or a danger
         // advisory) are not candidates at all: a closed place must not be recommended.
         $candidates ??= Destination::query()
-            ->plannerEligible()
+            ->where('is_accredited', true)
             ->whereNull('archived_at')
             ->availableDuring(...$preference->travelWindow())
             ->with('tags')
@@ -759,9 +757,12 @@ class ContentBasedRecommendationService
     /**
      * How far this destination is, and how much that figure can be trusted.
      *
-     * Mapped places are measured from the shared position or default city
-     * baseline, as in the route audit. Unmapped records fall back to their
-     * recorded city-distance figure, then a coarse region centre.
+     * Preference order: a real Haversine distance from the position the
+     * traveller shared, then the listing's recorded distance-from-city-centre,
+     * then a Haversine distance from the city centre (the default starting
+     * point) for a listing that has coordinates but no recorded figure, then
+     * the centre of its region. The stored column is a fixed figure that
+     * cannot know where the traveller is, which is the whole point of asking.
      *
      * The city-centre step matters because the imported accredited places have
      * coordinates but no stored distance. Without it their distance counted as
@@ -781,12 +782,7 @@ class ContentBasedRecommendationService
     {
         $origin = $preference->origin();
 
-        // Range and route checks share the same mapped baseline, including
-        // the default city start. A historical road-distance field must not
-        // silently remove a mapped interest that the audit considers in range.
-        if ($destination->latitude !== null && $destination->longitude !== null) {
-            $origin ??= ['lat' => self::DEFAULT_ORIGIN_LAT, 'lng' => self::DEFAULT_ORIGIN_LNG];
-
+        if ($origin && $destination->latitude !== null && $destination->longitude !== null) {
             return [
                 'km' => $this->haversineKm(
                     $origin['lat'],
@@ -804,6 +800,18 @@ class ContentBasedRecommendationService
 
         // No position shared and no recorded figure: measure from the city centre, which is where the plan starts.
         $origin ??= ['lat' => self::DEFAULT_ORIGIN_LAT, 'lng' => self::DEFAULT_ORIGIN_LNG];
+
+        if ($destination->latitude !== null && $destination->longitude !== null) {
+            return [
+                'km' => $this->haversineKm(
+                    $origin['lat'],
+                    $origin['lng'],
+                    (float) $destination->latitude,
+                    (float) $destination->longitude,
+                ),
+                'approximate' => false,
+            ];
+        }
 
         /*
          * Last resort: the centre of the destination's own region. Most of the

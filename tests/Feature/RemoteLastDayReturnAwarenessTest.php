@@ -35,10 +35,6 @@ class RemoteLastDayReturnAwarenessTest extends TestCase
     {
         parent::setUp();
 
-        // Inspect builder omission notices even when the synthetic request is infeasible.
-        // Production's strict rejection policy is covered separately below.
-        config(['itinerary.planner.reject_incomplete_trips' => false]);
-
         Carbon::setTestNow('2026-10-20 12:00:00');
     }
 
@@ -69,7 +65,6 @@ class RemoteLastDayReturnAwarenessTest extends TestCase
             'latitude' => self::ORIGIN_LAT + $northKm / 111.195,
             'longitude' => self::ORIGIN_LNG,
             'hours' => $hours,
-            'visit_duration' => '90 minutes',
         ]);
     }
 
@@ -234,7 +229,6 @@ class RemoteLastDayReturnAwarenessTest extends TestCase
         //   Lunch 12:00-13:00, travel 13:00-14:45, 90-min visit 14:45-16:15 (before 18:00 cutoff).
         //   Depart 16:30 + 195 min = 19:45 (> 19:30) => + 60-min dinner => 20:45 home arrival (>= 20:00).
         $first = $this->destination('Midway Falls', 30.0, 4.8);
-        $first->forceFill(['visit_duration' => '105 minutes'])->save();
         $second = $this->destination('Outer Ridge', 60.0, 4.5);
         $preference = $this->preference(1, 'far', null);
 
@@ -474,5 +468,4 @@ class RemoteLastDayReturnAwarenessTest extends TestCase
 
         // One stop over three days: Days 2 and 3 have no sightseeing stop.
         $this->assertGreaterThanOrEqual(2, $cost);
-    }
-}
+    }}

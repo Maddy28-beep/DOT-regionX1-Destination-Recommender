@@ -144,9 +144,6 @@ class ItineraryItem extends Model
     /** The listing this row points at, whatever kind it is. */
     public function listing()
     {
-        if ($this->kind === 'meal' && $this->restaurant_id) {
-            return $this->restaurant;
-        }
         return $this->destination ?: ($this->accommodation ?: ($this->restaurant ?: $this->souvenirCenter));
     }
 
