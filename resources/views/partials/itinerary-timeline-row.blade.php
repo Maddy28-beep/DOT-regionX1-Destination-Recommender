@@ -44,6 +44,13 @@
         $what = trim(str_replace(' — '.$listing->name, '', $what));
     }
 
+    // A stop that is sample data says so on its card. A name that already carries "[SAMPLE]" says it itself, and a card with a
+    // "popular pairing" line already gets that line's label, so neither gets a second one.
+    $sampleCue = $kind === 'activity' && $item->destination_id && $listing
+        && app(\App\Support\SampleData::class)->isSample($listing)
+        && ! str_contains(strtolower($listing->name), '[sample]')
+        && ! $item->ruleExplanation();
+
     $hours = $listing && filled($listing->hours ?? null) && \App\Support\OpeningHours::windows($listing->hours) !== null
         ? $listing->hours
         : null;
@@ -125,7 +132,10 @@
                         <h4>{{ $item->title }}</h4>
                         <p class="tl-card__what"><a href="{{ route($route, $listing) }}">{{ $listing->name }}</a></p>
                     @elseif ($kind === 'activity')
-                        <h4><a href="{{ route($route, $listing) }}">{{ $listing->name }}</a></h4>
+                        <h4>
+                            <a href="{{ route($route, $listing) }}">{{ $listing->name }}</a>
+                            @if ($sampleCue)<x-sample-tag label="Sample data" title="Sample data, not DOT-verified: this place's accreditation number is a placeholder, not an official DOT number." />@endif
+                        </h4>
                         <p class="tl-card__what">{{ $what }}</p>
                     @elseif ($isStay && $route)
                         {{-- The night's stay is named, like every other stop, instead of only "Overnight stay". --}}
