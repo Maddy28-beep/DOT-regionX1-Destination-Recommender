@@ -1,0 +1,76 @@
+{
+  "checked_on": "2026-11-01",
+  "purpose": "Evidence log for the four remaining missing-interest profiles. Review-only; not a list of enabled destinations.",
+  "enabled_update": {
+    "slug": "peoples-park",
+    "activity": "Urban birdwatching during public park hours",
+    "manifest": "planner-evidence-updates-2026-11-01.json",
+    "limits": "No promised bird species, no zoo/eagle encounter, no research-only morning access, no invented tour duration. Existing free admission, coordinates, hours and accreditation retained."
+  },
+  "remaining_profiles": [
+    {
+      "name_prefix": "Hold-out 01 near/taxi",
+      "missing_interest": "Beach & Island",
+      "requirement": "Actual accessible beach within the unchanged 5 km origin radius; a pool or coastal road is not a substitute."
+    },
+    {
+      "name_prefix": "Hold-out 13 near/jeep",
+      "missing_interest": "Hiking & Trekking",
+      "requirement": "Genuine currently accessible hike within the existing effective range, with a mapped road-accessible trailhead. Do not label an ordinary city-park walk as hiking."
+    },
+    {
+      "name_prefix": "Hold-out 25 near/rental_car",
+      "missing_interest": "Beach & Island",
+      "requirement": "Actual accessible beach within the unchanged 5 km origin radius."
+    }
+  ],
+  "candidates_not_enabled": [
+    {
+      "name": "Times Beach",
+      "reason": "Current access to a usable beach could not be established. A Nominatim quarter centroid is not a beach entrance. A Philippine Reclamation Authority ocular report describes the former bathing area as lost; the city confirms the coastal road as an exercise/recreation route. Do not turn the road or neighborhood into an invented beach stop.",
+      "sources": [
+        "https://www.pea.gov.ph/wp-content/uploads/2024/04/CY_2023_Gender_and_Development_Committee_Programs_Projects_and_Activities_d.pdf",
+        "https://davaocity.gov.ph/health/car-free-sundays-combines-active-lifestyle-with-a-scenic-route/"
+      ]
+    },
+    {
+      "name": "Felis Resort Complex",
+      "reason": "Recent mirrored operator posts support an operating seaside resort, but do not establish a currently usable beach. An earlier first-person account describes reclaimed frontage and pool swimming. Seaside dining and a pool do not prove the requested beach activity.",
+      "sources": [
+        "https://www.findglocal.com/PH/Davao-City/1681343375467796/Felis-Resort-Complex",
+        "https://www.philippinetraveler.com/felis-resort-davao/"
+      ]
+    },
+    {
+      "name": "Waterworld Davao",
+      "reason": "Current mirrored operator beach information exists, but mapped property at approximately 7.0306,125.5279 is outside both downtown profiles' 5 km limit. Do not change the origin or distance preference to make it eligible.",
+      "sources": ["https://www.findglocal.com/PH/Davao-City/383717441795559/Waterworld-Davao"]
+    },
+    {
+      "name": "Gumamela Caverock Farm Resort",
+      "reason": "Mapped resort in Matina Biao is a promising nearby candidate. A participant's September 2025 event bulletin supports resort use, but the detailed cave/forest trekking accounts located are from 2011-2016. Current permission for that hiking programme, trail access, full duration and guide conditions remain unverified. A resort event does not verify a hiking product.",
+      "sources": [
+        "https://www.rotarydistrict3860.org/wp-content/d3860/Matina%20Davao/25_26/04_ebulletin_04_ebulletin_03_ebulletin_RC_Matina_Davao_4th_Regular_Meeting_RY_2025-2026_Sep_18_2025_2025-11-01.pdf",
+        "https://scorpio-sojourn.blogspot.com/2014/08/fancy-free-at-farm-resorts-of-davao-city.html",
+        "https://www.openstreetmap.org/way/1412215394"
+      ]
+    },
+    {
+      "name": "Green Mountain View, Magtuod/Waan",
+      "reason": "Older hiking recommendations conflict with current mapped opening_hours=closed and visitor closure reports. Not enabled.",
+      "sources": [
+        "https://www.openstreetmap.org/node/7978818526",
+        "https://wanderlog.com/list/geoCategory/1507643/hiking-spots"
+      ]
+    },
+    {
+      "name": "Viper Peak via Lantaw Banud",
+      "reason": "A recent first-person guide describes a real hike and fencing restrictions, but mapped Banud access is farther west than an assumed Toril-center point. No verified road-access point inside this profile's range was established. Do not use a convenient town centroid or summit as its road-routing point.",
+      "sources": [
+        "https://manakaayugbukid.com/viper-peak-toril-davao-city-hiking-guide/",
+        "https://www.waze.com/live-map/directions/ph/davao-region/davao-city/lantaw-banud-cafe?to=place.ChIJv71o4c4P-TIRTxrdjZ-wk5w",
+        "https://mapcarta.com/N12825188603"
+      ]
+    }
+  ]
+}

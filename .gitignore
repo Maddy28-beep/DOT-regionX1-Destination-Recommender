@@ -39,3 +39,10 @@ Thumbs.db
 !/public/video/hero.mp4
 !/public/video/hero.webm
 !/public/video/hero-poster.jpg
+
+# Local audit/comparison scratch outputs and DB snapshots
+/output/
+/outputs/
+/database/data/outputs/
+/public/previews/
+
