@@ -3,6 +3,11 @@
 @section('title', $souvenirCenter->name.' — ExploreDVO')
 @section('meta_description', \Illuminate\Support\Str::limit(trim(strip_tags((string) ($souvenirCenter->description ?? $souvenirCenter->name.' on ExploreDVO, the DOT Region XI tourism platform.'))), 155))
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/accommodation-gallery.css') }}?v={{ filemtime(public_path('css/accommodation-gallery.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/destination-detail.css') }}?v={{ filemtime(public_path('css/destination-detail.css')) }}">
+@endpush
+
 @section('content')
 @php
     $gradients = [
@@ -15,7 +20,7 @@
     $mapUrl = \App\Support\MapLinks::directionsTo($souvenirCenter->latitude, $souvenirCenter->longitude, $souvenirCenter->name, $souvenirCenter->location);
 @endphp
 
-<div class="container">
+<div class="container souvenir-detail-refresh listing-detail-refresh standard-gallery-detail">
     @include('partials.operating-status-notice', ['listing' => $souvenirCenter])
     <nav class="breadcrumb">
         <a href="{{ route('home') }}">Home</a> /
@@ -26,6 +31,8 @@
     <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($souvenirCenter->getMorphClass(), $souvenirCenter->id)->latest()->get()" />
 
     @include('partials.gallery-hero', [
+        'categoryLayout' => true,
+        'keepOtherPhotos' => true,
         'photos' => $souvenirCenter->photos,
         'title' => $souvenirCenter->name,
         'subtitle' => $souvenirCenter->posterMeta(),
@@ -59,9 +66,9 @@
     </div>
 
     @if ($nearby->count())
-        <div class="section-tight">
+        <div class="section-tight detail-related">
             <div class="section-head">
-                <div><h2>More in {{ $souvenirCenter->region?->name ?? 'this area' }}</h2></div>
+                <div><h2 class="detail-related__title">More in {{ $souvenirCenter->region?->name ?? 'this area' }}</h2></div>
             </div>
             <div class="card-grid">
                 @foreach ($nearby as $n)

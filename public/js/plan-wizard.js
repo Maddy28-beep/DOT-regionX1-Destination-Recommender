@@ -67,6 +67,9 @@
         const summary = document.createElement('summary');
         summary.textContent = label;
         options.append(summary, ...fields);
+        // Keep consent after both notes fields in the visual, reading and keyboard order.
+        const consent = options.querySelector('.consent-check');
+        if (consent) options.append(consent);
         steps[3].append(options);
         if ([...options.querySelectorAll('input,textarea')].some(el => el.type === 'checkbox' ? el.checked : el.value.trim())) options.open = true;
     }

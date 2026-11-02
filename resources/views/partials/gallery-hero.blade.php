@@ -1,4 +1,8 @@
 @php
+    $categoryLayout = $categoryLayout ?? false;
+    $keepOtherPhotos = $keepOtherPhotos ?? false;
+    $galleryCategories = ['General', 'Exterior', 'Interior'];
+    $categoryFor = fn ($photo) => $photo->isIllustration() ? 'General' : (trim((string) $photo->category) ?: 'General');
     // official, sample or unverified (see SampleData). A caller that only knows "sample or not" still works.
     $provenance = $provenance ?? (($isSample ?? false) ? 'sample' : 'official');
     // Seeded SVG placeholders should not appear beside verified photographs.
@@ -8,6 +12,17 @@
     $total = $photos->count();
     if ($photos->contains(fn ($photo) => $photo->category !== 'Sample image' && ! str_ends_with(strtolower($photo->path), '.svg'))) {
         $photos = $photos->reject(fn ($photo) => $photo->category === 'Sample image')->values();
+        $total = $photos->count();
+    }
+
+    if ($categoryLayout) {
+        if (! $keepOtherPhotos) {
+            $photos = $photos->filter(fn ($photo) => in_array($categoryFor($photo), $galleryCategories, true));
+        }
+        $photos = $photos->sortBy(function ($photo) use ($categoryFor, $galleryCategories) {
+            $rank = array_search($categoryFor($photo), $galleryCategories, true);
+            return $rank === false ? count($galleryCategories) : $rank;
+        })->values();
         $total = $photos->count();
     }
 
@@ -21,11 +36,12 @@
 @if ($total > 0)
     <div data-gallery data-photos='@json($photos->map(fn ($p) => ["url" => $p->url(), "category" => $p->category, "credit" => $p->creditLine()])->values())'>
         {{-- Mobile: swipeable full-photo carousel (touch-native via scroll-snap) --}}
-        <div class="gallery-hero-mobile" @if($total > 1) data-carousel @endif>
+        <div class="gallery-hero-mobile {{ $categoryLayout ? 'gallery-categorized-mobile' : '' }}" @if($total > 1) data-carousel @endif>
             <div class="carousel-track">
                 @foreach ($photos as $i => $photo)
                     <a href="#" class="carousel-slide" data-open="{{ $i }}">
                         <img src="{{ $photo->url() }}" alt="{{ $altFor($photo) }}">
+                        @if ($categoryLayout)<span class="gallery-category-label">{{ $categoryFor($photo) }}</span>@endif
                         @if ($onlyIllustrations && $i === 0)
                             <span class="photo-illustration-tag">Illustration, not a photo of this place</span>
                         @endif
@@ -63,7 +79,24 @@
         </div>
 
         {{-- Desktop: Agoda-style grid (main + thumbnails) --}}
-        <div class="gallery-hero {{ $total === 1 ? 'single' : '' }}">
+        <div class="gallery-hero {{ $categoryLayout ? 'gallery-categorized' : ($total === 1 ? 'single' : '') }}">
+            @if ($categoryLayout)
+                @foreach ($galleryCategories as $category)
+                    @php $photoIndex = $photos->search(fn ($photo) => $categoryFor($photo) === $category); @endphp
+                    @if ($photoIndex !== false)
+                        <a href="#" class="{{ $category === 'General' ? 'g-main' : 'g-thumb' }}" data-category="{{ $category }}" data-open="{{ $photoIndex }}" aria-label="View {{ strtolower($category) }} photos of {{ $title }}">
+                            <img src="{{ $photos[$photoIndex]->url() }}" alt="{{ $altFor($photos[$photoIndex]) }}">
+                            <span class="gallery-category-label">{{ $category }}</span>
+                            @if ($photos[$photoIndex]->isIllustration())<span class="photo-illustration-tag">Illustration, not a photo of this place</span>@endif
+                        </a>
+                    @else
+                        <div class="{{ $category === 'General' ? 'g-main' : 'g-thumb' }} gallery-category-empty" data-category="{{ $category }}">
+                            <span class="gallery-category-label">{{ $category }}</span>
+                            <span>{{ $category }} photo not available</span>
+                        </div>
+                    @endif
+                @endforeach
+            @else
             <a href="#" class="g-main" data-open="0">
                 <img src="{{ $photos[0]->url() }}" alt="{{ $altFor($photos[0]) }}">
                 @if ($onlyIllustrations)
@@ -72,13 +105,14 @@
             </a>
             @if ($total >= 2)
                 @foreach ($photos->slice(1, 2) as $i => $photo)
-                    <a href="#" class="g-thumb {{ $total === 2 ? 'g-thumb-span' : '' }}" data-open="{{ $i + 1 }}">
+                    <a href="#" class="g-thumb {{ $total === 2 ? 'g-thumb-span' : '' }}" data-open="{{ $i }}">
                         <img src="{{ $photo->url() }}" alt="{{ $altFor($photo) }}">
                         @if ($loop->last && $total > 3)
                             <div class="g-more-overlay">+{{ $total - 3 }} more</div>
                         @endif
                     </a>
                 @endforeach
+            @endif
             @endif
             <div class="badges">
                 @if ($isAccredited)
@@ -105,7 +139,7 @@
 
         @include('partials.photo-credit', ['photos' => $photos, 'title' => $title])
 
-        @php $categories = $photos->groupBy('category'); @endphp
+        @php $categories = $photos->groupBy($categoryLayout ? $categoryFor : 'category'); @endphp
         @if ($categories->count() > 1)
             <div class="gallery-cats">
                 @foreach ($categories as $cat => $group)

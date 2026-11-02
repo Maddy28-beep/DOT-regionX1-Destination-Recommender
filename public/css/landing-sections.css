@@ -34,6 +34,10 @@
 
 .landing-section--cream { background: #f7f1e8; }
 
+/* Match the listing pages' card palette without changing homepage card geometry. */
+.hero-page .dpost-card { background: #fffefa; border-color: #e1e8e2; }
+.hero-page .dcard__foot { border-top-color: #eaf0ea; }
+
 /* Tourism marks replace the former orange official badge. */
 .hero-tourism-brands {
     position: relative;

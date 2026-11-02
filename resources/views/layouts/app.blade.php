@@ -7,6 +7,7 @@
     <title>@yield('title', 'ExploreDVO')</title>
     @include('partials.share-meta')
     @include('partials.head-assets')
+    @stack('styles')
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>

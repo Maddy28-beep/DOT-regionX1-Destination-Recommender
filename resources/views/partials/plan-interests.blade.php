@@ -35,8 +35,12 @@
     </div>
 </fieldset>
 
-<div class="field pc-group" style="margin-top:0;" data-checkbox-group="activities">
-    <label class="pc-legend">Interests &amp; activities <span class="field-required-hint">Select at least one</span></label>
+<div class="pc-interest-columns">
+<div class="field pc-group" style="margin-top:0;" data-checkbox-group="activities" role="group" aria-labelledby="pcActivitiesHeading">
+    <div class="pc-interest-heading">
+        <h3 class="pc-legend" id="pcActivitiesHeading">Interests &amp; activities <span class="field-required-hint">Select at least one</span></h3>
+        <span class="pc-selection-count" data-selection-count="activities" hidden></span>
+    </div>
     <div class="pc-checks">
         @foreach ($activityOptions as $activity)
             <label class="pc-check">
@@ -49,8 +53,11 @@
     </div>
 </div>
 
-<div class="field pc-group" data-checkbox-group="amenities">
-    <label class="pc-legend">Preferred amenities <span class="field-required-hint">Select at least one</span></label>
+<div class="field pc-group" data-checkbox-group="amenities" role="group" aria-labelledby="pcAmenitiesHeading">
+    <div class="pc-interest-heading">
+        <h3 class="pc-legend" id="pcAmenitiesHeading">Preferred amenities <span class="field-required-hint">Select at least one</span></h3>
+        <span class="pc-selection-count" data-selection-count="amenities" hidden></span>
+    </div>
     <div class="pc-checks">
         @foreach ($amenityOptions as $amenity)
             <label class="pc-check">
@@ -62,3 +69,9 @@
         @endforeach
     </div>
 </div>
+</div>
+<div class="pc-picks-summary" data-picks-summary hidden>
+    <span class="pc-picks-summary__icon" aria-hidden="true"><x-icon name="check" /></span>
+    <p><strong>Your picks:</strong> <span data-picks-text></span></p>
+</div>
+<span class="sr-only" data-selection-status role="status" aria-live="polite" aria-atomic="true"></span>

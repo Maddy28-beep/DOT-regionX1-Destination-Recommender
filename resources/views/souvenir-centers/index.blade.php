@@ -2,7 +2,12 @@
 
 @section('title', 'Souvenir Centers — ExploreDVO')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/stays-catalog.css') }}?v={{ filemtime(public_path('css/stays-catalog.css')) }}">
+@endpush
+
 @section('content')
+<div class="souvenirs-catalog catalog-refresh">
 <header class="catalog-banner catalog-banner--souvenir-centers">
     <div class="container">
         <h1 class="poster-title">Bring Home Davao</h1>
@@ -50,5 +55,6 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 @endsection

@@ -141,7 +141,9 @@ class SampleDataSurfacesTest extends TestCase
         $this->assertSame(['total' => 3, 'sample' => 1, 'real' => 2, 'unverified' => 0], app(SampleData::class)->split(Destination::publiclyVisible()));
 
         $home = $this->get(route('home'))->assertOk()->getContent();
-        $this->assertStringContainsString('including 1 sample data', $home);
+        // Homepage totals use plain catalogue labels; individual cards retain their provenance badges.
+        $this->assertStringNotContainsString('including 1 sample data', $home);
+        $this->assertStringContainsString('Sample Data', $home);
 
         $pref = TouristPreference::create(['travel_days' => 1, 'travel_type' => 'Family', 'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor',
             'budget' => 'Budget-Friendly', 'accommodation_pref' => 'Any', 'distance_pref' => 'far']);

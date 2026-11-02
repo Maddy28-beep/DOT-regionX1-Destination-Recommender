@@ -14,7 +14,7 @@
         <a href="{{ request()->fullUrlWithQuery([$categoryParam => $type, 'page' => null]) }}" class="chip catalog-categories__extra {{ request($categoryParam) === $type ? 'active' : '' }}" @if (request($categoryParam) === $type) aria-current="true" @endif>{{ $type }}</a>
     @endforeach
     @if ($moreTypes->isNotEmpty())
-        <details class="catalog-categories__more">
+        <details class="catalog-categories__more" data-more-label="{{ $moreCategoriesLabel }}">
             <summary class="chip {{ $moreTypeSelected ? 'active' : '' }}">
                 {{ $moreTypeSelected ? request($categoryParam) : $moreCategoriesLabel }}
                 <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 7.5 5 5 5-5" /></svg>

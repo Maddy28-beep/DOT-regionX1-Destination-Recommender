@@ -7,6 +7,7 @@
     $selectedActivities = $preference->relationLoaded('activities') ? $preference->activities->pluck('activity')->all() : [];
     $selectedAmenities = $preference->relationLoaded('amenities') ? $preference->amenities->pluck('amenity')->all() : [];
     $selectedConditions = $healthProfile ? $healthProfile->conditions->pluck('condition')->all() : [];
+    $healthIcons = ['mobility' => 'accessibility', 'vision' => 'eye', 'hearing' => 'ear', 'cardiac' => 'heart', 'respiratory' => 'wind', 'pregnancy' => 'user', 'senior' => 'user', 'child' => 'family'];
 
     $activityOptions = ['Beach & Island', 'Nature & Adventure', 'Cultural Heritage', 'Wildlife', 'Food Tourism', 'Shopping & Souvenirs', 'Hiking & Trekking', 'Relaxation & Wellness'];
     // The same list every listing ticks its amenities from, so what a traveller asks for is what a place can carry.
@@ -19,6 +20,7 @@
 <link rel="stylesheet" href="{{ asset('css/plan-wizard.css') }}?v={{ filemtime(public_path('css/plan-wizard.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/plan-comfort.css') }}?v={{ filemtime(public_path('css/plan-comfort.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/plan-compact.css') }}?v={{ filemtime(public_path('css/plan-compact.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/plan-trip-layout.css') }}?v={{ filemtime(public_path('css/plan-trip-layout.css')) }}">
 <div class="plan-shell plan-wizard" id="planWizard" data-draft-owner="{{ auth()->id() ?? 'guest' }}">
     <div class="page-head page-head--with-action">
         <div class="container plan-introduction">
@@ -92,7 +94,7 @@
 
                             @include('partials.plan-interests')
 
-                            <div class="field" style="margin-top:18px;">
+                            <div class="field pc-other-needs" style="margin-top:18px;">
                                 <label for="accessibility_notes">Anything else we should know? (optional)</label>
                                 <textarea id="accessibility_notes" name="accessibility_notes" rows="3" placeholder="e.g. traveling with young children, prefer slower-paced itineraries">{{ old('accessibility_notes', $preference->accessibility_notes) }}</textarea>
                             </div>
@@ -110,7 +112,7 @@
                             Coordinates are rounded to ~110 m before storage (see
                             TripPlannerController::applyOrigin).
                         --}}
-                        <div class="plan-section pc-block">
+                        <div class="plan-section pc-block pc-trip-start">
                             <header class="pc-block__head"><h3>Where you start</h3><p>Optional &mdash; your stops are ordered from here.</p></header>
 
                             <input type="hidden" name="origin_lat" id="origin_lat" value="{{ old('origin_lat', $preference->origin_lat) }}">
@@ -171,6 +173,11 @@
                                             @endif
                                         </span>
                                     </div>
+                                    <div class="pc-start-guide">
+                                        <span class="pc-start-guide__icon" aria-hidden="true"><x-icon name="map-pin" /></span>
+                                        <strong>Start somewhere familiar</strong>
+                                        <p>Your hotel, an airport or a landmark. Choose where your day begins and we&rsquo;ll order your stops from there.</p>
+                                    </div>
                                     <p class="pc-privacy"><x-icon name="shield-check" /> Your hotel, the airport, or any address. We order your stops from nearest to furthest. Rounded to about 100 metres before we store it, never linked to your name, and cleared when you clear the trip.</p>
                                 </div>
                             </div>
@@ -184,10 +191,10 @@
                             are optional and consent-gated, and clearing the
                             consent box on a later pass deletes what was stored.
                         --}}
-                        <div class="plan-section">
+                        <div class="plan-section pc-health-section">
                             <h3 class="plan-section__title"><x-icon name="shield-check" /> Health &amp; Accessibility</h3>
-                            <div class="field" style="margin-top:0;">
-                                <label>Health &amp; accessibility (optional)</label>
+                            <div class="field pc-health-options" style="margin-top:0;" role="group" aria-labelledby="healthChoicesLabel">
+                                <label id="healthChoicesLabel">Health &amp; accessibility (optional)</label>
                                 <div class="privacy-note">
                                     <x-icon name="shield-check" />
                                     <p>
@@ -195,17 +202,18 @@
                                         plan only, never linked to your name, and removed the moment you untick the box below.
                                     </p>
                                 </div>
-                                <div class="chip-checkbox-grid">
+                                <div class="chip-checkbox-grid pc-health-grid">
                                     @foreach ($healthOptions as $key => $label)
                                         <label class="field-check">
                                             <input type="checkbox" name="health_conditions[]" value="{{ $key }}" @checked(in_array($key, old('health_conditions', $selectedConditions)))>
-                                            <span>{{ $label }}</span>
+                                            <span class="pc-health-icon" aria-hidden="true"><x-icon :name="$healthIcons[$key] ?? 'shield-check'" /></span>
+                                            <span class="pc-health-name">{{ $label }}</span>
                                         </label>
                                     @endforeach
                                 </div>
                             </div>
 
-                            <div class="field" style="margin-top:14px;">
+                            <div class="field pc-health-other" style="margin-top:14px;">
                                 <label for="health_other">Anything else about access needs? (optional)</label>
                                 <input type="text" id="health_other" name="health_other" maxlength="300"
                                        value="{{ old('health_other', $healthProfile->other_text ?? '') }}"
@@ -440,5 +448,7 @@
 <script src="{{ asset('js/plan-origin.js') }}?v={{ filemtime(public_path('js/plan-origin.js')) }}" defer></script>
 <script src="{{ asset('js/plan-comfort.js') }}?v={{ filemtime(public_path('js/plan-comfort.js')) }}" defer></script>
 <script src="{{ asset('js/plan-wizard.js') }}?v={{ filemtime(public_path('js/plan-wizard.js')) }}" defer></script>
+<script src="{{ asset('js/plan-interest-summary.js') }}?v={{ filemtime(public_path('js/plan-interest-summary.js')) }}" defer></script>
+<script src="{{ asset('js/plan-stay-summary.js') }}?v={{ filemtime(public_path('js/plan-stay-summary.js')) }}" defer></script>
 
 @endsection

@@ -3,6 +3,11 @@
 @section('title', $accommodation->name.' — ExploreDVO')
 @section('meta_description', \Illuminate\Support\Str::limit(trim(strip_tags((string) ($accommodation->description ?? $accommodation->name.' on ExploreDVO, the DOT Region XI tourism platform.'))), 155))
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/accommodation-gallery.css') }}?v={{ filemtime(public_path('css/accommodation-gallery.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/destination-detail.css') }}?v={{ filemtime(public_path('css/destination-detail.css')) }}">
+@endpush
+
 @section('content')
 @php
     $gradients = [
@@ -21,7 +26,7 @@
     };
 @endphp
 
-<div class="container">
+<div class="container accommodation-detail-refresh listing-detail-refresh">
     @include('partials.operating-status-notice', ['listing' => $accommodation])
     <nav class="breadcrumb">
         <a href="{{ route('home') }}">Home</a> /
@@ -32,6 +37,7 @@
     <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($accommodation->getMorphClass(), $accommodation->id)->latest()->get()" />
 
     @include('partials.gallery-hero', [
+        'categoryLayout' => true,
         'photos' => $accommodation->photos,
         'title' => $accommodation->name,
         'subtitle' => $accommodation->posterMeta(),
@@ -103,9 +109,9 @@
     </div>
 
     @if ($nearby->count())
-        <div class="section-tight">
+        <div class="section-tight detail-related">
             <div class="section-head">
-                <div><h2>More in {{ $accommodation->region?->name ?? 'this area' }}</h2></div>
+                <div><h2 class="detail-related__title">More in {{ $accommodation->region?->name ?? 'this area' }}</h2></div>
             </div>
             <div class="card-grid">
                 @foreach ($nearby as $n)

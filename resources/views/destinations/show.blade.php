@@ -3,12 +3,17 @@
 @section('title', $destination->name.' — ExploreDVO')
 @section('meta_description', \Illuminate\Support\Str::limit(trim(strip_tags((string) ($destination->description ?? $destination->name.' on ExploreDVO, the DOT Region XI tourism platform.'))), 155))
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/accommodation-gallery.css') }}?v={{ filemtime(public_path('css/accommodation-gallery.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/destination-detail.css') }}?v={{ filemtime(public_path('css/destination-detail.css')) }}">
+@endpush
+
 @section('content')
 @php
     $mapUrl = \App\Support\MapLinks::directionsTo($destination->latitude, $destination->longitude, $destination->name, $destination->location);
 @endphp
 
-<div class="container">
+<div class="container destination-detail-refresh listing-detail-refresh">
     @include('partials.operating-status-notice', ['listing' => $destination])
     <nav class="breadcrumb">
         <a href="{{ route('home') }}">Home</a> /
@@ -17,13 +22,25 @@
     </nav>
 
 
-    @include('partials.dest-detail-hero', ['destination' => $destination])
-    @include('partials.photo-credit', ['photos' => collect([$destination->coverPhoto()])->filter(), 'title' => $destination->name])
+    @if ($destination->photos->isNotEmpty())
+        @include('partials.gallery-hero', [
+            'categoryLayout' => true,
+            'photos' => $destination->photos,
+            'title' => $destination->name,
+            'subtitle' => trim($destination->location.($destination->region ? ' · '.$destination->region->name : '')),
+            'isAccredited' => $destination->is_accredited,
+            'provenance' => app(\App\Support\SampleData::class)->status($destination),
+            'rating' => number_format($destination->rating, 1),
+            'reviewCount' => $destination->review_count,
+            'fallbackGradient' => '#163b30',
+        ])
+    @else
+        @include('partials.dest-detail-hero', ['destination' => $destination])
+    @endif
 
     <div class="detail-layout">
         <div>
             @include('partials.dest-stat-strip', ['destination' => $destination])
-
             @include('partials.dest-about-card', ['destination' => $destination])
 
             @include('partials.reviews-section', ['listing' => $destination, 'type' => 'destinations', 'kind' => 'destination'])
@@ -35,10 +52,10 @@
     </div>
 
     @if ($nearby->count())
-        <div class="section-tight">
+        <div class="section-tight detail-related">
             <div class="section-head">
                 <div>
-                    <h2 class="poster-title" style="color:var(--ocean-teal-dark);">
+                    <h2 class="detail-related__title">
                         @if ($nearbyIsSameRegion)
                             More in {{ $destination->region?->name ?? 'this area' }}
                         @else
