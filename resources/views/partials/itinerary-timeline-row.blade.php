@@ -198,7 +198,7 @@
                             @endif
                             <details class="pairing-why">
                                 <summary>why this pick?</summary>
-                                <p>{{ $item->ruleExplanation() }}</p>
+                                <p>{{ $item->ruleExplanation($provenance['transactions_demo'] ?? null, $provenance['transactions'] ?? null) }}</p>
                             </details>
                         </div>
                     @endif
