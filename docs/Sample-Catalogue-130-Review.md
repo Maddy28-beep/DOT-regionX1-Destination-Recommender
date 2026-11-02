@@ -313,4 +313,3 @@ must always split official vs sample (see G5 scope).
       never wired into `server-update.sh`. Rollback: triple-guarded `--remove` per kind + official-count check.
 
 **END OF PROPOSAL — awaiting explicit approval. No database changes have been made.**
-
