@@ -4,7 +4,9 @@ namespace App\Console\Commands;
 
 use App\Models\AccreditationRecord;
 use App\Models\Destination;
+use App\Models\DestinationTag;
 use App\Models\Region;
+use App\Support\Amenities;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -21,6 +23,8 @@ use Illuminate\Support\Str;
  *
  * CSV columns (header row required): name, type, location, region, latitude, longitude are required;
  * description, price_tier, entry_fee_min, entry_fee_max, hours, visit_duration, best_time, itinerary_role are optional.
+ * category_tags and amenity_tags are optional pipe-separated lists ("Beach|Island Hopping"); amenity_tags takes
+ * Amenities catalogue keys (parking, restroom, ...) and is stored as the exact catalogue labels the recommender reads.
  */
 class ImportSampleDestinations extends Command
 {
@@ -35,7 +39,7 @@ class ImportSampleDestinations extends Command
 
     private const REQUIRED = ['name', 'type', 'location', 'region', 'latitude', 'longitude'];
 
-    private const OPTIONAL = ['description', 'price_tier', 'entry_fee_min', 'entry_fee_max', 'hours', 'visit_duration', 'best_time', 'itinerary_role'];
+    private const OPTIONAL = ['description', 'price_tier', 'entry_fee_min', 'entry_fee_max', 'hours', 'visit_duration', 'best_time', 'itinerary_role', 'category_tags', 'amenity_tags'];
 
     /** Roughly the Davao Region (Region XI), so a swapped or mistyped coordinate is caught. */
     private const LAT = [5.5, 8.3];
@@ -93,6 +97,16 @@ class ImportSampleDestinations extends Command
             if (($row['itinerary_role'] ?? '') !== '' && ! isset(Destination::ITINERARY_ROLES[$row['itinerary_role']])) {
                 $errors[] = 'itinerary_role must be one of: '.implode(', ', array_keys(Destination::ITINERARY_ROLES));
             }
+            foreach ($this->splitList($row['category_tags'] ?? '') as $tag) {
+                if (strlen($tag) > 80) {
+                    $errors[] = "category tag '{$tag}' is longer than 80 characters";
+                }
+            }
+            foreach ($this->splitList($row['amenity_tags'] ?? '') as $key) {
+                if (! in_array($key, Amenities::FOR_KIND['destination'], true)) {
+                    $errors[] = "amenity '{$key}' is not a destination amenity (allowed: ".implode(', ', Amenities::FOR_KIND['destination']).')';
+                }
+            }
             if (isset($seen[$slug]) || Destination::where('slug', $slug)->exists()) {
                 $errors[] = 'a destination with this name already exists';
             }
@@ -132,6 +146,13 @@ class ImportSampleDestinations extends Command
                     'hours' => $r['hours'] ?? null, 'visit_duration' => $r['visit_duration'] ?? null, 'best_time' => $r['best_time'] ?? null,
                     'itinerary_role' => $r['itinerary_role'] ?? null, 'latitude' => $r['latitude'], 'longitude' => $r['longitude'],
                 ], fn ($v) => $v !== null && $v !== '') + ['is_accredited' => true, 'rating' => 0, 'review_count' => 0, 'featured' => false]);
+
+                foreach ($this->splitList($r['category_tags'] ?? '') as $tag) {
+                    DestinationTag::create(['destination_id' => $destination->id, 'kind' => 'category', 'value' => $tag]);
+                }
+                foreach ($this->splitList($r['amenity_tags'] ?? '') as $key) {
+                    DestinationTag::create(['destination_id' => $destination->id, 'kind' => 'amenity', 'value' => Amenities::label($key)]);
+                }
 
                 AccreditationRecord::create([
                     'listing_kind' => 'destination', 'listing_id' => $destination->id, 'accreditation_number' => $p['number'],
@@ -203,6 +224,12 @@ class ImportSampleDestinations extends Command
         fclose($handle);
 
         return [$rows, $problems];
+    }
+
+    /** @return array<int, string> */
+    private function splitList(string $value): array
+    {
+        return array_values(array_unique(array_filter(array_map('trim', explode('|', $value)), fn ($v) => $v !== '')));
     }
 
     private function nextNumber(): int

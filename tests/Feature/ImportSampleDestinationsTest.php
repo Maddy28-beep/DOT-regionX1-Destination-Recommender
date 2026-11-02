@@ -93,6 +93,32 @@ class ImportSampleDestinationsTest extends TestCase
         $this->artisan('sample:import-destinations', ['file' => $this->csv(['Z,Nature,X'], 'name,type,location')])->expectsOutputToContain('Missing column(s): region, latitude, longitude')->assertFailed();
     }
 
+    public function test_category_and_amenity_tags_are_written_as_the_recommender_reads_them(): void
+    {
+        $file = $this->csv(
+            ['Tag Falls,Nature & Adventure,X,Davao City,7.1,125.4,Desc,Budget-Friendly,8:00 AM-5:00 PM,2 hours,Morning,sightseeing,Nature|Hiking,parking|restroom|ramp'],
+            'name,type,location,region,latitude,longitude,description,price_tier,hours,visit_duration,best_time,itinerary_role,category_tags,amenity_tags'
+        );
+
+        $this->artisan('sample:import-destinations', ['file' => $file, '--apply' => true])->assertSuccessful();
+
+        $falls = Destination::where('name', 'Tag Falls [SAMPLE]')->firstOrFail();
+        $this->assertSame(['Hiking', 'Nature'], $falls->tags->where('kind', 'category')->pluck('value')->sort()->values()->all());
+        // Amenities are stored as the exact catalogue labels (Amenities::label), not the CSV keys.
+        $this->assertSame(['Accessibility Ramp', 'Parking Area', 'Restroom'], $falls->tags->where('kind', 'amenity')->pluck('value')->sort()->values()->all());
+    }
+
+    public function test_an_illegal_amenity_key_stops_the_whole_import(): void
+    {
+        $file = $this->csv(
+            ['Bad Falls,Nature,X,Davao City,7.1,125.4,,,,,,,,elevator'],
+            'name,type,location,region,latitude,longitude,description,price_tier,hours,visit_duration,best_time,itinerary_role,category_tags,amenity_tags'
+        );
+
+        $this->artisan('sample:import-destinations', ['file' => $file, '--apply' => true])->assertFailed();
+        $this->assertSame(0, Destination::count());
+    }
+
     public function test_remove_deletes_only_the_samples(): void
     {
         $region = Region::first();
