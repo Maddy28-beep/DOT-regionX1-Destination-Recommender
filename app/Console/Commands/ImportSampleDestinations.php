@@ -4,7 +4,10 @@ namespace App\Console\Commands;
 
 use App\Models\AccreditationRecord;
 use App\Models\Destination;
+use App\Models\DestinationTag;
 use App\Models\Region;
+use App\Support\Amenities;
+use App\Support\SampleManifest;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -21,13 +24,18 @@ use Illuminate\Support\Str;
  *
  * CSV columns (header row required): name, type, location, region, latitude, longitude are required;
  * description, price_tier, entry_fee_min, entry_fee_max, hours, visit_duration, best_time, itinerary_role are optional.
+ * category_tags and amenity_tags are optional pipe-separated lists ("Beach|Island Hopping"); amenity_tags takes
+ * Amenities catalogue keys (parking, restroom, ...) and is stored as the exact catalogue labels the recommender reads.
  */
 class ImportSampleDestinations extends Command
 {
     protected $signature = 'sample:import-destinations
         {file? : CSV file to read}
         {--apply : Write the changes (default is a report only)}
-        {--remove : Delete the sample destinations added by this command instead}';
+        {--remove : Delete the sample destinations added by this command instead}
+        {--from-number= : With --remove, only remove records numbered from this SAMPLE number (targeted rollback)}
+        {--to-number= : With --remove, only remove records numbered up to this SAMPLE number (targeted rollback)}
+        {--manifest= : With --remove, require removal candidates to exactly match this rollback manifest file}';
 
     protected $description = 'Add (or remove) clearly labelled sample destinations from a CSV.';
 
@@ -35,7 +43,7 @@ class ImportSampleDestinations extends Command
 
     private const REQUIRED = ['name', 'type', 'location', 'region', 'latitude', 'longitude'];
 
-    private const OPTIONAL = ['description', 'price_tier', 'entry_fee_min', 'entry_fee_max', 'hours', 'visit_duration', 'best_time', 'itinerary_role'];
+    private const OPTIONAL = ['description', 'price_tier', 'entry_fee_min', 'entry_fee_max', 'hours', 'visit_duration', 'best_time', 'itinerary_role', 'category_tags', 'amenity_tags'];
 
     /** Roughly the Davao Region (Region XI), so a swapped or mistyped coordinate is caught. */
     private const LAT = [5.5, 8.3];
@@ -93,6 +101,16 @@ class ImportSampleDestinations extends Command
             if (($row['itinerary_role'] ?? '') !== '' && ! isset(Destination::ITINERARY_ROLES[$row['itinerary_role']])) {
                 $errors[] = 'itinerary_role must be one of: '.implode(', ', array_keys(Destination::ITINERARY_ROLES));
             }
+            foreach ($this->splitList($row['category_tags'] ?? '') as $tag) {
+                if (strlen($tag) > 80) {
+                    $errors[] = "category tag '{$tag}' is longer than 80 characters";
+                }
+            }
+            foreach ($this->splitList($row['amenity_tags'] ?? '') as $key) {
+                if (! in_array($key, Amenities::FOR_KIND['destination'], true)) {
+                    $errors[] = "amenity '{$key}' is not a destination amenity (allowed: ".implode(', ', Amenities::FOR_KIND['destination']).')';
+                }
+            }
             if (isset($seen[$slug]) || Destination::where('slug', $slug)->exists()) {
                 $errors[] = 'a destination with this name already exists';
             }
@@ -133,6 +151,13 @@ class ImportSampleDestinations extends Command
                     'itinerary_role' => $r['itinerary_role'] ?? null, 'latitude' => $r['latitude'], 'longitude' => $r['longitude'],
                 ], fn ($v) => $v !== null && $v !== '') + ['is_accredited' => true, 'rating' => 0, 'review_count' => 0, 'featured' => false]);
 
+                foreach ($this->splitList($r['category_tags'] ?? '') as $tag) {
+                    DestinationTag::create(['destination_id' => $destination->id, 'kind' => 'category', 'value' => $tag]);
+                }
+                foreach ($this->splitList($r['amenity_tags'] ?? '') as $key) {
+                    DestinationTag::create(['destination_id' => $destination->id, 'kind' => 'amenity', 'value' => Amenities::label($key)]);
+                }
+
                 AccreditationRecord::create([
                     'listing_kind' => 'destination', 'listing_id' => $destination->id, 'accreditation_number' => $p['number'],
                     'status' => 'Active', 'issue_date' => now()->toDateString(), 'expiration_date' => self::EXPIRES, 'is_placeholder' => true,
@@ -149,7 +174,33 @@ class ImportSampleDestinations extends Command
     {
         $records = AccreditationRecord::where('listing_kind', 'destination')->where('is_placeholder', true)
             ->where('accreditation_number', 'like', 'SAMPLE-%')->get();
+
+        // Targeted rollback: a number range removes only that batch. Pre-existing samples below the
+        // range (e.g. SAMPLE-0001..SAMPLE-0018 in production) are reported as protected, never selected.
+        $from = SampleManifest::numberValue($this->option('from-number') ?: null);
+        $to = SampleManifest::numberValue($this->option('to-number') ?: null);
+        if ($this->option('from-number') && $from === null || $this->option('to-number') && $to === null) {
+            $this->error('--from-number and --to-number must look like SAMPLE-0042.');
+
+            return self::FAILURE;
+        }
+        if ($from !== null || $to !== null) {
+            $inRange = $records->filter(function ($r) use ($from, $to) {
+                $n = SampleManifest::numberValue($r->accreditation_number);
+
+                return $n !== null && ($from === null || $n >= $from) && ($to === null || $n <= $to);
+            });
+            $this->warn('Targeted removal: '.($records->count() - $inRange->count()).' sample destinations are outside the given range and will be left untouched.');
+            $records = $inRange;
+        }
+
         $destinations = Destination::whereIn('id', $records->pluck('listing_id'))->where('name', 'like', '%'.self::SUFFIX)->get();
+
+        // Manifest-enforced rollback: candidates must be exactly manifest ∩ range ∩ triple guard.
+        // Any missing, modified or out-of-manifest record aborts before anything can be deleted.
+        if ($this->option('manifest') && ! $this->manifestGuard('destination', $destinations->pluck('id')->all(), $from, $to)) {
+            return self::FAILURE;
+        }
 
         $this->table(['id', 'name', 'number'], $destinations->map(fn ($d) => [$d->id, $d->name, $records->firstWhere('listing_id', $d->id)?->accreditation_number])->all());
         $this->line($destinations->count().' sample destinations found.');
@@ -203,6 +254,52 @@ class ImportSampleDestinations extends Command
         fclose($handle);
 
         return [$rows, $problems];
+    }
+
+    /**
+     * Removal candidates must exactly match the manifest entries for this kind and range.
+     * Verifies manifest integrity and database agreement first; prints the reason and returns
+     * false (abort) on any mismatch, before any deletion can happen.
+     */
+    private function manifestGuard(string $kind, array $candidateIds, ?int $from, ?int $to): bool
+    {
+        $manifest = app(SampleManifest::class);
+        $path = (string) $this->option('manifest');
+        $check = $manifest->verifyAgainstDatabase($path);
+        if (! $check['ok']) {
+            foreach ($check['errors'] as $error) {
+                $this->error("Manifest check failed: {$error}");
+            }
+            $this->error('Removal aborted: the manifest does not verify against the database.');
+
+            return false;
+        }
+
+        $entries = collect(json_decode((string) file_get_contents($path), true)['entries'] ?? [])
+            ->where('kind', $kind)
+            ->filter(function ($e) use ($from, $to) {
+                $n = SampleManifest::numberValue($e['number'] ?? null);
+
+                return $n !== null && ($from === null || $n >= $from) && ($to === null || $n <= $to);
+            });
+        $manifestIds = $entries->pluck('id')->map(fn ($id) => (int) $id)->sort()->values()->all();
+        $candidateIds = collect($candidateIds)->map(fn ($id) => (int) $id)->sort()->values()->all();
+
+        if ($manifestIds !== $candidateIds) {
+            $this->error('Removal aborted: candidates do not exactly match the manifest for this kind and range.');
+            $this->error('Only in manifest: '.implode(', ', array_diff($manifestIds, $candidateIds)) ?: 'Only in manifest: -');
+            $this->error('Only eligible in range: '.implode(', ', array_diff($candidateIds, $manifestIds)) ?: 'Only eligible in range: -');
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /** @return array<int, string> */
+    private function splitList(string $value): array
+    {
+        return array_values(array_unique(array_filter(array_map('trim', explode('|', $value)), fn ($v) => $v !== '')));
     }
 
     private function nextNumber(): int

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AccreditationRecord;
 use App\Models\Destination;
 use App\Models\ListingPhoto;
 use App\Models\Region;
@@ -64,6 +65,27 @@ class ChatbotCardsTest extends TestCase
         $this->eagleCenter();
 
         $this->postJson(route('chatbot.respond'), ['message' => 'hello'])->assertOk()->assertJsonPath('cards', []);
+    }
+
+    public function test_a_sample_listing_is_never_introduced_as_dot_accredited_and_its_card_is_flagged(): void
+    {
+        $destination = $this->eagleCenter();
+        AccreditationRecord::create(['listing_kind' => 'destination', 'listing_id' => $destination->id, 'accreditation_number' => 'SAMPLE-9001', 'status' => 'Active', 'is_placeholder' => true]);
+
+        $response = $this->postJson(route('chatbot.respond'), ['message' => 'things to do'])->assertOk();
+        $text = $response->json('response');
+        $this->assertStringNotContainsString('DOT-accredited', $text);
+        $this->assertStringContainsString('Sample data', $text);
+        $this->assertTrue($response->json('cards.0.sample'));
+    }
+
+    public function test_an_official_only_answer_keeps_dot_accredited_and_unflagged_cards(): void
+    {
+        $this->eagleCenter();
+
+        $response = $this->postJson(route('chatbot.respond'), ['message' => 'things to do'])->assertOk();
+        $this->assertStringContainsString('DOT-accredited', $response->json('response'));
+        $this->assertFalse($response->json('cards.0.sample'));
     }
 
     public function test_cards_are_capped_at_three(): void
