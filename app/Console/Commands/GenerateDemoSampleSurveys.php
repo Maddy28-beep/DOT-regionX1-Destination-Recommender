@@ -37,6 +37,7 @@ class GenerateDemoSampleSurveys extends Command
         {--count=150 : How many surveys to simulate}
         {--batch=demo-samples-2026-11 : The batch name written on every row}
         {--seed=2026 : Same seed, same surveys}
+        {--ensure-sample-coverage : Add deterministic surveys so every eligible sample destination appears in at least two baskets}
         {--apply : Write the surveys (default is a report only)}
         {--revert : Delete the surveys of --batch instead}';
 
@@ -96,6 +97,11 @@ class GenerateDemoSampleSurveys extends Command
 
         mt_srand((int) $this->option('seed'));
         $surveys = $this->simulate($count);
+
+        if ($this->option('ensure-sample-coverage')) {
+            $surveys = $this->ensureSampleCoverage($surveys);
+        }
+
         $this->report($surveys, $batch);
 
         if (! $this->option('apply')) {
@@ -203,6 +209,62 @@ class GenerateDemoSampleSurveys extends Command
             }
 
             $surveys[] = $this->fields($main, $second, array_values(array_unique($places)), count($chosen));
+        }
+
+        return $surveys;
+    }
+
+    /**
+     * Coverage guarantee for the sample places (including the Sample-130 catalogue batch, which
+     * arrived after the original demo batch was generated): every eligible sample destination
+     * ends up in at least MIN_SUPPORT_COUNT baskets, so it can actually start an association
+     * rule instead of existing only in the catalogue. Deterministic: destinations are visited
+     * in id order and companions are the target's best-fitting places (ties by id), all under
+     * the caller's seed. The added surveys are ordinary simulated rows (data_source/batch are
+     * applied by the caller), never genuine data.
+     *
+     * @param  list<array{fields: array, places: list<string>, activities: list<string>, interests: list<string>}>  $surveys
+     * @return list<array{fields: array, places: list<string>, activities: list<string>, interests: list<string>}>
+     */
+    private function ensureSampleCoverage(array $surveys): array
+    {
+        $sample = app(SampleData::class);
+        $targets = $this->destinations->filter(fn ($d) => $sample->isSample($d))->sortBy('id')->values();
+
+        if ($targets->isEmpty()) {
+            return $surveys;
+        }
+
+        $visits = [];
+        foreach ($surveys as $s) {
+            foreach ($s['places'] as $place) {
+                $visits[$place] = ($visits[$place] ?? 0) + 1;
+            }
+        }
+
+        foreach ($targets as $target) {
+            $key = 'destination:'.$target->id;
+
+            while (($visits[$key] ?? 0) < self::MIN_SUPPORT_COUNT) {
+                // The interest this place fits best is the scenario the simulated visitor came for.
+                $main = collect(array_keys(self::PERSONAS))
+                    ->sortByDesc(fn ($interest) => $this->fit[$interest][$target->id] ?? 0)
+                    ->first();
+
+                $companions = $this->destinations
+                    ->reject(fn ($d) => $d->id === $target->id)
+                    ->sort(fn ($a, $b) => [($this->fit[$main][$b->id] ?? 0), $b->id] <=> [($this->fit[$main][$a->id] ?? 0), $a->id])
+                    ->take(3)
+                    ->values();
+
+                $basket = collect([$target])->concat($companions);
+                $places = $basket->map(fn ($d) => 'destination:'.$d->id)->all();
+                $surveys[] = $this->fields($main, null, $places, $basket->count());
+
+                foreach ($places as $place) {
+                    $visits[$place] = ($visits[$place] ?? 0) + 1;
+                }
+            }
         }
 
         return $surveys;
@@ -388,12 +450,14 @@ class GenerateDemoSampleSurveys extends Command
         };
 
         $sampleRules = $after->filter(fn ($r) => $isSample($r['a']) || $isSample($r['b']))->values();
-        $strong = $after->filter(fn ($r) => $r['n'] >= 4 && str_starts_with($r['a'], 'destination:') && str_starts_with($r['b'], 'destination:') && (str_contains($name($r['a']), '[SAMPLE]') || str_contains($name($r['b']), '[SAMPLE]')))
+        // Sample places are identified by provenance (SampleData), never by name: the Sample-130
+        // catalogue names do not carry a "[SAMPLE]" suffix, so the old name test missed them.
+        $strong = $after->filter(fn ($r) => $r['n'] >= 4 && str_starts_with($r['a'], 'destination:') && str_starts_with($r['b'], 'destination:') && ($isSample($r['a']) || $isSample($r['b'])))
             ->sort(fn ($x, $y) => [$y['n'], $y['confidence']] <=> [$x['n'], $x['confidence']])->values();
         $this->newLine();
-        $this->line('Destination-to-destination rules with co-count >= 4 that involve one of the new [SAMPLE] places (top 15 by co-count): '.$strong->count().' in all');
+        $this->line('Destination-to-destination rules with co-count >= 4 that involve a sample place (top 15 by co-count): '.$strong->count().' in all');
         $this->table(['if they visit', 'they also visit', 'n', 'support', 'confidence'], $strong->take(15)->map(fn ($r) => [$name($r['a']), $name($r['b']), $r['n'], $r['support'], $r['confidence']])->all());
-        $this->line('new [SAMPLE] places that start at least one such rule: '.$strong->pluck('a')->unique()->filter(fn ($k) => str_contains($name($k), '[SAMPLE]'))->count().' of 18');
+        $this->line('sample places that start at least one such rule: '.$strong->pluck('a')->unique()->filter(fn ($k) => $isSample($k))->count().' of '.$this->destinations->filter(fn ($d) => $sample->isSample($d))->count());
 
         $withRules = $this->destinations->filter(fn ($d) => $sample->isSample($d) && $sampleRules->contains(fn ($r) => $r['a'] === 'destination:'.$d->id));
         $this->line('sample places that become the START of at least one rule (so Apriori can credit them in an itinerary): '.$withRules->count().' of '.$this->destinations->filter(fn ($d) => $sample->isSample($d))->count());
