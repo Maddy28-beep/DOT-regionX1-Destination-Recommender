@@ -105,6 +105,45 @@ class ImportSampleListingsTest extends TestCase
         $this->assertSame(0, AccommodationRoomType::count());
     }
 
+    /** Import one record of the given kind and return the SAMPLE number it was given. */
+    private function importOne(string $kind, string $name): string
+    {
+        [$header, $row] = match ($kind) {
+            'accommodation' => [self::ACC_HEADER, "$name,Sample site,Davao City,7.07,125.61,Synthetic,wifi|ac|parking|restaurant,Hotel,Mid-range,1500,14:00,12:00,Standard Room:1200-1500,"],
+            'restaurant' => [self::REST_HEADER, "$name,Sample site,Davao City,7.07,125.61,Synthetic,parking|restroom|ac|wifi,Filipino,Budget-Friendly,10:00 AM-9:00 PM"],
+            default => [self::SOUV_HEADER, "$name,Sample site,Davao City,7.07,125.61,Synthetic,parking|restroom|ac|gcash"],
+        };
+        $this->artisan('sample:import-listings', ['file' => $this->csv([$row], $header), '--kind' => $kind, '--apply' => true])->assertSuccessful();
+
+        return AccreditationRecord::where('listing_kind', $kind)->orderByDesc('id')->firstOrFail()->accreditation_number;
+    }
+
+    public function test_targeted_removal_protects_earlier_samples_for_every_listing_kind(): void
+    {
+        $models = ['accommodation' => Accommodation::class, 'restaurant' => Restaurant::class, 'souvenir_center' => SouvenirCenter::class];
+
+        foreach ($models as $kind => $model) {
+            $oldNumber = $this->importOne($kind, "Old {$kind} Place");
+            $newNumber = $this->importOne($kind, "New {$kind} Place");
+            $this->assertNotSame($oldNumber, $newNumber);
+
+            // Targeted dry run selects only the newer record and deletes nothing.
+            $this->artisan('sample:import-listings', ['--kind' => $kind, '--remove' => true, '--from-number' => $newNumber])->assertSuccessful();
+            $this->assertSame(2, $model::count(), "{$kind}: targeted dry run must delete nothing.");
+
+            $this->artisan('sample:import-listings', ['--kind' => $kind, '--remove' => true, '--from-number' => $newNumber, '--apply' => true])->assertSuccessful();
+
+            $this->assertSame(["Old {$kind} Place [SAMPLE]"], $model::pluck('name')->all(), "{$kind}: the earlier sample outside the range must remain.");
+            $remaining = AccreditationRecord::where('listing_kind', $kind)->pluck('accreditation_number')->all();
+            $this->assertContains($oldNumber, $remaining, "{$kind}: the earlier SAMPLE number must remain.");
+            $this->assertNotContains($newNumber, $remaining, "{$kind}: only the in-range SAMPLE number is removed.");
+
+            // Reset for the next kind (SAMPLE numbering is shared across kinds).
+            $this->artisan('sample:import-listings', ['--kind' => $kind, '--remove' => true, '--apply' => true])->assertSuccessful();
+            $this->assertSame(0, $model::count());
+        }
+    }
+
     public function test_the_approved_130_record_data_files_dry_run_cleanly(): void
     {
         $files = [

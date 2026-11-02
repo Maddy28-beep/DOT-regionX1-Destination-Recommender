@@ -7,6 +7,7 @@ use App\Models\Destination;
 use App\Models\DestinationTag;
 use App\Models\Region;
 use App\Support\Amenities;
+use App\Support\SampleManifest;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -31,7 +32,10 @@ class ImportSampleDestinations extends Command
     protected $signature = 'sample:import-destinations
         {file? : CSV file to read}
         {--apply : Write the changes (default is a report only)}
-        {--remove : Delete the sample destinations added by this command instead}';
+        {--remove : Delete the sample destinations added by this command instead}
+        {--from-number= : With --remove, only remove records numbered from this SAMPLE number (targeted rollback)}
+        {--to-number= : With --remove, only remove records numbered up to this SAMPLE number (targeted rollback)}
+        {--manifest= : With --remove, require removal candidates to exactly match this rollback manifest file}';
 
     protected $description = 'Add (or remove) clearly labelled sample destinations from a CSV.';
 
@@ -170,7 +174,33 @@ class ImportSampleDestinations extends Command
     {
         $records = AccreditationRecord::where('listing_kind', 'destination')->where('is_placeholder', true)
             ->where('accreditation_number', 'like', 'SAMPLE-%')->get();
+
+        // Targeted rollback: a number range removes only that batch. Pre-existing samples below the
+        // range (e.g. SAMPLE-0001..SAMPLE-0018 in production) are reported as protected, never selected.
+        $from = SampleManifest::numberValue($this->option('from-number') ?: null);
+        $to = SampleManifest::numberValue($this->option('to-number') ?: null);
+        if ($this->option('from-number') && $from === null || $this->option('to-number') && $to === null) {
+            $this->error('--from-number and --to-number must look like SAMPLE-0042.');
+
+            return self::FAILURE;
+        }
+        if ($from !== null || $to !== null) {
+            $inRange = $records->filter(function ($r) use ($from, $to) {
+                $n = SampleManifest::numberValue($r->accreditation_number);
+
+                return $n !== null && ($from === null || $n >= $from) && ($to === null || $n <= $to);
+            });
+            $this->warn('Targeted removal: '.($records->count() - $inRange->count()).' sample destinations are outside the given range and will be left untouched.');
+            $records = $inRange;
+        }
+
         $destinations = Destination::whereIn('id', $records->pluck('listing_id'))->where('name', 'like', '%'.self::SUFFIX)->get();
+
+        // Manifest-enforced rollback: candidates must be exactly manifest ∩ range ∩ triple guard.
+        // Any missing, modified or out-of-manifest record aborts before anything can be deleted.
+        if ($this->option('manifest') && ! $this->manifestGuard('destination', $destinations->pluck('id')->all(), $from, $to)) {
+            return self::FAILURE;
+        }
 
         $this->table(['id', 'name', 'number'], $destinations->map(fn ($d) => [$d->id, $d->name, $records->firstWhere('listing_id', $d->id)?->accreditation_number])->all());
         $this->line($destinations->count().' sample destinations found.');
@@ -224,6 +254,46 @@ class ImportSampleDestinations extends Command
         fclose($handle);
 
         return [$rows, $problems];
+    }
+
+    /**
+     * Removal candidates must exactly match the manifest entries for this kind and range.
+     * Verifies manifest integrity and database agreement first; prints the reason and returns
+     * false (abort) on any mismatch, before any deletion can happen.
+     */
+    private function manifestGuard(string $kind, array $candidateIds, ?int $from, ?int $to): bool
+    {
+        $manifest = app(SampleManifest::class);
+        $path = (string) $this->option('manifest');
+        $check = $manifest->verifyAgainstDatabase($path);
+        if (! $check['ok']) {
+            foreach ($check['errors'] as $error) {
+                $this->error("Manifest check failed: {$error}");
+            }
+            $this->error('Removal aborted: the manifest does not verify against the database.');
+
+            return false;
+        }
+
+        $entries = collect(json_decode((string) file_get_contents($path), true)['entries'] ?? [])
+            ->where('kind', $kind)
+            ->filter(function ($e) use ($from, $to) {
+                $n = SampleManifest::numberValue($e['number'] ?? null);
+
+                return $n !== null && ($from === null || $n >= $from) && ($to === null || $n <= $to);
+            });
+        $manifestIds = $entries->pluck('id')->map(fn ($id) => (int) $id)->sort()->values()->all();
+        $candidateIds = collect($candidateIds)->map(fn ($id) => (int) $id)->sort()->values()->all();
+
+        if ($manifestIds !== $candidateIds) {
+            $this->error('Removal aborted: candidates do not exactly match the manifest for this kind and range.');
+            $this->error('Only in manifest: '.implode(', ', array_diff($manifestIds, $candidateIds)) ?: 'Only in manifest: -');
+            $this->error('Only eligible in range: '.implode(', ', array_diff($candidateIds, $manifestIds)) ?: 'Only eligible in range: -');
+
+            return false;
+        }
+
+        return true;
     }
 
     /** @return array<int, string> */

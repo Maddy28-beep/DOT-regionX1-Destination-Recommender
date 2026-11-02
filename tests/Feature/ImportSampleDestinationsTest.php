@@ -119,6 +119,23 @@ class ImportSampleDestinationsTest extends TestCase
         $this->assertSame(0, Destination::count());
     }
 
+    public function test_targeted_removal_protects_earlier_samples(): void
+    {
+        $first = $this->csv(['Old Falls,Nature,X,Davao City,7.1,125.4']);
+        $second = $this->csv(['New Falls,Nature,X,Davao City,7.2,125.5']);
+        $this->artisan('sample:import-destinations', ['file' => $first, '--apply' => true])->assertSuccessful();
+        $this->artisan('sample:import-destinations', ['file' => $second, '--apply' => true])->assertSuccessful();
+        $this->assertSame(['Old Falls [SAMPLE]', 'New Falls [SAMPLE]'], Destination::orderBy('id')->pluck('name')->all());
+
+        // Dry run of the targeted removal selects only SAMPLE-0002 and deletes nothing.
+        $this->artisan('sample:import-destinations', ['--remove' => true, '--from-number' => 'SAMPLE-0002'])->assertSuccessful();
+        $this->assertSame(2, Destination::count());
+
+        $this->artisan('sample:import-destinations', ['--remove' => true, '--from-number' => 'SAMPLE-0002', '--apply' => true])->assertSuccessful();
+        $this->assertSame(['Old Falls [SAMPLE]'], Destination::pluck('name')->all());
+        $this->assertSame(['SAMPLE-0001'], AccreditationRecord::pluck('accreditation_number')->all());
+    }
+
     public function test_remove_deletes_only_the_samples(): void
     {
         $region = Region::first();
