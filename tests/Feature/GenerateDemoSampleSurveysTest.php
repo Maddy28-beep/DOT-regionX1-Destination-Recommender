@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Models\Accommodation;
 use App\Models\AccreditationRecord;
 use App\Models\Destination;
 use App\Models\ExitSurvey;
 use App\Models\ExitSurveyVisit;
 use App\Models\Region;
+use App\Models\Restaurant;
 use App\Services\Recommendation\AprioriService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
@@ -146,16 +148,24 @@ class GenerateDemoSampleSurveysTest extends TestCase
     public function test_after_coverage_apriori_can_start_a_rule_from_a_sample_place(): void
     {
         $this->places();
+        $region = Region::firstOrCreate(['name' => 'Davao City']);
+        Restaurant::create(['slug' => 'coverage-cafe', 'name' => 'Coverage Cafe', 'location' => 'Davao City', 'region_id' => $region->id, 'is_accredited' => true, 'rating' => 0, 'review_count' => 0, 'latitude' => 7.42, 'longitude' => 125.5]);
+        Accommodation::create(['slug' => 'coverage-inn', 'name' => 'Coverage Inn', 'location' => 'Davao City', 'region_id' => $region->id, 'type' => 'Hotel', 'is_accredited' => true, 'rating' => 0, 'review_count' => 0, 'latitude' => 7.42, 'longitude' => 125.5]);
         $this->generate(['--count' => 5, '--seed' => 11, '--ensure-sample-coverage' => true, '--apply' => true, '--batch' => 'coverage-rules']);
 
         $sample = Destination::where('name', 'like', '%[SAMPLE]%')->firstOrFail();
-        $associated = app(AprioriService::class)
-            ->getAssociatedListings('destination', $sample->id, 10, 0.1, 2, 'destination');
+        $apriori = app(AprioriService::class);
+        $associated = $apriori->getAssociatedListings('destination', $sample->id, 10, 0.1, 2, 'destination');
 
         // The two guaranteed baskets pair the sample place with the same companions, clearing the
         // unchanged minimum support count of 2; a single co-visit must not form a rule.
         $this->assertNotEmpty($associated);
         $this->assertGreaterThanOrEqual(2, $associated[0]['co_count']);
+
+        // The builder credits rules on meal and overnight rows, so the coverage baskets also
+        // pair each sample place with its nearest meal and stay: those rules must qualify too.
+        $this->assertNotEmpty($apriori->suggestionsFor('destination', $sample->id, 5, 'restaurant'));
+        $this->assertNotEmpty($apriori->suggestionsFor('destination', $sample->id, 5, 'accommodation'));
     }
 
     public function test_it_refuses_without_enough_places(): void
