@@ -148,6 +148,7 @@
     .chatbot-card-name { font-weight: 700; font-size: .9rem; line-height: 1.25; }
     .chatbot-card-where { font-size: .76rem; color: var(--muted, #5b6b64); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .chatbot-card-meta { font-size: .8rem; font-weight: 700; color: var(--primary-dark); }
+    .chatbot-card-sample { font-size: .72rem; font-weight: 700; color: #8a5a12; background: #fdf0d5; border: 1px solid #e8cf9a; border-radius: 999px; padding: 1px 7px; align-self: flex-start; }
 
     /* The way into another page that an answer points at, e.g. the trip planner. */
     .chatbot-msg a.chatbot-action {
@@ -535,6 +536,7 @@
         body.className = 'chatbot-card-body';
         function line(cls, txt) { var s = document.createElement('span'); s.className = cls; s.textContent = txt; body.appendChild(s); }
         line('chatbot-card-name', c.name);
+        if (c.sample) line('chatbot-card-sample', 'Sample data, not DOT-verified');
         if (c.where) line('chatbot-card-where', c.where);
         line('chatbot-card-meta', (c.meta ? c.meta + ' · ' : '') + 'View →');
         a.appendChild(body);

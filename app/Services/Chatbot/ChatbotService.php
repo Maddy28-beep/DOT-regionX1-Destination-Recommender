@@ -3,13 +3,15 @@
 namespace App\Services\Chatbot;
 
 use App\Models\Accommodation;
-use App\Models\Concerns\HasOperatingStatus;
 use App\Models\ChatbotLog;
+use App\Models\Concerns\HasOperatingStatus;
 use App\Models\Destination;
 use App\Models\Package;
 use App\Models\Restaurant;
 use App\Models\SouvenirCenter;
 use App\Models\TourOperator;
+use App\Support\SampleData;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -126,6 +128,7 @@ class ChatbotService
             'meta' => $price ? '₱'.$price : ($listing->rating ? number_format($listing->rating, 1).'/5' : null),
             'image' => $photo?->url(),
             'url' => route($route, $listing),
+            'sample' => app(SampleData::class)->isSample($listing),
         ];
     }
 
@@ -179,7 +182,7 @@ class ChatbotService
     /** Grounds the model in what ExploreDVO actually has, so it doesn't invent listings or make booking promises. */
     private function buildSystemPrompt(): string
     {
-        $sampleData = app(\App\Support\SampleData::class);
+        $sampleData = app(SampleData::class);
         $listings = collect(self::LISTING_CONFIG)->flatMap(function ($config, $type) use ($sampleData) {
             return $config['model']::query()
                 ->where('is_accredited', true)
@@ -188,8 +191,8 @@ class ChatbotService
                 ->limit(10)
                 ->get(['id', 'name'])
                 ->map(fn ($l) => $l->name.match ($sampleData->status($l)) {
-                    \App\Support\SampleData::SAMPLE => ' [sample data, not DOT-verified]',
-                    \App\Support\SampleData::UNVERIFIED => ' [not yet verified]',
+                    SampleData::SAMPLE => ' [sample data, not DOT-verified]',
+                    SampleData::UNVERIFIED => ' [not yet verified]',
                     default => '',
                 }." ({$config['label']})");
         })->implode('; ');
@@ -233,7 +236,7 @@ class ChatbotService
         return match ($intent) {
             'greeting' => "Hi! I'm the ExploreDVO assistant. Ask me about destinations, accommodations, restaurants, tour packages, souvenir centers, or tour operators in the Davao Region — or ask whether a place is DOT-accredited.",
             'thanks' => "You're welcome! Let me know if there's anything else about Davao Region tourism I can help with.",
-            'help' => "I can help you find DOT-accredited destinations, accommodations, restaurants, souvenir centers, tour operators, and packages. You can also ask me to check if a specific place is accredited, or ask about your travel itinerary.",
+            'help' => 'I can help you find DOT-accredited destinations, accommodations, restaurants, souvenir centers, tour operators, and packages. You can also ask me to check if a specific place is accredited, or ask about your travel itinerary.',
             'itinerary' => "I'd love to help you plan your trip! Answer a few quick questions and your personalized itinerary is ready the moment you finish: no sign-up needed. I'll factor in your interests, budget, dates and any accessibility needs.",
             'accreditation' => $this->accreditationResponse($message),
             'destination' => $this->listingResponse('destination', $message),
@@ -342,9 +345,9 @@ class ChatbotService
         $kind = $listing->type ?? $listing->cuisine_type ?? $listing->specialization ?? $config['label'];
         $where = trim((string) ($listing->location ?? ''));
         // Sample data keeps its place in answers, but is never called DOT-accredited.
-        $provenance = app(\App\Support\SampleData::class)->status($listing);
-        $sample = $provenance === \App\Support\SampleData::SAMPLE;
-        $unverified = $provenance === \App\Support\SampleData::UNVERIFIED;
+        $provenance = app(SampleData::class)->status($listing);
+        $sample = $provenance === SampleData::SAMPLE;
+        $unverified = $provenance === SampleData::UNVERIFIED;
         $asked = str_contains(strtolower($message), 'accredit');
         $text = $asked
             ? ($sample
@@ -389,20 +392,26 @@ class ChatbotService
         $matches = $this->searchListings($config['model'], $message, $type === 'destination');
 
         if ($matches->isEmpty()) {
-            return "I couldn't find a DOT-accredited {$config['label']} matching that. Try browsing the full {$config['label']} list on the site instead.";
+            return "I couldn't find a {$config['label']} matching that. Try browsing the full {$config['label']} list on the site instead.";
         }
 
         $this->cardListings = $matches->map(fn ($listing) => [$listing, $config['route']])->all();
 
+        // Provenance decides the wording: a set containing sample data (placeholder accreditation) must
+        // never be introduced as DOT-accredited. Only an official-only set earns that line.
+        $anySample = $matches->contains(fn ($listing) => app(SampleData::class)->isSample($listing));
+
         // The names, photos and links are on the cards under this line; it only introduces them.
-        return "Here are some DOT-accredited {$config['label']} options. Tap one to see its details.";
+        return $anySample
+            ? "Here are some {$config['label']} options. Any marked Sample data are test listings, not DOT-verified. Tap one to see its details."
+            : "Here are some DOT-accredited {$config['label']} options. Tap one to see its details.";
     }
 
     private function searchListings(string $modelClass, string $message, bool $includeTags = false): Collection
     {
         $keywords = $this->extractKeywords($message);
 
-        /** @var \Illuminate\Database\Eloquent\Builder $query */
+        /** @var Builder $query */
         $query = $modelClass::query()->where('is_accredited', true)->whereNull('archived_at');
         if (in_array(HasOperatingStatus::class, class_uses_recursive($modelClass), true)) {
             $query->availableDuring(now(), now());   // a place that is closed today is not offered
@@ -475,9 +484,9 @@ class ChatbotService
 
             if ($listing) {
                 $status = $listing->is_accredited ? 'is DOT-accredited' : 'is not currently DOT-accredited';
-                if ($listing->is_accredited && app(\App\Support\SampleData::class)->isSample($listing)) {
+                if ($listing->is_accredited && app(SampleData::class)->isSample($listing)) {
                     $status = 'is sample data on this platform: its accreditation number is a placeholder, so it is not verified by DOT';
-                } elseif ($listing->is_accredited && app(\App\Support\SampleData::class)->status($listing) === \App\Support\SampleData::UNVERIFIED) {
+                } elseif ($listing->is_accredited && app(SampleData::class)->status($listing) === SampleData::UNVERIFIED) {
                     $status = 'has no DOT accreditation record on file, so its accreditation is not yet verified';
                 }
                 $this->cardListings = [[$config['model']::query()->find($listing->id), $config['route']]];
