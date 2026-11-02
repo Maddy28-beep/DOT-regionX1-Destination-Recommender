@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 class ItineraryItem extends Model
 {
@@ -23,7 +24,11 @@ class ItineraryItem extends Model
      * Returns null for rows picked by proximity or preference, so the page can
      * credit the algorithm only where it actually did the work.
      */
-    public function ruleExplanation(): ?string
+    /**
+     * @param  ?int  $simulatedTransactions  Demo (simulated) transactions in the mined dataset, when the caller knows it.
+     * @param  ?int  $totalTransactions  All transactions the rules were mined from, when the caller knows it.
+     */
+    public function ruleExplanation(?int $simulatedTransactions = null, ?int $totalTransactions = null): ?string
     {
         if (blank($this->rule_basis) || $this->rule_confidence === null) {
             return null;
@@ -32,12 +37,25 @@ class ItineraryItem extends Model
         $confidence = round((float) $this->rule_confidence * 100);
         $support = round((float) $this->rule_support * 100, 1);
 
+        // The mined dataset is the same for every rule in an itinerary, so its demo/genuine
+        // composition (the provenance panel's counts) decides the wording: counts that are
+        // entirely simulated must say so, or "(N trips)" reads as genuine tourist visits.
+        // A mixed dataset is labelled as including simulated trips without claiming a
+        // per-rule split the stored row does not carry.
+        $trips = match (true) {
+            $simulatedTransactions !== null && $totalTransactions !== null
+                && $totalTransactions > 0 && $simulatedTransactions >= $totalTransactions => sprintf('%d simulated trips', $this->rule_co_count),
+            $simulatedTransactions !== null && $totalTransactions !== null
+                && $totalTransactions > 0 && $simulatedTransactions > 0 => sprintf('%d trips, including simulated demonstration trips', $this->rule_co_count),
+            default => sprintf('%d trips', $this->rule_co_count),
+        };
+
         return sprintf(
-            'Frequently visited with %s — %d%% confidence, %s%% support (%d trips)',
+            'Frequently visited with %s — %d%% confidence, %s%% support (%s)',
             $this->rule_basis,
             $confidence,
             $support,
-            $this->rule_co_count,
+            $trips,
         );
     }
 
@@ -97,13 +115,13 @@ class ItineraryItem extends Model
             return '';
         }
 
-        $start = \Illuminate\Support\Carbon::parse($this->starts_at)->format('g:i A');
+        $start = Carbon::parse($this->starts_at)->format('g:i A');
 
         if (blank($this->ends_at)) {
             return $start;
         }
 
-        return $start.' – '.\Illuminate\Support\Carbon::parse($this->ends_at)->format('g:i A');
+        return $start.' – '.Carbon::parse($this->ends_at)->format('g:i A');
     }
 
     /**
@@ -116,8 +134,8 @@ class ItineraryItem extends Model
             return null;
         }
 
-        $start = \Illuminate\Support\Carbon::parse($this->starts_at);
-        $minutes = (int) $start->diffInMinutes(\Illuminate\Support\Carbon::parse($this->ends_at));
+        $start = Carbon::parse($this->starts_at);
+        $minutes = (int) $start->diffInMinutes(Carbon::parse($this->ends_at));
 
         if ($minutes <= 0) {
             return null;
