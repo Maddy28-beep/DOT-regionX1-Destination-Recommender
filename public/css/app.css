@@ -2407,6 +2407,8 @@ select.site-dropdown-native {
     margin-bottom: 32px;
 }
 .dpost-banner__art { position: relative; overflow: hidden; }
+/* A portrait upload must fill the banner, rather than contribute its intrinsic height to the grid row. */
+.dpost-banner__art > .dpost-card__photo { position: absolute; inset: 0; }
 .dpost-banner__art svg { display: block; width: 100%; height: 100%; }
 .dpost-ribbon {
     position: absolute;

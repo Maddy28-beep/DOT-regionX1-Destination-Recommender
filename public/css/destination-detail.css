@@ -1,0 +1,181 @@
+/* Listing detail presentation; content, review gates and planner inputs are unchanged. */
+.listing-detail-refresh { max-width: 1200px; padding-bottom: 36px; }
+.listing-detail-refresh .breadcrumb { margin-block: 20px; font-size: .8rem; }
+.listing-detail-refresh .dest-detail-hero {
+    min-height: 300px;
+    aspect-ratio: auto;
+    border-radius: 18px;
+    background: #163b30;
+}
+.listing-detail-refresh .dest-detail-hero > svg { position: absolute; inset: 0; }
+.listing-detail-refresh .dest-detail-hero__content { padding: 68px 26px 52px; width: 100%; }
+.listing-detail-refresh .dest-detail-hero__content h1 {
+    font-size: clamp(1.8rem, 3.4vw, 2.65rem);
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+}
+.listing-detail-refresh .dest-detail-hero__content .loc { font-size: .9rem; max-width: 80ch; line-height: 1.5; }
+.listing-detail-refresh .dest-detail-hero > .photo-illustration-tag { left: 26px; bottom: 16px; font-size: .68rem; }
+.listing-detail-refresh > .stat-strip { margin: 18px 0 0; box-shadow: 0 4px 14px rgb(17 61 44 / 4%); }
+.listing-detail-refresh .stat-strip__item { padding: 16px 24px; border-left-style: solid; border-left-width: 1px; }
+.listing-detail-refresh .stat-strip__item:first-child { border-left: 0; }
+.listing-detail-refresh .stat-strip__icon { width: 40px; height: 40px; border-radius: 12px; }
+.listing-detail-refresh .stat-strip__label { font-size: .62rem; }
+.listing-detail-refresh .stat-strip__value { font-size: 1.05rem; }
+.listing-detail-refresh .stat-strip__text { white-space: normal; overflow-wrap: anywhere; }
+.listing-detail-refresh .detail-layout {
+    grid-template-columns: minmax(0, 1.85fr) minmax(300px, 1fr);
+    gap: 24px;
+    margin-top: 20px;
+}
+.listing-detail-refresh .detail-layout > div { min-width: 0; }
+.listing-detail-refresh .side-card,
+.listing-detail-refresh .visit-card {
+    border-color: #e0e8e1;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 4px 16px rgb(17 61 44 / 4%);
+}
+.listing-detail-refresh .side-card { background: #fffefa; }
+.listing-detail-refresh .side-card > h3,
+.listing-detail-refresh .reviews-card__head h3,
+.listing-detail-refresh .visit-card__title,
+.listing-detail-refresh .detail-related__title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    line-height: 1.4;
+    letter-spacing: -.025em;
+    color: #075642;
+    text-transform: none;
+}
+.listing-detail-refresh .about-card__text { font-size: .9rem; line-height: 1.75; color: #41534b; }
+.listing-detail-refresh .about-card__label { font-size: .65rem; }
+.listing-detail-refresh .about-card__divider { border-top: 1px solid #e6ece6; }
+.listing-detail-refresh .good-for__chip { font-size: .76rem; }
+.listing-detail-refresh .amenity-chips { gap: 8px; }
+.listing-detail-refresh .amenity-chip { font-size: .76rem; min-height: 40px; padding: 8px 12px; }
+.listing-detail-refresh .visit-card { background: #fffbf2; }
+.listing-detail-refresh .visit-card__kicker { font-size: .64rem; margin-bottom: 6px; }
+.listing-detail-refresh .visit-card__title { font-size: 1.6rem; border-bottom: 1px solid #e1e8df; padding-bottom: 14px; margin: 0; }
+.listing-detail-refresh .visit-card__row { gap: 12px; padding-block: 14px; border-bottom-style: solid; border-bottom-width: 1px; }
+.listing-detail-refresh .visit-card__icon { width: 40px; height: 40px; border-radius: 12px; }
+.listing-detail-refresh .visit-card__label { font-size: .62rem; }
+.listing-detail-refresh .visit-card__value { font-size: .92rem; overflow-wrap: anywhere; }
+.listing-detail-refresh .visit-card__map { height: 190px; border-radius: 12px; }
+.listing-detail-refresh .visit-card__address { font-size: .8rem; line-height: 1.6; }
+.listing-detail-refresh .visit-card__go { font-size: .9rem; min-height: 48px; border-radius: 12px; }
+.listing-detail-refresh .visit-card__guide { padding-top: 16px; border-top-style: solid; border-top-width: 1px; }
+.listing-detail-refresh .visit-card__guide strong { font-size: .9rem; }
+.listing-detail-refresh .visit-card__guide small { font-size: .78rem; }
+.listing-detail-refresh .reviews-card__empty { padding: 16px; background: #f5f8f5; border: 1px solid #e7eee7; }
+.listing-detail-refresh .reviews-card__empty strong { font-size: .9rem; }
+.listing-detail-refresh .reviews-card__empty p { font-size: .8rem; line-height: 1.6; }
+.listing-detail-refresh .privacy-note { font-size: .8rem; padding: 16px; line-height: 1.65; }
+.listing-detail-refresh .detail-related { padding-block: 28px 0; }
+.listing-detail-refresh .detail-related .section-head { margin-bottom: 14px; }
+.listing-detail-refresh .detail-related__title { margin: 0; font-size: 1.4rem; }
+.listing-detail-refresh .detail-related :is(.dpost-grid, .card-grid) { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; grid-auto-rows: auto; }
+.listing-detail-refresh .dpost-card { border-radius: 16px; background: #fffefa; border-color: #e0e8e1; box-shadow: 0 4px 14px rgb(17 61 44 / 4%); }
+.listing-detail-refresh .dcard__art { aspect-ratio: 16 / 10; }
+.listing-detail-refresh .dcard__body { padding: 16px; }
+.listing-detail-refresh .dcard__top { flex-wrap: wrap; row-gap: 4px; }
+.listing-detail-refresh .dcard__name { font-size: 1rem; line-height: 1.4; overflow-wrap: anywhere; }
+.listing-detail-refresh .dcard__loc { font-size: .8rem; }
+.listing-detail-refresh .dcard__tags { gap: 6px; margin-bottom: 16px; }
+.listing-detail-refresh .dcard__tags .dpost-tag { font-size: .72rem; white-space: normal; }
+.listing-detail-refresh .dcard__foot { padding-top: 12px; border-top: 1px solid #e8eee8; }
+.listing-detail-refresh .dcard__price { overflow: visible; white-space: normal; }
+.listing-detail-refresh .dcard__price strong { font-size: 1.05rem; white-space: nowrap; }
+.listing-detail-refresh .dcard__price small { font-size: .76rem; }
+.listing-detail-refresh .save-heart { width: 36px; height: 36px; }
+
+/* Stays retain General / Exterior / Interior and use cream only for visit facts. */
+:is(.accommodation-detail-refresh, .destination-detail-refresh) .gallery-categorized { aspect-ratio: auto; height: 320px; }
+:is(.accommodation-detail-refresh, .destination-detail-refresh) .gallery-hero__title { padding: 48px 22px 22px; }
+:is(.accommodation-detail-refresh, .destination-detail-refresh) .gallery-hero__title h1 { font-size: clamp(1.5rem, 2.6vw, 2.15rem); line-height: 1.2; }
+:is(.accommodation-detail-refresh, .destination-detail-refresh) .gallery-hero__title .loc { font-size: .85rem; }
+:is(.accommodation-detail-refresh, .destination-detail-refresh) .photo-credit { font-size: .72rem; margin-top: 10px; }
+:is(.accommodation-detail-refresh, .destination-detail-refresh) .gallery-cats { gap: 8px; margin-top: 12px; }
+:is(.accommodation-detail-refresh, .destination-detail-refresh) .gallery-cats .chip { font-size: .76rem; padding: 8px 14px; }
+:is(.accommodation-detail-refresh, .destination-detail-refresh) .stat-strip { margin-bottom: 18px; }
+:is(.accommodation-detail-refresh, .destination-detail-refresh) .stat-strip__item { padding: 14px; gap: 10px; }
+:is(.accommodation-detail-refresh, .destination-detail-refresh) .review-form { border-top-style: solid; border-top-width: 1px; }
+:is(.accommodation-detail-refresh, .destination-detail-refresh) .review-form__title { font-size: 1rem; }
+:is(.accommodation-detail-refresh, .destination-detail-refresh) .review-form__rating legend { font-size: .85rem; }
+:is(.accommodation-detail-refresh, .destination-detail-refresh) .review-form label { font-size: .85rem; }
+:is(.accommodation-detail-refresh, .destination-detail-refresh) .review-form textarea { border-radius: 10px; min-height: 110px; font-size: .85rem; }
+:is(.accommodation-detail-refresh, .destination-detail-refresh) .review-form__meta { font-size: .76rem; flex-wrap: wrap; gap: 8px; }
+:is(.accommodation-detail-refresh, .destination-detail-refresh) .review-form__counter { font-size: .74rem; }
+
+/* These detail pages keep their original gallery categories, including food and tour photos. */
+.standard-gallery-detail .gallery-hero { aspect-ratio: auto; height: 320px; }
+.standard-gallery-detail .gallery-hero :is(.g-main, .g-thumb) { min-height: 0; overflow: hidden; }
+.standard-gallery-detail .gallery-hero__title { padding: 48px 24px 24px; }
+.standard-gallery-detail .gallery-hero:has(.photo-illustration-tag) .gallery-hero__title { padding-bottom: 52px; }
+.standard-gallery-detail .gallery-hero__title h1 { font-size: clamp(1.5rem, 2.6vw, 2.15rem); line-height: 1.2; overflow-wrap: anywhere; }
+.standard-gallery-detail .gallery-hero__title .loc { font-size: .85rem; }
+.standard-gallery-detail .gallery-hero > .g-main .photo-illustration-tag { font-size: .68rem; }
+.standard-gallery-detail .photo-illustration-tag { z-index: 3; }
+.standard-gallery-detail .stat-strip { margin-bottom: 18px; }
+.standard-gallery-detail .photo-credit { font-size: .72rem; margin-top: 10px; }
+.standard-gallery-detail .gallery-cats { gap: 8px; margin-top: 12px; }
+.standard-gallery-detail .gallery-cats .chip { font-size: .76rem; padding: 8px 14px; }
+.standard-gallery-detail .detail-hero { aspect-ratio: auto; min-height: 240px; padding: 68px 24px 24px; border-radius: 16px; }
+.standard-gallery-detail .detail-hero h1 { font-size: clamp(1.5rem, 2.6vw, 2.15rem); line-height: 1.2; overflow-wrap: anywhere; }
+
+@media (max-width: 1000px) {
+    .listing-detail-refresh .detail-related :is(.dpost-grid, .card-grid) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+    .listing-detail-refresh .detail-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+    .listing-detail-refresh .detail-layout > div { display: contents; }
+    .listing-detail-refresh .detail-layout > div > * { margin-block: 0; }
+    .listing-detail-refresh .detail-layout .about-card { order: 1; }
+    .listing-detail-refresh .detail-layout .visit-card { order: 2; }
+    .listing-detail-refresh .detail-layout .reviews-card { order: 3; }
+    .listing-detail-refresh .visit-card__map { height: 220px; }
+}
+@media (max-width: 560px) {
+    .listing-detail-refresh { padding-bottom: 24px; }
+    .listing-detail-refresh .breadcrumb { margin-block: 14px; font-size: .72rem; }
+    .listing-detail-refresh .dest-detail-hero { min-height: 260px; border-radius: 14px; }
+    .listing-detail-refresh .dest-detail-hero__content { padding: 70px 18px 66px; }
+    .listing-detail-refresh .dest-detail-hero__content h1 { font-size: 1.8rem; }
+    .listing-detail-refresh .dest-detail-hero__content .loc { font-size: .78rem; }
+    .listing-detail-refresh .dest-detail-hero > .photo-illustration-tag { left: 16px; bottom: 16px; max-width: calc(100% - 32px); font-size: .62rem; }
+    .listing-detail-refresh > .stat-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 14px; border-radius: 14px; }
+    .listing-detail-refresh .stat-strip__item { padding: 12px 9px; gap: 8px; flex-direction: column; align-items: flex-start; border-top: 0; }
+    .listing-detail-refresh .stat-strip__icon { width: 30px; height: 30px; }
+    .listing-detail-refresh .stat-strip__icon svg { width: 17px; height: 17px; }
+    .listing-detail-refresh .stat-strip__label { font-size: .54rem; letter-spacing: .05em; }
+    .listing-detail-refresh .stat-strip__value { font-size: .9rem; }
+    .listing-detail-refresh .side-card,
+    .listing-detail-refresh .visit-card { padding: 18px; }
+    .listing-detail-refresh .about-card__text { font-size: .85rem; }
+    .listing-detail-refresh .about-card__label--row small { font-size: .7rem; }
+    .listing-detail-refresh .amenity-chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .listing-detail-refresh .amenity-chip { min-width: 0; min-height: 44px; padding: 8px; gap: 6px; text-align: left; }
+    .listing-detail-refresh .amenity-chip > span { min-width: 0; overflow-wrap: anywhere; }
+    .listing-detail-refresh .amenity-chip__camera { margin-left: auto; }
+    .listing-detail-refresh .reviews-card__head { flex-wrap: wrap; gap: 8px; }
+    .listing-detail-refresh .reviews-card__head h3 { font-size: 1.1rem; }
+    .listing-detail-refresh .detail-related__title { font-size: 1.2rem; }
+    .listing-detail-refresh .detail-related :is(.dpost-grid, .card-grid) { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+    .listing-detail-refresh .dcard__art { aspect-ratio: 16 / 9; }
+    .listing-detail-refresh .dcard__name { display: block; -webkit-line-clamp: unset; max-height: none; overflow: visible; font-size: 1rem; }
+    .listing-detail-refresh .dcard__dot { font-size: .72rem; }
+    .listing-detail-refresh .dcard__tags .dpost-tag { display: inline-flex; }
+    .listing-detail-refresh .dcard__rating > span { display: inline; }
+    .listing-detail-refresh .dcard__new { top: 12px; left: 12px; font-size: .68rem; padding: 4px 9px; }
+    .listing-detail-refresh .save-heart { width: 44px; height: 44px; }
+    .listing-detail-refresh .dcard__foot { flex-direction: row; align-items: baseline; gap: 8px; }
+    .listing-detail-refresh .dcard__dist { font-size: .76rem; }
+    .listing-detail-refresh .dcard__dist svg { display: inline; }
+    :is(.accommodation-detail-refresh, .destination-detail-refresh) .gallery-hero-mobile .gallery-hero__title { padding: 56px 18px 38px; }
+    :is(.accommodation-detail-refresh, .destination-detail-refresh) .stat-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    :is(.accommodation-detail-refresh, .destination-detail-refresh) .stat-strip__item { padding: 12px 9px; }
+    :is(.accommodation-detail-refresh, .destination-detail-refresh) .review-form__submit { width: 100%; min-height: 44px; }
+    .standard-gallery-detail .gallery-hero-mobile .gallery-hero__title { padding: 56px 18px 58px; }
+    .standard-gallery-detail .detail-hero { min-height: 220px; padding-inline: 18px; }
+}

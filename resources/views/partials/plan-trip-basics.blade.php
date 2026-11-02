@@ -26,7 +26,7 @@
     $arrivalHelp = "When you expect to arrive in Davao. We allow about {$prepMinutes} minutes before your first outing and never start an outing before {$earliestStart}. A later arrival leaves less of your first day, so it may have fewer stops, or none if you arrive in the evening. Destination sightseeing ends by {$lastSightseeing}. Meals fall at 7:00 to 8:30 AM, 11:30 AM to 1:00 PM (usually 12:00) and 6:00 to 7:30 PM; if you arrive during one, we plan that meal first. Leave it blank and we'll assume {$earliestStart}.";
 @endphp
 
-<div class="plan-section pc-block">
+<div class="plan-section pc-block pc-trip-companions">
     <header class="pc-block__head"><h3>Who&rsquo;s coming</h3></header>
     <fieldset class="pc-group">
         <legend class="sr-only">Who are you traveling with?</legend>
@@ -42,7 +42,7 @@
     </fieldset>
 </div>
 
-<div class="plan-section pc-block">
+<div class="plan-section pc-block pc-trip-dates">
     <header class="pc-block__head"><h3>When</h3><p>Only the number of days is required.</p></header>
     <div class="pc-grid">
         <div class="field pc-field pc-col-3">
@@ -93,7 +93,7 @@
     </div>
 </div>
 
-<div class="plan-section pc-block">
+<div class="plan-section pc-block pc-trip-visitor">
     <header class="pc-block__head"><h3>Where you&rsquo;re from</h3></header>
     <div class="pc-grid">
         <fieldset class="pc-group pc-field pc-col-8">

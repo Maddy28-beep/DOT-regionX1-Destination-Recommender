@@ -16,7 +16,7 @@
 /* ---- a card ---- */
 .mood {
     position: relative; display: block; padding: 6px; border-radius: 18px;
-    background: #fff; box-shadow: 0 8px 22px rgba(16, 40, 30, .10);
+    background: #fff8ed; box-shadow: 0 8px 22px rgba(16, 40, 30, .10);
     color: #fff; text-decoration: none;
     transition: transform .25s ease, box-shadow .25s ease;
 }
@@ -26,7 +26,7 @@
 .mood__photo {
     position: relative; display: block; overflow: hidden; border-radius: 13px;
     aspect-ratio: 9 / 16;
-    background: linear-gradient(to bottom, #3d5f50, #12261d);
+    background: linear-gradient(to bottom, #287a80, #073d47);
 }
 .mood__photo img {
     display: block; width: 100%; height: 100%; object-fit: cover; object-position: var(--focal, 50% 50%);
@@ -35,7 +35,7 @@
 .mood:hover .mood__photo img { transform: scale(1.05); }
 .mood__photo::after {          /* the dark foot the words sit on */
     content: ""; position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(to top, rgba(8, 24, 17, .94) 0%, rgba(8, 24, 17, .6) 30%, rgba(8, 24, 17, 0) 62%);
+    background: linear-gradient(to top, rgba(4, 45, 54, .94) 0%, rgba(4, 45, 54, .6) 30%, rgba(4, 45, 54, 0) 62%);
 }
 .mood__photo--none { display: grid; place-items: center; }
 .mood__photo--none svg { width: 30px; height: 30px; color: rgba(255, 255, 255, .45); }
@@ -43,7 +43,7 @@
 .mood__count {
     position: absolute; top: 16px; right: 16px; z-index: 2;
     padding: 4px 9px; border: 1px dashed rgba(255, 255, 255, .75); border-radius: 6px;
-    background: rgba(10, 30, 22, .45);
+    background: rgba(4, 55, 63, .65);
     -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
     font: 700 .72rem/1.2 'Poppins', sans-serif; letter-spacing: .02em; white-space: nowrap;
 }

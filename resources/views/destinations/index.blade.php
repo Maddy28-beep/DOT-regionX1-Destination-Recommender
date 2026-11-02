@@ -2,7 +2,13 @@
 
 @section('title', 'Destinations — ExploreDVO')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/stays-catalog.css') }}?v={{ filemtime(public_path('css/stays-catalog.css')) }}">
+@endpush
+
 @section('content')
+<script src="{{ asset('js/stays-categories.js') }}?v={{ filemtime(public_path('js/stays-categories.js')) }}" defer></script>
+<div class="destinations-catalog catalog-refresh">
 <header class="catalog-banner">
     <div class="container">
         <h1 class="poster-title">Discover Davao</h1>
@@ -67,5 +73,6 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 @endsection

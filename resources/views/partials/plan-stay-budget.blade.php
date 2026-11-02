@@ -26,6 +26,9 @@
         'Premium' => 'Top-rated stays and signature experiences.',
     ];
     $stayNames = ['Any' => 'Any', 'Hotel' => 'Hotel', 'Resort' => 'Resort', 'Homestay' => 'Homestay / Self-catering'];
+    $budgetIcons = ['Budget-Friendly' => 'tag', 'Mid-range' => 'heart', 'Premium' => 'sparkles'];
+    $stayIcons = ['Any' => 'map', 'Hotel' => 'building', 'Resort' => 'umbrella', 'Homestay' => 'home'];
+    $settingIcons = ['Beach' => 'umbrella', 'Mountain' => 'mountain', 'Inland' => 'leaf', 'Island' => 'map-pin', 'Lake' => 'pool', 'Hot Spring' => 'sun', 'All-Inclusive' => 'sparkles'];
 @endphp
 
 <div class="plan-section">
@@ -34,10 +37,11 @@
     <fieldset class="pc-group">
         <legend>Spending style</legend>
         <p class="pc-help">Used to match stays, dining and activities to your budget.</p>
-        <div class="pc-cards">
+        <div class="pc-cards pc-budget-options">
             @foreach ($budgetNotes as $value => $note)
                 <label class="pc-card">
                     <input type="radio" name="budget" value="{{ $value }}" @checked($budgetNow === $value) required>
+                    <span class="pc-card__icon" aria-hidden="true"><x-icon :name="$budgetIcons[$value]" /></span>
                     <span class="pc-card__text"><strong>{{ $value }}</strong><small>{{ $note }}</small></span>
                     <span class="pc-card__tick" aria-hidden="true"><x-icon name="check" /></span>
                 </label>
@@ -48,11 +52,13 @@
     <fieldset class="pc-group">
         <legend>Where would you like to stay?</legend>
         <p class="pc-help">Choosing a resort lets you narrow it down by setting.</p>
-        <div class="pc-chips">
+        <div class="pc-chips pc-stay-options">
             @foreach ($stayNames as $value => $name)
-                <label class="pc-chip">
+                <label class="pc-chip pc-stay-choice">
                     <input type="radio" name="accommodation_pref" value="{{ $value }}" data-resort-toggle @checked($stayNow === $value) required>
-                    <span>{{ $name }}</span>
+                    <span class="pc-stay-choice__icon" aria-hidden="true"><x-icon :name="$stayIcons[$value]" /></span>
+                    <span class="pc-stay-choice__name">{{ $name }}</span>
+                    <span class="pc-stay-choice__tick" aria-hidden="true"><x-icon name="check" /></span>
                 </label>
             @endforeach
         </div>
@@ -64,11 +70,13 @@
                 <div class="pc-chips">
                     <label class="pc-chip">
                         <input type="radio" name="resort_setting" value="" @checked($settingNow === '')>
+                        <x-icon name="umbrella" aria-hidden="true" />
                         <span>Any resort</span>
                     </label>
                     @foreach ($resortSettings as $setting)
                         <label class="pc-chip">
                             <input type="radio" name="resort_setting" value="{{ $setting }}" @checked($settingNow === $setting)>
+                            <x-icon :name="$settingIcons[$setting] ?? 'map-pin'" aria-hidden="true" />
                             <span>{{ $setting === 'All-Inclusive' ? 'All Inclusive Resort' : $setting.' Resort' }}</span>
                         </label>
                     @endforeach
@@ -76,4 +84,8 @@
             </div>
         @endif
     </fieldset>
+    <div class="pc-stay-summary" data-stay-summary hidden>
+        <span class="pc-stay-summary__icon" aria-hidden="true"><x-icon name="check" /></span>
+        <p><strong>Your preferences:</strong> <span data-stay-summary-text></span></p>
+    </div>
 </div>
