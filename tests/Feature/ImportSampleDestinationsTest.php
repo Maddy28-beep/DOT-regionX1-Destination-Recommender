@@ -7,6 +7,7 @@ use App\Models\Destination;
 use App\Models\Region;
 use App\Support\SampleData;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
 use Tests\TestCase;
 
 /** Sample destinations arrive from a CSV, clearly labelled, all or nothing, and can be taken out again. */
@@ -18,7 +19,7 @@ class ImportSampleDestinationsTest extends TestCase
 
     private function csv(array $lines, string $header = self::HEADER): string
     {
-        $path = tempnam(sys_get_temp_dir(), 'sample').'.csv';
+        $path = storage_path('framework/sample-'.uniqid().'.csv');
         file_put_contents($path, $header."\n".implode("\n", $lines)."\n");
 
         return $path;
@@ -35,8 +36,8 @@ class ImportSampleDestinationsTest extends TestCase
     {
         $file = $this->csv(['Mango Falls,Nature,Toril,Davao City,7.0000,125.4000,A waterfall,Budget-Friendly,8AM-5PM']);
 
-        $this->assertSame(0, \Illuminate\Support\Facades\Artisan::call('sample:import-destinations', ['file' => $file]));
-        $output = \Illuminate\Support\Facades\Artisan::output();
+        $this->assertSame(0, Artisan::call('sample:import-destinations', ['file' => $file]));
+        $output = Artisan::output();
 
         foreach (['Mango Falls [SAMPLE]', 'SAMPLE-0001', 'new', 'Dry run'] as $expected) {
             $this->assertStringContainsString($expected, $output);
@@ -91,6 +92,49 @@ class ImportSampleDestinationsTest extends TestCase
         $this->artisan('sample:import-destinations', ['file' => $this->csv(['Dup,Nature,X,Davao City,7.1,125.4,,,']), '--apply' => true])->assertSuccessful();
         $this->artisan('sample:import-destinations', ['file' => $this->csv(['Dup,Nature,X,Davao City,7.1,125.4,,,'])])->expectsOutputToContain('already exists')->assertFailed();
         $this->artisan('sample:import-destinations', ['file' => $this->csv(['Z,Nature,X'], 'name,type,location')])->expectsOutputToContain('Missing column(s): region, latitude, longitude')->assertFailed();
+    }
+
+    public function test_category_and_amenity_tags_are_written_as_the_recommender_reads_them(): void
+    {
+        $file = $this->csv(
+            ['Tag Falls,Nature & Adventure,X,Davao City,7.1,125.4,Desc,Budget-Friendly,8:00 AM-5:00 PM,2 hours,Morning,sightseeing,Nature|Hiking,parking|restroom|ramp'],
+            'name,type,location,region,latitude,longitude,description,price_tier,hours,visit_duration,best_time,itinerary_role,category_tags,amenity_tags'
+        );
+
+        $this->artisan('sample:import-destinations', ['file' => $file, '--apply' => true])->assertSuccessful();
+
+        $falls = Destination::where('name', 'Tag Falls [SAMPLE]')->firstOrFail();
+        $this->assertSame(['Hiking', 'Nature'], $falls->tags->where('kind', 'category')->pluck('value')->sort()->values()->all());
+        // Amenities are stored as the exact catalogue labels (Amenities::label), not the CSV keys.
+        $this->assertSame(['Accessibility Ramp', 'Parking Area', 'Restroom'], $falls->tags->where('kind', 'amenity')->pluck('value')->sort()->values()->all());
+    }
+
+    public function test_an_illegal_amenity_key_stops_the_whole_import(): void
+    {
+        $file = $this->csv(
+            ['Bad Falls,Nature,X,Davao City,7.1,125.4,,,,,,,,elevator'],
+            'name,type,location,region,latitude,longitude,description,price_tier,hours,visit_duration,best_time,itinerary_role,category_tags,amenity_tags'
+        );
+
+        $this->artisan('sample:import-destinations', ['file' => $file, '--apply' => true])->assertFailed();
+        $this->assertSame(0, Destination::count());
+    }
+
+    public function test_targeted_removal_protects_earlier_samples(): void
+    {
+        $first = $this->csv(['Old Falls,Nature,X,Davao City,7.1,125.4']);
+        $second = $this->csv(['New Falls,Nature,X,Davao City,7.2,125.5']);
+        $this->artisan('sample:import-destinations', ['file' => $first, '--apply' => true])->assertSuccessful();
+        $this->artisan('sample:import-destinations', ['file' => $second, '--apply' => true])->assertSuccessful();
+        $this->assertSame(['Old Falls [SAMPLE]', 'New Falls [SAMPLE]'], Destination::orderBy('id')->pluck('name')->all());
+
+        // Dry run of the targeted removal selects only SAMPLE-0002 and deletes nothing.
+        $this->artisan('sample:import-destinations', ['--remove' => true, '--from-number' => 'SAMPLE-0002'])->assertSuccessful();
+        $this->assertSame(2, Destination::count());
+
+        $this->artisan('sample:import-destinations', ['--remove' => true, '--from-number' => 'SAMPLE-0002', '--apply' => true])->assertSuccessful();
+        $this->assertSame(['Old Falls [SAMPLE]'], Destination::pluck('name')->all());
+        $this->assertSame(['SAMPLE-0001'], AccreditationRecord::pluck('accreditation_number')->all());
     }
 
     public function test_remove_deletes_only_the_samples(): void
