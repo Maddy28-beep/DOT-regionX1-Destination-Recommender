@@ -7,6 +7,7 @@ use App\Models\Destination;
 use App\Models\Region;
 use App\Support\SampleData;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
 use Tests\TestCase;
 
 /** Sample destinations arrive from a CSV, clearly labelled, all or nothing, and can be taken out again. */
@@ -18,7 +19,7 @@ class ImportSampleDestinationsTest extends TestCase
 
     private function csv(array $lines, string $header = self::HEADER): string
     {
-        $path = tempnam(sys_get_temp_dir(), 'sample').'.csv';
+        $path = storage_path('framework/sample-'.uniqid().'.csv');
         file_put_contents($path, $header."\n".implode("\n", $lines)."\n");
 
         return $path;
@@ -35,8 +36,8 @@ class ImportSampleDestinationsTest extends TestCase
     {
         $file = $this->csv(['Mango Falls,Nature,Toril,Davao City,7.0000,125.4000,A waterfall,Budget-Friendly,8AM-5PM']);
 
-        $this->assertSame(0, \Illuminate\Support\Facades\Artisan::call('sample:import-destinations', ['file' => $file]));
-        $output = \Illuminate\Support\Facades\Artisan::output();
+        $this->assertSame(0, Artisan::call('sample:import-destinations', ['file' => $file]));
+        $output = Artisan::output();
 
         foreach (['Mango Falls [SAMPLE]', 'SAMPLE-0001', 'new', 'Dry run'] as $expected) {
             $this->assertStringContainsString($expected, $output);
