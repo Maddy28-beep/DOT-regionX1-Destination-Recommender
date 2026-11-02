@@ -10,6 +10,7 @@ use App\Models\Itinerary;
 use App\Models\ItineraryItem;
 use App\Models\Region;
 use App\Models\Restaurant;
+use App\Models\SouvenirCenter;
 use App\Models\TouristPreference;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -90,15 +91,88 @@ class ItinerarySampleCueTest extends TestCase
         $this->assertStringNotContainsString('DOT accreditation listed', $html);
     }
 
-    // Adapted for main at Gate 3 branch construction: main's timeline row carries no
-    // accreditation-label line at all (removed by the merged planner rollback), so the
-    // official-side expectation is "no sample cue", not a restored label. Resurrecting
-    // the removed label just to satisfy this assertion would undo merged main behaviour.
-    public function test_an_official_destination_carries_no_sample_label(): void
+    // G2 completed under explicit authorization: the card carries the three-state accreditation
+    // wording from SampleData provenance. An official record (genuine, non-placeholder DOT number)
+    // says so and never gets a sample cue; eligibility flag alone never decides this.
+    public function test_an_official_destination_shows_dot_accreditation_listed_and_no_sample_label(): void
     {
         $html = $this->page($this->destination('Verified Falls', false));
 
         $this->assertStringContainsString('Verified Falls', $html);
+        $this->assertStringContainsString('DOT accreditation listed', $html);
+        $this->assertStringNotContainsString(self::CUE, $html);
+    }
+
+    public function test_an_unverified_destination_shows_not_verified_and_is_never_listed_as_accredited(): void
+    {
+        // Eligible (is_accredited) but with no accreditation record on file at all: unverified.
+        $destination = Destination::create([
+            'slug' => 'unverified-falls', 'name' => 'Unverified Falls', 'location' => 'Davao City',
+            'region_id' => Region::firstOrCreate(['name' => 'Davao City'])->id,
+            'type' => 'Nature & Adventure', 'is_accredited' => true, 'rating' => 4.0, 'review_count' => 1, 'price_tier' => 'Budget-Friendly',
+            'latitude' => 7.15, 'longitude' => 125.40,
+        ]);
+
+        $html = $this->page($destination);
+
+        $this->assertStringContainsString('DOT accreditation not verified', $html);
+        $this->assertStringNotContainsString('DOT accreditation listed', $html);
+        $this->assertStringNotContainsString(self::CUE, $html);
+    }
+
+    public function test_a_sample_souvenir_stop_shows_the_sample_warning_exactly_once(): void
+    {
+        $region = Region::firstOrCreate(['name' => 'Davao City']);
+        $shop = SouvenirCenter::create([
+            'slug' => 'cue-sample-shop', 'name' => 'Cue Sample Shop', 'location' => 'X', 'region_id' => $region->id,
+            'is_accredited' => true, 'rating' => 0, 'review_count' => 0,
+        ]);
+        AccreditationRecord::create(['listing_kind' => 'souvenir_center', 'listing_id' => $shop->id, 'accreditation_number' => 'SAMPLE-9203', 'status' => 'Active', 'is_placeholder' => true]);
+
+        $pref = TouristPreference::create(['travel_days' => 1, 'travel_type' => 'Family', 'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor',
+            'budget' => 'Budget-Friendly', 'accommodation_pref' => 'Any', 'distance_pref' => 'far']);
+        $trip = Itinerary::create(['preference_id' => $pref->id, 'total_days' => 1, 'generated_at' => now()]);
+        ItineraryItem::create(['itinerary_id' => $trip->id, 'day_number' => 1, 'sort_order' => 1, 'slot' => 'Afternoon', 'kind' => 'activity',
+            'title' => 'Souvenir stop', 'starts_at' => '15:00:00', 'ends_at' => '16:00:00', 'souvenir_center_id' => $shop->id]);
+
+        $html = $this->withSession([TripPlannerController::ITINERARY_KEY => $trip->id, TripPlannerController::PREFERENCE_KEY => $pref->id])
+            ->get(route('plan.itinerary'))->assertOk()->getContent();
+
+        $this->assertSame(1, substr_count($html, self::CUE), 'The souvenir card carries exactly one sample label.');
+        $this->assertStringContainsString('Sample data, not DOT-verified', $html);
+        $this->assertStringNotContainsString('DOT accreditation listed', $html);
+    }
+
+    public function test_official_meal_and_stay_cards_show_dot_accreditation_listed(): void
+    {
+        $region = Region::firstOrCreate(['name' => 'Davao City']);
+        $destination = $this->destination('Anchor Falls', false);
+        $stay = Accommodation::create([
+            'slug' => 'cue-official-stay', 'name' => 'Cue Official Stay', 'location' => 'X', 'region_id' => $region->id,
+            'type' => 'Hotel', 'is_accredited' => true, 'rating' => 0, 'review_count' => 0,
+        ]);
+        AccreditationRecord::create(['listing_kind' => 'accommodation', 'listing_id' => $stay->id, 'accreditation_number' => 'DOT-R11-REAL-STAY', 'status' => 'Active', 'is_placeholder' => false]);
+        $restaurant = Restaurant::create([
+            'slug' => 'cue-official-restaurant', 'name' => 'Cue Official Restaurant', 'location' => 'X', 'region_id' => $region->id,
+            'cuisine_type' => 'Filipino', 'is_accredited' => true, 'rating' => 0, 'review_count' => 0,
+        ]);
+        AccreditationRecord::create(['listing_kind' => 'restaurant', 'listing_id' => $restaurant->id, 'accreditation_number' => 'DOT-R11-REAL-MEAL', 'status' => 'Active', 'is_placeholder' => false]);
+
+        $pref = TouristPreference::create(['travel_days' => 1, 'travel_type' => 'Family', 'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor',
+            'budget' => 'Budget-Friendly', 'accommodation_pref' => 'Any', 'distance_pref' => 'far']);
+        $trip = Itinerary::create(['preference_id' => $pref->id, 'total_days' => 1, 'generated_at' => now()]);
+        ItineraryItem::create(['itinerary_id' => $trip->id, 'day_number' => 1, 'sort_order' => 1, 'slot' => 'Morning', 'kind' => 'activity',
+            'title' => 'Visit', 'starts_at' => '10:00:00', 'ends_at' => '12:00:00', 'destination_id' => $destination->id]);
+        ItineraryItem::create(['itinerary_id' => $trip->id, 'day_number' => 1, 'sort_order' => 2, 'slot' => 'Afternoon', 'kind' => 'meal',
+            'title' => 'Lunch', 'starts_at' => '12:00:00', 'ends_at' => '13:00:00', 'restaurant_id' => $restaurant->id]);
+        ItineraryItem::create(['itinerary_id' => $trip->id, 'day_number' => 1, 'sort_order' => 3, 'slot' => 'Evening', 'kind' => 'overnight',
+            'title' => 'Overnight stay', 'starts_at' => '20:00:00', 'ends_at' => null, 'accommodation_id' => $stay->id]);
+
+        $html = $this->withSession([TripPlannerController::ITINERARY_KEY => $trip->id, TripPlannerController::PREFERENCE_KEY => $pref->id])
+            ->get(route('plan.itinerary'))->assertOk()->getContent();
+
+        // Destination stop, meal card and stay card each carry the official wording; no sample cue anywhere.
+        $this->assertSame(3, substr_count($html, 'DOT accreditation listed'));
         $this->assertStringNotContainsString(self::CUE, $html);
     }
 
@@ -131,6 +205,10 @@ class ItinerarySampleCueTest extends TestCase
             ->get(route('plan.itinerary'))->assertOk()->getContent();
 
         $this->assertSame(2, substr_count($html, self::CUE), 'The meal card and the stay card each carry one sample label.');
+        $this->assertStringContainsString('Sample data, not DOT-verified', $html);
+        // The official anchor destination on the same page correctly carries the official wording;
+        // the sample meal and stay are never the ones presented as accredited (their cue count above).
+        $this->assertStringContainsString('DOT accreditation listed', $html);
     }
 
     public function test_a_sample_stop_with_a_popular_pairing_still_carries_only_one_label(): void
