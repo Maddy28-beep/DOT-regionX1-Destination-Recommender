@@ -136,7 +136,19 @@ class ChatbotCardsTest extends TestCase
         // The retrieval context carries only names/types, so the model must be told not to embellish them
         // (a live answer once described a nature park as a "wildlife refuge" from prior knowledge alone).
         $this->assertStringContainsString('Do not add descriptive facts about a listing', $prompt);
+        // Every descriptive category the grounding rule names: location, features
+        // (amenities/facilities and accommodation/restaurant features), activities,
+        // wildlife/natural features, prices, and operating hours.
+        foreach (['location', 'features', 'activities', 'wildlife', 'prices', 'hours'] as $category) {
+            $this->assertStringContainsString($category, $prompt, "Grounding rule must cover: {$category}");
+        }
+        // Facts the visitor states themselves remain usable, so the ban is on invention, not on answering.
+        $this->assertStringContainsString("unless the visitor's own message states them", $prompt);
+        // Three-state provenance and placeholder-accreditation protection stay in force.
         $this->assertStringContainsString('Philippine Eagle Center [sample data, not DOT-verified]', $prompt);
         $this->assertStringContainsString('never call it DOT-accredited or verified', $prompt);
+        $this->assertStringContainsString('has a placeholder accreditation number', $prompt);
+        $this->assertStringContainsString('[not yet verified]', $prompt);
+        $this->assertStringContainsString('Never invent a listing', $prompt);
     }
 }
