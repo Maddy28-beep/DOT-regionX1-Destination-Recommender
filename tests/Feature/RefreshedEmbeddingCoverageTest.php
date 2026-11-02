@@ -79,6 +79,28 @@ class RefreshedEmbeddingCoverageTest extends TestCase
         $this->artisan('embeddings:coverage', ['--json' => true])->expectsOutputToContain('"complete": true')->assertSuccessful();
     }
 
+    public function test_phase4_refreshed_vectors_are_documented_and_not_claimed_as_preserved(): void
+    {
+        $data = $this->data();
+        $manifest = $this->manifest();
+
+        // The Phase 4 package (f9390ec) intentionally regenerated 35 vectors whose embedded
+        // text had gone stale since the 2026-11-01 refresh. Those vectors are correct for
+        // their current text, but they are not "preserved" — claiming them as preserved
+        // would silently freeze stale-text vectors as the expected baseline.
+        $refreshed = $manifest['phase4_refreshed_slugs'] ?? [];
+        $this->assertCount(35, $refreshed);
+        $this->assertSame([], array_intersect(array_keys($manifest['preserved_embeddings_sha256']), $refreshed),
+            'A regenerated vector must not also be listed as preserved.');
+        foreach ($refreshed as $slug) {
+            $this->assertArrayHasKey($slug, $data['embeddings'], $slug);
+        }
+        // Preserved means byte-identical to the 2026-11-01 shipped package: the 62 carried
+        // vectors verified identical across both packages, plus the unchanged interests hash
+        // asserted in test_existing_destination_and_interest_vectors_are_preserved.
+        $this->assertCount(62, $manifest['preserved_embeddings_sha256']);
+    }
+
     public function test_coverage_check_reports_missing_vectors_without_writing_data(): void
     {
         Destination::create(['slug' => 'missing-vector', 'name' => 'Missing vector', 'location' => 'Davao', 'is_accredited' => true]);
