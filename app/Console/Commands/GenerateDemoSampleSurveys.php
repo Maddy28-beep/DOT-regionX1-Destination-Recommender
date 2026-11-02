@@ -259,6 +259,22 @@ class GenerateDemoSampleSurveys extends Command
 
                 $basket = collect([$target])->concat($companions);
                 $places = $basket->map(fn ($d) => 'destination:'.$d->id)->all();
+
+                // A day out also eats, stays, and shops: adding the nearest meal, stay, and
+                // souvenir stop gives the itinerary builder rules it can actually credit on
+                // meal/overnight/souvenir rows (destination-only baskets would only ever
+                // produce destination rules, which no itinerary row displays).
+                foreach ([
+                    'restaurant' => Restaurant::publiclyVisible()->get(),
+                    'accommodation' => Accommodation::publiclyVisible()->get(),
+                    'souvenir_center' => SouvenirCenter::publiclyVisible()->get(),
+                ] as $kind => $pool) {
+                    $nearest = $pool->sort(fn ($a, $b) => [($this->km($target, $a) ?? PHP_FLOAT_MAX), $a->id] <=> [($this->km($target, $b) ?? PHP_FLOAT_MAX), $b->id])->first();
+                    if ($nearest) {
+                        $places[] = $kind.':'.$nearest->id;
+                    }
+                }
+
                 $surveys[] = $this->fields($main, null, $places, $basket->count());
 
                 foreach ($places as $place) {
