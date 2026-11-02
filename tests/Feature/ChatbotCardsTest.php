@@ -6,7 +6,9 @@ use App\Models\AccreditationRecord;
 use App\Models\Destination;
 use App\Models\ListingPhoto;
 use App\Models\Region;
+use App\Services\Chatbot\ChatbotService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use ReflectionMethod;
 use Tests\TestCase;
 
 /**
@@ -118,5 +120,23 @@ class ChatbotCardsTest extends TestCase
     public function test_other_questions_carry_no_action(): void
     {
         $this->postJson(route('chatbot.respond'), ['message' => 'hello'])->assertOk()->assertJsonPath('action', null);
+    }
+
+    public function test_the_system_prompt_forbids_invented_listing_facts_and_marks_sample_data(): void
+    {
+        $destination = $this->eagleCenter();
+        AccreditationRecord::create([
+            'listing_kind' => 'destination', 'listing_id' => $destination->id,
+            'accreditation_number' => 'SAMPLE-9999', 'status' => 'Active', 'is_placeholder' => true,
+        ]);
+
+        $prompt = (new ReflectionMethod(ChatbotService::class, 'buildSystemPrompt'))
+            ->invoke(app(ChatbotService::class));
+
+        // The retrieval context carries only names/types, so the model must be told not to embellish them
+        // (a live answer once described a nature park as a "wildlife refuge" from prior knowledge alone).
+        $this->assertStringContainsString('Do not add descriptive facts about a listing', $prompt);
+        $this->assertStringContainsString('Philippine Eagle Center [sample data, not DOT-verified]', $prompt);
+        $this->assertStringContainsString('never call it DOT-accredited or verified', $prompt);
     }
 }
