@@ -21,12 +21,16 @@ class TouristPreference extends Model
         'travel_days', 'travel_type', 'travel_purpose', 'visitor_type', 'place_of_origin', 'budget', 'accommodation_pref',
         'resort_setting', 'distance_pref', 'transport_pref', 'accessibility_notes', 'start_date', 'arrival_time',
         'origin_lat', 'origin_lng', 'origin_label', 'variation',
+        'departure_date', 'departure_time', 'departure_lat', 'departure_lng', 'departure_label',
     ];
 
     protected function casts(): array
     {
         return [
             'start_date' => 'date',
+            'departure_date' => 'date',
+            'departure_lat' => 'float',
+            'departure_lng' => 'float',
             'origin_lat' => 'float',
             'origin_lng' => 'float',
         ];
@@ -60,6 +64,26 @@ class TouristPreference extends Model
     public function startLabel(): string
     {
         return $this->origin() !== null && filled($this->origin_label) ? $this->origin_label : 'Davao City centre';
+    }
+
+    /**
+     * Where and when the traveller leaves, when they said so: the departure time (HH:MM) and the point they leave
+     * from. The point is the traveller's own choice -- nothing here guesses an airport -- so a time without a located
+     * point reports no point, and the planner says that instead of inventing a transfer.
+     *
+     * @return array{time: string, point: array{lat: float, lng: float, label: string}|null}|null  null when no departure time was given
+     */
+    public function departure(): ?array
+    {
+        if (blank($this->departure_time)) {
+            return null;
+        }
+
+        $point = $this->departure_lat !== null && $this->departure_lng !== null
+            ? ['lat' => (float) $this->departure_lat, 'lng' => (float) $this->departure_lng, 'label' => filled($this->departure_label) ? $this->departure_label : 'your departure point']
+            : null;
+
+        return ['time' => substr((string) $this->departure_time, 0, 5), 'point' => $point];
     }
 
     /** Health and accessibility needs stated while planning this trip, if any. */

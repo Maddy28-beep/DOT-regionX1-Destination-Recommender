@@ -23,6 +23,11 @@
     $prepMinutes = \App\Services\Recommendation\ItineraryScheduleBuilder::ARRIVAL_PREPARATION_MINUTES;
     $earliestStart = \Illuminate\Support\Carbon::parse(\App\Services\Recommendation\ItineraryScheduleBuilder::EARLIEST_DEPARTURE)->format('g:i A');
     $lastSightseeing = \Illuminate\Support\Carbon::parse(\App\Services\Recommendation\ItineraryScheduleBuilder::LAST_ACTIVITY_END)->format('g:i A');
+    // Leaving (optional). The allowance is quoted from configuration, so the help can never disagree with the planner.
+    $departureBuffer = (int) config('itinerary.departure.airport_buffer_minutes', 120);
+    $departureBufferText = $departureBuffer % 60 === 0 ? ($departureBuffer / 60).' '.($departureBuffer === 60 ? 'hour' : 'hours') : $departureBuffer.' minutes';
+    $departureValue = old('departure_time', $preference->departure_time ? substr((string) $preference->departure_time, 0, 5) : '');
+    $departureHelp = "Tell us when you leave and from where, and your last day is planned to get you there on time: we allow {$departureBufferText} at the departure point before your departure (a planning allowance, not an airline rule) and the travel time is an estimate, not a routed time. A stop that would risk the departure is left out, and with little time left the day is just the journey. Leave it blank and nothing about your last day changes.";
     $arrivalHelp = "When you expect to arrive in Davao. We allow about {$prepMinutes} minutes before your first outing and never start an outing before {$earliestStart}. A later arrival leaves less of your first day, so it may have fewer stops, or none if you arrive in the evening. Destination sightseeing ends by {$lastSightseeing}. Meals fall at 7:00 to 8:30 AM, 11:30 AM to 1:00 PM (usually 12:00) and 6:00 to 7:30 PM; if you arrive during one, we plan that meal first. Leave it blank and we'll assume {$earliestStart}.";
 @endphp
 
@@ -89,6 +94,38 @@
                 </div>
             </div>
             <input type="time" id="arrival_time" name="arrival_time" value="{{ $arrivalValue }}">
+        </div>
+
+        {{-- Leaving: all optional. The point is chosen here, never guessed from where the trip starts. The buttons only
+             fill the box and the two hidden coordinates (public/js/plan-departure.js); the server also reads a typed place. --}}
+        <div class="field pc-field pc-col-3" data-departure>
+            <label for="departure_date">Departure date (optional)
+                <span class="field-help" tabindex="0" title="{{ $departureHelp }}" aria-label="{{ $departureHelp }}"><x-icon name="info" /></span>
+            </label>
+            <input type="date" id="departure_date" name="departure_date" value="{{ old('departure_date', optional($preference->departure_date)->format('Y-m-d')) }}">
+            @error('departure_date')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
+        </div>
+
+        <div class="field pc-field pc-col-3">
+            <label for="departure_time">Departure time (optional)</label>
+            <input type="time" id="departure_time" name="departure_time" value="{{ $departureValue }}">
+            @error('departure_time')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
+            <p class="pc-hint">Needed if you give a date.</p>
+        </div>
+
+        <div class="field pc-field pc-col-6">
+            <label for="departure_label">Leaving from (needed with a time)</label>
+            <input type="text" id="departure_label" name="departure_label" value="{{ old('departure_label', $preference->departure_label) }}" placeholder="Airport, seaport or terminal" autocomplete="off">
+            <input type="hidden" name="departure_lat" id="departure_lat" value="{{ old('departure_lat', $preference->departure_lat) }}">
+            <input type="hidden" name="departure_lng" id="departure_lng" value="{{ old('departure_lng', $preference->departure_lng) }}">
+            @error('departure_label')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
+            <div class="pc-quick" role="group" aria-label="Common departure points" data-departure-points hidden>
+                <button type="button" data-departure-pick="Davao International Airport" data-lat="7.130" data-lng="125.645">Davao Airport</button>
+                <button type="button" data-departure-pick="Port of Sasa" data-lat="7.127" data-lng="125.663">Seaport</button>
+                <button type="button" data-departure-pick="Davao City Overland Transport Terminal, Ecoland" data-lat="7.056" data-lng="125.602">Bus terminal</button>
+                <button type="button" data-departure-same>Same as where I start</button>
+            </div>
+            <p class="pc-hint">We allow {{ $departureBufferText }} there before you leave.</p>
         </div>
     </div>
 </div>

@@ -197,6 +197,19 @@ class ItineraryScheduleBuilder
     ) {}
 
     /**
+     * The departure the traveller gave, read once per build(): null when no departure time was given.
+     * 'place' is null when a time was given without a located departure point (nothing is planned to it, and the
+     * departure row says so); 'deadline' is the latest time to be AT the departure point (departure time minus the
+     * stated allowance); 'at' is the departure time itself.
+     *
+     * @var array{at: Carbon, deadline: Carbon, buffer: int, place: array|null}|null
+     */
+    private ?array $departure = null;
+
+    /** The same departure while the LAST day is being planned (and a located point exists); null on every other day. */
+    private ?array $finalDayDeparture = null;
+
+    /**
      * @param  array<int, array<int, string>>  $dayCapacities  day number => slot names it can hold
      * @param  array<int, array{row: array, distance_km: float|null}>  $sequence
      * @param  array{lat: float, lng: float, label: string}  $origin
@@ -232,6 +245,11 @@ class ItineraryScheduleBuilder
          */
         $queue = $sequence;
         $tripStart = $preference->travelWindow()[0];
+        $this->departure = $this->departurePlan($preference);
+        $this->finalDayDeparture = null;
+        if ($this->departure !== null && $this->departure['place'] !== null && $lastDay > 1) {
+            $queue = $this->queueForDeparture($queue, $stayByNight, $lastDay, $origin, $tripStart->copy()->addDays($lastDay - 1));
+        }
 
         // Where the traveller physically is. Starts at their baseline and moves
         // with them, which is what makes each journey estimate honest rather
@@ -250,13 +268,15 @@ class ItineraryScheduleBuilder
             $stayRule = $stayByNight[$dayNumber]['rule'] ?? null;
             $lastNight = $stayByNight[$dayNumber - 1]['listing'] ?? null;
 
-            $clock = $this->openDay($itinerary, $dayNumber, $sortOrder, $preference, $origin, $lastNight, $date);
+            $this->finalDayDeparture = $isLastDay && $this->departure !== null && $this->departure['place'] !== null ? $this->departure : null;
+            $startPlace = $dayNumber === 1 ? $origin : ($lastNight ? $this->place($lastNight) : $here);
+            $clock = $this->openDay($itinerary, $dayNumber, $sortOrder, $preference, $origin, $lastNight, $date, $this->finalDayDeparture !== null ? $this->latestTransferLeave($startPlace) : null);
             $lunchTaken = false;
             $scheduled = 0;
 
             // Road time so far today, and where the day has to end (for the return journey).
             $driven = 0;
-            $dayEnd = $isLastDay ? $origin : ($accommodation ? $this->place($accommodation) : null);
+            $dayEnd = $isLastDay ? ($this->finalDayDeparture['place'] ?? $origin) : ($accommodation ? $this->place($accommodation) : null);
 
             $shifted = false;
 
@@ -271,7 +291,7 @@ class ItineraryScheduleBuilder
                 // The last day, and the arrival day while nothing is placed yet, look past the first few: the best
                 // stop that can actually be reached and visited today is promoted to the front instead of the day
                 // staying empty behind stops that are too far to reach.
-                $widen = $this->remoteTrip && ($isLastDay || ($dayNumber === 1 && $scheduled === 0));
+                $widen = ($this->remoteTrip && ($isLastDay || ($dayNumber === 1 && $scheduled === 0))) || $this->finalDayDeparture !== null;
                 $lookahead = $widen ? array_keys($queue) : array_slice(array_keys($queue), 0, self::LOOKAHEAD);
 
                 foreach ($lookahead as $pos => $index) {
@@ -311,6 +331,22 @@ class ItineraryScheduleBuilder
                         $this->note($destination->id, $dayNumber, 'would_return_after_2000');
 
                         continue;
+                    }
+
+                    // A departure time was given: the stop, the meal it brings and the journey on to the departure point
+                    // have to fit before the allowance starts. Decided here, while the day is being built.
+                    if ($this->finalDayDeparture !== null && $this->projectDepartureArrival($visit, $there)->greaterThan($this->finalDayDeparture['deadline'])) {
+                        // A visit that runs into the lunch window brings a lunch with it. Ending it before lunch is due
+                        // may still make the departure; if it does not, the stop cannot be done today.
+                        $shorter = $this->visitEndingBeforeLunch($visit, $clock, $here, $there, $lunchTaken, $destination, $date);
+
+                        if ($shorter === null) {
+                            $this->note($destination->id, $dayNumber, 'would_miss_departure');
+
+                            continue;
+                        }
+
+                        $visit = $shorter;
                     }
 
                     if ($scheduled === 0 && $this->remoteTrip && $driven + $leg + $back > self::MAX_DAILY_DRIVE_MINUTES) {
@@ -407,7 +443,9 @@ class ItineraryScheduleBuilder
                 $this->noteLeftovers($queue, $dayNumber, $capacity);
             }
 
-            if ($isLastDay) {
+            if ($isLastDay && $this->finalDayDeparture !== null) {
+                $this->closeDepartureDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $lunchTaken, $lastDestination, $date, $scheduled > 0);
+            } elseif ($isLastDay) {
                 $this->closeTripDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $origin, $lunchTaken, $lastDestination, $date, $driven);
             } else {
                 $this->closeOvernightDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $accommodation, $stayRule, $lastNight, $date);
@@ -415,6 +453,7 @@ class ItineraryScheduleBuilder
             }
         }
 
+        $this->finalDayDeparture = null;
         $this->storeAttempts($sequence, $stayByNight);
     }
 
@@ -635,15 +674,27 @@ class ItineraryScheduleBuilder
         $visitMinutes = $plan['visitMinutes'];
         $start = $this->toQuarterHour($plan['arrival']);
 
+        // The cutoff is the sightseeing hour, or -- on a last day with a departure time -- the latest the visit may end
+        // and still leave time for the journey to the departure point, whichever is earlier.
+        $cutoff = Carbon::parse(self::LAST_ACTIVITY_END);
+        $byDeparture = false;
+        if ($this->finalDayDeparture !== null) {
+            $latest = $this->latestFinish($to);
+            if ($latest->lessThan($cutoff)) {
+                $cutoff = $latest;
+                $byDeparture = true;
+            }
+        }
+
         // The sightseeing cutoff. A visit that does not fit before it in full is shortened to what does fit, as long
         // as that is still a proper visit (at least SHORT_VISIT_MINUTES, or the whole visit if that is shorter).
         // Without this, arriving at 15:45 with 135 minutes left dropped a place 15 km away and left the arrival day
         // with nothing but the drive to the stay.
-        if ($start->copy()->addMinutes($visitMinutes)->greaterThan(Carbon::parse(self::LAST_ACTIVITY_END))) {
-            $fit = $this->minutesBetween($start, Carbon::parse(self::LAST_ACTIVITY_END));
+        if ($start->copy()->addMinutes($visitMinutes)->greaterThan($cutoff)) {
+            $fit = $this->minutesBetween($start, $cutoff);
 
             if ($fit < min($visitMinutes, self::SHORT_VISIT_MINUTES)) {
-                $this->planRejection = 'would_end_after_cutoff';
+                $this->planRejection = $byDeparture ? 'would_miss_departure' : 'would_end_after_cutoff';
 
                 return null;
             }
@@ -678,6 +729,11 @@ class ItineraryScheduleBuilder
             $begin = max($startMinute, $open);
             $minutes = min($visitMinutes, $close - $begin);
 
+            // Waiting for a place to open pushes the visit later: it still has to end before a departure cutoff.
+            if ($byDeparture) {
+                $minutes = min($minutes, ($cutoff->hour * 60 + $cutoff->minute) - $begin);
+            }
+
             if ($minutes >= $enough) {
                 return [
                     'minutes' => $minutes,
@@ -708,6 +764,7 @@ class ItineraryScheduleBuilder
         array $origin,
         ?Accommodation $accommodation,
         ?Carbon $date = null,
+        ?Carbon $mustLeaveBy = null,
     ): Carbon {
         if ($dayNumber === 1) {
             $arrival = $this->arrivalTime($preference);
@@ -755,6 +812,12 @@ class ItineraryScheduleBuilder
             }
 
             return $ready;
+        }
+
+        // The journey to the departure point has to start before breakfast could be over: no breakfast is planned,
+        // and the transfer row says when to leave.
+        if ($mustLeaveBy !== null && $mustLeaveBy->lessThan(Carbon::parse(self::BREAKFAST)->addMinutes(self::BREAKFAST_MINUTES))) {
+            return Carbon::parse(self::EARLIEST_DEPARTURE);
         }
 
         // At the stay when there is one; otherwise the traveller's own choice, never a made-up "your accommodation".
@@ -1270,11 +1333,256 @@ class ItineraryScheduleBuilder
             $date,
         );
 
-        $this->row($itinerary, $dayNumber, $sortOrder, [
+        $this->row($itinerary, $dayNumber, $sortOrder, array_filter([
             'kind' => 'departure',
             'title' => 'Departure',
             'starts_at' => $this->toQuarterHour($clock),
+            // A time was given but no located departure point: say so rather than plan a journey to nowhere.
+            'note' => $this->departure !== null && $this->departure['place'] === null
+                ? 'You gave a departure time of '.$this->departure['at']->format('g:i A').' but no located departure point, so the journey there is not planned. Add where you leave from to plan it.'
+                : null,
+        ], fn ($v) => $v !== null));
+    }
+
+    /**
+     * The departure the traveller gave, or null. The allowance is configuration (itinerary.departure.airport_buffer_minutes)
+     * and is stated on the itinerary; the point is the traveller's own choice, never inferred.
+     *
+     * @return array{at: Carbon, deadline: Carbon, buffer: int, place: array|null}|null
+     */
+    private function departurePlan(TouristPreference $preference): ?array
+    {
+        $departure = $preference->departure();
+        if ($departure === null) {
+            return null;
+        }
+
+        $buffer = max(0, (int) config('itinerary.departure.airport_buffer_minutes', 120));
+        $at = Carbon::parse($departure['time']);
+
+        return [
+            'at' => $at,
+            'deadline' => $at->copy()->subMinutes($buffer),
+            'buffer' => $buffer,
+            'place' => $departure['point'] === null ? null : $departure['point'] + ['region' => null],
+        ];
+    }
+
+    /** Floors a clock time to the quarter hour (toQuarterHour rounds up). */
+    private function floorToQuarterHour(Carbon $time): Carbon
+    {
+        $floored = $time->copy()->second(0);
+
+        return $floored->subMinutes($floored->minute % 15);
+    }
+
+    /**
+     * The latest a visit at $from may END so that, after the usual set-off buffer, the journey on to the departure
+     * point still arrives by the deadline. The journey is the planner's own slow-end estimate (estimateLeg).
+     */
+    private function latestFinish(array $from): Carbon
+    {
+        return $this->latestTransferLeave($from)->subMinutes(self::DEPARTURE_BUFFER_MINUTES);
+    }
+
+    /** The latest the journey from $from to the departure point may begin and still arrive by the deadline. */
+    private function latestTransferLeave(array $from): Carbon
+    {
+        $leg = $this->estimateLeg($from, $this->finalDayDeparture['place'])['max_minutes'];
+
+        return $this->floorToQuarterHour($this->finalDayDeparture['deadline']->copy()->subMinutes($leg));
+    }
+
+    /** When the traveller would reach the departure point after finishing at $from at $finished (set-off buffer included). */
+    private function departureArrival(Carbon $finished, array $from): Carbon
+    {
+        $setOff = $this->toQuarterHour($finished->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES));
+
+        return $setOff->addMinutes($this->estimateLeg($from, $this->finalDayDeparture['place'])['max_minutes']);
+    }
+
+    /**
+     * When the traveller would reach the departure point if the last day ended with this candidate visit: the steps
+     * build() writes (the journey, waiting for opening, the visit, the lunch a visit ending in the lunch window brings),
+     * then departureArrival().
+     */
+    private function projectDepartureArrival(array $visit, array $there): Carbon
+    {
+        $afterLeg = $visit['plan']['arrival']->copy();
+        if ($visit['starts_at'] !== null && $visit['starts_at']->greaterThan($afterLeg)) {
+            $afterLeg = $visit['starts_at']->copy();
+        }
+        $clock = $this->toQuarterHour($afterLeg)->addMinutes($visit['minutes']);
+
+        if (! $visit['plan']['lunchTaken'] && $this->lunchIsDue($clock)) {
+            $clock = $this->toQuarterHour($clock)->addMinutes(self::MEAL_MINUTES);
+        }
+
+        return $this->departureArrival($clock, $there);
+    }
+
+    /**
+     * The same stop with a visit that ends before lunch is due, when that makes the departure and is still a proper
+     * visit; null otherwise. Only used on a last day with a departure time.
+     *
+     * @return array{minutes: int, starts_at: Carbon|null, wait: int, plan: array}|null
+     */
+    private function visitEndingBeforeLunch(array $visit, Carbon $clock, array $here, array $there, bool $lunchTaken, $destination, ?Carbon $date): ?array
+    {
+        if ($visit['plan']['lunchTaken'] || $lunchTaken) {
+            return null;
+        }
+
+        $begin = $visit['starts_at'] ?? $this->toQuarterHour($visit['plan']['arrival']);
+        $lunchDue = Carbon::parse(self::LUNCH_EARLIEST);
+        $room = $this->minutesBetween($begin, $lunchDue) - 15;
+        $minutes = intdiv(max(0, $room), 15) * 15;
+
+        if ($minutes < self::SHORT_VISIT_MINUTES) {
+            return null;
+        }
+
+        $again = $this->planVisit($clock, $here, $there, $minutes, $lunchTaken, $destination, $date);
+
+        return $again !== null && $this->projectDepartureArrival($again, $there)->lessThanOrEqualTo($this->finalDayDeparture['deadline'])
+            ? $again
+            : null;
+    }
+
+    /**
+     * With a departure time, the stops that cannot be done on the last day go earlier. Each stop is tried as the last
+     * day's first visit (a fresh morning, starting from last night's stay); those that cannot make the departure move to
+     * the front, so earlier days take them, and the rest keep their order for the last day. Without a departure, or
+     * with a one-day trip, the queue is left as it is.
+     *
+     * @param  array<int, array{row: array, distance_km: float|null}>  $queue
+     * @param  array<int, array{listing: mixed, rule: array|null}>  $stayByNight
+     * @return array<int, array{row: array, distance_km: float|null}>
+     */
+    private function queueForDeparture(array $queue, array $stayByNight, int $lastDay, array $origin, Carbon $lastDate): array
+    {
+        $lastNight = $stayByNight[$lastDay - 1]['listing'] ?? null;
+        $from = $lastNight ? $this->place($lastNight) : $origin;
+        $this->finalDayDeparture = $this->departure;
+        $morning = Carbon::parse(self::EARLIEST_DEPARTURE);
+        $early = $late = [];
+
+        try {
+            foreach ($queue as $item) {
+                $destination = $item['row']['destination'];
+                $there = $this->place($destination);
+                $visit = $this->planVisit($morning, $from, $there, self::VISIT_MINUTES, false, $destination, $lastDate);
+                $fits = $visit !== null && (
+                    $this->projectDepartureArrival($visit, $there)->lessThanOrEqualTo($this->departure['deadline'])
+                    || $this->visitEndingBeforeLunch($visit, $morning, $from, $there, false, $destination, $lastDate) !== null
+                );
+
+                if ($fits) {
+                    $late[] = $item;
+                } else {
+                    $early[] = $item;
+                }
+            }
+        } finally {
+            $this->finalDayDeparture = null;
+        }
+
+        return array_values([...$early, ...$late]);
+    }
+
+    /**
+     * The final day with a departure time: souvenirs and lunch only when they still fit before the allowance, then the
+     * journey to the departure point and the departure row (arrive-by time and the allowance, stated). With no
+     * sightseeing the day is just the journey, set off at the latest safe time, so no time is spent on stops that
+     * would put the departure at risk.
+     */
+    private function closeDepartureDay(Itinerary $itinerary, int $dayNumber, int &$sortOrder, Carbon $clock, array $here, bool $lunchTaken, $lastDestination, ?Carbon $date, bool $sawSights): void
+    {
+        $d = $this->finalDayDeparture;
+        $point = $d['place'];
+        $deadline = $d['deadline'];
+
+        $suggestion = $sawSights ? $this->souvenirStop($here, $lastDestination, $clock) : null;
+        if ($suggestion) {
+            $shop = $this->place($suggestion['listing']);
+            $shopArrival = $this->toQuarterHour($this->toQuarterHour($clock->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES))->addMinutes($this->estimateLeg($here, $shop)['max_minutes']));
+            $shopEnd = $shopArrival->copy()->addMinutes(self::MEAL_MINUTES);
+
+            if ($this->departureArrival($shopEnd, $shop)->greaterThan($deadline)) {
+                $suggestion = null;
+            }
+        }
+
+        if ($suggestion) {
+            $clock = $this->addTravel($itinerary, $dayNumber, $sortOrder, $this->toQuarterHour($clock->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES)), $here, $this->place($suggestion['listing']));
+            $start = $this->toQuarterHour($clock);
+            $end = $start->copy()->addMinutes(self::MEAL_MINUTES);
+            $this->row($itinerary, $dayNumber, $sortOrder, array_merge([
+                'kind' => 'activity',
+                'title' => 'Souvenir shopping',
+                'starts_at' => $start,
+                'ends_at' => $end,
+                'souvenir_center_id' => $suggestion['listing']->id,
+            ], $this->ruleColumns($suggestion['rule'] ?? null)));
+            $clock = $end;
+            $here = $this->place($suggestion['listing']);
+        }
+
+        if ($sawSights && ! $lunchTaken && $this->lunchIsDue($clock)
+            && $this->departureArrival($this->toQuarterHour($clock)->addMinutes(self::MEAL_MINUTES), $here)->lessThanOrEqualTo($deadline)) {
+            $clock = $this->addMeal($itinerary, $dayNumber, $sortOrder, $clock, 'Lunch', $here, null, $date, 'after');
+        }
+
+        $estimate = $this->estimateLeg($here, $point);
+        $setOff = $this->toQuarterHour($clock->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES));
+
+        if (! $sawSights) {
+            // Nothing was visited: stay put and set off at the latest safe time, rather than add stops.
+            $latest = $this->latestTransferLeave($here);
+            // A journey may set off before the day's 08:00 start (only sightseeing waits for 08:00), but never before the
+            // traveller is ready on the arrival day, nor before the row already written for the day.
+            $floor = $dayNumber === 1 ? $clock : Carbon::parse($this->lastStart[$itinerary->id.'-'.$dayNumber] ?? '00:00:00');
+            if ($latest->toDateString() === $clock->toDateString() && $latest->greaterThanOrEqualTo($floor)) {
+                $setOff = $latest;
+                if ($this->minutesBetween($clock, $setOff) >= self::MIN_FREE_TIME_BEFORE_DINNER_MINUTES) {
+                    $this->row($itinerary, $dayNumber, $sortOrder, [
+                        'kind' => 'free',
+                        'title' => 'Free time until '.$setOff->format('g:i A'),
+                        'starts_at' => $clock->copy(),
+                        'ends_at' => $setOff->copy(),
+                        'note' => 'Nothing is planned: the journey to '.$point['label'].' needs the time that is left before your departure.',
+                    ]);
+                }
+            } else {
+                $setOff = $this->toQuarterHour($floor);
+            }
+        }
+
+        $arrival = $this->toQuarterHour($this->addTravel($itinerary, $dayNumber, $sortOrder, $setOff, $here, $point));
+
+        $notes = ['Be at '.$point['label'].' by '.$deadline->format('g:i A').': that is '.$this->durationText($d['buffer']).' before your '.$d['at']->format('g:i A').' departure, a planning allowance and not an airline or airport rule.'];
+        $notes[] = $estimate['distance_km'] === null
+            ? 'The distance to '.$point['label'].' could not be measured from here, so a time allowance was used.'
+            : 'The journey is an estimate (straight line plus a detour allowance, at the slowest pace), not a routed time.';
+        if ($arrival->greaterThan($deadline)) {
+            $notes[] = 'Even so, this estimate reaches '.$point['label'].' at '.$arrival->format('g:i A').', after the allowance starts. Consider an earlier start or a later departure.';
+        }
+
+        $this->row($itinerary, $dayNumber, $sortOrder, [
+            'kind' => 'departure',
+            'title' => 'Departure from '.$point['label'],
+            'starts_at' => $arrival,
+            'ends_at' => $d['at']->copy(),
+            'note' => implode(' ', $notes),
         ]);
+    }
+
+    private function durationText(int $minutes): string
+    {
+        $h = intdiv($minutes, 60);
+        $m = $minutes % 60;
+
+        return trim(($h > 0 ? $h.' '.($h === 1 ? 'hour' : 'hours') : '').($m > 0 ? ' '.$m.' minutes' : '')) ?: '0 minutes';
     }
 
     /**

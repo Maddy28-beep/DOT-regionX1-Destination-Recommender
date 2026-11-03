@@ -74,6 +74,7 @@ class AnonymousDataPurger
 
             $counts['preferences_scrubbed'] = DB::table('tourist_preferences')->whereIn('id', $scrub)->update([
                 'accessibility_notes' => null, 'origin_lat' => null, 'origin_lng' => null, 'origin_label' => null, 'place_of_origin' => null,
+                'departure_lat' => null, 'departure_lng' => null, 'departure_label' => null,
             ]);
 
             // 3. old chatbot questions

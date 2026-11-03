@@ -73,4 +73,21 @@ return [
          */
         'long_driving_day_minutes' => 480,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Leaving: the departure time a traveller may give
+    |--------------------------------------------------------------------------
+    |
+    | With a departure time and a departure point, the last day is planned so the journey from the last stop to that
+    | point still arrives this many minutes before the departure (ItineraryScheduleBuilder). It is a planning allowance
+    | stated on the itinerary, not an airline or airport rule: check-in and security need differ by carrier and
+    | route. The journey itself is the planner's own estimate (straight line x 1.3 detour, slowest pace; no routing
+    | service), so it is stated as an estimate too. Set ITINERARY_DEPARTURE_BUFFER_MINUTES to change the allowance.
+    |
+    */
+
+    'departure' => [
+        'airport_buffer_minutes' => (int) env('ITINERARY_DEPARTURE_BUFFER_MINUTES', 120),
+    ],
 ];

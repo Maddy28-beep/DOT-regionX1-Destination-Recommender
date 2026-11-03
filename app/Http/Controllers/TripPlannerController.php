@@ -20,6 +20,7 @@ use App\Services\Recommendation\TourOperatorSuggester;
 use App\Services\Recommendation\TransportMode;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use App\Support\ItineraryCalendar;
@@ -166,6 +167,16 @@ class TripPlannerController extends Controller
             // Not more than two years ahead: a typo such as 2062 would otherwise be planned as written.
             'start_date' => ['nullable', 'date', 'before_or_equal:'.now('Asia/Manila')->addYears(2)->toDateString()],
             'arrival_time' => ['nullable', 'date_format:H:i'],
+            /*
+             * Leaving (all optional). The time is what the planner uses; a date alone means nothing, so it needs the
+             * time. The date, when given, has to agree with the arrival date and the number of days (checked below).
+             * The departure point is the traveller's own choice, never inferred from the starting point.
+             */
+            'departure_date' => ['nullable', 'date', 'before_or_equal:'.now('Asia/Manila')->addYears(2)->toDateString()],
+            'departure_time' => ['nullable', 'date_format:H:i', 'required_with:departure_date'],
+            'departure_lat' => ['nullable', 'numeric', 'between:-90,90', 'required_with:departure_lng'],
+            'departure_lng' => ['nullable', 'numeric', 'between:-180,180', 'required_with:departure_lat'],
+            'departure_label' => ['nullable', 'string', 'max:200'],
             // Bounds are the real ones, so a malformed or spoofed reading is
             // rejected rather than quietly sequencing the trip from the sea.
             'origin_lat' => ['nullable', 'numeric', 'between:-90,90', 'required_with:origin_lng'],
@@ -193,6 +204,8 @@ class TripPlannerController extends Controller
             'health_other' => ['nullable', 'string', 'max:300'],
         ]);
 
+        $this->validateDeparture($request, $data);
+
         // A setting only means something for a resort, and an unanswered field must clear a previous answer.
         $data['resort_setting'] = $data['accommodation_pref'] === 'Resort' ? ($data['resort_setting'] ?? null) : null;
         $data['transport_pref'] = $data['transport_pref'] ?? null;
@@ -202,9 +215,11 @@ class TripPlannerController extends Controller
         $preference->fill(collect($data)->except([
             'activities', 'amenities', 'health_conditions', 'health_other',
             'origin_lat', 'origin_lng', 'origin_label',
+            'departure_lat', 'departure_lng', 'departure_label',
         ])->all());
 
         $this->applyOrigin($preference, $data);
+        $this->applyDeparture($preference, $data);
         $preference->save();
 
         $preference->activities()->delete();
@@ -374,6 +389,89 @@ class TripPlannerController extends Controller
         $request->session()->put(self::ITINERARY_KEY, $itinerary->id);
 
         return redirect()->route('plan.itinerary')->with(Toast::success('Itinerary regenerated', 'Rebuilt from your current preferences.'));
+    }
+
+    /**
+     * The checks on leaving that need more than one field. Nothing here is guessed: a time needs a departure point the
+     * traveller chose, a date has to fit the arrival date and the number of days, and a same-day trip cannot leave
+     * before it arrives.
+     *
+     * @param  array<string, mixed>  $data  the validated input
+     */
+    private function validateDeparture(Request $request, array $data): void
+    {
+        $errors = [];
+        $time = $data['departure_time'] ?? null;
+        $days = (int) $data['travel_days'];
+        $arrival = filled($data['start_date'] ?? null) ? Carbon::parse($data['start_date'])->startOfDay() : null;
+        $leaving = filled($data['departure_date'] ?? null) ? Carbon::parse($data['departure_date'])->startOfDay() : null;
+
+        if ($time !== null && ! $this->hasDeparturePoint($data)) {
+            $errors['departure_label'] = 'Tell us where you leave from (for example Davao Airport) so we can plan the journey there.';
+        }
+
+        if ($leaving !== null && $arrival !== null) {
+            $span = (int) $arrival->diffInDays($leaving, false) + 1;
+
+            if ($leaving->lt($arrival)) {
+                $errors['departure_date'] = 'Your departure date is before your arrival date.';
+            } elseif ($span !== $days) {
+                $errors['departure_date'] = 'Arriving '.$arrival->format('M j').' and leaving '.$leaving->format('M j').' is '.$span.' '.($span === 1 ? 'day' : 'days').', not '.$days.'. Change the number of days or the date.';
+            }
+        } elseif ($leaving !== null && $leaving->lt(Carbon::parse(now('Asia/Manila')->toDateString()))) {
+            $errors['departure_date'] = 'Your departure date is in the past.';
+        }
+
+        // A one-day trip leaves on the day it arrives: the departure has to come after the arrival.
+        if ($time !== null && $days === 1 && filled($data['arrival_time'] ?? null)
+            && $time <= $data['arrival_time']) {
+            $errors['departure_time'] = 'Your departure time has to be after your arrival time on a one-day trip.';
+        }
+
+        if ($errors !== []) {
+            throw \Illuminate\Validation\ValidationException::withMessages($errors);
+        }
+    }
+
+    /** A located departure point: coordinates (a tapped place or shared position) or a typed place the geocoder knows. */
+    private function hasDeparturePoint(array $data): bool
+    {
+        if (isset($data['departure_lat'], $data['departure_lng'])) {
+            return true;
+        }
+
+        $typed = trim((string) ($data['departure_label'] ?? ''));
+
+        return $typed !== '' && $this->addresses->resolve($typed) !== null;
+    }
+
+    /**
+     * Record where the traveller leaves from. Same rounding as the starting point (about 110 m), and nothing is kept
+     * when no departure time was given, so a cleared field really clears.
+     */
+    private function applyDeparture(TouristPreference $preference, array $data): void
+    {
+        $typed = trim((string) ($data['departure_label'] ?? ''));
+
+        if (blank($data['departure_time'] ?? null)) {
+            $preference->departure_date = $preference->departure_time = null;
+            $preference->departure_lat = $preference->departure_lng = $preference->departure_label = null;
+
+            return;
+        }
+
+        if (isset($data['departure_lat'], $data['departure_lng'])) {
+            $preference->departure_lat = round((float) $data['departure_lat'], 3);
+            $preference->departure_lng = round((float) $data['departure_lng'], 3);
+            $preference->departure_label = $typed !== '' ? $typed : 'Your departure point';
+
+            return;
+        }
+
+        $match = $this->addresses->resolve($typed);
+        $preference->departure_lat = $match ? round($match['lat'], 3) : null;
+        $preference->departure_lng = $match ? round($match['lng'], 3) : null;
+        $preference->departure_label = $typed;
     }
 
     /**

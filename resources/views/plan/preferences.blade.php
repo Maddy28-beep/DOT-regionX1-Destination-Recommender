@@ -446,6 +446,7 @@
 <script>window.planWizardErrors = {{ Illuminate\Support\Js::from($errors->keys()) }};</script>
 <script src="{{ asset('js/plan-basics.js') }}?v={{ filemtime(public_path('js/plan-basics.js')) }}" defer></script>
 <script src="{{ asset('js/plan-origin.js') }}?v={{ filemtime(public_path('js/plan-origin.js')) }}" defer></script>
+<script src="{{ asset('js/plan-departure.js') }}?v={{ filemtime(public_path('js/plan-departure.js')) }}" defer></script>
 <script src="{{ asset('js/plan-comfort.js') }}?v={{ filemtime(public_path('js/plan-comfort.js')) }}" defer></script>
 <script src="{{ asset('js/plan-wizard.js') }}?v={{ filemtime(public_path('js/plan-wizard.js')) }}" defer></script>
 <script src="{{ asset('js/plan-interest-summary.js') }}?v={{ filemtime(public_path('js/plan-interest-summary.js')) }}" defer></script>
