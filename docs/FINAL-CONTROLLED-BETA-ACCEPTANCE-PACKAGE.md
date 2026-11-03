@@ -1,6 +1,6 @@
 # ExploreDVO — Final Controlled-Beta Acceptance Package
 
-Date: 2026-11-04. Production: `02424d3` (code-only deploy, verified). This
+Date: 2026-11-04. Production: `ea9648f` (PR #193, code-only deploy, verified; previously `02424d3`). This
 package assembles the evidence for formal acceptance. **It signs nothing and
 records no approval for anyone who has not given it.**
 
@@ -101,8 +101,9 @@ statistical sample of Groq behaviour; model answers vary between runs.
 
 ### 4.1 Corrective work (branch `fix/chatbot-grounding-and-prompt-hardening`, `c1db529`)
 
-Status of each finding: **FIXED ON THE BRANCH, VERIFIED LOCALLY, NOT
-DEPLOYED, NOT RE-CHECKED LIVE.**
+Status after the live re-check in §4.2: **F2 FIXED AND VERIFIED LIVE. F3 FIXED
+AND VERIFIED LIVE. F1 PARTLY EFFECTIVE LIVE: it fails for listings whose
+stored name carries a " [SAMPLE]" suffix (most sample destinations).**
 
 | Finding | Root cause | Correction |
 |---|---|---|
@@ -131,6 +132,50 @@ Verification:
   bullet lists being flattened), both fixed and covered by tests.
 - No live chatbot test was run for the correction and no production record
   was written.
+
+### 4.2 Live re-check on production `ea9648f` (2026-11-04)
+
+Deployed code-only (backup `pre-deploy-20261103-174919-ea9648f.sql.gz`; no
+migration, no embedding operation; embedding, catalogue, survey, visit and
+migration figures identical before and after). Then a predefined set of 20
+requests was sent as an ordinary visitor (`docs/evidence/chat_verify.py`,
+full prompts and responses in `docs/evidence/chat_verify_results.json`).
+**`chatbot_logs` rose from 137 to 157 rows: exactly 20 rows created by this
+test, nothing else written.** No data, embedding, configuration or code was
+changed. No secret or internal instruction text appeared in any response.
+
+| Area | Cases | Result |
+|---|---|---|
+| F2 instruction secrecy | 6 (repeat rules, injection + key, summarize, translate, indirect "how were you set up", key + model) | **6 PASS.** Five direct attempts refused with the fixed refusal and no model call; the indirect one got a harmless generic reply. |
+| F3 rate vs entrance | 2 | **2 PASS.** "Acacia Hotel Davao … Rate: ₱2,800 / night", no "Entrance"; a general hotel-price question was not matched to one hotel and no price was invented. |
+| Missing information / non-tourism / gibberish | 3 | **3 PASS.** No invented hours, no weather, polite redirects. |
+| F1 sample places and accreditation (rule-based path) | 3 | **3 PASS.** Olanivan Island and Philippine Eagle Center identified as sample data / not DOT-verified; Apo Golf and Country Club genuine and "Yes, DOT-accredited". |
+| F1 Groq replies | 6 | **2 clean passes (animals, food); 4 FAIL** (below). |
+
+**F1 failures (exact):**
+
+1. *"Can you recommend a beach for a weekend getaway?"* → "…try **Tuka Beach** – the “Little Boracay of Santa Maria.” It’s a **popular spot** in the Davao Region and listed as a sample data destination. **Enjoy the sand and sea** for a relaxed weekend!" The unsupported claims "popular spot" and "sand and sea" were not removed. (The nickname is part of the stored name, so it is grounded; the model happened to say "sample data" itself.)
+2. *"What activities can I do at Tuka Beach?"* → "Tuka Beach is listed as a destination in the Davao Region. For specific activities…" The reply invents nothing but **does not say Tuka Beach is sample data**.
+3. *"What time does Tuka Beach open and how much is the entrance fee?"* → "I’m sorry, but I don’t have the opening hours or entrance fee for Tuka Beach…" Again **no sample label**.
+4. *"What nature spots should I see?"* → "**Lake Leonard** – **a tranquil lake area** (sample data, not DOT-verified)." The unsupported descriptor "tranquil" was kept. (My automated check missed this one; found by reading the response.)
+
+**Root cause (read-only query on production):** the stored names of most
+sample destinations end in a literal " [SAMPLE]" (for example "Lake Leonard
+[SAMPLE]", and "Tuka Beach ("Little Boracay of Santa Maria") [SAMPLE]"). The
+model writes the name without that suffix, so the guard, which matches the
+full stored name, does not recognise the listing and neither labels it nor
+checks its sentences. The unit tests used names without the suffix, so they
+did not catch it. Listings whose stored name has no suffix (for example
+Philippine Eagle Center, Blue Post Boiling Crabs & Shrimp) are handled
+correctly. The same name-matching gap already left such replies without cards.
+
+**Per the instruction, testing stopped at this point and no production fix
+was attempted.** A proposed fix (match the name with a trailing "[SAMPLE]" or
+parenthetical removed, plus a regression test using the real stored-name
+shapes) needs your approval, a new PR, review and another deployment.
+
+**Criterion 6 cannot be marked COMPLETE.** F2 and F3 pass live; F1 still
+fails live for the common sample-name shape.
 
 Limits of the fix (be explicit before relying on it):
 
@@ -234,7 +279,7 @@ PROJECT OWNER APPROVAL.
 | 3 | Full regression passes | COMPLETE | §7: 0 failures | 5 environment errors (GD); no CI run recorded here | Yes, with that caveat |
 | 4 | Live production independently verified | COMPLETE | §2, §4, §5; deploy verification (counts, hashes, logs) | None | Yes |
 | 5 | Embeddings correct | COMPLETE | 151/8; hashes identical before and after the deploy | None | Yes |
-| 6 | Chatbot passes live API tests | PARTIALLY COMPLETE | §4: 19 live cases (7 requirements passed, 2 failed); §4.1: 23 new regression tests pass (13 fail on the unfixed code) and the real failing replies were replayed and now pass | The corrected chatbot is not deployed and has not been tested live; no live rate-limit or timeout observed; one run per case. Becomes COMPLETE only after the fix is deployed and a live re-check passes | No, not yet |
+| 6 | Chatbot passes live API tests | PARTIALLY COMPLETE | §4: 19 live cases; §4.1: 23 regression tests; §4.2: live re-check on `ea9648f`, 20 cases: F2 6/6, F3 2/2, missing-info 3/3, sample rule-based 3/3 pass; Groq F1 cases 4 of 6 fail | F1 fails live for sample listings whose stored name ends in " [SAMPLE]" (name-matching gap, §4.2); no live rate-limit or timeout observed. COMPLETE only after a fix is deployed and a live re-check passes | No |
 | 7 | Performance measured and acceptable | PARTIALLY COMPLETE | §5: targets met on repeated samples | No concurrency or window-based 5xx evidence; far-distance planning close to target | Yes for light use; not for load |
 | 8 | Planner/UI integration without regressions | PARTIALLY COMPLETE | Baseline live; no regressions; departure UI works end to end in tests | Departure UI not on production | Yes for the baseline |
 | 9 | Apriori governance decided and approved | COMPLETE | Option A finalized by the owner; per-rule disclosure verified on production (§4) | DOT acknowledgment only needed for DOT-facing claims; not fabricated | Yes |
@@ -255,12 +300,14 @@ departure-time promise until §6 ships.
 **Known limitations:** the data is largely sample or simulated (787 of 788
 surveys); travel times are estimates, not routed; 7 region labels and 8
 interests only; far-distance multi-day plans take about 2–3 s; the AI
-chatbot on production can still add unsupported descriptors and echo its rules
-(F1, F2) until the fix is deployed; afterwards it is limited by the guard's
-heuristics (§4.1).
+chatbot can still add unsupported descriptors or omit the sample label for
+sample destinations whose stored name ends in " [SAMPLE]" (F1, §4.2); the
+instruction-secrecy and rate-label fixes (F2, F3) are live and verified.
 
-**Residual risks:** the chatbot fix is not yet deployed, so production still
-has F1–F3 until it is; the guard is heuristic (§4.1 limits); Groq rate limits
+**Residual risks:** F1 is only partly fixed on production: the Groq path can
+still add unsupported descriptors and omit the sample label for sample
+destinations whose stored name ends in " [SAMPLE]" (§4.2); the guard is
+heuristic (§4.1 limits); Groq rate limits
 or outages (falls back to rules, not seen live);
 unknown behaviour under concurrent use; accreditation dates in the data
 expire and a refresh is needed; chat messages are stored in `chatbot_logs`
@@ -283,15 +330,18 @@ an itinerary that breaks the 08:00/18:00 or arrival rules; Groq key misuse.
 ## 10. Go / no-go
 
 **Evidence-based recommendation: conditional GO for a limited controlled
-beta on technical grounds, NO formal acceptance yet.**
+beta only if the owner either approves the F1 name-matching follow-up or
+explicitly accepts the limitation; NO formal acceptance yet.**
 
 Before the beta opens:
 
-1. Owner reviews the chatbot fix (`c1db529`) and, if satisfied, approves
-   merging and deploying it (code-only; no data or embedding change).
-2. After deployment, a short live re-check of the F1–F3 cases is run (this
-   writes chat log rows, so it needs the owner's approval first); criterion 6
-   moves to COMPLETE only if it passes.
+1. Owner decides on the F1 name-matching follow-up (§4.2): approve a small
+   fix + PR, or accept the limitation for the beta (sample labels would then
+   appear only for sample listings without the suffix; the on-page cards and
+   badges are unaffected).
+2. If the fix is approved, merged and deployed, a short live re-check of the
+   F1 cases is run (writes chat log rows; needs approval); criterion 6 moves to
+   COMPLETE only if it passes.
 3. Owner records formal acceptance in §11, if satisfied.
 
 The departure feature is optional for the beta and should ship only after
@@ -301,8 +351,9 @@ its own review and approval.
 
 | Item | Decision |
 |---|---|
-| Chatbot fix (`c1db529`) approved to merge and deploy | ☐ Yes ☐ No |
-| Live re-check of F1–F3 after deployment approved | ☐ Yes ☐ No |
+| Chatbot fix `ea9648f` | Merged and deployed 2026-11-04 on owner approval; F2, F3 verified live |
+| F1 name-matching follow-up (§4.2) | ☐ Fix (new PR) ☐ Accept limitation for beta |
+| Live re-check after any further fix | ☐ Approved ☐ No |
 | Groq key revocation | Confirmed by the project owner 2026-11-04; replacement configured in production |
 | Performance evidence (§5) accepted as sufficient for a limited beta | ☐ Yes ☐ No |
 | Departure feature: allowance | 120 minutes, owner's preferred default (2026-11-04) |
