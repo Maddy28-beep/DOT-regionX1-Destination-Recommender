@@ -38,3 +38,23 @@ The sample records are a temporary beta-testing arrangement and must eventually 
 ## 5. Wording that was corrected
 
 The home page said "Verified DOT-accredited spots", "a DOT-verified must-see" (all six featured destinations are samples), "connects travelers directly with DOT-verified destinations" and similar; the plan chooser, two helper texts, the visit-card link and the site description (search engines and link previews) said "DOT-accredited" for everything. They now describe what the record is. The legal pages and the partner registration page were deliberately left unchanged (no specific factual or compliance issue was identified).
+
+## 6. Listing-pairing coverage (restaurant and souvenir rules) and its side effect on popularity
+
+> **Status (4 Nov 2026): implemented on the branch `apriori-pairing-coverage`, tested on a scratch copy of production only. NOT merged, NOT deployed, NO production batch generated.**
+
+**Why.** The earlier simulated batches paired destinations with randomly chosen restaurants, shops and stays, so most mined rules point at a listing the itinerary builder will not use (more than 10 km for a meal, more than 20 km for a souvenir stop). On a scratch copy of production, 1 of 192 deterministic trips contained a rule-paired item, and every restaurant and souvenir rule that was checked failed the distance test.
+
+**What.** `php artisan surveys:generate-demo-samples --pair-listings --batch=<new name>` (dry run by default; `--apply` writes; `--revert --batch=<name> --apply` removes exactly that batch). For each destination the planner offers (`itinerary_role` null or `sightseeing`, publicly visible) it checks whether a *usable* restaurant rule and a *usable* souvenir rule exist, and only where one is missing it adds the fewest simulated surveys (one destination plus its nearest valid restaurant and/or souvenir centre) that bring the pair to a co-count of at least 2 and a confidence of at least 0.1, at most 6 surveys per destination. "Usable" means what the builder accepts: restaurant within 10 km, same region, open at 12:00, publicly visible; souvenir centre within 20 km, publicly visible and available. A destination with its own restaurant gets no restaurant pairing (the builder never consults a rule there). Accommodation is never paired. Every row is `data_source = demo` with the explicit batch name; the command refuses an existing batch, refuses to run without an explicit `--batch`, refuses to combine with `--ensure-sample-coverage`, and is deterministic for a seed. A second pass finds nothing to add.
+
+**What it does not do.** It changes no Apriori threshold, no recommendation score, no itinerary-builder logic and no genuine survey. The rule only explains a choice the builder's proximity fallback already makes (the partner is the nearest valid listing); on the 192 scenarios the itineraries are identical to the control that has the same surveys without the pairings.
+
+**Side effect: popularity.** Recommendation ranking uses each destination's survey visits as a popularity share, and Apriori support counts every transaction. Any survey row added for a destination therefore nudges its ranking, and this batch adds one destination visit per survey. Measured on the same 192 scenarios (near and moderate, 1 to 3 days, 8 interest sets, 4 arrival times) on the scratch copy of production:
+
+| Dataset | Trips whose schedule changed vs baseline | Itinerary audit: clean trips |
+|---|---|---|
+| Baseline (616 surveys) | 0 | 128 of 192 |
+| Same added surveys, destination only (popularity-only control) | 22 | 125 of 192 |
+| Pairing batch (this feature) | 22 (the same 22) | 125 of 192 |
+
+The three trips that stop being audit-clean come from the popularity shift alone: the control has them too, and the pairing batch adds none on top. The failing audit checks (interest coverage, day distance, travel share, stay distance) are the ones that already failed in the baseline. Any additional simulated survey batch, including the existing 159-row coverage batch, carries the same kind of ripple.
