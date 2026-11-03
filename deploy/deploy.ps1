@@ -10,11 +10,15 @@
   What it never does
     - It never touches .env, uploaded files, or the database contents (only runs `migrate`).
     - It never runs `db:seed` or `migrate:fresh`. Do those by hand, only when you mean to.
+    - It never loads embedding vectors unless you ask: a normal deploy leaves destination_embeddings and
+      interest_embeddings exactly as they are. Add -RefreshEmbeddings only when the package ships new vectors
+      (database/data/destination-embeddings.json changed); that runs `embeddings:import` once.
 
   Usage (from the project folder, D:\Downloads\ExploreDVO):
     .\deploy\deploy.ps1
     .\deploy\deploy.ps1 -Key "$env:USERPROFILE\.ssh\exploredvo_teammate"
     .\deploy\deploy.ps1 -Server 209.97.174.246 -Yes        # skip the confirmation question
+    .\deploy\deploy.ps1 -RefreshEmbeddings                 # code AND load the shipped embedding vectors
 
   Needs: git and OpenSSH (ssh, scp) -- both come with Windows 10/11 + Git for Windows.
 #>
@@ -23,7 +27,8 @@ param(
     [string]$User   = "root",
     [string]$Key    = "$env:USERPROFILE\.ssh\exploredvo_do",
     [string]$Branch = "main",
-    [switch]$Yes
+    [switch]$Yes,
+    [switch]$RefreshEmbeddings
 )
 
 # "Continue", not "Stop": Windows PowerShell 5.1 turns anything a program prints on stderr
@@ -53,6 +58,7 @@ $local   = (git rev-parse --short HEAD).Trim()
 Write-Host "Will deploy : origin/$Branch  $sha  ($subject)"
 Write-Host "Your PC is  : $local" $(if ($local -ne $sha) { "(not the same as GitHub -- that is fine, GitHub is what gets deployed)" } else { "(same)" })
 Write-Host "Server      : $User@$Server"
+Write-Host "Embeddings  : $(if ($RefreshEmbeddings) { 'WILL BE RELOADED from the package (-RefreshEmbeddings)' } else { 'left as they are (code-only deploy)' })"
 
 if (-not $Yes) {
     $a = Read-Host "`nDeploy this to the live server? (y/N)"
@@ -73,7 +79,8 @@ scp @sshOpt -q $tar ".\deploy\server-update.sh" "${User}@${Server}:/root/"
 if ($LASTEXITCODE -ne 0) { Fail "Upload failed (wrong key, wrong IP, or server is off?)." }
 
 Step "Running the update on the server"
-$remote = "tr -d '\r' < /root/server-update.sh > /root/server-update.run.sh && bash /root/server-update.run.sh /root/$(Split-Path -Leaf $tar) $sha"
+$refresh = if ($RefreshEmbeddings) { " --refresh-embeddings" } else { "" }
+$remote = "tr -d '\r' < /root/server-update.sh > /root/server-update.run.sh && bash /root/server-update.run.sh /root/$(Split-Path -Leaf $tar) $sha$refresh"
 # 2>&1 + ToString(): show the server's messages as plain text (not as red PowerShell errors)
 ssh @sshOpt "${User}@${Server}" $remote 2>&1 | ForEach-Object { "$_" } | Out-Host
 $code = $LASTEXITCODE

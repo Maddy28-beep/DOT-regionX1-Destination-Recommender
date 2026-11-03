@@ -8,7 +8,7 @@ New vectors were generated locally with the original `nomic-embed-text` model, 7
 
 `database/data/embedding-refresh-2026-11-01.json` records the public source pages, exact embedded input, added slugs, old-vector hashes, compatibility measurements and the covered live snapshot. Public rendered destination names, types, category tags, amenities and descriptions supply the live input. Additional local-only input comes from the existing local catalogue. Sample names remain sample names; this refresh changes no accreditation, place data, ranking, routing, rental-car suggestions or resort classifications.
 
-After deploying the refreshed main branch, verify the embedding import on the server:
+Since the deploy script no longer imports embeddings by default (see `deploy/DEPLOYING.md`), load them either by deploying with `.\deploy\deploy.ps1 -RefreshEmbeddings` or by hand. After deploying the refreshed main branch, verify the embedding import on the server:
 
 ```bash
 cd /var/www/exploredvo

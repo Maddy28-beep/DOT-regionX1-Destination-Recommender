@@ -1,11 +1,21 @@
 #!/usr/bin/env bash
 # ExploreDVO -- server-side update. Called by deploy/deploy.ps1; you normally never run this by hand.
-#   Usage: bash server-update.sh /root/exploredvo-<sha>.tar.gz <sha>
+#   Usage: bash server-update.sh /root/exploredvo-<sha>.tar.gz <sha> [--refresh-embeddings]
+# A normal deploy changes code only: the stored embedding vectors (destination_embeddings, interest_embeddings) are
+# left exactly as they are. Pass --refresh-embeddings (deploy.ps1 -RefreshEmbeddings) to load the vector file that
+# ships with the package; that is the only thing that runs `embeddings:import`.
 # Stops at the first error (set -e), and does NOT hide errors.
 set -Eeuo pipefail
 
 PKG="${1:?package path missing}"
 SHA="${2:-unknown}"
+REFRESH_EMBEDDINGS=0
+case "${3:-}" in
+  "") ;;
+  --refresh-embeddings) REFRESH_EMBEDDINGS=1 ;;
+  *) echo "!! Unknown option '${3}'. The only option is --refresh-embeddings. Nothing was changed." >&2; exit 64 ;;
+esac
+VECTORS=database/data/destination-embeddings.json
 APP=/var/www/exploredvo
 BACKUPS=/var/backups/exploredvo
 STAGE=$(mktemp -d /root/exploredvo-stage.XXXXXX)
@@ -26,6 +36,9 @@ echo "[2/8] Unpacking $SHA"
 tar -xzf "$PKG" -C "$STAGE"
 
 echo "[3/8] Copying code (keeps .env, uploads, storage, vendor, the public/storage link)"
+# Remember whether this package ships a different vector file than the server had (only used for a reminder below).
+OLD_VECTORS=$(md5sum "$APP/$VECTORS" 2>/dev/null | cut -d' ' -f1 || true)
+NEW_VECTORS=$(md5sum "$STAGE/$VECTORS" 2>/dev/null | cut -d' ' -f1 || true)
 rsync -a --delete \
   --exclude='.env' --exclude='storage/' --exclude='vendor/' \
   --exclude='bootstrap/cache/' --exclude='public/storage' \
@@ -45,11 +58,19 @@ chmod -R ug+rwX "$APP/storage" "$APP/bootstrap/cache"
 echo "[6/8] Database migrations (only adds new tables/columns)"
 as_www php artisan migrate --force
 
-# Similar-place swaps: load the stored embedding vectors (a shipped JSON file).
+# Similar-place swaps: the stored embedding vectors (a shipped JSON file) are loaded only on request.
 # Needs no Ollama or model on the server. Skipped on older code that predates the feature.
-if as_www php artisan list --raw | grep -q '^embeddings:import'; then
-  echo "      loading similar-place vectors"
-  as_www php artisan embeddings:import
+if [ "$REFRESH_EMBEDDINGS" = "1" ]; then
+  if as_www php artisan list --raw | grep -q '^embeddings:import'; then
+    echo "      loading similar-place vectors (--refresh-embeddings)"
+    as_www php artisan embeddings:import
+  fi
+else
+  echo "      embeddings: left as they are (code-only deploy)"
+  if [ -n "$NEW_VECTORS" ] && [ "$OLD_VECTORS" != "$NEW_VECTORS" ]; then
+    echo "      NOTE: this package ships a different vector file than the server had, and it was NOT loaded."
+    echo "            If the vectors are meant to change, deploy again with -RefreshEmbeddings."
+  fi
 fi
 
 echo "[7/8] Rebuilding caches and reloading PHP"
