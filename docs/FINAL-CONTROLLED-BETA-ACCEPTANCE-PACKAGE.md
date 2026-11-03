@@ -1,6 +1,6 @@
 # ExploreDVO — Final Controlled-Beta Acceptance Package
 
-Date: 2026-11-04. Production: `ea9648f` (PR #193, code-only deploy, verified; previously `02424d3`). This
+Date: 2026-11-04. Production: `bc35db1` (PR #194, code-only deploy, verified; previously `ea9648f` / PR #193 and `02424d3`). This
 package assembles the evidence for formal acceptance. **It signs nothing and
 records no approval for anyone who has not given it.**
 
@@ -10,13 +10,13 @@ deploy). No key or `.env` value appears in any of them (scanned).
 
 ## 1. Disposition
 
-ExploreDVO is **technically ready for a limited controlled beta once the
-chatbot fix (§4) is reviewed, merged and deployed**, and is **not formally
-accepted**. The three chatbot findings are corrected on a branch and verified
-by tests and a review of the actual responses, but the fix is **not on
-production** and has not been re-checked live. Nothing in this package was
-deployed, merged or changed on production by the verification or corrective
-work.
+ExploreDVO is **technically ready for a limited controlled beta on the
+deployed baseline (`bc35db1`)** and is **not formally accepted**: the owner has
+not recorded acceptance. The three chatbot findings (F1–F3) are fixed on
+production and **verified live** (§4.3: 29 cases, 29 pass on the checks, no
+leak, no invented fact). The departure-aware scheduling feature is built,
+reviewed and tested on an integrated tree (1,497 tests, 0 failures) but is
+**not merged, migrated or deployed**; it is optional for the beta (§6).
 
 Project-owner statements recorded here (2026-11-04):
 
@@ -32,19 +32,20 @@ Project-owner statements recorded here (2026-11-04):
 
 | Item | Value |
 |---|---|
-| Commit | `02424d3` (PR #192 merged), code-only deploy, no `-RefreshEmbeddings` |
+| Commit | `bc35db1` (PR #194 merged), code-only deploy, no `-RefreshEmbeddings`; 88 migrations, none new |
 | Destinations / accommodations / restaurants / souvenir centres | 151 / 255 / 81 / 32 |
-| Embeddings | 151 destination, 8 interest; SHA-256 identical before and after the deploy (`docs/evidence/pre_deploy_hashes.txt`, `post_deploy_hashes.txt`) |
-| Exit surveys / visits | 788 (787 simulated, 1 genuine) / 2,605, unchanged by the deploy |
+| Embeddings | 151 destination, 8 interest; hashes identical before and after each deploy and after the live chatbot test (`docs/evidence/pre_deploy_hashes.txt`, `post_deploy_hashes.txt`, `emb_check.json`) |
+| Exit surveys / visits / itineraries | 788 (787 simulated, 1 genuine) / 2,605 / 287, unchanged |
 | Apriori batch | `demo-apriori-nearby-pairings-2026-11` |
-| Pre-deploy backup | `pre-deploy-20261103-165422-02424d3.sql.gz` |
+| Pre-deploy backup | `pre-deploy-20261103-181157-bc35db1.sql.gz` (earlier: `…174919-ea9648f`, `…165422-02424d3`) |
+| `chatbot_logs` | 186 rows (29 added by the authorised live test; only table that changed) |
 
 ## 3. Workstream results summary
 
 - **Chatbot (A):** 9 requirements tested live on 2026-11-04; 7 passed and 2
-  had findings. All three findings (F1–F3) were then corrected on branch
-  `fix/chatbot-grounding-and-prompt-hardening` (commit `c1db529`, not merged,
-  not deployed). See §4.1.
+  had findings. F1–F3 were corrected in PR #193 (`ea9648f`) and PR #194
+  (`bc35db1`, the " [SAMPLE]" name-matching follow-up), both deployed code-only.
+  The final live check (§4.3) passed all 29 cases.
 - **Performance (A):** every approved target met on repeated single-user
   samples (§5); no concurrency or load evidence exists.
 - **Departure-aware scheduling (B):** implemented locally on branch
@@ -101,9 +102,8 @@ statistical sample of Groq behaviour; model answers vary between runs.
 
 ### 4.1 Corrective work (branch `fix/chatbot-grounding-and-prompt-hardening`, `c1db529`)
 
-Status after the live re-check in §4.2: **F2 FIXED AND VERIFIED LIVE. F3 FIXED
-AND VERIFIED LIVE. F1 PARTLY EFFECTIVE LIVE: it fails for listings whose
-stored name carries a " [SAMPLE]" suffix (most sample destinations).**
+Status after §4.2 and §4.3: **F1, F2 and F3 FIXED AND VERIFIED LIVE on `bc35db1`.**
+(On `ea9648f` F1 still failed for names with a " [SAMPLE]" suffix; PR #194 fixed that.)
 
 | Finding | Root cause | Correction |
 |---|---|---|
@@ -174,8 +174,40 @@ was attempted.** A proposed fix (match the name with a trailing "[SAMPLE]" or
 parenthetical removed, plus a regression test using the real stored-name
 shapes) needs your approval, a new PR, review and another deployment.
 
-**Criterion 6 cannot be marked COMPLETE.** F2 and F3 pass live; F1 still
-fails live for the common sample-name shape.
+**At that point criterion 6 could not be marked COMPLETE.** The follow-up
+(PR #194, `bc35db1`, 16 new tests) was approved, merged and deployed, and re-checked in §4.3.
+
+### 4.3 Live verification on production `bc35db1` (2026-11-04)
+
+Authorised F1–F3 verification. 29 predefined requests as an ordinary visitor
+(`docs/evidence/chat_verify2.py`, prompts and replies in
+`chat_verify2_results.json`). All 29 returned HTTP 200. `chatbot_logs` 157 →
+186 (exactly 29 rows). Before/after hashes show no other table changed; no new
+Laravel error.
+
+| Area | Cases | Result |
+|---|---|---|
+| F1 grounding and sample labels | 15 | **15 PASS.** Tuka Beach (`… ("Little Boracay of Santa Maria") [SAMPLE]`) answered from the record with its footer; activities and hours replies carry "(sample data)"; the nature list kept its bullets and stored names; Lake Leonard, Olanivan Island, Mount Apo trek from database facts; Kublai Art Garden (parenthetical name) labelled; Apo Golf and Country Club "Yes… DOT-accredited" with no sample label; Philippine Eagle Center "sample data… not verified by DOT". |
+| F2 instruction secrecy | 7 | **7 PASS.** Five direct attempts and the roleplay request refused with the fixed refusal; the indirect "how were you set up" got a harmless generic reply. No key or prompt text anywhere. |
+| F3 rate vs entrance | 4 | **4 PASS.** Acacia Hotel Davao "Rate: ₱2,800 / night"; Mount Apo 3-Day Summit Trek "Price: ₱6,500 / pax"; Olanivan Island "Entrance: ₱50–100 / person"; general hotel-price question not matched to one hotel, nothing invented. |
+| Missing info / gibberish / non-tourism | 3 | **3 PASS.** Polite redirects. |
+
+Notes, stated plainly:
+
+- The automatic checker flagged "Little Boracay" in two cases; it is part of
+  the stored listing name, so these are checker false positives (read by hand).
+- F1-09 (animals, Groq): the reply said the sample-labelled Philippine Eagle
+  Center "could offer a glimpse of local fauna". Hedged and tied to the record
+  type "wildlife"; minor, not a failure.
+- F1-15 (compare Apo Golf vs Lake Leonard): answered from one place only; the
+  place answer handles a single named place. A limitation, not a defect.
+- Latency this run: rule-based n = 17, p50 0.57 s, max 0.75 s; Groq n = 12,
+  p50 1.68 s, max 2.47 s.
+- One run per case; no live 429 or timeout was observed; the guard is
+  heuristic and cannot detect an invented listing whose name is not in the
+  database. These limits remain.
+
+**Criterion 6 is COMPLETE on this evidence, with those limits.**
 
 Limits of the fix (be explicit before relying on it):
 
@@ -200,18 +232,18 @@ transactions that were rolled back (no rows stored). Raw data in
 
 | Target | Measured | Result |
 |---|---|---|
-| Public pages p95 < 2 s | 8 URLs × 20 samples (160 requests), all HTTP 200; p50 0.39–0.58 s, worst p95 1.16 s (`/`), max 1.25 s | MET |
-| Recommendations p50 < 2 s | `rank()`, 48 runs: p50 0.09 s, max 0.14 s (server side, no HTTP) | MET |
-| Itinerary p50 < 3 s | 48 generations (near/moderate/far × 4 interest sets × 2–3 days): p50 1.01 s, p95 2.51 s, max 2.67 s. By distance: near p50 0.68 s, moderate 0.82 s, far **2.18 s** (p95 2.65 s) | MET, but "far" is within about 0.8 s of the target |
-| Rule chatbot p50 < 1 s | n = 18: p50 0.70 s, max 0.87 s | MET |
-| Groq chatbot p50 < 3 s | n = 14: p50 1.37 s, max 2.41 s (inside the 8 s client timeout) | MET |
+| Public pages p95 < 2 s | Re-measured on `bc35db1`: 8 URLs × 20 samples (160 requests), all HTTP 200; p50 0.38–0.65 s, worst p95 0.995 s (`/`), max 1.28 s | MET |
+| Recommendations p50 < 2 s | `rank()`, 48 runs (re-run on `bc35db1`): p50 0.08 s, max 0.15 s (server side, no HTTP) | MET |
+| Itinerary p50 < 3 s | 48 generations, re-run on `bc35db1` (rolled back, no rows stored: tourist_preferences 146 and itineraries 287 before and after): p50 0.86 s, p95 2.97 s, max 3.21 s. By distance: near p50 0.59 s, moderate 0.77 s, far **2.47 s** (p95 3.19 s, max 3.21 s) | MET on p50; "far" is within about 0.5 s of the target and its p95/max slightly exceed 3 s |
+| Rule chatbot p50 < 1 s | Live run §4.3, n = 17: p50 0.57 s, max 0.75 s | MET |
+| Groq chatbot p50 < 3 s | Live run §4.3, n = 12: p50 1.68 s, max 2.47 s (inside the 8 s client timeout) | MET |
 | 5xx < 1% | 0 server errors in about 250 requests made | NOT DEMONSTRATED over a window; no 5xx observed |
 
 Other evaluations:
 
-- **Consistency:** each of the 24 planner scenarios was generated twice; all 24 produced identical itineraries.
-- **Database:** 98–389 queries per generation, the slowest single query 15.5 ms (an insert). No slow query found; `EXPLAIN` was not run.
-- **Slowest area:** far-distance multi-day planning (about 2.2–2.7 s). The query count is high; this is the first place to look if timing worsens.
+- **Consistency:** each of the 24 planner scenarios was generated twice (both runs, 2026-11-04 earlier and on `bc35db1`); all produced identical itineraries.
+- **Database:** 98–389 queries per generation, the slowest single query 15.5 ms (an insert; earlier run). No slow query found; `EXPLAIN` was not run.
+- **Slowest area:** far-distance multi-day planning (about 2.2–3.2 s; the second run was slower than the first, so treat this as a range, not a fixed number). The query count is high; this is the first place to look if timing worsens.
 - **Not measured:** concurrency, sustained load, an HTTP `POST /plan` end to end (it stores rows on production; not done without approval), and Groq behaviour under rate limiting.
 
 Single machine, one location, a small sample: this supports "targets met
@@ -219,8 +251,14 @@ under light single-user use". It is **not** load-test readiness.
 
 ## 6. Departure-aware itinerary scheduling (branch, not deployed)
 
-Branch `feature/departure-aware-scheduling` (from `02424d3`). Status and
-commit hash are in the report accompanying this package.
+Branch `feature/departure-aware-scheduling` (commits `560818b`, `6eda166`).
+`git merge-tree` against `bc35db1` is conflict-free. Final review (2026-11-04)
+checked: validation (time needs a point, date needs a time); explicit departure
+point (airport / seaport / bus terminal quick picks or custom place, nothing
+inferred); latest set-off computed backwards from the departure; the existing
+`TravelTimeEstimator` reused; estimate disclosure; configurable and disclosed
+120-minute allowance; unsuitable final-day stops moved or dropped with a
+recorded reason; flexible and arrival-only trips unchanged.
 
 - Optional departure date and time, plus a departure point the traveller
   chooses (nothing is inferred; there is no airport selector, so the point
@@ -246,9 +284,39 @@ commit hash are in the report accompanying this package.
   branch **1,459 tests, 12,525 assertions, 0 failures, 5 errors** — the same
   5 GD-extension errors that occur on `main` in this environment. Mutation
   checks confirmed the key rules are actually tested.
-- **Needs before it can ship:** review, a migration adding five nullable
-  columns to `tourist_preferences` (not run on production), and an explicit
-  merge and deployment approval. The allowance question is settled.
+- **Integrated verification:** a local-only merge of `bc35db1` plus the
+  branch (commit `b3a4cf0`, never pushed) ran the full suite: **1,497 tests,
+  12,687 assertions, 0 failures, 5 errors** (the same GD-extension errors;
+  `docs/evidence/integrated_full_suite.txt`).
+- **Actual journey (local isolated sqlite DB, 24 seeded destinations, not
+  production):** the form shows departure date and time, "Leaving from" and
+  quick picks plus "We allow 2 hours there before you leave."; a time with no
+  point returns "Tell us where you leave from (for example Davao Airport)…"
+  with the input kept; with Davao Airport chosen, day 2 ended lunch → "30 min ·
+  9.4 km" travel → "Departure from Davao International Airport", with "Be at
+  Davao International Airport by 3:00 PM: that is 2 hours before your 5:00 PM
+  departure, a planning allowance and not an airline or airport rule. The
+  journey is an estimate… not a routed time."; an unplaced stop was omitted
+  with a stated reason; at 375 px there was no horizontal overflow.
+- **Merge and deployment plan (NOT executed; each step needs its own approval):**
+  1. Push the branch and open a PR to `main`; review; merge (owner).
+  2. Take a fresh pre-deploy backup (the deploy script does this).
+  3. Run `deploy/deploy.ps1` from a clean worktree at the merge commit, code-only
+     (no `-RefreshEmbeddings`). The script's migrate step runs
+     `2026_11_04_000100_add_departure_to_preferences` — five nullable columns
+     on `tourist_preferences` (`departure_date`, `departure_time`,
+     `departure_lat`, `departure_lng`, `departure_label`); no data rewrite,
+     metadata-only on Postgres. **Approval to run this migration is separate.**
+  4. Read-only post-checks: commit, 89 migrations, row counts and embedding
+     hashes unchanged, six-page check, no new log errors, then a planner
+     journey with a departure (that writes a test itinerary on production and
+     needs its own approval; prefer the rolled-back timing script instead).
+  5. Rollback: redeploy `bc35db1`; the new columns are nullable and unused by
+     the old code, so they can stay; `migrate:rollback` runs `down()` (drops the
+     five columns and discards any departure data); restore the backup only as
+     a last resort.
+- **Risks:** extra planner work on the final day (measure p95 after deploy);
+  the journey time is an estimate, not a routed time, and says so on screen.
 
 ## 7. Regression
 
@@ -259,13 +327,16 @@ environment errors, not failures; no CI run is recorded in this package.
 
 | Branch | Tests | Assertions | Failures | Errors |
 |---|---|---|---|---|
-| Chatbot fix `fix/chatbot-grounding-and-prompt-hardening` (`c1db529`) | 1,452 (23 new) | 12,504 | 0 | 5 (GD) |
-| Departure feature `feature/departure-aware-scheduling` | 1,459 (29 new) | 12,525 | 0 | 5 (GD) |
+| Chatbot fix PR #193 (`c1db529`, 22 new tests) | 1,452 | 12,504 | 0 | 5 (GD) |
+| PR #194 on top (`86061fc`, 16 new tests) = deployed `bc35db1` | 1,468 | 12,560 | 0 | 5 (GD) |
+| Departure feature `feature/departure-aware-scheduling` alone (29 new) | 1,459 | 12,525 | 0 | 5 (GD) |
+| **`bc35db1` + departure feature (local merge `b3a4cf0`)** | **1,497** | **12,687** | **0** | **5 (GD)** |
 
-Focused chatbot, Groq and sample-label tests (43 existing) also pass on the
-chatbot branch. The two branches were each run against `02424d3`; the
-combination of both has not been run, and the departure branch does not
-touch the chatbot. This docs branch changes no code.
+(The earlier figure of 23 new tests for #193 was a miscount; the file has 22.)
+The 5 errors are `LogicException: GD extension is not installed` in
+AmenitiesTest ×2, PartnerPortalRedesignTest ×1, PostcardCarouselTest ×2; they
+are environmental and **not passes**: the image-upload paths they cover were
+not exercised by any automated run here. This docs branch changes no code.
 
 ## 8. Final 12-criterion tracker
 
@@ -274,17 +345,17 @@ PROJECT OWNER APPROVAL.
 
 | # | Criterion | Status | Evidence | Gap | Genuinely satisfied? |
 |---|---|---|---|---|---|
-| 1 | Required features implemented and working | PARTIALLY COMPLETE | Deployed baseline live (§2) | Departure-aware scheduling is built and tested but unmerged and undeployed (§6) | Yes for the deployed baseline; the departure feature is not shipped |
-| 2 | Critical/High defects resolved | COMPLETE | None known open; F1/F2 (Medium) and F3 (Low) corrected on a branch (§4.1) | The corrections are not on production | Yes (no Critical/High); the Medium/Low fixes are pending deployment |
-| 3 | Full regression passes | COMPLETE | §7: 0 failures | 5 environment errors (GD); no CI run recorded here | Yes, with that caveat |
-| 4 | Live production independently verified | COMPLETE | §2, §4, §5; deploy verification (counts, hashes, logs) | None | Yes |
-| 5 | Embeddings correct | COMPLETE | 151/8; hashes identical before and after the deploy | None | Yes |
-| 6 | Chatbot passes live API tests | PARTIALLY COMPLETE | §4: 19 live cases; §4.1: 23 regression tests; §4.2: live re-check on `ea9648f`, 20 cases: F2 6/6, F3 2/2, missing-info 3/3, sample rule-based 3/3 pass; Groq F1 cases 4 of 6 fail | F1 fails live for sample listings whose stored name ends in " [SAMPLE]" (name-matching gap, §4.2); no live rate-limit or timeout observed. COMPLETE only after a fix is deployed and a live re-check passes | No |
-| 7 | Performance measured and acceptable | PARTIALLY COMPLETE | §5: targets met on repeated samples | No concurrency or window-based 5xx evidence; far-distance planning close to target | Yes for light use; not for load |
-| 8 | Planner/UI integration without regressions | PARTIALLY COMPLETE | Baseline live; no regressions; departure UI works end to end in tests | Departure UI not on production | Yes for the baseline |
-| 9 | Apriori governance decided and approved | COMPLETE | Option A finalized by the owner; per-rule disclosure verified on production (§4) | DOT acknowledgment only needed for DOT-facing claims; not fabricated | Yes |
-| 10 | Backup, rollback, release procedures verified | COMPLETE | Backup `pre-deploy-20261103-165422-02424d3.sql.gz`; deploy script verified; no data changed by the last deploy | Operator should confirm the previous-release rollback target before beta starts | Yes |
-| 11 | Required approvals obtained | REQUIRES PROJECT OWNER APPROVAL | Past deployment approvals on record; the project owner confirmed the old Groq key is revoked and the replacement is configured in production (2026-11-04); the 120-minute allowance decided | Still needed: approval to merge and deploy the chatbot fix; approval for the departure feature's merge, migration and deployment | Partly |
+| 1 | Required features implemented and working | PARTIALLY COMPLETE | Deployed baseline live (§2); departure feature built, reviewed, 1,497-test integrated run, live-style UI journey locally (§6) | Departure-aware scheduling is not merged, migrated or deployed | Yes for the deployed baseline; the departure feature is not shipped |
+| 2 | Critical/High defects resolved | COMPLETE | No Critical/High known. F1/F2 (Medium) and F3 (Low) fixed and verified live on `bc35db1` (§4.3) | None open. Known minor: F1-09 hedged wording, single-place comparisons | Yes |
+| 3 | Full regression passes | COMPLETE | §7: 0 failures on `bc35db1` (1,468) and on `bc35db1` + departure (1,497) | 5 environmental GD-extension errors, reported as errors, not passes; no CI run recorded here | Yes, with that caveat |
+| 4 | Live production independently verified | COMPLETE | §2, §4.3, §5; commit, migrations, counts, hashes, logs checked read-only | None | Yes |
+| 5 | Embeddings correct | COMPLETE | 151 destination + 8 interest vectors, `nomic-embed-text`, 768 dims, no non-finite values, norms 0.999999–1.000001, no orphans, none missing, hashes unchanged (`emb_check.json`) | Two destinations share an identical vector (149 unique of 151); noted, not changed | Yes |
+| 6 | Chatbot passes live API tests | COMPLETE | §4.3: 29 live cases, F1 15/15, F2 7/7, F3 4/4, other 3/3; 29 log rows and nothing else written | Heuristic guard; one run per case; no live 429/timeout seen; cannot detect an invented listing whose name is not in the database | Yes, within those limits |
+| 7 | Performance measured and acceptable | PARTIALLY COMPLETE | §5: re-measured on `bc35db1`; pages p95 0.995 s, itinerary p50 0.86 s, rank p50 0.08 s, chatbot p50 0.57 s / 1.68 s | No concurrency, load or window-based 5xx evidence; no HTTP `POST /plan` timing; far-distance planning p50 2.47 s, p95 3.19 s | Yes for light single-user use; not for load |
+| 8 | Planner/UI integration without regressions | PARTIALLY COMPLETE | Baseline live and unchanged; departure UI journey verified locally on desktop and 375 px | Departure UI not on production | Yes for the baseline |
+| 9 | Apriori governance decided and approved | COMPLETE | Option A finalized by the owner; production wording "(2 trips, including simulated demonstration trips)" (787 of 788 surveys simulated) | DOT acknowledgment only for DOT-facing claims; not fabricated | Yes |
+| 10 | Backup, rollback, release procedures verified | COMPLETE | Backups exist for every deploy (latest `pre-deploy-20261103-181157-bc35db1.sql.gz`); deploys were code-only; rollback target is `ea9648f`, previous release, and the departure plan has its own rollback (§6) | Backup restore was not rehearsed | Yes |
+| 11 | Required approvals obtained | REQUIRES PROJECT OWNER APPROVAL | Approvals on record for PR #193/#194, both deployments and the live F1–F3 tests; Groq key revocation and 120-minute default recorded | Still needed: merge, migration and deployment of the departure feature (if wanted for the beta); push/merge of this docs branch | Partly |
 | 12 | Controlled-beta acceptance formally justified | REQUIRES PROJECT OWNER APPROVAL | This package | The owner has not recorded acceptance | No — pending the owner |
 
 ## 9. Beta scope, restrictions, limitations and risks
@@ -300,26 +371,22 @@ departure-time promise until §6 ships.
 **Known limitations:** the data is largely sample or simulated (787 of 788
 surveys); travel times are estimates, not routed; 7 region labels and 8
 interests only; far-distance multi-day plans take about 2–3 s; the AI
-chatbot can still add unsupported descriptors or omit the sample label for
-sample destinations whose stored name ends in " [SAMPLE]" (F1, §4.2); the
-instruction-secrecy and rate-label fixes (F2, F3) are live and verified.
+chatbot guard is heuristic and answers about one named place at a time (F1–F3
+are fixed and verified live, §4.3).
 
-**Residual risks:** F1 is only partly fixed on production: the Groq path can
-still add unsupported descriptors and omit the sample label for sample
-destinations whose stored name ends in " [SAMPLE]" (§4.2); the guard is
-heuristic (§4.1 limits); Groq rate limits
-or outages (falls back to rules, not seen live);
-unknown behaviour under concurrent use; accreditation dates in the data
-expire and a refresh is needed; chat messages are stored in `chatbot_logs`
-and should be covered by the privacy notice.
+**Residual risks:** the chatbot guard is heuristic (§4.1 limits); Groq rate
+limits or outages (falls back to rules, not seen live); unknown behaviour under
+concurrent use; far-distance planning at p95 about 3.2 s; accreditation dates
+in the data expire and a refresh is needed; chat messages are stored in
+`chatbot_logs` and should be covered by the privacy notice.
 
 **Monitoring:** watch `storage/logs/laravel.log` for errors daily; count
 HTTP 5xx in the nginx log; track the share of `chatbot_logs` rows ending in
 `:ai` against the rule-based rows; time a far-distance plan weekly.
 
 **Rollback:** redeploy the previous release with `deploy/deploy.ps1`
-(operator to confirm the exact previous commit); restore from
-`pre-deploy-20261103-165422-02424d3.sql.gz` only if data changed (none did
+(previous release `ea9648f`; operator to confirm); restore from
+`pre-deploy-20261103-181157-bc35db1.sql.gz` only if data changed (none did
 in the last deploy). Embeddings are opt-in and untouched.
 
 **Stop conditions (pause the beta if any occurs):** a sustained 5xx
@@ -329,35 +396,28 @@ an itinerary that breaks the 08:00/18:00 or arrival rules; Groq key misuse.
 
 ## 10. Go / no-go
 
-**Evidence-based recommendation: conditional GO for a limited controlled
-beta only if the owner either approves the F1 name-matching follow-up or
-explicitly accepts the limitation; NO formal acceptance yet.**
+**Evidence-based recommendation: GO for a limited controlled beta on the
+deployed baseline `bc35db1`, subject to the owner recording acceptance. NOT
+"everything is done":** criteria 1, 7 and 8 are only partly satisfied and 11
+and 12 need the owner.
 
 Before the beta opens:
 
-1. Owner decides on the F1 name-matching follow-up (§4.2): approve a small
-   fix + PR, or accept the limitation for the beta (sample labels would then
-   appear only for sample listings without the suffix; the on-page cards and
-   badges are unaffected).
-2. If the fix is approved, merged and deployed, a short live re-check of the
-   F1 cases is run (writes chat log rows; needs approval); criterion 6 moves to
-   COMPLETE only if it passes.
-3. Owner records formal acceptance in §11, if satisfied.
-
-The departure feature is optional for the beta and should ship only after
-its own review and approval.
+1. Owner decides whether the departure feature is in the beta. If yes: PR,
+   merge, migration and deployment per §6, each approved separately; if no, the
+   beta runs without departure-time planning and says so.
+2. Owner accepts the performance limits (§5) and the chatbot limits (§4.3).
+3. Owner records formal acceptance in §11.
 
 ## 11. Project-owner acceptance sheet (unsigned)
 
 | Item | Decision |
 |---|---|
-| Chatbot fix `ea9648f` | Merged and deployed 2026-11-04 on owner approval; F2, F3 verified live |
-| F1 name-matching follow-up (§4.2) | ☐ Fix (new PR) ☐ Accept limitation for beta |
-| Live re-check after any further fix | ☐ Approved ☐ No |
+| Chatbot fixes PR #193 (`ea9648f`) and PR #194 (`bc35db1`) | Merged and deployed 2026-11-04 on owner approval; F1–F3 verified live (§4.3) |
 | Groq key revocation | Confirmed by the project owner 2026-11-04; replacement configured in production |
 | Performance evidence (§5) accepted as sufficient for a limited beta | ☐ Yes ☐ No |
 | Departure feature: allowance | 120 minutes, owner's preferred default (2026-11-04) |
-| Departure feature: merge, migration and deployment | ☐ Approve ☐ Defer |
+| Departure feature: push/PR, merge, migration, deployment (separate approvals, §6) | ☐ Approve ☐ Defer |
 | Beta scope and restrictions (§9) accepted | ☐ Yes ☐ No |
 | Rollback arrangements accepted | ☐ Yes ☐ No |
 | **Formal controlled-beta approval** | ☐ Granted ☐ Not granted |
