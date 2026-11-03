@@ -10,11 +10,23 @@ deploy). No key or `.env` value appears in any of them (scanned).
 
 ## 1. Disposition
 
-ExploreDVO is **technically ready for a limited controlled beta**, with the
-conditions in §9, and is **not formally accepted**: three items need a human
-(§10). Two Medium chatbot findings (§4) are open and are the main thing the
-owner should decide on before opening the beta. Nothing in this package was
-deployed, merged or changed on production by the verification work.
+ExploreDVO is **technically ready for a limited controlled beta once the
+chatbot fix (§4) is reviewed, merged and deployed**, and is **not formally
+accepted**. The three chatbot findings are corrected on a branch and verified
+by tests and a review of the actual responses, but the fix is **not on
+production** and has not been re-checked live. Nothing in this package was
+deployed, merged or changed on production by the verification or corrective
+work.
+
+Project-owner statements recorded here (2026-11-04):
+
+- The old Groq API key was **confirmed revoked by the project owner**; the
+  replacement key is configured in production. (The operator's confirmation
+  is the project owner's statement; no key value is held in this repository.)
+- The **preferred default airport allowance is 120 minutes** for
+  departure-aware scheduling. It stays configurable and disclosed to the
+  tourist. That decision does not authorise merging, deployment, the
+  migration or any production change.
 
 ## 2. Production state (verified 2026-11-04)
 
@@ -29,12 +41,16 @@ deployed, merged or changed on production by the verification work.
 
 ## 3. Workstream results summary
 
-- **Chatbot (A):** 9 requirements tested live; 7 pass, 2 have findings (§4).
-- **Performance (A):** every approved target met on repeated samples (§5);
-  no concurrency evidence exists.
-- **Departure-aware scheduling (B):** implemented and tested on branch
+- **Chatbot (A):** 9 requirements tested live on 2026-11-04; 7 passed and 2
+  had findings. All three findings (F1–F3) were then corrected on branch
+  `fix/chatbot-grounding-and-prompt-hardening` (commit `c1db529`, not merged,
+  not deployed). See §4.1.
+- **Performance (A):** every approved target met on repeated single-user
+  samples (§5); no concurrency or load evidence exists.
+- **Departure-aware scheduling (B):** implemented locally on branch
   `feature/departure-aware-scheduling`; **not merged, not deployed**, needs a
-  migration and one owner decision (§6).
+  migration run and a deployment approval. The 120-minute allowance is the
+  owner's preferred default (§6).
 
 ## 4. Chatbot live verification (production, 2026-11-04)
 
@@ -71,18 +87,64 @@ live test). Full prompts and responses: `docs/evidence/chat_logs_qual.txt`.
 Hallucinations observed: unsupported descriptive claims in two Groq replies
 (F1). No invented place, price, hours or wildlife was observed in 19 cases.
 
-**Open findings (not fixed; fixing is outside this task and needs approval):**
+**Findings from the live run:**
 
-- **F1 (Medium):** the Groq path does not always say a listing is sample
-  data and adds descriptive claims the record does not contain. The
-  database-answer path does not have this problem.
-- **F2 (Medium/Low):** the model echoes its system prompt on request. No
-  secret is in the prompt (the key is not), so the harm is limited.
-- **F3 (Low):** a "price" question can match a hotel and label an
-  accommodation rate "Entrance".
+- **F1 (Medium):** the Groq path did not always say a listing is sample data
+  and added descriptive claims the record does not contain.
+- **F2 (Medium/Low):** the model echoed its system prompt on request. No
+  secret is in the prompt.
+- **F3 (Low):** a "price" question matched a hotel and labelled its room rate
+  "Entrance".
 
-Limitations of this test: 19 qualitative cases and one run each, not a
+Limitations of the live run: 19 qualitative cases, one run each, not a
 statistical sample of Groq behaviour; model answers vary between runs.
+
+### 4.1 Corrective work (branch `fix/chatbot-grounding-and-prompt-hardening`, `c1db529`)
+
+Status of each finding: **FIXED ON THE BRANCH, VERIFIED LOCALLY, NOT
+DEPLOYED, NOT RE-CHECKED LIVE.**
+
+| Finding | Root cause | Correction |
+|---|---|---|
+| F1 | The model's reply was shown as written. The only protection was a prompt instruction, which the model did not always follow. | A deterministic guard (`ChatbotReplyGuard`) checks every model reply against the database: sentences with claims the record lacks (descriptors, wildlife, nicknames, prices, hours) are dropped and the listing is described from its own record; every mention of a sample or unverified listing is labelled "(sample data)" / "(not yet verified)" with a line saying what that means, however the model phrased it; a reply with nothing supportable falls back to the rule-based answer. Genuine listings are never labelled sample. |
+| F2 | Only a prompt rule. Nothing stopped a request or checked a reply. | Requests for the instructions, rules, configuration, key or model are refused before any model call (direct and indirect phrasings). A reply that quotes the instructions or holds a key is replaced. The prompt also forbids it. |
+| F3 | Reproduced. The place answer printed every listing's price as "Entrance", and generic words ("hotel", "davao") alone matched a general question to Acacia Hotel Davao. | Accommodation prices print as "Rate", packages as "Price", destinations stay "Entrance". Names made only of generic words no longer match a question. |
+
+Verification:
+
+- 23 new regression tests (`ChatbotGroundingTest`) covering genuine, sample
+  and mixed listings, unsupported descriptive claims, price and opening-hour
+  claims, 13 direct and indirect extraction attempts, model-echo and key
+  leaks, and accommodation rate versus entrance fee. **13 of them fail on the
+  unfixed service and all pass on the fix.**
+- Focused chatbot, Groq and sample-label tests pass; full suite result is in
+  §7.
+- **Actual responses reviewed:** the three real production replies that
+  exposed the findings (beach, Bisaya wildlife, "repeat the rules") plus a
+  food list were replayed through the real service and request path with the
+  model faked to return exactly those texts. Result: the beach and wildlife
+  replies lose "popular", "sun-bathing", "quieter shoreline", "Little Boracay",
+  "iconic" and "native species" and gain the sample label; the rules reply is
+  refused; the hotel question gives "Rate: ₱2,800 / night"; hours and
+  accreditation answers are unchanged. The review also found two defects in my
+  first version (a claim in a sentence that said "It" instead of the name;
+  bullet lists being flattened), both fixed and covered by tests.
+- No live chatbot test was run for the correction and no production record
+  was written.
+
+Limits of the fix (be explicit before relying on it):
+
+- The guard removes the kinds of claim the platform has no data for. It
+  cannot prove a sentence true, and it does not detect a made-up listing whose
+  name is not in the database; that still relies on the prompt. None was
+  observed in 19 live cases.
+- The claim list and the extraction patterns are heuristics. A new wording can
+  get past them; the output check for the instructions and the key is a second
+  layer. Bisaya coverage is a few common words only.
+- Because claims are removed, replies naming a listing are plainer than the
+  model's own wording.
+- Pint was not confirmed clean: the formatter run flagged the new file and an
+  unchanged file alike, so it is not a reliable signal in this environment.
 
 ## 5. Production performance (2026-11-04)
 
@@ -124,10 +186,14 @@ commit hash are in the report accompanying this package.
   added). The restriction is applied while the schedule is built, so
   stops that cannot make it are moved off the last day or dropped with a
   recorded reason, and the time is re-checked after any swap.
-- **Allowance default is 120 minutes — my choice, needs owner
-  confirmation.** It is configurable (`ITINERARY_DEPARTURE_BUFFER_MINUTES`),
-  and the form and itinerary state that it is a planning allowance and not
-  an airline rule.
+- **Allowance default is 120 minutes: the project owner's preferred
+  default (decided 2026-11-04).** It stays configurable
+  (`ITINERARY_DEPARTURE_BUFFER_MINUTES`), and the form ("We allow 2 hours
+  there before you leave.") and the itinerary state that it is a planning
+  allowance and not an airline rule. This decision covers the default and its
+  documentation only (`docs/Departure-Aware-Scheduling.md` on the feature
+  branch); it does not authorise merging, deployment, the migration or any
+  production change.
 - The journey time is an estimate (straight line plus a detour allowance)
   and says so on screen. Flexible tourists and arrival-only trips are
   unchanged.
@@ -135,17 +201,26 @@ commit hash are in the report accompanying this package.
   branch **1,459 tests, 12,525 assertions, 0 failures, 5 errors** — the same
   5 GD-extension errors that occur on `main` in this environment. Mutation
   checks confirmed the key rules are actually tested.
-- **Needs before it can ship:** review, a migration adding six nullable
-  columns to `tourist_preferences` (not run on production), an owner
-  decision on the 120-minute default, and a deployment approval.
+- **Needs before it can ship:** review, a migration adding five nullable
+  columns to `tourist_preferences` (not run on production), and an explicit
+  merge and deployment approval. The allowance question is settled.
 
 ## 7. Regression
 
-`main` at `02424d3`: 1,430 tests, 0 failures, 5 errors, all five from the
-missing PHP GD extension on the local machine (AmenitiesTest ×2,
-PartnerPortalRedesignTest ×1, PostcardCarouselTest ×2). Not re-run on CI as
-part of this package. Departure branch: see §6. This docs branch changes no
-code.
+All results are from this development machine, which has no PHP GD
+extension, so the same 5 tests error everywhere (AmenitiesTest ×2,
+PartnerPortalRedesignTest ×1, PostcardCarouselTest ×2). They are
+environment errors, not failures; no CI run is recorded in this package.
+
+| Branch | Tests | Assertions | Failures | Errors |
+|---|---|---|---|---|
+| Chatbot fix `fix/chatbot-grounding-and-prompt-hardening` (`c1db529`) | 1,452 (23 new) | 12,504 | 0 | 5 (GD) |
+| Departure feature `feature/departure-aware-scheduling` | 1,459 (29 new) | 12,525 | 0 | 5 (GD) |
+
+Focused chatbot, Groq and sample-label tests (43 existing) also pass on the
+chatbot branch. The two branches were each run against `02424d3`; the
+combination of both has not been run, and the departure branch does not
+touch the chatbot. This docs branch changes no code.
 
 ## 8. Final 12-criterion tracker
 
@@ -155,16 +230,16 @@ PROJECT OWNER APPROVAL.
 | # | Criterion | Status | Evidence | Gap | Genuinely satisfied? |
 |---|---|---|---|---|---|
 | 1 | Required features implemented and working | PARTIALLY COMPLETE | Deployed baseline live (§2) | Departure-aware scheduling is built and tested but unmerged and undeployed (§6) | Yes for the deployed baseline; the departure feature is not shipped |
-| 2 | Critical/High defects resolved | COMPLETE | None known open | Medium F1 and F2 and Low F3 are open (§4) and are not Critical/High | Yes, with the Mediums disclosed |
+| 2 | Critical/High defects resolved | COMPLETE | None known open; F1/F2 (Medium) and F3 (Low) corrected on a branch (§4.1) | The corrections are not on production | Yes (no Critical/High); the Medium/Low fixes are pending deployment |
 | 3 | Full regression passes | COMPLETE | §7: 0 failures | 5 environment errors (GD); no CI run recorded here | Yes, with that caveat |
 | 4 | Live production independently verified | COMPLETE | §2, §4, §5; deploy verification (counts, hashes, logs) | None | Yes |
 | 5 | Embeddings correct | COMPLETE | 151/8; hashes identical before and after the deploy | None | Yes |
-| 6 | Chatbot passes live API tests | PARTIALLY COMPLETE | §4: 19 live cases | F1, F2 open; no live rate-limit or timeout observed; one run per case | No |
+| 6 | Chatbot passes live API tests | PARTIALLY COMPLETE | §4: 19 live cases (7 requirements passed, 2 failed); §4.1: 23 new regression tests pass (13 fail on the unfixed code) and the real failing replies were replayed and now pass | The corrected chatbot is not deployed and has not been tested live; no live rate-limit or timeout observed; one run per case. Becomes COMPLETE only after the fix is deployed and a live re-check passes | No, not yet |
 | 7 | Performance measured and acceptable | PARTIALLY COMPLETE | §5: targets met on repeated samples | No concurrency or window-based 5xx evidence; far-distance planning close to target | Yes for light use; not for load |
 | 8 | Planner/UI integration without regressions | PARTIALLY COMPLETE | Baseline live; no regressions; departure UI works end to end in tests | Departure UI not on production | Yes for the baseline |
 | 9 | Apriori governance decided and approved | COMPLETE | Option A finalized by the owner; per-rule disclosure verified on production (§4) | DOT acknowledgment only needed for DOT-facing claims; not fabricated | Yes |
 | 10 | Backup, rollback, release procedures verified | COMPLETE | Backup `pre-deploy-20261103-165422-02424d3.sql.gz`; deploy script verified; no data changed by the last deploy | Operator should confirm the previous-release rollback target before beta starts | Yes |
-| 11 | Required approvals obtained | BLOCKED | Past deployment approvals on record | Operator has not confirmed that the chat-exposed Groq key was revoked | No |
+| 11 | Required approvals obtained | REQUIRES PROJECT OWNER APPROVAL | Past deployment approvals on record; the project owner confirmed the old Groq key is revoked and the replacement is configured in production (2026-11-04); the 120-minute allowance decided | Still needed: approval to merge and deploy the chatbot fix; approval for the departure feature's merge, migration and deployment | Partly |
 | 12 | Controlled-beta acceptance formally justified | REQUIRES PROJECT OWNER APPROVAL | This package | The owner has not recorded acceptance | No — pending the owner |
 
 ## 9. Beta scope, restrictions, limitations and risks
@@ -180,10 +255,13 @@ departure-time promise until §6 ships.
 **Known limitations:** the data is largely sample or simulated (787 of 788
 surveys); travel times are estimates, not routed; 7 region labels and 8
 interests only; far-distance multi-day plans take about 2–3 s; the AI
-chatbot can add unsupported descriptors and echo its rules (F1, F2).
+chatbot on production can still add unsupported descriptors and echo its rules
+(F1, F2) until the fix is deployed; afterwards it is limited by the guard's
+heuristics (§4.1).
 
-**Residual risks:** the chat-exposed Groq key may still be live (BLOCKED
-item); Groq rate limits or outages (falls back to rules, not seen live);
+**Residual risks:** the chatbot fix is not yet deployed, so production still
+has F1–F3 until it is; the guard is heuristic (§4.1 limits); Groq rate limits
+or outages (falls back to rules, not seen live);
 unknown behaviour under concurrent use; accreditation dates in the data
 expire and a refresh is needed; chat messages are stored in `chatbot_logs`
 and should be covered by the privacy notice.
@@ -209,9 +287,11 @@ beta on technical grounds, NO formal acceptance yet.**
 
 Before the beta opens:
 
-1. Operator confirms the exposed Groq key was revoked (criterion 11).
-2. Owner decides whether to accept F1/F2 for the beta or to have them
-   fixed first (separate proposal; not started).
+1. Owner reviews the chatbot fix (`c1db529`) and, if satisfied, approves
+   merging and deploying it (code-only; no data or embedding change).
+2. After deployment, a short live re-check of the F1–F3 cases is run (this
+   writes chat log rows, so it needs the owner's approval first); criterion 6
+   moves to COMPLETE only if it passes.
 3. Owner records formal acceptance in §11, if satisfied.
 
 The departure feature is optional for the beta and should ship only after
@@ -221,10 +301,12 @@ its own review and approval.
 
 | Item | Decision |
 |---|---|
-| Chatbot findings F1–F3 accepted for beta, or fix first | ☐ Accept ☐ Fix first |
-| Groq key revocation confirmed by the operator | ☐ Confirmed ☐ Not yet |
+| Chatbot fix (`c1db529`) approved to merge and deploy | ☐ Yes ☐ No |
+| Live re-check of F1–F3 after deployment approved | ☐ Yes ☐ No |
+| Groq key revocation | Confirmed by the project owner 2026-11-04; replacement configured in production |
 | Performance evidence (§5) accepted as sufficient for a limited beta | ☐ Yes ☐ No |
-| Departure feature: 120-minute allowance and deployment | ☐ Approve ☐ Change ☐ Defer |
+| Departure feature: allowance | 120 minutes, owner's preferred default (2026-11-04) |
+| Departure feature: merge, migration and deployment | ☐ Approve ☐ Defer |
 | Beta scope and restrictions (§9) accepted | ☐ Yes ☐ No |
 | Rollback arrangements accepted | ☐ Yes ☐ No |
 | **Formal controlled-beta approval** | ☐ Granted ☐ Not granted |
