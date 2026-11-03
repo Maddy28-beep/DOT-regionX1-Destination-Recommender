@@ -38,7 +38,7 @@ class ChatbotReplyGuard
     ];
 
     /** Words that make a claim about a listing which the record rarely supports. A word in the listing's own record is allowed. */
-    private const UNSUPPORTED = '/\b(popular|famous|iconic|renowned|best|top-?rated|must-?(?:visit|see)|beautiful|stunning|scenic|picturesque|breathtaking|gorgeous|pristine|serene|peaceful|quiet(?:er)?|crowded|perfect|ideal|great for|known for|home to|boasts?|offers|features|featuring|activities|amenities|facilities|swimming|snorkel\w*|div(?:e|ing)|hik(?:e|ing)|trek\w*|camp(?:ing)?|sun-?bath\w*|shoreline|sand|waves|views?|wildlife|animals?|birds?|species|endemic|native|eagles?|monkeys?|crocodiles?|fish\w*|coral|waterfalls?|known as|nicknamed|dubbed|called the|little boracay|pinakasikat|nindot|gwapa|lami|dako|opens?|closes?|open daily|24\/7|free (?:entry|entrance|admission)|affordable|cheap|expensive|budget-friendly|luxur\w*|family-friendly|romantic|instagram\w*|visitors love|tourists love|worth(?:while)?|relax\w*|adventure\w*|thrilling|exciting|fun|delicious|tasty|fresh|cozy|spacious|clean)\b/iu';
+    private const UNSUPPORTED = '/\b(popular|famous|iconic|renowned|best|top-?rated|must-?(?:visit|see)|beautiful|stunning|scenic|picturesque|breathtaking|gorgeous|pristine|serene|peaceful|quiet(?:er)?|crowded|perfect|ideal|great for|known for|home to|boasts?|offers|features|featuring|activities|amenities|facilities|swimming|snorkel\w*|div(?:e|ing)|hik(?:e|ing)|trek\w*|camp(?:ing)?|sun-?bath\w*|shoreline|sand|waves|views?|wildlife|animals?|birds?|species|endemic|native|eagles?|monkeys?|crocodiles?|fish\w*|coral|waterfalls?|known as|nicknamed|dubbed|called the|little boracay|pinakasikat|nindot|gwapa|lami|dako|opens?|closes?|open daily|24\/7|free (?:entry|entrance|admission)|affordable|cheap|expensive|budget-friendly|luxur\w*|family-friendly|romantic|instagram\w*|visitors love|tourists love|worth(?:while)?|relax\w*|adventure\w*|thrilling|exciting|fun|delicious|tasty|fresh|cozy|spacious|clean|unwind|great (?:place|spot|choice|option|way)|nice (?:place|spot)|good (?:place|spot|choice)|favou?rite|treat|tranquil|calm|charming|lovely|wonderful|amazing|magnificent|majestic|idyllic|refreshing|vibrant|lively|bustling|unique|hidden gem|gem|paradise|enchanting|spectacular|awesome|incredible|dramatic|lush|crystal|turquoise|white-?sand|sunsets?|sunrises?|swim\w*|picnic\w*|nightlife)\b/iu';
 
     public function __construct(private readonly SampleData $sampleData) {}
 
@@ -97,10 +97,78 @@ class ChatbotReplyGuard
     }
 
     /**
+     * The names a listing can be called by: its stored name, and the same name without a trailing " [SAMPLE]" or
+     * parenthetical ("Tuka Beach (\"Little Boracay of Santa Maria\") [SAMPLE]" is also "Tuka Beach"). The stored name is
+     * never changed; this only widens what counts as a mention, so a model that drops the suffix is still recognised.
+     *
+     * @return array<int, string> longest first, none shorter than four characters
+     */
+    public function nameVariants(string $name): array
+    {
+        $variants = [trim($name)];
+        $current = trim($name);
+
+        while (preg_match('/\s*(?:\[[^\]]*\]|\([^)]*\))\s*$/u', $current)) {
+            $current = trim((string) preg_replace('/\s*(?:\[[^\]]*\]|\([^)]*\))\s*$/u', '', $current));
+            $variants[] = $current;
+        }
+
+        return array_values(array_unique(array_filter($variants, fn ($v) => mb_strlen($v) > 3)));
+    }
+
+    /**
+     * One pattern for every name any of the listings can be called by, longest first so "Jack's Ridge Resort and
+     * Restaurant" is read as that listing and never as a shorter name inside it.
+     *
+     * @param  array<int, array{0: Model, 1: array}>  $named
+     * @return array{0: string, 1: array<string, int>}|null  [regex, lower-case variant => index in $named]
+     */
+    private function matcher(array $named): ?array
+    {
+        $byVariant = [];
+        foreach ($named as $i => [$listing]) {
+            foreach ($this->nameVariants($listing->name) as $variant) {
+                $byVariant[mb_strtolower($variant)] ??= $i;
+            }
+        }
+
+        if ($byVariant === []) {
+            return null;
+        }
+
+        $variants = array_keys($byVariant);
+        usort($variants, fn ($a, $b) => mb_strlen($b) <=> mb_strlen($a));
+        $alternatives = implode('|', array_map(fn ($v) => preg_quote($v, '/'), $variants));
+
+        return ['/(?<![\p{L}\p{N}])(?:'.$alternatives.')(?![\p{L}\p{N}])/iu', $byVariant];
+    }
+
+    /**
+     * Of the candidate listings, the ones the text really names (whole words, under any of their names).
+     *
+     * @param  array<int, array{0: Model, 1: array}>  $named
+     * @return array<int, array{0: Model, 1: array}>
+     */
+    public function onlyMentioned(string $text, array $named): array
+    {
+        return array_values(array_intersect_key($named, array_flip($this->mentioned($text, $this->matcher($named)))));
+    }
+
+    /** @return array<int, int> indexes in $named of the listings mentioned in the text */
+    private function mentioned(string $text, ?array $matcher): array
+    {
+        if ($matcher === null || ! preg_match_all($matcher[0], $text, $found)) {
+            return [];
+        }
+
+        return array_values(array_unique(array_map(fn ($m) => $matcher[1][mb_strtolower($m)], $found[0])));
+    }
+
+    /**
      * The model's reply made safe: unsupported claims about listings removed, sample and unverified listings labelled.
      * Null when nothing usable is left, so the caller falls back to the rule-based answer.
      *
-     * @param  array<int, array{0: Model, 1: array}>  $named  the listings the reply names (listing, LISTING_CONFIG entry)
+     * @param  array<int, array{0: Model, 1: array}>  $named  listings the reply may name (listing, LISTING_CONFIG entry)
      */
     public function sanitize(string $reply, array $named): ?string
     {
@@ -111,51 +179,60 @@ class ChatbotReplyGuard
             return null;
         }
 
-        $names = collect($named)->map(fn ($pair) => $pair[0]->name)->sortByDesc(fn ($n) => strlen($n))->values()->all();
+        // Only the listings the reply actually names, under whichever of their names it used.
+        $named = array_values(array_intersect_key($named, array_flip($this->mentioned($reply, $this->matcher($named)))));
+        $matcher = $this->matcher($named);
         $facts = $this->facts($named);
         $factWords = $this->words($facts);
         // Names count for figures ("Mall 88") but not for descriptive words: "eagle" in a name is no fact about eagles.
-        $figureSource = $facts.' '.strtolower(implode(' ', $names));
+        $figureSource = $facts.' '.strtolower(implode(' ', array_map(fn ($pair) => $pair[0]->name, $named)));
 
         // Once the reply names a listing, every sentence is held to the record, not only the ones that repeat the name:
         // "It's a great spot to see the iconic eagle" says nothing by name and claims the most.
-        $aboutListings = collect($names)->contains(fn ($n) => stripos($reply, $n) !== false);
+        $aboutListings = $named !== [];
 
         $lines = [];
         $stillNamed = [];
         foreach (preg_split('/\R/u', $reply) as $line) {
+            preg_match('/^\s*(?:[-*•]|\d+[.)])\s+/u', $line, $bullet);
             $kept = [];
             foreach ($this->sentences($line) as $sentence) {
-                $mentions = array_values(array_filter($names, fn ($n) => stripos($sentence, $n) !== false));
-                $masked = $sentence;
-                foreach ($mentions as $n) {
-                    $masked = str_ireplace($n, ' ', $masked);
-                }
+                $masked = $matcher !== null ? (string) preg_replace($matcher[0], ' ', $sentence) : $sentence;
+                $mentions = $this->mentioned($sentence, $matcher);
 
                 if ($this->makesUnsupportedClaim($masked, $aboutListings, $factWords, $figureSource)) {
+                    // The listing it was about is still described, from its record, in the same place in the list.
+                    foreach ($mentions as $i) {
+                        if (! isset($stillNamed[$i])) {
+                            $kept[] = $this->recordLine($named[$i][0], $named[$i][1]);
+                            $stillNamed[$i] = true;
+                        }
+                    }
+
                     continue;
                 }
 
                 $kept[] = $sentence;
-                foreach ($mentions as $n) {
-                    $stillNamed[$n] = true;
+                foreach ($mentions as $i) {
+                    $stillNamed[$i] = true;
                 }
             }
 
             if ($kept !== []) {
-                $lines[] = implode(' ', $kept);
+                $text = implode(' ', $kept);
+                // Dropping a bullet's first sentence must not drop the bullet.
+                $lines[] = $bullet !== [] && ! preg_match('/^\s*(?:[-*•]|\d+[.)])\s+/u', $text) ? trim($bullet[0]).' '.$text : $text;
             }
         }
 
         // A listing whose every sentence was dropped is still described, from its own record.
-        foreach ($named as [$listing, $config]) {
-            if (! isset($stillNamed[$listing->name]) && stripos($reply, $listing->name) !== false) {
+        foreach ($named as $i => [$listing, $config]) {
+            if (! isset($stillNamed[$i])) {
                 $lines[] = $this->recordLine($listing, $config);
             }
         }
 
-        $text = trim(implode("
-", $lines));
+        $text = trim(implode("\n", $lines));
         if ($text === '') {
             return null;
         }
@@ -163,7 +240,7 @@ class ChatbotReplyGuard
         return $this->label($text, $named);
     }
 
-    /** One grounded sentence about a listing, from its record. */
+    /** One grounded sentence about a listing, from its record (under its stored name). */
     public function recordLine(Model $listing, array $config): string
     {
         $kind = strtolower((string) ($listing->type ?? $listing->cuisine_type ?? $listing->specialization ?? $config['label']));
@@ -172,29 +249,50 @@ class ChatbotReplyGuard
         return $listing->name.' – '.$kind.($where !== '' ? ', in '.$where : '').'.';
     }
 
-    /** Appends the label to every mention of a sample or unverified listing, and one line saying what the label means. */
+    /**
+     * Appends the label to every mention of a sample or unverified listing, whichever of its names was used, and one
+     * line saying what the label means. A genuine listing is never labelled, and a longer name is never read as the
+     * shorter listing inside it.
+     *
+     * @param  array<int, array{0: Model, 1: array}>  $named
+     */
     public function label(string $text, array $named): string
     {
+        $matcher = $this->matcher($named);
+        if ($matcher === null) {
+            return $text;
+        }
+
         $sample = false;
         $unverified = false;
 
-        foreach ($named as [$listing]) {
-            $status = $this->sampleData->status($listing);
-            if ($status === SampleData::OFFICIAL) {
-                continue;
-            }
+        $original = $text;
+        $text = preg_replace_callback(
+            $matcher[0],
+            function ($m) use ($matcher, $named, $original, &$sample, &$unverified) {
+                [$mention, $offset] = $m[0];
+                $status = $this->sampleData->status($named[$matcher[1][mb_strtolower($mention)]][0]);
+                if ($status === SampleData::OFFICIAL) {
+                    return $mention;
+                }
 
-            $tag = $status === SampleData::SAMPLE ? 'sample data' : 'not yet verified';
-            $sample = $sample || $status === SampleData::SAMPLE;
-            $unverified = $unverified || $status === SampleData::UNVERIFIED;
+                $sample = $sample || $status === SampleData::SAMPLE;
+                $unverified = $unverified || $status === SampleData::UNVERIFIED;
 
-            // Every mention, unless the model already put a label straight after it.
-            $text = preg_replace_callback(
-                '/'.preg_quote($listing->name, '/').'(?!\**\s*(?:[\(\[]|[–—-])\s*(?:sample|not yet verified))/iu',
-                fn ($m) => $m[0].' ('.$tag.')',
-                $text,
-            );
-        }
+                // Already labelled: by the stored name ("... [SAMPLE]") or by the words straight after it.
+                $after = substr($original, $offset + strlen($mention), 80);
+                if (preg_match('/\[(?:sample|not yet verified)\]$/i', $mention)
+                    || preg_match('/^\**\s*(?:[\(\[]|[–—-])\s*(?:sample|not yet verified)/iu', $after)) {
+                    return $mention;
+                }
+
+                return $mention.($status === SampleData::SAMPLE ? ' (sample data)' : ' (not yet verified)');
+            },
+            $text,
+            -1,
+            $count,
+            PREG_OFFSET_CAPTURE,
+        );
 
         $notes = [];
         if ($sample) {

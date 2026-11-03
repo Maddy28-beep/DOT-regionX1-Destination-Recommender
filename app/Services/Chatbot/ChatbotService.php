@@ -159,7 +159,8 @@ class ChatbotService
             $ids = $config['model']::query()
                 ->where('is_accredited', true)->whereNull('archived_at')
                 ->get(['id', 'name'])
-                ->filter(fn ($l) => strlen($l->name) > 3 && str_contains($haystack, strtolower($l->name)))
+                // Under its stored name or the same name without a trailing "[SAMPLE]" / parenthetical, which a model leaves off.
+                ->filter(fn ($l) => collect($this->guard->nameVariants($l->name))->contains(fn ($v) => str_contains($haystack, strtolower($v))))
                 ->pluck('id');
 
             if ($ids->isEmpty()) {
@@ -171,7 +172,8 @@ class ChatbotService
             }
         }
 
-        return $found;
+        // The substring test above is broad; keep the listings whose name is really in the text.
+        return $this->guard->onlyMentioned($text, $found);
     }
 
     /** @return array{0: string, 1: 'groq'|'rule_based'} */
