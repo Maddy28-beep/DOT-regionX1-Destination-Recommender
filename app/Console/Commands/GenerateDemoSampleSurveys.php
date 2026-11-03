@@ -11,6 +11,7 @@ use App\Models\ExitSurveyVisit;
 use App\Models\Restaurant;
 use App\Models\SouvenirCenter;
 use App\Services\Embeddings\InterestEmbeddingService;
+use App\Support\OpeningHours;
 use App\Support\SampleData;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
@@ -29,6 +30,9 @@ use Illuminate\Support\Facades\DB;
  *     same embedding vectors the recommender uses, with a share of mixed and random picks as noise;
  *   - distance is only a small nudge, so rules reflect interest and not just nearness. The dry run measures this.
  *
+ * --pair-listings adds the listing-pairing coverage described at pairListings(): a separate, explicitly named batch
+ * that only pairs destinations with a nearby restaurant and souvenir centre where no usable rule exists yet.
+ *
  * Without --apply nothing is written. --revert deletes the batch's rows (and only those).
  */
 class GenerateDemoSampleSurveys extends Command
@@ -38,6 +42,7 @@ class GenerateDemoSampleSurveys extends Command
         {--batch=demo-samples-2026-11 : The batch name written on every row}
         {--seed=2026 : Same seed, same surveys}
         {--ensure-sample-coverage : Add deterministic surveys so every eligible sample destination appears in at least two baskets}
+        {--pair-listings : Instead of random surveys, add the few that give each eligible destination a usable restaurant and souvenir rule (needs an explicit --batch; ignores --count)}
         {--apply : Write the surveys (default is a report only)}
         {--revert : Delete the surveys of --batch instead}';
 
@@ -64,6 +69,26 @@ class GenerateDemoSampleSurveys extends Command
 
     private const MIN_CONFIDENCE = 0.15;
 
+    /**
+     * What makes a rule usable for the itinerary builder. These repeat AprioriService::suggestionsFor() (confidence 0.1,
+     * co-count 2) and the builder's private meal and souvenir limits (ItineraryScheduleBuilder::MEAL_SEARCH_KM,
+     * SOUVENIR_MAX_KM); a test fails if either side drifts, so pairing never aims at a rule the builder would refuse.
+     */
+    private const PAIR_MIN_CONFIDENCE = 0.1;
+
+    private const PAIR_MEAL_KM = 10;
+
+    private const PAIR_SOUVENIR_KM = 20;
+
+    /** A lunch is judged open when the listing's plain daily hours cover this 30-minute window (unreadable hours put no limit). */
+    private const PAIR_LUNCH_START = 12 * 60;
+
+    /** Most baskets one destination may need; a very popular place that would need more is reported, not forced. */
+    private const PAIR_MAX_BASKETS = 6;
+
+    /** @var array<string, mixed> What pairListings() found, for the report. */
+    private array $pairing = [];
+
     /** @var Collection<int, Destination> */
     private Collection $destinations;
 
@@ -82,6 +107,19 @@ class GenerateDemoSampleSurveys extends Command
         }
 
         $count = max(1, (int) $this->option('count'));
+        $pairing = (bool) $this->option('pair-listings');
+
+        if ($pairing && $this->option('ensure-sample-coverage')) {
+            $this->error('--pair-listings and --ensure-sample-coverage are separate batches: run them one at a time.');
+
+            return self::FAILURE;
+        }
+
+        if ($pairing && ! $this->input->hasParameterOption('--batch')) {
+            $this->error('--pair-listings needs an explicit --batch name, so it can never land in (or be mistaken for) another batch.');
+
+            return self::FAILURE;
+        }
 
         if (ExitSurvey::withoutGlobalScopes()->where('batch', $batch)->exists()) {
             $this->error("Batch '{$batch}' already exists. Revert it first or choose another name.");
@@ -96,10 +134,24 @@ class GenerateDemoSampleSurveys extends Command
         }
 
         mt_srand((int) $this->option('seed'));
-        $surveys = $this->simulate($count);
 
-        if ($this->option('ensure-sample-coverage')) {
-            $surveys = $this->ensureSampleCoverage($surveys);
+        if ($pairing) {
+            $this->loadCatalogue();
+            $surveys = $this->pairListings();
+            $count = count($surveys);
+            $this->reportPairing($batch);
+
+            if ($surveys === []) {
+                $this->info('Nothing to add: every eligible destination already has a usable restaurant and souvenir rule, or has no valid listing to pair with.');
+
+                return self::SUCCESS;
+            }
+        } else {
+            $surveys = $this->simulate($count);
+
+            if ($this->option('ensure-sample-coverage')) {
+                $surveys = $this->ensureSampleCoverage($surveys);
+            }
         }
 
         $this->report($surveys, $batch);
@@ -151,17 +203,7 @@ class GenerateDemoSampleSurveys extends Command
     /** @return list<array{fields: array, places: list<string>, activities: list<string>, interests: list<string>}> */
     private function simulate(int $count): array
     {
-        // A command object can run more than once in a process (tests, scheduled runs): start from a clean slate.
-        $this->picked = [];
-        $this->fit = [];
-
-        $this->destinations = Destination::publiclyVisible()
-            ->where(fn ($q) => $q->whereNull('itinerary_role')->orWhere('itinerary_role', 'sightseeing'))
-            ->with('region', 'tags')->get();
-
-        foreach (array_keys(self::PERSONAS) as $interest) {
-            $this->fit[$interest] = app(InterestEmbeddingService::class)->fitFor([$interest], $this->destinations)?->all() ?? [];
-        }
+        $this->loadCatalogue();
 
         $stays = Accommodation::publiclyVisible()->with('region')->get();
         $restaurants = Restaurant::publiclyVisible()->with('region')->get();
@@ -212,6 +254,191 @@ class GenerateDemoSampleSurveys extends Command
         }
 
         return $surveys;
+    }
+
+    /** The destinations a survey may list (the planner's own sightseeing set) and how well each fits each interest. */
+    private function loadCatalogue(): void
+    {
+        // A command object can run more than once in a process (tests, scheduled runs): start from a clean slate.
+        $this->picked = [];
+        $this->fit = [];
+
+        $this->destinations = Destination::publiclyVisible()
+            ->where(fn ($q) => $q->whereNull('itinerary_role')->orWhere('itinerary_role', 'sightseeing'))
+            ->with('region', 'tags')->get();
+
+        foreach (array_keys(self::PERSONAS) as $interest) {
+            $this->fit[$interest] = app(InterestEmbeddingService::class)->fitFor([$interest], $this->destinations)?->all() ?? [];
+        }
+    }
+
+    /**
+     * Listing-pairing coverage: for every eligible destination that has no usable restaurant or souvenir rule, the few
+     * simulated surveys that give it one.
+     *
+     * "Usable" is what ItineraryScheduleBuilder will actually accept, not merely what Apriori mines: a rule to a
+     * restaurant (within the meal radius, in the destination's region, open for lunch, publicly visible) or a souvenir
+     * centre (within the souvenir radius, publicly visible and available), at the planner's own thresholds (co-count
+     * 2, confidence 0.1). Rules to a listing the builder would reject (the random pairings of the earlier batches
+     * are often 50 km or more away) do not count, so such a destination still gets a usable one.
+     *
+     * The partner is the nearest valid listing (ties by id), the same listing the builder's proximity fallback would
+     * choose, so the rule explains a choice rather than steering it elsewhere. The basket count is the smallest that
+     * clears both thresholds with the destination's existing support, at most PAIR_MAX_BASKETS. Each basket lists
+     * only the destination plus the partner(s) it still needs. Accommodation is never paired: the stay planner's
+     * choice is left alone. Deterministic: destinations in id order, all randomness under the caller's seed.
+     *
+     * @return list<array{fields: array, places: list<string>, activities: list<string>, interests: list<string>}>
+     */
+    private function pairListings(): array
+    {
+        $this->pairing = [
+            'targets' => 0, 'baskets' => 0, 'usable' => ['restaurant' => 0, 'souvenir_center' => 0],
+            'paired' => ['restaurant' => 0, 'souvenir_center' => 0], 'no_valid_listing' => ['restaurant' => 0, 'souvenir_center' => 0],
+            'own_restaurant' => 0, 'over_cap' => [],
+        ];
+
+        $mined = ExitSurvey::query()->select('id');
+        $support = ExitSurveyVisit::query()->whereIn('exit_survey_id', $mined)->where('listing_kind', 'destination')
+            ->selectRaw('listing_id, count(distinct exit_survey_id) as c')->groupBy('listing_id')->pluck('c', 'listing_id');
+        $together = [];
+        foreach (DB::table('exit_survey_visits as a')->join('exit_survey_visits as b', 'a.exit_survey_id', '=', 'b.exit_survey_id')
+            ->whereIn('a.exit_survey_id', $mined)->where('a.listing_kind', 'destination')->whereIn('b.listing_kind', ['restaurant', 'souvenir_center'])
+            ->selectRaw('a.listing_id as d, b.listing_kind as k, b.listing_id as l, count(distinct a.exit_survey_id) as c')
+            ->groupBy('a.listing_id', 'b.listing_kind', 'b.listing_id')->get() as $row) {
+            $together[$row->d][$row->k][$row->l] = (int) $row->c;
+        }
+
+        $pools = [
+            'restaurant' => Restaurant::publiclyVisible()->with('region')->whereNotNull('latitude')->whereNotNull('longitude')->orderBy('id')->get(),
+            'souvenir_center' => SouvenirCenter::publiclyVisible()->availableForTrip()->whereNotNull('latitude')->whereNotNull('longitude')->orderBy('id')->get(),
+        ];
+        $surveys = [];
+
+        foreach ($this->destinations->sortBy('id') as $destination) {
+            $this->pairing['targets']++;
+            $seen = (int) ($support[$destination->id] ?? 0);
+            $need = [];
+            $baskets = 0;
+
+            foreach ($pools as $kind => $pool) {
+                // The builder takes a destination's own restaurant for lunch and never consults a rule there.
+                if ($kind === 'restaurant' && $this->hasOwnRestaurant($destination)) {
+                    $this->pairing['own_restaurant']++;
+
+                    continue;
+                }
+
+                $valid = $pool->filter(fn ($listing) => $this->validPartner($kind, $destination, $listing));
+
+                if ($valid->isEmpty()) {
+                    $this->pairing['no_valid_listing'][$kind]++;
+
+                    continue;
+                }
+
+                $withThis = $together[$destination->id][$kind] ?? [];
+                if ($seen > 0 && $valid->contains(fn ($l) => ($withThis[$l->id] ?? 0) >= self::MIN_SUPPORT_COUNT && $withThis[$l->id] / $seen >= self::PAIR_MIN_CONFIDENCE)) {
+                    $this->pairing['usable'][$kind]++;
+
+                    continue;
+                }
+
+                $nearest = $valid->sort(fn ($a, $b) => [$this->km($destination, $a), $a->id] <=> [$this->km($destination, $b), $b->id])->first();
+                $have = $withThis[$nearest->id] ?? 0;
+                $n = 1;
+                while (! (($have + $n) >= self::MIN_SUPPORT_COUNT && ($have + $n) / ($seen + $n) >= self::PAIR_MIN_CONFIDENCE)) {
+                    $n++;
+                }
+
+                $need[$kind] = $nearest;
+                $baskets = max($baskets, $n);
+            }
+
+            if ($need === []) {
+                continue;
+            }
+
+            if ($baskets > self::PAIR_MAX_BASKETS) {
+                $this->pairing['over_cap'][] = $destination->name;
+
+                continue;
+            }
+
+            // The interest this place fits best is the scenario the simulated visitor came for.
+            $main = collect(array_keys(self::PERSONAS))
+                ->sortByDesc(fn ($interest) => $this->fit[$interest][$destination->id] ?? 0)
+                ->first();
+
+            for ($i = 1; $i <= $baskets; $i++) {
+                $places = ['destination:'.$destination->id];
+                foreach ($need as $kind => $listing) {
+                    $places[] = $kind.':'.$listing->id;
+                }
+                $surveys[] = $this->fields($main, null, $places, 1);
+                $this->pairing['baskets']++;
+            }
+            foreach (array_keys($need) as $kind) {
+                $this->pairing['paired'][$kind]++;
+            }
+        }
+
+        return $surveys;
+    }
+
+    /** Would the itinerary builder accept this listing as the partner of a rule on this destination? */
+    private function validPartner(string $kind, Destination $destination, $listing): bool
+    {
+        $km = $this->km($destination, $listing);
+
+        if ($km === null) {
+            return false;
+        }
+
+        if ($kind === 'souvenir_center') {
+            return $km <= self::PAIR_SOUVENIR_KM;
+        }
+
+        if ($km > self::PAIR_MEAL_KM) {
+            return false;
+        }
+
+        if ($destination->region?->name !== null && $listing->region?->name !== null && $destination->region->name !== $listing->region->name) {
+            return false;
+        }
+
+        $windows = OpeningHours::windows($listing->opening_hours);
+
+        if ($windows === null) {
+            return true; // hours that cannot be read put no limit on the meal, as the builder treats them
+        }
+
+        foreach ($windows as [$open, $close]) {
+            if (self::PAIR_LUNCH_START >= $open && self::PAIR_LUNCH_START + 30 <= $close) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** The destination's own restaurant, as the builder reads it: an amenity tag saying so. */
+    private function hasOwnRestaurant(Destination $destination): bool
+    {
+        return $destination->tags->where('kind', 'amenity')->contains(fn ($tag) => mb_strtolower(trim((string) $tag->value)) === 'restaurant');
+    }
+
+    private function reportPairing(string $batch): void
+    {
+        $p = $this->pairing;
+
+        $this->info("PAIRING COVERAGE: batch '{$batch}' (data_source = demo), ".$p['targets'].' eligible destinations examined');
+        foreach (['restaurant', 'souvenir_center'] as $kind) {
+            $this->line(sprintf('  %s: already usable %d, paired by this batch %d, no valid listing in range %d%s', $kind, $p['usable'][$kind], $p['paired'][$kind], $p['no_valid_listing'][$kind], $kind === 'restaurant' ? ', own restaurant (rule never used) '.$p['own_restaurant'] : ''));
+        }
+        $this->line('  simulated surveys to add: '.$p['baskets'].'; left alone because they would need more than '.self::PAIR_MAX_BASKETS.' each: '.(count($p['over_cap']) ?: 'none').($p['over_cap'] ? ' ('.implode(', ', $p['over_cap']).')' : ''));
+        $this->line('  accommodation is never paired by this batch.');
+        $this->newLine();
     }
 
     /**
