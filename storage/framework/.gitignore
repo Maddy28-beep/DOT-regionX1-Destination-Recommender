@@ -7,3 +7,7 @@ routes.php
 routes.scanned.php
 schedule-*
 services.json
+sample-*.csv
+manifest-seed-*.csv
+sample-manifest-*.json
+manifest-copy-*/
