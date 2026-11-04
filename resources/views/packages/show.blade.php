@@ -38,7 +38,6 @@
     <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($package->getMorphClass(), $package->id)->latest()->get()" />
 
     @include('partials.gallery-hero', [
-        'categoryLayout' => true,
         'keepOtherPhotos' => true,
         'photos' => $package->photos,
         'title' => $package->name,

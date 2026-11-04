@@ -140,7 +140,8 @@
         @include('partials.photo-credit', ['photos' => $photos, 'title' => $title])
 
         @php $categories = $photos->groupBy($categoryLayout ? $categoryFor : 'category'); @endphp
-        @if ($categories->count() > 1)
+        {{-- Photos carry no visible type: the chips only appear in the legacy categorised layout. --}}
+        @if ($categoryLayout && $categories->count() > 1)
             <div class="gallery-cats">
                 @foreach ($categories as $cat => $group)
                     <a href="#" class="chip" data-open="{{ $photos->search(fn ($p) => $p->id === $group->first()->id) }}">{{ $cat }} ({{ $group->count() }})</a>

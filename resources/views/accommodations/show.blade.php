@@ -37,7 +37,6 @@
     <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($accommodation->getMorphClass(), $accommodation->id)->latest()->get()" />
 
     @include('partials.gallery-hero', [
-        'categoryLayout' => true,
         'photos' => $accommodation->photos,
         'title' => $accommodation->name,
         'subtitle' => $accommodation->posterMeta(),
