@@ -201,6 +201,10 @@
                                 // coordinates for can be drawn on the inline map;
                                 // the rest still travel to Google Maps by name.
                                 $stops = $routeStops[$day] ?? [];
+                                // Day 1 starts from the traveller's chosen start point (only when they gave one); later days are unchanged.
+                                if ((int) $day === 1 && ! $itinerary->package) {
+                                    $stops = \App\Models\Itinerary::withStartPoint($stops, $preference?->origin(), $preference?->startLabel());
+                                }
                                 $plottable = array_values(array_filter(
                                     $stops,
                                     fn ($s) => $s['lat'] !== null && $s['lng'] !== null
