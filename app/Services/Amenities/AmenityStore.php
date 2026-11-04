@@ -6,6 +6,7 @@ use App\Models\DestinationTag;
 use App\Models\ListingAmenity;
 use App\Support\Amenities;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Reads and writes the ticked amenities of any listing, by catalog key.
@@ -27,27 +28,48 @@ class AmenityStore
     }
 
     /** Replace what is ticked with $keys (only choices this kind offers are kept). Values saved some other way are left alone. */
-    public function sync(string $kind, Model $listing, array $keys): array
+    public function sync(string $kind, Model $listing, array $keys, array $displayNames = []): array
     {
         $keys = Amenities::allowed($kind, $keys);
 
-        if ($kind === 'destination') {
-            $offered = array_map(fn (string $k) => Amenities::label($k), Amenities::FOR_KIND['destination']);
-            DestinationTag::where('destination_id', $listing->getKey())->where('kind', 'amenity')->whereIn('value', $offered)->delete();
+        DB::transaction(function () use ($kind, $listing, $keys, $displayNames) {
+            $listing->newQuery()->whereKey($listing->getKey())->lockForUpdate()->firstOrFail();
+            [$query, $column] = $this->records($kind, $listing);
+            $value = fn (string $key) => $kind === 'destination' ? Amenities::label($key) : $key;
+            $query->whereIn($column, array_map($value, Amenities::keysFor($kind)))
+                ->whereNotIn($column, array_map($value, $keys))->delete();
+
             foreach ($keys as $key) {
-                DestinationTag::firstOrCreate(['destination_id' => $listing->getKey(), 'kind' => 'amenity', 'value' => Amenities::label($key)]);
+                $identity = $kind === 'destination'
+                    ? ['destination_id' => $listing->getKey(), 'kind' => 'amenity', 'value' => $value($key)]
+                    : ['listing_kind' => $kind, 'listing_id' => $listing->getKey(), 'amenity' => $key];
+                $record = $query->getModel()->newQuery()->firstOrCreate($identity);
+                if (array_key_exists($key, $displayNames)) {
+                    $name = trim((string) $displayNames[$key]);
+                    $record->display_name = $name === '' ? null : $name;
+                    $record->save();
+                }
             }
-            $listing->unsetRelation('tags');
-
-            return $keys;
-        }
-
-        ListingAmenity::where('listing_kind', $kind)->where('listing_id', $listing->getKey())->delete();
-        foreach ($keys as $key) {
-            ListingAmenity::create(['listing_kind' => $kind, 'listing_id' => $listing->getKey(), 'amenity' => $key]);
-        }
+        });
+        $listing->unsetRelation('tags');
 
         return $keys;
+    }
+
+    public function displayNames(string $kind, Model $listing): array
+    {
+        [$query, $column] = $this->records($kind, $listing);
+        $names = $query->whereNotNull('display_name')->pluck('display_name', $column);
+        $labels = Amenities::keysByLabel();
+
+        return $names->mapWithKeys(fn ($name, $value) => [$kind === 'destination' ? ($labels[$value] ?? $value) : $value => $name])->all();
+    }
+
+    private function records(string $kind, Model $listing): array
+    {
+        return $kind === 'destination'
+            ? [DestinationTag::where('destination_id', $listing->getKey())->where('kind', 'amenity'), 'value']
+            : [ListingAmenity::where('listing_kind', $kind)->where('listing_id', $listing->getKey()), 'amenity'];
     }
 
     /** Tick one more (used when a photo says it shows an amenity that is not ticked yet). */

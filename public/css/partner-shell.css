@@ -202,6 +202,35 @@
 .ptr-chk { display: flex; align-items: center; gap: 8px; margin: 0; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: .8rem; font-weight: 600; color: var(--ink); cursor: pointer; }
 .ptr-chk input { width: 16px; height: 16px; accent-color: var(--primary); }
 .ptr-chk:has(input:checked) { border-color: var(--primary); background: var(--primary-light); }
+.ptr-amenity-group { border: 1px solid var(--border); border-radius: 10px; margin-top: 8px; }
+.ptr-amenity-group > summary { padding: 10px 12px; font-weight: 700; cursor: pointer; }
+.ptr-amenity-group > summary small { float: right; }
+.ptr-amenity-group > .ptr-incl { padding: 0 10px 10px; }
+.ptr-amenity-toolbar { display: flex; align-items: center; gap: 10px; }
+.ptr-amenity-toolbar input { flex: 1; min-width: 0; }
+.ptr-amenity-count { background: var(--primary-light); color: var(--primary); border-radius: 999px; padding: 3px 9px; font-size: .75rem; font-weight: 700; white-space: nowrap; }
+.ptr-amenity-option { position: relative; min-width: 0; }
+.ptr-amenity-option .ptr-chk { min-height: 44px; }
+.ptr-amenity-option:has(input:checked) .ptr-chk { padding-right: 50px; }
+.ptr-amenity-pencil { position: absolute; top: 0; right: 0; display: none; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 8px; cursor: pointer; color: var(--primary); background: transparent; }
+.ptr-amenity-option:has(input:checked) .ptr-amenity-pencil { display: grid; }
+.ptr-amenity-pencil svg { width: 17px; height: 17px; }
+.ptr-amenity-pencil:hover { background: var(--surface, #fff); }
+.ptr-amenity-name:popover-open { width: min(360px, calc(100vw - 32px)); box-sizing: border-box; padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface, #fff); color: var(--ink); box-shadow: 0 12px 36px rgb(0 0 0 / 20%); }
+.ptr-amenity-name-actions { display: flex; justify-content: flex-end; margin-top: 12px; }
+.ptr-amenity-picks { display: grid; gap: 6px; margin: 10px 0 4px; padding: 8px 12px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface, #fff); }
+.ptr-amenity-picks[hidden] { display: none; }
+.ptr-amenity-picks__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; }
+.ptr-amenity-picks strong { font-size: .8rem; color: var(--primary); }
+.ptr-amenity-picks__list { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.ptr-amenity-chip { min-height: 32px; max-width: 100%; padding: 4px 10px; border: 1px solid var(--border); border-radius: 999px; background: var(--primary-light); color: var(--primary-dark); font: inherit; font-size: .78rem; font-weight: 600; overflow-wrap: anywhere; cursor: pointer; }
+.ptr-amenity-chip:hover { border-color: var(--primary); }
+.ptr-amenity-link { padding: 4px 6px; border: 0; background: none; color: var(--primary); font: inherit; font-size: .8rem; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.ptr-amenity-group__tools { display: flex; gap: 10px; justify-content: flex-end; padding: 0 12px 6px; }
+.ptr-amenity-renamed { margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: #fff3d6; color: #8a5a00; font-size: .65rem; font-weight: 700; }
+.ptr-amenity-renamed[hidden] { display: none; }
+.ptr-amenity-actions { position: sticky; bottom: 0; z-index: 1; justify-content: flex-end; flex-wrap: wrap; background: var(--surface, #fff); border-top: 1px solid var(--border); padding: 12px 0; margin-top: 12px; }
+@media (min-width: 600px) { .ptr-amenity-group > .ptr-incl { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; } }
 @media (max-width: 900px) { .ptr-incl { grid-template-columns: 1fr; } .ptr-tabs button { padding: 0 8px; font-size: .74rem; } .ptr-steps { padding: 12px 6px; } .ptr-step { font-size: .68rem; } }
 
 .ptr-choices { display: grid; gap: 8px; }

@@ -7,7 +7,9 @@
     $listing, $kind (the listing kind as the morph map names it)
 --}}
 @php
-    $keys = app(\App\Services\Amenities\AmenityStore::class)->keys($kind, $listing);
+    $store = app(\App\Services\Amenities\AmenityStore::class);
+    $keys = $store->keys($kind, $listing);
+    $names = $store->displayNames($kind, $listing);
     $photos = $listing->relationLoaded('photos') ? $listing->photos : $listing->photos()->get();
     $viewer = [];
     $rows = [];
@@ -16,18 +18,19 @@
             if (\App\Support\Amenities::group($key) !== $group) {
                 continue;
             }
-            $label = \App\Support\Amenities::label($key);
+            $standard = \App\Support\Amenities::label($key);
+            $label = $names[$key] ?? $standard;
             $photo = $photos->first(fn ($p) => $p->amenity === $key && ! $p->isIllustration());
             if ($photo) {
                 $url = $photo->url();
                 $credit = $photo->creditLine();
             } else {
-                $slug = \Illuminate\Support\Str::slug($label);
+                $slug = \Illuminate\Support\Str::slug($standard);
                 $url = asset('img/amenities/'.(file_exists(public_path("img/amenities/{$slug}.svg")) ? $slug : 'default').'.svg');
                 $credit = null;
             }
             $viewer[] = array_filter(['url' => $url, 'category' => $label, 'credit' => $credit]);
-            $rows[$title][] = ['label' => $label, 'open' => count($viewer) - 1, 'real' => (bool) $photo];
+            $rows[$title][] = ['label' => $label, 'standard' => $standard, 'open' => count($viewer) - 1, 'real' => (bool) $photo];
         }
     }
 @endphp
@@ -42,7 +45,7 @@
             <div class="amenity-chips">
                 @foreach ($chips as $chip)
                     <button type="button" class="amenity-chip" data-open="{{ $chip['open'] }}" title="{{ $chip['real'] ? 'See '.$chip['label'].' here' : 'See what '.$chip['label'].' looks like' }}">
-                        <x-amenity-icon :name="$chip['label']" class="amenity-chip__icon" />
+                        <x-amenity-icon :name="$chip['standard']" class="amenity-chip__icon" />
                         <span>{{ $chip['label'] }}</span>
                         <x-icon name="camera" class="amenity-chip__camera" />
                     </button>

@@ -159,6 +159,27 @@ class AmenitiesTest extends TestCase
         $this->assertSame([], app(AmenityStore::class)->keys('accommodation', $stay));
     }
 
+    public function test_a_custom_destination_amenity_name_keeps_the_standard_matching_tag(): void
+    {
+        $destination = $this->listing('destination');
+        $account = $this->account('destination', $destination);
+
+        $this->actingAs($account, 'establishment')->putJson('/portal/establishment/listing', [
+            'section' => 'amenities',
+            'amenities' => ['viewing_decks'],
+            'amenity_names' => ['viewing_decks' => 'Sunset viewing deck'],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('destination_tags', [
+            'destination_id' => $destination->id,
+            'kind' => 'amenity',
+            'value' => 'Viewing Decks',
+            'display_name' => 'Sunset viewing deck',
+        ]);
+        $this->get('/destinations/'.$destination->slug)->assertOk()->assertSee('Sunset viewing deck');
+        $this->get(route('plan.edit'))->assertOk()->assertSee('value="Viewing Decks"', false);
+    }
+
     // ---------- photos tied to an amenity ----------
 
     public function test_an_amenity_photo_says_which_amenity_it_shows_and_ticks_it(): void
