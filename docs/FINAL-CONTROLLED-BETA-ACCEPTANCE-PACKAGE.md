@@ -349,7 +349,7 @@ PROJECT OWNER APPROVAL.
 | 2 | Critical/High defects resolved | COMPLETE | No Critical/High known. F1/F2 (Medium) and F3 (Low) fixed and verified live on `bc35db1` (§4.3) | None open. Known minor: F1-09 hedged wording, single-place comparisons | Yes |
 | 3 | Full regression passes | COMPLETE | §7: 0 failures on `bc35db1` (1,468) and on `bc35db1` + departure (1,497) | 5 environmental GD-extension errors, reported as errors, not passes; no CI run recorded here | Yes, with that caveat |
 | 4 | Live production independently verified | COMPLETE | §2, §4.3, §5; commit, migrations, counts, hashes, logs checked read-only | None | Yes |
-| 5 | Embeddings correct | COMPLETE | 151 destination + 8 interest vectors, `nomic-embed-text`, 768 dims, no non-finite values, norms 0.999999–1.000001, no orphans, none missing, hashes unchanged (`emb_check.json`) | Two destinations share an identical vector (149 unique of 151); noted, not changed | Yes |
+| 5 | Embeddings correct | COMPLETE | 151 destination + 8 interest vectors, `nomic-embed-text`, 768 dims, no non-finite values, norms 0.999999–1.000001, no orphans, none missing, hashes unchanged (`emb_check.json`) | None. Three destinations (Elysia Wellness Spa, ids 22–24) share one vector (149 unique of 151): intentional, see §9.1 | Yes |
 | 6 | Chatbot passes live API tests | COMPLETE | §4.3: 29 live cases, F1 15/15, F2 7/7, F3 4/4, other 3/3; 29 log rows and nothing else written | Heuristic guard; one run per case; no live 429/timeout seen; cannot detect an invented listing whose name is not in the database | Yes, within those limits |
 | 7 | Performance measured and acceptable | PARTIALLY COMPLETE | §5: re-measured on `bc35db1`; pages p95 0.995 s, itinerary p50 0.86 s, rank p50 0.08 s, chatbot p50 0.57 s / 1.68 s | No concurrency, load or window-based 5xx evidence; no HTTP `POST /plan` timing; far-distance planning p50 2.47 s, p95 3.19 s | Yes for light single-user use; not for load |
 | 8 | Planner/UI integration without regressions | PARTIALLY COMPLETE | Baseline live and unchanged; departure UI journey verified locally on desktop and 375 px | Departure UI not on production | Yes for the baseline |
@@ -393,6 +393,19 @@ in the last deploy). Embeddings are opt-in and untouched.
 cluster; a secret or personal data exposed; the chatbot stating an
 unsupported fact as DOT-verified; a sample listing presented as accredited;
 an itinerary that breaks the 08:00/18:00 or arrival rules; Groq key misuse.
+
+### 9.1 Identical embeddings: intentional behaviour, not a defect
+
+Elysia Wellness Spa (ids 22, 23, 24) are three legitimate DOT-accredited
+branches with different addresses, coordinates and accreditation numbers. The
+embedding source text deliberately leaves out location (see
+`DestinationEmbeddingService::textFor`), so branches with the same name, type,
+tags and description have the same `text_hash` and therefore the same vector.
+Distance is checked separately by the planner. Owner decision (2026-11-04):
+leave the embedding text unchanged; no address added, no regeneration, no
+production change. Location-aware embeddings can be revisited in a future
+optimisation phase if similarity testing shows a real problem. Read-only
+investigation; nothing was modified.
 
 ## 10. Go / no-go
 
