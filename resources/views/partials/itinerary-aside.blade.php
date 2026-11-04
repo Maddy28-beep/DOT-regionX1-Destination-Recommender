@@ -16,7 +16,12 @@
             'stops' => $plottable->map(fn ($s) => ['lat' => $s['lat'], 'lng' => $s['lng'], 'label' => $s['label']])->all(),
             'count' => $dayMeta[$day]['stops'] ?? 0,
             'km' => $dayMeta[$day]['km'] ?? 0,
-            'gmaps' => \App\Models\Itinerary::googleMapsUrl($dayStops),
+            // Day 1's link starts from the traveller's chosen start point, when they gave one.
+            'gmaps' => \App\Models\Itinerary::googleMapsUrl(
+                ((int) $day === 1 && ! $itinerary->package)
+                    ? \App\Models\Itinerary::withStartPoint($dayStops, $preference?->origin(), $preference?->startLabel())
+                    : $dayStops
+            ),
         ];
     }
     $hasMap = collect($dayMaps)->contains(fn ($d) => $d['stops'] !== []);

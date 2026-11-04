@@ -126,6 +126,30 @@ class Itinerary extends Model
     }
 
     /**
+     * Put the traveller's chosen starting point in front of a day's stops, so that day's route (the OSRM request and
+     * the Google Maps link) runs from where they start to the first planned stop. Used for Day 1 only.
+     *
+     * @param  array<int, array{label: string, address: string|null, lat: float|null, lng: float|null}>  $stops
+     * @param  array{lat: float, lng: float}|null  $origin  TouristPreference::origin(); null leaves the stops as they are
+     * @return array<int, array{label: string, address: string|null, lat: float|null, lng: float|null}>
+     */
+    public static function withStartPoint(array $stops, ?array $origin, ?string $label = null): array
+    {
+        if ($origin === null || $stops === []) {
+            return $stops;
+        }
+
+        array_unshift($stops, [
+            'label' => 'Start: '.(filled($label) ? $label : 'your starting point'),
+            'address' => null,
+            'lat' => (float) $origin['lat'],
+            'lng' => (float) $origin['lng'],
+        ]);
+
+        return $stops;
+    }
+
+    /**
      * A Google Maps link covering every stop of a day, in order.
      *
      * Uses the keyless Maps URL scheme rather than the JavaScript or Embed

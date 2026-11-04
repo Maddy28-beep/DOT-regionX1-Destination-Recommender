@@ -8,7 +8,7 @@
         <div class="container">
             <div>
                 <h1>Privacy Policy</h1>
-                <div class="sub">Last updated {{ \Illuminate\Support\Carbon::parse('2026-11-04')->format('F j, Y') }} &middot; what ExploreDVO collects, why, how long it is kept, and how to reach us about it.</div>
+                <div class="sub">Last updated {{ \Illuminate\Support\Carbon::parse('2026-11-05')->format('F j, Y') }} &middot; what ExploreDVO collects, why, how long it is kept, and how to reach us about it.</div>
             </div>
         </div>
     </div>
@@ -147,8 +147,10 @@
                             for a day on an itinerary page, your browser asks the public routing server of
                             the OSRM project (router.project-osrm.org) for the route. The request contains
                             the map coordinates of that day's planned places, in order: the attractions, and
-                            also the meals, shops and lodging that the itinerary lists for that day. It does
-                            not contain your name or your own starting point. As with any request, the
+                            also the meals, shops and lodging that the itinerary lists for that day. For Day 1,
+                            if you chose a starting point, the request also contains the coordinates of that
+                            starting point, as the first place on the route. It does
+                            not contain your name or anything else about you. As with any request, the
                             routing server also sees your IP address, your browser type and the website the
                             request came from. This is a free public server run by others; ExploreDVO does
                             not control it and cannot guarantee that it is available.</li>
@@ -161,8 +163,9 @@
                             itinerary has an "Open Day N in Google Maps" link. Nothing is sent to Google
                             until you click it. When you do, Google Maps opens in a new tab and receives, in
                             the link, the coordinates of that day's planned places (or the name and address
-                            of a place that has no coordinates) in order, but not your starting point or
-                            your name. Google handles that under its own terms.</li>
+                            of a place that has no coordinates) in order. For Day 1, if you chose a starting
+                            point, the link also carries the coordinates of that starting point as the first
+                            place, and nothing else about you; it does not carry your name. Google handles that under its own terms.</li>
                         <li><strong>About these outside services.</strong> OpenStreetMap, OSRM, Google
                             Fonts and Google Maps are run by independent third parties, not by ExploreDVO or
                             DOT Region XI. They handle the information above under their own policies;
