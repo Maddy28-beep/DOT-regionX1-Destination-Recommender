@@ -22,14 +22,14 @@ class GroqChatbotClient
      * @throws RuntimeException on any HTTP/API failure — callers should catch
      *   this and fall back to the rule-based responder rather than surface it.
      */
-    public function complete(string $systemPrompt, string $userMessage): string
+    public function complete(string $systemPrompt, string $userMessage, int $timeoutSeconds = 8): string
     {
         if (! $this->isConfigured()) {
             throw new RuntimeException('Groq API key is not configured.');
         }
 
         $response = Http::withToken(config('services.groq.key'))
-            ->timeout(8)
+            ->timeout($timeoutSeconds)
             ->post('https://api.groq.com/openai/v1/chat/completions', [
                 'model' => config('services.groq.model'),
                 'messages' => [

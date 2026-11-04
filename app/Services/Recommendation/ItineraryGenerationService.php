@@ -90,6 +90,7 @@ class ItineraryGenerationService
         private readonly AprioriService $apriori,
         private readonly ItineraryScheduleBuilder $schedule,
         private readonly ThemeDayGrouper $themeDays,
+        private readonly ?AiSkeletonAdvisor $aiSkeleton = null,
     ) {}
 
     /**
@@ -241,7 +242,19 @@ class ItineraryGenerationService
                 : $this->pickAccommodation($routeSequence, $preference))
             : null;
 
-        return DB::transaction(function () use ($routeAccommodationPick, $reserve, $preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
+        /*
+         * AI-assisted skeleton (optional, advisory). Asked before the transaction so no database lock is held while
+         * waiting for the outside service. Returns a plan only when the answer is valid, differs from the planner's own
+         * grouping and stays within its travelling limit; the transaction below still has to prove the built plan is no
+         * worse before it is kept. Disabled, failed, slow or invalid: $aiPlan stays null and nothing below changes.
+         */
+        $ai = ($this->aiSkeleton ?? app(AiSkeletonAdvisor::class))->advise($preference, $sequence, $routeSequence, $dayCapacities, $origin);
+        $aiPlan = $ai['plan'];
+        $aiStays = $aiPlan === null ? null : ($totalDays >= 2
+            ? $this->pickStays($aiPlan['sequence'], $dayCapacities, $preference, $origin)
+            : $this->pickAccommodation($aiPlan['sequence'], $preference));
+
+        return DB::transaction(function () use ($ai, $aiPlan, $aiStays, $routeAccommodationPick, $reserve, $preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
             // The schedule builder keeps why it turned each place away, per build; start this trip with none.
             $this->schedule->forgetRecordedAttempts();
 
@@ -337,6 +350,11 @@ class ItineraryGenerationService
                 }
             }
 
+            $aiApplied = false;
+            if ($aiPlan !== null) {
+                $aiApplied = $this->tryAiSkeleton($itinerary, $build, $stays, $built, $sequence, $aiPlan, $aiStays);
+            }
+
             if ($totalDays >= 2 && $this->stayMode($preference) === 'far') {
                 $this->settleEmptyLastDay($itinerary, $build, $stays, $built, $reserve, $preference, $dayCapacities, $origin);
             }
@@ -361,8 +379,78 @@ class ItineraryGenerationService
                 }
             }
 
+            if ($ai['attempted']) {
+                $this->recordAiSkeleton($itinerary, $ai, $aiApplied ? $aiPlan : null);
+            }
+
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);
         });
+    }
+
+    /**
+     * Builds the AI-suggested grouping on top of the plan already built, and keeps it only if it places at least as many
+     * stops and is no less feasible (late check-ins, empty days, days over the driving ceiling). Otherwise the plan
+     * that was there is put back row for row. The schedule builder applies every rule to the suggestion exactly as it
+     * does to the planner's own order; this only decides which of the two built plans stays.
+     *
+     * @param  array<string, mixed>  $aiPlan
+     * @param  array<int, array<string, mixed>>  $sequence  replaced by the AI sequence when it is kept
+     */
+    private function tryAiSkeleton(Itinerary $itinerary, callable $build, ?array &$stays, array &$built, array &$sequence, array $aiPlan, ?array $aiStays): bool
+    {
+        $snapshot = $itinerary->items()->orderBy('id')->get()->map(fn ($r) => $r->getAttributes())->all();
+        $placed = fn (): int => $itinerary->items()->whereNotNull('destination_id')->distinct()->count('destination_id');
+        $plannerPlaced = $placed();
+        $plannerCost = $this->feasibilityCost($itinerary);
+
+        $itinerary->items()->delete();
+        $itinerary->unsetRelation('items');
+        $plannerStays = $stays;
+        $stays = $aiStays;
+        $build($aiPlan['sequence']);
+
+        if ($placed() >= $plannerPlaced && $this->feasibilityCost($itinerary) <= $plannerCost) {
+            $built = $aiPlan['sequence'];
+            $sequence = $aiPlan['sequence'];
+
+            return true;
+        }
+
+        $itinerary->items()->delete();
+        $itinerary->unsetRelation('items');
+        foreach (array_chunk($snapshot, 50) as $chunk) {
+            \App\Models\ItineraryItem::insert($chunk);
+        }
+        $stays = $plannerStays;
+
+        return false;
+    }
+
+    /**
+     * Writes down, on the itinerary itself, whether the AI suggestion shaped it. ml_skeleton_applied is true only when it
+     * did (false when it was asked and not used, null when never asked); the day labels and the page note come from
+     * day_themes['ai_skeleton'], which exists only for a plan the suggestion actually shaped.
+     *
+     * @param  array<string, mixed>  $ai
+     */
+    private function recordAiSkeleton(Itinerary $itinerary, array $ai, ?array $applied): void
+    {
+        $update = ['ml_skeleton_applied' => $applied !== null, 'ml_skeleton_seconds' => $ai['seconds']];
+
+        if ($applied !== null) {
+            $themes = $itinerary->day_themes ?? ['days' => [], 'summary' => null];
+            $days = [];
+            foreach ($applied['days'] as $day => $entry) {
+                $days[$day] = ['label' => $entry['theme'], 'similarity' => null, 'stops' => $entry['stops']];
+            }
+            $themes['days'] = $days;
+            // The embedding grouping's before/after figures describe a grouping that is no longer the plan's.
+            $themes['summary'] = null;
+            $themes['ai_skeleton'] = ['applied' => true, 'days' => array_map(fn (array $d) => $d['theme'], $applied['days'])];
+            $update['day_themes'] = $themes;
+        }
+
+        $itinerary->update($update);
     }
 
     /**
