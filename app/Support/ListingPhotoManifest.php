@@ -81,10 +81,13 @@ class ListingPhotoManifest
         $problems = [];
         $status = $e['verification_status'] ?? null;
 
-        if (! in_array($e['kind'] ?? null, config('listing_photos.listing_kinds'), true)) {
+        // A batch can name its listings instead of numbering them (lookup = name): ids differ between installations.
+        $byName = ($e['lookup'] ?? null) === 'name';
+
+        if (! $byName && ! in_array($e['kind'] ?? null, config('listing_photos.listing_kinds'), true)) {
             $problems[] = "$label: kind must be one of ".implode(', ', config('listing_photos.listing_kinds'));
         }
-        if (! isset($e['id']) || ! is_numeric($e['id'])) {
+        if (! $byName && (! isset($e['id']) || ! is_numeric($e['id']))) {
             $problems[] = "$label: id is missing";
         }
         if (blank($e['name'] ?? null)) {
