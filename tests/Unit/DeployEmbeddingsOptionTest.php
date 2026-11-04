@@ -35,7 +35,7 @@ class DeployEmbeddingsOptionTest extends TestCase
 
         $this->b = $this->bashPath($this->sandbox);
 
-        foreach (['bin', 'app/database/data', 'backups', 'stage', 'pkg/database/data'] as $dir) {
+        foreach (['bin', 'app/database/data', 'backups', 'stage', 'pkg/database/data', 'pkg/deploy'] as $dir) {
             mkdir($this->sandbox.'/'.$dir, 0777, true);
         }
 
@@ -66,6 +66,8 @@ class DeployEmbeddingsOptionTest extends TestCase
             file_get_contents($this->script)
         );
         file_put_contents($this->sandbox.'/server-update.sandbox.sh', $source);
+        // The package carries the same script as the one that runs, exactly as a real package built from one commit does.
+        file_put_contents($this->sandbox.'/pkg/deploy/server-update.sh', $source);
         file_put_contents($this->sandbox.'/run.sh', "#!/usr/bin/env bash\nexport CALLS=\"".$this->sandbox."/calls.log\"\nexport PATH=\"".$this->bashPath($this->sandbox).'/bin:$PATH"'."\nexec bash \"".$this->sandbox."/server-update.sandbox.sh\" \"\$@\"\n");
     }
 
@@ -204,5 +206,39 @@ class DeployEmbeddingsOptionTest extends TestCase
         $this->assertSame(1, substr_count($pc, '--refresh-embeddings'), 'the flag is only ever added by the switch');
         $this->assertMatchesRegularExpression('/\$refresh = if \(\$RefreshEmbeddings\) \{ " --refresh-embeddings" \} else \{ "" \}/', $pc);
         $this->assertStringContainsString('$sha$refresh"', $pc);
+    }
+
+    public function test_a_script_that_differs_from_the_one_in_the_package_stops_before_anything_is_deployed(): void
+    {
+        // A stale copy of the script (for example an older one from a checkout left on another branch).
+        file_put_contents($this->sandbox.'/pkg/deploy/server-update.sh', "#!/usr/bin/env bash\n# an older version\nphp artisan embeddings:import\n");
+
+        [$code, $output, $calls] = $this->deploy();
+
+        $this->assertSame(65, $code, $output);
+        $this->assertStringContainsString('is not the same as the one in the package', $output);
+        $this->assertSame([], $this->importCalls($calls), 'no embeddings:import');
+        $this->assertSame([], array_values(array_filter($calls, fn ($c) => $c === 'rsync' || str_contains($c, 'migrate') || str_starts_with($c, 'composer'))), 'no code copied, no packages, no migrations');
+        $this->assertStringNotContainsString('is live', $output);
+    }
+
+    public function test_a_package_without_the_script_is_refused_too(): void
+    {
+        unlink($this->sandbox.'/pkg/deploy/server-update.sh');
+
+        [$code, $output, $calls] = $this->deploy();
+
+        $this->assertSame(65, $code, $output);
+        $this->assertNotContains('rsync', $calls);
+    }
+
+    public function test_line_endings_alone_do_not_trip_the_script_check(): void
+    {
+        $script = file_get_contents($this->sandbox.'/pkg/deploy/server-update.sh');
+        file_put_contents($this->sandbox.'/pkg/deploy/server-update.sh', str_replace(["\r\n", "\n"], "\r\n", $script));
+
+        [$code, $output] = $this->deploy();
+
+        $this->assertSame(0, $code, $output);
     }
 }
