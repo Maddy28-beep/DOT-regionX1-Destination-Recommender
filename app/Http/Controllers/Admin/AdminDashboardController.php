@@ -545,7 +545,112 @@ class AdminDashboardController extends Controller
             'reportType' => $reportType,
             'reportTypes' => self::REPORT_TYPES,
             'report' => $report,
+            'charts' => $this->buildCharts($reportType, $from, $to, $report),
         ]);
+    }
+
+    /**
+     * Chart data for the reports page, drawn from the same tables, the same date range and the same
+     * simulated-rows switch as the table beneath it. Nothing is estimated: every number is a count of
+     * stored rows, and a chart with nothing to count is reported as empty so the page can say so.
+     *
+     * Shape: ['timeline' => chart, 'top' => chart|null, 'breakdown' => chart|null, 'hasData' => bool]
+     * where chart = ['title', 'note', 'labels' => [], 'values' => [], 'axis' => 'x label'].
+     */
+    private function buildCharts(string $reportType, string $from, string $to, array $report): array
+    {
+        $start = \Illuminate\Support\Carbon::parse($from, 'Asia/Manila')->startOfDay()->utc()->toDateTimeString();
+        $rangeEnd = \Illuminate\Support\Carbon::parse($to, 'Asia/Manila')->endOfDay()->utc()->toDateTimeString();
+        // Stored timestamps are UTC; a raw string from a plucked column is read as UTC, a cast attribute is already a Carbon.
+        $manilaDay = fn ($value) => ($value instanceof \Carbon\CarbonInterface ? $value->copy() : \Illuminate\Support\Carbon::parse($value, 'UTC'))->timezone('Asia/Manila')->toDateString();
+
+        $top = null;
+        $breakdown = null;
+
+        switch ($reportType) {
+            case 'Exit Survey Responses':
+                $q = fn () => ExitSurvey::query()->whereIn('data_source', $this->reportSurveySources())->whereBetween('submitted_at', [$start, $rangeEnd]);
+                $days = $q()->get(['submitted_at'])->map(fn ($r) => $manilaDay($r->submitted_at));
+                $timeline = $this->timelineChart('Exit survey responses over time', 'Responses submitted per day', $days, $from, $to);
+                $ratings = $q()->whereNotNull('overall_rating')->selectRaw('overall_rating, count(*) as n')->groupBy('overall_rating')->pluck('n', 'overall_rating');
+                $breakdown = $this->countChart('Overall rating given', 'Responses by overall rating (1 to 5)', collect(range(1, 5))->mapWithKeys(fn ($i) => [$i.' / 5' => (int) ($ratings[$i] ?? 0)]));
+                break;
+
+            case 'Accreditation Status':
+                $q = fn () => AccreditationRecord::query()->whereBetween('created_at', [$start, $rangeEnd]);
+                $days = $q()->get(['created_at'])->map(fn ($r) => $manilaDay($r->created_at));
+                $timeline = $this->timelineChart('Accreditation records over time', 'Records created per day. Includes sample records marked "Sample data" in the table.', $days, $from, $to);
+                $breakdown = $this->countChart('Records by status', 'Accreditation status of the records in range', $q()->selectRaw('status, count(*) as n')->groupBy('status')->orderByDesc('n')->pluck('n', 'status'));
+                break;
+
+            case 'Destination Visits':
+                $days = ExitSurveyVisit::join('exit_surveys', 'exit_surveys.id', '=', 'exit_survey_visits.exit_survey_id')
+                    ->whereBetween('exit_surveys.submitted_at', [$start, $rangeEnd])
+                    ->whereIn('exit_surveys.data_source', $this->reportSurveySources())
+                    ->pluck('exit_surveys.submitted_at')
+                    ->map(fn ($v) => $manilaDay($v));
+                $timeline = $this->timelineChart('Reported visits over time', 'Visits ticked in exit surveys, by the day the survey was submitted', $days, $from, $to);
+                $top = $this->topPlacesChart($report, 'Most-visited places', 'Visits reported per place');
+                break;
+
+            case 'Trip Plans Created':
+                $q = fn () => TouristPreference::query()->whereBetween('created_at', [$start, $rangeEnd]);
+                $days = $q()->get(['created_at'])->map(fn ($r) => $manilaDay($r->created_at));
+                $timeline = $this->timelineChart('Trip plans over time', 'Trip plans created per day', $days, $from, $to);
+                $breakdown = $this->countChart('Trip plans by travel type', 'Travel type chosen in the plan', $q()->selectRaw("coalesce(travel_type, 'Not stated') as label, count(*) as n")->groupBy('label')->orderByDesc('n')->pluck('n', 'label'));
+                break;
+
+            default:
+                $days = TouristVisit::where('source', 'qr_scan')
+                    ->whereDate('visit_date', '>=', $from)->whereDate('visit_date', '<=', $to)
+                    ->get(['visit_date'])->map(fn ($r) => $r->visit_date->toDateString());
+                $timeline = $this->timelineChart('Verified check-ins over time', 'QR check-ins per day (one per device, per place, per day)', $days, $from, $to);
+                $top = $this->topPlacesChart($report, 'Most-visited places', 'Unique visitors per place');
+                $breakdown = $this->countChart('Unique visitors by place type', 'Unique visitors summed per type of place', collect($report['rows'])->groupBy(1)->map(fn ($g) => $g->sum(2))->sortDesc());
+        }
+
+        $charts = array_filter(['timeline' => $timeline, 'top' => $top, 'breakdown' => $breakdown]);
+        $hasData = collect($charts)->contains(fn ($c) => array_sum($c['values']) > 0);
+
+        return $charts + ['top' => null, 'breakdown' => null, 'hasData' => $hasData];
+    }
+
+    /** One bar per day (per month when the range is longer than about three months), zero days included. */
+    private function timelineChart(string $title, string $note, \Illuminate\Support\Collection $dates, string $from, string $to): array
+    {
+        $monthly = \Illuminate\Support\Carbon::parse($from)->diffInDays(\Illuminate\Support\Carbon::parse($to)) > 92;
+        $bucket = fn (string $d) => $monthly ? substr($d, 0, 7) : $d;
+        $counts = $dates->map($bucket)->countBy();
+
+        $labels = [];
+        $cursor = \Illuminate\Support\Carbon::parse($from);
+        $last = \Illuminate\Support\Carbon::parse($to);
+        while ($cursor->lte($last)) {
+            $labels[$bucket($cursor->toDateString())] = true;
+            $cursor->addDay();
+        }
+        $labels = array_keys($labels);
+
+        return [
+            'title' => $title,
+            'note' => $note.($monthly ? ' (grouped by month because the range is long)' : ''),
+            'labels' => $labels,
+            'values' => array_map(fn ($l) => (int) ($counts[$l] ?? 0), $labels),
+            'axis' => $monthly ? 'Month' : 'Day',
+        ];
+    }
+
+    private function countChart(string $title, string $note, \Illuminate\Support\Collection $counts): array
+    {
+        return ['title' => $title, 'note' => $note, 'labels' => $counts->keys()->map(fn ($k) => (string) $k)->all(), 'values' => $counts->values()->map(fn ($v) => (int) $v)->all(), 'axis' => ''];
+    }
+
+    /** The ten biggest rows of a Place / Type / Count report. */
+    private function topPlacesChart(array $report, string $title, string $note): array
+    {
+        $rows = array_slice($report['rows'], 0, 10);
+
+        return ['title' => $title, 'note' => $note.(count($report['rows']) > 10 ? ' (top 10 of '.count($report['rows']).')' : ''), 'labels' => array_map(fn ($r) => (string) $r[0], $rows), 'values' => array_map(fn ($r) => (int) $r[2], $rows), 'axis' => ''];
     }
 
     public function exportCsv(Request $request)

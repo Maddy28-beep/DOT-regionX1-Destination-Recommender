@@ -7,6 +7,7 @@
     <title>@yield('title', 'DOT Admin — ExploreDVO')</title>
     @include('partials.head-assets')
     <link rel="stylesheet" href="{{ asset('css/admin-shell.css') }}?v={{ filemtime(public_path('css/admin-shell.css')) }}">
+    @stack('head')
 </head>
 <body class="admin">
     <a class="skip-link" href="#admin-main">Skip to main content</a>
@@ -79,6 +80,7 @@
     {{-- Shared behaviours (bulk row selection). Everything in app.js is
          guarded by element lookups, so the public-site code is inert here. --}}
     <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
+    @stack('scripts')
     @include('partials.flash-toast')
 </body>
 </html>
