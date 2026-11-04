@@ -28,6 +28,27 @@ final class Amenities
         'info' => ['Information desk', self::FACILITY], 'lockers' => ['Lockers', self::FACILITY], 'picnic' => ['Picnic area', self::FACILITY],
         'outdoor' => ['Outdoor seating', self::FACILITY], 'kids' => ['Kid-friendly', self::FACILITY], 'airport' => ['Airport pickup', self::FACILITY],
         'gcash' => ['GCash or card payment', self::FACILITY],
+        'overnight_lodging' => ['Overnight Lodging', self::FACILITY],
+        'day_use_cottages' => ['Day-use Cottages & Gazebos', self::FACILITY],
+        'campsites' => ['Campsites', self::FACILITY],
+        'viewing_decks' => ['Viewing Decks', self::FACILITY],
+        'walking_trails' => ['Walking Trails & Boardwalks', self::FACILITY],
+        'visitor_bridges' => ['Visitor Bridges', self::FACILITY],
+        'souvenir_shops' => ['Souvenir Shops', self::FACILITY],
+        'showers' => ['Showers & Changing Rooms', self::FACILITY],
+        'water_stations' => ['Drinking Water Stations', self::FACILITY],
+        'charging_stations' => ['Charging Stations', self::FACILITY],
+        'playgrounds' => ['Playgrounds', self::FACILITY],
+        'gyms' => ['Gyms', self::FACILITY],
+        'spa' => ['Spa & Massage', self::FACILITY],
+        'sports_courts' => ['Sports Courts', self::FACILITY],
+        'golf_practice' => ['Golf Practice Areas', self::FACILITY],
+        'games_karaoke' => ['Game & Karaoke Rooms', self::FACILITY],
+        'hot_springs' => ['Hot Spring Soaking Areas', self::FACILITY],
+        'event_spaces' => ['Event & Meeting Spaces', self::FACILITY],
+        'guided_tours' => ['Guided Tours', self::FACILITY],
+        'grilling' => ['Grilling Areas & Fire Pits', self::FACILITY],
+        'adventure_facilities' => ['Adventure Facilities', self::FACILITY],
         'ramp' => ['Accessibility Ramp', self::ACCESS], 'stepfree' => ['Step-free entrance', self::ACCESS], 'accroom' => ['Accessible room', self::ACCESS],
         'elevator' => ['Elevator', self::ACCESS], 'accwc' => ['Accessible restroom', self::ACCESS], 'firstaid' => ['First aid on site', self::ACCESS],
         // packages
@@ -39,7 +60,13 @@ final class Amenities
 
     /** The choices each kind of listing is offered, in the order they are shown. Tour operators have none. */
     public const FOR_KIND = [
-        'destination' => ['parking', 'restroom', 'restaurant', 'wifi', 'pool', 'ac', 'info', 'lockers', 'picnic', 'ramp', 'accwc', 'firstaid'],
+        'destination' => [
+            'parking', 'restroom', 'restaurant', 'wifi', 'pool', 'ac', 'info', 'lockers', 'picnic', 'ramp', 'accwc', 'firstaid',
+            'overnight_lodging', 'day_use_cottages', 'campsites', 'viewing_decks', 'walking_trails', 'visitor_bridges',
+            'souvenir_shops', 'showers', 'water_stations', 'charging_stations', 'playgrounds', 'gyms', 'spa',
+            'sports_courts', 'golf_practice', 'games_karaoke', 'hot_springs', 'event_spaces', 'grilling', 'adventure_facilities',
+            'elevator', 'guided_tours',
+        ],
         'accommodation' => ['wifi', 'pool', 'ac', 'parking', 'restaurant', 'airport', 'accroom', 'elevator', 'ramp', 'accwc'],
         'restaurant' => ['parking', 'restroom', 'ac', 'wifi', 'outdoor', 'kids', 'stepfree', 'accwc'],
         'souvenir_center' => ['parking', 'restroom', 'ac', 'gcash', 'stepfree', 'accwc'],
@@ -48,6 +75,17 @@ final class Amenities
 
     /** What the trip planner asks a traveller to choose from: the same list, the part a destination can answer. */
     public const PLANNER = ['parking', 'restaurant', 'pool', 'wifi', 'restroom', 'ramp', 'ac'];
+
+    public const PLANNER_MORE = ['viewing_decks', 'campsites', 'walking_trails', 'playgrounds'];
+
+    public const EDITOR_GROUPS = [
+        'Facilities' => ['parking', 'restroom', 'wifi', 'ac', 'info', 'lockers', 'showers', 'water_stations', 'charging_stations', 'airport'],
+        'Accessibility & safety' => ['ramp', 'accwc', 'firstaid', 'stepfree', 'accroom', 'elevator'],
+        'Dining & shopping' => ['restaurant', 'souvenir_shops', 'outdoor', 'gcash'],
+        'Outdoor & adventure' => ['picnic', 'viewing_decks', 'walking_trails', 'visitor_bridges', 'grilling', 'adventure_facilities', 'guided_tours'],
+        'Stay & relaxation' => ['overnight_lodging', 'day_use_cottages', 'campsites', 'pool', 'spa', 'hot_springs'],
+        'Sports & entertainment' => ['playgrounds', 'gyms', 'sports_courts', 'golf_practice', 'games_karaoke', 'event_spaces', 'kids'],
+    ];
 
     public const DIFFICULTY = [
         'easy' => ['Easy', 'Mostly flat, short walks. Most travellers manage it.'],

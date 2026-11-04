@@ -7,21 +7,20 @@
     const status = form.querySelector('[data-selection-status]');
     const groups = ['activities', 'amenities'];
     function render(announce = false) {
-        const labels = [];
         const counts = [];
         groups.forEach(group => {
             const selected = [...form.querySelectorAll(`input[name="${group}[]"]:checked`)].map(input => input.value);
             const badge = form.querySelector(`[data-selection-count="${group}"]`);
             badge.textContent = `${selected.length} selected`;
             badge.hidden = false;
-            if (selected.length) labels.push(selected.join(', '));
+            summary.querySelector(`[data-picks-text="${group}"]`).textContent = selected.length
+                ? selected.join(', ')
+                : group === 'activities' ? 'Choose at least one interest.' : 'None selected';
             const noun = group === 'activities'
                 ? (selected.length === 1 ? 'interest' : 'interests')
                 : (selected.length === 1 ? 'amenity' : 'amenities');
             counts.push(`${selected.length} ${noun} selected`);
         });
-        summary.querySelector('[data-picks-text]').textContent = labels.length
-            ? labels.join(' · ') : 'Choose at least one interest and one amenity to shape your trip.';
         summary.hidden = false;
         if (announce && status) status.textContent = counts.join('. ');
     }

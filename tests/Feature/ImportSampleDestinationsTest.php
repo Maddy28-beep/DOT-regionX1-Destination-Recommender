@@ -112,7 +112,7 @@ class ImportSampleDestinationsTest extends TestCase
     public function test_an_illegal_amenity_key_stops_the_whole_import(): void
     {
         $file = $this->csv(
-            ['Bad Falls,Nature,X,Davao City,7.1,125.4,,,,,,,,elevator'],
+            ['Bad Falls,Nature,X,Davao City,7.1,125.4,,,,,,,,airport'],  // an accommodation-only amenity, not offered to a destination
             'name,type,location,region,latitude,longitude,description,price_tier,hours,visit_duration,best_time,itinerary_role,category_tags,amenity_tags'
         );
 

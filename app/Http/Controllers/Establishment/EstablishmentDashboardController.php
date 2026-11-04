@@ -172,8 +172,13 @@ class EstablishmentDashboardController extends Controller
 
         if ($section === 'amenities') {
             abort_if(! $this->hasAmenityList($establishment->listing_kind), 404);
-            $request->validate(['amenities' => ['nullable', 'array'], 'amenities.*' => ['string']]);
-            app(AmenityStore::class)->sync($establishment->listing_kind, $listing, (array) $request->input('amenities', []));
+            $data = $request->validate([
+                'amenities' => ['nullable', 'array'],
+                'amenities.*' => ['string'],
+                'amenity_names' => ['nullable', 'array'],
+                'amenity_names.*' => ['nullable', 'string', 'max:80'],
+            ]);
+            app(AmenityStore::class)->sync($establishment->listing_kind, $listing, $data['amenities'] ?? [], $data['amenity_names'] ?? []);
 
             return $this->savedTo($request, route('establishment.listing.edit'), Toast::success('Amenities saved', 'Travellers see them on your page and the trip planner uses them.'));
         }
