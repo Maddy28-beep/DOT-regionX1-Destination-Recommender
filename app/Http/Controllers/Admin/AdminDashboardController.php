@@ -20,6 +20,7 @@ use App\Models\TourOperator;
 use App\Models\TouristPreference;
 use App\Models\TouristVisit;
 use App\Services\Recommendation\AprioriService;
+use App\Support\SampleData;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -41,13 +42,23 @@ class AdminDashboardController extends Controller
 
     public function overview(): View
     {
+        // The is_accredited flag also covers sample (placeholder) records, so split it by provenance: only
+        // official DOT records count as accredited. Display only; no record is modified.
+        $destinationSplit = app(SampleData::class)->split(Destination::where('is_accredited', true));
+        $destinationTotal = Destination::count();
+
         $stats = [
             // whereDate, not a plain equality: visit_date is a cast date, so
             // it is stored as "2026-08-30 00:00:00" and never equals the plain
             // "2026-08-30" a toDateString() produces. A straight comparison
             // reads 0 forever. Same trap as CheckInController's dedupe.
             'checkins_today' => TouristVisit::whereDate('visit_date', now('Asia/Manila')->toDateString())->count(),
-            'destinations' => Destination::where('is_accredited', true)->count(),
+            'destinations' => $destinationSplit['real'],
+            'sample_destinations' => $destinationSplit['sample'],
+            // Everything the two counts above leave out: official records whose flag is off (expired or hidden),
+            // and destinations with no accreditation record. Shown so the tiles never read as the total.
+            'other_destinations' => max(0, $destinationTotal - $destinationSplit['real'] - $destinationSplit['sample']),
+            'total_destinations' => $destinationTotal,
             'pending_establishments' => EstablishmentAccount::where('status', 'pending')->count(),
             'expiring_accreditations' => AccreditationRecord::where('status', 'Expiring Soon')->count(),
         ];

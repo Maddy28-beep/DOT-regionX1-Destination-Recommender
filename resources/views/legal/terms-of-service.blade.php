@@ -28,9 +28,11 @@
                 <div class="panel-head"><div><h2>1. What ExploreDVO is</h2></div></div>
                 <div class="panel-body legal-content">
                     <p>ExploreDVO is an informational tourism platform for Davao Region, built for the
-                        Department of Tourism Region XI. It helps visitors discover DOT-accredited
-                        destinations, accommodations, restaurants, tour packages, souvenir centers, and tour
-                        operators, and generates suggested itineraries based on preferences you provide.</p>
+                        Department of Tourism Region XI. It helps visitors
+                        discover destinations featuring DOT-accredited establishments and clearly labelled
+                        sample data. It also lists accommodations, restaurants, tour packages, souvenir centers,
+                        and tour operators, and generates suggested itineraries based on preferences you
+                        provide.</p>
                 </div>
             </div>
 
