@@ -1,0 +1,35 @@
+# Final read-only snapshot taken 2026-11-04 09:01 UTC, after the QA submission and the rolled-back replay.
+# Removed: the request-log line count. Nothing else changed.
+# The "prefs id<=722" and "itin existing" hashes cover exactly the rows that existed at the baseline and equal the baseline hashes.
+== 2026-11-04T09:01:57+00:00
+-- marker preferences
+723 | 3 | Solo | Leisure | First-time Visitor | QA-SUPERVISED-TEST-20261104 | Mid-range | Hotel | moderate | personal_car | 2026-11-14 | 09:00:00 | 2026-11-16 | 17:30:00 | 7.130 | 125.645 | Davao International Airport |  | 2026-11-04 08:58:40
+PID=723
+-- itineraries
+01a1a5c8-2a21-7061-95d1-768d9e0d44b9 | 723 | 3 | 2026-11-04 08:58:41 | moderate | f | f
+IID=01a1a5c8-2a21-7061-95d1-768d9e0d44b9
+-- child counts
+activities | 2
+amenities | 1
+matches | 54
+items | 26
+health_profiles | 0
+tourist_preferences rows=149
+preference_activities rows=263
+preference_amenities rows=171
+itineraries rows=290
+itinerary_matches rows=5937
+itinerary_items rows=7126
+tourist_health_profiles rows=0
+exit_surveys rows=788
+exit_survey_visits rows=2605
+chatbot_logs rows=186
+sessions rows=226
+cache rows=8
+prefs id<=722 md5=e8cea02400d8d8da76a0de25c74800a3
+itin existing md5=04e4a07a71abeca7c20429e6c7a29716
+dest_emb md5=5fc0e23a3a1e0f1bfc77f46978f1283d int_emb md5=3820d5ce04363e2d582b8b48980629b0
+destinations md5=df73d0f06e240f0d6e424e9d2fda3f08 migrations=89
+other new prefs since baseline: 723:QA-SUPERVISE 
+other new itineraries since baseline: 01a1a5c8-2a21-7061-95d1-768d9e0d44b9 pref=723 at 2026-11-04 08:58:41;
+log_lines=670 log_bytes=81049

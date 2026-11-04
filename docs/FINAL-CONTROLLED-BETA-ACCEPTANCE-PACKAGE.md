@@ -6,7 +6,19 @@ records no approval for anyone who has not given it.**
 
 Evidence files are in `docs/evidence/` (raw chatbot logs, latency samples,
 page-timing samples, planner timing, embedding hashes before and after the
-deploy). No key or `.env` value appears in any of them (scanned).
+deploy, deploy logs with the server address and SSH user redacted) and, for the
+supervised production submission, in `docs/evidence/qa_supervised_20261104/`
+(a sanitised copy, section 6.4). No key, cookie, token or `.env` value appears in
+any of them (scanned). **Not preserved in the repository:** the raw nginx log lines
+and raw browser timings for the supervised test (the timings are transcribed in
+the test report), a Day 2 screenshot, the production snapshot scripts (they read
+production configuration and print other visitors' fields), and the live QA
+itinerary page itself.
+
+**Documentation history.** This package was first merged to `main` as PR #197
+(merge commit `588a95f`, 2026-11-04). The later update recording the supervised
+production submission, the criteria 3 and 10 corrections and the sanitised QA
+evidence is a follow-up that needs the owner's approval to push and merge.
 
 ## 1. Disposition
 
@@ -24,10 +36,13 @@ deploys, each from a clean detached worktree with a pre-deploy backup):
 - the derived departure date (PR #196, `7e856ff`): the tourist no longer enters
   a departure date (section 6.1), verified live on the form at desktop and 375 px.
 
-What has **only been tested locally or on rolled-back transactions**, not as a
-real tourist submission on production: a persistent departure-aware plan
-created through the live form (section 5.1 and section 8, criterion 8), the live
-address lookup for a typed departure place, and anything under load. Nothing here
+One **supervised production submission** was made through the live form on
+`7e856ff` (2026-11-04) with a QA identity: a persistent departure-aware plan,
+retained in production for the owner's review (section 6.4, section 2).
+
+What has **not** been exercised on production: a typed departure place submitted
+through the planner (the separate address lookup was tried, section 6.4), real
+phones or other browsers, and anything under load or concurrency. Nothing here
 is "everything is done".
 
 Project-owner statements recorded here (2026-11-04):
@@ -50,7 +65,8 @@ Project-owner statements recorded here (2026-11-04):
 | Destinations / accommodations / restaurants / souvenir centres | 151 / 255 / 81 / 32 |
 | Embeddings | 151 destination, 8 interest; hashes identical before and after every deploy and after the timing and browsing checks (`docs/evidence/pre_dep_hashes.txt`, `post_dep_hashes.txt`, `post_deptime_hashes.txt`, `pre_dd_hashes.txt`, `post_dd_hashes.txt`, `post_dd_hashes2.txt`, `emb_check.json`) |
 | Exit surveys / visits | 788 (787 simulated, 1 genuine) / 2,605, unchanged |
-| Itineraries / tourist preferences | 288 / 147 at the last check. They were 287 / 146 at the start of the `c303912` deploy: one real visitor created a plan since then. I only counted rows and read no individual record; my own test runs were rolled back and added none |
+| Itineraries / tourist preferences | **290 / 149** at the last check. They were 287 / 146 at the start of the `c303912` deploy: real visitors created two plans since (the latest at 08:43 UTC, giving 289 / 148 before the QA test; counted only, no individual record read) and the supervised QA submission added one of each. My other test runs were rolled back and added none |
+| **Retained QA records (remain in production)** | `tourist_preferences` id **723**, place of origin marker `QA-SUPERVISED-TEST-20261104`; itinerary `01a1a5c8-2a21-7061-95d1-768d9e0d44b9`; child rows: 2 `preference_activities`, 1 `preference_amenities`, 54 `itinerary_matches`, 26 `itinerary_items`; no health profile. Created 2026-11-04 08:58 UTC (server clock). **Kept for the owner's review; not deleted.** The 30-day privacy purge would remove them automatically if they are not deleted earlier. Section 6.4 |
 | `chatbot_logs` | 186 rows (29 added by the authorised live chatbot test) |
 | Apriori batch | `demo-apriori-nearby-pairings-2026-11` |
 | Latest pre-deploy backup | `pre-deploy-20261104-081916-7e856ff.sql.gz` (gzip integrity test passed; backup line in `docs/evidence/deploy_7e856ff.log.txt`) |
@@ -269,7 +285,7 @@ Other evaluations:
 - **Consistency:** each of the 24 planner scenarios was generated twice (both runs, 2026-11-04 earlier and on `bc35db1`); all produced identical itineraries.
 - **Database:** 98–389 queries per generation, the slowest single query 15.5 ms (an insert; earlier run). No slow query found; `EXPLAIN` was not run.
 - **Slowest area:** far-distance multi-day planning (about 2.2–3.2 s; the second run was slower than the first, so treat this as a range, not a fixed number). The query count is high; this is the first place to look if timing worsens.
-- **Not measured:** concurrency, sustained load, an HTTP `POST /plan` end to end (it stores rows on production; not done without approval), and Groq behaviour under rate limiting.
+- **Not measured:** concurrency, sustained load, and Groq behaviour under rate limiting. One HTTP `POST /plan` was timed later on `7e856ff` (section 5.1, last bullets): a single sample, not a percentile.
 
 Single machine, one location, a small sample: this supports "targets met
 under light single-user use". It is **not** load-test readiness.
@@ -313,8 +329,9 @@ scenario ran twice inside a transaction that was rolled back.
   of far cases take 3 to 4.6 s. This is a small sample (16 runs per range) on
   one server with no load. It is the most likely place for a slow request in
   the beta and is on the watch list.
-- **Not measured:** an HTTP `POST /plan` with the departure form and the live
-  address lookup (writes rows; not authorised), and concurrent use.
+- **Not measured in this run:** an HTTP `POST /plan` with the departure form and the live
+  address lookup (writes rows; not authorised at the time), and concurrent use.
+  A single supervised submission was timed afterwards (below).
 - **Which release:** this timing ran on `c303912`, when the form still had a
   departure-date field and the test set one. The planner never read that date
   (it uses the departure time and point and plans the last day), and `7e856ff`
@@ -324,6 +341,26 @@ scenario ran twice inside a transaction that was rolled back.
   far-distance p95 (about 4.3 s with a departure) is accepted for a limited
   invited beta. The acceptance box in section 11 is left unticked: formal
   acceptance is not recorded and this package signs nothing for the owner.
+
+**Supervised live submission on `7e856ff` (2026-11-04, section 6.4).** One
+moderate-distance, 3-day trip with a 17:30 departure from Davao airport,
+submitted through the live form:
+
+- **`POST /plan`:** 1,153 ms (browser fetch, HTTP 200; the response is a small
+  JSON redirect). One sample.
+- **Itinerary page `GET /plan/itinerary`:** first byte 592 ms, fully loaded
+  1,511 ms (HTTP 200, 31 kB).
+- **Server-side generation, rolled-back replay of the same inputs, six runs:**
+  641 to 783 ms (783, 646, 672, 706, 641, 721), 203 queries per run, the same 26
+  items and 54 matches every time and identical to the stored plan. (Each run
+  added 203 queries. The raw output in `qa_replay_result.txt` shows a cumulative
+  counter, 203, 406, 609, 812, 1,015 and 1,218, because the script registered its
+  query listener again in every run; the per-run figure of 203 is derived from the
+  difference between successive cumulative values.)
+- **What this does and does not show:** it is one moderate trip on a quiet server
+  and a single request. It is not a percentile, not a far-distance trip (the
+  slow case above) and **not a load or concurrency test: no load or concurrency
+  testing has been done.** The far-distance p95 above is unchanged.
 
 ## 6. Departure-aware itinerary scheduling (deployed: `c303912`, `7e856ff`)
 
@@ -394,8 +431,9 @@ enters arrival date, number of travel days, departure time and departure point.
 | Derived departure date and hints (PR #196) | **Deployed** (`7e856ff`); form verified live (below) |
 | Live form at desktop width | **Verified on production**, nothing submitted: no `departure_date` input; "Leaving November 8", "November 5 – November 8 · 4 days, 3 nights", 1-day, year-end and no-arrival cases correct |
 | Live form at 375 px | **Verified on production** (Chromium emulation, nothing submitted): departure time and "Leaving from" stack full width (306 px of 375, no horizontal overflow), then the three quick picks, "Same as where I start" and "We allow 2 hours there before you leave." |
-| A real tourist submission with a departure through the live form, including the typed-place address lookup | **Not exercised by this work** (it writes rows; not authorised). Tested locally and in automated tests only |
-| Persistent departure itinerary rendered on production | **Not seen** here (the earlier journey with the "Be at Davao International Airport by 3:00 PM" wording was on an isolated local database) |
+| Supervised submission with a departure through the live form (QA identity) | **Verified on production** (`7e856ff`, 2026-11-04): `POST /plan` 200; derived departure date 2026-11-16 stored; persistent departure itinerary rendered with the airport row. Records retained (section 2, section 6.4) |
+| The typed-place address lookup | **Tried separately** (`GET /plan/address-suggest`, HTTP 200, 624 ms, three results). **A typed departure place submitted through the planner was not tested** (the server resolves a typed place at submit time) |
+| A real tourist's submission with a departure | **Not reviewed:** two real visitor plans exist since the departure deploy; they were counted, not read |
 | Concurrency, load | **Not tested** |
 
 ## 6.3 Merge and deployment record
@@ -406,6 +444,104 @@ each as a code-only deploy. Rollback target for the current release: `c303912`
 whole: `bc35db1` (the nullable columns can stay; `migrate:rollback` would drop
 them and any departure data); restore from the pre-deploy backup only as a last
 resort.
+
+## 6.4 Supervised production planner submission (2026-11-04, `7e856ff`)
+
+Authorised by the project owner in chat: one submission with a QA identity, one
+separate typed-place lookup and one rolled-back replay. Retained, not cleaned up.
+
+**Scenario.** Solo, 3 days, arrival Saturday 14 November 2026 at 09:00, moderate
+distance, personal car, hotel, mid-range, interests Nature & Adventure and Food
+Tourism, one amenity (Air Conditioning), departure 17:30 from the "Davao Airport"
+quick pick (7.130, 125.645, label "Davao International Airport"). Place of origin
+carried the QA marker `QA-SUPERVISED-TEST-20261104`. No health information, no exit
+survey, no account.
+
+**Session deviation.** The built-in browser pane was used, not a private window.
+A leftover local form draft from my earlier testing (browser storage on this
+device only, no server record) was cleared first; the form opened blank and no
+earlier plan was attached to the session.
+
+**Result.** `POST /plan` HTTP 200, redirect to `/plan/itinerary` HTTP 200 (the
+supervised test report recorded HTTP 200 for both requests; the original raw nginx
+log lines were not preserved in the committed evidence, so this is reported test
+evidence and not independently inspectable raw-log evidence). Stored: `departure_date` 2026-11-16 (= arrival + 3 − 1),
+`departure_time` 17:30, departure point 7.130 / 125.645. The form showed "November
+14 – November 16 · 3 days, 2 nights" and "Leaving November 16"; the itinerary's
+Day 3 is Monday, November 16; a reload on the 375 px emulated screen showed the
+saved values and the same hints with no horizontal overflow (375 of 375 px).
+
+**Itinerary (26 items).** Day 1: Sample Upland Botanical Park [SAMPLE], Eden
+Nature Park; Day 2: Sample Inland Farm & Food Park [SAMPLE], Sample Highland
+Flower Park [SAMPLE]; Day 3: Sample Banana & Cacao Farm Experience [SAMPLE], then the
+airport. Stay: Jardin De Seorita (type Hotel, "DOT accreditation listed"), both
+nights.
+
+| Rule | Observed |
+|---|---|
+| Arrival preparation | Arrive 09:00, first travel 09:30 |
+| Earliest departure 08:00 | Days 2 and 3: breakfast 07:00, travel 08:00 |
+| 18:00 sightseeing cutoff | Last activities end 17:00 (day 1), 16:00 (day 2), 14:00 (day 3) |
+| Meals | Lunch 12:45 (day 1, within 11:30 to 13:00), 11:30 (days 2 and 3); dinner 18:30 on days 1 and 2; breakfast 07:00 |
+| Driving | At most about 150 min on each of days 1 and 2 against the 300 min moderate budget; day 3 120 to 180 min out and 45 to 75 min to the airport (up to 255 min), under the 480 min ceiling |
+| Accommodation | One Hotel, matching the preference, for both nights; dinner and overnight there |
+| Final day / airport | Last stop ends 14:00; travel 14:15; worst-case arrival 15:30 = departure 17:30 minus the 120-minute allowance; the row reads "Be at Davao International Airport by 3:30 PM ... a planning allowance and not an airline or airport rule" and states the journey is an estimate |
+| Omitted stop | The page reports that Malagos Garden Resort could not be fitted because there was not enough time to still reach the departure point |
+
+**Typed-place lookup.** `GET /plan/address-suggest?q=Davao International Airport`
+returned HTTP 200 in 624 ms with three results. **A typed departure place
+submitted through the planner remains untested.**
+
+**Rolled-back replay.** Six runs of the same inputs inside transactions on the
+single default connection (pgsql; no model or service in the generation path uses
+another connection, the cache, the queue or an external service), each rolled
+back: 641 to 783 ms, 203 queries per run (each run added 203; the raw output
+shows the cumulative counter 203, 406, 609, 812, 1,015 and 1,218, so the per-run
+figure is derived from the difference between successive values), output
+identical to the stored plan every time, no persistent records (no replay-marker rows, table counts unchanged,
+QA records intact, transaction level 0 afterwards). **One side effect that a
+rollback does not undo: the PostgreSQL id counter for `tourist_preferences` advanced
+from 723 to 729 (a gap of six ids; harmless).** The temporary script was removed from
+the server.
+
+**Unchanged by the test.** Embedding hashes (destination 5fc0e23a..., interest
+3820d5ce...), destination hash, migrations (89), exit surveys 788, visits 2,605,
+chatbot logs 186, every preference with id 722 or lower and every earlier
+itinerary (hashes identical). `laravel.log` stayed at 670 lines. `sessions` and
+`cache` rows rose through ordinary browsing, mine and other visitors'.
+
+**Observations (not confirmed defects; for the owner's judgement).**
+
+- **All five stops carry the label "SAMPLE DATA, NOT DOT-VERIFIED"** (four are
+  named `[SAMPLE]`; Eden Nature Park is labelled "Sample data" in the catalogue);
+  the hotel is shown as "DOT accreditation listed". The structure is realistic;
+  the content is largely sample data (already a stated limitation).
+- Day 3 sends the visitor 73 km (120 to 180 min) out for a 90-minute visit
+  before an afternoon flight, with up to 4 h 15 min of travel in total. It obeys
+  every rule and the page warns about the travel time; a visitor may still find
+  it heavy. A possible tuning topic for a separate change, not a rule breach.
+- The "Open Day 3 in Google Maps" link routes the stops only; it does not
+  include the airport leg.
+
+**Evidence preserved in the repository** (`docs/evidence/qa_supervised_20261104/`,
+sanitised; all from the same supervised test, preference 723): `pre_qa_baseline.txt`
+(counts, ids and hashes before; production configuration lines removed),
+`post_qa_final.txt` (final snapshot after the replay), `qa_items.txt` (the 26
+items), `qa_replay.php` and `qa_replay_result.txt` (rolled-back replay and its
+output), `http_verification.txt` (the HTTP results and timings **transcribed from
+the supervised test report, not raw server logs and not independently retrieved**),
+and five screenshots: `desktop_form_step1.jpg`, `desktop_itinerary_day1.jpg`,
+`desktop_day3_departure.jpg`, `mobile375_day3_departure.jpg`,
+`mobile375_form_saved.jpg`. The `laravel.log` comparison is in the two
+snapshots (670 lines, 81,049 bytes, before and after).
+
+**Not preserved:** the raw nginx log lines and raw browser timing records; a Day 2
+screenshot (Day 2 is in `qa_items.txt`); the intermediate snapshot taken right
+after the submission (it differs from the final one only in session and request
+counts); the two read-only snapshot scripts (they read production configuration and
+print other visitors' fields, so they are not safe to publish or reuse); the live
+QA itinerary page, which will be deleted or purged (screenshots and
+`qa_items.txt` are the durable record).
 
 ## 7. Regression
 
@@ -435,16 +571,16 @@ PROJECT OWNER APPROVAL.
 
 | # | Criterion | Status | Evidence | Gap | Genuinely satisfied? |
 |---|---|---|---|---|---|
-| 1 | Required features implemented and working | COMPLETE | Baseline, departure-aware scheduling (`c303912`) and the derived departure date (`7e856ff`) deployed (section 2.1); 1,510-test run; 24 of 24 production-generated rolled-back itineraries with a departure ended at the departure point (section 5.1) | A real tourist submission with a departure through the live form was not exercised by this work (writes data; not authorised) | Yes, with that caveat |
+| 1 | Required features implemented and working | COMPLETE | Baseline, departure-aware scheduling (`c303912`) and the derived departure date (`7e856ff`) deployed (section 2.1); 1,510-test run; 24 of 24 production-generated rolled-back itineraries with a departure ended at the departure point (section 5.1); one supervised live submission produced a persistent, rule-compliant departure itinerary on production (section 6.4) | The features are implemented and working as scoped; the integration-coverage gaps are tracked under criterion 8, not here. A typed departure place is covered by two automated tests only (`test_a_typed_place_the_lookup_finds_is_accepted_and_located`, `test_a_typed_place_the_lookup_cannot_find_is_not_accepted_as_a_departure_point`) and was not submitted through the live planner; real visitors' plans were not reviewed | Yes for the implemented features; integration coverage is partial (criterion 8) |
 | 2 | Critical/High defects resolved | COMPLETE | No Critical/High known. F1/F2 (Medium) and F3 (Low) fixed and verified live on `bc35db1` (§4.3) | None open. Known minor: F1-09 hedged wording, single-place comparisons | Yes |
-| 3 | Full regression passes | COMPLETE | Section 7: 0 failures on `bc35db1` (1,468), on `c303912` (1,497) and on `7e856ff` (1,510); post-merge focused run 110 tests | 5 environmental GD-extension errors, reported as errors, not passes; no CI run recorded here | Yes, with that caveat |
+| 3 | Full regression passes | PARTIALLY COMPLETE | Section 7: on `7e856ff` 1,510 tests ran: **1,505 completed without failure or error, 0 failures, and 5 errored** (PHP GD extension missing: `AmenitiesTest` ×2, `PartnerPortalRedesignTest` ×1, `PostcardCarouselTest` ×2); the same pattern on `bc35db1` (1,468) and `c303912` (1,497); post-merge focused run of 110 departure and trip-planner tests passed; one PHPUnit deprecation notice was reported on the `c303912` run | **The 5 errored tests are not passes:** the image-upload paths they cover have never run successfully here. No GD-enabled run and no CI run is recorded. Closes when those 5 tests pass in a GD-enabled environment | Not fully: 1,505 of 1,510 pass; 5 not executed to a result |
 | 4 | Live production independently verified | COMPLETE | Sections 2, 2.1, 4.3, 5; for each of four deploys: commit, migrations, counts, hashes, logs, six pages checked read-only | None | Yes |
 | 5 | Embeddings correct | COMPLETE | 151/8 vectors, `nomic-embed-text`, 768 dims, no non-finite values, norms 0.999999 to 1.000001, no orphans, none missing, hashes unchanged through the deploy and both timing runs (`emb_check.json`) | None. Three destinations (Elysia Wellness Spa, ids 22-24) share one vector (149 unique of 151): intentional, section 9.1 | Yes |
-| 6 | Chatbot passes live API tests | COMPLETE | §4.3: 29 live cases, F1 15/15, F2 7/7, F3 4/4, other 3/3; 29 log rows and nothing else written. Chatbot code unchanged by PR #195 and #196; the 29-case run was not repeated on `7e856ff` | Heuristic guard; one run per case; no live 429/timeout seen; cannot detect an invented listing whose name is not in the database | Yes, within those limits |
-| 7 | Performance measured and acceptable | PARTIALLY COMPLETE | Section 5: pages p95 0.995 s; itinerary p50 0.86 to 1.02 s overall; far-distance p50 2.4 to 2.6 s; with a departure far p50 2.44 s (section 5.1); chatbot p50 0.57 s / 1.68 s; single-user only | Far-distance p95 4.25 s and max 4.57 s with a departure, above 3 s (the owner stated on 2026-11-04 that it is accepted for a limited invited beta; formal acceptance is not recorded here); **no load, concurrency or window-based 5xx evidence; no HTTP `POST /plan` timing; not repeated on `7e856ff`** | Yes for light single-user use; **not** load- or concurrency-ready |
-| 8 | Planner/UI integration without regressions | PARTIALLY COMPLETE | Baseline unchanged; six pages 200 after each deploy; live form at desktop and 375 px verified on `7e856ff` (no departure-date input, derived hints correct); production generator verified with departures (rolled back); 1,510 tests | **Gaps:** no persistent departure plan submitted through the live form by this work (writes data); the typed-place address lookup not exercised on production; one real visitor plan exists since the departure deploy but was counted, not reviewed; mobile checked by Chromium emulation only, no cross-browser or assistive-technology test | Yes for the baseline and the form; the end-to-end departure submission is unverified on production |
+| 6 | Chatbot passes live API tests | COMPLETE | §4.3: 29 live cases on `bc35db1`, F1 15/15, F2 7/7, F3 4/4, other 3/3; 29 log rows and nothing else written. **The 29 live tests were performed on `bc35db1` and were not repeated on `7e856ff`;** chatbot code is unchanged in `7e856ff` (PR #195 and #196 touch none: 14 files differ between `bc35db1` and `7e856ff`, none with a chatbot-related name; a name-based check) | Heuristic guard; one run per case; no live 429/timeout seen; cannot detect an invented listing whose name is not in the database | Yes, within those limits |
+| 7 | Performance measured and acceptable | PARTIALLY COMPLETE | Section 5: pages p95 0.995 s; itinerary p50 0.86 to 1.02 s overall; far-distance p50 2.4 to 2.6 s; with a departure far p50 2.44 s (section 5.1); one live `POST /plan` 1,153 ms, itinerary page 1,511 ms loaded, generation replay 641 to 783 ms (moderate trip, `7e856ff`); chatbot p50 0.57 s / 1.68 s; single-user only | Far-distance p95 4.25 s and max 4.57 s with a departure, above 3 s (the owner stated on 2026-11-04 that it is accepted for a limited invited beta; formal acceptance is not recorded here); **no load or concurrency testing has been done; no window-based 5xx evidence; the live POST is a single sample of a moderate trip, not a percentile and not a far-distance run** | Yes for light single-user use; **not** load- or concurrency-ready |
+| 8 | Planner/UI integration without regressions | PARTIALLY COMPLETE | Baseline unchanged; six pages 200 after each deploy; live form at desktop and 375 px verified on `7e856ff`; **supervised live submission verified on production: `POST /plan` 200, derived departure date 2026-11-16 stored, departure itinerary rendered with the airport allowance, replay deterministic, no other data changed (section 6.4)**; 1,510 tests | **Remaining gaps:** a typed departure place submitted through the planner (only the separate lookup, 200 in 624 ms, was tried); two real visitor plans since the departure deploy were counted, not reviewed; mobile checked by Chromium emulation only, no real phone, no other browser, no assistive-technology test; one QA scenario only (moderate distance, one departure time) | Yes for the baseline, the form and a persistent departure submission; the remaining items are unverified on production |
 | 9 | Apriori governance decided and approved | COMPLETE | Option A finalized by the owner; production wording "(2 trips, including simulated demonstration trips)" (787 of 788 surveys simulated). The demonstration trips are simulated and must never be presented as genuine visitor behaviour (restriction in section 9) | DOT acknowledgment only for DOT-facing claims; not fabricated | Yes |
-| 10 | Backup, rollback, release procedures verified | COMPLETE | Backup before each of four deploys (latest `pre-deploy-20261104-081916-7e856ff.sql.gz`, gzip-tested); code-only deploys; rollback targets in section 6.3 | Backup restore was not rehearsed | Yes |
+| 10 | Backup, rollback, release procedures verified | PARTIALLY COMPLETE | **Verified:** a database backup was created before each of the four deploys (latest `pre-deploy-20261104-081916-7e856ff.sql.gz`, gzip integrity test passed); deploys were code-only; rollback targets are documented (section 6.3) | **Not verified:** a code rollback was not performed, and a database restoration from a backup was not rehearsed. Closes after an owner-approved restore into a scratch database and a rollback rehearsal | Partly: backups verified, rollback and restore untested |
 | 11 | Required approvals obtained | REQUIRES PROJECT OWNER APPROVAL | Approvals on record for PRs #193-#196, all four deployments including migration 89, the live F1-F3 tests and both rolled-back timing runs; Groq key revocation and the 120-minute default recorded | Still needed: push and merge of this docs branch; any production write-test; formal beta acceptance | Partly |
 | 12 | Controlled-beta acceptance formally justified | REQUIRES PROJECT OWNER APPROVAL | This package | The owner has not recorded acceptance | No — pending the owner |
 
@@ -467,7 +603,9 @@ are fixed and verified live, section 4.3); the departure date is derived from th
 number of days, so a tourist who wants to leave on a particular date must set the
 days correctly (the live hint shows the result); a departure time without an
 arrival date counts the last day from today; the departure journey time is an
-estimate, not a routed time.
+estimate, not a routed time; the content of generated plans is largely sample data, and a last day can include a long drive (observation, section 6.4).
+
+**Observations from the supervised submission (not confirmed defects):** all five stops carried sample-data labels; day 3 included a 73 km (120 to 180 min) outbound drive for a 90-minute visit before the flight, within every rule; the Day 3 Google Maps link covers the stops but not the airport leg (section 6.4).
 
 **Residual risks:** the chatbot guard is heuristic (§4.1 limits); Groq rate
 limits or outages (falls back to rules, not seen live); **no load or concurrent-use testing was
@@ -516,7 +654,7 @@ investigation; nothing was modified.
 
 **Evidence-based recommendation: GO for a limited controlled beta on
 `7e856ff`, subject to the owner recording acceptance. NOT "everything is
-done":** criteria 7 and 8 are only partly satisfied and 11 and 12 need the
+done":** criteria 3, 7, 8 and 10 are only partly satisfied and 11 and 12 need the
 owner.
 
 Before the beta opens:
@@ -524,9 +662,10 @@ Before the beta opens:
 1. Owner confirms the performance limits (section 5, especially far-distance
    planning with a departure at p95 about 4.3 s, single-user only) and the
    chatbot limits (section 4.3), or asks for an improvement first.
-2. Optional: a supervised persistent departure submission through the live form
-   (writes a test itinerary; needs separate approval) to close the remaining gap
-   in criterion 8.
+2. Done on 2026-11-04: a supervised persistent departure submission through the
+   live form (section 6.4). Owner decision still needed: keep or delete the QA
+   records (preference 723, itinerary `01a1a5c8-...`), and whether a typed
+   departure place should also be tested through the planner.
 3. Owner approves pushing and merging this documentation branch.
 4. Owner records formal acceptance in section 11.
 
