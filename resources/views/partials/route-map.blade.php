@@ -69,7 +69,7 @@
                     .then(function (res) { return res.json(); })
                     .then(function (data) {
                         if (data.code !== 'Ok' || !data.routes || !data.routes.length) {
-                            summaryEl.textContent = 'Turn-by-turn directions are not available for this route right now.';
+                            summaryEl.textContent = 'Step-by-step directions are not available for this route right now.';
                             return;
                         }
                         var route = data.routes[0];
@@ -101,7 +101,7 @@
                         });
                     })
                     .catch(function () {
-                        summaryEl.textContent = 'Turn-by-turn directions are not available right now.';
+                        summaryEl.textContent = 'Step-by-step directions are not available right now.';
                     });
             }
 

@@ -135,11 +135,40 @@
                 <div class="panel-head"><div><h2>4. Outside services and where data is stored</h2></div></div>
                 <div class="panel-body legal-content">
                     <ul>
-                        <li><strong>Maps and directions.</strong> Maps are drawn with tiles from
-                            OpenStreetMap, and the route and turn-by-turn directions on an itinerary page
-                            are requested from a public OpenStreetMap-based routing service, which receives
-                            the coordinates of the stops (not your name). Like any website you visit, these
-                            services can see your IP address.</li>
+                        <li><strong>Map images (OpenStreetMap).</strong> The maps on the site are drawn
+                            from small map images loaded from OpenStreetMap's public tile servers. Your
+                            browser contacts those servers directly; ExploreDVO does not pass the request
+                            through its own server. Each request tells OpenStreetMap your IP address, your
+                            browser type, the website the request came from (the site's address, not the
+                            specific page) and which part of the map you are looking at. If your itinerary
+                            map is centred to include your starting point, that area is what is requested;
+                            the starting point itself is not sent as coordinates.</li>
+                        <li><strong>Routes and directions (OSRM).</strong> When you open the directions
+                            for a day on an itinerary page, your browser asks the public routing server of
+                            the OSRM project (router.project-osrm.org) for the route. The request contains
+                            the map coordinates of that day's planned places, in order: the attractions, and
+                            also the meals, shops and lodging that the itinerary lists for that day. It does
+                            not contain your name or your own starting point. As with any request, the
+                            routing server also sees your IP address, your browser type and the website the
+                            request came from. This is a free public server run by others; ExploreDVO does
+                            not control it and cannot guarantee that it is available.</li>
+                        <li><strong>Fonts (Google Fonts).</strong> The text styles used on the site
+                            (Poppins, Alfa Slab One and Caveat) are loaded from Google's font servers on
+                            every page. Your browser contacts those servers directly and they receive your
+                            IP address, your browser type, the website the request came from and the font
+                            files requested.</li>
+                        <li><strong>Google Maps links (only if you click).</strong> Each day of an
+                            itinerary has an "Open Day N in Google Maps" link. Nothing is sent to Google
+                            until you click it. When you do, Google Maps opens in a new tab and receives, in
+                            the link, the coordinates of that day's planned places (or the name and address
+                            of a place that has no coordinates) in order, but not your starting point or
+                            your name. Google handles that under its own terms.</li>
+                        <li><strong>About these outside services.</strong> OpenStreetMap, OSRM, Google
+                            Fonts and Google Maps are run by independent third parties, not by ExploreDVO or
+                            DOT Region XI. They handle the information above under their own policies;
+                            ExploreDVO does not control how long they keep it or where they process it, and
+                            this policy does not describe that. ExploreDVO does not send them your name,
+                            email or browser token.</li>
                         <li><strong>Address search.</strong> If you type an address as your starting point,
                             the text you type is sent from our server to @if (filled(config('services.geoapify.key')))
                             Geoapify's address search service (outside the Philippines) @else

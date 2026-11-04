@@ -306,7 +306,7 @@
 
                                         @if (count($plottable) >= 2)
                                             <details>
-                                                <summary class="btn btn-outline" style="display:inline-block; cursor:pointer;">View turn-by-turn directions for Day {{ $day }}</summary>
+                                                <summary class="btn btn-outline" style="display:inline-block; cursor:pointer;">View planned route for Day {{ $day }}</summary>
                                                 <div style="margin-top:12px;">
                                                     @include('partials.route-map', ['stops' => $plottable, 'mapId' => 'route-day-'.$day])
                                                 </div>
