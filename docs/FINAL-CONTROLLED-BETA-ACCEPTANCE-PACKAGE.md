@@ -1,6 +1,6 @@
 # ExploreDVO — Final Controlled-Beta Acceptance Package
 
-Date: 2026-11-04. Production: `bc35db1` (PR #194, code-only deploy, verified; previously `ea9648f` / PR #193 and `02424d3`). This
+Date: 2026-11-04. Production: `c303912` (PR #195 merge, code-only deploy with migration 89, verified; previously `bc35db1` / PR #194, `ea9648f` / PR #193, `02424d3`). This
 package assembles the evidence for formal acceptance. **It signs nothing and
 records no approval for anyone who has not given it.**
 
@@ -11,12 +11,15 @@ deploy). No key or `.env` value appears in any of them (scanned).
 ## 1. Disposition
 
 ExploreDVO is **technically ready for a limited controlled beta on the
-deployed baseline (`bc35db1`)** and is **not formally accepted**: the owner has
-not recorded acceptance. The three chatbot findings (F1–F3) are fixed on
-production and **verified live** (§4.3: 29 cases, 29 pass on the checks, no
-leak, no invented fact). The departure-aware scheduling feature is built,
-reviewed and tested on an integrated tree (1,497 tests, 0 failures) but is
-**not merged, migrated or deployed**; it is optional for the beta (§6).
+deployed release `c303912`** and is **not formally accepted**: the owner has
+not recorded acceptance. The three chatbot findings (F1-F3) are fixed and
+**verified live** (section 4.3: 29 cases). Departure-aware scheduling (PR #195) is
+now **merged and deployed**, with migration 89 applied and verified (section 2),
+and its planner timing was measured on production in rolled-back transactions
+(section 5.1). Its behaviour with a real tourist form submission has not been
+exercised on production (that writes data and was not authorised), and the
+far-distance cases with a departure are slower than the target at p95
+(section 5.1). Nothing here is "everything is done".
 
 Project-owner statements recorded here (2026-11-04):
 
@@ -32,13 +35,15 @@ Project-owner statements recorded here (2026-11-04):
 
 | Item | Value |
 |---|---|
-| Commit | `bc35db1` (PR #194 merged), code-only deploy, no `-RefreshEmbeddings`; 88 migrations, none new |
+| Commit | `c303912` (merge of PR #195), code-only deploy from a clean detached worktree; the prompt showed "Will deploy : origin/main c303912" and "Embeddings  : left as they are (code-only deploy)"; no `-RefreshEmbeddings` |
+| Migration | `2026_11_04_000100_add_departure_to_preferences`, 10 ms. **89 migrations** (was 88). Five columns on `tourist_preferences`, **all nullable, all NULL** in the 146 existing rows: `departure_date` (date), `departure_time` (time), `departure_lat`, `departure_lng` (numeric), `departure_label` (varchar) |
 | Destinations / accommodations / restaurants / souvenir centres | 151 / 255 / 81 / 32 |
-| Embeddings | 151 destination, 8 interest; hashes identical before and after each deploy and after the live chatbot test (`docs/evidence/pre_deploy_hashes.txt`, `post_deploy_hashes.txt`, `emb_check.json`) |
-| Exit surveys / visits / itineraries | 788 (787 simulated, 1 genuine) / 2,605 / 287, unchanged |
+| Embeddings | 151 destination, 8 interest; hashes identical before and after the deploy and after the timing runs (`docs/evidence/pre_dep_hashes.txt`, `post_dep_hashes.txt`, `post_deptime_hashes.txt`, `emb_check.json`) |
+| Exit surveys / visits / itineraries / tourist preferences | 788 (787 simulated, 1 genuine) / 2,605 / 287 / 146, unchanged by the deploy and by both timing runs |
+| `chatbot_logs` | 186 rows (29 added earlier by the authorised live chatbot test) |
 | Apriori batch | `demo-apriori-nearby-pairings-2026-11` |
-| Pre-deploy backup | `pre-deploy-20261103-181157-bc35db1.sql.gz` (earlier: `…174919-ea9648f`, `…165422-02424d3`) |
-| `chatbot_logs` | 186 rows (29 added by the authorised live test; only table that changed) |
+| Pre-deploy backup | `pre-deploy-20261104-071231-c303912.sql.gz` (gzip verified, 50 table blocks, 151 embedding rows). Earlier: `...20261103-181157-bc35db1`, `...174919-ea9648f`, `...165422-02424d3` |
+| Pages after deploy | `/`, `/destinations`, `/accommodations`, `/plan/start`, `/advisories`, `/portal/login`: HTTP 200 (script check and an outside check on the public host); `/restaurants` 200. No new Laravel errors (log unchanged at 670 lines) |
 
 ## 3. Workstream results summary
 
@@ -48,10 +53,9 @@ Project-owner statements recorded here (2026-11-04):
   The final live check (§4.3) passed all 29 cases.
 - **Performance (A):** every approved target met on repeated single-user
   samples (§5); no concurrency or load evidence exists.
-- **Departure-aware scheduling (B):** implemented locally on branch
-  `feature/departure-aware-scheduling`; **not merged, not deployed**, needs a
-  migration run and a deployment approval. The 120-minute allowance is the
-  owner's preferred default (§6).
+- **Departure-aware scheduling (B):** PR #195 merged (`c303912`) and deployed
+  code-only with migration 89 on owner approval. The 120-minute allowance is the
+  owner's preferred default. Production planner timing with a departure: section 5.1.
 
 ## 4. Chatbot live verification (production, 2026-11-04)
 
@@ -249,7 +253,49 @@ Other evaluations:
 Single machine, one location, a small sample: this supports "targets met
 under light single-user use". It is **not** load-test readiness.
 
-## 6. Departure-aware itinerary scheduling (branch, not deployed)
+### 5.1 Departure-aware planning on production (rolled back, `c303912`)
+
+Authorised rolled-back test (`docs/evidence/prod_timing_dep.php`, results in
+`prod_timing_dep.json`). The same 24 scenarios as the earlier timing (near,
+moderate, far x 4 interest sets x 2 and 3 days, arrival 09:00, Saturday
+start, starting point Davao airport), but **each with an explicit departure date
+(last day of the trip), a departure time (10:30, 14:00, 17:30 or 21:00, one per
+interest set) and Davao International Airport as the departure point**. Each
+scenario ran twice inside a transaction that was rolled back.
+
+| Range | Without departure p50 / p95 / max | **With departure p50 / p95 / max** |
+|---|---|---|
+| Near (n = 16) | 0.69 / 1.00 / 1.07 s | **0.78 / 1.58 / 1.65 s** |
+| Moderate (n = 16) | 0.96 / 1.17 / 1.36 s | **0.91 / 1.24 / 1.36 s** |
+| **Far (n = 16)** | 2.59 / 2.93 / 4.13 s | **2.44 / 4.25 / 4.57 s** |
+| All (n = 48) | 1.02 / 2.83 / 4.13 s | **1.05 / 4.05 / 4.57 s** |
+
+- **No persistent change:** `tourist_preferences` 146, `itineraries` 287 and
+  `itinerary_items` 7,037 before and after; the full hash set (embeddings,
+  catalogue, surveys, visits, chatbot logs) is identical before and after
+  (`pre_deptime_hashes.txt`, `post_deptime_hashes.txt`); the temporary script
+  was removed from the server; no new Laravel error. (Database id sequences
+  advance on a rolled-back insert; no row remains.)
+- **Deterministic:** all 24 scenarios produced identical itineraries on both
+  runs. **24 of 24 itineraries ended with a "Departure from Davao
+  International Airport" row, and none reported that the allowance could not
+  be met.**
+- **Queries per generation:** 98 to 494 (the non-departure maximum was 389).
+- **Departure-time effect:** the far-distance cases with the earliest
+  departure (10:30) were the slowest, 3.1 to 4.6 s per run, because the
+  planner searches more candidate stops for a short final day; far cases with
+  later departures were 2.0 to 4.3 s. Near and moderate cases were close to the
+  non-departure timings.
+- **Reading this honestly:** the itinerary p50 target (< 3 s) is met in every
+  range (far p50 2.44 s). The far-distance **p95 (4.25 s) and max (4.57 s) are
+  above 3 s**, worse than without a departure (2.93 s / 4.13 s), and a handful
+  of far cases take 3 to 4.6 s. This is a small sample (16 runs per range) on
+  one server with no load. It is the most likely place for a slow request in
+  the beta and is on the watch list.
+- **Not measured:** an HTTP `POST /plan` with the departure form and the live
+  address lookup (writes rows; not authorised), and concurrent use.
+
+## 6. Departure-aware itinerary scheduling (merged and deployed in `c303912`)
 
 Branch `feature/departure-aware-scheduling` (commits `560818b`, `6eda166`).
 `git merge-tree` against `bc35db1` is conflict-free. Final review (2026-11-04)
@@ -298,7 +344,7 @@ recorded reason; flexible and arrival-only trips unchanged.
   departure, a planning allowance and not an airline or airport rule. The
   journey is an estimate… not a routed time."; an unplaced stop was omitted
   with a stated reason; at 375 px there was no horizontal overflow.
-- **Merge and deployment plan (NOT executed; each step needs its own approval):**
+- **Merge and deployment plan: EXECUTED 2026-11-04 on owner approval (PR #195 merged as `c303912`, deployed; results in sections 2 and 5.1):**
   1. Push the branch and open a PR to `main`; review; merge (owner).
   2. Take a fresh pre-deploy backup (the deploy script does this).
   3. Run `deploy/deploy.ps1` from a clean worktree at the merge commit, code-only
@@ -330,7 +376,7 @@ environment errors, not failures; no CI run is recorded in this package.
 | Chatbot fix PR #193 (`c1db529`, 22 new tests) | 1,452 | 12,504 | 0 | 5 (GD) |
 | PR #194 on top (`86061fc`, 16 new tests) = deployed `bc35db1` | 1,468 | 12,560 | 0 | 5 (GD) |
 | Departure feature `feature/departure-aware-scheduling` alone (29 new) | 1,459 | 12,525 | 0 | 5 (GD) |
-| **`bc35db1` + departure feature (local merge `b3a4cf0`)** | **1,497** | **12,687** | **0** | **5 (GD)** |
+| **`c303912` = `bc35db1` + departure feature (merged tree identical to local merge `b3a4cf0`)** | **1,497** | **12,687** | **0** | **5 (GD)** |
 
 (The earlier figure of 23 new tests for #193 was a miscount; the file has 22.)
 The 5 errors are `LogicException: GD extension is not installed` in
@@ -345,17 +391,17 @@ PROJECT OWNER APPROVAL.
 
 | # | Criterion | Status | Evidence | Gap | Genuinely satisfied? |
 |---|---|---|---|---|---|
-| 1 | Required features implemented and working | PARTIALLY COMPLETE | Deployed baseline live (§2); departure feature built, reviewed, 1,497-test integrated run, live-style UI journey locally (§6) | Departure-aware scheduling is not merged, migrated or deployed | Yes for the deployed baseline; the departure feature is not shipped |
+| 1 | Required features implemented and working | COMPLETE | Baseline plus departure-aware scheduling deployed (`c303912`, section 2); 1,497-test run; 24 of 24 production-generated itineraries with a departure ended at the departure point (section 5.1) | A real tourist form submission with a departure was not exercised on production (writes data; not authorised) | Yes, with that caveat |
 | 2 | Critical/High defects resolved | COMPLETE | No Critical/High known. F1/F2 (Medium) and F3 (Low) fixed and verified live on `bc35db1` (§4.3) | None open. Known minor: F1-09 hedged wording, single-place comparisons | Yes |
 | 3 | Full regression passes | COMPLETE | §7: 0 failures on `bc35db1` (1,468) and on `bc35db1` + departure (1,497) | 5 environmental GD-extension errors, reported as errors, not passes; no CI run recorded here | Yes, with that caveat |
 | 4 | Live production independently verified | COMPLETE | §2, §4.3, §5; commit, migrations, counts, hashes, logs checked read-only | None | Yes |
-| 5 | Embeddings correct | COMPLETE | 151 destination + 8 interest vectors, `nomic-embed-text`, 768 dims, no non-finite values, norms 0.999999–1.000001, no orphans, none missing, hashes unchanged (`emb_check.json`) | None. Three destinations (Elysia Wellness Spa, ids 22–24) share one vector (149 unique of 151): intentional, see §9.1 | Yes |
+| 5 | Embeddings correct | COMPLETE | 151/8 vectors, `nomic-embed-text`, 768 dims, no non-finite values, norms 0.999999 to 1.000001, no orphans, none missing, hashes unchanged through the deploy and both timing runs (`emb_check.json`) | None. Three destinations (Elysia Wellness Spa, ids 22-24) share one vector (149 unique of 151): intentional, section 9.1 | Yes |
 | 6 | Chatbot passes live API tests | COMPLETE | §4.3: 29 live cases, F1 15/15, F2 7/7, F3 4/4, other 3/3; 29 log rows and nothing else written | Heuristic guard; one run per case; no live 429/timeout seen; cannot detect an invented listing whose name is not in the database | Yes, within those limits |
-| 7 | Performance measured and acceptable | PARTIALLY COMPLETE | §5: re-measured on `bc35db1`; pages p95 0.995 s, itinerary p50 0.86 s, rank p50 0.08 s, chatbot p50 0.57 s / 1.68 s | No concurrency, load or window-based 5xx evidence; no HTTP `POST /plan` timing; far-distance planning p50 2.47 s, p95 3.19 s | Yes for light single-user use; not for load |
-| 8 | Planner/UI integration without regressions | PARTIALLY COMPLETE | Baseline live and unchanged; departure UI journey verified locally on desktop and 375 px | Departure UI not on production | Yes for the baseline |
+| 7 | Performance measured and acceptable | PARTIALLY COMPLETE | Section 5: pages p95 0.995 s; itinerary p50 0.86 to 1.02 s overall; far-distance p50 2.4 to 2.6 s; with a departure far p50 2.44 s (section 5.1); chatbot p50 0.57 s / 1.68 s | **Far-distance p95 4.25 s and max 4.57 s with a departure, above 3 s**; no concurrency, load or window-based 5xx evidence; no HTTP `POST /plan` timing | Yes for light single-user use; not for load |
+| 8 | Planner/UI integration without regressions | PARTIALLY COMPLETE | Baseline unchanged; pages 200 after deploy; departure UI journey verified locally on desktop and 375 px; production generator verified with departures (section 5.1) | The departure form submitted on production, with its address lookup, has not been observed | Yes for the baseline; departure form verified locally only |
 | 9 | Apriori governance decided and approved | COMPLETE | Option A finalized by the owner; production wording "(2 trips, including simulated demonstration trips)" (787 of 788 surveys simulated) | DOT acknowledgment only for DOT-facing claims; not fabricated | Yes |
-| 10 | Backup, rollback, release procedures verified | COMPLETE | Backups exist for every deploy (latest `pre-deploy-20261103-181157-bc35db1.sql.gz`); deploys were code-only; rollback target is `ea9648f`, previous release, and the departure plan has its own rollback (§6) | Backup restore was not rehearsed | Yes |
-| 11 | Required approvals obtained | REQUIRES PROJECT OWNER APPROVAL | Approvals on record for PR #193/#194, both deployments and the live F1–F3 tests; Groq key revocation and 120-minute default recorded | Still needed: merge, migration and deployment of the departure feature (if wanted for the beta); push/merge of this docs branch | Partly |
+| 10 | Backup, rollback, release procedures verified | COMPLETE | Backups for every deploy (latest `pre-deploy-20261104-071231-c303912.sql.gz`, gzip-tested); deploys code-only; rollback target `bc35db1` (new nullable columns can stay; `down()` drops them) | Backup restore was not rehearsed | Yes |
+| 11 | Required approvals obtained | REQUIRES PROJECT OWNER APPROVAL | Approvals on record for PR #193, #194, #195, all three deployments including migration 89, the live F1-F3 tests and both rolled-back timing runs; Groq key revocation and 120-minute default recorded | Still needed: push and merge of this docs branch; any production write-test; formal beta acceptance | Partly |
 | 12 | Controlled-beta acceptance formally justified | REQUIRES PROJECT OWNER APPROVAL | This package | The owner has not recorded acceptance | No — pending the owner |
 
 ## 9. Beta scope, restrictions, limitations and risks
@@ -366,7 +412,7 @@ with its simulated-data disclosure.
 
 **Restrictions:** no claim that recommendations reflect real visitor
 behaviour; sample listings stay labelled; no DOT endorsement claim; no
-departure-time promise until §6 ships.
+claim that departure times are guaranteed: the journey time is an estimate.
 
 **Known limitations:** the data is largely sample or simulated (787 of 788
 surveys); travel times are estimates, not routed; 7 region labels and 8
@@ -376,7 +422,7 @@ are fixed and verified live, §4.3).
 
 **Residual risks:** the chatbot guard is heuristic (§4.1 limits); Groq rate
 limits or outages (falls back to rules, not seen live); unknown behaviour under
-concurrent use; far-distance planning at p95 about 3.2 s; accreditation dates
+concurrent use; far-distance planning at p95 about 3 s without a departure and 4.3 s with one (max 4.6 s); accreditation dates
 in the data expire and a refresh is needed; chat messages are stored in
 `chatbot_logs` and should be covered by the privacy notice.
 
@@ -385,8 +431,8 @@ HTTP 5xx in the nginx log; track the share of `chatbot_logs` rows ending in
 `:ai` against the rule-based rows; time a far-distance plan weekly.
 
 **Rollback:** redeploy the previous release with `deploy/deploy.ps1`
-(previous release `ea9648f`; operator to confirm); restore from
-`pre-deploy-20261103-181157-bc35db1.sql.gz` only if data changed (none did
+(previous release `bc35db1`); restore from
+`pre-deploy-20261104-071231-c303912.sql.gz` only if data changed (none did
 in the last deploy). Embeddings are opt-in and untouched.
 
 **Stop conditions (pause the beta if any occurs):** a sustained 5xx
@@ -409,18 +455,20 @@ investigation; nothing was modified.
 
 ## 10. Go / no-go
 
-**Evidence-based recommendation: GO for a limited controlled beta on the
-deployed baseline `bc35db1`, subject to the owner recording acceptance. NOT
-"everything is done":** criteria 1, 7 and 8 are only partly satisfied and 11
-and 12 need the owner.
+**Evidence-based recommendation: GO for a limited controlled beta on
+`c303912`, subject to the owner recording acceptance. NOT "everything is
+done":** criteria 7 and 8 are only partly satisfied and 11 and 12 need the
+owner.
 
 Before the beta opens:
 
-1. Owner decides whether the departure feature is in the beta. If yes: PR,
-   merge, migration and deployment per §6, each approved separately; if no, the
-   beta runs without departure-time planning and says so.
-2. Owner accepts the performance limits (§5) and the chatbot limits (§4.3).
-3. Owner records formal acceptance in §11.
+1. Owner accepts the performance limits (section 5, especially far-distance
+   planning with a departure at p95 about 4.3 s) and the chatbot limits
+   (section 4.3), or asks for a performance improvement first.
+2. Optional: a supervised test of the departure form on production (writes a
+   test itinerary; needs separate approval) to close criterion 8.
+3. Owner approves pushing and merging this documentation branch.
+4. Owner records formal acceptance in section 11.
 
 ## 11. Project-owner acceptance sheet (unsigned)
 
@@ -430,7 +478,8 @@ Before the beta opens:
 | Groq key revocation | Confirmed by the project owner 2026-11-04; replacement configured in production |
 | Performance evidence (§5) accepted as sufficient for a limited beta | ☐ Yes ☐ No |
 | Departure feature: allowance | 120 minutes, owner's preferred default (2026-11-04) |
-| Departure feature: push/PR, merge, migration, deployment (separate approvals, §6) | ☐ Approve ☐ Defer |
+| Departure feature: PR #195 merged, deployed with migration 89 (`c303912`), timing measured | Done 2026-11-04 on owner approval (sections 2 and 5.1) |
+| Far-distance p95 with a departure (about 4.3 s) accepted for the beta | ☐ Yes ☐ Improve first |
 | Beta scope and restrictions (§9) accepted | ☐ Yes ☐ No |
 | Rollback arrangements accepted | ☐ Yes ☐ No |
 | **Formal controlled-beta approval** | ☐ Granted ☐ Not granted |
