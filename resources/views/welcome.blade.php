@@ -419,6 +419,7 @@
 </div>{{-- /.hero-screen --}}
 
 @include('partials.mood-cards')
+@include('partials.culinary-highlights')
 
 @php
     // Scene mapping now lives on Destination::illustrationScene() -- reused

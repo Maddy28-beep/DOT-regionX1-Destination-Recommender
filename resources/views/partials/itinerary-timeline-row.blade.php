@@ -38,12 +38,6 @@
     $photo = $listing?->coverPhoto();
     $realPhoto = $photo && ! str_ends_with(strtolower($photo->path), '.svg') ? $photo : null;
 
-    // "Nature walks and leisure activities — Malagos Garden Resort": the name is the card's title, the rest is what you do.
-    $what = $item->title;
-    if ($listing && str_contains($what, ' — '.$listing->name)) {
-        $what = trim(str_replace(' — '.$listing->name, '', $what));
-    }
-
     // A card whose place is sample data says so: a destination stop, a meal restaurant, a souvenir stop and the
     // night's stay alike. A name that already carries "[SAMPLE]" says it itself, and a card with a
     // "popular pairing" line already gets that line's label, so neither gets a second one.
@@ -86,6 +80,19 @@
     }
     $askedSetting = ($preference?->accommodation_pref ?? null) === 'Resort' ? ($preference->resort_setting ?? null) : null;
     $stayMatches = $askedSetting && in_array($askedSetting, $stayTags, true);
+
+    // "Nature walks and leisure activities — Malagos Garden Resort": the name is the card's title, the rest is what you do.
+    $what = $item->title;
+    if ($listing && str_contains($what, ' — '.$listing->name)) {
+        $what = trim(str_replace(' — '.$listing->name, '', $what));
+    }
+
+    // A stop's price band against the band the traveller chose (the same order the audit's budget check uses). Nothing is
+    // said when either is unknown: an unpriced place is not "within" a budget, it just has no claim.
+    $tierOrder = ['Free' => 0, 'Budget-Friendly' => 1, 'Mid-range' => 2, 'Premium' => 3];
+    $budgetLimit = $tierOrder[$preference?->budget ?? null] ?? null;
+    $stopTier = $kind === 'activity' && $item->destination_id ? ($tierOrder[$listing?->price_tier ?? null] ?? null) : null;
+    $withinBudget = $budgetLimit !== null && $stopTier !== null && $stopTier <= $budgetLimit;
 
     $icon = match ($kind) {
         'baseline', 'departure' => 'map-pin',
@@ -158,6 +165,9 @@
                             <p class="tl-card__label">{{ $accreditationLabel }}</p>
                         @endif
                         <p class="tl-card__what">{{ $what }}</p>
+                        @if ($withinBudget)
+                            <p class="tl-card__tags"><span class="tl-tag tl-tag--match"><x-icon name="check" /> Within your budget</span></p>
+                        @endif
                     @elseif ($isStay && $route)
                         {{-- The night's stay is named, like every other stop, instead of only "Overnight stay". --}}
                         <h4><a href="{{ route($route, $listing) }}">{{ $listing->name }}</a>@if ($sampleCue)<x-sample-tag label="Sample data" title="Sample data, not DOT-verified: this place's accreditation number is a placeholder, not an official DOT number." />@endif</h4>

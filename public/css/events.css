@@ -242,3 +242,5 @@
     .event-card__stub { flex-basis: 78px; }
     .event-card__day { font-size: 2.1rem; }
 }
+.event-card__day--tba { font-size: 1.7rem; }
+.events-detail a.event-card__add { display: inline-block; text-decoration: none; }
