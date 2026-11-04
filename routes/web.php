@@ -231,6 +231,7 @@ Route::prefix('portal/admin')->name('admin.')->middleware(['auth:admin', \App\Ht
     Route::post('/data-completeness/{type}/{id}', [\App\Http\Controllers\Admin\AdminDataCompletenessController::class, 'fix'])->name('data-completeness.fix');
     Route::get('/reports', [AdminDashboardController::class, 'reports'])->name('reports');
     Route::get('/reports/export.csv', [AdminDashboardController::class, 'exportCsv'])->name('reports.export-csv');
+    Route::get('/feedback-analysis', [\App\Http\Controllers\Admin\AdminFeedbackAnalysisController::class, 'index'])->name('feedback-analysis');
     Route::get('/reports/print', [AdminDashboardController::class, 'printReport'])->name('reports.print');
 
     // Tourism Information Management (2.2.3.1.2)

@@ -364,7 +364,11 @@ class EstablishmentDashboardController extends Controller
 
         $reviews = $listing ? $listing->reviews()->latest()->paginate(10) : null;
 
-        return view('establishment.reviews', compact('establishment', 'listing', 'reviews'));
+        $stats = app(\App\Services\Feedback\ReviewStatistics::class)->analyse(
+            $listing ? $listing->reviews()->get(['rating', 'service_rating', 'amenities_rating', 'created_at']) : []
+        );
+
+        return view('establishment.reviews', compact('establishment', 'listing', 'reviews', 'stats'));
     }
 
     /** The reply form: a modal where JavaScript is on, a page otherwise. */

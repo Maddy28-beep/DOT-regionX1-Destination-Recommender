@@ -42,6 +42,12 @@
         @error('rating')
             <div class="alert alert-error">{{ $message }}</div>
         @enderror
+        @error('service_rating')
+            <div class="alert alert-error">{{ $message }}</div>
+        @enderror
+        @error('amenities_rating')
+            <div class="alert alert-error">{{ $message }}</div>
+        @enderror
 
         <fieldset class="review-form__rating">
             <legend>Your rating of {{ $listing->name }}</legend>
@@ -61,6 +67,24 @@
             </div>
             <span class="star-input__word" data-star-word data-words='@json($ratingWords)'>{{ $ratingWords[$chosen] ?? 'Tap a star to rate' }}</span>
         </fieldset>
+
+        {{-- Optional extra ratings. Same radio-star pattern; a second click on the chosen star clears it (app.js). --}}
+        @foreach (['service_rating' => 'Service', 'amenities_rating' => 'Amenities'] as $field => $aspectLabel)
+            @php $aspectChosen = (int) old($field, 0); @endphp
+            <fieldset class="review-form__rating review-form__rating--aspect">
+                <legend>{{ $aspectLabel }} <span class="field-hint">(optional)</span></legend>
+                <div class="star-input" data-star-input data-star-optional>
+                    @foreach ([5, 4, 3, 2, 1] as $value)
+                        <input type="radio" name="{{ $field }}" id="{{ $field }}-{{ $listing->id }}-{{ $value }}" value="{{ $value }}"
+                               @checked($aspectChosen === $value)>
+                        <label for="{{ $field }}-{{ $listing->id }}-{{ $value }}" title="{{ $aspectLabel }}: {{ $value }} &mdash; {{ $ratingWords[$value] }}">
+                            <x-icon name="star" />
+                            <span class="sr-only">{{ $aspectLabel }}: {{ $value }} &mdash; {{ $ratingWords[$value] }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            </fieldset>
+        @endforeach
 
         <div class="field">
             <label for="comment-{{ $listing->id }}">Anything you would tell another traveler? (optional)</label>
