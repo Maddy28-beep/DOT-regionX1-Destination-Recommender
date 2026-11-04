@@ -8,7 +8,7 @@
         <div class="container">
             <div>
                 <h1>Terms of Service</h1>
-                <div class="sub">Last updated {{ \Illuminate\Support\Carbon::parse('2026-09-01')->format('F j, Y') }}</div>
+                <div class="sub">Last updated {{ \Illuminate\Support\Carbon::parse('2026-11-04')->format('F j, Y') }}</div>
             </div>
         </div>
     </div>

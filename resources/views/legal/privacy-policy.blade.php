@@ -8,7 +8,7 @@
         <div class="container">
             <div>
                 <h1>Privacy Policy</h1>
-                <div class="sub">Last updated {{ \Illuminate\Support\Carbon::parse('2026-10-15')->format('F j, Y') }} &middot; what ExploreDVO collects, why, how long it is kept, and how to reach us about it.</div>
+                <div class="sub">Last updated {{ \Illuminate\Support\Carbon::parse('2026-11-04')->format('F j, Y') }} &middot; what ExploreDVO collects, why, how long it is kept, and how to reach us about it.</div>
             </div>
         </div>
     </div>

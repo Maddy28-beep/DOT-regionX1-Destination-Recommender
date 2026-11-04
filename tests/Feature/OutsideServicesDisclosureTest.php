@@ -58,6 +58,10 @@ class OutsideServicesDisclosureTest extends TestCase
 
         // No retention period or legal-compliance claim was added for the outside providers.
         $this->assertStringNotContainsString('comply with', $text);
+
+        // The approved text dates the change to its publication day.
+        $this->assertStringContainsString('Last updated November 4, 2026', $text);
+        $this->assertStringContainsString('Last updated November 4, 2026', $this->text(route('legal.terms')));
     }
 
     public function test_terms_have_the_approved_section_four_correction_and_outside_services_section(): void
