@@ -1,0 +1,15 @@
+{
+    "format": 1,
+    "generated_at": "2026-11-04T19:04:51+00:00",
+    "count": 1,
+    "sha256": "f518f255e6d2ea8ba702879c01443861e9486a30613e91374a4822540f691caf",
+    "entries": [
+        {
+            "kind": "souvenir_center",
+            "id": 1,
+            "slug": "seq-craft-sample",
+            "name": "Seq Craft [SAMPLE]",
+            "number": "SAMPLE-0004"
+        }
+    ]
+}

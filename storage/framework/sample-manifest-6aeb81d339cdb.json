@@ -1,0 +1,15 @@
+{
+    "format": 1,
+    "generated_at": "2026-11-04T19:04:51+00:00",
+    "count": 1,
+    "sha256": "f1e3cc13c765c69cab7d07e2a2e0446583de09c6b2005ab1923401b3637a22a9",
+    "entries": [
+        {
+            "kind": "destination",
+            "id": 1,
+            "slug": "seq-falls-sample",
+            "name": "Seq Falls [SAMPLE]",
+            "number": "SAMPLE-0001"
+        }
+    ]
+}
