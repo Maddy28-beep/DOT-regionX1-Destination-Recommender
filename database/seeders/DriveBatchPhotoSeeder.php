@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 /**
  * Imports the 2026-11 team photo batch (database/data/listing-photos/drive-2026-11) for beta testing.
  *
- * Listings are found by EXACT NAME across destinations, accommodations, restaurants, souvenir centers, tour operators
+ * Listings are found by EXACT NAME (and kind, when the entry gives one) across destinations, accommodations, restaurants, souvenir centers, tour operators
  * and packages, because ids differ between installations. A name that matches no listing, or more than one, is skipped
  * and reported, so a photo is never attached to a guess. The first real photo of a listing becomes its primary picture;
  * later ones are added behind it, and an existing real photo always stays primary. Safe to run repeatedly (a picture is
@@ -40,7 +40,8 @@ class DriveBatchPhotoSeeder extends Seeder
             }
 
             $matches = [];
-            foreach (self::KINDS as $kind) {
+            // An entry may name its kind when the same name exists as more than one kind of listing.
+            foreach (isset($entry['kind']) ? [$entry['kind']] : self::KINDS as $kind) {
                 $class = 'App\\Models\\'.$kind;
                 foreach ($class::where('name', $entry['name'])->get() as $listing) {
                     $matches[] = $listing;
