@@ -18,6 +18,22 @@
     <div class="adm-card">
         <div class="adm-card__head">
             <div>
+                <h2>Feedback analysis</h2>
+                <p>Statistics from all {{ $stats['review_count'] }} {{ \Illuminate\Support\Str::plural('review', $stats['review_count']) }} of your listing. Service and Amenities are optional, so they can have fewer ratings than the overall score.</p>
+            </div>
+        </div>
+        <div class="adm-card__body">
+            @if ($stats['review_count'] === 0)
+                <p class="ptr-empty">No ratings yet.</p>
+            @else
+                @include('partials.feedback-stats', ['stats' => $stats])
+            @endif
+        </div>
+    </div>
+
+    <div class="adm-card">
+        <div class="adm-card__head">
+            <div>
                 <h2>{{ $reviews->total() }} {{ \Illuminate\Support\Str::plural('review', $reviews->total()) }}</h2>
                 <p>{{ ($listing->review_count ?? 0) > 0 ? 'Average rating '.number_format($listing->rating, 1).' ★ from '.$listing->review_count.' total ratings.' : 'Nobody has rated this listing yet.' }}</p>
             </div>

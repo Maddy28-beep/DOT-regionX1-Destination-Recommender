@@ -1114,6 +1114,17 @@ document.addEventListener('DOMContentLoaded', function () {
         radios.forEach(function (radio) { radio.addEventListener('change', sync); });
         sync();
 
+        // Service / Amenities are optional: clicking the star that is already chosen clears it.
+        form.querySelectorAll('[data-star-optional] input').forEach(function (radio) {
+            var wasChecked = false;
+            var label = form.querySelector('label[for="' + radio.id + '"]');
+            if (!label) { return; }
+            label.addEventListener('mousedown', function () { wasChecked = radio.checked; });
+            label.addEventListener('click', function (e) {
+                if (wasChecked) { e.preventDefault(); radio.checked = false; wasChecked = false; }
+            });
+        });
+
         if (comment && counter) {
             var count = function () { counter.textContent = comment.value.length + '/' + comment.maxLength; };
             comment.addEventListener('input', count);

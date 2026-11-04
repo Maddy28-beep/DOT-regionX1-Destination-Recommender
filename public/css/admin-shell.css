@@ -320,3 +320,20 @@ body.admin .admin-pagehead__actions { display: flex; align-items: center; gap: 8
 .adm-modal__body:has(.adm-rv2) .util-row { position: static; margin: 0 !important; padding: 0; background: none; border: 0; }
 body.admin .admin-sidebar .adm-nb { margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px; display: grid; place-items: center; border-radius: 99px; background: var(--danger); color: #fff; font-size: .66rem; font-weight: 700; }
 @media (max-width: 900px) { .adm-rv2 { grid-template-columns: 1fr; } .adm-rv2__side { border-left: 0; border-top: 1px solid var(--border); } }
+
+/* Feedback analysis (service / amenities ratings): small server-rendered bar charts, no JS. */
+.fb-index { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; }
+.fb-index__score { font-size: 2rem; font-weight: 700; line-height: 1; }
+.fb-index__note { color: var(--muted); font-size: .85rem; }
+.fb-aspects { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.fb-aspect { border: 1px solid var(--border, #dfe7e2); border-radius: 10px; padding: 14px; min-width: 0; }
+.fb-aspect h3 { margin: 0 0 8px; font-size: 1rem; }
+.fb-aspect__empty { color: var(--muted); margin: 0; }
+.fb-stats { width: 100%; border-collapse: collapse; font-size: .85rem; margin: 0 0 10px; }
+.fb-stats th { text-align: left; font-weight: 500; color: var(--muted); padding: 2px 8px 2px 0; }
+.fb-stats td { padding: 2px 0; font-weight: 600; }
+.fb-dist { display: grid; grid-template-columns: 2.4em 1fr 6.5em; align-items: center; gap: 6px 8px; font-size: .8rem; }
+.fb-dist__bar { display: block; height: 10px; border-radius: 99px; background: #e8efeb; overflow: hidden; }
+.fb-dist__bar i { display: block; height: 100%; background: var(--primary); }
+.fb-dist__n { color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+.fb-trend { margin: 10px 0 0; font-size: .82rem; color: var(--muted); }

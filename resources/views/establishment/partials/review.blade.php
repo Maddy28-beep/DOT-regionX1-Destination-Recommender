@@ -6,6 +6,13 @@
         @if (! $review->owner_reply && $review->created_at && $review->created_at->gt(now()->subDays(7)))<span class="status-pill status-active">New</span>@endif
         <small>{{ $review->created_at?->timezone('Asia/Manila')->format('M j, Y') }}</small>
     </div>
+    @if ($review->service_rating || $review->amenities_rating)
+        <p class="ptr-rv__aspects"><small>
+            @if ($review->service_rating)Service {{ $review->service_rating }}/5 @endif
+            @if ($review->service_rating && $review->amenities_rating) &middot; @endif
+            @if ($review->amenities_rating)Amenities {{ $review->amenities_rating }}/5 @endif
+        </small></p>
+    @endif
     @if ($review->comment)<p>{{ $review->comment }}</p>@endif
     @if ($review->owner_reply)
         <div class="ptr-rv__reply"><b>Your reply</b>{{ $review->owner_reply }}</div>

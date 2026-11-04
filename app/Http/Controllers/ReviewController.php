@@ -57,6 +57,9 @@ class ReviewController extends Controller
 
         $data = $request->validate([
             'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            // Optional: the overall rating stays the only required one.
+            'service_rating' => ['nullable', 'integer', 'min:1', 'max:5'],
+            'amenities_rating' => ['nullable', 'integer', 'min:1', 'max:5'],
             'comment' => ['nullable', 'string', 'max:500'],
         ]);
 
@@ -76,6 +79,8 @@ class ReviewController extends Controller
                 'visitor_token' => $token,
                 'author_name' => 'Verified visitor',
                 'rating' => $data['rating'],
+                'service_rating' => $data['service_rating'] ?? null,
+                'amenities_rating' => $data['amenities_rating'] ?? null,
                 'comment' => $data['comment'] ?? null,
             ]);
         } catch (UniqueConstraintViolationException) {

@@ -42,6 +42,7 @@
 
             <div class="group-label">Insights</div>
             <a href="{{ route('admin.reports') }}" class="{{ request()->routeIs('admin.reports') ? 'active' : '' }}"><x-icon name="chart" /><span>Reports &amp; Export</span></a>
+            <a href="{{ route('admin.feedback-analysis') }}" class="{{ request()->routeIs('admin.feedback-analysis') ? 'active' : '' }}"><x-icon name="star" /><span>Feedback Analysis</span></a>
         </aside>
 
         <main class="admin-main" id="admin-main" tabindex="-1">

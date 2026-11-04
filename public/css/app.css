@@ -5327,6 +5327,8 @@ body.mobile-menu-open .survey-invite { visibility: hidden; }
 .review-form__rating legend { padding: 0; margin-bottom: 8px; font-weight: 600; font-size: .9rem; }
 /* Radios are listed 5 to 1 and shown in reverse, so "every star from the left up to the chosen one" is
    just "the chosen label and the ones after it in the markup". */
+.review-form__rating--aspect { margin-bottom: 12px; }
+.review-form__rating--aspect .star-input label svg { width: 26px; height: 26px; }
 .star-input { display: inline-flex; flex-direction: row-reverse; gap: 4px; }
 .star-input input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
 .star-input label { cursor: pointer; color: var(--border); line-height: 0; transition: color .12s ease, transform .12s ease; }
