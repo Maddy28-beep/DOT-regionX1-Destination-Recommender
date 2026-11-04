@@ -65,9 +65,16 @@
                 var summaryEl = document.getElementById('{{ $routeId }}-summary');
                 var stepsEl = document.getElementById('{{ $routeId }}-steps');
 
-                fetch('https://router.project-osrm.org/route/v1/driving/' + coords + '?overview=full&geometries=geojson&steps=true')
+                // The public routing server can be slow or never answer. Give up after 12 seconds so the
+                // panel shows the normal "not available" message instead of "Calculating route..." forever.
+                var controller = window.AbortController ? new AbortController() : null;
+                var routeTimer = controller ? setTimeout(function () { controller.abort(); }, 12000) : null;
+
+                fetch('https://router.project-osrm.org/route/v1/driving/' + coords + '?overview=full&geometries=geojson&steps=true',
+                    controller ? { signal: controller.signal } : undefined)
                     .then(function (res) { return res.json(); })
                     .then(function (data) {
+                        if (routeTimer) clearTimeout(routeTimer);
                         if (data.code !== 'Ok' || !data.routes || !data.routes.length) {
                             summaryEl.textContent = 'Step-by-step directions are not available for this route right now.';
                             return;
@@ -101,6 +108,7 @@
                         });
                     })
                     .catch(function () {
+                        if (routeTimer) clearTimeout(routeTimer);
                         summaryEl.textContent = 'Step-by-step directions are not available right now.';
                     });
             }
