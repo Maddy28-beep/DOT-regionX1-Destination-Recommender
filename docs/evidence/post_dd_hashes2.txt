@@ -1,0 +1,7 @@
+dest_emb  rows=151 md5=5fc0e23a3a1e0f1bfc77f46978f1283d
+int_emb   rows=8 md5=3820d5ce04363e2d582b8b48980629b0
+surveys=788 visits=2605 itineraries=288
+destinations=151 md5=df73d0f06e240f0d6e424e9d2fda3f08
+chatbot_logs=186 accommodations=255
+migrations=89
+log_lines=670 log_bytes=81049

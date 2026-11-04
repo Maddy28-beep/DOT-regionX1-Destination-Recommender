@@ -1,0 +1,584 @@
+[
+ {
+  "message": "What are the opening hours of Apo Golf and Country Club?",
+  "http": 200,
+  "seconds": 0.558,
+  "source": "rule_based",
+  "intent": "place",
+  "response": "Apo Golf and Country Club is in Brgy. Bago Aplaya, Davao City (sports & recreation). Hours: 6:00 AM–6:00 PM. Entrance: ₱1,500–3,500 / person. Hours and prices can change, so check before you go.",
+  "cards": [
+   {
+    "name": "Apo Golf and Country Club",
+    "sample": false
+   }
+  ],
+  "action": false,
+  "case": "L-rule-hours",
+  "rep": 1
+ },
+ {
+  "message": "What are the opening hours of Apo Golf and Country Club?",
+  "http": 200,
+  "seconds": 0.582,
+  "source": "rule_based",
+  "intent": "place",
+  "response": "Apo Golf and Country Club is in Brgy. Bago Aplaya, Davao City (sports & recreation). Hours: 6:00 AM–6:00 PM. Entrance: ₱1,500–3,500 / person. Hours and prices can change, so check before you go.",
+  "cards": [
+   {
+    "name": "Apo Golf and Country Club",
+    "sample": false
+   }
+  ],
+  "action": false,
+  "case": "L-rule-hours",
+  "rep": 2
+ },
+ {
+  "message": "What are the opening hours of Apo Golf and Country Club?",
+  "http": 200,
+  "seconds": 0.509,
+  "source": "rule_based",
+  "intent": "place",
+  "response": "Apo Golf and Country Club is in Brgy. Bago Aplaya, Davao City (sports & recreation). Hours: 6:00 AM–6:00 PM. Entrance: ₱1,500–3,500 / person. Hours and prices can change, so check before you go.",
+  "cards": [
+   {
+    "name": "Apo Golf and Country Club",
+    "sample": false
+   }
+  ],
+  "action": false,
+  "case": "L-rule-hours",
+  "rep": 3
+ },
+ {
+  "message": "What are the opening hours of Apo Golf and Country Club?",
+  "http": 200,
+  "seconds": 0.866,
+  "source": "rule_based",
+  "intent": "place",
+  "response": "Apo Golf and Country Club is in Brgy. Bago Aplaya, Davao City (sports & recreation). Hours: 6:00 AM–6:00 PM. Entrance: ₱1,500–3,500 / person. Hours and prices can change, so check before you go.",
+  "cards": [
+   {
+    "name": "Apo Golf and Country Club",
+    "sample": false
+   }
+  ],
+  "action": false,
+  "case": "L-rule-hours",
+  "rep": 4
+ },
+ {
+  "message": "What are the opening hours of Apo Golf and Country Club?",
+  "http": 200,
+  "seconds": 0.589,
+  "source": "rule_based",
+  "intent": "place",
+  "response": "Apo Golf and Country Club is in Brgy. Bago Aplaya, Davao City (sports & recreation). Hours: 6:00 AM–6:00 PM. Entrance: ₱1,500–3,500 / person. Hours and prices can change, so check before you go.",
+  "cards": [
+   {
+    "name": "Apo Golf and Country Club",
+    "sample": false
+   }
+  ],
+  "action": false,
+  "case": "L-rule-hours",
+  "rep": 5
+ },
+ {
+  "message": "Is Philippine Eagle Center DOT-accredited?",
+  "http": 200,
+  "seconds": 0.608,
+  "source": "rule_based",
+  "intent": "place",
+  "response": "Philippine Eagle Center is sample data on this platform: its accreditation number is a placeholder, so it is not verified by DOT. Philippine Eagle Center is in Malagos, Baguio District, Davao City (wildlife). Hours: 8:00 AM-5:00 PM. Entrance: ₱150 / person. Hours and prices can change, so check before you go.",
+  "cards": [
+   {
+    "name": "Philippine Eagle Center",
+    "sample": true
+   }
+  ],
+  "action": false,
+  "case": "L-rule-accred",
+  "rep": 1
+ },
+ {
+  "message": "Is Philippine Eagle Center DOT-accredited?",
+  "http": 200,
+  "seconds": 0.623,
+  "source": "rule_based",
+  "intent": "place",
+  "response": "Philippine Eagle Center is sample data on this platform: its accreditation number is a placeholder, so it is not verified by DOT. Philippine Eagle Center is in Malagos, Baguio District, Davao City (wildlife). Hours: 8:00 AM-5:00 PM. Entrance: ₱150 / person. Hours and prices can change, so check before you go.",
+  "cards": [
+   {
+    "name": "Philippine Eagle Center",
+    "sample": true
+   }
+  ],
+  "action": false,
+  "case": "L-rule-accred",
+  "rep": 2
+ },
+ {
+  "message": "Is Philippine Eagle Center DOT-accredited?",
+  "http": 200,
+  "seconds": 0.638,
+  "source": "rule_based",
+  "intent": "place",
+  "response": "Philippine Eagle Center is sample data on this platform: its accreditation number is a placeholder, so it is not verified by DOT. Philippine Eagle Center is in Malagos, Baguio District, Davao City (wildlife). Hours: 8:00 AM-5:00 PM. Entrance: ₱150 / person. Hours and prices can change, so check before you go.",
+  "cards": [
+   {
+    "name": "Philippine Eagle Center",
+    "sample": true
+   }
+  ],
+  "action": false,
+  "case": "L-rule-accred",
+  "rep": 3
+ },
+ {
+  "message": "Is Philippine Eagle Center DOT-accredited?",
+  "http": 200,
+  "seconds": 0.727,
+  "source": "rule_based",
+  "intent": "place",
+  "response": "Philippine Eagle Center is sample data on this platform: its accreditation number is a placeholder, so it is not verified by DOT. Philippine Eagle Center is in Malagos, Baguio District, Davao City (wildlife). Hours: 8:00 AM-5:00 PM. Entrance: ₱150 / person. Hours and prices can change, so check before you go.",
+  "cards": [
+   {
+    "name": "Philippine Eagle Center",
+    "sample": true
+   }
+  ],
+  "action": false,
+  "case": "L-rule-accred",
+  "rep": 4
+ },
+ {
+  "message": "Is Philippine Eagle Center DOT-accredited?",
+  "http": 200,
+  "seconds": 0.692,
+  "source": "rule_based",
+  "intent": "place",
+  "response": "Philippine Eagle Center is sample data on this platform: its accreditation number is a placeholder, so it is not verified by DOT. Philippine Eagle Center is in Malagos, Baguio District, Davao City (wildlife). Hours: 8:00 AM-5:00 PM. Entrance: ₱150 / person. Hours and prices can change, so check before you go.",
+  "cards": [
+   {
+    "name": "Philippine Eagle Center",
+    "sample": true
+   }
+  ],
+  "action": false,
+  "case": "L-rule-accred",
+  "rep": 5
+ },
+ {
+  "message": "What can you do?",
+  "http": 200,
+  "seconds": 1.292,
+  "source": "groq",
+  "intent": "help",
+  "response": "I can help you find destinations, accommodations, restaurants, tour packages, souvenir centers, and tour operators in the Davao Region. Just let me know what you’re interested in, and I’ll point you to the listings on our platform. If you need a personalized itinerary, I can direct you to Plan My Trip.",
+  "cards": [],
+  "action": false,
+  "case": "L-rule-help",
+  "rep": 1
+ },
+ {
+  "message": "What can you do?",
+  "http": 200,
+  "seconds": 2.296,
+  "source": "groq",
+  "intent": "help",
+  "response": "I can help you find and learn about destinations, accommodations, restaurants, souvenir centers, and tour operators in the Davao Region. Just let me know what you’re interested in, and I’ll point you to the listings on our platform.",
+  "cards": [],
+  "action": false,
+  "case": "L-rule-help",
+  "rep": 2
+ },
+ {
+  "message": "What can you do?",
+  "http": 200,
+  "seconds": 1.004,
+  "source": "groq",
+  "intent": "help",
+  "response": "I can help you discover destinations, hotels, restaurants, souvenir spots, and tour operators in the Davao Region. Just let me know what you’re interested in, and I’ll suggest options from our listings. If you need a personalized itinerary, you can use Plan My Trip.",
+  "cards": [],
+  "action": false,
+  "case": "L-rule-help",
+  "rep": 3
+ },
+ {
+  "message": "What can you do?",
+  "http": 200,
+  "seconds": 1.434,
+  "source": "groq",
+  "intent": "help",
+  "response": "I’m here to help you explore the Davao Region! I can recommend destinations, accommodations, restaurants, tour packages, souvenir centers, and tour operators from the listings we have. I can also point you to Plan My Trip for personalized itineraries. If you need anything else, just let me know!",
+  "cards": [],
+  "action": false,
+  "case": "L-rule-help",
+  "rep": 4
+ },
+ {
+  "message": "What can you do?",
+  "http": 200,
+  "seconds": 1.064,
+  "source": "groq",
+  "intent": "help",
+  "response": "I can help you discover destinations, hotels, restaurants, souvenir shops, and tour operators in the Davao Region.  \nI’ll point you to the listings on the platform and suggest “Plan My Trip” for itineraries.  \nI can’t make bookings or payments, but I’ll give you the info you need to plan your visit!",
+  "cards": [],
+  "action": false,
+  "case": "L-rule-help",
+  "rep": 5
+ },
+ {
+  "message": "I want to plan a 3 day trip",
+  "http": 200,
+  "seconds": 1.283,
+  "source": "groq",
+  "intent": "itinerary",
+  "response": "For a 3‑day adventure in the Davao Region, you can use the “Plan My Trip” tool on our site to create a personalized itinerary. It will help you pick destinations, accommodations, and activities from the listings we have. If you need any specific suggestions, let me know!",
+  "cards": [],
+  "action": true,
+  "case": "L-rule-plan",
+  "rep": 1
+ },
+ {
+  "message": "I want to plan a 3 day trip",
+  "http": 200,
+  "seconds": 1.54,
+  "source": "groq",
+  "intent": "itinerary",
+  "response": "Sure! For a 3‑day adventure in the Davao Region, you can start by exploring a destination, staying at an accommodation, and enjoying local food. Use **Plan My Trip** to build a personalized itinerary—just pick a few of the listings below that interest you:\n\n- **Destinations:** Philippine Eagle Center, Tuka Beach, Awao Falls, Lake Leonard  \n- **Accommodations:** Eden Mountain Resort, Pearl Farm Beach Resort, Discovery Samal  \n- **Restaurants:** Blue Post Boiling Crabs & Shrimp, Arvie’s Cafe, Jack’s Ridge Resort and Restaurant  \n- **Souvenir Centers:** Aldevinco Shopping Center, Apo Ni Lola Durian Delicacies, Sample Central Pasalubong Centre  \n- **Tour Operators:** Davao Heritage Walks, Mati Surf Co., Aquagem Travel and Tours  \n\nJust visit the site’s “Plan My Trip” tool to mix and match these options for a fun 3‑day itinerary!",
+  "cards": [
+   {
+    "name": "Philippine Eagle Center",
+    "sample": true
+   },
+   {
+    "name": "Discovery Samal",
+    "sample": false
+   },
+   {
+    "name": "Eden Mountain Resort",
+    "sample": false
+   }
+  ],
+  "action": true,
+  "case": "L-rule-plan",
+  "rep": 2
+ },
+ {
+  "message": "I want to plan a 3 day trip",
+  "http": 200,
+  "seconds": 1.175,
+  "source": "groq",
+  "intent": "itinerary",
+  "response": "For a 3‑day adventure in the Davao Region, you can use the “Plan My Trip” tool to build a personalized itinerary. It will let you pick from destinations, accommodations, restaurants, and tour packages listed on the platform. If you need help getting started, just let me know!",
+  "cards": [],
+  "action": true,
+  "case": "L-rule-plan",
+  "rep": 3
+ },
+ {
+  "message": "I want to plan a 3 day trip",
+  "http": 200,
+  "seconds": 1.313,
+  "source": "groq",
+  "intent": "itinerary",
+  "response": "For a 3‑day adventure in the Davao Region, you can use the “Plan My Trip” tool to craft a personalized itinerary. It’ll help you pick destinations, accommodations, restaurants, and tour packages from the listings we have. If you’d like a quick suggestion, let me know your interests and I can point you to the best options!",
+  "cards": [],
+  "action": true,
+  "case": "L-rule-plan",
+  "rep": 4
+ },
+ {
+  "message": "I want to plan a 3 day trip",
+  "http": 200,
+  "seconds": 0.522,
+  "source": "rule_based",
+  "intent": "itinerary",
+  "response": "I'd love to help you plan your trip! Answer a few quick questions and your personalized itinerary is ready the moment you finish: no sign-up needed. I'll factor in your interests, budget, dates and any accessibility needs.",
+  "cards": [],
+  "action": true,
+  "case": "L-rule-plan",
+  "rep": 5
+ },
+ {
+  "message": "Can you recommend a beach for a weekend getaway?",
+  "http": 200,
+  "seconds": 1.275,
+  "source": "groq",
+  "intent": "destination",
+  "response": "Sure! For a quick beach escape, you might enjoy **Tuka Beach** – known as the “Little Boracay of Santa Maria.” It’s a sample‑data listing, so its accreditation number is a placeholder. If you’re looking for a quieter spot, consider **Tuke Makil / Tuke Nunsol Marine Cove** or the nearby **Olanivan Island** for a relaxed vibe. Happy beach‑hopping!",
+  "cards": [],
+  "action": false,
+  "case": "L-ai-beach",
+  "rep": 1
+ },
+ {
+  "message": "Can you recommend a beach for a weekend getaway?",
+  "http": 200,
+  "seconds": 0.859,
+  "source": "rule_based",
+  "intent": "destination",
+  "response": "Here are some destination options. Any marked Sample data are test listings, not DOT-verified. Tap one to see its details.",
+  "cards": [
+   {
+    "name": "Olanivan Island [SAMPLE]",
+    "sample": true
+   },
+   {
+    "name": "Tuka Beach (\"Little Boracay of Santa Maria\") [SAMPLE]",
+    "sample": true
+   },
+   {
+    "name": "Kopiat Island [SAMPLE]",
+    "sample": true
+   }
+  ],
+  "action": false,
+  "case": "L-ai-beach",
+  "rep": 2
+ },
+ {
+  "message": "Can you recommend a beach for a weekend getaway?",
+  "http": 200,
+  "seconds": 0.759,
+  "source": "rule_based",
+  "intent": "destination",
+  "response": "Here are some destination options. Any marked Sample data are test listings, not DOT-verified. Tap one to see its details.",
+  "cards": [
+   {
+    "name": "Olanivan Island [SAMPLE]",
+    "sample": true
+   },
+   {
+    "name": "Tuka Beach (\"Little Boracay of Santa Maria\") [SAMPLE]",
+    "sample": true
+   },
+   {
+    "name": "Kopiat Island [SAMPLE]",
+    "sample": true
+   }
+  ],
+  "action": false,
+  "case": "L-ai-beach",
+  "rep": 3
+ },
+ {
+  "message": "Where can I eat good food in Davao?",
+  "http": 200,
+  "seconds": 1.722,
+  "source": "groq",
+  "intent": "restaurant",
+  "response": "Here are a few restaurants in the Davao Region you might enjoy:\n\n- **Blue Post Boiling Crabs & Shrimp** – a seafood spot with sample data accreditation.  \n- **Arvie's Cafe** – a local café that’s popular for its relaxed vibe.  \n- **Axl Dave Bibingka Food Corporation** – known for its traditional Filipino treats.  \n- **Jack's Ridge Resort and Restaurant** – a dining option that also offers accommodation.  \n\nIf you’re looking for more options, feel free to browse the site for additional restaurants in Davao.",
+  "cards": [
+   {
+    "name": "Jack's Ridge Resort and Restaurant",
+    "sample": false
+   },
+   {
+    "name": "Blue Post Boiling Crabs & Shrimp",
+    "sample": true
+   },
+   {
+    "name": "Arvie's Cafe",
+    "sample": false
+   }
+  ],
+  "action": false,
+  "case": "L-ai-food",
+  "rep": 1
+ },
+ {
+  "message": "Where can I eat good food in Davao?",
+  "http": 200,
+  "seconds": 0.81,
+  "source": "rule_based",
+  "intent": "restaurant",
+  "response": "Here are some restaurant options. Any marked Sample data are test listings, not DOT-verified. Tap one to see its details.",
+  "cards": [
+   {
+    "name": "Sample North Port Eatery [SAMPLE]",
+    "sample": true
+   },
+   {
+    "name": "Sample Seaside Eatery South [SAMPLE]",
+    "sample": true
+   },
+   {
+    "name": "Blue Post Boiling Crabs & Shrimp",
+    "sample": true
+   }
+  ],
+  "action": false,
+  "case": "L-ai-food",
+  "rep": 2
+ },
+ {
+  "message": "Where can I eat good food in Davao?",
+  "http": 200,
+  "seconds": 2.412,
+  "source": "groq",
+  "intent": "restaurant",
+  "response": "Here are a few spots you might enjoy in Davao:\n\n- **Blue Post Boiling Crabs & Shrimp** – a local favorite for seafood, listed as sample data.  \n- **Arvie's Cafe** – known for its relaxed vibe and tasty dishes, also sample data.  \n- **Axl Dave Bibingka Food Corporation** – a great place to try traditional bibingka, sample data.  \n- **Jack's Ridge Resort and Restaurant** – offers a mix of local and international cuisine, sample data.  \n\nIf you’d like more options or a different style of food, feel free to ask!",
+  "cards": [
+   {
+    "name": "Jack's Ridge Resort and Restaurant",
+    "sample": false
+   },
+   {
+    "name": "Blue Post Boiling Crabs & Shrimp",
+    "sample": true
+   },
+   {
+    "name": "Arvie's Cafe",
+    "sample": false
+   }
+  ],
+  "action": false,
+  "case": "L-ai-food",
+  "rep": 3
+ },
+ {
+  "message": "Any good places to stay with a pool?",
+  "http": 200,
+  "seconds": 1.772,
+  "source": "groq",
+  "intent": "fallback",
+  "response": "Sure! Here are a few accommodations in the Davao Region that offer a pool:\n\n- **Eden Mountain Resort** (accommodation)  \n- **Dusit Thani Lubi Plantation Resort** (accommodation)  \n- **Pearl Farm Beach Resort** (accommodation)  \n- **Acacia Hotel Davao** (accommodation)  \n- **Apo View Hotel** (accommodation)  \n- **Camp Holiday Resort and Recreation Area** (accommodation)  \n- **Sample Central City Hotel** (accommodation)  \n- **Blue Lotus Hotel** (accommodation)  \n- **Grand Palm Villas and Hotel** (accommodation)  \n- **Discovery Samal** (accommodation)  \n\nAll of these have pool facilities. If you’d like more details or help planning a trip, let me know!",
+  "cards": [
+   {
+    "name": "Discovery Samal",
+    "sample": false
+   },
+   {
+    "name": "Eden Mountain Resort",
+    "sample": false
+   },
+   {
+    "name": "Dusit Thani Lubi Plantation Resort",
+    "sample": false
+   }
+  ],
+  "action": false,
+  "case": "L-ai-hotel",
+  "rep": 1
+ },
+ {
+  "message": "Any good places to stay with a pool?",
+  "http": 200,
+  "seconds": 0.756,
+  "source": "rule_based",
+  "intent": "fallback",
+  "response": "I'm not sure I understood that. You could ask things like \"where can I see wildlife?\", \"is Eden Nature Park open?\", \"where to stay in Davao City\", or \"plan a 3-day trip\". Here are a few places visitors like in the meantime.",
+  "cards": [
+   {
+    "name": "Philippine Eagle Center",
+    "sample": true
+   },
+   {
+    "name": "Tuka Beach (\"Little Boracay of Santa Maria\") [SAMPLE]",
+    "sample": true
+   },
+   {
+    "name": "Olanivan Island [SAMPLE]",
+    "sample": true
+   }
+  ],
+  "action": false,
+  "case": "L-ai-hotel",
+  "rep": 2
+ },
+ {
+  "message": "Any good places to stay with a pool?",
+  "http": 200,
+  "seconds": 0.75,
+  "source": "rule_based",
+  "intent": "fallback",
+  "response": "I'm not sure I understood that. You could ask things like \"where can I see wildlife?\", \"is Eden Nature Park open?\", \"where to stay in Davao City\", or \"plan a 3-day trip\". Here are a few places visitors like in the meantime.",
+  "cards": [
+   {
+    "name": "Philippine Eagle Center",
+    "sample": true
+   },
+   {
+    "name": "Tuka Beach (\"Little Boracay of Santa Maria\") [SAMPLE]",
+    "sample": true
+   },
+   {
+    "name": "Olanivan Island [SAMPLE]",
+    "sample": true
+   }
+  ],
+  "action": false,
+  "case": "L-ai-hotel",
+  "rep": 3
+ },
+ {
+  "message": "What nature spots should I see?",
+  "http": 200,
+  "seconds": 1.746,
+  "source": "groq",
+  "intent": "fallback",
+  "response": "Here are a few nature‑focused spots you might enjoy in the Davao Region:\n\n- **Philippine Eagle Center** (sample data, not DOT‑verified) – a wildlife sanctuary that highlights the region’s iconic bird.  \n- **Tuka Beach** (“Little Boracay of Santa Maria”) (sample data, not DOT‑verified) – a pristine beach ideal for a relaxed day by the sea.  \n- **Awao Falls** (sample data, not DOT‑verified) – a scenic waterfall that’s great for a short trek.  \n- **Lake Leonard** (sample data, not DOT‑verified) – a tranquil lake perfect for a peaceful walk or picnic.  \n\nIf you’d like more options or a tailored itinerary, feel free to check out the “Plan My Trip” feature on the site.",
+  "cards": [
+   {
+    "name": "Philippine Eagle Center",
+    "sample": true
+   }
+  ],
+  "action": false,
+  "case": "L-ai-nature",
+  "rep": 1
+ },
+ {
+  "message": "What nature spots should I see?",
+  "http": 200,
+  "seconds": 0.708,
+  "source": "rule_based",
+  "intent": "fallback",
+  "response": "I'm not sure I understood that. You could ask things like \"where can I see wildlife?\", \"is Eden Nature Park open?\", \"where to stay in Davao City\", or \"plan a 3-day trip\". Here are a few places visitors like in the meantime.",
+  "cards": [
+   {
+    "name": "Philippine Eagle Center",
+    "sample": true
+   },
+   {
+    "name": "Tuka Beach (\"Little Boracay of Santa Maria\") [SAMPLE]",
+    "sample": true
+   },
+   {
+    "name": "Olanivan Island [SAMPLE]",
+    "sample": true
+   }
+  ],
+  "action": false,
+  "case": "L-ai-nature",
+  "rep": 2
+ },
+ {
+  "message": "What nature spots should I see?",
+  "http": 200,
+  "seconds": 0.789,
+  "source": "rule_based",
+  "intent": "fallback",
+  "response": "I'm not sure I understood that. You could ask things like \"where can I see wildlife?\", \"is Eden Nature Park open?\", \"where to stay in Davao City\", or \"plan a 3-day trip\". Here are a few places visitors like in the meantime.",
+  "cards": [
+   {
+    "name": "Philippine Eagle Center",
+    "sample": true
+   },
+   {
+    "name": "Tuka Beach (\"Little Boracay of Santa Maria\") [SAMPLE]",
+    "sample": true
+   },
+   {
+    "name": "Olanivan Island [SAMPLE]",
+    "sample": true
+   }
+  ],
+  "action": false,
+  "case": "L-ai-nature",
+  "rep": 3
+ }
+]
