@@ -1,0 +1,26 @@
+1 | 09:00 |  | baseline | Planned arrival |  | - | Starting point for travel times: Davao City centre.
+1 | 09:30 |  | travel | Travel to Sample Upland Botanical Park [SAMP | 11.8 | 30-45 | 
+1 | 10:15 | 12:45 | activity | Nature walks and leisure activities |  | - | 
+1 | 12:45 | 13:45 | meal | Lunch — Sample Upland Botanical Park [SAMPLE |  | - | 
+1 | 13:45 |  | travel | Travel to Eden Nature Park | 20.4 | 45-60 | 
+1 | 14:45 | 17:00 | activity | Nature and adventure activities |  | - | 
+1 | 17:15 |  | travel | Travel to Jardin De Seorita | 17.4 | 30-45 | 
+1 | 18:00 | 18:30 | free | Free time until dinner |  | - | Nothing is arranged for this time.
+1 | 18:30 |  | meal | Dinner — Jardin De Seorita |  | - | 
+1 | 20:00 |  | overnight | Overnight stay |  | - | 
+2 | 07:00 |  | meal | Breakfast — Jardin De Seorita |  | - | 
+2 | 08:00 |  | travel | Travel to Sample Inland Farm & Food Park [SA | 19.7 | 45-60 | 
+2 | 09:00 | 11:30 | activity | Farm tour and tasting experience |  | - | 
+2 | 11:30 | 12:30 | meal | Lunch — Sample Inland Farm & Food Park [SAMP |  | - | 
+2 | 12:30 |  | travel | Travel to Sample Highland Flower Park [SAMPL | 23.9 | 45-60 | 
+2 | 13:30 | 16:00 | activity | Nature walks and leisure activities |  | - | 
+2 | 16:15 |  | travel | Travel to Jardin De Seorita | 7.8 | 15-30 | 
+2 | 16:45 | 18:30 | free | Free time until dinner |  | - | Nothing is arranged for this time.
+2 | 18:30 |  | meal | Dinner — Jardin De Seorita |  | - | 
+2 | 20:00 |  | overnight | Overnight stay |  | - | 
+3 | 07:00 |  | meal | Breakfast — Jardin De Seorita |  | - | 
+3 | 08:00 |  | travel | Travel to Sample Banana & Cacao Farm Experie | 73.3 | 120-180 | 
+3 | 11:30 | 12:30 | meal | Lunch — Sample Banana & Cacao Farm Experienc |  | - | 
+3 | 12:30 | 14:00 | activity | Farm tour and tasting experience |  | - | 
+3 | 14:15 |  | travel | Travel to Davao International Airport | 25.1 | 45-75 | 
+3 | 15:30 | 17:30 | departure | Departure from Davao International Airport |  | - | Be at Davao International Airport by 3:30 PM: that is 2 hours before your 5:30 PM departure, a planning allowance and not an airline or airport rule. 

@@ -1,0 +1,20 @@
+HTTP verification, supervised production planner test, 2026-11-04 (production commit 7e856ff)
+
+IMPORTANT: these values are TRANSCRIBED from the supervised test report written during the test.
+They are not raw server logs and were not independently retrieved afterwards. The raw nginx lines and
+raw browser timing records are not preserved in this repository.
+
+Submission (one QA plan, preference 723, marker QA-SUPERVISED-TEST-20261104)
+  POST /plan                  HTTP 200, JSON redirect to /plan/itinerary   1,153 ms (browser fetch duration)
+  GET  /plan/itinerary        HTTP 200 (about 31 kB)
+        first byte (TTFB)     592 ms
+        fully loaded          1,511 ms
+  The test report also stated that the server's access log showed 200 for both requests.
+
+Separate typed-place lookup (no database write; the planner submission used the "Davao Airport" quick pick)
+  GET /plan/address-suggest?q=Davao International Airport
+                              HTTP 200, 624 ms, three results
+  A typed departure place submitted through the planner was NOT tested.
+
+Server-side generation time is in qa_replay_result.txt (six rolled-back runs, 641 to 783 ms).
+Clock note: the browser and server clocks differed by roughly 45 seconds; database times use the server clock.

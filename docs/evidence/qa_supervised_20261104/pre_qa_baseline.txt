@@ -1,0 +1,26 @@
+# Sanitised copy of the read-only baseline taken 2026-11-04 08:55 UTC (before the supervised QA submission).
+# Removed: production configuration values, database configuration lines, a failed git probe, request-log sizes and the creation time of another visitor's itinerary. Counts, ids and hashes are unchanged.
+== 2026-11-04T08:55:52+00:00
+tourist_preferences rows=148
+preference_activities rows=261
+preference_amenities rows=170
+itineraries rows=289
+itinerary_matches rows=5883
+itinerary_items rows=7100
+tourist_health_profiles rows=0
+tourist_health_conditions rows=0
+exit_surveys rows=788
+exit_survey_visits rows=2605
+chatbot_logs rows=186
+sessions rows=212
+cache rows=3
+cache_locks rows=0
+jobs rows=0
+failed_jobs rows=0
+max pref id=722
+prefs with departure_time=1 marker=0
+dest_emb md5=5fc0e23a3a1e0f1bfc77f46978f1283d int_emb md5=3820d5ce04363e2d582b8b48980629b0
+destinations md5=df73d0f06e240f0d6e424e9d2fda3f08 accommodations=255 migrations=89
+pref md5 (all existing)=e8cea02400d8d8da76a0de25c74800a3
+itin md5 (all existing)=04e4a07a71abeca7c20429e6c7a29716
+log_lines=670 log_bytes=81049

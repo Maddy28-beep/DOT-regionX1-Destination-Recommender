@@ -1,0 +1,102 @@
+log_before=670
+{
+    "connection": "pgsql",
+    "driver": "pgsql",
+    "level_before": 0,
+    "seq_before": 723,
+    "stored_items": 26,
+    "runs": [
+        {
+            "rep": 0,
+            "tx_level": 1,
+            "gen_ms": 783,
+            "queries": 203,
+            "items": 26,
+            "matches": 54,
+            "same_as_stored": true
+        },
+        {
+            "rep": 1,
+            "tx_level": 1,
+            "gen_ms": 646,
+            "queries": 406,
+            "items": 26,
+            "matches": 54,
+            "same_as_stored": true
+        },
+        {
+            "rep": 2,
+            "tx_level": 1,
+            "gen_ms": 672,
+            "queries": 609,
+            "items": 26,
+            "matches": 54,
+            "same_as_stored": true
+        },
+        {
+            "rep": 3,
+            "tx_level": 1,
+            "gen_ms": 706,
+            "queries": 812,
+            "items": 26,
+            "matches": 54,
+            "same_as_stored": true
+        },
+        {
+            "rep": 4,
+            "tx_level": 1,
+            "gen_ms": 641,
+            "queries": 1015,
+            "items": 26,
+            "matches": 54,
+            "same_as_stored": true
+        },
+        {
+            "rep": 5,
+            "tx_level": 1,
+            "gen_ms": 721,
+            "queries": 1218,
+            "items": 26,
+            "matches": 54,
+            "same_as_stored": true
+        }
+    ],
+    "level_after": 0,
+    "connections_used": [
+        "pgsql"
+    ],
+    "counts_before": {
+        "tourist_preferences": 149,
+        "preference_activities": 263,
+        "preference_amenities": 171,
+        "itineraries": 290,
+        "itinerary_matches": 5937,
+        "itinerary_items": 7126,
+        "sessions": 226,
+        "cache": 8,
+        "exit_surveys": 788,
+        "chatbot_logs": 186
+    },
+    "counts_after": {
+        "tourist_preferences": 149,
+        "preference_activities": 263,
+        "preference_amenities": 171,
+        "itineraries": 290,
+        "itinerary_matches": 5937,
+        "itinerary_items": 7126,
+        "sessions": 226,
+        "cache": 8,
+        "exit_surveys": 788,
+        "chatbot_logs": 186
+    },
+    "replay_marker_rows_left": 0,
+    "seq_after": 729,
+    "qa_records_intact": {
+        "pref": 1,
+        "itinerary": 1,
+        "items": 26
+    }
+}
+exit=0
+log_after=670
+ls: cannot access '/tmp/qa_replay.php': No such file or directory
