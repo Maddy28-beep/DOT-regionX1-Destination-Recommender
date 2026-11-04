@@ -205,21 +205,22 @@
         return article;
     }
 
-    /* A guidebook festival with no confirmed date: same ticket card, "TBA" on the stub, no calendar button. */
+    /* Guidebook dates are displayed as references in the month list. */
     function festivalCard(f) {
         var article = el('article', 'event-card event-card--festival');
         article.innerHTML =
             '<div class="event-card__stub">' +
                 '<span class="event-card__month">' + esc(MONTHS[view.month].slice(0, 3).toUpperCase()) + '</span>' +
-                '<span class="event-card__day event-card__day--tba">TBA</span>' +
-                '<span class="event-card__foot">Date unconfirmed</span>' +
+                '<span class="event-card__day event-card__day--tba">' + (f[4] ? 'INFO' : 'TBA') + '</span>' +
+                '<span class="event-card__foot">' + (f[4] ? 'See dates' : 'Date unconfirmed') + '</span>' +
             '</div>' +
             '<div class="event-card__body">' +
                 '<div class="event-card__top"><span class="event-card__tag">Festival</span>' +
-                '<span class="event-card__when">This month</span></div>' +
+                '<span class="event-card__when">' + (f[3] ? 'Date reference' : 'This month') + '</span></div>' +
                 '<h3 class="event-card__title">' + esc(f[0]) + '</h3>' +
                 '<p class="event-card__meta">' + PIN + ' ' + esc(f[1]) + '</p>' +
-                '<p class="event-card__desc">Exact date not yet confirmed. Check with the local tourism office before making plans.</p>' +
+                (f[3] ? '<p class="event-card__desc"><strong>' + esc(f[3]) + '</strong></p>' : '') +
+                (f[4] ? '' : '<p class="event-card__desc">Exact date not yet confirmed. Check with the local tourism office before making plans.</p>') +
             '</div>';
         if (f[2]) {
             var call = el('a', 'event-card__add', 'Call tourism office · ' + f[2]);
