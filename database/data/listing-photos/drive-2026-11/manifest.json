@@ -381,7 +381,7 @@
  },
  {
   "lookup": "name",
-  "name": "Hagimit Falls",
+  "name": "Hagimit Falls [SAMPLE]",
   "file": "hagimit-falls-1.jpg",
   "sha256": "6b4032f138cd4067c459e821e985baf67b767a63d5af5ed5e3aa86d500cbad93",
   "source_type": "other",
@@ -401,7 +401,7 @@
  },
  {
   "lookup": "name",
-  "name": "Kopiat Island",
+  "name": "Kopiat Island [SAMPLE]",
   "file": "kopiat-island-1.jpg",
   "sha256": "0938b3cbd86e51ebe625b8ab67dd039cea6709d003ce8a885790e6905ba861ba",
   "source_type": "other",
@@ -421,7 +421,7 @@
  },
  {
   "lookup": "name",
-  "name": "Kopiat Island",
+  "name": "Kopiat Island [SAMPLE]",
   "file": "kopiat-island-2.jpg",
   "sha256": "adc719a685b2ba73236d9fdafdbc368a5542519d6e21555a779c65ecab1acc14",
   "source_type": "other",
@@ -441,7 +441,7 @@
  },
  {
   "lookup": "name",
-  "name": "Kopiat Island",
+  "name": "Kopiat Island [SAMPLE]",
   "file": "kopiat-island-3.jpg",
   "sha256": "f2fa9bf9f3bbb30b0809d6254ce29d921735851db7960e80a556c2f3cc4cddec",
   "source_type": "other",
@@ -697,7 +697,29 @@
   "credit_text": "ExploreDVO team collection (testing)",
   "verified_by": "Project owner decision; pictures matched to places by Claude",
   "verified_at": "2026-11-05",
-  "show_credit": true
+  "show_credit": true,
+  "kind": "Destination"
+ },
+ {
+  "lookup": "name",
+  "name": "Malagos Garden Resort",
+  "file": "malagos-garden-resort-acc-1.jpg",
+  "sha256": "c89dae6dba446bd487b93c81dd683bead240807dd449e77b6aa48b58c7254f26",
+  "source_type": "other",
+  "source_name": "Team-collected photo folder (Establishment_DOT)",
+  "source_url": "https://drive.google.com/drive/folders/1YC6n7RKUEc4BiBFftp6TlRZ1nJhrwVIm",
+  "original_name": "malagosGar.jpg",
+  "match_confidence": "medium",
+  "shows": "Brick-paved garden path through lush greenery",
+  "verification_status": "approved",
+  "permission_basis": "team_testing_decision",
+  "permission_ref": "Project owner instruction in chat, 2026-11-05: beta testing only; to be re-reviewed after DOT approval",
+  "permission_date": "2026-11-05",
+  "credit_text": "ExploreDVO team collection (testing)",
+  "verified_by": "Project owner decision; pictures matched to places by Claude",
+  "verified_at": "2026-11-05",
+  "show_credit": true,
+  "kind": "Accommodation"
  },
  {
   "lookup": "name",
@@ -717,7 +739,29 @@
   "credit_text": "ExploreDVO team collection (testing)",
   "verified_by": "Project owner decision; pictures matched to places by Claude",
   "verified_at": "2026-11-05",
-  "show_credit": true
+  "show_credit": true,
+  "kind": "Destination"
+ },
+ {
+  "lookup": "name",
+  "name": "Malagos Garden Resort",
+  "file": "malagos-garden-resort-acc-2.jpg",
+  "sha256": "f71523927f51bf2f9874913500fdc33ceba35633553e881a14111a823d434776",
+  "source_type": "other",
+  "source_name": "Team-collected photo folder (Establishment_DOT)",
+  "source_url": "https://drive.google.com/drive/folders/1YC6n7RKUEc4BiBFftp6TlRZ1nJhrwVIm",
+  "original_name": "mlagos.jpg",
+  "match_confidence": "medium",
+  "shows": "Aerial garden with play area and red roof",
+  "verification_status": "approved",
+  "permission_basis": "team_testing_decision",
+  "permission_ref": "Project owner instruction in chat, 2026-11-05: beta testing only; to be re-reviewed after DOT approval",
+  "permission_date": "2026-11-05",
+  "credit_text": "ExploreDVO team collection (testing)",
+  "verified_by": "Project owner decision; pictures matched to places by Claude",
+  "verified_at": "2026-11-05",
+  "show_credit": true,
+  "kind": "Accommodation"
  },
  {
   "lookup": "name",

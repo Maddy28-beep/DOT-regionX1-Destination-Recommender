@@ -98,6 +98,24 @@ class DriveBatchPhotoSeederTest extends TestCase
         $this->assertSame(1, $resort->photos()->count());
     }
 
+    public function test_an_entry_naming_its_kind_picks_that_kind_when_the_name_is_shared(): void
+    {
+        Storage::fake('public');
+        $region = Region::firstOrCreate(['name' => 'Davao City']);
+        $destination = $this->place('Malagos Garden Resort', 'malagos-dest');
+        $resort = Accommodation::create(['slug' => 'malagos-acc', 'name' => 'Malagos Garden Resort', 'location' => 'Davao', 'region_id' => $region->id, 'type' => 'Resort', 'is_accredited' => true, 'rating' => 0, 'review_count' => 0, 'price_tier' => 'Mid-range']);
+        $unkinded = $this->entry('Malagos Garden Resort', 'm-0.png');
+        $asDestination = $this->entry('Malagos Garden Resort', 'm-1.png') + ['kind' => 'Destination'];
+        $asResort = $this->entry('Malagos Garden Resort', 'm-2.png') + ['kind' => 'Accommodation'];
+
+        $this->importFrom($this->folder([$unkinded]));
+        $this->assertSame(0, ListingPhoto::count());
+
+        $this->importFrom($this->folder([$asDestination, $asResort]));
+        $this->assertSame(1, $destination->photos()->count());
+        $this->assertSame(1, $resort->photos()->count());
+    }
+
     public function test_unknown_or_ambiguous_names_are_skipped_not_guessed(): void
     {
         Storage::fake('public');
@@ -129,8 +147,8 @@ class DriveBatchPhotoSeederTest extends TestCase
     {
         $manifest = new ListingPhotoManifest(database_path('data/listing-photos/drive-2026-11'));
 
-        $this->assertCount(48, $manifest->entries());
+        $this->assertCount(50, $manifest->entries());
         $this->assertSame([], $manifest->problems());
-        $this->assertCount(48, $manifest->approved());
+        $this->assertCount(50, $manifest->approved());
     }
 }
