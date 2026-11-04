@@ -53,7 +53,8 @@ Project-owner statements recorded here (2026-11-04):
 | Itineraries / tourist preferences | 288 / 147 at the last check. They were 287 / 146 at the start of the `c303912` deploy: one real visitor created a plan since then. I only counted rows and read no individual record; my own test runs were rolled back and added none |
 | `chatbot_logs` | 186 rows (29 added by the authorised live chatbot test) |
 | Apriori batch | `demo-apriori-nearby-pairings-2026-11` |
-| Latest pre-deploy backup | `pre-deploy-20261104-081916-7e856ff.sql.gz` (gzip verified, 50 table blocks, 151 embedding rows) |
+| Latest pre-deploy backup | `pre-deploy-20261104-081916-7e856ff.sql.gz` (gzip integrity test passed; backup line in `docs/evidence/deploy_7e856ff.log.txt`) |
+| Deploy logs | `docs/evidence/deploy_c303912.log.txt` (prompt lines, backup, migration 10.15 ms) and `docs/evidence/deploy_7e856ff.log.txt` (prompt lines, backup, "Nothing to migrate"), ANSI colour codes stripped |
 | Pages after the latest deploy | `/`, `/destinations`, `/accommodations`, `/plan/start`, `/advisories`, `/portal/login`: HTTP 200 (script check and an outside check on the public host); `/restaurants` 200. No new Laravel errors: the log stayed at 670 lines, checked before and after browsing |
 
 ### 2.1 Deployments on 2026-11-04
@@ -319,10 +320,10 @@ scenario ran twice inside a transaction that was rolled back.
   (it uses the departure time and point and plans the last day), and `7e856ff`
   changed only how the form and validation obtain the date, so these figures
   describe the planner as it runs today. They were not repeated on `7e856ff`.
-- **Accepted limitation:** the project owner's instruction of 2026-11-04 refers
-  to the far-distance p95 (about 4.3 s with a departure) as an accepted limitation
-  for the beta. The acceptance box in section 11 is left unticked: this package
-  signs nothing for the owner.
+- **Accepted limitation:** the project owner stated on 2026-11-04 that the
+  far-distance p95 (about 4.3 s with a departure) is accepted for a limited
+  invited beta. The acceptance box in section 11 is left unticked: formal
+  acceptance is not recorded and this package signs nothing for the owner.
 
 ## 6. Departure-aware itinerary scheduling (deployed: `c303912`, `7e856ff`)
 
@@ -439,10 +440,10 @@ PROJECT OWNER APPROVAL.
 | 3 | Full regression passes | COMPLETE | Section 7: 0 failures on `bc35db1` (1,468), on `c303912` (1,497) and on `7e856ff` (1,510); post-merge focused run 110 tests | 5 environmental GD-extension errors, reported as errors, not passes; no CI run recorded here | Yes, with that caveat |
 | 4 | Live production independently verified | COMPLETE | Sections 2, 2.1, 4.3, 5; for each of four deploys: commit, migrations, counts, hashes, logs, six pages checked read-only | None | Yes |
 | 5 | Embeddings correct | COMPLETE | 151/8 vectors, `nomic-embed-text`, 768 dims, no non-finite values, norms 0.999999 to 1.000001, no orphans, none missing, hashes unchanged through the deploy and both timing runs (`emb_check.json`) | None. Three destinations (Elysia Wellness Spa, ids 22-24) share one vector (149 unique of 151): intentional, section 9.1 | Yes |
-| 6 | Chatbot passes live API tests | COMPLETE | §4.3: 29 live cases, F1 15/15, F2 7/7, F3 4/4, other 3/3; 29 log rows and nothing else written | Heuristic guard; one run per case; no live 429/timeout seen; cannot detect an invented listing whose name is not in the database | Yes, within those limits |
-| 7 | Performance measured and acceptable | PARTIALLY COMPLETE | Section 5: pages p95 0.995 s; itinerary p50 0.86 to 1.02 s overall; far-distance p50 2.4 to 2.6 s; with a departure far p50 2.44 s (section 5.1); chatbot p50 0.57 s / 1.68 s; single-user only | Far-distance p95 4.25 s and max 4.57 s with a departure, above 3 s (owner refers to it as an accepted limitation for the beta; not signed here); **no load, concurrency or window-based 5xx evidence; no HTTP `POST /plan` timing; not repeated on `7e856ff`** | Yes for light single-user use; **not** load- or concurrency-ready |
+| 6 | Chatbot passes live API tests | COMPLETE | §4.3: 29 live cases, F1 15/15, F2 7/7, F3 4/4, other 3/3; 29 log rows and nothing else written. Chatbot code unchanged by PR #195 and #196; the 29-case run was not repeated on `7e856ff` | Heuristic guard; one run per case; no live 429/timeout seen; cannot detect an invented listing whose name is not in the database | Yes, within those limits |
+| 7 | Performance measured and acceptable | PARTIALLY COMPLETE | Section 5: pages p95 0.995 s; itinerary p50 0.86 to 1.02 s overall; far-distance p50 2.4 to 2.6 s; with a departure far p50 2.44 s (section 5.1); chatbot p50 0.57 s / 1.68 s; single-user only | Far-distance p95 4.25 s and max 4.57 s with a departure, above 3 s (the owner stated on 2026-11-04 that it is accepted for a limited invited beta; formal acceptance is not recorded here); **no load, concurrency or window-based 5xx evidence; no HTTP `POST /plan` timing; not repeated on `7e856ff`** | Yes for light single-user use; **not** load- or concurrency-ready |
 | 8 | Planner/UI integration without regressions | PARTIALLY COMPLETE | Baseline unchanged; six pages 200 after each deploy; live form at desktop and 375 px verified on `7e856ff` (no departure-date input, derived hints correct); production generator verified with departures (rolled back); 1,510 tests | **Gaps:** no persistent departure plan submitted through the live form by this work (writes data); the typed-place address lookup not exercised on production; one real visitor plan exists since the departure deploy but was counted, not reviewed; mobile checked by Chromium emulation only, no cross-browser or assistive-technology test | Yes for the baseline and the form; the end-to-end departure submission is unverified on production |
-| 9 | Apriori governance decided and approved | COMPLETE | Option A finalized by the owner; production wording "(2 trips, including simulated demonstration trips)" (787 of 788 surveys simulated) | DOT acknowledgment only for DOT-facing claims; not fabricated | Yes |
+| 9 | Apriori governance decided and approved | COMPLETE | Option A finalized by the owner; production wording "(2 trips, including simulated demonstration trips)" (787 of 788 surveys simulated). The demonstration trips are simulated and must never be presented as genuine visitor behaviour (restriction in section 9) | DOT acknowledgment only for DOT-facing claims; not fabricated | Yes |
 | 10 | Backup, rollback, release procedures verified | COMPLETE | Backup before each of four deploys (latest `pre-deploy-20261104-081916-7e856ff.sql.gz`, gzip-tested); code-only deploys; rollback targets in section 6.3 | Backup restore was not rehearsed | Yes |
 | 11 | Required approvals obtained | REQUIRES PROJECT OWNER APPROVAL | Approvals on record for PRs #193-#196, all four deployments including migration 89, the live F1-F3 tests and both rolled-back timing runs; Groq key revocation and the 120-minute default recorded | Still needed: push and merge of this docs branch; any production write-test; formal beta acceptance | Partly |
 | 12 | Controlled-beta acceptance formally justified | REQUIRES PROJECT OWNER APPROVAL | This package | The owner has not recorded acceptance | No — pending the owner |
@@ -539,7 +540,7 @@ Before the beta opens:
 | Departure feature: allowance | 120 minutes, owner's preferred default (2026-11-04) |
 | Departure feature: PR #195 merged and deployed with migration 89 (`c303912`) | Done 2026-11-04 on owner approval (sections 2.1 and 6) |
 | Derived departure date: PR #196 merged and deployed (`7e856ff`) | Done 2026-11-04 on owner approval (section 6.1) |
-| Far-distance p95 with a departure (about 4.3 s, single-user) accepted for the beta | Owner referred to it as accepted (2026-11-04); ☐ confirm here ☐ Improve first |
+| Far-distance p95 with a departure (about 4.3 s, single-user) accepted for the beta | Owner stated it is accepted for a limited invited beta (2026-11-04); formal acceptance: ☐ Confirmed ☐ Improve first |
 | Beta scope and restrictions (§9) accepted | ☐ Yes ☐ No |
 | Rollback arrangements accepted | ☐ Yes ☐ No |
 | **Formal controlled-beta approval** | ☐ Granted ☐ Not granted |

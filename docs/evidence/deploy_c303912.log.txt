@@ -1,0 +1,66 @@
+﻿
+==> Fetching GitHub
+Will deploy : origin/main  c303912  (Merge pull request #195 from Maddy28-beep/feature/departure-aware-scheduling)
+Your PC is  : c303912 (same)
+Server      : root@209.97.174.246
+Embeddings  : left as they are (code-only deploy)
+
+==> Packing c303912
+Package: 29.3 MB
+
+==> Uploading to the server
+
+==> Running the update on the server
+[1/8] Database backup
+      saved /var/backups/exploredvo/pre-deploy-20261104-071231-c303912.sql.gz
+[2/8] Unpacking c303912
+[3/8] Copying code (keeps .env, uploads, storage, vendor, the public/storage link)
+[4/8] PHP packages
+Installing dependencies from lock file
+Verifying lock file contents can be installed on current platform.
+Nothing to install, update or remove
+Generating optimized autoload files
+> Illuminate\Foundation\ComposerScripts::postAutoloadDump
+> @php artisan package:discover --ansi
+
+   INFO  Discovering packages.  
+
+  laravel/tinker ........................................................ DONE
+  nesbot/carbon ......................................................... DONE
+  nunomaduro/termwind ................................................... DONE
+
+54 packages you are using are looking for funding.
+Use the `composer fund` command to find out more!
+[5/8] Permissions
+[6/8] Database migrations (only adds new tables/columns)
+
+   INFO  Running migrations.  
+
+  2026_11_04_000100_add_departure_to_preferences ................ 10.15ms DONE
+
+      embeddings: left as they are (code-only deploy)
+[7/8] Rebuilding caches and reloading PHP
+
+   INFO  Configuration cached successfully.  
+
+
+   INFO  Routes cached successfully.  
+
+
+
+   INFO  Blade templates cached successfully.  
+
+
+   INFO  Application cache cleared successfully.  
+
+[8/8] Checking the site
+      /                200
+      /destinations    200
+      /accommodations  200
+      /plan/start      200
+      /advisories      200
+      /portal/login    200
+OK -- c303912 is live.
+
+DONE. Deployed c303912 to http://209.97.174.246
+Open it and press Ctrl+F5 to skip the browser's saved copy.
