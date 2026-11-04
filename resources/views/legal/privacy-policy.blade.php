@@ -172,6 +172,18 @@
                             ExploreDVO does not control how long they keep it or where they process it, and
                             this policy does not describe that. ExploreDVO does not send them your name,
                             email or browser token.</li>
+                        @if (app(\App\Services\Recommendation\AiSkeletonAdvisor::class)->enabled())
+                        <li><strong>AI-assisted day plan (Groq).</strong> When you generate an itinerary, ExploreDVO's
+                            server sends Groq, an outside AI service whose servers are outside the Philippines, a
+                            description of the trip so that it can suggest which of the places the planner has already
+                            chosen go together on each day and name each day. It receives the number of days, the
+                            distance range, budget level and interests you chose, and, for each candidate place, its
+                            name, type, price level and category tags. It does not receive your name, browser token,
+                            starting point, dates, arrival time or anything you typed. The planner can only use places
+                            it had already chosen and checks every suggestion; if Groq does not answer in time or
+                            answers badly, the itinerary is made without it. Groq handles that information under its
+                            own policies; ExploreDVO does not control how long it keeps it.</li>
+                        @endif
                         <li><strong>Address search.</strong> If you type an address as your starting point,
                             the text you type is sent from our server to @if (filled(config('services.geoapify.key')))
                             Geoapify's address search service (outside the Philippines) @else

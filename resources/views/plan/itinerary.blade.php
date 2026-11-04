@@ -72,6 +72,9 @@
                         @endif
                     </p>
                     <p class="itin-banner__meta">Generated {{ $itinerary->generated_at->timezone('Asia/Manila')->format('F j, Y g:i A') }}</p>
+                    @if (data_get($itinerary->day_themes, 'ai_skeleton.applied') === true)
+                        <span class="plan-badge plan-badge--ai" title="An outside AI service suggested which of the already-chosen places share a day, and the day names. The planner checked the suggestion and kept it only because it fit, with no fewer stops and no more travelling than its own plan.">&#10024; Day themes suggested with AI assistance</span>
+                    @endif
                     @if (data_get($itinerary->day_themes, 'summary.regrouped'))
                         <span class="plan-badge plan-badge--ai" title="A pretrained embedding model grouped similar places into the same day, without adding more than a quarter to the travelling.">&#10024; Days grouped by theme</span>
                     @endif
@@ -478,6 +481,16 @@
                                 estimates, not routed directions.
                             </div>
                         </li>
+                        @if (data_get($itinerary->day_themes, 'ai_skeleton.applied') === true)
+                            <li>
+                                <span class="provenance-step">AI-assisted days</span>
+                                <div>
+                                    An <strong>outside AI service</strong> was asked which of the places already chosen belong together on each day, and
+                                    for a short name for each day. Its answer could only rearrange those places; it was kept because the planner's own
+                                    checks found it fit with no fewer stops and no worse a schedule. Places within a day keep the planner's route order.
+                                </div>
+                            </li>
+                        @endif
                         @if (data_get($itinerary->day_themes, 'summary'))
                             <li>
                                 <span class="provenance-step">Themes</span>
