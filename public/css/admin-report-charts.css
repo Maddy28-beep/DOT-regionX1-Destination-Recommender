@@ -1,0 +1,13 @@
+/* Reports page chart block. Bootstrap is loaded scoped to .bs-scope, so these rules only tune it to the admin look. */
+.report-charts { margin-bottom: 18px; }
+.report-charts.bs-scope { font-family: inherit; color: var(--ink); background: transparent; line-height: inherit; font-size: inherit; }
+.report-charts .card { border-color: var(--border); border-radius: var(--radius-md, 10px); background: var(--white); --bs-card-cap-bg: var(--white); }
+.report-charts .card-header { padding: 14px 18px; }
+.report-charts .card-body { padding: 14px 18px 18px; }
+.report-charts .nav-tabs { --bs-nav-link-color: var(--muted); --bs-nav-link-hover-color: var(--primary-dark); --bs-nav-tabs-link-active-color: var(--primary-dark); --bs-nav-tabs-border-color: var(--border); flex-wrap: wrap; }
+.report-charts .nav-link { font-size: .85rem; font-weight: 600; width: auto; }
+.report-charts .nav-link.active { border-bottom-color: var(--white); }
+.report-charts .text-body-secondary { color: var(--muted) !important; }
+.report-charts h2, .report-charts h3 { font-family: inherit; color: var(--ink); }
+.report-chart-box { position: relative; height: 320px; width: 100%; }
+@media (max-width: 575px) { .report-chart-box { height: 260px; } }
