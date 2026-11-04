@@ -19,6 +19,7 @@
     var detailTitle = document.getElementById('eventsDetailTitle');
     var detailSub = document.getElementById('eventsDetailSub');
     var detailList = document.getElementById('eventsDetailList');
+    var festivalGuide = JSON.parse(document.getElementById('eventsFestivalData').textContent);
 
     var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     var SHORT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -149,13 +150,21 @@
         weeksOfMonth().forEach(function (week) { grid.appendChild(renderWeek(week)); });
     }
 
+    /* Guidebook festivals for the viewed month, minus any already on the calendar with a date. */
+    function undatedFestivals() {
+        var dated = inMonth(events).map(function (e) { return e.title.toLowerCase(); });
+        return (festivalGuide[MONTHS[view.month]] || []).filter(function (f) { return dated.indexOf(f[0].toLowerCase()) === -1; });
+    }
+
     /* ---------- Chips ---------- */
 
     function renderChips() {
         var monthEvents = inMonth(events);
+        var undatedCount = undatedFestivals().length;
         chips.querySelectorAll('[data-category]').forEach(function (chip) {
             var key = chip.dataset.category;
             var n = key === 'all' ? monthEvents.length : monthEvents.filter(function (e) { return e.category === key; }).length;
+            if (key === 'all' || key === 'festival') n += undatedCount;
             chip.querySelector('.chip__count').textContent = n;
             chip.classList.toggle('is-empty', n === 0);
         });
@@ -196,6 +205,30 @@
         return article;
     }
 
+    /* A guidebook festival with no confirmed date: same ticket card, "TBA" on the stub, no calendar button. */
+    function festivalCard(f) {
+        var article = el('article', 'event-card event-card--festival');
+        article.innerHTML =
+            '<div class="event-card__stub">' +
+                '<span class="event-card__month">' + esc(MONTHS[view.month].slice(0, 3).toUpperCase()) + '</span>' +
+                '<span class="event-card__day event-card__day--tba">TBA</span>' +
+                '<span class="event-card__foot">Date unconfirmed</span>' +
+            '</div>' +
+            '<div class="event-card__body">' +
+                '<div class="event-card__top"><span class="event-card__tag">Festival</span>' +
+                '<span class="event-card__when">This month</span></div>' +
+                '<h3 class="event-card__title">' + esc(f[0]) + '</h3>' +
+                '<p class="event-card__meta">' + PIN + ' ' + esc(f[1]) + '</p>' +
+                '<p class="event-card__desc">Exact date not yet confirmed. Check with the local tourism office before making plans.</p>' +
+            '</div>';
+        if (f[2]) {
+            var call = el('a', 'event-card__add', 'Call tourism office · ' + f[2]);
+            call.href = 'tel:' + f[2].replace(/\s/g, '');
+            article.querySelector('.event-card__body').appendChild(call);
+        }
+        return article;
+    }
+
     function icsText(s) { return String(s || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); }
     function compact(s) { return s.replace(/-/g, ''); }
 
@@ -230,7 +263,7 @@
 
     function renderDetail() {
         detailList.textContent = '';
-        var list, empty;
+        var list, empty, festivals = [];
 
         if (selected) {
             var date = parse(selected);
@@ -240,17 +273,20 @@
         } else {
             detailTitle.textContent = MONTHS[view.month] + ' events';
             list = inMonth(visibleEvents());
+            if (category === 'all' || category === 'festival') festivals = undatedFestivals();
             empty = 'No events this month' + (category === 'all' ? '' : ' in this category') + '.';
         }
 
         list.sort(function (a, b) { return a.start < b.start ? -1 : a.start > b.start ? 1 : a.title.localeCompare(b.title); });
-        detailSub.textContent = list.length + (list.length === 1 ? ' event' : ' events');
+        var total = list.length + festivals.length;
+        detailSub.textContent = total + (total === 1 ? ' event' : ' events');
 
-        if (!list.length) {
+        if (!total) {
             detailList.appendChild(el('p', 'events-empty', empty));
             return;
         }
         list.forEach(function (e) { detailList.appendChild(card(e)); });
+        festivals.forEach(function (f) { detailList.appendChild(festivalCard(f)); });
     }
 
     function render() { renderGrid(); renderChips(); renderDetail(); }

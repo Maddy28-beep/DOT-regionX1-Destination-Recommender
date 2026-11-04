@@ -17,7 +17,8 @@
 <div class="section-tight">
     <div class="container">
 
-        @if ($events->isEmpty())
+        @php($festivalGuide = config('festival-guide', []))
+        @if ($events->isEmpty() && empty($festivalGuide))
             <div class="panel panel-body">
                 <p>No events have been posted yet. Check back soon.</p>
             </div>
@@ -59,6 +60,7 @@
                 </aside>
             </div>
 
+            <script type="application/json" id="eventsFestivalData">{!! json_encode($festivalGuide, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) !!}</script>
             <script type="application/json" id="eventsData">{!! json_encode($calendarEvents, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) !!}</script>
             <script src="{{ asset('js/events-calendar.js') }}?v={{ filemtime(public_path('js/events-calendar.js')) }}" defer></script>
         @endif

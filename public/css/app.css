@@ -5430,7 +5430,9 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
     padding-top: 10px;
     border-top: 1.5px dotted var(--border);
 }
-.dcard__price strong { font-size: 1.05rem; font-weight: 800; color: var(--primary-dark); }
+/* The amount is ink, not brand green: green already means selected/accredited/go, so only "Free entry" takes it. */
+.dcard__price strong { font-size: 1.05rem; font-weight: 800; color: var(--ink); }
+.dcard__price strong.dcard__free { color: var(--primary-dark); }
 .dcard__price small { font-size: .8rem; color: var(--muted); }
 .dcard__band { font-size: .95rem; letter-spacing: .04em; }
 .dcard__band span { color: var(--border); }

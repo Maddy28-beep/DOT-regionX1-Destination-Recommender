@@ -149,7 +149,7 @@
                         @if ($priceMain)
                             @if ($priceLead)<small class="dcard__from">{{ $priceLead }}</small> @endif<strong><span class="currency">&#8369;</span>{{ $priceMain }}</strong>@if ($priceUnit) <small>/ {{ $priceUnit }}</small>@endif
                         @elseif ($isDestination && $tier === 0)
-                            <strong>Free entry</strong>
+                            <strong class="dcard__free">Free entry</strong>
                         @elseif ($packageCount)
                             <span class="dcard__count">{{ $packageCount }} tour {{ \Illuminate\Support\Str::plural('package', $packageCount) }}</span>
                         @elseif ($tierWord)
