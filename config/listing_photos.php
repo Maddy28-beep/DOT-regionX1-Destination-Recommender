@@ -20,7 +20,7 @@ return [
      * Why it may be shown. `establishment_meeting` is the owners' consent given in person at the meeting before the
      * system was built: it needs a reference to that meeting (permission_ref) and its date.
      */
-    'permission_bases' => ['establishment_owner', 'establishment_meeting', 'own_work', 'dot_written_permission', 'open_licence'],
+    'permission_bases' => ['establishment_owner', 'establishment_meeting', 'own_work', 'dot_written_permission', 'open_licence', 'team_testing_decision'],
 
     'listing_kinds' => ['Destination', 'Accommodation', 'Restaurant', 'SouvenirCenter', 'Package', 'TourOperator'],
 ];
