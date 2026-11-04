@@ -352,7 +352,11 @@ submitted through the live form:
   1,511 ms (HTTP 200, 31 kB).
 - **Server-side generation, rolled-back replay of the same inputs, six runs:**
   641 to 783 ms (783, 646, 672, 706, 641, 721), 203 queries per run, the same 26
-  items and 54 matches every time and identical to the stored plan.
+  items and 54 matches every time and identical to the stored plan. (Each run
+  added 203 queries. The raw output in `qa_replay_result.txt` shows a cumulative
+  counter, 203, 406, 609, 812, 1,015 and 1,218, because the script registered its
+  query listener again in every run; the per-run figure of 203 is derived from the
+  difference between successive cumulative values.)
 - **What this does and does not show:** it is one moderate trip on a quiet server
   and a single request. It is not a percentile, not a far-distance trip (the
   slow case above) and **not a load or concurrency test: no load or concurrency
@@ -458,8 +462,10 @@ A leftover local form draft from my earlier testing (browser storage on this
 device only, no server record) was cleared first; the form opened blank and no
 earlier plan was attached to the session.
 
-**Result.** `POST /plan` HTTP 200, redirect to `/plan/itinerary` HTTP 200 (nginx
-log: 200 for both). Stored: `departure_date` 2026-11-16 (= arrival + 3 − 1),
+**Result.** `POST /plan` HTTP 200, redirect to `/plan/itinerary` HTTP 200 (the
+supervised test report recorded HTTP 200 for both requests; the original raw nginx
+log lines were not preserved in the committed evidence, so this is reported test
+evidence and not independently inspectable raw-log evidence). Stored: `departure_date` 2026-11-16 (= arrival + 3 − 1),
 `departure_time` 17:30, departure point 7.130 / 125.645. The form showed "November
 14 – November 16 · 3 days, 2 nights" and "Leaving November 16"; the itinerary's
 Day 3 is Monday, November 16; a reload on the 375 px emulated screen showed the
@@ -489,8 +495,10 @@ submitted through the planner remains untested.**
 **Rolled-back replay.** Six runs of the same inputs inside transactions on the
 single default connection (pgsql; no model or service in the generation path uses
 another connection, the cache, the queue or an external service), each rolled
-back: 641 to 783 ms, 203 queries per run, output identical to the stored plan
-every time, no persistent records (no replay-marker rows, table counts unchanged,
+back: 641 to 783 ms, 203 queries per run (each run added 203; the raw output
+shows the cumulative counter 203, 406, 609, 812, 1,015 and 1,218, so the per-run
+figure is derived from the difference between successive values), output
+identical to the stored plan every time, no persistent records (no replay-marker rows, table counts unchanged,
 QA records intact, transaction level 0 afterwards). **One side effect that a
 rollback does not undo: the PostgreSQL id counter for `tourist_preferences` advanced
 from 723 to 729 (a gap of six ids; harmless).** The temporary script was removed from
