@@ -39,6 +39,10 @@
         <div><div class="adm-kpi__val">{{ $stats['destinations'] }}</div><div class="adm-kpi__lab">Accredited Destinations</div></div>
     </div>
     <div class="adm-kpi">
+        <span class="adm-kpi__ic"><x-icon name="map-pin" /></span>
+        <div><div class="adm-kpi__val">{{ $stats['sample_destinations'] }}</div><div class="adm-kpi__lab">Sample Destinations</div></div>
+    </div>
+    <div class="adm-kpi">
         <span class="adm-kpi__ic"><x-icon name="building" /></span>
         <div>
             <div class="adm-kpi__val">{{ $stats['pending_establishments'] }}</div>
@@ -55,6 +59,11 @@
         </div>
     </div>
 </div>
+<p class="adm-kpi-note" id="destination-breakdown">
+    Destinations: {{ $stats['destinations'] }} DOT-accredited (official record) + {{ $stats['sample_destinations'] }} sample data
+    + {{ $stats['other_destinations'] }} not counted in either (official record not currently accredited, or no accreditation record on file)
+    = {{ $stats['total_destinations'] }} in total.
+</p>
 
 <div class="adm-cols">
     <section class="adm-card" aria-labelledby="watch-title">

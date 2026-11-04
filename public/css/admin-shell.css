@@ -33,12 +33,13 @@ body.admin .admin-pagehead__actions { display: flex; align-items: center; gap: 8
 .adm-alert > div { flex: 1; min-width: 0; }
 .adm-alert .btn { flex: none; height: 34px; padding: 0 14px; font-size: .8rem; }
 
-.adm-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.adm-kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
 .adm-kpi { display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: var(--white); border: 1px solid var(--border); border-radius: 14px; }
 .adm-kpi__ic { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--primary-light); color: var(--primary); }
 .adm-kpi__ic svg { width: 20px; height: 20px; }
 .adm-kpi__val { font-size: 1.6rem; font-weight: 800; line-height: 1; color: var(--primary-dark); }
 .adm-kpi__lab { margin-top: 3px; font-size: .74rem; color: var(--muted); }
+.adm-kpi-note { margin: 8px 2px 0; font-size: .78rem; opacity: .78; }
 .adm-kpi__flag { margin-top: 2px; font-size: .68rem; font-weight: 700; color: #c2410c; }
 
 .adm-cols { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 14px; }
