@@ -1,0 +1,2 @@
+name,location,region,latitude,longitude,description,amenities,cuisine_type,price_tier,opening_hours
+Old restaurant Place,Sample site,Davao City,7.07,125.61,Synthetic,parking|restroom|ac|wifi,Filipino,Budget-Friendly,10:00 AM-9:00 PM

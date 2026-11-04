@@ -87,8 +87,9 @@
         $what = trim(str_replace(' — '.$listing->name, '', $what));
     }
 
-    // A stop's price band against the band the traveller chose (the same order the audit's budget check uses). Nothing is
-    // said when either is unknown: an unpriced place is not "within" a budget, it just has no claim.
+    // A stop's price band against the band the traveller chose (the same order the audit's budget check uses). This compares
+    // bands, not prices, so the tag says "fits your budget band" and never claims a cost. Nothing is said when either is
+    // unknown: an unpriced place does not fit a band, it just has no claim.
     $tierOrder = ['Free' => 0, 'Budget-Friendly' => 1, 'Mid-range' => 2, 'Premium' => 3];
     $budgetLimit = $tierOrder[$preference?->budget ?? null] ?? null;
     $stopTier = $kind === 'activity' && $item->destination_id ? ($tierOrder[$listing?->price_tier ?? null] ?? null) : null;
@@ -166,7 +167,7 @@
                         @endif
                         <p class="tl-card__what">{{ $what }}</p>
                         @if ($withinBudget)
-                            <p class="tl-card__tags"><span class="tl-tag tl-tag--match"><x-icon name="check" /> Within your budget</span></p>
+                            <p class="tl-card__tags"><span class="tl-tag tl-tag--match"><x-icon name="check" /> Fits your budget band</span></p>
                         @endif
                     @elseif ($isStay && $route)
                         {{-- The night's stay is named, like every other stop, instead of only "Overnight stay". --}}

@@ -1,0 +1,15 @@
+{
+    "format": 1,
+    "generated_at": "2026-11-04T19:04:51+00:00",
+    "count": 1,
+    "sha256": "4410d610439f52f72d56a8eb7ec33b6903c274c27107ff6be8636ae8331dabef",
+    "entries": [
+        {
+            "kind": "accommodation",
+            "id": 1,
+            "slug": "seq-hotel-sample",
+            "name": "Seq Hotel [SAMPLE]",
+            "number": "SAMPLE-0002"
+        }
+    ]
+}

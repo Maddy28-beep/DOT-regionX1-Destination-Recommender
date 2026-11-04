@@ -1,0 +1,15 @@
+{
+    "format": 1,
+    "generated_at": "2026-11-04T19:04:50+00:00",
+    "count": 1,
+    "sha256": "7b84dc8518ce47e0f46ff76ec504bfc1db2e780e9eee5d09f15bb91628788167",
+    "entries": [
+        {
+            "kind": "destination",
+            "id": 1,
+            "slug": "first-falls-sample",
+            "name": "First Falls [SAMPLE]",
+            "number": "SAMPLE-0001"
+        }
+    ]
+}
