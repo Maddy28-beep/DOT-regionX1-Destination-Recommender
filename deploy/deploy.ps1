@@ -19,6 +19,7 @@
     .\deploy\deploy.ps1 -Key "$env:USERPROFILE\.ssh\exploredvo_teammate"
     .\deploy\deploy.ps1 -Server 209.97.174.246 -Yes        # skip the confirmation question
     .\deploy\deploy.ps1 -RefreshEmbeddings                 # code AND load the shipped embedding vectors
+    .\deploy\deploy.ps1 -CheckOnly                         # only check that these scripts match origin/main
 
   Needs: git and OpenSSH (ssh, scp) -- both come with Windows 10/11 + Git for Windows.
 #>
@@ -28,7 +29,8 @@ param(
     [string]$Key    = "$env:USERPROFILE\.ssh\exploredvo_do",
     [string]$Branch = "main",
     [switch]$Yes,
-    [switch]$RefreshEmbeddings
+    [switch]$RefreshEmbeddings,
+    [switch]$CheckOnly          # run the safety checks and stop; deploys nothing
 )
 
 # "Continue", not "Stop": Windows PowerShell 5.1 turns anything a program prints on stderr
@@ -55,6 +57,21 @@ $sha     = (git rev-parse --short "origin/$Branch").Trim()
 $subject = (git log -1 --format="%s" "origin/$Branch").Trim()
 $local   = (git rev-parse --short HEAD).Trim()
 
+# These scripts must be exactly the ones on origin/$Branch. A stale or locally edited copy (for example a checkout
+# left on an old feature branch) once ran an older server-update.sh that imported the embedding vectors on a
+# code-only deploy. This runs before anything is packed, uploaded or backed up.
+Step "Checking these deploy scripts match origin/$Branch"
+foreach ($f in @("deploy/deploy.ps1", "deploy/server-update.sh")) {
+    $onBranch = (git show "origin/${Branch}:$f") -join "`n"
+    if ($LASTEXITCODE -ne 0) { Fail "Could not read $f from origin/$Branch." }
+    $onThisPc = ((Get-Content -Raw -Path $f) -replace "`r", "")
+    if ($onThisPc.TrimEnd("`n") -ne $onBranch.TrimEnd("`n")) {
+        Fail "$f on this PC is not the same as on origin/$Branch (a stale or edited copy). Nothing was deployed. Fix: git fetch origin; git checkout origin/$Branch -- deploy   (or deploy from a clean checkout of $Branch), then run this again."
+    }
+}
+Write-Host "deploy.ps1 and server-update.sh are identical to origin/$Branch."
+if ($CheckOnly) { Write-Host "-CheckOnly: nothing was deployed."; exit 0 }
+
 Write-Host "Will deploy : origin/$Branch  $sha  ($subject)"
 Write-Host "Your PC is  : $local" $(if ($local -ne $sha) { "(not the same as GitHub -- that is fine, GitHub is what gets deployed)" } else { "(same)" })
 Write-Host "Server      : $User@$Server"
@@ -75,7 +92,13 @@ if ($LASTEXITCODE -ne 0 -or -not (Test-Path $tar)) { Fail "git archive failed." 
 Write-Host ("Package: {0:N1} MB" -f ((Get-Item $tar).Length / 1MB))
 
 Step "Uploading to the server"
-scp @sshOpt -q $tar ".\deploy\server-update.sh" "${User}@${Server}:/root/"
+# Upload the server script as it is on origin/$Branch (the same commit as the package), not the working-tree copy.
+$updateDir = Join-Path $env:TEMP "exploredvo-update-$sha"
+New-Item -ItemType Directory -Force -Path $updateDir | Out-Null
+$updateScript = Join-Path $updateDir "server-update.sh"
+git show "origin/${Branch}:deploy/server-update.sh" | Out-File -FilePath $updateScript -Encoding ascii
+if ($LASTEXITCODE -ne 0) { Fail "Could not read deploy/server-update.sh from origin/$Branch." }
+scp @sshOpt -q $tar $updateScript "${User}@${Server}:/root/"
 if ($LASTEXITCODE -ne 0) { Fail "Upload failed (wrong key, wrong IP, or server is off?)." }
 
 Step "Running the update on the server"
@@ -86,6 +109,7 @@ ssh @sshOpt "${User}@${Server}" $remote 2>&1 | ForEach-Object { "$_" } | Out-Hos
 $code = $LASTEXITCODE
 
 Remove-Item $tar -Force -ErrorAction SilentlyContinue
+Remove-Item $updateDir -Recurse -Force -ErrorAction SilentlyContinue
 
 if ($code -ne 0) {
     Fail "The server reported an error (exit $code). Read the messages above. A database backup was taken before anything changed."
