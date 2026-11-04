@@ -54,7 +54,7 @@ Project-owner statements recorded here (2026-11-04):
 | `chatbot_logs` | 186 rows (29 added by the authorised live chatbot test) |
 | Apriori batch | `demo-apriori-nearby-pairings-2026-11` |
 | Latest pre-deploy backup | `pre-deploy-20261104-081916-7e856ff.sql.gz` (gzip integrity test passed; backup line in `docs/evidence/deploy_7e856ff.log.txt`) |
-| Deploy logs | `docs/evidence/deploy_c303912.log.txt` (prompt lines, backup, migration 10.15 ms) and `docs/evidence/deploy_7e856ff.log.txt` (prompt lines, backup, "Nothing to migrate"), ANSI colour codes stripped |
+| Deploy logs | `docs/evidence/deploy_c303912.log.txt` (prompt lines, backup, migration 10.15 ms) and `docs/evidence/deploy_7e856ff.log.txt` (prompt lines, backup, "Nothing to migrate"), ANSI colour codes stripped, server address and SSH user redacted |
 | Pages after the latest deploy | `/`, `/destinations`, `/accommodations`, `/plan/start`, `/advisories`, `/portal/login`: HTTP 200 (script check and an outside check on the public host); `/restaurants` 200. No new Laravel errors: the log stayed at 670 lines, checked before and after browsing |
 
 ### 2.1 Deployments on 2026-11-04

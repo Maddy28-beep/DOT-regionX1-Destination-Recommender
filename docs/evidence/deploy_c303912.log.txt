@@ -2,7 +2,7 @@
 ==> Fetching GitHub
 Will deploy : origin/main  c303912  (Merge pull request #195 from Maddy28-beep/feature/departure-aware-scheduling)
 Your PC is  : c303912 (same)
-Server      : root@209.97.174.246
+Server      : [REDACTED_SSH_USER]@[REDACTED_SERVER_IP]
 Embeddings  : left as they are (code-only deploy)
 
 ==> Packing c303912
@@ -62,5 +62,5 @@ Use the `composer fund` command to find out more!
       /portal/login    200
 OK -- c303912 is live.
 
-DONE. Deployed c303912 to http://209.97.174.246
+DONE. Deployed c303912 to http://[REDACTED_SERVER_IP]
 Open it and press Ctrl+F5 to skip the browser's saved copy.

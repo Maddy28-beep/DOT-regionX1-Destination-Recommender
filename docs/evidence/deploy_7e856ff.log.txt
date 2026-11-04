@@ -2,7 +2,7 @@
 ==> Fetching GitHub
 Will deploy : origin/main  7e856ff  (Merge pull request #196 from Maddy28-beep/feature/derived-departure-date)
 Your PC is  : 7e856ff (same)
-Server      : root@209.97.174.246
+Server      : [REDACTED_SSH_USER]@[REDACTED_SERVER_IP]
 Embeddings  : left as they are (code-only deploy)
 
 ==> Packing 7e856ff
@@ -60,5 +60,5 @@ Use the `composer fund` command to find out more!
       /portal/login    200
 OK -- 7e856ff is live.
 
-DONE. Deployed 7e856ff to http://209.97.174.246
+DONE. Deployed 7e856ff to http://[REDACTED_SERVER_IP]
 Open it and press Ctrl+F5 to skip the browser's saved copy.
