@@ -66,17 +66,12 @@ class DepartureInputTest extends TestCase
     private function leaving(array $over = []): array
     {
         return $this->form($over + [
-            'departure_date' => '2026-10-28', 'departure_time' => '17:00',
+            'departure_time' => '17:00',
             'departure_lat' => '7.130', 'departure_lng' => '125.645', 'departure_label' => 'Davao International Airport',
         ]);
     }
 
     // ---- 1. validation ------------------------------------------------------------------------------------
-
-    public function test_a_departure_date_needs_a_departure_time(): void
-    {
-        $this->post(route('plan.update'), $this->form(['departure_date' => '2026-10-28']))->assertSessionHasErrors('departure_time');
-    }
 
     public function test_a_departure_time_needs_a_departure_point_the_traveller_chose(): void
     {
@@ -104,32 +99,89 @@ class DepartureInputTest extends TestCase
 
     public function test_invalid_departure_values_are_rejected(): void
     {
-        $this->post(route('plan.update'), $this->leaving(['departure_date' => 'not-a-date']))->assertSessionHasErrors('departure_date');
         $this->post(route('plan.update'), $this->leaving(['departure_time' => '25:99']))->assertSessionHasErrors('departure_time');
-        $this->post(route('plan.update'), $this->leaving(['departure_date' => '2099-01-01']))->assertSessionHasErrors('departure_date');
         $this->post(route('plan.update'), $this->leaving(['departure_lat' => '95', 'departure_lng' => '125']))->assertSessionHasErrors('departure_lat');
         $this->post(route('plan.update'), $this->leaving(['departure_lng' => null]))->assertSessionHasErrors('departure_lng');
     }
 
-    public function test_a_departure_date_before_the_arrival_date_is_rejected(): void
+    // ---- 2. the departure date is derived: arrival date + (days - 1) -----------------------------------------
+
+    /** @return array<string, array{0: string, 1: int, 2: string}> start date, days, the day the traveller leaves */
+    public static function derivedDates(): array
     {
-        $this->post(route('plan.update'), $this->leaving(['travel_days' => 3, 'start_date' => '2026-10-28', 'departure_date' => '2026-10-27']))
-            ->assertSessionHasErrors(['departure_date' => 'Your departure date is before your arrival date.']);
+        return [
+            'one day' => ['2026-10-28', 1, '2026-10-28'],
+            'two days' => ['2026-10-28', 2, '2026-10-29'],
+            'three days' => ['2026-10-28', 3, '2026-10-30'],
+            'four days' => ['2026-10-28', 4, '2026-10-31'],
+            'month end' => ['2026-10-30', 4, '2026-11-02'],
+            'year end' => ['2026-12-30', 4, '2027-01-02'],
+            'new year eve to new year day' => ['2026-12-31', 2, '2027-01-01'],
+            'leap day reached' => ['2028-02-27', 3, '2028-02-29'],
+            'leap day passed' => ['2028-02-27', 4, '2028-03-01'],
+            'no leap day' => ['2027-02-27', 3, '2027-03-01'],
+            'long trip' => ['2026-10-28', 30, '2026-11-26'],
+        ];
     }
 
-    public function test_a_departure_date_that_disagrees_with_the_number_of_days_is_rejected(): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('derivedDates')]
+    public function test_the_departure_date_is_the_last_day_of_the_trip(string $start, int $days, string $expected): void
     {
-        // Arriving Oct 28 and leaving Oct 31 is four days, not three.
-        $response = $this->post(route('plan.update'), $this->leaving(['travel_days' => 3, 'start_date' => '2026-10-28', 'departure_date' => '2026-10-31']));
-
-        $response->assertSessionHasErrors('departure_date');
-        $this->assertStringContainsString('is 4 days, not 3', session('errors')->first('departure_date'));
-    }
-
-    public function test_a_departure_date_that_matches_the_days_is_accepted(): void
-    {
-        $this->post(route('plan.update'), $this->leaving(['travel_days' => 3, 'start_date' => '2026-10-28', 'departure_date' => '2026-10-30']))
+        $this->post(route('plan.update'), $this->leaving(['travel_days' => $days, 'start_date' => $start, 'arrival_time' => '08:00']))
             ->assertSessionHasNoErrors();
+
+        $preference = TouristPreference::first();
+        $this->assertSame($expected, $preference->departureDate()->toDateString());
+        $this->assertSame($expected, $preference->departure_date->toDateString());
+        // The planner's own window ends on the same day.
+        $this->assertSame($expected, $preference->travelWindow()[1]->toDateString());
+    }
+
+    public function test_a_departure_time_without_an_arrival_date_is_planned_and_the_form_says_how_to_see_the_date(): void
+    {
+        $this->post(route('plan.update'), $this->leaving(['travel_days' => 2, 'start_date' => null]))->assertSessionHasNoErrors();
+
+        $preference = TouristPreference::first();
+        $this->assertNull($preference->departureDate());
+        $this->assertNull($preference->departure_date);
+        $this->assertSame('17:00', substr((string) $preference->departure_time, 0, 5));
+
+        $this->get(route('plan.itinerary'))->assertSee('Departure from Davao International Airport');
+        $this->get(route('plan.edit'))->assertSee('Add your arrival date to see your departure date.');
+    }
+
+    public function test_a_posted_or_saved_departure_date_never_overrides_the_derived_one(): void
+    {
+        // A stale or hand-made departure_date in the request is not read, whatever it says.
+        foreach (['2026-12-31', '2026-01-01', 'not-a-date', '2099-01-01'] as $stale) {
+            $this->post(route('plan.update'), $this->leaving(['travel_days' => 3, 'start_date' => '2026-10-28', 'departure_date' => $stale]))
+                ->assertSessionHasNoErrors();
+            $this->assertSame('2026-10-30', TouristPreference::first()->departure_date->toDateString());
+        }
+
+        // A date saved before this change (the column is kept) is replaced on the next save and ignored by the planner.
+        TouristPreference::query()->update(['departure_date' => '2026-01-01']);
+        $this->post(route('plan.update'), $this->leaving(['travel_days' => 3, 'start_date' => '2026-10-28']))->assertSessionHasNoErrors();
+        $this->assertSame('2026-10-30', TouristPreference::first()->departure_date->toDateString());
+
+        TouristPreference::query()->update(['departure_date' => '2026-01-01']);
+        $this->post(route('plan.regenerate'))->assertRedirect(route('plan.itinerary'));
+        $page = $this->get(route('plan.itinerary'));
+        $page->assertSee('Departure from Davao International Airport');
+        $page->assertSee('Be at Davao International Airport by 3:00 PM');
+    }
+
+    public function test_the_same_trip_is_planned_whatever_departure_date_a_form_posts(): void
+    {
+        $this->post(route('plan.update'), $this->leaving(['travel_days' => 2, 'start_date' => '2026-10-28']))->assertSessionHasNoErrors();
+        $without = $this->get(route('plan.itinerary'))->getContent();
+
+        $this->post(route('plan.update'), $this->leaving(['travel_days' => 2, 'start_date' => '2026-10-28', 'departure_date' => '2026-12-31']))->assertSessionHasNoErrors();
+        $with = $this->get(route('plan.itinerary'))->getContent();
+
+        // The page carries a CSRF token and randomly named SVG gradient ids; nothing else may differ.
+        $strip = fn (string $html) => preg_replace('/<input[^>]*name="_token"[^>]*>|<meta name="csrf-token"[^>]*>|brand-mark-grad-[A-Za-z0-9]+/', '', $html);
+        $this->assertSame($strip($without), $strip($with));
     }
 
     public function test_leaving_on_the_arrival_date_is_a_one_day_trip_and_must_come_after_arrival(): void
@@ -137,13 +189,6 @@ class DepartureInputTest extends TestCase
         $this->post(route('plan.update'), $this->leaving(['arrival_time' => '08:00', 'departure_time' => '07:30']))->assertSessionHasErrors('departure_time');
         $this->post(route('plan.update'), $this->leaving(['arrival_time' => '08:00', 'departure_time' => '08:00']))->assertSessionHasErrors('departure_time');
         $this->post(route('plan.update'), $this->leaving(['arrival_time' => '08:00', 'departure_time' => '17:00']))->assertSessionHasNoErrors();
-        // Same date but two days is inconsistent.
-        $this->post(route('plan.update'), $this->leaving(['travel_days' => 2, 'departure_date' => '2026-10-28']))->assertSessionHasErrors('departure_date');
-    }
-
-    public function test_a_date_alone_in_the_past_is_rejected_when_there_is_no_arrival_date(): void
-    {
-        $this->post(route('plan.update'), $this->leaving(['start_date' => null, 'departure_date' => '2026-10-01']))->assertSessionHasErrors('departure_date');
     }
 
     // ---- 12. form -> controller -> planner -> page --------------------------------------------------------
@@ -195,10 +240,51 @@ class DepartureInputTest extends TestCase
         $page = $this->get(route('plan.edit'));
 
         $page->assertOk();
-        $page->assertSee('Departure date (optional)');
         $page->assertSee('Departure time (optional)');
         $page->assertSee('name="departure_label"', false);
         $page->assertSee('We allow 2 hours there before you leave.');
         $page->assertSee('not an airline rule');
+    }
+
+    public function test_the_form_has_no_departure_date_input(): void
+    {
+        $page = $this->get(route('plan.edit'));
+
+        $page->assertOk();
+        $page->assertDontSee('name="departure_date"', false);
+        $page->assertDontSee('id="departure_date"', false);
+        $page->assertDontSee('Departure date');
+        $page->assertSee('name="departure_time"', false);
+    }
+
+    public function test_the_form_shows_the_derived_leaving_day_under_the_departure_time(): void
+    {
+        $this->post(route('plan.update'), $this->leaving(['travel_days' => 4, 'start_date' => '2026-11-05']))->assertSessionHasNoErrors();
+
+        $this->get(route('plan.edit'))->assertSee('Leaving November 8');
+    }
+
+    public function test_a_rejected_arrival_date_does_not_break_the_form_or_its_leaving_line(): void
+    {
+        $this->post(route('plan.update'), $this->leaving(['start_date' => 'not-a-date', 'travel_days' => 99999]))->assertSessionHasErrors('start_date');
+
+        $this->followingRedirects()->get(route('plan.edit'))->assertOk()->assertSee('Add your arrival date to see your departure date.');
+    }
+
+    public function test_the_form_explains_days_versus_nights_and_has_the_live_hint_slots(): void
+    {
+        $page = $this->get(route('plan.edit'));
+
+        $page->assertOk();
+        $page->assertSee('Days include your arrival and departure day; nights are one fewer.');
+        $page->assertSee('data-trip-dates', false);
+        $page->assertSee('data-departure-date', false);
+        // The live wording lives in the script the page loads.
+        $js = file_get_contents(public_path('js/plan-basics.js'));
+        $this->assertStringContainsString('Add your arrival date to see your departure date.', $js);
+        $this->assertStringContainsString('Leaving ${longDate(leaving)}', $js);
+        $this->assertStringContainsString("n === 1 ? 'day' : 'days'", $js);
+        $this->assertStringContainsString("n - 1 === 1 ? 'night' : 'nights'", $js);
+        $this->assertStringNotContainsString("getElementById('departure_date')", $js);
     }
 }

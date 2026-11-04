@@ -20,7 +20,6 @@ use App\Services\Recommendation\TourOperatorSuggester;
 use App\Services\Recommendation\TransportMode;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use App\Support\ItineraryCalendar;
@@ -168,12 +167,12 @@ class TripPlannerController extends Controller
             'start_date' => ['nullable', 'date', 'before_or_equal:'.now('Asia/Manila')->addYears(2)->toDateString()],
             'arrival_time' => ['nullable', 'date_format:H:i'],
             /*
-             * Leaving (all optional). The time is what the planner uses; a date alone means nothing, so it needs the
-             * time. The date, when given, has to agree with the arrival date and the number of days (checked below).
+             * Leaving (all optional). The time is what the planner uses. There is no departure date to enter: the traveller
+             * leaves on the last day of the trip, arrival date + (days - 1), derived in TouristPreference::departureDate().
+             * A departure_date posted by an old form is not validated, so it is never read.
              * The departure point is the traveller's own choice, never inferred from the starting point.
              */
-            'departure_date' => ['nullable', 'date', 'before_or_equal:'.now('Asia/Manila')->addYears(2)->toDateString()],
-            'departure_time' => ['nullable', 'date_format:H:i', 'required_with:departure_date'],
+            'departure_time' => ['nullable', 'date_format:H:i'],
             'departure_lat' => ['nullable', 'numeric', 'between:-90,90', 'required_with:departure_lng'],
             'departure_lng' => ['nullable', 'numeric', 'between:-180,180', 'required_with:departure_lat'],
             'departure_label' => ['nullable', 'string', 'max:200'],
@@ -393,8 +392,8 @@ class TripPlannerController extends Controller
 
     /**
      * The checks on leaving that need more than one field. Nothing here is guessed: a time needs a departure point the
-     * traveller chose, a date has to fit the arrival date and the number of days, and a same-day trip cannot leave
-     * before it arrives.
+     * traveller chose, and a one-day trip cannot leave before it arrives. The departure date is not a field: it is the
+     * last day of the trip.
      *
      * @param  array<string, mixed>  $data  the validated input
      */
@@ -403,23 +402,9 @@ class TripPlannerController extends Controller
         $errors = [];
         $time = $data['departure_time'] ?? null;
         $days = (int) $data['travel_days'];
-        $arrival = filled($data['start_date'] ?? null) ? Carbon::parse($data['start_date'])->startOfDay() : null;
-        $leaving = filled($data['departure_date'] ?? null) ? Carbon::parse($data['departure_date'])->startOfDay() : null;
 
         if ($time !== null && ! $this->hasDeparturePoint($data)) {
             $errors['departure_label'] = 'Tell us where you leave from (for example Davao Airport) so we can plan the journey there.';
-        }
-
-        if ($leaving !== null && $arrival !== null) {
-            $span = (int) $arrival->diffInDays($leaving, false) + 1;
-
-            if ($leaving->lt($arrival)) {
-                $errors['departure_date'] = 'Your departure date is before your arrival date.';
-            } elseif ($span !== $days) {
-                $errors['departure_date'] = 'Arriving '.$arrival->format('M j').' and leaving '.$leaving->format('M j').' is '.$span.' '.($span === 1 ? 'day' : 'days').', not '.$days.'. Change the number of days or the date.';
-            }
-        } elseif ($leaving !== null && $leaving->lt(Carbon::parse(now('Asia/Manila')->toDateString()))) {
-            $errors['departure_date'] = 'Your departure date is in the past.';
         }
 
         // A one-day trip leaves on the day it arrives: the departure has to come after the arrival.
@@ -459,6 +444,10 @@ class TripPlannerController extends Controller
 
             return;
         }
+
+        // Always the derived day (null without an arrival date): a date an old form or a hand-made request posts is
+        // not in $data, and an earlier saved one is overwritten here.
+        $preference->departure_date = $preference->departureDate();
 
         if (isset($data['departure_lat'], $data['departure_lng'])) {
             $preference->departure_lat = round((float) $data['departure_lat'], 3);
