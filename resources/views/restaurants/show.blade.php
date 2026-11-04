@@ -49,7 +49,6 @@
     <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($restaurant->getMorphClass(), $restaurant->id)->latest()->get()" />
 
     @include('partials.gallery-hero', [
-        'categoryLayout' => true,
         'keepOtherPhotos' => true,
         'photos' => $restaurant->photos,
         'title' => $restaurant->name,

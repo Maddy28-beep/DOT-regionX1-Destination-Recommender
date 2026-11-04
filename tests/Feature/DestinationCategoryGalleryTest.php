@@ -20,17 +20,18 @@ class DestinationCategoryGalleryTest extends TestCase
         ]);
     }
 
-    public function test_destination_photos_use_the_same_category_slots_as_stays(): void
+    public function test_destination_photos_show_as_a_main_photo_with_thumbnails_and_no_type_labels(): void
     {
         $place = $this->destination();
-        foreach (['Interior', 'General', 'Exterior'] as $category) {
-            $place->photos()->create(['path' => strtolower($category).'.jpg', 'category' => $category]);
+        foreach (['Interior', 'General', 'Exterior', 'General'] as $i => $category) {
+            $place->photos()->create(['path' => 'photo-'.$i.'.jpg', 'category' => $category]);
         }
         $this->get('/destinations/example-park')->assertOk()
-            ->assertSee('gallery-categorized', false)
-            ->assertSee('data-category="General" data-open="0"', false)
-            ->assertSee('data-category="Exterior" data-open="1"', false)
-            ->assertSee('data-category="Interior" data-open="2"', false)
+            ->assertDontSee('gallery-categorized', false)
+            ->assertDontSee('photo not available')
+            ->assertDontSee('gallery-cats', false)
+            ->assertSee('class="g-main"', false)
+            ->assertSee('+1 more')
             ->assertSee('Entry fee')->assertSee('Plan your visit');
     }
 

@@ -31,7 +31,6 @@
     <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($souvenirCenter->getMorphClass(), $souvenirCenter->id)->latest()->get()" />
 
     @include('partials.gallery-hero', [
-        'categoryLayout' => true,
         'keepOtherPhotos' => true,
         'photos' => $souvenirCenter->photos,
         'title' => $souvenirCenter->name,

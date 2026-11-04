@@ -24,7 +24,6 @@
 
     @if ($destination->photos->isNotEmpty())
         @include('partials.gallery-hero', [
-            'categoryLayout' => true,
             'photos' => $destination->photos,
             'title' => $destination->name,
             'subtitle' => trim($destination->location.($destination->region ? ' · '.$destination->region->name : '')),
