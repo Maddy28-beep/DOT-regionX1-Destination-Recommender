@@ -8,7 +8,7 @@
         <div class="container">
             <div>
                 <h1>Terms of Service</h1>
-                <div class="sub">Last updated {{ \Illuminate\Support\Carbon::parse('2026-09-01')->format('F j, Y') }}</div>
+                <div class="sub">Last updated {{ \Illuminate\Support\Carbon::parse('2026-11-04')->format('F j, Y') }}</div>
             </div>
         </div>
     </div>
@@ -60,14 +60,34 @@
                 <div class="panel-head"><div><h2>4. Itineraries and recommendations are suggestions</h2></div></div>
                 <div class="panel-body legal-content">
                     <p>Generated itineraries, distance estimates, and travel times are planning aids based on
-                        the information available to the system, not routed driving directions or a
-                        guarantee of feasibility. Always confirm opening hours, availability, and travel
-                        conditions before you go.</p>
+                        the information available to the system, not a guarantee of feasibility. The route
+                        line, distance, driving time and step-by-step directions shown on an itinerary map
+                        are a planning route that an outside routing service calculates between the planned
+                        places (see section 5). They are not live navigation: they do not take current
+                        traffic, road closures or weather into account, and the road they show may differ
+                        from the one you can actually take. On the day of travel, use a navigation app for
+                        directions. Always confirm opening hours, availability, and travel conditions before
+                        you go.</p>
                 </div>
             </div>
 
             <div class="panel">
-                <div class="panel-head"><div><h2>5. Establishment partner accounts</h2></div></div>
+                <div class="panel-head"><div><h2>5. Outside services</h2></div></div>
+                <div class="panel-body legal-content">
+                    <p>ExploreDVO's pages use services run by other organisations: OpenStreetMap for map
+                        images, the public OSRM routing server for road routes and directions, Google Fonts
+                        for text styles, and, if you click a "Google Maps" link, Google Maps. They are
+                        provided by third parties, not by ExploreDVO or DOT Region XI, under their own
+                        terms. They may be slow, unavailable or inaccurate at times, in which case maps,
+                        routes or fonts may not display correctly. Your browser contacts these services
+                        directly, and the information they receive is described in section 4 of the
+                        <a href="{{ route('legal.privacy') }}">Privacy Policy</a>, which also describes the
+                        other outside services that features of the site use.</p>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-head"><div><h2>6. Establishment partner accounts</h2></div></div>
                 <div class="panel-body legal-content">
                     <p>A business that registers a partner account represents that it holds valid DOT
                         accreditation and that the information it submits is accurate. DOT Region XI reviews
@@ -76,7 +96,7 @@
             </div>
 
             <div class="panel">
-                <div class="panel-head"><div><h2>6. Changes to these terms</h2></div></div>
+                <div class="panel-head"><div><h2>7. Changes to these terms</h2></div></div>
                 <div class="panel-body legal-content">
                     <p>These terms may be updated from time to time as the platform changes. The date at the
                         top of this page reflects the last update.</p>
@@ -84,7 +104,7 @@
             </div>
 
             <div class="panel">
-                <div class="panel-head"><div><h2>7. Contact</h2></div></div>
+                <div class="panel-head"><div><h2>8. Contact</h2></div></div>
                 <div class="panel-body legal-content">
                     <p>Questions about these terms can be sent to
                         <a href="mailto:{{ config('dot.contact_email') }}">{{ config('dot.contact_email') }}</a>.</p>
