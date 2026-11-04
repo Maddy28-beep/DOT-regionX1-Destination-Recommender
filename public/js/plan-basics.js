@@ -18,8 +18,26 @@
 
     // ---- days: [-] 3 days [+], and the dates they make
     const datesLine = document.querySelector('[data-trip-dates]');
-    const shortDate = date => date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+    // "3 days, 2 nights": days count the arrival and the departure day, nights are one fewer (a one-day trip has none).
+    const longDate = date => date.toLocaleDateString('en-US', {month: 'long', day: 'numeric'});
+    const daysAndNights = n => `${n} ${n === 1 ? 'day' : 'days'}, ${n - 1} ${n - 1 === 1 ? 'night' : 'nights'}`;
+    const departureLine = document.querySelector('[data-departure-date]');
+
+    // You leave on the last day of the trip, arrival date + (days - 1): nothing to enter, so it is only shown.
+    const departureDate = () => {
+        if (!departureLine) return;
+        if (!startDate || !startDate.value) {
+            departureLine.textContent = 'Add your arrival date to see your departure date.';
+            return;
+        }
+        const n = Math.min(30, Math.max(1, Number(days && days.value) || 1));
+        const leaving = new Date(`${startDate.value}T00:00:00`);
+        leaving.setDate(leaving.getDate() + n - 1);
+        departureLine.textContent = `Leaving ${longDate(leaving)}`;
+    };
+
     const tripDates = () => {
+        departureDate();
         if (!datesLine) return;
         const n = Math.min(30, Math.max(1, Number(days && days.value) || 1));
         if (!startDate || !startDate.value) {
@@ -30,7 +48,7 @@
         const first = new Date(`${startDate.value}T00:00:00`);
         const last = new Date(first);
         last.setDate(first.getDate() + n - 1);
-        datesLine.textContent = n === 1 ? shortDate(first) : `${shortDate(first)} – ${shortDate(last)}`;
+        datesLine.textContent = `${n === 1 ? longDate(first) : `${longDate(first)} – ${longDate(last)}`} · ${daysAndNights(n)}`;
         datesLine.classList.add('is-set');
     };
 

@@ -67,6 +67,19 @@ class TouristPreference extends Model
     }
 
     /**
+     * The day the traveller leaves: the last day of the trip, arrival date + (days - 1). Null without an arrival date.
+     * Derived, never entered: the planner places the departure on the last day whatever is stored in departure_date.
+     */
+    public function departureDate(): ?Carbon
+    {
+        if ($this->start_date === null) {
+            return null;
+        }
+
+        return $this->start_date->copy()->startOfDay()->addDays(max(1, (int) $this->travel_days) - 1);
+    }
+
+    /**
      * Where and when the traveller leaves, when they said so: the departure time (HH:MM) and the point they leave
      * from. The point is the traveller's own choice -- nothing here guesses an airport -- so a time without a located
      * point reports no point, and the planner says that instead of inventing a transfer.
