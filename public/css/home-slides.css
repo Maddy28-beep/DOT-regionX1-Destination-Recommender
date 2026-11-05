@@ -1,0 +1,83 @@
+/*
+ * Home page as screen-sized slides (owner/professor request, 2026-11-05: "every scroll should be one page, nothing cut").
+ *
+ * Only on a desktop-sized window (wide AND at least 560px tall). On phones, tablets and very short windows the page
+ * scrolls normally: forcing fixed-height slides there would cut text, which the responsive-layout rules forbid.
+ *
+ *  - Each section is one slide as tall as the window below the fixed header (77px).
+ *  - The two sections that are longer than one screen (#destinations, #about-region) are split into two slide parts.
+ *  - Scroll-snap moves one slide per scroll. A part taller than the window would scroll freely (snap never cuts content).
+ *  - On short windows the content is scaled down with `zoom` (--z) so a slide still fits.
+ *  - Reduced-motion visitors get normal scrolling.
+ *
+ * Markup: <html class="home-slides">, sections of <main>, `.home-split` sections holding `.slide-part` blocks.
+ */
+:root { --slide-header: 77px; --z: 1; }
+
+@media (min-width: 1024px) and (min-height: 560px) and (max-height: 780px) { :root { --z: .9; } }
+@media (min-width: 1024px) and (min-height: 560px) and (max-height: 700px) { :root { --z: .8; } }
+@media (min-width: 1024px) and (min-height: 560px) and (max-height: 620px) { :root { --z: .72; } }
+
+@media (min-width: 1024px) and (min-height: 560px) and (prefers-reduced-motion: no-preference) {
+    html.home-slides {
+        scroll-snap-type: y mandatory;
+        scroll-padding-top: var(--slide-header);
+    }
+
+    html.home-slides main#main-content > .hero-screen,
+    html.home-slides main#main-content > section:not(.home-split),
+    html.home-slides main#main-content .slide-part,
+    html.home-slides .site-footer {
+        scroll-snap-align: start;
+    }
+
+    /* The first screen keeps its own design; it only needs to scale on short windows. */
+    html.home-slides main#main-content > .hero-screen {
+        zoom: var(--z);
+        min-height: calc(100svh / var(--z));
+    }
+
+    /* One slide: as tall as the window below the header, content centred, never shorter than its content. */
+    html.home-slides main#main-content > section:not(.home-split) {
+        zoom: var(--z);
+        min-height: calc((100svh - var(--slide-header)) / var(--z));
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-sizing: border-box;
+        padding-top: 18px;
+        padding-bottom: 18px;
+    }
+    html.home-slides main#main-content > section:not(.home-split) > .container { width: 100%; }
+
+    /* The two long sections: each part is a slide of its own. */
+    html.home-slides main#main-content > section.home-split { padding: 0; }
+    html.home-slides main#main-content .slide-part {
+        zoom: var(--z);
+        height: calc((100svh - var(--slide-header)) / var(--z));
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-sizing: border-box;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    /* Popular destinations: heading + featured place on one screen, then six cards on the next. */
+    html.home-slides #destinations .dpost-head { flex: none; margin-bottom: 12px; }
+    html.home-slides #destinations .dpost-banner { flex: 1 1 0; min-height: 260px; height: auto; }
+    html.home-slides #destinations .dpost-grid { flex: none; }
+    html.home-slides #destinations .dpost-grid > :nth-child(n + 7) { display: none; }
+    html.home-slides #destinations .dpost-card__art {
+        max-height: clamp(96px, calc((100svh - var(--slide-header) - 40px) / 2 / var(--z) - 185px), 260px);
+    }
+
+    /* About the region: wider text column and slightly tighter text so the heading, text, provinces and map share a screen. */
+    html.home-slides #about-region .about-grid {
+        grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+        gap: 28px;
+        align-items: start;
+    }
+    html.home-slides #about-region .about-copy p { margin-block: 0 10px; font-size: .9rem; line-height: 1.45; }
+    html.home-slides #about-region .about-regions { gap: 6px; }
+}

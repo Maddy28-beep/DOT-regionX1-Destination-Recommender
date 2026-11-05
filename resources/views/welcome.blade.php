@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="home-slides">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ asset('css/landing-sections.css') }}?v={{ filemtime(public_path('css/landing-sections.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/mood-cards.css') }}?v={{ filemtime(public_path('css/mood-cards.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/hero-search.css') }}?v={{ filemtime(public_path('css/hero-search.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/home-slides.css') }}?v={{ filemtime(public_path('css/home-slides.css')) }}">
     @if ($heroVideo && $heroVideo['poster'])
         {{-- Fetched in parallel with the stylesheet so the hero's ground is
              ready at first paint, rather than arriving after it. --}}
@@ -430,8 +431,10 @@
         : $destinations;
 @endphp
 
-<section class="section dpost-section landing-section landing-section--white" id="destinations">
+<section class="section dpost-section landing-section landing-section--white home-split" id="destinations">
     <div class="container">
+        {{-- Two screens on a desktop: the heading and the featured place, then the grid (see css/home-slides.css). --}}
+        <div class="slide-part">
         <div class="dpost-head">
             <div>
                 <span class="dpost-kicker poster-kicker">handpicked for you</span>
@@ -498,12 +501,16 @@
             </a>
         @endif
 
+        </div>
+
+        <div class="slide-part">
         <div class="dpost-grid">
             @forelse ($gridDestinations as $destination)
                 @include('partials.listing-poster-card', ['listing' => $destination])
             @empty
                 <p>Destinations will appear here once the catalog is seeded.</p>
             @endforelse
+        </div>
         </div>
     </div>
 </section>
@@ -597,8 +604,9 @@
     </div>
 </section>
 
-<section class="section about-region landing-section" id="about-region">
+<section class="section about-region landing-section home-split" id="about-region">
     <div class="container">
+        <div class="slide-part">
         <div class="section-head">
             <div>
                 <span class="poster-kicker">the region</span>
@@ -661,6 +669,9 @@
             </figure>
         </div>
 
+        </div>
+
+        <div class="slide-part">
         <div class="dyk-strip">
             <span class="dyk-strip__label poster-kicker">did you know</span>
             <div class="dyk-items">
@@ -681,6 +692,7 @@
                     </div>
                 @endforeach
             </div>
+        </div>
         </div>
     </div>
 </section>
