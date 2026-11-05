@@ -47,7 +47,7 @@
 
     @if ($listing->latitude && $listing->longitude)
         <div class="visit-card__map">
-            @include('partials.map-embed', ['latitude' => $listing->latitude, 'longitude' => $listing->longitude, 'name' => $listing->name])
+            @include('partials.map-embed', ['latitude' => $listing->latitude, 'longitude' => $listing->longitude, 'name' => $listing->displayName()])
         </div>
     @endif
 

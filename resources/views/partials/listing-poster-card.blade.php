@@ -75,7 +75,7 @@
             @if ($listing->review_count > 0) {{ number_format($listing->rating, 1) }} @else New @endif
         </span>
 
-        <span class="dpost-card__name">{{ $listing->name }}</span>
+        <span class="dpost-card__name">{{ $listing->displayName() }}</span>
     </div>
 
     <div class="dpost-card__body">

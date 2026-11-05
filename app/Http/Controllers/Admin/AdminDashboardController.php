@@ -21,6 +21,8 @@ use App\Models\TouristPreference;
 use App\Models\TouristVisit;
 use App\Services\Recommendation\AprioriService;
 use App\Support\SampleData;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -102,7 +104,76 @@ class AdminDashboardController extends Controller
         $expiring = AccreditationRecord::with('listing')->where('status', 'Expired')->orderByDesc('expiration_date')->take(4)->get()
             ->concat(AccreditationRecord::with('listing')->where('status', 'Expiring Soon')->orderBy('expiration_date')->take(4)->get());
 
-        return view('admin.overview', compact('stats', 'recentVisits', 'pendingEstablishments', 'expiring', 'accreditationAlert'));
+        $checkinCharts = $this->checkinCharts();
+        $trend = [
+            'checkins_yesterday' => TouristVisit::whereDate('visit_date', now('Asia/Manila')->subDay()->toDateString())->count(),
+            // How long the longest-waiting request has been open: the thing the admin can still act on.
+            'oldest_pending_days' => ($oldest = EstablishmentAccount::where('status', 'pending')->min('submitted_at'))
+                ? (int) Carbon::parse($oldest)->startOfDay()->diffInDays(now('Asia/Manila')->startOfDay(), true) : null,
+        ];
+
+        return view('admin.overview', compact('stats', 'recentVisits', 'pendingEstablishments', 'expiring', 'accreditationAlert', 'checkinCharts', 'trend'));
+    }
+
+    /**
+     * What the Overview's check-in chart draws, for each period it can show (30 days, 90 days, all time): one count
+     * per day with the empty days filled in as 0 so the line is honest, plus the five most-visited places.
+     * Counted in the database (grouped by day), never by loading every visit.
+     *
+     * @return array<string, array{labels: list<string>, values: list<int>, total: int, peak: int, peakDay: ?string, top: list<array{name: string, count: int}>}>
+     */
+    private function checkinCharts(): array
+    {
+        $today = now('Asia/Manila')->startOfDay();
+        $first = TouristVisit::min('visit_date');
+        $allStart = $first ? Carbon::parse($first, 'Asia/Manila')->startOfDay() : $today->copy();
+        // A year and a half of daily points is plenty for a line; older history is still counted in the totals.
+        $allStart = $allStart->max($today->copy()->subDays(547));
+
+        $periods = [
+            '30' => $today->copy()->subDays(29),
+            '90' => $today->copy()->subDays(89),
+            'all' => $allStart->min($today->copy()->subDays(29)),
+        ];
+
+        $out = [];
+        foreach ($periods as $key => $start) {
+            $perDay = TouristVisit::query()
+                ->whereDate('visit_date', '>=', $start->toDateString())
+                ->selectRaw('DATE(visit_date) as day, COUNT(*) as n')
+                ->groupBy(DB::raw('DATE(visit_date)'))
+                ->pluck('n', 'day');
+
+            $labels = [];
+            $values = [];
+            for ($day = $start->copy(); $day->lte($today); $day->addDay()) {
+                $labels[] = $day->format('M j');
+                $values[] = (int) ($perDay[$day->toDateString()] ?? 0);
+            }
+            $peak = $values === [] ? 0 : max($values);
+
+            $top = TouristVisit::query()
+                ->whereDate('visit_date', '>=', $start->toDateString())
+                ->selectRaw('listing_kind, listing_id, COUNT(*) as n')
+                ->groupBy('listing_kind', 'listing_id')
+                ->orderByDesc('n')->orderBy('listing_id')
+                ->take(5)->get()
+                ->map(fn ($row) => [
+                    'name' => SampleData::displayName($this->resolveListingName($row->listing_kind, (int) $row->listing_id) ?? 'Removed listing'),
+                    'count' => (int) $row->n,
+                ])->all();
+
+            $out[$key] = [
+                'labels' => $labels,
+                'values' => $values,
+                'total' => array_sum($values),
+                'peak' => $peak,
+                'peakDay' => $peak > 0 ? $labels[array_search($peak, $values, true)] : null,
+                'top' => $top,
+            ];
+        }
+
+        return $out;
     }
 
     public function establishments(Request $request): View

@@ -76,4 +76,10 @@ trait PresentsAsPosterCard
     {
         return $scenes[$this->id % count($scenes)];
     }
+
+    /** The name to show a visitor: the stored name without a trailing " [SAMPLE]" (see SampleData::displayName). */
+    public function displayName(): string
+    {
+        return \App\Support\SampleData::displayName($this->name);
+    }
 }

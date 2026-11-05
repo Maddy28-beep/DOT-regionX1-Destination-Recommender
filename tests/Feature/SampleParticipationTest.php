@@ -236,7 +236,7 @@ class SampleParticipationTest extends TestCase
 
         $this->assertTrue(Destination::publiclyVisible()->whereKey($sample->id)->exists());
         $this->assertTrue(Destination::publiclyVisible()->whereKey($unrecorded->id)->exists());
-        $this->get('/destinations')->assertOk()->assertSee('Demo Falls [SAMPLE]')->assertSee('Unrecorded Falls');
+        $this->get('/destinations')->assertOk()->assertSee('Demo Falls')->assertSee('Unrecorded Falls');
     }
 
     // ---- Apriori ----------------------------------------------------------------------------------------------

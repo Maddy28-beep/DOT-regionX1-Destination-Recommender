@@ -39,13 +39,12 @@
     $realPhoto = $photo && ! str_ends_with(strtolower($photo->path), '.svg') ? $photo : null;
 
     // A card whose place is sample data says so: a destination stop, a meal restaurant, a souvenir stop and the
-    // night's stay alike. A name that already carries "[SAMPLE]" says it itself, and a card with a
-    // "popular pairing" line already gets that line's label, so neither gets a second one.
+    // night's stay alike. A card with a "popular pairing" line already gets that line's label, so it does not get
+    // a second one. (The name is shown without its " [SAMPLE]" suffix, so the tag is what says it.)
     // Provenance comes from SampleData, never from the is_accredited eligibility flag alone: a sample is
     // "Sample data, not DOT-verified" even though the flag is set.
     $sampleCue = in_array($kind, ['activity', 'meal', 'overnight'], true) && $listing
         && app(\App\Support\SampleData::class)->isSample($listing)
-        && ! str_contains(strtolower($listing->name), '[sample]')
         && ! $item->ruleExplanation();
 
     // The card's accreditation line, in the project's three provenance states (G2 completed under
@@ -122,7 +121,7 @@
             {{-- "15 min · 1.4 km": the way of travelling is the icon, the destination is the next card. --}}
             <p class="tl-travel">
                 <x-icon :name="$transportIcon" />
-                <span class="sr-only">{{ $item->title }}: </span>
+                <span class="sr-only">{{ \App\Support\SampleData::displayName($item->title) }}: </span>
                 <span>{{ $item->travelBrief() }}</span>
             </p>
         @elseif ($isCard)
@@ -154,12 +153,12 @@
                     @if (filled($label))<p class="tl-card__label">{{ $label }}</p>@endif
                     @if ($kind === 'activity' && ! $item->destination_id)
                         {{-- The souvenir stop has no name in its title, so the shop is named as the subject. --}}
-                        <h4>{{ $item->title }}</h4>
-                        <p class="tl-card__what"><a href="{{ route($route, $listing) }}">{{ $listing->name }}</a>@if ($sampleCue)<x-sample-tag label="Sample data" title="Sample data, not DOT-verified: this place's accreditation number is a placeholder, not an official DOT number." />@endif</p>
+                        <h4>{{ \App\Support\SampleData::displayName($item->title) }}</h4>
+                        <p class="tl-card__what"><a href="{{ route($route, $listing) }}">{{ $listing->displayName() }}</a>@if ($sampleCue)<x-sample-tag label="Sample data" title="Sample data, not DOT-verified: this place's accreditation number is a placeholder, not an official DOT number." />@endif</p>
                         <p class="tl-card__label">{{ $accreditationLabel }}</p>
                     @elseif ($kind === 'activity')
                         <h4>
-                            <a href="{{ route($route, $listing) }}">{{ $listing->name }}</a>
+                            <a href="{{ route($route, $listing) }}">{{ $listing->displayName() }}</a>
                             @if ($sampleCue)<x-sample-tag label="Sample data" title="Sample data, not DOT-verified: this place's accreditation number is a placeholder, not an official DOT number." />@endif
                         </h4>
                         @if ($item->destination_id)
@@ -171,7 +170,7 @@
                         @endif
                     @elseif ($isStay && $route)
                         {{-- The night's stay is named, like every other stop, instead of only "Overnight stay". --}}
-                        <h4><a href="{{ route($route, $listing) }}">{{ $listing->name }}</a>@if ($sampleCue)<x-sample-tag label="Sample data" title="Sample data, not DOT-verified: this place's accreditation number is a placeholder, not an official DOT number." />@endif</h4>
+                        <h4><a href="{{ route($route, $listing) }}">{{ $listing->displayName() }}</a>@if ($sampleCue)<x-sample-tag label="Sample data" title="Sample data, not DOT-verified: this place's accreditation number is a placeholder, not an official DOT number." />@endif</h4>
                         <p class="tl-card__label">{{ $accreditationLabel }}</p>
                         @if ($merged)
                             <p class="tl-card__what"><x-icon name="building" /> Dinner {{ $start?->format('g:i A') }} &middot; check in for the night</p>
@@ -183,10 +182,10 @@
                             </p>
                         @endif
                     @elseif ($kind === 'meal' && $route && $listing)
-                        <h4><a href="{{ route($route, $listing) }}">{{ $listing->name }}</a>@if ($sampleCue)<x-sample-tag label="Sample data" title="Sample data, not DOT-verified: this place's accreditation number is a placeholder, not an official DOT number." />@endif</h4>
+                        <h4><a href="{{ route($route, $listing) }}">{{ $listing->displayName() }}</a>@if ($sampleCue)<x-sample-tag label="Sample data" title="Sample data, not DOT-verified: this place's accreditation number is a placeholder, not an official DOT number." />@endif</h4>
                         <p class="tl-card__label">{{ $accreditationLabel }}</p>
                     @else
-                        <h4>{{ $item->title }}</h4>
+                        <h4>{{ \App\Support\SampleData::displayName($item->title) }}</h4>
                         <p class="tl-card__what">{{ $item->travelSummary() }}</p>
                     @endif
 
@@ -262,9 +261,9 @@
                             @endif
                         </small>
                     @elseif ($listing && $route && str_contains($item->title, $listing->name))
-                        <a href="{{ route($route, $listing) }}">{{ $item->title }}</a>
+                        <a href="{{ route($route, $listing) }}">{{ \App\Support\SampleData::displayName($item->title) }}</a>
                     @else
-                        <strong>{{ $item->title }}</strong>
+                        <strong>{{ \App\Support\SampleData::displayName($item->title) }}</strong>
                     @endif
                     @if ($kind === 'free' && $item->note === 'Nothing is arranged for this time.')
                         {{-- The free time before dinner: said plainly, and where to spend it. --}}

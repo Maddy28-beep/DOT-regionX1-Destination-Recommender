@@ -46,27 +46,56 @@
         justify-content: center;
         box-sizing: border-box;
         padding-top: 18px;
-        padding-bottom: 18px;
+        /* Every sheet slides 32px up over the one before it (--sheet-radius), so the last 32px of a slide are hidden
+           under the next sheet: leave room for that or the bottom of the cards is cut. */
+        padding-bottom: calc(var(--sheet-radius) + 18px);
     }
     html.home-slides main#main-content > section:not(.home-split) > .container { width: 100%; }
+
+    /* Short sections (packages, happening soon, the closing banner) are not stretched to a whole screen: that left a
+       few hundred pixels of empty band above and below a handful of cards. They keep their snap point but take only
+       the height of their content plus an even, modest padding. */
+    html.home-slides main#main-content > section.slide-compact {
+        min-height: 0;
+        justify-content: flex-start;
+        padding-top: 40px;
+        padding-bottom: calc(var(--sheet-radius) + 24px);
+    }
 
     /* The two long sections: each part is a slide of its own. */
     html.home-slides main#main-content > section.home-split { padding: 0; }
     html.home-slides main#main-content .slide-part {
         zoom: var(--z);
-        height: calc((100svh - var(--slide-header)) / var(--z));
+        /* min-height, not height: a part whose content is taller than the window grows instead of being clipped. */
+        min-height: calc((100svh - var(--slide-header)) / var(--z));
         display: flex;
         flex-direction: column;
         justify-content: center;
         box-sizing: border-box;
-        padding-top: 12px;
+        padding-top: 40px; /* clear of the sheet's rounded top edge, like the other sections */
         padding-bottom: 12px;
     }
+
+    /* About the region is already close to one screen of content; centring it in a full-height part left a ~170px band
+       above the heading. Start it near the top and let it take its own height. */
+    html.home-slides main#main-content #about-region .slide-part {
+        min-height: 0;
+        justify-content: flex-start;
+        padding-top: 40px;
+        padding-bottom: 8px;
+    }
+    /* The "did you know" strip is the second part: keep it just under the text, not centred in its own screen. */
+    html.home-slides main#main-content #about-region .slide-part + .slide-part { padding-top: 8px; }
+    html.home-slides main#main-content #about-region .slide-part:last-child { padding-bottom: calc(var(--sheet-radius) + 24px); }
+
+    /* The last part of a split section also sits under the next sheet's overlap. */
+    html.home-slides main#main-content .slide-part:last-child { padding-bottom: calc(var(--sheet-radius) + 12px); }
 
     /* Popular destinations: heading + featured place on one screen, then six cards on the next. */
     html.home-slides #destinations .dpost-head { flex: none; margin-bottom: 12px; }
     html.home-slides #destinations .dpost-banner { flex: 1 1 0; min-height: 260px; height: auto; }
-    html.home-slides #destinations .dpost-grid { flex: none; }
+    /* Six cards as 3 + 3: four columns left the second row half empty. */
+    html.home-slides #destinations .dpost-grid { flex: none; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     html.home-slides #destinations .dpost-grid > :nth-child(n + 7) { display: none; }
     html.home-slides #destinations .dpost-card__art {
         max-height: clamp(96px, calc((100svh - var(--slide-header) - 40px) / 2 / var(--z) - 185px), 260px);

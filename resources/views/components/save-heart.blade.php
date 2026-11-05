@@ -56,7 +56,7 @@
                  stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21.2l7.7-7.7 1.1-1.1a5.5 5.5 0 0 0 0-7.8z"/>
             </svg>
-            <span class="sr-only">{{ $isSaved ? 'Remove' : 'Save' }} {{ $listing->name }}</span>
+            <span class="sr-only">{{ $isSaved ? 'Remove' : 'Save' }} {{ $listing->displayName() }}</span>
         </button>
     @else
         <button type="submit" class="save-heart {{ $isSaved ? 'is-saved' : '' }}"
@@ -67,7 +67,7 @@
                  stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21.2l7.7-7.7 1.1-1.1a5.5 5.5 0 0 0 0-7.8z"/>
             </svg>
-            <span class="sr-only">{{ $isSaved ? 'Remove' : 'Save' }} {{ $listing->name }}</span>
+            <span class="sr-only">{{ $isSaved ? 'Remove' : 'Save' }} {{ $listing->displayName() }}</span>
         </button>
     @endif
 </form>

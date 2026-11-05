@@ -4,6 +4,10 @@
 @section('page-title', 'Overview')
 @section('page-sub', 'Key tourism statistics at a glance')
 
+@push('head')
+    <link rel="stylesheet" href="{{ asset('css/admin-overview.css') }}?v={{ filemtime(public_path('css/admin-overview.css')) }}">
+@endpush
+
 @section('page-actions')
     <a href="{{ route('admin.reports') }}" class="btn btn-outline"><x-icon name="chart" /> Reports &amp; export</a>
 @endsection
@@ -11,7 +15,7 @@
 @section('content')
 {{-- One screen: the alert is a line, the numbers are a row, and the three lists share the rest of the height, each
      scrolling inside its own card. --}}
-<div class="adm-fit">
+<div class="adm-flow">
 
 @if ($accreditationAlert['expired'] > 0 || $accreditationAlert['expiring'] > 0)
     @php
@@ -42,7 +46,14 @@
 <div class="adm-kpis">
     <div class="adm-kpi">
         <span class="adm-kpi__ic"><x-icon name="target" /></span>
-        <div><div class="adm-kpi__val">{{ $stats['checkins_today'] }}</div><div class="adm-kpi__lab">QR Check-ins Today</div></div>
+        <div>
+            <div class="adm-kpi__val">{{ $stats['checkins_today'] }}</div><div class="adm-kpi__lab">QR Check-ins Today</div>
+            @php
+                $diff = $stats['checkins_today'] - $trend['checkins_yesterday'];
+                $trendText = $diff > 0 ? '&#9650; '.$diff.' more than yesterday' : ($diff < 0 ? '&#9660; '.abs($diff).' fewer than yesterday' : 'Same as yesterday');
+            @endphp
+            <div class="adm-kpi__trend {{ $diff > 0 ? 'is-up' : ($diff < 0 ? 'is-down' : '') }}">{!! $trendText !!}</div>
+        </div>
     </div>
     <div class="adm-kpi">
         <span class="adm-kpi__ic"><x-icon name="map-pin" /></span>
@@ -57,7 +68,10 @@
         <div>
             <div class="adm-kpi__val">{{ $stats['pending_establishments'] }}</div>
             <div class="adm-kpi__lab">Pending Establishments</div>
-            @if ($stats['pending_establishments'] > 0)<div class="adm-kpi__flag">Needs review</div>@endif
+            @if ($stats['pending_establishments'] > 0)
+                @php $waiting = (int) ($trend['oldest_pending_days'] ?? 0); @endphp
+                <div class="adm-kpi__flag">Needs review{{ $waiting > 0 ? ' · oldest waiting '.$waiting.' '.\Illuminate\Support\Str::plural('day', $waiting) : '' }}</div>
+            @endif
         </div>
     </div>
     <div class="adm-kpi">
@@ -74,6 +88,37 @@
     + {{ $stats['other_destinations'] }} not counted in either (official record not currently accredited, or no accreditation record on file)
     = {{ $stats['total_destinations'] }} in total.
 </p>
+
+<div class="adm-charts" id="overview-charts">
+    <section class="adm-card adm-chart" aria-labelledby="checkin-chart-title">
+        <div class="adm-card__head">
+            <div>
+                <h2 id="checkin-chart-title">QR Check-ins</h2>
+                <p id="checkin-summary" aria-live="polite"></p>
+            </div>
+            <div class="adm-range" role="group" aria-label="Period">
+                <button type="button" data-range="30">30 days</button>
+                <button type="button" data-range="90" class="is-on" aria-pressed="true">90 days</button>
+                <button type="button" data-range="all">All</button>
+            </div>
+        </div>
+        <div class="adm-chart__body">
+            <canvas id="checkin-line" role="img" aria-label="Daily QR check-ins for the selected period"></canvas>
+            <div class="adm-chart__empty" id="checkin-empty" hidden>
+                <strong>Not enough check-ins in this period yet</strong>
+                <span>Try a longer period, or share the QR codes with partner establishments to start collecting visits.</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="adm-card adm-chart" aria-labelledby="top-places-title">
+        <div class="adm-card__head">
+            <div><h2 id="top-places-title">Top places by check-ins</h2><p>Same period as the chart.</p></div>
+        </div>
+        <div class="adm-chart__body adm-bars" id="top-places"></div>
+    </section>
+</div>
+<script type="application/json" id="overview-chart-data">{!! json_encode($checkinCharts, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) !!}</script>
 
 <div class="adm-cols">
     <section class="adm-card" aria-labelledby="watch-title">
@@ -166,3 +211,8 @@
 
 </div>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('vendor/chartjs/chart.umd.js') }}?v={{ filemtime(public_path('vendor/chartjs/chart.umd.js')) }}"></script>
+    <script src="{{ asset('js/admin-overview-charts.js') }}?v={{ filemtime(public_path('js/admin-overview-charts.js')) }}"></script>
+@endpush

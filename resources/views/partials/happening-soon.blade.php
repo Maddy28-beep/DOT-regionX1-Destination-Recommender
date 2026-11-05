@@ -1,6 +1,6 @@
 @if ($upcomingEvents->isNotEmpty())
 <link rel="stylesheet" href="{{ asset('css/events.css') }}?v={{ filemtime(public_path('css/events.css')) }}">
-<section class="section landing-section landing-section--cream">
+<section class="section landing-section landing-section--cream slide-compact">
     <div class="container">
         <div class="dpost-head">
             <div>

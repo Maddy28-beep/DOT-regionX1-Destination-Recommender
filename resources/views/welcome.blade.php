@@ -450,9 +450,6 @@
                 @else
                     <p>Spots across the Davao Region.</p>
                 @endif
-                @if (($stats['destinations_sample'] ?? 0) > 0)
-                    <p><small>Places marked <strong>DOT Accredited</strong> are official DOT records; places marked <strong>Sample Data</strong> are temporary demonstration records.</small></p>
-                @endif
             </div>
             <div class="dpost-head__right">
                 <svg class="dpost-flight" viewBox="0 0 160 46" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -518,7 +515,7 @@
 @if ($packages->count())
 {{-- The same card as the packages page and every other grid. This strip kept its own older card, which also
      ribboned one package "Most Popular" on a review-count proxy even while no package had a single review. --}}
-<section class="section landing-section landing-section--tint">
+<section class="section landing-section landing-section--tint slide-compact">
     <div class="container">
         <div class="dpost-head">
             <div>
@@ -539,7 +536,7 @@
 
 @include('partials.happening-soon')
 
-<section class="section section-alt landing-section" id="experiences">
+<section class="section section-alt landing-section slide-compact" id="experiences">
     <div class="container">
         <div class="section-head">
             <div>
@@ -697,7 +694,7 @@
     </div>
 </section>
 
-<section class="section landing-section landing-section--cream">
+<section class="section landing-section landing-section--cream slide-compact">
     <div class="container">
         <div class="cta-banner">
             {{--

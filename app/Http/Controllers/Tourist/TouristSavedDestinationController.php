@@ -96,7 +96,7 @@ class TouristSavedDestinationController extends Controller
                 'saved' => $saved,
                 'title' => $toast['status'],
                 'detail' => $toast['status_detail'],
-                'name' => $listing->name,
+                'name' => $listing->displayName(),
             ]);
         }
 

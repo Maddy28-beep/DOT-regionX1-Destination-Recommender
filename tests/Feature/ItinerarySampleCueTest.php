@@ -75,12 +75,14 @@ class ItinerarySampleCueTest extends TestCase
         $this->assertStringNotContainsString(self::CUE, $html);
     }
 
-    public function test_a_destination_already_named_sample_gets_no_second_label(): void
+    public function test_a_destination_stored_with_the_sample_suffix_shows_a_clean_name_and_the_sample_label(): void
     {
         $html = $this->page($this->destination('Tagbibinta Falls [SAMPLE]', true));
 
-        $this->assertStringContainsString('Tagbibinta Falls [SAMPLE]', $html);
-        $this->assertStringNotContainsString(self::CUE, $html);
+        // The suffix stays in the stored name, but a visitor reads the clean name and is told by the label instead.
+        $this->assertStringContainsString('Tagbibinta Falls', $html);
+        $this->assertStringNotContainsString('Tagbibinta Falls [SAMPLE]', $html);
+        $this->assertStringContainsString(self::CUE, $html);
     }
 
     public function test_a_sample_destination_says_not_dot_verified_never_accreditation_listed(): void

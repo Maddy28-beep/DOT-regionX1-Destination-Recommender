@@ -52,6 +52,16 @@ class SampleData
         return $this->loadStatuses()[$kind.':'.$id] ?? self::UNVERIFIED;
     }
 
+    /**
+     * A listing's name as a visitor reads it: without the trailing " [SAMPLE]" the import adds. The stored name keeps
+     * the suffix (it is one of the three sample markers, and the planner, imports and chatbot match on it); the
+     * "Sample Data" badge, which comes from the accreditation records, is what tells a visitor it is sample data.
+     */
+    public static function displayName(?string $name): string
+    {
+        return trim((string) preg_replace('/\s*\[SAMPLE\]\s*$/i', '', (string) $name));
+    }
+
     /** The badge text for a status. */
     public static function label(string $status): string
     {

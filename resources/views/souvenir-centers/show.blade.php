@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', $souvenirCenter->name.' — ExploreDVO')
-@section('meta_description', \Illuminate\Support\Str::limit(trim(strip_tags((string) ($souvenirCenter->description ?? $souvenirCenter->name.' on ExploreDVO, the DOT Region XI tourism platform.'))), 155))
+@section('title', $souvenirCenter->displayName().' — ExploreDVO')
+@section('meta_description', \Illuminate\Support\Str::limit(trim(strip_tags((string) ($souvenirCenter->description ?? $souvenirCenter->displayName().' on ExploreDVO, the DOT Region XI tourism platform.'))), 155))
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/accommodation-gallery.css') }}?v={{ filemtime(public_path('css/accommodation-gallery.css')) }}">
@@ -25,7 +25,7 @@
     <nav class="breadcrumb">
         <a href="{{ route('home') }}">Home</a> /
         <a href="{{ route('souvenir-centers.index') }}">Souvenir Centers</a> /
-        {{ $souvenirCenter->name }}
+        {{ $souvenirCenter->displayName() }}
     </nav>
 
     <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($souvenirCenter->getMorphClass(), $souvenirCenter->id)->latest()->get()" />
@@ -33,7 +33,7 @@
     @include('partials.gallery-hero', [
         'keepOtherPhotos' => true,
         'photos' => $souvenirCenter->photos,
-        'title' => $souvenirCenter->name,
+        'title' => $souvenirCenter->displayName(),
         'subtitle' => $souvenirCenter->posterMeta(),
         'isAccredited' => $souvenirCenter->is_accredited,
         'isSample' => app(\App\Support\SampleData::class)->isSample($souvenirCenter),

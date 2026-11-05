@@ -130,7 +130,7 @@
                 @endif
             </div>
 
-            <h3 class="dcard__name">{{ $listing->name }}</h3>
+            <h3 class="dcard__name">{{ $listing->displayName() }}</h3>
             @if ($sub !== '')
                 <div class="dcard__loc"><x-icon :name="$subIcon" /> <span title="{{ $sub }}">{{ $sub }}</span></div>
             @endif
