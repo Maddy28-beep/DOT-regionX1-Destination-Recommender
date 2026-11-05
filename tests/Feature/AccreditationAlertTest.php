@@ -50,11 +50,24 @@ class AccreditationAlertTest extends TestCase
 
         $this->assertStringContainsString('Accreditation needs attention', $html);
         $this->assertStringContainsString('1 record expired', $html);
-        $this->assertStringContainsString('2 expire within 30 days', $html);
-        $this->assertStringContainsString('1 within 7 days', $html);
+        $this->assertStringContainsString('2 records are flagged Expiring Soon: 1 due within 7 days', $html);
+        $this->assertStringNotContainsString('past the expiry date', $html);
         $this->assertStringContainsString('Hidden Falls', $html);
         $this->assertStringContainsString('Soon Beach', $html);
         $this->assertStringNotContainsString('Fine Cave', $html);
+    }
+
+    public function test_a_date_that_has_already_passed_is_not_reported_as_within_7_days(): void
+    {
+        // Still "Expiring Soon" because the test grace period holds the nightly sync back, but the date is behind us.
+        $this->record('Late Beach', 'Expiring Soon', -5, 1);
+        $this->record('Soon Park', 'Expiring Soon', 3, 2);
+
+        $html = $this->actingAs($this->admin(), 'admin')->get(route('admin.overview'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('2 records are flagged Expiring Soon: 1 already past the expiry date', $html);
+        $this->assertStringContainsString('1 due within 7 days', $html);
+        $this->assertStringNotContainsString('expire within 30 days', $html);
     }
 
     public function test_no_banner_when_everything_is_current(): void

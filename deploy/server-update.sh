@@ -52,9 +52,11 @@ echo "[3/8] Copying code (keeps .env, uploads, storage, vendor, the public/stora
 # Remember whether this package ships a different vector file than the server had (only used for a reminder below).
 OLD_VECTORS=$(md5sum "$APP/$VECTORS" 2>/dev/null | cut -d' ' -f1 || true)
 NEW_VECTORS=$(md5sum "$STAGE/$VECTORS" 2>/dev/null | cut -d' ' -f1 || true)
+# Every pattern starts with "/" so it matches only at the top of the package. An unanchored 'vendor/' also matched
+# public/vendor/ (Bootstrap, Chart.js, Leaflet), so those files were never deployed and the admin Reports page crashed.
 rsync -a --delete \
-  --exclude='.env' --exclude='storage/' --exclude='vendor/' \
-  --exclude='bootstrap/cache/' --exclude='public/storage' \
+  --exclude='/.env' --exclude='/storage/' --exclude='/vendor/' \
+  --exclude='/bootstrap/cache/' --exclude='/public/storage' \
   "$STAGE"/ "$APP"/
 # make sure runtime folders exist even on a first run
 mkdir -p "$APP"/storage/{app/public,framework/{cache,sessions,views},logs} "$APP"/bootstrap/cache

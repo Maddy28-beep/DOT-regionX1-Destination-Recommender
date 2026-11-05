@@ -72,8 +72,14 @@ class AdminDashboardController extends Controller
         $accreditationAlert = [
             'expired' => AccreditationRecord::where('status', 'Expired')->count(),
             'expiring' => $stats['expiring_accreditations'],
+            // Not yet due: today through the next 7 days. A record whose date has already passed is not "within 7 days".
             'within_week' => AccreditationRecord::where('status', 'Expiring Soon')
+                ->whereDate('expiration_date', '>=', now('Asia/Manila')->toDateString())
                 ->whereDate('expiration_date', '<=', now('Asia/Manila')->addDays(7)->toDateString())->count(),
+            // Date already passed but the status is still "Expiring Soon" (the test grace period holds the nightly
+            // sync back), so the place is still shown to tourists. Said plainly instead of folded into "within 7 days".
+            'past_due' => AccreditationRecord::where('status', 'Expiring Soon')
+                ->whereDate('expiration_date', '<', now('Asia/Manila')->toDateString())->count(),
         ];
 
         /*
