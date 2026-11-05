@@ -6,7 +6,7 @@
     $groups: ['Property type' => ['Hotel', ...], ...] -- empty groups are skipped
 --}}
 <div class="side-card about-card">
-    <h3 class="mt-0">About {{ $listing->name }}</h3>
+    <h3 class="mt-0">About {{ $listing->displayName() }}</h3>
     <p class="about-card__text">{{ $listing->description ?? 'No description available yet for this '.$noun.'.' }}</p>
 
     @foreach (collect($groups)->map(fn ($values) => collect($values)->filter()->values())->filter(fn ($values) => $values->isNotEmpty()) as $label => $values)

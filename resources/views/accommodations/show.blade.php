@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', $accommodation->name.' — ExploreDVO')
-@section('meta_description', \Illuminate\Support\Str::limit(trim(strip_tags((string) ($accommodation->description ?? $accommodation->name.' on ExploreDVO, the DOT Region XI tourism platform.'))), 155))
+@section('title', $accommodation->displayName().' — ExploreDVO')
+@section('meta_description', \Illuminate\Support\Str::limit(trim(strip_tags((string) ($accommodation->description ?? $accommodation->displayName().' on ExploreDVO, the DOT Region XI tourism platform.'))), 155))
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/accommodation-gallery.css') }}?v={{ filemtime(public_path('css/accommodation-gallery.css')) }}">
@@ -31,14 +31,14 @@
     <nav class="breadcrumb">
         <a href="{{ route('home') }}">Home</a> /
         <a href="{{ route('accommodations.index') }}">Accommodations</a> /
-        {{ $accommodation->name }}
+        {{ $accommodation->displayName() }}
     </nav>
 
     <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($accommodation->getMorphClass(), $accommodation->id)->latest()->get()" />
 
     @include('partials.gallery-hero', [
         'photos' => $accommodation->photos,
-        'title' => $accommodation->name,
+        'title' => $accommodation->displayName(),
         'subtitle' => $accommodation->posterMeta(),
         'isAccredited' => $accommodation->is_accredited,
         'isSample' => app(\App\Support\SampleData::class)->isSample($accommodation),

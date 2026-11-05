@@ -15,7 +15,7 @@
 @endphp
 
 <div class="side-card about-card">
-    <h3 class="mt-0">About {{ $destination->name }}</h3>
+    <h3 class="mt-0">About {{ $destination->displayName() }}</h3>
     <p class="about-card__text">{{ $destination->description ?? 'No description available yet for this destination.' }}</p>
 
     @if ($categories->isNotEmpty())

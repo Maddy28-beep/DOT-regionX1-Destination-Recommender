@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', $restaurant->name.' — ExploreDVO')
-@section('meta_description', \Illuminate\Support\Str::limit(trim(strip_tags((string) ($restaurant->description ?? $restaurant->name.' on ExploreDVO, the DOT Region XI tourism platform.'))), 155))
+@section('title', $restaurant->displayName().' — ExploreDVO')
+@section('meta_description', \Illuminate\Support\Str::limit(trim(strip_tags((string) ($restaurant->description ?? $restaurant->displayName().' on ExploreDVO, the DOT Region XI tourism platform.'))), 155))
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/accommodation-gallery.css') }}?v={{ filemtime(public_path('css/accommodation-gallery.css')) }}">
@@ -43,7 +43,7 @@
     <nav class="breadcrumb">
         <a href="{{ route('home') }}">Home</a> /
         <a href="{{ route('restaurants.index') }}">Restaurants</a> /
-        {{ $restaurant->name }}
+        {{ $restaurant->displayName() }}
     </nav>
 
     <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($restaurant->getMorphClass(), $restaurant->id)->latest()->get()" />
@@ -51,7 +51,7 @@
     @include('partials.gallery-hero', [
         'keepOtherPhotos' => true,
         'photos' => $restaurant->photos,
-        'title' => $restaurant->name,
+        'title' => $restaurant->displayName(),
         'subtitle' => $restaurant->posterMeta(),
         'isAccredited' => $restaurant->is_accredited,
         'isSample' => app(\App\Support\SampleData::class)->isSample($restaurant),

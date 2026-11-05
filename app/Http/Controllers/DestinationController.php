@@ -59,7 +59,7 @@ class DestinationController extends Controller
         // Map results use the same filters, across all pages of the catalogue.
         $mapDestinations = (clone $query)->get()->map(fn (Destination $destination) => [
             'id' => $destination->id,
-            'name' => $destination->name,
+            'name' => $destination->displayName(),
             'location' => $destination->location,
             'type' => $destination->type,
             'latitude' => $destination->latitude,

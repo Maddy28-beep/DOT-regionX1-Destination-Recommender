@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', $destination->name.' — ExploreDVO')
-@section('meta_description', \Illuminate\Support\Str::limit(trim(strip_tags((string) ($destination->description ?? $destination->name.' on ExploreDVO, the DOT Region XI tourism platform.'))), 155))
+@section('title', $destination->displayName().' — ExploreDVO')
+@section('meta_description', \Illuminate\Support\Str::limit(trim(strip_tags((string) ($destination->description ?? $destination->displayName().' on ExploreDVO, the DOT Region XI tourism platform.'))), 155))
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/accommodation-gallery.css') }}?v={{ filemtime(public_path('css/accommodation-gallery.css')) }}">
@@ -18,14 +18,14 @@
     <nav class="breadcrumb">
         <a href="{{ route('home') }}">Home</a> /
         <a href="{{ route('destinations.index') }}">Destinations</a> /
-        {{ $destination->name }}
+        {{ $destination->displayName() }}
     </nav>
 
 
     @if ($destination->photos->isNotEmpty())
         @include('partials.gallery-hero', [
             'photos' => $destination->photos,
-            'title' => $destination->name,
+            'title' => $destination->displayName(),
             'subtitle' => trim($destination->location.($destination->region ? ' · '.$destination->region->name : '')),
             'isAccredited' => $destination->is_accredited,
             'provenance' => app(\App\Support\SampleData::class)->status($destination),

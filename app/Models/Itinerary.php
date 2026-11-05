@@ -113,12 +113,12 @@ class Itinerary extends Model
             $day = (int) $item->day_number;
             $previous = empty($byDay[$day]) ? null : end($byDay[$day]);
 
-            if ($previous && $previous['label'] === $listing->name) {
+            if ($previous && $previous['label'] === $listing->displayName()) {
                 continue;
             }
 
             $byDay[$day][] = [
-                'label' => $listing->name,
+                'label' => $listing->displayName(),
                 'address' => $listing->location,
                 'lat' => $listing->latitude === null ? null : (float) $listing->latitude,
                 'lng' => $listing->longitude === null ? null : (float) $listing->longitude,

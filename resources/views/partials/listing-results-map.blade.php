@@ -40,7 +40,7 @@
         var points = {!! Illuminate\Support\Js::from($mappable->map(fn ($listing) => [
             'lat' => (float) $listing->latitude,
             'lng' => (float) $listing->longitude,
-            'name' => $listing->name,
+            'name' => $listing->displayName(),
             'meta' => $listing->posterMeta(),
             'url' => $listing->posterUrl(),
         ])) !!};

@@ -39,7 +39,7 @@
     </span>
 
     <div class="dest-detail-hero__content">
-        <h1>{{ $destination->name }}</h1>
+        <h1>{{ $destination->displayName() }}</h1>
         <div class="loc">{{ $destination->location }}@if($destination->region) &middot; {{ $destination->region->name }}@endif</div>
     </div>
 </div>

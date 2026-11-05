@@ -22,13 +22,13 @@
 @if ($alreadyReviewed)
     <div class="privacy-note">
         <x-icon name="shield-check" />
-        <p>You have reviewed {{ $listing->name }}. Thanks &mdash; one review per visitor keeps the ratings honest.</p>
+        <p>You have reviewed {{ $listing->displayName() }}. Thanks &mdash; one review per visitor keeps the ratings honest.</p>
     </div>
 @elseif (! $checkedIn)
     <div class="privacy-note">
         <x-icon name="target" />
         <p>
-            Been to {{ $listing->name }}? Scan the DOT QR code displayed at the entrance to leave a review.
+            Been to {{ $listing->displayName() }}? Scan the DOT QR code displayed at the entrance to leave a review.
             Ratings here only come from people who checked in on site, so they cannot be posted by
             anyone who has never been.
         </p>
@@ -50,7 +50,7 @@
         @enderror
 
         <fieldset class="review-form__rating">
-            <legend>Your rating of {{ $listing->name }}</legend>
+            <legend>Your rating of {{ $listing->displayName() }}</legend>
 
             {{-- Real radio inputs, so the stars work with a keyboard and a screen reader and the form
                  still submits without JavaScript. Listed 5 to 1 and laid out in reverse so a CSS-only

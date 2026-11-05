@@ -46,7 +46,7 @@ class ItinerarySwapController extends Controller
         $closure = $this->similar->closure($original, $this->similar->windowFor($itinerary));
 
         return response()->json([
-            'original' => ['id' => $original->id, 'name' => $original->name],
+            'original' => ['id' => $original->id, 'name' => $original->displayName()],
             'advisory' => $closure ? ['title' => $closure['reason'], 'message' => $closure['reason']] : null,
             'alternatives' => $this->similar->alternatives($original, $itinerary, self::OFFER)
                 ->map(fn (array $row) => $this->present($row))
@@ -207,7 +207,7 @@ class ItinerarySwapController extends Controller
 
         return [
             'id' => $d->id,
-            'name' => $d->name,
+            'name' => $d->displayName(),
             'type' => $d->type,
             'location' => $d->location,
             'similarity' => (int) round($row['similarity'] * 100),
