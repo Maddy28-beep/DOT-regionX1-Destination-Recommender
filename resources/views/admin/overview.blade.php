@@ -14,6 +14,16 @@
 <div class="adm-fit">
 
 @if ($accreditationAlert['expired'] > 0 || $accreditationAlert['expiring'] > 0)
+    @php
+        $expiringParts = [];
+        if ($accreditationAlert['past_due'] > 0) {
+            $expiringParts[] = $accreditationAlert['past_due'].' already past the expiry date but still shown while the test grace period is on';
+        }
+        if ($accreditationAlert['within_week'] > 0) {
+            $expiringParts[] = $accreditationAlert['within_week'].' due within 7 days';
+        }
+        $expiringDetail = $expiringParts ? ': '.implode(', ', $expiringParts) : '';
+    @endphp
     <div class="adm-alert accreditation-alert" role="alert">
         <x-icon name="alert-triangle" />
         <div>
@@ -22,7 +32,7 @@
                 {{ $accreditationAlert['expired'] }} {{ \Illuminate\Support\Str::plural('record', $accreditationAlert['expired']) }} expired, so those places are hidden from tourists until renewed.
             @endif
             @if ($accreditationAlert['expiring'] > 0)
-                {{ $accreditationAlert['expiring'] }} {{ $accreditationAlert['expiring'] === 1 ? 'expires' : 'expire' }} within 30 days{{ $accreditationAlert['within_week'] > 0 ? ' ('.$accreditationAlert['within_week'].' within 7 days)' : '' }}.
+                {{ $accreditationAlert['expiring'] }} {{ \Illuminate\Support\Str::plural('record', $accreditationAlert['expiring']) }} {{ $accreditationAlert['expiring'] === 1 ? 'is' : 'are' }} flagged Expiring Soon{{ $expiringDetail }}.
             @endif
         </div>
         <a href="{{ route('admin.accreditation', ['status' => $accreditationAlert['expired'] > 0 ? 'Expired' : 'Expiring Soon']) }}" class="btn btn-outline">Review &amp; renew</a>

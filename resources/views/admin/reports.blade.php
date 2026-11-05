@@ -7,8 +7,8 @@
 @push('head')
     {{-- Bootstrap 5, vendored and prefixed with .bs-scope (see public/vendor/bootstrap/README.md): it styles only
          the chart block on this page, never the admin sidebar, top bar or the panels around it. --}}
-    <link rel="stylesheet" href="{{ asset('vendor/bootstrap/bootstrap-scoped.min.css') }}?v={{ filemtime(public_path('vendor/bootstrap/bootstrap-scoped.min.css')) }}">
-    <link rel="stylesheet" href="{{ asset('css/admin-report-charts.css') }}?v={{ filemtime(public_path('css/admin-report-charts.css')) }}">
+    <link rel="stylesheet" href="{{ asset('vendor/bootstrap/bootstrap-scoped.min.css') }}?v={{ @filemtime(public_path('vendor/bootstrap/bootstrap-scoped.min.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/admin-report-charts.css') }}?v={{ @filemtime(public_path('css/admin-report-charts.css')) }}">
 @endpush
 
 @section('content')
@@ -160,9 +160,9 @@
 
 @if ($charts['hasData'])
     @push('scripts')
-        <script src="{{ asset('vendor/bootstrap/bootstrap.bundle.min.js') }}?v={{ filemtime(public_path('vendor/bootstrap/bootstrap.bundle.min.js')) }}" defer></script>
-        <script src="{{ asset('vendor/chartjs/chart.umd.js') }}?v={{ filemtime(public_path('vendor/chartjs/chart.umd.js')) }}" defer></script>
-        <script src="{{ asset('js/admin-report-charts.js') }}?v={{ filemtime(public_path('js/admin-report-charts.js')) }}" defer></script>
+        <script src="{{ asset('vendor/bootstrap/bootstrap.bundle.min.js') }}?v={{ @filemtime(public_path('vendor/bootstrap/bootstrap.bundle.min.js')) }}" defer></script>
+        <script src="{{ asset('vendor/chartjs/chart.umd.js') }}?v={{ @filemtime(public_path('vendor/chartjs/chart.umd.js')) }}" defer></script>
+        <script src="{{ asset('js/admin-report-charts.js') }}?v={{ @filemtime(public_path('js/admin-report-charts.js')) }}" defer></script>
     @endpush
 @endif
 
