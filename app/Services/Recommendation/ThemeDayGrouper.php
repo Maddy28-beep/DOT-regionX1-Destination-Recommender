@@ -20,7 +20,9 @@ use App\Services\Embeddings\DestinationEmbeddingService;
  *      nearest-neighbor plan (plus a small allowance for very short trips).
  * The search is deterministic, so the same trip always groups the same way.
  *
- * If any stop has no stored vector, nothing is changed.
+ * If any stop has no usable vector (missing, empty, not numbers, no length, or a different number of dimensions from the
+ * others), nothing is changed -- and skipReason() says so, so that a plan that silently lost its themed days can be seen
+ * and counted instead of just looking like a trip where nothing could be improved.
  */
 class ThemeDayGrouper
 {
@@ -32,6 +34,20 @@ class ThemeDayGrouper
 
     private const MAX_ROUNDS = 50;
 
+    /** @var array{reason: string, destination_ids: list<int>}|null why the last group() call left the plan alone for want of embeddings */
+    private ?array $skip = null;
+
+    /**
+     * Why the last group() call changed nothing because of the embeddings, or null when it ran (or had nothing to do for
+     * another reason: fewer than three stops, or a single day).
+     *
+     * @return array{reason: string, destination_ids: list<int>}|null
+     */
+    public function skipReason(): ?array
+    {
+        return $this->skip;
+    }
+
     /**
      * @param  array<int, array{row: array, distance_km: float|null}>  $sequence
      * @param  array<int, array<int, string>>  $dayCapacities  day number => slot labels
@@ -40,22 +56,22 @@ class ThemeDayGrouper
      */
     public function group(array $sequence, array $dayCapacities, array $origin): ?array
     {
+        $this->skip = null;
+
         $count = count($sequence);
         if ($count < 3) {
             return null;
         }
 
-        $ids = array_map(fn (array $e) => $e['row']['destination']->id, $sequence);
-        $vectors = DestinationEmbedding::whereIn('destination_id', $ids)->get()->keyBy('destination_id')
-            ->map(fn (DestinationEmbedding $e) => $e->vector);
-
-        if ($vectors->count() !== count(array_unique($ids))) {
-            return null; // a stop without a vector: leave the plan exactly as it is
-        }
-
         $sizes = $this->daySizes($dayCapacities, $count);
         if (count($sizes) < 2) {
             return null;
+        }
+
+        $ids = array_map(fn (array $e) => $e['row']['destination']->id, $sequence);
+        $vectors = $this->usableVectors($ids);
+        if ($vectors === null) {
+            return null; // a stop without a usable vector: leave the plan exactly as it is (skipReason() says which)
         }
 
         // Baseline: the plain nearest-neighbor grouping, in order.
@@ -148,6 +164,61 @@ class ThemeDayGrouper
                 'types_per_day_after' => round($this->typesPerDay($groups, $sequence), 2),
             ],
         ];
+    }
+
+    /**
+     * The stored vector of every stop, or null (with skipReason() set and a warning logged) when one is missing or unusable.
+     *
+     * @param  list<int>  $ids
+     * @return \Illuminate\Support\Collection<int, array<int, float>>|null
+     */
+    private function usableVectors(array $ids)
+    {
+        $unique = array_values(array_unique($ids));
+        $vectors = DestinationEmbedding::whereIn('destination_id', $unique)->get()->keyBy('destination_id')
+            ->map(fn (DestinationEmbedding $e) => $e->vector);
+
+        $missing = array_values(array_filter($unique, fn ($id) => ! $vectors->has($id)));
+        if ($missing !== []) {
+            return $this->skipped('missing_embeddings', $missing);
+        }
+
+        // The dimension most stops share is the expected one; a stop that differs is the odd one out.
+        $lengths = $vectors->map(fn ($v) => is_array($v) ? count($v) : 0)->countBy()->sortDesc();
+        $expected = (int) $lengths->keys()->first();
+
+        $invalid = [];
+        foreach ($vectors as $id => $vector) {
+            if (DestinationEmbeddingService::vectorProblem($vector, $expected) !== null) {
+                $invalid[] = (int) $id;
+            }
+        }
+        if ($invalid !== []) {
+            return $this->skipped('invalid_embeddings', $invalid);
+        }
+
+        // Vectors are stored as unit length. One that is clearly not (a hand-edited row) is brought back to unit length,
+        // so that a longer vector cannot outweigh the rest; ordinary rounding noise is left exactly as stored.
+        return $vectors->map(function (array $v) {
+            $norm = sqrt(array_sum(array_map(fn ($x) => $x * $x, $v)));
+
+            return abs($norm - 1.0) > 0.01 ? DestinationEmbeddingService::normalise($v) : $v;
+        });
+    }
+
+    /** @param  list<int>  $ids */
+    private function skipped(string $reason, array $ids)
+    {
+        sort($ids);
+        $this->skip = ['reason' => $reason, 'destination_ids' => $ids];
+
+        try {
+            \Illuminate\Support\Facades\Log::warning('Theme-based days skipped: '.$reason.'.', $this->skip);
+        } catch (\Throwable) {
+            // A log problem must never take an itinerary down.
+        }
+
+        return null;
     }
 
     /**

@@ -215,6 +215,8 @@ class ItineraryGenerationService
          */
         $routeSequence = $sequence;
         $themes = $this->themeDays->group($sequence, $dayCapacities, $origin);
+        $themeSkip = $this->themeDays->skipReason(); // set (and logged) when a missing or unusable vector kept the plain order
+        $guardReverted = false; // set below when the Theme Guard puts the plain order back
         $themedSequence = ($themes !== null && $themes['sequence'] !== $routeSequence) ? $themes['sequence'] : null;
         if ($themes !== null) {
             $sequence = $themes['sequence'];
@@ -256,7 +258,7 @@ class ItineraryGenerationService
             ? $this->pickStays($aiPlan['sequence'], $dayCapacities, $preference, $origin)
             : $this->pickAccommodation($aiPlan['sequence'], $preference));
 
-        return DB::transaction(function () use ($correlationId, $ai, $aiPlan, $aiStays, $routeAccommodationPick, $reserve, $preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
+        return DB::transaction(function () use (&$guardReverted, $themeSkip, $correlationId, $ai, $aiPlan, $aiStays, $routeAccommodationPick, $reserve, $preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
             // The schedule builder keeps why it turned each place away, per build; start this trip with none.
             $this->schedule->forgetRecordedAttempts();
 
@@ -336,6 +338,7 @@ class ItineraryGenerationService
                     || ($preference->distance_pref === 'far' && $themedPlaced === $routePlaced && $this->feasibilityCost($itinerary) > $routeCost);
 
                 if ($routeWins) {
+                    $guardReverted = true;
                     $itinerary->items()->delete();
                     $itinerary->unsetRelation('items');
                     $stays = $routeStays;
@@ -384,7 +387,14 @@ class ItineraryGenerationService
 
             if ($ai['attempted']) {
                 $this->recordAiSkeleton($itinerary, $ai, $aiApplied ? $aiPlan : null);
-                $this->logAiEvaluation($correlationId, $itinerary, $ai, $aiApplied, $aiGuard);
+                $this->logAiEvaluation($correlationId, $itinerary, $ai, $aiApplied, $aiGuard, [
+                    'engine' => $themes === null ? 'route_order' : 'theme_day_grouper',
+                    'ran' => $themes !== null,
+                    'regrouped' => $themedSequence !== null,
+                    'reverted_by_guard' => $guardReverted,
+                    'skipped_for' => $themeSkip,
+                    'stops' => count($routeSequence),
+                ]);
             }
 
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);
@@ -446,8 +456,9 @@ class ItineraryGenerationService
      *
      * @param  array<string, mixed>  $ai  the advisor's result
      * @param  array<string, mixed>|null  $guard  the built-plan comparison, when the suggestion got that far
+     * @param  array<string, mixed>  $grouping  what the deterministic ThemeDayGrouper did for this trip (it runs whether or not the AI is asked)
      */
-    private function logAiEvaluation(string $correlationId, Itinerary $itinerary, array $ai, bool $applied, ?array $guard): void
+    private function logAiEvaluation(string $correlationId, Itinerary $itinerary, array $ai, bool $applied, ?array $guard, array $grouping): void
     {
         $reasons = [];
         $decidedBy = 'advisor';
@@ -473,7 +484,20 @@ class ItineraryGenerationService
             'decided_by' => $decidedBy,
             'reasons' => $reasons,
             'fallback_used' => ! $applied,
+            // The model asked, and how long the call took (null when it never got as far as a reply).
+            'model' => (string) config('services.groq.model'),
             'call_seconds' => $ai['seconds'],
+            // The embedding grouping is the planner's own and is not switched off by the AI: whether it ran, and whether it was kept.
+            'deterministic_grouping' => $grouping,
+            'comparison' => [
+                // Travel between the stops of the planner's grouping and the AI's (km, with the limit the AI had to stay within).
+                'travel_km' => $ai['checks']['travel_km'] ?? null,
+                // Stops the planner chose, and how many each built plan placed once the schedule rules were applied.
+                'stops_chosen' => $grouping['stops'],
+                'stops_placed' => $guard['stops_placed'] ?? null,
+                // Late check-ins + empty days + days over the driving ceiling; lower is better.
+                'feasibility_cost' => $guard['feasibility_cost'] ?? null,
+            ],
             'validation' => ($ai['checks'] ?? []) + ($guard !== null ? ['built_plan' => $guard] : []),
         ]);
     }
