@@ -75,12 +75,17 @@
                             @if ($pickedInterests->count() > 2)
                                 <span class="itin-around__chip">+{{ $pickedInterests->count() - 2 }} more</span>
                             @endif
-                            <span>Starting from {{ $startingFrom }}@if ($preference?->arrival_time), arriving {{ \Illuminate\Support\Carbon::parse($preference->arrival_time)->format('g:i A') }}@endif</span>
                         </div>
                     @endunless
-                    <p class="itin-banner__meta">Generated {{ $itinerary->generated_at->timezone('Asia/Manila')->format('F j, Y g:i A') }}</p>
+                    {{-- Where it starts and when it was made: one quiet row, each with its own icon, instead of two loose lines. --}}
+                    <p class="itin-banner__meta">
+                        @unless ($itinerary->package)
+                            <span><x-icon name="map-pin" aria-hidden="true" /> Starting from {{ $startingFrom }}@if ($preference?->arrival_time), arriving {{ \Illuminate\Support\Carbon::parse($preference->arrival_time)->format('g:i A') }}@endif</span>
+                        @endunless
+                        <span><x-icon name="clock" aria-hidden="true" /> Generated {{ $itinerary->generated_at->timezone('Asia/Manila')->format('F j, Y g:i A') }}</span>
+                    </p>
                     @if (data_get($itinerary->day_themes, 'ai_skeleton.applied') === true)
-                        <span class="plan-badge plan-badge--ai" title="An outside AI service suggested which of the already-chosen places share a day, and the day names. The planner checked the suggestion and kept it only because it fit, with no fewer stops and no more travelling than its own plan.">&#10024; Day themes suggested with AI assistance</span>
+                        <span class="plan-badge plan-badge--ai" title="An outside AI service suggested which of the already-chosen places share a day, and the day names. The planner checked the suggestion and kept it only because it fit, with no fewer stops and no more travelling than its own plan."><x-icon name="sparkles" aria-hidden="true" /> Day themes suggested with AI assistance</span>
                     @endif
                 </div>
 
@@ -107,7 +112,7 @@
                     {{-- Set expectations honestly: no account is needed to plan or view a trip, by design -- this is what
                          happens if you do not save it. --}}
                     @unless ($itinerary->tourist_account_id)
-                        <p class="itin-banner__unsaved" role="status">Not saved yet &mdash; this plan disappears when you close the tab.</p>
+                        <p class="itin-banner__unsaved" role="status"><x-icon name="info" aria-hidden="true" /><span>Not saved yet &mdash; this plan disappears when you close the tab.</span></p>
                     @endunless
                 </div>
             </section>

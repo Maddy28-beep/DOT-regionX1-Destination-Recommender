@@ -512,3 +512,74 @@
     .itin .day-actions > a, .itin .day-actions details { flex: 0 0 auto; }
     .itin .day-actions details[open] { flex: 1 1 100%; }
 }
+
+/* ---- The "Your adventure is ready!" banner: a clearer pecking order ----
+   Title, then what the plan is, then the picked interests, then one quiet row of facts (start, when it was made), then the
+   AI note when it applies. On the right the two buttons, and under them the "not saved" heads-up as a calm notice instead of
+   alarm-red text. */
+.itin-banner { gap: 8px 26px; padding: 20px 26px 20px 22px; }
+.itin-banner__davo { max-height: 128px; width: 112px; }
+.itin-banner__sub { margin: 8px 0 0; font-weight: 600; }
+.itin-banner__context { margin-top: 10px; }
+.itin-banner__meta { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 12px 0 0; color: #55645d; font-size: .84rem; line-height: 1.4; }
+.itin-banner__meta span { display: inline-flex; align-items: center; gap: 6px; }
+.itin-banner__meta svg { width: 15px; height: 15px; flex: none; color: var(--primary-dark); }
+.itin-banner .plan-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; padding: 4px 12px; border-width: 1px; font-size: .78rem; }
+.itin-banner .plan-badge svg { width: 14px; height: 14px; flex: none; }
+.itin-banner__actions { align-self: center; gap: 10px; width: 360px; }
+.itin-banner__unsaved {
+    display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 9px 12px;
+    border: 1px solid #f0d9a4; border-radius: 10px; background: rgba(255, 252, 244, .85);
+    color: #6b5200; font-size: .82rem; line-height: 1.45; text-align: left;
+}
+.itin-banner__unsaved svg { width: 16px; height: 16px; flex: none; margin-top: 1px; }
+@media (max-width: 960px) {
+    .itin-banner__actions { align-self: stretch; width: auto; }
+}
+@media (max-width: 760px) {
+    /* Davo sits beside the title only; everything under it (summary, chips, facts, notice) gets the full width, so the
+       chips run along a row instead of stacking one per line in a narrow column. */
+    .itin-banner { padding: 16px 16px 16px; }
+    .itin-banner__copy { display: contents; }
+    .itin-banner__davo { grid-column: 1; grid-row: 1; width: 84px; align-self: center; }
+    .itin-banner__title { grid-column: 2; grid-row: 1; align-self: center; }
+    .itin-banner__copy > :not(.itin-banner__title) { grid-column: 1 / -1; }
+    .itin-banner__sub { margin-top: 2px; }
+    .itin-banner__actions { grid-column: 1 / -1; }
+    .itin-banner .plan-badge { margin-bottom: 4px; }
+}
+
+/* ---- The banner, compact ----
+   On a desktop the summary and the interest chips share a line, the start and generated facts share the next, and Davo and
+   the title are smaller, so the banner is about a third shorter and the plan starts higher on the page. */
+@media (min-width: 761px) {
+    .itin-banner { grid-template-columns: 84px minmax(0, 1fr) auto; gap: 4px 16px; margin: 12px 0 14px; padding: 12px 18px 12px 16px; border-radius: 16px; }
+    .itin-banner__davo { width: 84px; max-height: 92px; }
+    .itin-banner__copy { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+    .itin-banner__title { flex: 0 0 100%; font-size: clamp(1.4rem, 2.4vw, 1.85rem); line-height: 1.2; }
+    .itin-banner__name { flex: 0 0 100%; margin: 0; }
+    .itin-banner__sub { margin: 0; font-size: .9rem; }
+    .itin-banner__context { margin: 0; gap: 6px; }
+    .itin-banner .itin-around__chip { padding: 3px 9px; font-size: .74rem; }
+    .itin-banner__meta { flex: 0 0 100%; margin: 2px 0 0; gap: 2px 14px; font-size: .78rem; }
+    .itin-banner .plan-badge { flex: 0 0 auto; margin: 2px 0 0; padding: 2px 10px; font-size: .74rem; }
+    .itin-banner__actions { gap: 8px; width: 320px; }
+    /* Two equal columns that can never be wider than the column they sit in: the labels are sized to fit, and a label that
+       ever could not would be clipped with an ellipsis rather than push the button past the notice below it. */
+    .itin-banner__buttons { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+    .itin-banner__buttons .btn { min-width: 0; min-height: 42px; padding: 8px 8px; gap: 6px; font-size: .86rem; overflow: hidden; text-overflow: ellipsis; }
+    .itin-banner__buttons .btn svg { width: 15px; height: 15px; }
+    .itin-banner__unsaved { padding: 7px 10px; font-size: .78rem; line-height: 1.4; }
+}
+@media (max-width: 760px) {
+    .itin-banner { gap: 6px 12px; padding: 12px 14px; margin: 12px 0 14px; }
+    .itin-banner__davo { width: 64px; }
+    .itin-banner__title { font-size: 1.3rem; line-height: 1.2; }
+    .itin-banner__sub { font-size: .88rem; }
+    .itin-banner__context { margin-top: 6px; gap: 5px 6px; }
+    .itin-banner .itin-around__chip { padding: 3px 9px; font-size: .74rem; }
+    .itin-banner__meta { margin-top: 8px; gap: 2px 14px; font-size: .78rem; }
+    .itin-banner .plan-badge { margin-top: 8px; padding: 3px 10px; font-size: .72rem; }
+    .itin-banner__buttons .btn { min-height: 42px; }
+    .itin-banner__unsaved { padding: 7px 10px; font-size: .76rem; }
+}

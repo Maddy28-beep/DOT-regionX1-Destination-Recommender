@@ -80,11 +80,16 @@ class ItineraryPageRedesignTest extends TestCase
         $this->page($trip, $pref)->assertOk()
             ->assertSee('Your adventure is ready!')
             ->assertSee('2 days')
-            ->assertSee('starting from Davao City centre')
-            ->assertSee('Nature &amp; Adventure, Wildlife +1 more', false)
+            ->assertSee('Starting from Davao City centre')
+            ->assertSee('Nature &amp; Adventure', false)
+            ->assertSee('+1 more')
             ->assertSee('Budget-Friendly')
+            ->assertSee('Generated')
             ->assertSee('Edit preferences')
-            ->assertSee('Save Itinerary');
+            ->assertSee('Save Itinerary')
+            // Unsaved: a calm notice with an icon, not alarm-red text.
+            ->assertSee('Not saved yet')
+            ->assertSee('itin-banner__unsaved', false);
     }
 
     public function test_a_saved_plans_own_title_is_kept(): void
@@ -209,7 +214,8 @@ class ItineraryPageRedesignTest extends TestCase
 
         // What the traveller told us is in the banner, not in a list beside the plan.
         $this->assertStringContainsString('Family', $html);
-        $this->assertStringContainsString('Nature &amp; Adventure, Wildlife +1 more', $html);
+        $this->assertStringContainsString('Nature &amp; Adventure', $html);
+        $this->assertStringContainsString('+1 more', $html);
         $this->assertStringContainsString('Check opening hours before you go.', $html);
     }
 
