@@ -93,13 +93,25 @@
 
     /* Popular destinations: heading + featured place on one screen, then six cards on the next. */
     html.home-slides #destinations .dpost-head { flex: none; margin-bottom: 12px; }
-    html.home-slides #destinations .dpost-banner { flex: 1 1 0; min-height: 260px; height: auto; }
+    /* A featured banner of a sensible size, not stretched to fill the whole screen. */
+    html.home-slides #destinations .dpost-banner { flex: none; min-height: 0; height: clamp(280px, 42vh, 400px); }
     /* Six cards as 3 + 3: four columns left the second row half empty. */
     html.home-slides #destinations .dpost-grid { flex: none; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     html.home-slides #destinations .dpost-grid > :nth-child(n + 7) { display: none; }
     html.home-slides #destinations .dpost-card__art {
         max-height: clamp(96px, calc((100svh - var(--slide-header) - 40px) / 2 / var(--z) - 185px), 260px);
     }
+
+    /* Popular destinations: heading + banner, then six cards. Centring each part in a full-height box left a wide empty
+       band above and below both, so they take their own height and sit close together, like the About section. */
+    html.home-slides main#main-content #destinations .slide-part {
+        min-height: 0;
+        justify-content: flex-start;
+        padding-top: 40px;
+        padding-bottom: 8px;
+    }
+    html.home-slides main#main-content #destinations .slide-part + .slide-part { padding-top: 20px; }
+    html.home-slides main#main-content #destinations .slide-part:last-child { padding-bottom: calc(var(--sheet-radius) + 24px); }
 
     /* About the region: wider text column and slightly tighter text so the heading, text, provinces and map share a screen. */
     html.home-slides #about-region .about-grid {

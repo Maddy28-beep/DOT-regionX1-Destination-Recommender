@@ -83,6 +83,16 @@
     .culinary__grid { grid-template-columns: 1fr; }
 }
 
+/* The featured destination banner: a medium height at every width instead of 340px plus whatever its text needs.
+   (A phone and a tablet keep their own stacked layout from app.css.) */
+@media (min-width: 801px) {
+    #destinations .dpost-banner { min-height: 0; height: clamp(280px, 30vw, 380px); }
+    #destinations .dpost-banner__copy { padding: clamp(20px, 3vw, 36px); }
+    #destinations .dpost-banner__name { font-size: clamp(1.5rem, 2.6vw, 2.2rem); margin-bottom: 10px; }
+    #destinations .dpost-banner__blurb { margin-bottom: 12px; font-size: .92rem; line-height: 1.5; }
+    #destinations .dpost-banner__meta { margin-bottom: 16px; }
+}
+
 /* Match the listing pages' card palette without changing homepage card geometry. */
 .hero-page .dpost-card { background: #fffefa; border-color: #e1e8e2; }
 .hero-page .dcard__foot { border-top-color: #eaf0ea; }

@@ -41,7 +41,6 @@
                 @foreach ($photos as $i => $photo)
                     <a href="#" class="carousel-slide" data-open="{{ $i }}">
                         <img src="{{ $photo->url() }}" alt="{{ $altFor($photo) }}">
-                        @if ($categoryLayout)<span class="gallery-category-label">{{ $categoryFor($photo) }}</span>@endif
                         @if ($onlyIllustrations && $i === 0)
                             <span class="photo-illustration-tag">Illustration, not a photo of this place</span>
                         @endif
@@ -86,12 +85,10 @@
                     @if ($photoIndex !== false)
                         <a href="#" class="{{ $category === 'General' ? 'g-main' : 'g-thumb' }}" data-category="{{ $category }}" data-open="{{ $photoIndex }}" aria-label="View {{ strtolower($category) }} photos of {{ $title }}">
                             <img src="{{ $photos[$photoIndex]->url() }}" alt="{{ $altFor($photos[$photoIndex]) }}">
-                            <span class="gallery-category-label">{{ $category }}</span>
                             @if ($photos[$photoIndex]->isIllustration())<span class="photo-illustration-tag">Illustration, not a photo of this place</span>@endif
                         </a>
                     @else
                         <div class="{{ $category === 'General' ? 'g-main' : 'g-thumb' }} gallery-category-empty" data-category="{{ $category }}">
-                            <span class="gallery-category-label">{{ $category }}</span>
                             <span>{{ $category }} photo not available</span>
                         </div>
                     @endif

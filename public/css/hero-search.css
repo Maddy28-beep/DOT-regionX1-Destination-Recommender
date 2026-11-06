@@ -377,6 +377,42 @@ body.hero-page { --hs-overlap: clamp(150px, 24vh, 210px); }
     .hero-search__pair { grid-template-columns: 1fr; }
     .hero-search__box + .hero-search__box { border-left: 0; border-top: 1px solid #dde1db; }
     .hero-search .hero-search__go { width: min(86%, 340px); }
+
+    /* All five tabs fit a phone: icon over label, equal widths, so nothing hides behind a scroll. */
+    .hero-search__tabs { justify-content: stretch; gap: 0; padding: 0 4px; overflow: visible; -webkit-mask-image: none; mask-image: none; }
+    .hero-search__tab { flex: 1 1 0; min-width: 0; }
+    .hero-search__tab-body { flex-direction: column; justify-content: center; gap: 4px; padding: 10px 2px 9px; font-size: .68rem; line-height: 1.15; text-align: center; }
+    .hero-search__tab-body svg { width: 20px; height: 20px; }
+
+    /* Four budget pills as a tidy 2 x 2 grid instead of three and a lonely fourth. */
+    .hero-search__pills { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .hero-search__pill span { padding: 10px 8px; text-align: center; }
+
+    /* On a phone the first screen is not stretched to the full height of the window: that left a wide empty band under
+       the numbers. It ends after them, with a planner call to action, and the top of the next section shows beneath. */
+    .hero-screen { min-height: 0; }
+    .hero-lower { padding-bottom: 28px; }
+    .hero-lower .hero-scroll-cue { display: none; }
+    .hero-plan-cta {
+        display: grid;
+        gap: 12px;
+        justify-items: center;
+        margin: 22px 16px 0;
+        padding: 16px;
+        border: 1px solid #d9dfda;
+        border-radius: 16px;
+        background: #f4f8f5;
+        text-align: center;
+    }
+    .hero-plan-cta p { margin: 0; color: var(--ink, #17382c); font-size: .88rem; line-height: 1.5; }
+    .hero-plan-cta .btn { min-height: 44px; display: inline-flex; align-items: center; gap: 8px; }
+    .hero-plan-cta .btn svg { width: 18px; height: 18px; }
+
+    /* The three numbers stay in one row, like on a computer. */
+    .hero-lower .stats-strip { flex-wrap: nowrap; row-gap: 0; }
+    .hero-lower .stat-item { flex: 1 1 0; padding: 0 6px; }
+    .hero-lower .stat-item:nth-child(n + 2) { border-left: 1px solid #d9dfda; }
+    .hero-lower .stat-label { white-space: normal; font-size: .6rem; line-height: 1.25; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -396,5 +432,6 @@ body.hero-page { --hs-overlap: clamp(150px, 24vh, 210px); }
     min-height: 100svh;
     min-height: 100dvh;
 }
+.hero-plan-cta { display: none; }
 .hero-screen > .poster-hero { flex: none; }
 .hero-screen > .hero-lower { flex: 1 0 auto; }

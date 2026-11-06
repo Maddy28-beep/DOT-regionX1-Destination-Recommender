@@ -193,9 +193,10 @@ html:has(.catalog-refresh) { scrollbar-gutter: stable; }
     .catalog-refresh .catalog-layout { grid-template-columns: minmax(0, 1fr); }
     .catalog-refresh .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .catalog-refresh .filter-panel { box-shadow: none; }
-    /* Reserve the applied-filter line even when no filters are selected. */
-    .catalog-refresh .results-toolbar { column-gap: 12px; grid-template-rows: 44px 48px 44px; }
-    .catalog-refresh .results-toolbar .active-filters { height: 44px; align-items: center; }
+    /* The applied-filter line only takes room when a filter is applied. */
+    .catalog-refresh .results-toolbar { column-gap: 12px; grid-template-rows: none; grid-auto-rows: minmax(44px, auto); margin-bottom: 12px; }
+    .catalog-refresh .results-toolbar .active-filters { min-height: 44px; align-items: center; }
+    .catalog-refresh .results-toolbar .active-filters:not(:has(*)) { display: none; }
     .catalog-refresh .results-toolbar :is(.view-toggle, .destination-view-toggle) { margin-left: 0; }
     .catalog-refresh .sort-control { min-width: 0; }
     .catalog-refresh .sort-control .site-dropdown { min-width: 0; }
@@ -210,30 +211,72 @@ html:has(.catalog-refresh) { scrollbar-gutter: stable; }
 }
 
 @media (max-width: 560px) {
-    .catalog-refresh .catalog-categories { margin-bottom: 22px; }
-    .catalog-refresh .card-grid { grid-template-columns: minmax(0, 1fr); gap: 18px; grid-auto-rows: auto; }
-    .catalog-refresh .dcard__art { aspect-ratio: 16 / 9; }
-    .catalog-refresh .dcard__body { padding: 16px; }
-    .catalog-refresh .dcard__top { min-height: 18px; gap: 8px; }
-    .catalog-refresh .dcard__dot { font-size: .72rem; }
-    .catalog-refresh .dcard__dot svg { width: 13px; height: 13px; }
-    .catalog-refresh .dcard__name {
-        display: block;
-        overflow: visible;
-        -webkit-line-clamp: unset;
-        max-height: none;
-        font-size: 1.05rem;
+    /* ---- Category chips on a phone: one edge-to-edge swipe row ----
+       Inside a white box the row was cut off at the box's rounded corner, so "Beach &..." looked broken. Without the
+       box it simply runs off the edge of the screen, which reads as "swipe for more", and a soft fade on the right
+       says the same. The chips keep their size and are never squeezed. */
+    .catalog-refresh .catalog-categories {
+        margin: -10px -20px 14px;
+        padding: 6px 20px 8px;
+        min-height: 0;
+        gap: 8px;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x proximity;
+        scroll-padding-inline: 20px;
+        scrollbar-width: none;
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+        mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
     }
-    .catalog-refresh .dcard__loc { font-size: .8rem; }
-    .catalog-refresh .dcard__tags .dpost-tag { display: inline-flex; font-size: .72rem; }
-    .catalog-refresh .dcard__rating { font-size: .76rem; }
-    .catalog-refresh .dcard__rating > span { display: inline; }
-    .catalog-refresh .dcard__new { top: 12px; left: 12px; font-size: .68rem; }
-    .catalog-refresh .save-form--icon { top: 10px; right: 10px; }
-    .catalog-refresh .save-heart { width: 44px; height: 44px; }
-    .catalog-refresh .save-heart svg { width: 18px; height: 18px; }
-    .catalog-refresh .dcard__price strong { font-size: 1.15rem; }
-    .catalog-refresh .dcard__price small { font-size: .8rem; }
+    .catalog-refresh .catalog-categories::-webkit-scrollbar { display: none; }
+    .catalog-refresh .catalog-categories > .chip { flex: 0 0 auto; scroll-snap-align: start; white-space: nowrap; background: #fffefa; }
+    .catalog-refresh .catalog-categories > .chip.active { background: var(--primary); }
+    .catalog-refresh .catalog-categories .chip { padding: 8px 16px; min-height: 44px; }
+
+    /* ---- Phones: a compact list, not a tall card per place ----
+       A square photo on the left and the facts on the right, so three or four places fit on one screen
+       instead of one. Everything a card shows is still here; only the arrangement changes. */
+    .catalog-refresh .card-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; grid-auto-rows: auto; }
+    .catalog-refresh .dpost-card { display: grid; grid-template-columns: 112px minmax(0, 1fr); height: auto; }
+    .catalog-refresh .dpost-card-wrap { height: auto; }
+    .catalog-refresh .dcard__art { aspect-ratio: auto; height: 100%; min-height: 112px; }
+    .catalog-refresh .dcard__art .photo-illustration-tag { display: none; }
+    .catalog-refresh .dcard__new { top: 6px; left: 6px; padding: 2px 6px; font-size: .6rem; }
+    .catalog-refresh .dcard__body { min-width: 0; min-height: 0; padding: 10px 12px; }
+    /* The save heart sits at the top right of the text area; give the first two lines room so they never run under it. */
+    .catalog-refresh .save-form--icon { top: 6px; right: 6px; }
+    .catalog-refresh .save-heart { width: 40px; height: 40px; }
+    .catalog-refresh .save-heart svg { width: 17px; height: 17px; }
+    .catalog-refresh .dcard__top { min-height: 0; margin-bottom: 3px; gap: 6px; padding-right: 40px; }
+    .catalog-refresh .dcard__dot { font-size: .66rem; gap: 4px; }
+    .catalog-refresh .dcard__dot svg { width: 12px; height: 12px; }
+    .catalog-refresh .dcard__rating { font-size: .72rem; }
+    .catalog-refresh .dcard__rating > span { display: none; }
+    .catalog-refresh .dcard__name {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        max-height: none;
+        margin-bottom: 3px;
+        padding-right: 40px;
+        font-size: 1rem;
+        line-height: 1.22;
+    }
+    .catalog-refresh .dcard__loc { margin-bottom: 6px; font-size: .76rem; }
+    .catalog-refresh .dcard__tags { margin-bottom: 6px; }
+    .catalog-refresh .dcard__tags .dpost-tag { display: inline-flex; padding: 2px 8px; font-size: .66rem; }
+    .catalog-refresh .dcard__tags .dpost-tag:nth-child(n + 3) { display: none; }
+    .catalog-refresh .dcard__foot { padding-top: 6px; }
+    .catalog-refresh .dcard__price strong { font-size: 1rem; }
+    .catalog-refresh .dcard__price small { font-size: .74rem; }
+    .catalog-refresh .dcard__dist { font-size: .74rem; }
 }
 
 @media (max-width: 360px) {

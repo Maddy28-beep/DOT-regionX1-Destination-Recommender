@@ -26,7 +26,7 @@
     <table class="data-table">
         <thead>
             <tr>
-                <th>Event</th><th>Category</th><th>Dates</th><th>Location</th><th>Status</th><th></th>
+                <th>Event</th><th>Category</th><th>Dates</th><th>Location</th><th>Status</th><th class="adm-table__actions"><span class="sr-only">Actions</span></th>
             </tr>
         </thead>
         <tbody>
@@ -50,18 +50,21 @@
                             <span class="status-pill status-active">{{ $event->countdownLabel() }}</span>
                         @endif
                     </td>
-                    <td>
-                        <div class="util-row">
-                            <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-primary btn-xs" data-modal-form data-title="Edit event" data-sub="{{ $event->title }}">Edit</a>
+                    <td class="adm-table__actions">
+                        <div class="adm-actions">
+                            <a href="{{ route('admin.events.edit', $event) }}" class="adm-icon-btn" title="Edit {{ $event->title }}"
+                               data-modal-form data-title="Edit event" data-sub="{{ $event->title }}">
+                                <x-icon name="pencil" /><span class="sr-only">Edit {{ $event->title }}</span>
+                            </a>
                             @if ($event->archived_at)
                                 <form method="POST" action="{{ route('admin.events.unarchive', $event) }}">
                                     @csrf
-                                    <button type="submit" class="btn btn-outline btn-xs">Restore</button>
+                                    <button type="submit" class="adm-icon-btn" title="Restore {{ $event->title }}"><x-icon name="rotate" /><span class="sr-only">Restore {{ $event->title }}</span></button>
                                 </form>
                             @else
                                 <form method="POST" action="{{ route('admin.events.archive', $event) }}" onsubmit="return confirm('Archive this event? It will leave the public calendar.');">
                                     @csrf
-                                    <button type="submit" class="btn btn-outline btn-xs">Archive</button>
+                                    <button type="submit" class="adm-icon-btn" title="Archive {{ $event->title }}"><x-icon name="archive" /><span class="sr-only">Archive {{ $event->title }}</span></button>
                                 </form>
                             @endif
                         </div>

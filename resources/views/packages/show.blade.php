@@ -35,8 +35,6 @@
         {{ $package->name }}
     </nav>
 
-    <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($package->getMorphClass(), $package->id)->latest()->get()" />
-
     @include('partials.gallery-hero', [
         'keepOtherPhotos' => true,
         'photos' => $package->photos,
@@ -52,6 +50,7 @@
 
     <div class="detail-layout">
         <div>
+            <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($package->getMorphClass(), $package->id)->latest()->get()" />
             @include('partials.stat-strip', ['items' => [
                 ['icon' => 'tag', 'label' => 'Price tier', 'text' => $tierLabel ?? '—', 'meter' => $package->posterTier()],
                 ['icon' => 'ticket', 'label' => 'Per person', 'text' => $package->price_per_pax ? number_format($package->price_per_pax) : '—', 'peso' => (bool) $package->price_per_pax],

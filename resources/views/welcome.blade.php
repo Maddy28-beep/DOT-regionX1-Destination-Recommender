@@ -412,6 +412,12 @@
         </div>
     </div>
 
+    {{-- Phones only (see hero-search.css): the planner is the heart of the site, and the first screen is otherwise a search box. --}}
+    <div class="hero-plan-cta">
+        <p><strong>Not sure where to start?</strong> Tell us what you like and we will build your day-by-day plan.</p>
+        <a href="{{ route('plan.edit') }}" class="btn btn-outline">Plan my trip <x-icon name="arrow-right" /></a>
+    </div>
+
     <a href="#known-for" class="hero-scroll-cue">
         Discover Davao
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>

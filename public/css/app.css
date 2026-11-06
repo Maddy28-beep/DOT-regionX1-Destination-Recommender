@@ -3251,8 +3251,17 @@ select.site-dropdown-native {
 
 /* ---------- Footer ---------- */
 
-.site-footer { background: #0d221b; color: #cfe3da; padding: 64px 0 28px; margin-top: 0; border-top: 0; }
-.footer-grid { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 28px 44px; }
+.site-footer { background: #0d221b; color: #cfe3da; padding: 40px 0 24px; margin-top: 0; border-top: 0; }
+.site-footer > .container { width: 100%; max-width: 1440px; margin-inline: auto; padding-inline: 32px; box-sizing: border-box; }
+.footer-grid { display: grid; grid-template-columns: 1.6fr 1.8fr 1fr 1fr; gap: 28px 32px; }
+.footer-grid > div { min-width: 0; }
+.footer-traveler-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; }
+.footer-social { margin-top: 18px; }
+.footer-social p { font-size: .75rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.footer-social nav { display: flex; flex-wrap: wrap; gap: 10px; }
+.footer-social nav a { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; margin: 0; border: 1px solid #526d60; border-radius: 10px; }
+.footer-social nav a:hover { background: #264b3b; transform: none; }
+.footer-social svg { width: 20px; height: 20px; }
 .footer-grid h3 { color: var(--gold); font-weight: 700; font-size: .85rem; text-transform: uppercase; letter-spacing: .05em; margin: 0 0 18px; }
 .footer-grid a, .footer-grid p { display: block; font-size: .88rem; line-height: 1.55; margin-bottom: 10px; }
 .footer-grid p { color: #93ac9f; }
@@ -3283,13 +3292,13 @@ select.site-dropdown-native {
 .footer-brand-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
 .footer-brand-icon { width: 32px; height: 32px; flex-shrink: 0; }
 .footer-brand { font-weight: 800; font-size: 1.3rem; color: var(--white); letter-spacing: .01em; }
-.footer-contact { margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.08); }
+.footer-contact { margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); }
 .footer-contact p { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; color: #93ac9f; }
 .footer-contact svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; opacity: .8; }
 .footer-contact a { display: inline; color: #b7cec2; transition: color .15s ease, transform .15s ease; }
 .footer-contact a:hover { color: var(--white); transform: translateX(2px); }
 
-.footer-bottom { border-top: 1px solid rgba(255,255,255,.08); margin-top: 40px; padding-top: 22px; font-size: .8rem; color: #7f9c8f; text-align: center; }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,.08); margin-top: 28px; padding-top: 18px; font-size: .8rem; color: #7f9c8f; text-align: center; }
 .footer-legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px; margin-bottom: 14px; }
 .footer-legal a { display: inline-block; padding: 2px; color: #b7cec2; font-size: .8rem; transition: color .15s ease; }
 .footer-legal a:hover { color: var(--gold); }
@@ -3309,11 +3318,39 @@ select.site-dropdown-native {
 }
 @media (max-width: 800px) {
     .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px 28px; }
+    .footer-intro { grid-column: 1 / -1; }
+    .footer-traveler-links { grid-template-columns: 1fr; }
 }
-@media (max-width: 480px) {
-    .footer-grid { grid-template-columns: 1fr; gap: 34px; }
+@media (min-width: 801px) and (max-width: 1150px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px 36px; }
+}
+/* Phones and small tablets (up to 800px, not only up to 480px: a phone in a wide window or a landscape one still got the
+   squeezed half-width link columns, with long words running into each other). */
+@media (max-width: 800px) {
+    .site-footer { padding-top: 32px; }
+    .site-footer > .container { padding-inline: 20px; }
+    /* Intro and travelers get the full width; Partners and the Department sit side by side, so the footer is two
+       short blocks shorter than one long column. */
+    .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 20px; }
+    .footer-intro, .footer-grid > div:nth-child(2) { grid-column: 1 / -1; }
+    .footer-grid h3 { margin-bottom: 8px; }
+    .footer-intro > p { font-size: .82rem; line-height: 1.55; }
+    .footer-traveler-links { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; }
+    /* Links are real tap targets: about 44px tall, not a 22px line with a gap. */
+    .footer-grid a { margin: 0; padding: 11px 0; overflow-wrap: anywhere; }
+    .footer-traveler-links { column-gap: 20px; }
+    .footer-contact { margin-top: 12px; padding-top: 12px; }
+    .footer-contact p { margin-bottom: 8px; }
+    .footer-contact a { padding: 0; }
+    .footer-social { margin-top: 14px; }
+    .footer-social nav a { padding: 0; width: 44px; height: 44px; }
+    .footer-social p { margin-bottom: 8px; }
     .site-footer { padding-bottom: 100px; }
-    .footer-legal { gap: 10px 20px; }
+    .footer-bottom { margin-top: 18px; padding-top: 14px; }
+    /* The legal links as a neat 2 x 2 grid instead of a ragged wrapped line. */
+    .footer-legal { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 14px; justify-items: start; text-align: left; margin-bottom: 12px; }
+    .footer-legal a { padding: 9px 0; font-size: .78rem; line-height: 1.3; }
+    .footer-copyright { text-align: left; }
 }
 
 /* ---------- Auth pages ---------- */
@@ -3522,16 +3559,17 @@ select.site-dropdown-native {
 }
 @media (max-width: 640px) {
     .catalog-banner {
-        min-height: 132px;
-        padding-block: 18px;
+        min-height: 0;
+        padding-block: 14px 16px;
         background-position: 28% center;
         background-image:
             linear-gradient(90deg, rgba(6, 24, 20, .64), rgba(6, 24, 20, .28)),
             var(--catalog-banner-image, url('../images/davao-landscape-header.webp'));
     }
     .catalog-banner h1 {
-        font-size: 1.7rem;
+        font-size: 1.5rem;
     }
+    .catalog-banner p { font-size: .85rem; margin-top: 2px; }
 }
 
 /*
@@ -5940,3 +5978,66 @@ main:focus { outline: none; }
 .amen-none { color: var(--muted, #5f6f68); font-size: .82rem; font-style: italic; }
 .amen-block { margin: 18px 0; }
 .amen-block h3 { margin: 0 0 8px; font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted, #5f6f68); }
+
+.listing-promo {
+    margin-block-end: 16px;
+    padding: clamp(16px, 3vw, 24px);
+    border: 1px solid #abd8c5;
+    border-radius: 16px;
+    background: linear-gradient(120deg, #f5fbf7, #e3f5ec);
+    color: var(--primary-dark);
+    overflow-wrap: anywhere;
+}
+.listing-promo__row { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.listing-promo__icon { display: grid; place-items: center; flex: none; width: 54px; height: 54px; border-radius: 14px; background: #d5eee3; }
+.listing-promo__copy { display: grid; gap: 3px; flex: 1 1 220px; min-width: 0; padding-inline-start: 16px; border-inline-start: 1px solid #abd8c5; }
+.listing-promo__title { font-size: clamp(1.15rem, 2.3vw, 1.55rem); line-height: 1.25; }
+.listing-promo__badge { color: #964500; font-size: .7rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.listing-promo__date, .listing-promo__action { display: flex; align-items: center; gap: 7px; font-size: .85rem; }
+.listing-promo svg { width: 1em; height: 1em; flex: none; }
+.listing-promo__icon svg { width: 28px; height: 28px; }
+.listing-promo__details summary { list-style: none; cursor: pointer; }
+.listing-promo__details summary::-webkit-details-marker { display: none; }
+.listing-promo__action { justify-content: center; min-height: 42px; padding: 7px 13px; border: 1px solid currentColor; border-radius: 9px; font-weight: 700; }
+.listing-promo__details summary:hover .listing-promo__action { background: #d5eee3; }
+.listing-promo__details[open] .listing-promo__action svg { transform: rotate(180deg); }
+.listing-promo__hide, .listing-promo__details[open] .listing-promo__show { display: none; }
+.listing-promo__details[open] .listing-promo__hide { display: inline; }
+.listing-promo__terms {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border: 1px solid #c8e3d7;
+    border-radius: 10px;
+    background: rgb(255 255 255 / 65%);
+}
+.listing-promo__terms p { margin: 0; font-size: .9rem; line-height: 1.55; white-space: pre-line; }
+.listing-promo__terms p:not(.listing-promo__code) { flex: 1 1 240px; min-width: 0; }
+.listing-promo__code { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+@media (max-width: 600px) {
+    .listing-promo__row { gap: 10px; }
+    .listing-promo__copy { flex-basis: 0; padding-inline-start: 10px; }
+    .listing-promo__action { flex-basis: 100%; }
+}
+
+/* Offer card with the ticket and badge above the headline. */
+.listing-promo { position: relative; isolation: isolate; overflow: hidden; border-color: #087244; border-radius: 12px; }
+.listing-promo svg.listing-promo__frond { position: absolute; z-index: -1; inset: 0 0 auto auto; width: 160px; height: 112px; color: #63bd86; opacity: .35; pointer-events: none; }
+.listing-promo__row { align-items: flex-end; gap: 10px 18px; }
+.listing-promo__copy { padding: 0; border: 0; gap: 5px; }
+.listing-promo__eyebrow { display: flex; align-items: center; gap: 10px; }
+.listing-promo__icon { width: 36px; height: 32px; background: transparent; transform: rotate(-18deg); }
+.listing-promo__badge { border-radius: 8px; background: #ffd68a; color: #8a330b; padding: 4px 10px; letter-spacing: 0; }
+.listing-promo__title { font-size: clamp(1.25rem, 2.6vw, 1.8rem); }
+.listing-promo__preview { color: var(--ink); font-size: .9rem; }
+.listing-promo__date { justify-self: start; padding: 4px 10px; border-radius: 999px; background: #d8f1df; }
+.listing-promo__action { background: #075e35; color: #fff; border-color: transparent; }
+.listing-promo__details summary:hover .listing-promo__action { background: #064c2c; }
+.listing-promo__details[open] .listing-promo__preview { display: none; }
+@media (max-width: 600px) {
+    .listing-promo__copy { flex-basis: 100%; }
+    .listing-promo svg.listing-promo__frond { opacity: .2; }
+}

@@ -26,13 +26,6 @@
     const next = document.getElementById('planNext');
     const submit = form.querySelector('[type="submit"]');
     const status = document.getElementById('planStepStatus');
-    const says = document.getElementById('planDavoSays');
-    const davoLines = [
-        'Four quick steps and I’ll build your day-by-day plan!',
-        'Pick as many as you like — I’ll spread them across your days.',
-        'Tell me your budget and I’ll match stays, food and fees to it.',
-        'Last one! Then I’ll put your plan together.'
-    ];
     const headings = ['Tell us about your trip.', 'What would you love to do?', 'Where will you rest, and what’s your budget?', 'How will you get around?'];
     const descriptions = [
         'The basics — when you’re coming and who’s coming with you.',
@@ -102,7 +95,6 @@
         submit.hidden = index !== last;
         next.textContent = ['Next: your interests →', 'Next: stay & budget →', 'Next: getting around →'][index] || 'Next →';
         status.textContent = `Step ${index + 1} of ${steps.length}`;
-        if (says) { says.textContent = davoLines[index] || ''; says.hidden = false; }
         saveDraft();
         if (focus) {
             steps[index].querySelector('h2').focus({preventScroll: true});
@@ -282,7 +274,11 @@
         const summary = document.getElementById('planResumeSummary');
         const days = Number(draft.values.travel_days[0]);
         const parts = [days >= 1 && days <= 30 ? `${days} ${days === 1 ? 'day' : 'days'}` : '', draft.values['activities[]'].slice(0, 2).join(' · '), draft.values.budget[0]];
-        parts.filter(Boolean).forEach(text => { const item = document.createElement('span'); item.textContent = text; summary.append(item); });
+        parts.forEach((text, index) => {
+            const item = summary.children[index];
+            item.lastElementChild.textContent = text;
+            item.hidden = !text;
+        });
         const sprite = resume.querySelector('.plan-resume-davo');
         const motion = matchMedia('(prefers-reduced-motion: reduce)');
         let waveTimer;

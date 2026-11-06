@@ -4,15 +4,21 @@
 @section('page-title', 'Exit Survey Insights')
 @section('page-sub', 'Visitor profile, satisfaction ratings, and visitation trends from submitted exit surveys')
 
-@section('content')
+@push('head')
+    <link rel="stylesheet" href="{{ asset('css/admin-exit-surveys.css') }}?v={{ filemtime(public_path('css/admin-exit-surveys.css')) }}">
+@endpush
 
-<div class="panel">
+@section('content')
+<div class="xs">
+
+<div class="xs-head">
+    <p>Collecting more responses?</p>
+    <a href="{{ route('admin.exit-survey-qr') }}" class="btn btn-outline"><x-icon name="qr" /> Printable survey QR code</a>
+</div>
+
+<div class="panel xs-filters">
     <div class="panel-body">
-        <p style="margin:0 0 14px; font-size:.9rem;">
-            Collecting more responses?
-            <a href="{{ route('admin.exit-survey-qr') }}" class="btn btn-outline btn-xs">Printable survey QR code</a>
-        </p>
-        <form method="GET" class="filter-inline">
+        <form method="GET" class="filter-inline" aria-label="Filter survey responses">
             <div class="field">
                 <label for="from">From date</label>
                 <input type="date" id="from" name="from" value="{{ $filters['from'] }}">
@@ -48,9 +54,8 @@
                     @endforeach
                 </select>
             </div>
-            <div class="field">
-                <label for="include_simulated">Simulated rows</label>
-                <label class="check-inline" style="font-weight:400;">
+            <div class="field xs-sim">
+                <label class="check-inline" for="include_simulated" style="font-weight:500;">
                     <input type="checkbox" id="include_simulated" name="include_simulated" value="1" @checked($includeSimulated)>
                     Include simulated survey rows
                 </label>
@@ -84,287 +89,364 @@
         </div>
     </div>
 @else
-    <div class="stat-cards stat-cards--kpi">
-        <div class="stat-card">
-            <div class="stat-card-val">{{ $count }}</div>
-            <div class="stat-card-label">Exit Survey Responses</div>
+    @php
+        $fmtPct = fn ($n, $d) => $d ? round($n / $d * 100) : 0;
+        $firstOf = fn ($c) => $c->isEmpty() ? null : (is_array($c->first()) ? $c->first() : null);
+
+        // Ratings, highest first; categories nobody rated yet go last, in their usual order.
+        $ratedRows = collect($avgRatings)->filter(fn ($v) => $v !== null)->sortDesc();
+        $unratedRows = collect($avgRatings)->filter(fn ($v) => $v === null);
+
+        // The donut: each activity's share, in the project palette. Anything past the fifth is one "Other" slice.
+        $palette = ['#0E6B4A', '#8C5F08', '#2F5D8A', '#9B3B3B', '#6B7268'];
+        $slices = [];
+        foreach ($topActivities->values() as $i => $activity) {
+            $slices[] = ['label' => $activity['activity'], 'total' => $activity['total'], 'pct' => $activity['pct'], 'color' => $palette[$i % count($palette)]];
+        }
+        $activityTotal = array_sum(array_column($slices, 'total'));
+        $stops = [];
+        $acc = 0;
+        foreach ($slices as $sl) {
+            $share = $activityTotal ? $sl['total'] / $activityTotal * 100 : 0;
+            $stops[] = $sl['color'].' '.round($acc, 2).'% '.round($acc + $share, 2).'%';
+            $acc += $share;
+        }
+        $donutStyle = $stops ? 'background:conic-gradient('.implode(',', $stops).')' : '';
+
+        $maxPlace = max(1, (int) ($topPlaces->max('visits') ?? 1));
+        $kindClass = fn ($k) => $k === 'restaurant' ? 'is-restaurant' : (in_array($k, ['souvenir_center', 'package', 'tour_operator'], true) ? 'is-shop' : '');
+    @endphp
+
+    <section class="xs-kpis" aria-label="Summary">
+        <div class="xs-kpi">
+            <span class="xs-ico"><x-icon name="chart" /></span>
+            <div>
+                <div class="stat-card-val">{{ $count }}</div>
+                <div class="stat-card-label">Exit Survey Responses</div>
+            </div>
         </div>
-        <div class="stat-card" title="A rule needs two places in the same survey, so only real responses that list two or more places count towards Apriori. Simulated demo rows are not included.">
-            <div class="stat-card-val">{{ $realUsableForRules }}<span class="stat-card-val__suffix"> of {{ $realCount }}</span></div>
-            <div class="stat-card-label">Real Surveys Usable for Rules</div>
+        <div class="xs-kpi" title="A rule needs two places in the same survey, so only real responses that list two or more places count towards Apriori. Simulated demo rows are not included.">
+            <span class="xs-ico"><x-icon name="check" /></span>
+            <div>
+                <div class="stat-card-val">{{ $realUsableForRules }}<span class="stat-card-val__suffix"> of {{ $realCount }}</span></div>
+                <div class="stat-card-label">Real Surveys Usable for Rules</div>
+            </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-card-val">{{ $checkedInVisitors }}</div>
-            <div class="stat-card-label">Distinct Check-ins</div>
+        <div class="xs-kpi">
+            <span class="xs-ico is-blue"><x-icon name="map-pin" /></span>
+            <div>
+                <div class="stat-card-val">{{ $checkedInVisitors }}</div>
+                <div class="stat-card-label">Distinct Check-ins</div>
+            </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-card-val">{{ $avgRatings['Overall Satisfaction'] !== null ? number_format($avgRatings['Overall Satisfaction'], 2) : '—' }}<span class="stat-card-val__suffix">/5</span></div>
-            <div class="stat-card-label">Avg. Overall Satisfaction</div>
+        <div class="xs-kpi">
+            <span class="xs-ico is-amber"><x-icon name="star" /></span>
+            <div>
+                <div class="stat-card-val">{{ $avgRatings['Overall Satisfaction'] !== null ? number_format($avgRatings['Overall Satisfaction'], 2) : '—' }}<span class="stat-card-val__suffix">/5</span></div>
+                <div class="stat-card-label">Avg. Overall Satisfaction</div>
+            </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-card-val">{{ $wouldRecommendPct !== null ? $wouldRecommendPct.'%' : '—' }}</div>
-            <div class="stat-card-label">Would Recommend Davao Region</div>
+        <div class="xs-kpi">
+            <span class="xs-ico"><x-icon name="heart" /></span>
+            <div>
+                <div class="stat-card-val">{{ $wouldRecommendPct !== null ? $wouldRecommendPct.'%' : '—' }}</div>
+                <div class="stat-card-label">Would Recommend Davao Region</div>
+            </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-card-val">{{ $avgDaysStayed !== null ? $avgDaysStayed : '—' }}</div>
-            <div class="stat-card-label">Avg. Days Stayed</div>
+        <div class="xs-kpi">
+            <span class="xs-ico is-blue"><x-icon name="clock" /></span>
+            <div>
+                <div class="stat-card-val">{{ $avgDaysStayed !== null ? $avgDaysStayed : '—' }}</div>
+                <div class="stat-card-label">Avg. Days Stayed</div>
+            </div>
         </div>
-        <div class="stat-card" title="Self-reported. Only counts responses that answered this optional question.">
-            <div class="stat-card-val">{{ $avgTotalSpend !== null ? '₱'.number_format($avgTotalSpend, 2) : '—' }}</div>
-            <div class="stat-card-label">Avg. Spend per Trip</div>
+        <div class="xs-kpi" title="Self-reported. Only counts responses that answered this optional question.">
+            <span class="xs-ico is-amber"><x-icon name="wallet" /></span>
+            <div>
+                <div class="stat-card-val">{{ $avgTotalSpend !== null ? '₱'.number_format($avgTotalSpend, 2) : '—' }}</div>
+                <div class="stat-card-label">Avg. Spend per Trip</div>
+            </div>
         </div>
-    </div>
-    <p style="color:var(--muted); font-size:.85rem; margin-top:-8px;">
+    </section>
+    <p class="xs-foot">
         Survey activity is based on voluntary, anonymous submissions. Distinct check-ins and survey responses are not necessarily one-to-one, so these figures should be interpreted as population-level indicators rather than a per-visitor response rate.
     </p>
 
     @php
-        $insightLines = array_filter([
-            $insights['highest_rated_category'] ? "Highest-rated category: <strong>".e($insights['highest_rated_category'])."</strong>" : null,
-            $insights['lowest_rated_category'] ? "Lowest-rated category: <strong>".e($insights['lowest_rated_category'])."</strong>" : null,
-            $insights['most_common_origin'] ? "Most common visitor origin: <strong>".e($insights['most_common_origin'])."</strong>" : null,
-            $insights['most_common_purpose'] ? "Most common purpose of travel: <strong>".e($insights['most_common_purpose'])."</strong>" : null,
-            $insights['most_visited_place'] ? "Most visited place: <strong>".e($insights['most_visited_place'])."</strong>" : null,
-            $insights['most_popular_activity'] ? "Most popular activity: <strong>".e($insights['most_popular_activity'])."</strong>" : null,
+        $insightPairs = array_filter([
+            'Highest-rated category' => $insights['highest_rated_category'],
+            'Lowest-rated category' => $insights['lowest_rated_category'],
+            'Most common visitor origin' => $insights['most_common_origin'],
+            'Most common purpose of travel' => $insights['most_common_purpose'],
+            'Most visited place' => $insights['most_visited_place'],
+            'Most popular activity' => $insights['most_popular_activity'],
         ]);
     @endphp
-    @if (! empty($insightLines))
-        <div class="panel">
+    @if (! empty($insightPairs))
+        <section class="panel xs-card" aria-labelledby="xs-insights">
             <div class="panel-head">
                 <div>
-                    <h2>Key Insights</h2>
+                    <h2 id="xs-insights">Key Insights</h2>
                     <p>Calculated automatically from the responses currently shown.</p>
                 </div>
             </div>
-            <div class="panel-body">
-                <ul class="rank-list">
-                    @foreach ($insightLines as $line)
-                        <li style="border-bottom:none; padding:4px 0;">{!! $line !!}</li>
-                    @endforeach
-                </ul>
-            </div>
-        </div>
+            <dl class="xs-pairs">
+                @foreach ($insightPairs as $label => $value)
+                    <div class="xs-pair"><dt>{{ $label }}</dt><dd>{{ $value }}</dd></div>
+                @endforeach
+            </dl>
+        </section>
     @endif
 
-    <div class="panel">
-        <div class="panel-head">
-            <div>
-                <h2>Average Ratings by Category</h2>
-                <p>Out of 5 stars, across all responses that rated each category.</p>
+    <div class="xs-two">
+        <section class="panel xs-card" aria-labelledby="xs-ratings">
+            <div class="panel-head">
+                <div>
+                    <h2 id="xs-ratings">Average Ratings by Category</h2>
+                    <p>Out of 5 stars, across all responses that rated each category.</p>
+                </div>
             </div>
-        </div>
-        <div class="panel-body">
-            {{-- Bars are a data visualisation, so a fill colour is correct here --
-                 this is not a status badge. Bands: leaf green >= 4.0,
-                 amber 3.5-3.99, stamp red < 3.5. --}}
-            <div class="bar-chart">
-                @foreach ($avgRatings as $label => $value)
-                    @php
-                        $band = $value === null ? 'low' : ($value >= 4 ? 'good' : ($value >= 3.5 ? 'mid' : 'low'));
-                    @endphp
-                    <div class="bar-row">
-                        <span class="bar-row-label">
-                            {{ $label }}
-                            @if ($label === $insights['highest_rated_category'])
-                                <span class="badge badge-tone-good">Highest</span>
-                            @elseif ($label === $insights['lowest_rated_category'] && $insights['highest_rated_category'] !== $insights['lowest_rated_category'])
-                                <span class="badge badge-tone-low">Lowest</span>
-                            @endif
-                        </span>
-                        <div class="bar-track"><div class="bar-fill bar-fill--{{ $band }}" style="width:{{ $value ? ($value / 5 * 100) : 0 }}%"></div></div>
-                        <span class="bar-row-value">{{ $value !== null ? number_format($value, 2) : '—' }}</span>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-
-    <div class="panel">
-        <div class="panel-head">
-            <div>
-                <h2>Visitor Origin</h2>
-                <p>Where respondents say they are visiting from (self-reported, optional field).</p>
-            </div>
-        </div>
-        <div class="panel-body">
-            @if ($originBreakdown->isEmpty())
-                <p style="color:var(--muted); font-size:.85rem;">No origin data available yet.</p>
-            @else
-                <div class="bar-chart">
-                    @php $maxOrigin = $originBreakdown->max('total'); @endphp
-                    @foreach ($originBreakdown as $row)
-                        <div class="bar-row">
-                            <span class="bar-row-label">{{ $row['label'] }}</span>
-                            <div class="bar-track"><div class="bar-fill" style="width:{{ $maxOrigin ? ($row['total'] / $maxOrigin * 100) : 0 }}%"></div></div>
-                            <span class="bar-row-value">{{ $row['total'] }} ({{ $originTotal ? round($row['total'] / $originTotal * 100) : 0 }}%)</span>
+            <div class="panel-body">
+                {{-- Bars are a data visualisation, so a fill colour is correct here -- this is not a status badge.
+                     Bands: leaf green >= 4.0, amber 3.5-3.99, stamp red < 3.5. --}}
+                <div class="xs-bars">
+                    @foreach ($ratedRows as $label => $value)
+                        @php $band = $value >= 4 ? 'good' : ($value >= 3.5 ? 'mid' : 'low'); @endphp
+                        <div class="xs-bar">
+                            <div class="xs-bar__top">
+                                <span class="xs-bar__name">
+                                    {{ $label }}
+                                    @if ($label === $insights['highest_rated_category'])
+                                        <span class="xs-pill is-good">Highest</span>
+                                    @elseif ($label === $insights['lowest_rated_category'] && $insights['highest_rated_category'] !== $insights['lowest_rated_category'])
+                                        <span class="xs-pill is-low">Lowest</span>
+                                    @endif
+                                </span>
+                                <span class="xs-bar__val">{{ number_format($value, 2) }}</span>
+                            </div>
+                            <div class="xs-track" role="img" aria-label="{{ $label }}: {{ number_format($value, 2) }} out of 5"><div class="xs-fill is-{{ $band }}" style="width:{{ $value / 5 * 100 }}%"></div></div>
+                        </div>
+                    @endforeach
+                    @foreach ($unratedRows as $label => $value)
+                        <div class="xs-bar is-empty">
+                            <div class="xs-bar__top"><span class="xs-bar__name">{{ $label }}</span><span class="xs-bar__val">No data yet</span></div>
+                            <div class="xs-track"></div>
                         </div>
                     @endforeach
                 </div>
-                <p style="color:var(--muted); font-size:.82rem; margin:12px 0 0;">
-                    {{ $originTotal }} of {{ $count }} response{{ $count === 1 ? '' : 's' }} reported a place of origin.
-                    @if ($otherOriginsCount > 0)
-                        {{ $otherOriginsCount }} more response{{ $otherOriginsCount === 1 ? '' : 's' }} reported {{ $otherOriginsCount === 1 ? 'a location' : 'locations' }} outside the top {{ $originBreakdown->count() }} shown above.
-                    @endif
-                </p>
-            @endif
-        </div>
-    </div>
+            </div>
+        </section>
 
-    <div class="two-col-panels">
-        <div class="panel">
+        <section class="panel xs-card" aria-labelledby="xs-activities">
             <div class="panel-head">
                 <div>
-                    <h2>Visitor Residency</h2>
-                    <p>Self-reported by respondents (optional field).</p>
-                </div>
-            </div>
-            <div class="panel-body">
-                @if ($residencyBreakdown->isEmpty())
-                    <p style="color:var(--muted); font-size:.85rem;">No responses provided this yet.</p>
-                @else
-                    <div class="bar-chart">
-                        @php $maxResidency = $residencyBreakdown->max(); @endphp
-                        @foreach ($residencyBreakdown as $label => $total)
-                            <div class="bar-row">
-                                <span class="bar-row-label">{{ $label }}</span>
-                                <div class="bar-track"><div class="bar-fill" style="width:{{ $maxResidency ? ($total / $maxResidency * 100) : 0 }}%"></div></div>
-                                <span class="bar-row-value">{{ $total }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <div class="panel">
-            <div class="panel-head">
-                <div>
-                    <h2>Visit Type</h2>
-                    <p>First-time vs. returning vs. regular/local visitors.</p>
-                </div>
-            </div>
-            <div class="panel-body">
-                @if ($visitorTypeBreakdown->isEmpty())
-                    <p style="color:var(--muted); font-size:.85rem;">No responses provided this yet.</p>
-                @else
-                    <div class="bar-chart">
-                        @php $maxVisitorType = $visitorTypeBreakdown->max(); @endphp
-                        @foreach ($visitorTypeBreakdown as $label => $total)
-                            <div class="bar-row">
-                                <span class="bar-row-label">{{ $label }}</span>
-                                <div class="bar-track"><div class="bar-fill" style="width:{{ $maxVisitorType ? ($total / $maxVisitorType * 100) : 0 }}%"></div></div>
-                                <span class="bar-row-value">{{ $total }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <div class="panel">
-        <div class="panel-head">
-            <div>
-                <h2>Average Spending</h2>
-                <p>Self-reported total spend for the whole trip (₱), across respondents who answered this optional question.</p>
-            </div>
-        </div>
-        <div class="panel-body">
-            @if ($spendRespondentCount === 0)
-                <p style="color:var(--muted); font-size:.85rem;">No spending data available yet.</p>
-            @else
-                <p style="color:var(--muted); font-size:.82rem; margin:0 0 14px;">
-                    {{ $spendRespondentCount }} of {{ $count }} response{{ $count === 1 ? '' : 's' }} ({{ round($spendRespondentCount / $count * 100) }}%) provided spending data.
-                    Overall average: <strong style="color:var(--ink);">₱{{ number_format($avgTotalSpend, 2) }}</strong> per trip.
-                </p>
-                @if ($spendByResidency->isNotEmpty())
-                    <div class="bar-chart">
-                        @php $maxSpend = $spendByResidency->max(); @endphp
-                        @foreach ($spendByResidency as $label => $avgSpend)
-                            <div class="bar-row">
-                                <span class="bar-row-label">{{ $label }}</span>
-                                <div class="bar-track"><div class="bar-fill" style="width:{{ $maxSpend ? ($avgSpend / $maxSpend * 100) : 0 }}%"></div></div>
-                                <span class="bar-row-value">₱{{ number_format($avgSpend, 2) }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-            @endif
-        </div>
-    </div>
-
-    <div class="panel">
-        <div class="panel-head">
-            <div>
-                <h2>Purpose of Travel</h2>
-                <p>Why visitors say they came to the Davao Region.</p>
-            </div>
-        </div>
-        <div class="panel-body">
-            @if ($travelPurposeBreakdown->isEmpty())
-                <p style="color:var(--muted); font-size:.85rem;">No responses provided this yet.</p>
-            @else
-                <div class="bar-chart">
-                    @php $maxPurpose = $travelPurposeBreakdown->max(); @endphp
-                    @foreach ($travelPurposeBreakdown as $label => $total)
-                        <div class="bar-row">
-                            <span class="bar-row-label">{{ $label }}</span>
-                            <div class="bar-track"><div class="bar-fill" style="width:{{ $maxPurpose ? ($total / $maxPurpose * 100) : 0 }}%"></div></div>
-                            <span class="bar-row-value">{{ $total }}</span>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
-        </div>
-    </div>
-
-    <div class="two-col-panels">
-        <div class="panel">
-            <div class="panel-head">
-                <div>
-                    <h2>Most Visited Places</h2>
-                    <p>Ranked by mentions across all exit survey responses.</p>
-                </div>
-            </div>
-            <div class="panel-body">
-                @if ($topPlaces->isEmpty())
-                    <p style="color:var(--muted); font-size:.85rem;">No places reported yet.</p>
-                @else
-                    <ul class="rank-list">
-                        @foreach ($topPlaces as $place)
-                            <li>
-                                <span class="rank-name">{{ $place['name'] }} <span style="color:var(--muted); font-size:.78rem;">({{ ucfirst(str_replace('_', ' ', $place['kind'])) }})</span></span>
-                                <span class="rank-count">{{ $place['visits'] }} visit{{ $place['visits'] === 1 ? '' : 's' }}</span>
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
-            </div>
-        </div>
-
-        <div class="panel">
-            <div class="panel-head">
-                <div>
-                    <h2>Popular Activities</h2>
+                    <h2 id="xs-activities">Popular Activities</h2>
                     <p>What visitors say they did during their trip.</p>
                 </div>
             </div>
-            <div class="panel-body">
+            <div class="panel-body xs-center">
                 @if ($topActivities->isEmpty())
-                    <p style="color:var(--muted); font-size:.85rem;">No activities reported yet.</p>
+                    <p class="xs-none">No activities reported yet.</p>
                 @else
-                    <ul class="rank-list">
-                        @foreach ($topActivities as $activity)
-                            <li>
-                                <span class="rank-name">{{ $activity['activity'] }}</span>
-                                <span class="rank-count">{{ $activity['total'] }} mention{{ $activity['total'] === 1 ? '' : 's' }}{{ $activity['pct'] !== null ? ' ('.$activity['pct'].'%)' : '' }}</span>
-                            </li>
-                        @endforeach
-                    </ul>
+                    <div class="xs-donut-wrap">
+                        <div class="xs-donut" style="{{ $donutStyle }}" role="img" aria-label="{{ collect($slices)->map(fn ($sl) => $sl['label'].' '.($sl['pct'] ?? round($activityTotal ? $sl['total'] / $activityTotal * 100 : 0)).' percent')->implode(', ') }}">
+                            <b>{{ $activityTotal }}<small>{{ $activityTotal === 1 ? 'mention' : 'mentions' }}</small></b>
+                        </div>
+                        <ul class="xs-legend">
+                            @foreach ($slices as $sl)
+                                <li>
+                                    <i class="xs-sw" style="background:{{ $sl['color'] }}"></i>
+                                    <span>{{ $sl['label'] }}</span>
+                                    <span class="xs-legend__p">{{ $sl['total'] }} mention{{ $sl['total'] === 1 ? '' : 's' }}{{ $sl['pct'] !== null ? ' ('.$sl['pct'].'%)' : '' }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
                 @endif
             </div>
-        </div>
+        </section>
     </div>
+
+    @php
+        // A one-line summary of a breakdown: its top answer, how many responded, and the other answers as small bars.
+        $topOf = fn ($c) => $c->isEmpty() ? null : $c->sortDesc()->keys()->first();
+    @endphp
+    <div class="xs-two xs-two--even">
+        <section class="panel xs-card" aria-labelledby="xs-profile">
+            <div class="panel-head">
+                <div>
+                    <h2 id="xs-profile">Visitor Profile</h2>
+                    <p>Self-reported by respondents (optional fields).</p>
+                </div>
+            </div>
+            <ul class="xs-rows">
+                <li>
+                    <span class="xs-ico"><x-icon name="map-pin" /></span>
+                    <div class="xs-rows__t">
+                        <h3>Visitor Origin</h3>
+                        @if ($originBreakdown->isEmpty())
+                            <strong class="is-none">No origin data available yet.</strong>
+                        @else
+                            <strong>{{ $originBreakdown->first()['label'] }}</strong>
+                            <em>
+                                {{ $originTotal }} of {{ $count }} response{{ $count === 1 ? '' : 's' }} ({{ $fmtPct($originTotal, $count) }}%) reported a place of origin.
+                                @if ($otherOriginsCount > 0)
+                                    {{ $otherOriginsCount }} more response{{ $otherOriginsCount === 1 ? '' : 's' }} reported {{ $otherOriginsCount === 1 ? 'a location' : 'locations' }} outside the top {{ $originBreakdown->count() }} shown below.
+                                @endif
+                            </em>
+                            @if ($originBreakdown->count() > 1)
+                                @php $maxOrigin = $originBreakdown->max('total'); @endphp
+                                <div class="xs-mini-list">
+                                    @foreach ($originBreakdown as $row)
+                                        <div class="xs-mini"><span>{{ $row['label'] }}</span><span class="xs-track"><i class="xs-fill" style="width:{{ $maxOrigin ? $row['total'] / $maxOrigin * 100 : 0 }}%"></i></span><span>{{ $row['total'] }} ({{ $fmtPct($row['total'], $originTotal) }}%)</span></div>
+                                    @endforeach
+                                </div>
+                            @endif
+                        @endif
+                    </div>
+                </li>
+                <li>
+                    <span class="xs-ico is-blue"><x-icon name="building" /></span>
+                    <div class="xs-rows__t">
+                        <h3>Visitor Residency</h3>
+                        @if ($residencyBreakdown->isEmpty())
+                            <strong class="is-none">No responses provided this yet.</strong>
+                        @else
+                            <strong>{{ $topOf($residencyBreakdown) }}</strong>
+                            @if ($residencyBreakdown->count() > 1)
+                                @php $maxResidency = $residencyBreakdown->max(); @endphp
+                                <div class="xs-mini-list">
+                                    @foreach ($residencyBreakdown as $label => $total)
+                                        <div class="xs-mini"><span>{{ $label }}</span><span class="xs-track"><i class="xs-fill" style="width:{{ $maxResidency ? $total / $maxResidency * 100 : 0 }}%"></i></span><span>{{ $total }}</span></div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <em>{{ $residencyBreakdown->sum() }} of {{ $count }} response{{ $count === 1 ? '' : 's' }}.</em>
+                            @endif
+                        @endif
+                    </div>
+                </li>
+                <li>
+                    <span class="xs-ico is-amber"><x-icon name="user" /></span>
+                    <div class="xs-rows__t">
+                        <h3>Visit Type</h3>
+                        <em class="xs-sub">First-time vs. returning vs. regular/local visitors.</em>
+                        @if ($visitorTypeBreakdown->isEmpty())
+                            <strong class="is-none">No responses provided this yet.</strong>
+                        @else
+                            <strong>{{ $topOf($visitorTypeBreakdown) }}</strong>
+                            @if ($visitorTypeBreakdown->count() > 1)
+                                @php $maxVisitorType = $visitorTypeBreakdown->max(); @endphp
+                                <div class="xs-mini-list">
+                                    @foreach ($visitorTypeBreakdown as $label => $total)
+                                        <div class="xs-mini"><span>{{ $label }}</span><span class="xs-track"><i class="xs-fill" style="width:{{ $maxVisitorType ? $total / $maxVisitorType * 100 : 0 }}%"></i></span><span>{{ $total }}</span></div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <em>{{ $visitorTypeBreakdown->sum() }} of {{ $count }} response{{ $count === 1 ? '' : 's' }}.</em>
+                            @endif
+                        @endif
+                    </div>
+                </li>
+                <li>
+                    <span class="xs-ico"><x-icon name="compass" /></span>
+                    <div class="xs-rows__t">
+                        <h3>Purpose of Travel</h3>
+                        <em class="xs-sub">Why visitors say they came to the Davao Region.</em>
+                        @if ($travelPurposeBreakdown->isEmpty())
+                            <strong class="is-none">No responses provided this yet.</strong>
+                        @else
+                            <strong>{{ $topOf($travelPurposeBreakdown) }}</strong>
+                            @if ($travelPurposeBreakdown->count() > 1)
+                                @php $maxPurpose = $travelPurposeBreakdown->max(); @endphp
+                                <div class="xs-mini-list">
+                                    @foreach ($travelPurposeBreakdown as $label => $total)
+                                        <div class="xs-mini"><span>{{ $label }}</span><span class="xs-track"><i class="xs-fill" style="width:{{ $maxPurpose ? $total / $maxPurpose * 100 : 0 }}%"></i></span><span>{{ $total }}</span></div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <em>{{ $travelPurposeBreakdown->sum() }} of {{ $count }} response{{ $count === 1 ? '' : 's' }}.</em>
+                            @endif
+                        @endif
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <section class="panel xs-card" aria-labelledby="xs-economics">
+            <div class="panel-head">
+                <div>
+                    <h2 id="xs-economics">Trip Economics</h2>
+                    <p>Self-reported total spend for the whole trip (₱), across respondents who answered this optional question.</p>
+                </div>
+            </div>
+            <ul class="xs-rows">
+                <li>
+                    <span class="xs-ico is-amber"><x-icon name="wallet" /></span>
+                    <div class="xs-rows__t">
+                        <h3>Average Spending</h3>
+                        @if ($spendRespondentCount === 0)
+                            <strong class="is-none">No spending data available yet.</strong>
+                        @else
+                            <strong>₱{{ number_format($avgTotalSpend, 2) }} per trip</strong>
+                            <em>{{ $spendRespondentCount }} of {{ $count }} response{{ $count === 1 ? '' : 's' }} ({{ $fmtPct($spendRespondentCount, $count) }}%) provided spending data.</em>
+                        @endif
+                    </div>
+                </li>
+                @if ($spendRespondentCount > 0 && $spendByResidency->isNotEmpty())
+                    <li>
+                        <span class="xs-ico"><x-icon name="building" /></span>
+                        <div class="xs-rows__t">
+                            <h3>Average spending by residency</h3>
+                            @if ($spendByResidency->count() === 1)
+                                <strong>{{ $spendByResidency->keys()->first() }} &middot; ₱{{ number_format($spendByResidency->first(), 2) }}</strong>
+                                @if ($spendRespondentCount < 3)<em>Only {{ $spendRespondentCount === 1 ? 'one respondent' : $spendRespondentCount.' respondents' }} so far, so treat this as indicative.</em>@endif
+                            @else
+                                @php $maxSpend = $spendByResidency->max(); @endphp
+                                <div class="xs-mini-list">
+                                    @foreach ($spendByResidency as $label => $avgSpend)
+                                        <div class="xs-mini"><span>{{ $label }}</span><span class="xs-track"><i class="xs-fill" style="width:{{ $maxSpend ? $avgSpend / $maxSpend * 100 : 0 }}%"></i></span><span>₱{{ number_format($avgSpend, 2) }}</span></div>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    </li>
+                @endif
+                <li>
+                    <span class="xs-ico is-blue"><x-icon name="clock" /></span>
+                    <div class="xs-rows__t">
+                        <h3>Avg. Days Stayed</h3>
+                        <strong class="{{ $avgDaysStayed === null ? 'is-none' : '' }}">{{ $avgDaysStayed !== null ? $avgDaysStayed.' '.($avgDaysStayed == 1 ? 'day' : 'days') : 'No data yet' }}</strong>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+
+    <section class="panel xs-card" aria-labelledby="xs-places">
+        <div class="panel-head">
+            <div>
+                <h2 id="xs-places">Most Visited Places</h2>
+                <p>Ranked by mentions across all exit survey responses.</p>
+            </div>
+        </div>
+        @if ($topPlaces->isEmpty())
+            <p class="xs-none" style="padding:0 22px 20px;">No places reported yet.</p>
+        @else
+            <ol class="xs-rank">
+                @foreach ($topPlaces as $place)
+                    <li>
+                        <span class="xs-pos">{{ $loop->iteration }}</span>
+                        <span class="xs-pname">{{ $place['name'] }}</span>
+                        <span class="xs-kind {{ $kindClass($place['kind']) }}">{{ ucfirst(str_replace('_', ' ', $place['kind'])) }}</span>
+                        <span class="xs-mini-bar" role="img" aria-label="{{ $place['visits'] }} visit{{ $place['visits'] === 1 ? '' : 's' }}"><i style="width:{{ $place['visits'] / $maxPlace * 100 }}%"></i></span>
+                        <span class="xs-vc">{{ $place['visits'] }} visit{{ $place['visits'] === 1 ? '' : 's' }}</span>
+                    </li>
+                @endforeach
+            </ol>
+        @endif
+    </section>
 @endif
 
+</div>
 @endsection

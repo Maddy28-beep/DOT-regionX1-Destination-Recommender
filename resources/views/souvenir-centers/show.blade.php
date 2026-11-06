@@ -28,8 +28,6 @@
         {{ $souvenirCenter->displayName() }}
     </nav>
 
-    <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($souvenirCenter->getMorphClass(), $souvenirCenter->id)->latest()->get()" />
-
     @include('partials.gallery-hero', [
         'keepOtherPhotos' => true,
         'photos' => $souvenirCenter->photos,
@@ -45,6 +43,7 @@
 
     <div class="detail-layout">
         <div>
+            <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($souvenirCenter->getMorphClass(), $souvenirCenter->id)->latest()->get()" />
             @include('partials.listing-about-card', ['listing' => $souvenirCenter, 'noun' => 'souvenir center', 'groups' => []])
 
             @include('partials.listing-amenities-card', ['listing' => $souvenirCenter, 'kind' => 'souvenir_center'])

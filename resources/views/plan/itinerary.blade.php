@@ -64,19 +64,23 @@
                             &middot; from the <a href="{{ route('packages.show', $itinerary->package) }}">{{ $itinerary->package->name }}</a> package
                         @else
                             @if (filled($preference?->travel_type))&middot; {{ $preference->travel_type }}@endif
-                            @if ($pickedInterests->isNotEmpty())
-                                &middot; {{ $pickedInterests->take(2)->join(', ') }}@if ($pickedInterests->count() > 2) +{{ $pickedInterests->count() - 2 }} more @endif
-                            @endif
                             @if (filled($preference?->budget))&middot; {{ $preference->budget }}@endif
-                            &middot; starting from {{ $startingFrom }}@if ($preference?->arrival_time), arriving {{ \Illuminate\Support\Carbon::parse($preference->arrival_time)->format('g:i A') }}@endif
                         @endif
                     </p>
+                    @unless ($itinerary->package)
+                        <div class="itin-banner__context">
+                            @foreach ($pickedInterests->take(2) as $interest)
+                                <span class="itin-around__chip">{{ $interest }}</span>
+                            @endforeach
+                            @if ($pickedInterests->count() > 2)
+                                <span class="itin-around__chip">+{{ $pickedInterests->count() - 2 }} more</span>
+                            @endif
+                            <span>Starting from {{ $startingFrom }}@if ($preference?->arrival_time), arriving {{ \Illuminate\Support\Carbon::parse($preference->arrival_time)->format('g:i A') }}@endif</span>
+                        </div>
+                    @endunless
                     <p class="itin-banner__meta">Generated {{ $itinerary->generated_at->timezone('Asia/Manila')->format('F j, Y g:i A') }}</p>
                     @if (data_get($itinerary->day_themes, 'ai_skeleton.applied') === true)
                         <span class="plan-badge plan-badge--ai" title="An outside AI service suggested which of the already-chosen places share a day, and the day names. The planner checked the suggestion and kept it only because it fit, with no fewer stops and no more travelling than its own plan.">&#10024; Day themes suggested with AI assistance</span>
-                    @endif
-                    @if (data_get($itinerary->day_themes, 'summary.regrouped'))
-                        <span class="plan-badge plan-badge--ai" title="A pretrained embedding model grouped similar places into the same day, without adding more than a quarter to the travelling.">&#10024; Days grouped by theme</span>
                     @endif
                 </div>
 
@@ -132,6 +136,9 @@
                             </a>
                         @endforeach
                     </nav>
+                    @if (data_get($itinerary->day_themes, 'summary.regrouped'))
+                        <span class="plan-badge plan-badge--ai itin-bar__theme" title="A pretrained embedding model grouped similar places into the same day, without adding more than a quarter to the travelling."><span aria-hidden="true">&#10024;</span> Days grouped by theme</span>
+                    @endif
                     @unless ($itinerary->package)
                         <div class="itin-bar__links">
                             <button type="button" class="itinerary-explainer-trigger" id="itineraryExplainerOpen"
@@ -148,6 +155,13 @@
                         </div>
                     @endunless
                 </div>
+            @endif
+
+            @if ($itemsByDay->isNotEmpty() && ! $itinerary->package)
+                @include('partials.itinerary-stay-notices', [
+                    'itinerary' => $itinerary,
+                    'hasOvernight' => $itemsByDay->contains(fn ($rows) => $rows->contains('kind', 'overnight')),
+                ])
             @endif
 
             <div class="itin-layout">
@@ -183,13 +197,6 @@
                                 wherever you are staying. Check the <a href="{{ route('accommodations.index') }}">accommodation list</a> for the latest, or contact DOT Region XI.
                             </div>
                         @endif
-
-                        @unless ($itinerary->package)
-                            @include('partials.itinerary-stay-notices', [
-                                'itinerary' => $itinerary,
-                                'hasOvernight' => $itemsByDay->contains(fn ($rows) => $rows->contains('kind', 'overnight')),
-                            ])
-                        @endunless
 
                         @php
                             // Facts about days that are not obvious from the timeline: arrival/transfer day, late check-in, lunch not arranged.

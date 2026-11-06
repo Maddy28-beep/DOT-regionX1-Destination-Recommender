@@ -96,6 +96,8 @@ body.admin .admin-pagehead__actions { display: flex; align-items: center; gap: 8
 .adm-icon-btn:hover { color: var(--primary); border-color: var(--primary); }
 .adm-icon-btn:focus-visible { outline: 3px solid #e98543; outline-offset: 2px; }
 .adm-icon-btn svg { width: 16px; height: 16px; }
+.adm-icon-btn--danger:hover { color: #b42318; border-color: #b42318; background: #fff5f4; }
+.adm-table__actions .adm-actions { justify-content: flex-end; }
 
 .adm-modal { width: min(1000px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 0; border: 0; border-radius: 18px; background: var(--white); color: var(--ink); box-shadow: 0 24px 70px rgba(8, 35, 28, .35); overflow: hidden; }
 .adm-modal[open] { display: flex; flex-direction: column; animation: adm-pop .16s ease-out; }

@@ -34,8 +34,6 @@
         {{ $tourOperator->name }}
     </nav>
 
-    <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($tourOperator->getMorphClass(), $tourOperator->id)->latest()->get()" />
-
     @include('partials.gallery-hero', [
         'keepOtherPhotos' => true,
         'photos' => $tourOperator->photos,
@@ -51,6 +49,7 @@
 
     <div class="detail-layout">
         <div>
+            <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($tourOperator->getMorphClass(), $tourOperator->id)->latest()->get()" />
             @include('partials.stat-strip', ['items' => [
                 ['icon' => 'tag', 'label' => 'Price tier', 'text' => $tierLabel ?? '—', 'meter' => $tourOperator->posterTier()],
                 ['icon' => 'compass', 'label' => 'Specialization', 'text' => $tourOperator->specialization ?: '—', 'wrap' => true],

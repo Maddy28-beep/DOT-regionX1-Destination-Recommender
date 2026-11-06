@@ -33,7 +33,6 @@
             <a href="{{ route('saved.index') }}" class="btn btn-outline plan-saved-link">
                 <x-icon name="heart" /> Saved Places
             </a>
-            <p class="plan-davo-says" id="planDavoSays" aria-live="polite" hidden></p>
         </div>
     </div>
 
@@ -50,17 +49,23 @@
             @endif
 
             <section class="plan-resume" id="planResume" aria-labelledby="planResumeTitle" hidden>
-                <div class="plan-resume-davo" role="img" aria-label="Davo waving hello" style="background-image:url('{{ asset('images/davo-resume-frames.webp') }}')"></div>
-                <div>
-                    <span class="plan-resume-eyebrow">Welcome back</span>
-                    <h2 id="planResumeTitle">Ready to continue your Davao adventure?</h2>
+                <div class="plan-resume-art">
+                    <div class="plan-resume-davo" role="img" aria-label="Davo waving hello" style="background-image:url('{{ asset('images/davo-resume-frames.webp') }}')"></div>
+                </div>
+                <div class="plan-resume-copy">
+                    <span class="plan-resume-eyebrow"><x-icon name="check" /> Trip draft saved</span>
+                    <h2 id="planResumeTitle">Pick up where you left off</h2>
                     <p>Your trip basics and interests are saved on this device.</p>
-                    <div class="plan-resume-summary" id="planResumeSummary"></div>
+                    <div class="plan-resume-summary" id="planResumeSummary">
+                        <span hidden><x-icon name="calendar" /><span></span></span>
+                        <span hidden><x-icon name="mountain" /><span></span></span>
+                        <span hidden><x-icon name="tag" /><span></span></span>
+                    </div>
                     <div class="plan-resume-actions">
                         <button type="button" id="planResumeContinue">Continue planning <span aria-hidden="true">&rarr;</span></button>
                         <button type="button" id="planResumeDiscard">Start over</button>
                     </div>
-                    <p class="plan-resume-note">You can review your answers before creating your itinerary. Dates, location and health details aren't saved in this draft.</p>
+                    <p class="plan-resume-note">You can review your answers before creating your itinerary.<br>Dates, location, and health details aren’t saved in this draft.</p>
                 </div>
             </section>
             <nav class="plan-wizard-steps" aria-label="Trip planning steps" hidden>

@@ -199,15 +199,16 @@ class ClarityOmissionReasonTest extends TestCase
 
         $this->assertStringContainsString('6 places we set out to include could not be fitted into your plan.', $html);
         $this->assertStringContainsString('keeps the same place to stay for the whole trip', $html);
-        $this->assertStringContainsString('<summary style="cursor:pointer;">Show the 6 places</summary>', $html);
+        $this->assertStringContainsString('<details class="itin-notice itin-omissions">', $html);
         $this->assertStringContainsString('Place 6', $html, 'all of them are still there');
     }
 
-    public function test_a_short_list_is_not_folded(): void
+    public function test_a_short_list_can_also_be_expanded(): void
     {
         $html = $this->pageFor('moderate', [$this->notice(1, 'Only One', [['day' => 2, 'cause' => 'would_end_after_cutoff', 'minutes' => null, 'limit' => null, 'fresh' => false]])]);
 
         $this->assertStringContainsString('1 place we set out to include could not be fitted into your plan.', $html);
-        $this->assertStringNotContainsString('Show the 1 places', $html);
+        $this->assertStringContainsString('<details class="itin-notice itin-omissions">', $html);
+        $this->assertStringContainsString('Only One', $html);
     }
 }

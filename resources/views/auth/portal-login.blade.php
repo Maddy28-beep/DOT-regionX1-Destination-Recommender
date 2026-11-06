@@ -2,92 +2,100 @@
 
 @section('title', 'Partner Portal Sign In — ExploreDVO')
 
+@push('styles')
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="{{ asset('css/portal-login.css') }}?v={{ filemtime(public_path('css/portal-login.css')) }}">
+@endpush
+
 @section('content')
-<div class="auth-shell">
-    <div class="auth-card">
-        <a href="{{ route('home') }}" class="brand poster-title auth-brand">
-            <x-brand-mark class="brand-icon" />
-            Explore<span class="dot">DVO</span>
-        </a>
-
-        <span class="poster-kicker">welcome back</span>
-        <h1 class="page-title">Partner Portal Sign In</h1>
-        <p class="auth-sub">DOT Region XI Partners &amp; Administrators</p>
-
-        @if ($errors->any())
-            <div class="alert alert-error">
-                @foreach ($errors->all() as $error)
-                    <div>{{ $error }}</div>
-                @endforeach
+@php
+    $portal = request('portal', old('portal', 'establishment')) === 'admin' ? 'admin' : 'establishment';
+@endphp
+<div class="portal-signin">
+    <div class="portal-signin__card" data-portal-signin>
+        <aside class="portal-poster portal-poster--photo" aria-label="ExploreDVO partner network">
+            <img class="portal-poster__art" src="{{ asset('images/postcards/mountain-peak-enhanced.webp') }}" alt="" width="1254" height="1254" decoding="async">
+            <div class="portal-poster__intro">
+                <a class="portal-poster__brand" href="{{ route('home') }}">
+                    <x-brand-mark class="brand-icon" /> Explore<span>DVO</span>
+                </a>
+                <span class="portal-poster__badge">DOT Region XI · Davao</span>
+                <p class="portal-poster__headline">Your gateway to Davao’s tourism network.</p>
+                <p class="portal-poster__copy">Manage your listing and help travelers discover the Davao Region.</p>
             </div>
-        @endif
-
-        @php $portal = request('portal', old('portal', 'establishment')); @endphp
-
-        {{--
-            "Establishment / Tour Operator" needed 200px inside a 134px tab, so
-            both states rendered as "Establishment / Tour Ope...". The tab is
-            flex:1 in a two-up track, so there is no width to win back -- the
-            label had to get shorter. The submit button below uses the same
-            wording so the tab and the action it performs agree.
-        --}}
-        <div class="tabs">
-            <a href="{{ route('portal.login', ['portal' => 'establishment']) }}" class="tab {{ $portal === 'establishment' ? 'active' : '' }}" style="text-decoration:none; text-align:center;">Partner / Operator</a>
-            <a href="{{ route('portal.login', ['portal' => 'admin']) }}" class="tab {{ $portal === 'admin' ? 'active' : '' }}" style="text-decoration:none; text-align:center;">DOT Admin</a>
-        </div>
-
-        <form method="POST" action="{{ route('portal.login') }}">
-            @csrf
-            <input type="hidden" name="portal" value="{{ $portal }}">
-
-            <div class="field">
-                <label for="identifier">Email address</label>
-                <input type="email" id="identifier" name="identifier" value="{{ old('identifier') }}" required autofocus>
-            </div>
-
-            <div class="field">
-                <div class="field-label-row">
-                    <label for="password">Password</label>
-                    {{--
-                        There is no self-service reset flow in this system: no
-                        route, no controller, no token table, and both guards
-                        store `password_hash` on their own models rather than
-                        Laravel's users table, so the default broker would not
-                        work unconfigured either.
-
-                        Rather than link to a page that 404s, this points at the
-                        recovery path that genuinely exists today -- accounts are
-                        created and approved by DOT Region XI, so DOT Region XI
-                        is who reissues them.
-                    --}}
-                    <a class="field-label-row__aside"
-                       href="mailto:{{ config('dot.contact_email') }}?subject={{ rawurlencode('ExploreDVO portal - password reset request') }}">Forgot password?</a>
-                </div>
-                <div class="password-field">
-                    <input type="password" id="password" name="password" required autocomplete="current-password">
-                    @include('partials.password-toggle', ['target' => 'password'])
+            <div class="portal-poster__network">
+                <span class="portal-poster__compass" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m16 8-2.5 5.5L8 16l2.5-5.5L16 8Z"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
+                </span>
+                <div>
+                    <strong>EST. PARTNER NETWORK</strong>
+                    <span>Accredited stays, tours &amp; operators</span>
                 </div>
             </div>
+        </aside>
 
-            <button type="submit" class="btn btn-accent btn-block" style="margin-top:22px;">
-                Log In as {{ $portal === 'admin' ? 'DOT Admin' : 'Partner / Operator' }}
-            </button>
-        </form>
+        <section class="portal-signin__main" aria-labelledby="portal-signin-title">
+            <span class="portal-signin__welcome">welcome back</span>
+            <h1 id="portal-signin-title">Partner Portal Sign&nbsp;In</h1>
+            <p class="portal-signin__subtitle">DOT Region XI Partners &amp; Administrators</p>
 
-        {{--
-            Follows the active tab, the way the submit label already did. On the
-            admin tab the establishment signup prompt was not merely irrelevant
-            but misleading: DOT Admin is internal staff, and those accounts are
-            issued by DOT, never self-requested.
-        --}}
-        @if ($portal === 'admin')
-            <p class="auth-foot">
-                DOT Region XI staff only. Trouble signing in?
-                <a href="mailto:{{ config('dot.contact_email') }}?subject={{ rawurlencode('ExploreDVO admin portal - sign-in help') }}">Contact the system administrator</a>
-            </p>
-        @else
-            <p class="auth-foot">Not an accredited establishment yet? <a href="{{ route('portal.establishment.register') }}">Request a partner account</a></p>
-        @endif
+            <nav class="portal-signin__tabs" data-portal-tabs aria-label="Account type">
+                <a id="portal-tab-establishment" href="{{ route('portal.login', ['portal' => 'establishment']) }}" data-portal="establishment" @if ($portal === 'establishment') aria-current="page" @endif>
+                    <x-icon name="briefcase" aria-hidden="true" /> Partner / Operator
+                </a>
+                <a id="portal-tab-admin" href="{{ route('portal.login', ['portal' => 'admin']) }}" data-portal="admin" @if ($portal === 'admin') aria-current="page" @endif>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s7-3 7-9V5l-7-3-7 3v8c0 6 7 9 7 9Z"/></svg> DOT Admin
+                </a>
+            </nav>
+
+            <div id="portal-signin-panel">
+                @if ($errors->any())
+                    <div class="alert alert-error" role="alert">
+                        @foreach ($errors->all() as $error)
+                            <div>{{ $error }}</div>
+                        @endforeach
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('portal.login') }}">
+                    @csrf
+                    <input type="hidden" name="portal" value="{{ $portal }}">
+
+                    <div class="field">
+                        <label for="identifier">Email address</label>
+                        <div class="portal-signin__input">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                            <input type="email" id="identifier" name="identifier" value="{{ old('identifier') }}" placeholder="you@company.com" autocomplete="username" required>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label-row">
+                            <label for="password">Password</label>
+                            <a class="field-label-row__aside" href="mailto:{{ config('dot.contact_email') }}?subject={{ rawurlencode('ExploreDVO portal - password reset request') }}">Forgot password?</a>
+                        </div>
+                        <div class="portal-signin__input password-field">
+                            <x-icon name="lock" aria-hidden="true" />
+                            <input type="password" id="password" name="password" required autocomplete="current-password">
+                            @include('partials.password-toggle', ['target' => 'password'])
+                        </div>
+                    </div>
+
+                    <button type="submit" class="portal-signin__submit" data-portal-submit>
+                        Log In as {{ $portal === 'admin' ? 'DOT Admin' : 'Partner / Operator' }}
+                    </button>
+                </form>
+
+                <p class="portal-signin__help" data-portal-help="admin" @if ($portal !== 'admin') hidden @endif>
+                    DOT Region XI staff only. Trouble signing in?
+                    <a href="mailto:{{ config('dot.contact_email') }}?subject={{ rawurlencode('ExploreDVO admin portal - sign-in help') }}">Contact the system administrator</a>
+                </p>
+                <p class="portal-signin__help" data-portal-help="establishment" @if ($portal !== 'establishment') hidden @endif>
+                    Not an accredited establishment yet? <a href="{{ route('portal.establishment.register') }}">Request a partner account</a>
+                </p>
+            </div>
+        </section>
     </div>
 </div>
+<script src="{{ asset('js/portal-login.js') }}?v={{ filemtime(public_path('js/portal-login.js')) }}" defer></script>
 @endsection

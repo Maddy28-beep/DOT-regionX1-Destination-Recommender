@@ -1,7 +1,7 @@
 <footer class="site-footer" id="about">
     <div class="container">
         <div class="footer-grid">
-            <div>
+            <div class="footer-intro">
                 <div class="footer-brand-row">
                     <x-brand-mark class="footer-brand-icon" />
                     <div class="footer-brand">Explore<span style="color:var(--gold)">DVO</span></div>
@@ -23,9 +23,21 @@
                         <a href="mailto:{{ config('dot.contact_email') }}">{{ config('dot.contact_email') }}</a>
                     </p>
                 </div>
+                <div class="footer-social">
+                    <p>Follow DOT Davao</p>
+                    <nav aria-label="DOT Davao social media">
+                        <a href="https://www.facebook.com/DoTDavao" target="_blank" rel="noopener noreferrer" aria-label="DOT Davao on Facebook (opens in a new tab)" title="Facebook"><x-icon name="facebook" aria-hidden="true" /></a>
+                        <a href="https://www.instagram.com/dotdavao" target="_blank" rel="noopener noreferrer" aria-label="DOT Davao on Instagram (opens in a new tab)" title="Instagram"><x-icon name="instagram" aria-hidden="true" /></a>
+                        <a href="https://www.youtube.com/@davaotourismdotph8487" target="_blank" rel="noopener noreferrer" aria-label="DOT Davao on YouTube (opens in a new tab)" title="YouTube">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="4"/><path d="m10 9 5 3-5 3z"/></svg>
+                        </a>
+                        <a href="https://www.tiktok.com/@dotdavao" target="_blank" rel="noopener noreferrer" aria-label="DOT Davao on TikTok (opens in a new tab)" title="TikTok"><x-icon name="tiktok" aria-hidden="true" /></a>
+                    </nav>
+                </div>
             </div>
             <div>
                 <h3>For Travelers</h3>
+                <div class="footer-traveler-links">
                 <a href="{{ route('plan.edit') }}">Plan a trip</a>
                 <a href="{{ route('destinations.index') }}">Browse destinations</a>
                 <a href="{{ route('accommodations.index') }}">Browse accommodations</a>
@@ -36,6 +48,7 @@
                 <a href="{{ route('exit-survey.create') }}">Share your feedback</a>
                 <a href="{{ route('saved.index') }}">Saved places</a>
                 <a href="{{ route('events.index') }}">Browse events</a>
+                </div>
             </div>
             <div>
                 <h3>For Partners</h3>
