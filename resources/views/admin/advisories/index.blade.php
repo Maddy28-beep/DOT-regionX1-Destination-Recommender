@@ -18,7 +18,7 @@
     <table class="data-table">
         <thead>
             <tr>
-                <th>Title</th><th>Applies To</th><th>Severity</th><th>Window</th><th>Posted By</th><th></th>
+                <th>Title</th><th>Applies To</th><th>Severity</th><th>Window</th><th>Posted By</th><th class="adm-table__actions"><span class="sr-only">Actions</span></th>
             </tr>
         </thead>
         <tbody>
@@ -46,13 +46,18 @@
                         @endif
                     </td>
                     <td class="cell-muted">{{ $advisory->admin?->full_name ?? '—' }}</td>
-                    <td>
-                        <div class="util-row">
-                            <a href="{{ route('admin.advisories.edit', $advisory) }}" class="btn btn-primary btn-xs" data-modal-form data-title="Edit advisory" data-sub="{{ $advisory->title }}">Edit</a>
+                    <td class="adm-table__actions">
+                        <div class="adm-actions">
+                            <a href="{{ route('admin.advisories.edit', $advisory) }}" class="adm-icon-btn" title="Edit {{ $advisory->title }}"
+                               data-modal-form data-title="Edit advisory" data-sub="{{ $advisory->title }}">
+                                <x-icon name="pencil" /><span class="sr-only">Edit {{ $advisory->title }}</span>
+                            </a>
                             <form method="POST" action="{{ route('admin.advisories.destroy', $advisory) }}" onsubmit="return confirm('Remove this advisory? Travelers will no longer see it.');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-outline btn-xs">Remove</button>
+                                <button type="submit" class="adm-icon-btn adm-icon-btn--danger" title="Remove {{ $advisory->title }}">
+                                    <x-icon name="trash" /><span class="sr-only">Remove {{ $advisory->title }}</span>
+                                </button>
                             </form>
                         </div>
                     </td>

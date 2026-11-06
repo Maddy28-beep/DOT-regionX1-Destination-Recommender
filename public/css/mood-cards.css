@@ -38,6 +38,12 @@
     background: linear-gradient(to top, rgba(4, 45, 54, .94) 0%, rgba(4, 45, 54, .6) 30%, rgba(4, 45, 54, 0) 62%);
 }
 .mood__photo--none { display: grid; place-items: center; }
+
+/* On a wide screen all five cards are in view, so they do not need to be phone-tall: a 3:4 card is about a quarter
+   shorter and the section takes far less of the page. On a phone or tablet the swipe row keeps the tall cards. */
+@media (min-width: 1101px) {
+    .mood__photo { aspect-ratio: 3 / 4; }
+}
 .mood__photo--none svg { width: 30px; height: 30px; color: rgba(255, 255, 255, .45); }
 
 .mood__count {

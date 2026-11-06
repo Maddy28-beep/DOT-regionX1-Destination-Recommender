@@ -55,7 +55,7 @@
 </div>
 
 <div class="plan-section pc-block pc-trip-dates">
-    <header class="pc-block__head"><h3>When</h3><p>Only the number of days is required.</p></header>
+    <header class="pc-block__head"><h3>Dates &amp; arrival</h3><p>Only the number of days is required.</p></header>
     <div class="pc-grid">
         <div class="field pc-field pc-col-3">
             <label for="travel_days">Number of travel days
@@ -104,25 +104,32 @@
             </div>
             <input type="time" id="arrival_time" name="arrival_time" value="{{ $arrivalValue }}">
         </div>
+    </div>
 
-        {{-- Leaving: all optional. The point is chosen here, never guessed from where the trip starts. The buttons only
-             fill the box and the two hidden coordinates (public/js/plan-departure.js); the server also reads a typed place. --}}
-        <div class="field pc-field pc-col-4" data-departure>
-            <label for="departure_time">Departure time (optional)
-                <span class="field-help" tabindex="0" title="{{ $departureHelp }}" aria-label="{{ $departureHelp }}"><x-icon name="info" /></span>
-            </label>
-            <input type="time" id="departure_time" name="departure_time" value="{{ $departureValue }}">
-            @error('departure_time')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
-            {{-- You leave on the last day of the trip: the arrival date + (days - 1). Nothing to enter; plan-basics.js keeps it live. --}}
-            <p class="pc-hint" data-departure-date aria-live="polite">{{ $leavingLine }}</p>
+    <fieldset class="pc-trip-departure">
+        <legend>Departure <span>Optional</span></legend>
+        <div class="pc-departure-grid">
+            {{-- Leaving: all optional. The point is chosen here, never guessed from where the trip starts. The buttons only
+                 fill the box and the two hidden coordinates (public/js/plan-departure.js); the server also reads a typed place. --}}
+            <div class="field pc-field" data-departure>
+                <label for="departure_time">Departure time
+                    <span class="field-help" tabindex="0" title="{{ $departureHelp }}" aria-label="{{ $departureHelp }}"><x-icon name="info" /></span>
+                </label>
+                <input type="time" id="departure_time" name="departure_time" value="{{ $departureValue }}">
+                @error('departure_time')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
+                {{-- You leave on the last day of the trip: the arrival date + (days - 1). Nothing to enter; plan-basics.js keeps it live. --}}
+                <p class="pc-hint" data-departure-date aria-live="polite">{{ $leavingLine }}</p>
+            </div>
+
+            <div class="field pc-field">
+                <label for="departure_label">Leaving from <span class="pc-hint">(required if you enter a time)</span></label>
+                <input type="text" id="departure_label" name="departure_label" value="{{ old('departure_label', $preference->departure_label) }}" placeholder="Airport, seaport or terminal" autocomplete="off">
+                <input type="hidden" name="departure_lat" id="departure_lat" value="{{ old('departure_lat', $preference->departure_lat) }}">
+                <input type="hidden" name="departure_lng" id="departure_lng" value="{{ old('departure_lng', $preference->departure_lng) }}">
+                @error('departure_label')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
+            </div>
         </div>
-
-        <div class="field pc-field pc-col-8">
-            <label for="departure_label">Leaving from (needed with a time)</label>
-            <input type="text" id="departure_label" name="departure_label" value="{{ old('departure_label', $preference->departure_label) }}" placeholder="Airport, seaport or terminal" autocomplete="off">
-            <input type="hidden" name="departure_lat" id="departure_lat" value="{{ old('departure_lat', $preference->departure_lat) }}">
-            <input type="hidden" name="departure_lng" id="departure_lng" value="{{ old('departure_lng', $preference->departure_lng) }}">
-            @error('departure_label')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
+        <div class="pc-departure-shortcuts">
             <div class="pc-quick" role="group" aria-label="Common departure points" data-departure-points hidden>
                 <button type="button" data-departure-pick="Davao International Airport" data-lat="7.130" data-lng="125.645">Davao Airport</button>
                 <button type="button" data-departure-pick="Port of Sasa" data-lat="7.127" data-lng="125.663">Seaport</button>
@@ -131,7 +138,7 @@
             </div>
             <p class="pc-hint">We allow {{ $departureBufferText }} there before you leave.</p>
         </div>
-    </div>
+    </fieldset>
 </div>
 
 <div class="plan-section pc-block pc-trip-visitor">

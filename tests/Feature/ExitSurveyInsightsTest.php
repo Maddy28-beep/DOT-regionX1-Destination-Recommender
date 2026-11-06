@@ -86,8 +86,8 @@ class ExitSurveyInsightsTest extends TestCase
         $this->assertStringContainsString('Destination Relevance', $html);
         $this->assertStringContainsString('Highest', $html);
         $this->assertStringContainsString('Lowest', $html);
-        $this->assertStringContainsString('Highest-rated category: <strong>Itinerary Usefulness</strong>', $html);
-        $this->assertStringContainsString('Lowest-rated category: <strong>Destination Relevance</strong>', $html);
+        $this->assertMatchesRegularExpression('/<dt>Highest-rated category<\/dt><dd>Itinerary Usefulness<\/dd>/', $html);
+        $this->assertMatchesRegularExpression('/<dt>Lowest-rated category<\/dt><dd>Destination Relevance<\/dd>/', $html);
     }
 
     public function test_most_visited_places_and_popular_activities_reflect_actual_survey_data(): void

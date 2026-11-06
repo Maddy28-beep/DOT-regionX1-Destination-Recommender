@@ -46,8 +46,6 @@
         {{ $restaurant->displayName() }}
     </nav>
 
-    <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($restaurant->getMorphClass(), $restaurant->id)->latest()->get()" />
-
     @include('partials.gallery-hero', [
         'keepOtherPhotos' => true,
         'photos' => $restaurant->photos,
@@ -63,6 +61,7 @@
 
     <div class="detail-layout">
         <div>
+            <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($restaurant->getMorphClass(), $restaurant->id)->latest()->get()" />
             @include('partials.stat-strip', ['items' => $strip])
 
             @include('partials.listing-about-card', [

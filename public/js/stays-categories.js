@@ -1,6 +1,11 @@
 /* Presentation only: expose existing category links while retaining their URLs and selection. */
 (() => {
     const bar = document.querySelector('.catalog-refresh .catalog-categories');
+    // On a phone the chips are a swipe row: start with the selected one in view, not off the right edge.
+    const current = bar?.querySelector('.chip.active');
+    if (current && bar.scrollWidth > bar.clientWidth) {
+        bar.scrollLeft = Math.max(0, current.offsetLeft - 20);
+    }
     const more = bar?.querySelector('.catalog-categories__more');
     if (!more) return;
 

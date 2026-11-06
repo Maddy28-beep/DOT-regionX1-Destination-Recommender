@@ -34,8 +34,6 @@
         {{ $accommodation->displayName() }}
     </nav>
 
-    <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($accommodation->getMorphClass(), $accommodation->id)->latest()->get()" />
-
     @include('partials.gallery-hero', [
         'photos' => $accommodation->photos,
         'title' => $accommodation->displayName(),
@@ -50,6 +48,7 @@
 
     <div class="detail-layout">
         <div>
+            <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($accommodation->getMorphClass(), $accommodation->id)->latest()->get()" />
             @include('partials.stat-strip', ['items' => [
                 ['icon' => 'tag', 'label' => 'Price tier', 'text' => $tierLabel ?? '—', 'meter' => $accommodation->posterTier()],
                 ['icon' => 'ticket', 'label' => 'Per night', 'text' => $accommodation->price_per_night ? number_format($accommodation->price_per_night) : '—', 'peso' => (bool) $accommodation->price_per_night],

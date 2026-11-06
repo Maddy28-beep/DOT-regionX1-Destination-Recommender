@@ -39,6 +39,7 @@
 
     <div class="detail-layout">
         <div>
+            <x-promo-banner :promotions="\App\Models\Promotion::active()->forListing($destination->getMorphClass(), $destination->id)->latest()->get()" />
             @include('partials.dest-stat-strip', ['destination' => $destination])
             @include('partials.dest-about-card', ['destination' => $destination])
 

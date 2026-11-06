@@ -18,7 +18,7 @@
     <div class="table-scroll">
     <table class="data-table">
         <thead>
-            <tr><th>Order</th><th>Photo</th><th>Caption</th><th>Links to</th><th>Status</th><th></th></tr>
+            <tr><th>Order</th><th>Photo</th><th>Caption</th><th>Links to</th><th>Status</th><th class="adm-table__actions"><span class="sr-only">Actions</span></th></tr>
         </thead>
         <tbody>
             @forelse ($slides as $slide)
@@ -31,13 +31,16 @@
                     </td>
                     <td class="cell-muted">{{ $slide->cta_label }}<div style="font-size:.78rem;">{{ $slide->cta_url }}</div></td>
                     <td><span class="status-pill {{ $slide->is_active ? 'status-active' : 'status-expired' }}">{{ $slide->is_active ? 'Shown' : 'Hidden' }}</span></td>
-                    <td>
-                        <div class="util-row">
-                            <a href="{{ route('admin.postcard-slides.edit', $slide) }}" class="btn btn-primary btn-xs" data-modal-form data-title="Edit slide" data-sub="{{ $slide->title }}">Edit</a>
+                    <td class="adm-table__actions">
+                        <div class="adm-actions">
+                            <a href="{{ route('admin.postcard-slides.edit', $slide) }}" class="adm-icon-btn" title="Edit {{ $slide->title }}"
+                               data-modal-form data-title="Edit slide" data-sub="{{ $slide->title }}">
+                                <x-icon name="pencil" /><span class="sr-only">Edit {{ $slide->title }}</span>
+                            </a>
                             <form method="POST" action="{{ route('admin.postcard-slides.destroy', $slide) }}" onsubmit="return confirm('Remove this slide? Its photo files are deleted too.');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-outline btn-xs">Remove</button>
+                                <button type="submit" class="adm-icon-btn adm-icon-btn--danger" title="Remove {{ $slide->title }}"><x-icon name="trash" /><span class="sr-only">Remove {{ $slide->title }}</span></button>
                             </form>
                         </div>
                     </td>

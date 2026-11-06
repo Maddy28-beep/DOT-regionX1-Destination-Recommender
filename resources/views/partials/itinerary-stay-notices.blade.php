@@ -13,8 +13,6 @@
     $stayMode = data_get($stayPlan, 'mode');
     // Every range lists what it could not place, Remote included.
     $unplaced = $stayNotices->where('type', 'unplaced_destination')->values();
-    // A long list folds away so the plan below stays in view.
-    $foldFrom = 5;
     $stayNights = (int) data_get($stayPlan, 'continuity.nights', 0);
     // When the trip has no stay at all, the page already says so; naming each night as well would repeat it.
     $uncoveredNights = $hasOvernight ? $stayNotices->where('type', 'no_stay_for_night')->pluck('night')->values() : collect();
@@ -22,25 +20,25 @@
 @endphp
 
 @if ($unplaced->isNotEmpty())
-    <div class="itin-notice" role="note" style="margin:0 0 16px; padding:12px 16px; border-radius:12px; background:#fff7e6; border:1px solid #f0c36d;">
-        <strong>{{ $unplaced->count() }} {{ \Illuminate\Support\Str::plural('place', $unplaced->count()) }} we set out to include could not be fitted into your plan.</strong>
-        @if ($stayMode === 'near' && $stayNights > 0)
-            Your range keeps the same place to stay for the whole trip, so the plan was not changed to reach {{ $unplaced->count() === 1 ? 'it' : 'them' }}.
-        @endif
-        @if ($unplaced->count() >= $foldFrom)
-            <details style="margin-top:8px;"><summary style="cursor:pointer;">Show the {{ $unplaced->count() }} places</summary>
-        @endif
-        <ul style="margin:8px 0 0 18px; padding:0;">
+    <details class="itin-notice itin-omissions">
+        <summary>
+            <x-icon name="info" />
+            <span>
+                <strong>{{ $unplaced->count() }} {{ \Illuminate\Support\Str::plural('place', $unplaced->count()) }} we set out to include could not be fitted into your plan.</strong>
+                @if ($stayMode === 'near' && $stayNights > 0)
+                    Your range keeps the same place to stay for the whole trip.
+                @endif
+            </span>
+            <span class="itin-omissions__toggle" aria-hidden="true">View details</span>
+        </summary>
+        <ul>
             @foreach ($unplaced as $notice)
                 <li>
                     <strong>{{ $notice['name'] }}</strong>: {{ \App\Support\OmissionReason::sentence($notice) }}
                 </li>
             @endforeach
         </ul>
-        @if ($unplaced->count() >= $foldFrom)
-            </details>
-        @endif
-    </div>
+    </details>
 @endif
 
 @if ($noSingleStay)

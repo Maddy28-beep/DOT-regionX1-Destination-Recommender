@@ -12,7 +12,7 @@
     $postcardSlides  Collection<PostcardSlide>, already active + ordered
 --}}
 @if ($postcardSlides->isNotEmpty())
-    <section class="section landing-section landing-section--tint moods" id="known-for" aria-labelledby="moodsTitle">
+    <section class="section landing-section landing-section--tint moods slide-compact" id="known-for" aria-labelledby="moodsTitle">
         <div class="container">
             {{-- The same heading as every other landing section (Popular Destinations, Featured Tour Packages...). --}}
             <div class="dpost-head">
