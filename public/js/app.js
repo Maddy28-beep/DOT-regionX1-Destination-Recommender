@@ -544,15 +544,15 @@ document.addEventListener('DOMContentLoaded', function () {
      */
     // The number on the header's heart follows what was just saved or removed.
     function updateSavedBadge(delta) {
-        var badge = document.querySelector('[data-saved-count]');
-        if (!badge) return;
+        // The header's heart and the phone drawer's Saved button each carry one.
+        document.querySelectorAll('[data-saved-count]').forEach(function (badge) {
+            var next = Math.max(0, (parseInt(badge.textContent, 10) || 0) + delta);
+            badge.textContent = String(next);
+            badge.hidden = next < 1;
 
-        var next = Math.max(0, (parseInt(badge.textContent, 10) || 0) + delta);
-        badge.textContent = String(next);
-        badge.hidden = next < 1;
-
-        var link = badge.closest('[data-saved-link]');
-        if (link) link.setAttribute('aria-label', 'Saved places' + (next > 0 ? ', ' + next + ' saved' : ''));
+            var link = badge.closest('[data-saved-link]');
+            if (link) link.setAttribute('aria-label', 'Saved places' + (next > 0 ? ', ' + next + ' saved' : ''));
+        });
     }
 
     function flyHeartToSavedLink(sourceButton) {

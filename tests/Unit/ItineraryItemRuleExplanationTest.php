@@ -74,4 +74,15 @@ class ItineraryItemRuleExplanationTest extends TestCase
     {
         $this->assertNull((new ItineraryItem)->ruleExplanation(456, 456));
     }
+
+    public function test_the_rule_facts_are_the_stored_figures_and_say_how_simulated_they_are(): void
+    {
+        $facts = $this->item(12)->ruleFacts(0, 300);
+
+        $this->assertSame(['basis' => 'Eden Nature Park', 'confidence' => 80, 'support' => '20', 'trips' => 12, 'simulated' => 'none'], $facts);
+        $this->assertSame('some', $this->item()->ruleFacts(10, 300)['simulated']);
+        $this->assertSame('all', $this->item()->ruleFacts(456, 456)['simulated']);
+        $this->assertSame('none', $this->item()->ruleFacts()['simulated'], 'Nothing is claimed when the caller does not know.');
+        $this->assertNull((new ItineraryItem)->ruleFacts(456, 456));
+    }
 }

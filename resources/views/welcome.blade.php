@@ -531,7 +531,7 @@
             </div>
             <a href="{{ route('packages.index') }}" class="btn dpost-cta">See all packages</a>
         </div>
-        <div class="dpost-grid">
+        <div class="dpost-grid dpost-grid--three">
             @foreach ($packages as $package)
                 @include('partials.listing-poster-card', ['listing' => $package])
             @endforeach

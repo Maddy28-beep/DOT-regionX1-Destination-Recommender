@@ -64,6 +64,13 @@
 
     /* The two long sections: each part is a slide of its own. */
     html.home-slides main#main-content > section.home-split { padding: 0; }
+    /* The zoom is on each part, not on the section, so the container around the parts was not scaled with it: on a short
+       or zoomed window these two sections ran 1200px wide while every other section is scaled to 1200 x --z. Scale the
+       container to match, so every section lines up. */
+    html.home-slides main#main-content > section.home-split > .container {
+        max-width: calc(var(--container) * var(--z));
+        padding-inline: calc(20px * var(--z));
+    }
     html.home-slides main#main-content .slide-part {
         zoom: var(--z);
         /* min-height, not height: a part whose content is taller than the window grows instead of being clipped. */

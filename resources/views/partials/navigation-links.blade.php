@@ -19,7 +19,12 @@
         @else
             More
         @endif
-        <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 7.5 5 5 5-5" /></svg>
+        @if ($icons)
+            {{-- The drawer's chevron points right when closed and turns to point up when open (see mobile-drawer.css). --}}
+            <svg class="mobile-menu__chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+        @else
+            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 7.5 5 5 5-5" /></svg>
+        @endif
     </button>
     <div class="nav-more__links" id="{{ $navId }}-more-links" hidden>
         <a href="{{ route('souvenir-centers.index') }}" @if(request()->routeIs('souvenir-centers.*')) aria-current="page" @endif>@if ($icons)<span class="mobile-menu__icon" aria-hidden="true"><x-icon name="tag" /></span>@endif Souvenir Centers</a>
@@ -28,10 +33,11 @@
     </div>
 </div>
 <a href="{{ route('advisories.index') }}" class="main-nav__advisories" @if(request()->routeIs('advisories.*')) aria-current="page" @endif>
-    @if ($icons)<span class="mobile-menu__icon" aria-hidden="true"><x-icon name="alert-triangle" /></span>@endif
+    @if ($icons)<span class="mobile-menu__icon" aria-hidden="true"><x-icon name="alert-triangle" />@if (($activeAdvisoryCount ?? 0) > 0)<i class="mobile-menu__pip"></i>@endif</span>@endif
     <span class="main-nav__label">Advisories</span>
     @if (($activeAdvisoryCount ?? 0) > 0)
         <span class="main-nav__dot main-nav__dot--count" aria-hidden="true">{{ $activeAdvisoryCount > 9 ? '9+' : $activeAdvisoryCount }}</span>
+        @if ($icons)<span class="mobile-menu__urgent" aria-hidden="true">{{ $activeAdvisoryCount > 9 ? '9+' : $activeAdvisoryCount }} active</span>@endif
         <span class="sr-only">({{ $activeAdvisoryCount }} active {{ \Illuminate\Support\Str::plural('advisory', $activeAdvisoryCount) }})</span>
     @endif
 </a>

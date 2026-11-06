@@ -384,7 +384,7 @@ class FreeTimeIdeasTest extends TestCase
         return $this->get(route('plan.itinerary'))->assertOk();
     }
 
-    public function test_the_page_shows_a_collapsed_optional_section_with_the_disclosure(): void
+    public function test_the_page_shows_an_open_optional_section_with_the_disclosure(): void
     {
         $this->fixture();
         $this->shop('Near Shop', 1);
@@ -396,12 +396,30 @@ class FreeTimeIdeasTest extends TestCase
         $page->assertSee("These are ideas only. They are not part of your plan, nothing is booked, and we can't promise they're open.", false);
         $page->assertSee('Souvenir shop');
         $page->assertSee('Approx. 1.3 km from your accommodation');
-        $page->assertSee('Opening hours are not listed. Check before visiting.');
-        $page->assertSee('<details class="tl-ideas">', false);
-        $page->assertDontSee('<details class="tl-ideas" open', false);
+        $page->assertSee('Opening hours not listed &mdash; check before visiting', false);
+        // A real button, open by default, whose aria-expanded follows the list; the note is a banner, the ideas solid cards.
+        $page->assertSee('<button type="button" class="tl-ideas__toggle" aria-expanded="true" aria-controls="free-ideas-', false);
+        $page->assertSee('class="tl-ideas__note"', false);
+        $page->assertSee('<li class="tl-idea">', false);
+        $page->assertDontSee('<details class="tl-ideas"', false);
         $page->assertSee('&lt;b&gt;Bold&lt;/b&gt; Shop', false);
         $page->assertDontSee('<b>Bold</b> Shop', false);
         $page->assertSee('Free time until dinner');
+    }
+
+    public function test_only_a_shop_that_is_sample_data_gets_the_amber_pill_and_never_a_bracket_in_its_name(): void
+    {
+        $this->fixture();
+        $real = $this->shop('Real Keepsakes', 1);
+        $sample = $this->shop('Island Crafts [SAMPLE]', 2);
+        \App\Models\AccreditationRecord::create(['listing_kind' => 'souvenir_center', 'listing_id' => $real->id, 'accreditation_number' => 'DOT-R11-REAL-1', 'status' => 'Active', 'is_placeholder' => false]);
+        \App\Models\AccreditationRecord::create(['listing_kind' => 'souvenir_center', 'listing_id' => $sample->id, 'accreditation_number' => 'SAMPLE-1', 'status' => 'Active', 'is_placeholder' => true]);
+
+        $html = $this->planPage()->getContent();
+
+        $this->assertStringContainsString('Island Crafts', $html);
+        $this->assertStringNotContainsString('Island Crafts [SAMPLE]', $html, 'the bracket is not part of the name a visitor reads');
+        $this->assertSame(1, substr_count($html, 'class="tl-idea__sample"'), 'one pill, on the sample shop only');
     }
 
     public function test_the_page_shows_nothing_extra_when_no_shop_qualifies(): void
@@ -424,7 +442,7 @@ class FreeTimeIdeasTest extends TestCase
         $page = $this->planPage('04:00');
 
         $page->assertSee('Free time until 8:00 AM');
-        $this->assertSame(1, substr_count($page->getContent(), '<details class="tl-ideas">'), 'only the evening row carries ideas');
+        $this->assertSame(1, substr_count($page->getContent(), 'data-ideas'), 'only the evening row carries ideas');
     }
 
     // ---------------------------------------------------------------------------------------------

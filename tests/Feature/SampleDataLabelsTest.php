@@ -218,13 +218,14 @@ class SampleDataLabelsTest extends TestCase
             ->get(route('plan.itinerary'))->assertOk()->getContent();
     }
 
-    public function test_the_itinerary_marks_a_pairing_that_involves_sample_data(): void
+    public function test_the_itinerary_pairing_line_has_no_boxed_sample_tag(): void
     {
         $real = $this->dest('Real Falls');
         $sample = $this->sample('Sample Falls');
 
-        $this->assertStringContainsString('Involves sample data', $this->pairingPage($sample, 'Real Falls'), 'The suggested stop is sample data.');
-        $this->assertStringContainsString('Involves sample data', $this->pairingPage($real, 'Sample Falls'), 'The place the rule started from is sample data.');
+        // The admin rules page still marks such rules; a visitor's pairing line does not carry the boxed tag.
+        $this->assertStringNotContainsString('Involves sample data', $this->pairingPage($sample, 'Real Falls'));
+        $this->assertStringNotContainsString('Involves sample data', $this->pairingPage($real, 'Sample Falls'));
         $this->assertStringNotContainsString('Involves sample data', $this->pairingPage($real, 'Real Falls'));
     }
 

@@ -360,3 +360,24 @@
 .plan-wizard #plan-step-1 .pc-extra-check { display: none; }
 .plan-wizard #plan-step-1 .pc-chip--extra:has(input:checked) .pc-extra-check { display: grid; place-items: center; flex: none; width: 17px; height: 17px; border-radius: 50%; background: var(--primary); color: #fff; }
 .plan-wizard #plan-step-1 .pc-extra-check svg { width: 11px; height: 11px; }
+
+/* ---- The planner's header on a desktop: one layout, not three stylesheets disagreeing ----
+   The kicker, title, line and "Saved Places" button are one block centred on the page. Davo sits just to the left of that
+   block (his column is the same width as the empty one on the right, so the block stays centred), a short gap from the
+   text instead of out at the edge of the container.
+   The earlier rules centred some of these and left-aligned the rest, so the block looked off. Phones and the "pick up
+   where you left off" state keep theirs. */
+@media (min-width: 761px) {
+    .plan-wizard:not(.has-resume) > .page-head { padding: 22px 0 14px; }
+    .plan-wizard:not(.has-resume) > .page-head .plan-introduction {
+        max-width: 1200px; grid-template-columns: minmax(0, 1fr) minmax(0, max-content) minmax(0, 1fr); gap: 8px 24px; align-items: center; text-align: center;
+    }
+    .plan-wizard:not(.has-resume) .plan-davo { width: 116px; height: 139px; grid-column: 1; grid-row: 1 / 3; justify-self: end; }
+    .plan-wizard:not(.has-resume) .plan-introduction-copy { grid-column: 2; grid-row: 1; }
+    .plan-wizard:not(.has-resume) .plan-introduction .poster-kicker { display: block; text-align: center; }
+    .plan-wizard:not(.has-resume) .plan-introduction .page-title { margin: 6px 0 8px; text-align: center; text-wrap: balance; }
+    .plan-wizard:not(.has-resume) .plan-introduction p { max-width: 62ch; margin-inline: auto; color: var(--muted); font-size: .95rem; line-height: 1.55; text-align: center; }
+    .plan-wizard:not(.has-resume) .plan-saved-link {
+        grid-column: 2; grid-row: 2; justify-self: center; align-self: start; min-height: 44px; padding: 8px 18px; font-size: .86rem; background: #fff;
+    }
+}

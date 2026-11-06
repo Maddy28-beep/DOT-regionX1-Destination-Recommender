@@ -38,14 +38,10 @@
     $photo = $listing?->coverPhoto();
     $realPhoto = $photo && ! str_ends_with(strtolower($photo->path), '.svg') ? $photo : null;
 
-    // A card whose place is sample data says so: a destination stop, a meal restaurant, a souvenir stop and the
-    // night's stay alike. A card with a "popular pairing" line already gets that line's label, so it does not get
-    // a second one. (The name is shown without its " [SAMPLE]" suffix, so the tag is what says it.)
+    // A card whose place is sample data says so in its accreditation line below ("Sample data, not DOT-verified"),
+    // not in a second boxed tag beside the name. (The name is shown without its " [SAMPLE]" suffix.)
     // Provenance comes from SampleData, never from the is_accredited eligibility flag alone: a sample is
     // "Sample data, not DOT-verified" even though the flag is set.
-    $sampleCue = in_array($kind, ['activity', 'meal', 'overnight'], true) && $listing
-        && app(\App\Support\SampleData::class)->isSample($listing)
-        && ! $item->ruleExplanation();
 
     // The card's accreditation line, in the project's three provenance states (G2 completed under
     // explicit authorization, minimum presentation logic only): SampleData::status() is the rule -
@@ -57,6 +53,7 @@
         \App\Support\SampleData::OFFICIAL => 'DOT accreditation listed',
         default => 'DOT accreditation not verified',
     } : null;
+    $accreditationOk = $listing && app(\App\Support\SampleData::class)->status($listing) === \App\Support\SampleData::OFFICIAL;
 
     $hours = $listing && filled($listing->hours ?? null) && \App\Support\OpeningHours::windows($listing->hours) !== null
         ? $listing->hours
@@ -154,15 +151,15 @@
                     @if ($kind === 'activity' && ! $item->destination_id)
                         {{-- The souvenir stop has no name in its title, so the shop is named as the subject. --}}
                         <h4>{{ \App\Support\SampleData::displayName($item->title) }}</h4>
-                        <p class="tl-card__what"><a href="{{ route($route, $listing) }}">{{ $listing->displayName() }}</a>@if ($sampleCue)<x-sample-tag label="Sample data" title="Sample data, not DOT-verified: this place's accreditation number is a placeholder, not an official DOT number." />@endif</p>
-                        <p class="tl-card__label">{{ $accreditationLabel }}</p>
+                        <p class="tl-card__what"><a href="{{ route($route, $listing) }}">{{ $listing->displayName() }}</a></p>
+                        <x-provenance-badge :ok="$accreditationOk" :label="$accreditationLabel" />
                     @elseif ($kind === 'activity')
                         <h4>
                             <a href="{{ route($route, $listing) }}">{{ $listing->displayName() }}</a>
-                            @if ($sampleCue)<x-sample-tag label="Sample data" title="Sample data, not DOT-verified: this place's accreditation number is a placeholder, not an official DOT number." />@endif
+                            
                         </h4>
                         @if ($item->destination_id)
-                            <p class="tl-card__label">{{ $accreditationLabel }}</p>
+                            <x-provenance-badge :ok="$accreditationOk" :label="$accreditationLabel" />
                         @endif
                         <p class="tl-card__what">{{ $what }}</p>
                         @if ($withinBudget)
@@ -170,8 +167,8 @@
                         @endif
                     @elseif ($isStay && $route)
                         {{-- The night's stay is named, like every other stop, instead of only "Overnight stay". --}}
-                        <h4><a href="{{ route($route, $listing) }}">{{ $listing->displayName() }}</a>@if ($sampleCue)<x-sample-tag label="Sample data" title="Sample data, not DOT-verified: this place's accreditation number is a placeholder, not an official DOT number." />@endif</h4>
-                        <p class="tl-card__label">{{ $accreditationLabel }}</p>
+                        <h4><a href="{{ route($route, $listing) }}">{{ $listing->displayName() }}</a></h4>
+                        <x-provenance-badge :ok="$accreditationOk" :label="$accreditationLabel" />
                         @if ($merged)
                             <p class="tl-card__what"><x-icon name="building" /> Dinner {{ $start?->format('g:i A') }} &middot; check in for the night</p>
                         @endif
@@ -182,8 +179,8 @@
                             </p>
                         @endif
                     @elseif ($kind === 'meal' && $route && $listing)
-                        <h4><a href="{{ route($route, $listing) }}">{{ $listing->displayName() }}</a>@if ($sampleCue)<x-sample-tag label="Sample data" title="Sample data, not DOT-verified: this place's accreditation number is a placeholder, not an official DOT number." />@endif</h4>
-                        <p class="tl-card__label">{{ $accreditationLabel }}</p>
+                        <h4><a href="{{ route($route, $listing) }}">{{ $listing->displayName() }}</a></h4>
+                        <x-provenance-badge :ok="$accreditationOk" :label="$accreditationLabel" />
                     @else
                         <h4>{{ \App\Support\SampleData::displayName($item->title) }}</h4>
                         <p class="tl-card__what">{{ $item->travelSummary() }}</p>
@@ -200,50 +197,69 @@
                         <p class="tl-card__note">{{ $item->note }}</p>
                     @endif
 
-                    @if ($item->ruleExplanation())
+                    @php $pairing = $item->ruleFacts($provenance['transactions_demo'] ?? null, $provenance['transactions'] ?? null); @endphp
+                    @if ($pairing)
+                        @php $paired = \App\Support\SampleData::displayName($pairing['basis']); @endphp
                         <div class="tl-card__pairing">
-                            <span class="pairing-tag">Popular pairing with {{ $item->rule_basis }}</span>
-                            @if (($listing && app(\App\Support\SampleData::class)->isSample($listing)) || app(\App\Support\SampleData::class)->isSampleName($item->rule_basis))
-                                <x-sample-tag />
-                            @endif
-                            <details class="pairing-why">
-                                <summary>why this pick?</summary>
-                                <p>{{ $item->ruleExplanation($provenance['transactions_demo'] ?? null, $provenance['transactions'] ?? null) }}</p>
-                            </details>
-                        </div>
-                    @endif
-
-                    @if (($swap['available'] ?? false) && $kind === 'activity' && $item->destination_id)
-                        @php $closed = $swap['closed'][$item->destination_id] ?? null; @endphp
-                        <div class="swap" data-swap
-                             data-destination="{{ $item->destination_id }}"
-                             data-url="{{ route('plan.alternatives', $item->destination_id) }}"
-                             data-swap-url="{{ route('plan.swap') }}"
-                             data-token="{{ csrf_token() }}">
-                            @if ($closed)
-                                <div class="swap-notice" role="alert">
-                                    <strong>Not available on your dates:</strong> {{ $closed['advisory'] }}.
-                                    @if ($closed['substitute'])
-                                        Closest open substitute:
-                                        <strong>{{ $closed['substitute']['name'] }}</strong>@if ($closed['substitute']['sample'] ?? false)<x-sample-tag label="Sample data, not DOT-verified" title="This place's accreditation number is a placeholder, not an official DOT number." />@endif
-                                        ({{ $closed['substitute']['similarity'] }}% similar{{ $closed['substitute']['distance_km'] !== null ? ', '.$closed['substitute']['distance_km'].' km away' : '' }}).
-                                        <form method="POST" action="{{ route('plan.swap') }}" class="swap-inline">
-                                            @csrf
-                                            <input type="hidden" name="original_id" value="{{ $item->destination_id }}">
-                                            <input type="hidden" name="replacement_id" value="{{ $closed['substitute']['id'] }}">
-                                            <button type="submit" class="btn btn-primary swap-use">Use {{ $closed['substitute']['name'] }} instead</button>
-                                        </form>
+                            <span class="pairing-tag">Popular pairing with {{ $paired }}</span>
+                            <div class="pairing-why" data-pairing>
+                                <button type="button" class="pairing-why__btn" aria-expanded="false" aria-controls="pairing-{{ $item->id }}">Why this pick? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
+                                <div class="pairing-why__panel" id="pairing-{{ $item->id }}" hidden>
+                                    <p>Frequently visited together with {{ $paired }}.</p>
+                                    <ul class="pairing-why__stats">
+                                        <li>Confidence {{ $pairing['confidence'] }}%</li>
+                                        <li>Support {{ $pairing['support'] }}%</li>
+                                        <li>Based on {{ $pairing['trips'] }} {{ \Illuminate\Support\Str::plural('trip', $pairing['trips']) }}</li>
+                                    </ul>
+                                    @if ($pairing['simulated'] === 'all')
+                                        <p class="pairing-why__note">These are simulated demonstration trips, not real traveller visits.</p>
+                                    @elseif ($pairing['simulated'] === 'some')
+                                        <p class="pairing-why__note">Includes simulated demonstration trips.</p>
                                     @endif
                                 </div>
-                            @endif
-                            <button type="button" class="swap-toggle" data-swap-toggle aria-expanded="false" title="Swap this stop"><x-icon name="swap" /><span class="sr-only">Swap this stop</span></button>
-                            <div class="swap-panel" data-swap-panel hidden></div>
+                            </div>
                         </div>
                     @endif
+
                 </div>
 
-                @if ($saveSegment)
-                    <div class="tl-card__actions"><x-save-heart :type="$saveSegment" :listing="$listing" variant="square" /></div>
+                @php $canSwap = ($swap['available'] ?? false) && $kind === 'activity' && $item->destination_id; @endphp
+                @if ($saveSegment || $canSwap)
+                    <div class="tl-card__actions">
+                        @if ($saveSegment)<x-save-heart :type="$saveSegment" :listing="$listing" variant="square" />@endif
+                        @if ($canSwap)
+                            <button type="button" class="swap-toggle" data-swap-toggle aria-expanded="false" aria-controls="swap-panel-{{ $item->id }}" aria-label="Swap this stop for a similar place" title="Swap this stop"><x-icon name="swap" aria-hidden="true" /></button>
+                        @endif
+                    </div>
+                @endif
+
+                {{-- Last child of the card, full width: the swap button sits top-right with the heart, and its panel opens
+                     underneath the whole card instead of squeezed into the text column. --}}
+                @if (($swap['available'] ?? false) && $kind === 'activity' && $item->destination_id)
+                    @php $closed = $swap['closed'][$item->destination_id] ?? null; @endphp
+                    <div class="swap" data-swap
+                         data-destination="{{ $item->destination_id }}"
+                         data-url="{{ route('plan.alternatives', $item->destination_id) }}"
+                         data-swap-url="{{ route('plan.swap') }}"
+                         data-token="{{ csrf_token() }}">
+                        @if ($closed)
+                            <div class="swap-notice" role="alert">
+                                <strong>Not available on your dates:</strong> {{ $closed['advisory'] }}.
+                                @if ($closed['substitute'])
+                                    Closest open substitute:
+                                    <strong>{{ $closed['substitute']['name'] }}</strong>@if ($closed['substitute']['sample'] ?? false)<x-sample-tag label="Sample data, not DOT-verified" title="This place's accreditation number is a placeholder, not an official DOT number." />@endif
+                                    ({{ $closed['substitute']['similarity'] }}% similar{{ $closed['substitute']['distance_km'] !== null ? ', '.$closed['substitute']['distance_km'].' km away' : '' }}).
+                                    <form method="POST" action="{{ route('plan.swap') }}" class="swap-inline">
+                                        @csrf
+                                        <input type="hidden" name="original_id" value="{{ $item->destination_id }}">
+                                        <input type="hidden" name="replacement_id" value="{{ $closed['substitute']['id'] }}">
+                                        <button type="submit" class="btn btn-primary swap-use">Use {{ $closed['substitute']['name'] }} instead</button>
+                                    </form>
+                                @endif
+                            </div>
+                        @endif
+                        <div class="swap-panel" id="swap-panel-{{ $item->id }}" data-swap-panel hidden></div>
+                    </div>
                 @endif
             </article>
         @else
@@ -278,19 +294,26 @@
             </p>
 
             @if ($kind === 'free' && ! empty($ideas))
-                <details class="tl-ideas">
-                    <summary>Optional ideas for this free time ({{ count($ideas) }})</summary>
-                    <p class="tl-ideas__intro">These are ideas only. They are not part of your plan, nothing is booked, and we can't promise they're open.</p>
-                    <ul class="tl-ideas__list">
-                        @foreach ($ideas as $idea)
-                            <li>
-                                <a href="{{ route('souvenir-centers.show', $idea['shop']) }}">{{ $idea['shop']->name }}</a>
-                                <span>Souvenir shop &middot; Approx. {{ rtrim(rtrim(number_format($idea['km'], 1), '0'), '.') }} km from your accommodation</span>
-                                <small>Opening hours are not listed. Check before visiting.</small>
-                            </li>
-                        @endforeach
-                    </ul>
-                </details>
+                {{-- Open by default, and a plain section rather than a card: it is empty time, not a booking. Only a
+                     shop that really is sample data gets the amber pill; every other idea is an ordinary solid card. --}}
+                <div class="tl-ideas" data-ideas>
+                    <button type="button" class="tl-ideas__toggle" aria-expanded="true" aria-controls="free-ideas-{{ $item->id }}">Optional ideas for this free time ({{ count($ideas) }}) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
+                    <div class="tl-ideas__panel" id="free-ideas-{{ $item->id }}">
+                        <p class="tl-ideas__note"><x-icon name="info" aria-hidden="true" /><span>These are ideas only. They are not part of your plan, nothing is booked, and we can't promise they're open.</span></p>
+                        <ul class="tl-ideas__list">
+                            @foreach ($ideas as $idea)
+                                <li class="tl-idea">
+                                    <h5 class="tl-idea__title">
+                                        <a href="{{ route('souvenir-centers.show', $idea['shop']) }}">{{ $idea['shop']->displayName() }}</a>
+                                        @if (app(\App\Support\SampleData::class)->isSample($idea['shop']))<span class="tl-idea__sample">Sample data</span>@endif
+                                    </h5>
+                                    <p class="tl-idea__meta">Souvenir shop &middot; Approx. {{ rtrim(rtrim(number_format($idea['km'], 1), '0'), '.') }} km from your accommodation</p>
+                                    <p class="tl-idea__hours"><x-icon name="clock" aria-hidden="true" /> Opening hours not listed &mdash; check before visiting</p>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
             @endif
         @endif
     </div>

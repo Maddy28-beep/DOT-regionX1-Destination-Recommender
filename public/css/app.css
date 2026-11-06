@@ -481,15 +481,7 @@ a { color: inherit; text-decoration: none; }
     font-size: .74rem; font-weight: 700;
     margin-top: 4px;
 }
-.pairing-why { margin-top: 4px; }
-.pairing-why summary {
-    cursor: pointer; list-style: none;
-    display: inline-block;
-    font-size: .74rem; color: var(--muted); text-decoration: underline;
-    text-underline-offset: 2px;
-}
-.pairing-why summary::-webkit-details-marker { display: none; }
-.pairing-why p { margin: 4px 0 0; font-size: .76rem; color: var(--muted); font-style: italic; }
+/* The "Why this pick?" button and panel are styled in itinerary-redesign.css. */
 
 /* "How was this itinerary created?" -- a small trigger near the Day-by-Day
    panel head, and the tourist-facing/technical explainer it opens. Hidden
@@ -1300,145 +1292,7 @@ body:not(.portal):not(.admin) .header-actions .account-menu { display: none; }
 }
 .nav-toggle svg { width: 26px; height: 26px; }
 
-/*
-   Premium slide-in drawer (right side, ~85vw), not a dropped-down flat list.
-   Structural rules live outside the collapse-to-hamburger media query on
-   purpose: .mobile-menu is fixed-position and off-screen (translateX(100%))
-   by default regardless of viewport, and the only way to open it is the
-   hamburger button, which is itself only shown below the media query's
-   breakpoint -- so defining it unconditionally costs nothing above that
-   breakpoint and keeps the drawer correct even if that ever changes.
-*/
-.mobile-menu-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 59;
-    background: rgba(10, 22, 17, .45);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity .3s ease, visibility 0s linear .3s;
-}
-.mobile-menu-overlay.open {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity .3s ease, visibility 0s linear 0s;
-}
-
-.mobile-menu {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 85vw;
-    max-width: 340px;
-    z-index: 60;
-    background: var(--paper);
-    box-shadow: -12px 0 32px rgba(16, 40, 30, .18);
-    display: flex;
-    flex-direction: column;
-    transform: translateX(100%);
-    transition: transform .32s cubic-bezier(.22, .61, .36, 1);
-}
-.mobile-menu.open { transform: translateX(0); }
-
 body.mobile-menu-open { overflow: hidden; }
-
-.mobile-menu__head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 16px 18px 20px;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-}
-.mobile-menu__close {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    margin-right: -10px;
-    background: none;
-    border: none;
-    border-radius: 50%;
-    color: var(--ink);
-    cursor: pointer;
-    transition: background .15s ease;
-}
-.mobile-menu__close:hover { background: var(--primary-light); }
-.mobile-menu__close svg { width: 20px; height: 20px; }
-
-.mobile-menu__body {
-    flex: 1 1 auto;
-    overflow-y: auto;
-    padding: 8px 20px 12px;
-    display: flex;
-    flex-direction: column;
-}
-
-.mobile-menu__group { display: flex; flex-direction: column; padding: 14px 0 6px; }
-
-/* One shared row treatment for every tappable line in the drawer -- primary
-   catalogue links, Saved/Log in, and the smaller account/partner links --
-   so there is exactly one visual language, not several competing ones. A
-   comfortable >=44px tap target and a soft hover/tap fill stand in for the
-   old per-row border, which is what requirement 7 explicitly ruled out. */
-.mobile-menu__group a,
-.mobile-menu__utility {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 44px;
-    padding-inline: 10px;
-    margin-inline: -10px;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--ink);
-    transition: background .15s ease, color .15s ease;
-}
-.mobile-menu__group a:hover,
-.mobile-menu__group a:active,
-.mobile-menu__utility:hover,
-.mobile-menu__utility:active {
-    background: var(--primary-light);
-    color: var(--primary-dark);
-}
-.mobile-menu__utility svg { width: 18px; height: 18px; flex-shrink: 0; }
-.mobile-menu__utility--btn {
-    background: none;
-    border: none;
-    width: 100%;
-    text-align: left;
-    font: inherit;
-    cursor: pointer;
-}
-
-.mobile-menu__divider { height: 1px; background: var(--border); margin: 6px 10px; }
-
-.mobile-menu__group--plain { padding: 8px 0; }
-
-.mobile-menu__group--muted { padding: 8px 0 4px; }
-.mobile-menu__group--muted .mobile-menu__utility--small {
-    font-size: .88rem;
-    font-weight: 600;
-    color: var(--muted);
-}
-.mobile-menu__account {
-    display: block;
-    padding: 4px 10px 2px;
-    font-size: .82rem;
-    font-weight: 600;
-    color: var(--muted);
-}
-
-.mobile-menu__foot {
-    flex-shrink: 0;
-    padding: 14px 20px 22px;
-    border-top: 1px solid var(--border);
-}
-.mobile-menu__foot .btn { padding: 14px 20px; font-size: 1rem; border-radius: 11px; }
-
 /* The chatbot launcher (partials/chatbot-widget.blade.php) sets its own
    z-index: 200 inline, well above this drawer's 60, so it otherwise floats
    on top of the drawer's content once open. #id beats .mobile-menu-open's
@@ -3316,42 +3170,94 @@ select.site-dropdown-native {
     .site-footer { padding-bottom: 76px; }
     .footer-bottom { padding-right: 84px; }
 }
-@media (max-width: 800px) {
-    .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px 28px; }
-    .footer-intro { grid-column: 1 / -1; }
-    .footer-traveler-links { grid-template-columns: 1fr; }
-}
 @media (min-width: 801px) and (max-width: 1150px) {
     .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px 36px; }
 }
-/* Phones and small tablets (up to 800px, not only up to 480px: a phone in a wide window or a landscape one still got the
-   squeezed half-width link columns, with long words running into each other). */
-@media (max-width: 800px) {
-    .site-footer { padding-top: 32px; }
-    .site-footer > .container { padding-inline: 20px; }
-    /* Intro and travelers get the full width; Partners and the Department sit side by side, so the footer is two
-       short blocks shorter than one long column. */
-    .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 20px; }
-    .footer-intro, .footer-grid > div:nth-child(2) { grid-column: 1 / -1; }
-    .footer-grid h3 { margin-bottom: 8px; }
-    .footer-intro > p { font-size: .82rem; line-height: 1.55; }
-    .footer-traveler-links { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; }
-    /* Links are real tap targets: about 44px tall, not a 22px line with a gap. */
-    .footer-grid a { margin: 0; padding: 11px 0; overflow-wrap: anywhere; }
-    .footer-traveler-links { column-gap: 20px; }
-    .footer-contact { margin-top: 12px; padding-top: 12px; }
-    .footer-contact p { margin-bottom: 8px; }
-    .footer-contact a { padding: 0; }
-    .footer-social { margin-top: 14px; }
-    .footer-social nav a { padding: 0; width: 44px; height: 44px; }
-    .footer-social p { margin-bottom: 8px; }
-    .site-footer { padding-bottom: 100px; }
-    .footer-bottom { margin-top: 18px; padding-top: 14px; }
-    /* The legal links as a neat 2 x 2 grid instead of a ragged wrapped line. */
-    .footer-legal { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 14px; justify-items: start; text-align: left; margin-bottom: 12px; }
-    .footer-legal a { padding: 9px 0; font-size: .78rem; line-height: 1.3; }
-    .footer-copyright { text-align: left; }
+/* ---------- Footer: phones and small tablets (up to 800px) ----------
+   One column, with the three link groups as accordions instead of one long flat dump (or the squeezed two-column grid
+   that broke words mid-line). "For Travelers" starts open (public/js/footer-accordion.js). Every link is a full-width row
+   of at least 48px with a hairline under it. The section labels are all the same amber; coral is only the "DVO" in the
+   wordmark. Wider screens keep their plain headings and the multi-column grid, and show every panel. */
+.footer-acc__btn { display: none; }
+.footer-grid .footer-acc__title { margin: 0; }
+@media (min-width: 801px) {
+    .footer-acc__panel[hidden] { display: block; }
+    .footer-traveler-links.footer-acc__panel[hidden] { display: grid; }
 }
+@media (max-width: 800px) {
+    .site-footer { padding: 36px 0 112px; } /* the room at the bottom keeps the chat bubble off the last links */
+    .site-footer > .container { padding-inline: 20px; }
+    .footer-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+
+    .footer-brand__dvo { color: var(--accent); }
+    .footer-intro { padding-bottom: 22px; }
+    .footer-intro > p { margin: 0; color: rgba(255, 247, 233, .72); font-size: .9rem; line-height: 1.6; }
+
+    .footer-contact { margin-top: 14px; padding-top: 6px; border-top: 0; }
+    .footer-contact p { align-items: center; gap: 12px; min-height: 44px; margin: 0; }
+    .footer-contact svg { width: 18px; height: 18px; margin-top: 0; opacity: .9; }
+    .footer-contact a { display: inline-flex; align-items: center; min-height: 44px; color: rgba(255, 247, 233, .92); overflow-wrap: anywhere; }
+
+    .footer-grid .footer-social { margin-top: 10px; }
+    .footer-grid .footer-social p { margin: 0 0 10px; color: var(--gold); font-size: .75rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+    .footer-social nav { gap: 10px; }
+    .footer-social nav a { width: 44px; height: 44px; padding: 0; border: 1px solid rgba(255, 247, 233, .3); border-radius: 10px; color: rgba(255, 247, 233, .92); }
+    .footer-social svg { width: 20px; height: 20px; }
+
+    /* The accordions */
+    .footer-acc { border-top: 1px solid rgba(255, 247, 233, .14); }
+    .footer-acc__static { display: none; }
+    .footer-acc__btn {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        min-height: 54px;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--gold);
+        font: inherit;
+        font-size: .8rem;
+        font-weight: 700;
+        letter-spacing: .09em;
+        text-align: left;
+        text-transform: uppercase;
+        cursor: pointer;
+    }
+    .footer-acc__btn svg { width: 18px; height: 18px; flex: none; color: rgba(255, 247, 233, .7); transition: transform .2s ease; }
+    .footer-acc__btn[aria-expanded="true"] svg { transform: rotate(90deg); }
+    .footer-acc__btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; border-radius: 6px; }
+    @media (prefers-reduced-motion: reduce) { .footer-acc__btn svg { transition: none; } }
+
+    .footer-traveler-links.footer-acc__panel { display: block; }
+    /* After the rule above and one step more specific, or the travelers' list would stay open when closed. */
+    .footer-acc__panel[hidden],
+    .footer-traveler-links.footer-acc__panel[hidden] { display: none; }
+    .footer-acc__panel { padding-bottom: 8px; }
+    .footer-grid .footer-acc__panel a,
+    .footer-grid .footer-acc__panel p {
+        display: flex;
+        align-items: center;
+        min-height: 48px;
+        margin: 0;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 247, 233, .12);
+        color: rgba(255, 247, 233, .92);
+        font-size: .95rem;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+    }
+    .footer-grid .footer-acc__panel > :last-child { border-bottom: 0; }
+    .footer-grid .footer-acc__panel a:hover { transform: none; color: #fff; }
+
+    /* Legal links: one column, small and muted (still above 4.5:1 on the dark green). */
+    .footer-bottom { margin-top: 0; padding: 0; border-top: 1px solid rgba(255, 247, 233, .14); text-align: left; }
+    .footer-legal { display: flex; flex-direction: column; gap: 0; margin: 0; padding-top: 6px; }
+    .footer-legal a { display: flex; align-items: center; min-height: 44px; padding: 0; color: rgba(255, 247, 233, .62); font-size: .82rem; line-height: 1.3; }
+    .footer-copyright { margin: 8px 0 0; color: rgba(255, 247, 233, .55); font-size: .78rem; text-align: left; }
+}
+
 
 /* ---------- Auth pages ---------- */
 
@@ -5061,9 +4967,6 @@ body:has(.dash-header) .toast-stack { top: 226px; }
 .mobile-menu a.btn[aria-current="page"] { text-decoration: none; }
 .site-topbar a:focus-visible, .site-topbar button:focus-visible, .mobile-menu a:focus-visible, .mobile-menu button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 5px; }
 body.hero-page .site-header:not(.scrolled) .nav-more__toggle { color: var(--paper); }
-.mobile-menu .nav-more__toggle { width: 100%; justify-content: space-between; font-size: 1rem; }
-.mobile-menu .nav-more__links { background: transparent; position: static; min-width: 0; margin: 0 0 6px 12px; box-shadow: none; border: 0; border-left: 2px solid var(--primary); border-radius: 0; }
-.mobile-menu .mobile-menu__saved { border: 1px solid var(--primary); color: var(--primary-dark); margin: 8px 0 0; }
 .site-topbar .header-actions .btn-outline { background: transparent; box-shadow: none; }
 
 /* A non-blocking survey invitation; page navigation remains available. */
@@ -5586,7 +5489,7 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
     .dcard__dist svg { display: none; }
 }
 
-.swap-option__reason { display: block; margin-top: 2px; font-size: .78rem; color: var(--primary-dark); }
+.swap-option__reason { display: block; margin-top: 2px; font-size: .78rem; color: #5f6b66; }
 
 /* ---------- Phones: two cards to a row ----------
    Every listing grid (destinations, stays, dining, packages, souvenirs, operators, saved places and the
@@ -5638,47 +5541,6 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
     .dcard__dist svg { width: 12px; height: 12px; }
     .dcard__dist-more { display: none; }
 }
-
-/* ---------- Phone drawer: an icon in front of every link ----------
-   Each primary link has a small tinted tile with its icon. The current page is a tinted row with a solid tile,
-   instead of the underline the top bar uses (an underlined word in a drawer row reads as a mistake). The
-   account and partner links carry a bare icon, like "Saved" always did. */
-.mobile-menu__icon {
-    display: inline-grid;
-    place-items: center;
-    flex: none;
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    background: var(--primary-light);
-    color: var(--primary);
-    transition: background .15s ease, color .15s ease;
-}
-.mobile-menu__icon svg { width: 19px; height: 19px; }
-.mobile-menu__label { display: inline-flex; align-items: center; gap: 12px; }
-
-.mobile-menu__group a,
-.mobile-menu .nav-more__toggle { gap: 12px; }
-.mobile-menu__group .nav-more__links a { font-size: .95rem; min-height: 42px; }
-.mobile-menu__group .nav-more__links .mobile-menu__icon { width: 30px; height: 30px; border-radius: 9px; }
-.mobile-menu__group .nav-more__links .mobile-menu__icon svg { width: 17px; height: 17px; }
-
-.mobile-menu__group a:hover .mobile-menu__icon,
-.mobile-menu__group a:active .mobile-menu__icon,
-.mobile-menu .nav-more__toggle:hover .mobile-menu__icon { background: #fff; }
-
-.mobile-menu .mobile-menu__group a[aria-current="page"],
-.mobile-menu .nav-more__toggle.is-active {
-    text-decoration: none;
-    background: var(--primary-light);
-    color: var(--primary-dark);
-}
-.mobile-menu a[aria-current="page"] .mobile-menu__icon,
-.mobile-menu .nav-more__toggle.is-active .mobile-menu__icon { background: var(--primary); color: #fff; }
-
-.mobile-menu__utility--small svg { opacity: .8; }
-.mobile-menu__foot .btn { display: flex; align-items: center; justify-content: center; gap: 9px; }
-.mobile-menu__foot .btn svg { width: 19px; height: 19px; flex: none; }
 
 /* ---------- Phones: filters as a bottom sheet, tidier listing toolbar ----------
    Opening the filters used to push the whole listing down. On a phone the panel is now a sheet over the page
@@ -5841,21 +5703,6 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
     .feature-card .feature-stamp svg { width: 24px; height: 24px; }
     .feature-card h3 { grid-column: 2; margin-bottom: 4px; font-size: .98rem; }
     .feature-card p { grid-column: 2; font-size: .85rem; line-height: 1.5; }
-}
-
-/* ---------- Phones: a shorter footer ----------
-   One column of every link made the footer ~1350px, more than a screen and a half. The travellers' list runs in
-   two columns, Partners and the DOT note sit side by side, and the spacing is tighter. */
-@media (max-width: 480px) {
-    .site-footer { padding-top: 40px; }
-    .footer-grid { grid-template-columns: 1fr 1fr; gap: 26px 20px; }
-    .footer-grid > div:nth-child(1), .footer-grid > div:nth-child(2) { grid-column: 1 / -1; }
-    .footer-grid h3 { margin-bottom: 10px; }
-    .footer-grid a, .footer-grid p { margin-bottom: 0; }
-    .footer-grid a { padding: 7px 0; }
-    .footer-grid > div:nth-child(2) { display: grid; grid-template-columns: 1fr 1fr; column-gap: 20px; }
-    .footer-grid > div:nth-child(2) h3 { grid-column: 1 / -1; }
-    .footer-grid > div:nth-child(4) p { margin-bottom: 8px; font-size: .84rem; }
 }
 
 /* Phones: the events category chips are a swipeable row; the scrollbar under them looked like a stray line. */

@@ -63,8 +63,9 @@ class ItinerarySampleCueTest extends TestCase
         $html = $this->page($this->destination('Samal Island', true));
 
         $this->assertStringContainsString('Samal Island', $html);
-        $this->assertSame(1, substr_count($html, self::CUE));
-        $this->assertStringContainsString('Sample data', $html);
+        // The card's accreditation line says it; there is no second, boxed tag beside the name.
+        $this->assertStringNotContainsString(self::CUE, $html);
+        $this->assertStringContainsString('Sample data, not DOT-verified', $html);
     }
 
     public function test_an_official_destination_is_not_labelled_as_sample(): void
@@ -82,7 +83,7 @@ class ItinerarySampleCueTest extends TestCase
         // The suffix stays in the stored name, but a visitor reads the clean name and is told by the label instead.
         $this->assertStringContainsString('Tagbibinta Falls', $html);
         $this->assertStringNotContainsString('Tagbibinta Falls [SAMPLE]', $html);
-        $this->assertStringContainsString(self::CUE, $html);
+        $this->assertStringContainsString('Sample data, not DOT-verified', $html);
     }
 
     public function test_a_sample_destination_says_not_dot_verified_never_accreditation_listed(): void
@@ -140,7 +141,7 @@ class ItinerarySampleCueTest extends TestCase
         $html = $this->withSession([TripPlannerController::ITINERARY_KEY => $trip->id, TripPlannerController::PREFERENCE_KEY => $pref->id])
             ->get(route('plan.itinerary'))->assertOk()->getContent();
 
-        $this->assertSame(1, substr_count($html, self::CUE), 'The souvenir card carries exactly one sample label.');
+        $this->assertStringNotContainsString(self::CUE, $html, 'No boxed tag beside the name; the accreditation line says it.');
         $this->assertStringContainsString('Sample data, not DOT-verified', $html);
         $this->assertStringNotContainsString('DOT accreditation listed', $html);
     }
@@ -206,20 +207,42 @@ class ItinerarySampleCueTest extends TestCase
         $html = $this->withSession([TripPlannerController::ITINERARY_KEY => $trip->id, TripPlannerController::PREFERENCE_KEY => $pref->id])
             ->get(route('plan.itinerary'))->assertOk()->getContent();
 
-        $this->assertSame(2, substr_count($html, self::CUE), 'The meal card and the stay card each carry one sample label.');
+        $this->assertStringNotContainsString(self::CUE, $html, 'No boxed tag on the meal or stay card; the accreditation line says it.');
         $this->assertStringContainsString('Sample data, not DOT-verified', $html);
         // The official anchor destination on the same page correctly carries the official wording;
         // the sample meal and stay are never the ones presented as accredited (their cue count above).
         $this->assertStringContainsString('DOT accreditation listed', $html);
     }
 
-    public function test_a_sample_stop_with_a_popular_pairing_still_carries_only_one_label(): void
+    public function test_a_sample_stop_with_a_popular_pairing_has_no_boxed_tag_but_keeps_its_accreditation_line(): void
     {
         $html = $this->page($this->destination('Eden Nature Park', true), [
             'rule_basis' => 'Malagos Garden Resort', 'rule_support' => 0.12, 'rule_confidence' => 0.8, 'rule_co_count' => 9,
         ]);
 
         $this->assertStringContainsString('Popular pairing with', $html);
-        $this->assertSame(1, substr_count($html, self::CUE));
+        $this->assertStringNotContainsString(self::CUE, $html);
+
+        // "Why this pick?" is a real button; the figures are chips taken from the stored rule, nothing invented.
+        $this->assertMatchesRegularExpression('/<button type="button" class="pairing-why__btn" aria-expanded="false" aria-controls="pairing-\d+">Why this pick\?/', $html);
+        $this->assertStringContainsString('Frequently visited together with Malagos Garden Resort.', $html);
+        $this->assertStringContainsString('<li>Confidence 80%</li>', $html);
+        $this->assertStringContainsString('<li>Support 12%</li>', $html);
+        $this->assertStringContainsString('<li>Based on 9 trips</li>', $html);
+        $this->assertStringNotContainsString('Involves sample data', $html);
+        $this->assertStringNotContainsString('[SAMPLE]', $html);
+        $this->assertStringContainsString('Sample data, not DOT-verified', $html, 'The accreditation line still says it.');
+    }
+
+    public function test_the_accreditation_badge_is_one_pill_in_two_states(): void
+    {
+        $sample = $this->page($this->destination('Quiet Falls', true));
+        $official = $this->page($this->destination('Damosa Land Inc. / Agriya Naturetainment', false));
+
+        $this->assertStringContainsString('tl-badge tl-badge--warn', $sample);
+        $this->assertStringNotContainsString('tl-badge--ok', $sample);
+        $this->assertStringContainsString('tl-badge tl-badge--ok', $official);
+        $this->assertStringNotContainsString('tl-badge--warn', $official);
+        $this->assertStringContainsString('DOT accreditation listed', $official);
     }
 }
