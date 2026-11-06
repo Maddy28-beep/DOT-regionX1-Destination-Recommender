@@ -89,21 +89,27 @@
 .tl-line strong, .tl-line a { color: var(--primary-dark); font-weight: 700; }
 .tl-line small { display: block; font-size: .8rem; color: var(--muted); }
 
-/* Optional ideas under a free-time row: dashed and collapsed, so they never read as a scheduled stop. */
-.tl-ideas { margin: 0 0 10px 42px; font-size: .88rem; }
-.tl-ideas summary { display: flex; align-items: center; gap: 10px; min-height: 40px; list-style: none; cursor: pointer; font-weight: 600; color: var(--primary-dark); }
-.tl-ideas summary::-webkit-details-marker { display: none; }
-/* The arrow: display:flex above removes the browser's own marker, so the summary says it opens in CSS. */
-.tl-ideas summary::after { content: ""; flex: none; width: 8px; height: 8px; margin-top: -4px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .15s ease; }
-.tl-ideas[open] summary::after { margin-top: 4px; transform: rotate(-135deg); }
-.tl-ideas__intro { margin: 2px 0 8px; font-size: .82rem; color: var(--muted); }
+/* Optional ideas under a free-time row: plain section, open by default, never a card. A toggle, one info banner, then
+   ordinary solid-bordered idea cards. Dashed borders mean sample data elsewhere on this page, so they are not used here:
+   a place that really is sample data gets the amber "Sample data" pill beside its title and nothing else. */
+.tl-ideas { margin: 0 0 10px; font-size: .88rem; }
+.tl-ideas__toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0; border: 0; background: none; color: var(--primary-dark); font: 600 .9rem/1.3 'Poppins', sans-serif; text-align: left; cursor: pointer; }
+.tl-ideas__toggle svg { width: 16px; height: 16px; flex: none; transition: transform .2s ease; }
+.tl-ideas__toggle[aria-expanded="true"] svg { transform: rotate(90deg); }
+.tl-ideas__toggle:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; border-radius: 6px; }
+.tl-ideas__panel[hidden] { display: none; }
+.tl-ideas__note { display: flex; align-items: flex-start; gap: 10px; margin: 4px 0 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: #f3f6f4; color: var(--ink); font-size: .84rem; line-height: 1.5; }
+.tl-ideas__note svg { width: 18px; height: 18px; flex: none; margin-top: 1px; color: var(--primary-dark); }
 .tl-ideas__list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.tl-ideas__list li { padding: 0 12px 8px; border: 1px dashed var(--border); border-radius: 10px; }
-/* The whole name line is the tap target (about 40px, taller when a long name wraps). */
-.tl-ideas__list a { display: flex; align-items: center; min-height: 40px; color: var(--primary-dark); font-weight: 700; overflow-wrap: anywhere; }
-.tl-ideas__list span, .tl-ideas__list small { display: block; font-size: .82rem; color: var(--muted); }
+.tl-idea { padding: 10px 14px 12px; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
+.tl-idea__title { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0; font: 700 .95rem/1.3 'Poppins', sans-serif; }
+.tl-idea__title a { display: inline-flex; align-items: center; min-height: 32px; color: var(--primary-dark); overflow-wrap: anywhere; }
+.tl-idea__sample { padding: 1px 9px; border: 1px solid #d9962b; border-radius: 999px; background: #fff; color: #8a4b00; font: 600 .72rem/1.5 'Poppins', sans-serif; }
+.tl-idea__meta { margin: 0; color: #5f6b66; font-size: .82rem; }
+.tl-idea__hours { display: flex; align-items: center; gap: 6px; margin: 4px 0 0; color: #5f6b66; font-size: .82rem; }
+.tl-idea__hours svg { width: 14px; height: 14px; flex: none; }
 
-@media (prefers-reduced-motion: reduce) { .tl-ideas summary::after { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .tl-ideas__toggle svg { transition: none; } }
 
 .itin .day-actions { margin-top: 8px; padding-top: 18px; border-top: 1px solid var(--border); }
 
@@ -115,7 +121,6 @@
     .itin-layout { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
-    .tl-ideas { margin-left: 0; }
     .itin-tabs .itin-tabs__more { margin-left: 0; }
     .tl-row { grid-template-columns: 58px 18px minmax(0, 1fr); column-gap: 8px; }
     .tl-time strong { font-size: .8rem; }
@@ -218,7 +223,6 @@
     .tl-card h4 { font-size: 1rem; }
     .tl-card__what { font-size: .88rem; margin: 2px 0 4px; }
     .tl-card--meal, .tl-card--overnight { grid-template-columns: 64px minmax(0, 1fr); gap: 12px; }
-    .tl-card .swap-toggle { display: inline-flex; align-items: center; min-height: 40px; }
 
     .itinerary-feedback { flex-direction: row; align-items: center; gap: 14px; padding: 18px; }
     .itinerary-feedback img { width: 64px; height: 84px; }
@@ -327,11 +331,11 @@
 .tl-card__actions { display: flex; flex-direction: column; gap: 8px; }
 .tl-card__actions .save-square { width: 40px; height: 40px; border-radius: 10px; }
 .tl-card__actions .save-square svg { width: 19px; height: 19px; }
-.tl-card .swap { position: static; }
+.tl-card .swap { position: static; grid-column: 1 / -1; margin-top: -12px; } /* cancels the grid gap while the block is empty */
+.tl-card .swap:has(.swap-notice, .swap-panel:not([hidden])) { margin-top: 0; }
 .tl-card .swap-toggle {
-    position: absolute; right: 12px; top: 60px;
     display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
-    border: 1px solid var(--border); border-radius: 10px; background: #fff; color: var(--ink); text-decoration: none;
+    border: 1px solid var(--border); border-radius: 10px; background: #fff; color: var(--ink); text-decoration: none; cursor: pointer;
 }
 .tl-card .swap-toggle:hover { border-color: var(--primary); color: var(--primary); }
 .tl-card .swap-toggle svg { width: 19px; height: 19px; }
@@ -403,7 +407,6 @@
     .tl-card, .tl-card--meal, .tl-card--overnight { grid-template-columns: minmax(0, 1fr) 40px; }
     .tl-card__media { grid-column: 1 / -1; }
     .tl-card__actions { grid-column: 2; grid-row: 2; }
-    .tl-card .swap-toggle { top: auto; bottom: 12px; }
 }
 
 /* ---- print / save as PDF: the plan on paper, every day, no controls ----
@@ -430,4 +433,82 @@
     .tl-card { box-shadow: none; border-color: #999; }
     .tl-card__media img { max-height: 28mm; }
     a { color: inherit; text-decoration: none; }
+}
+
+/* ---- one badge system for accreditation, and a bounded compare panel ----
+   Green is only for a genuine DOT accreditation record. Amber, outlined, is for sample or unverified data. Both are the
+   same pill (shape, size, weight), so they read as one badge in two opposite states. Neutral gray carries everything that
+   is not a positive or a warning. */
+.tl-badges { margin: 0 0 8px; }
+.tl-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border: 1px solid transparent; border-radius: 999px; font: 600 .72rem/1.35 'Poppins', sans-serif; }
+.tl-badge svg { flex: none; width: 12px; height: 12px; }
+.tl-badge--ok { background: var(--primary-light); border-color: rgba(11, 107, 79, .35); color: var(--primary-dark); }
+.tl-badge--warn { background: #fff; border-color: #d9962b; color: #8a4b00; }
+
+/* The swap button turns solid while its panel is open, so it is clear which stop opened it. */
+.tl-card .swap-toggle[aria-expanded="true"] { background: var(--primary); border-color: var(--primary); color: #fff; }
+.tl-card .swap-toggle:focus-visible, .swap-panel__close:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+/* The panel: its own boundary and header, so comparing places never blends into the stop's own card. */
+.tl-card .swap-panel { grid-column: 1 / -1; margin-top: 12px; padding: 0; overflow: hidden; border: 1px solid #c9ddd2; border-radius: 12px; background: #fff; }
+.swap-panel__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid #c9ddd2; background: var(--primary-light); }
+.swap-panel__title { margin: 0; color: var(--primary-dark); font: 700 .98rem/1.3 'Poppins', sans-serif; }
+.swap-panel__sub { margin: 2px 0 0; color: var(--muted); font-size: .82rem; line-height: 1.4; }
+.swap-panel__close { position: relative; display: grid; place-items: center; flex: none; width: 32px; height: 32px; padding: 0; border: 1px solid rgba(11, 107, 79, .35); border-radius: 50%; background: #fff; color: var(--primary-dark); cursor: pointer; }
+.swap-panel__close::before { content: ''; position: absolute; inset: -6px; } /* a 44px target around the small circle */
+.swap-panel__close:hover { background: var(--primary-light); }
+.swap-panel__close svg { width: 15px; height: 15px; }
+.swap-panel__body > .swap-empty { padding: 14px; }
+
+.swap-panel .swap-list { gap: 0; }
+.swap-panel .swap-option { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 14px; border-top: 1px solid #e6eee9; }
+.swap-panel .swap-option:first-child { border-top: 0; padding-top: 12px; }
+.swap-option__thumb { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--primary-light); color: var(--primary-dark); }
+.swap-option__thumb svg { width: 22px; height: 22px; }
+.swap-option__info { display: grid; gap: 3px; min-width: 0; }
+.swap-option__top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.swap-panel .swap-option__name { color: var(--ink); font-weight: 700; }
+.swap-chip { padding: 1px 9px; border: 1px solid rgba(11, 107, 79, .35); border-radius: 999px; background: var(--primary-light); color: var(--primary-dark); font: 700 .72rem/1.5 'Poppins', sans-serif; }
+.swap-sample { padding: 1px 9px; border: 1px solid #d9962b; border-radius: 999px; background: #fff; color: #8a4b00; font: 600 .72rem/1.5 'Poppins', sans-serif; }
+.swap-panel .swap-option__meta { color: var(--muted); font-size: .82rem; }
+/* Interest fit and opening hours stay neutral gray: "not one of your picked interests" is not a positive signal. */
+.swap-panel .swap-option__reason { display: block; margin: 0; color: #5f6b66; font-size: .8rem; }
+.swap-panel .swap-use { align-self: center; white-space: nowrap; border-color: var(--primary); color: var(--primary-dark); background: #fff; }
+.swap-panel .swap-use:hover { background: var(--primary-light); }
+
+@media (max-width: 560px) {
+    .swap-panel .swap-option { grid-template-columns: 40px minmax(0, 1fr); }
+    .swap-panel .swap-option form { grid-column: 1 / -1; }
+    .swap-panel .swap-use { width: 100%; min-height: 44px; }
+}
+
+/* ---- "Why this pick?": a button that opens a small panel under the pairing pill ----
+   Deep green for the link and the chips, neutral gray for the caption, nothing new in the way of colour. */
+.pairing-why { margin-top: 6px; }
+.pairing-why__btn {
+    display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0;
+    border: 0; background: none; color: var(--primary-dark);
+    font: 600 .82rem/1.3 'Poppins', sans-serif; text-decoration: none; cursor: pointer;
+}
+.pairing-why__btn svg { width: 15px; height: 15px; flex: none; transition: transform .2s ease; }
+.pairing-why__btn[aria-expanded="true"] svg { transform: rotate(90deg); }
+.pairing-why__btn:hover { color: var(--primary); }
+.pairing-why__btn:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; border-radius: 6px; }
+@media (prefers-reduced-motion: reduce) { .pairing-why__btn svg { transition: none; } }
+
+.pairing-why__panel { margin-top: 6px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: #f6f8f6; }
+.pairing-why__panel[hidden] { display: none; }
+.pairing-why .pairing-why__panel p { margin: 0; color: var(--ink); font-size: .88rem; font-style: normal; line-height: 1.5; }
+.pairing-why__stats { display: flex; flex-wrap: wrap; gap: 6px 8px; margin: 10px 0 0; padding: 0; list-style: none; }
+.pairing-why__stats li { padding: 3px 10px; border: 1px solid #c9ddd2; border-radius: 999px; background: #fff; color: var(--primary-dark); font: 600 .76rem/1.4 'Poppins', sans-serif; }
+.pairing-why .pairing-why__panel .pairing-why__note { margin-top: 8px; color: #5f6b66; font-size: .78rem; }
+
+/* A day's two buttons ("Open Day N in Google Maps" and "View planned route for Day N") sit side by side on one row. The
+   shared rule made the route <details> a full-width item, which pushed it under the other button. It still opens to the
+   full width (so the map has room), and then the button and its map take the row below the Google Maps one. Phones keep the
+   buttons stacked, full width, as easier tap targets (see itinerary-page.css). */
+@media (min-width: 561px) {
+    .itin .day-actions { align-items: center; }
+    .itin .day-actions > a, .itin .day-actions details { flex: 0 0 auto; }
+    .itin .day-actions details[open] { flex: 1 1 100%; }
 }

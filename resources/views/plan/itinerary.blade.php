@@ -640,6 +640,8 @@
 @endunless
 
 <script src="{{ asset('js/itinerary-swap.js') }}?v={{ filemtime(public_path('js/itinerary-swap.js')) }}" defer></script>
+<script src="{{ asset('js/itinerary-pairing.js') }}?v={{ filemtime(public_path('js/itinerary-pairing.js')) }}" defer></script>
+<script src="{{ asset('js/itinerary-ideas.js') }}?v={{ filemtime(public_path('js/itinerary-ideas.js')) }}" defer></script>
 <script src="{{ asset('js/itinerary-days.js') }}?v={{ filemtime(public_path('js/itinerary-days.js')) }}" defer></script>
 <script>
     /*

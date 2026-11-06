@@ -178,3 +178,10 @@
     .about-copy .read-more[hidden] { display: none; }
     .about-copy .read-more:focus-visible { outline: 3px solid var(--accent, #ff693b); outline-offset: 2px; }
 }
+
+/* Featured Tour Packages: three cards. The shared grid fits as many 250px columns as the row holds (four in a 1200px
+   container), which left the right quarter of the row empty and squeezed each card's price line. On a wide screen the
+   strip is three equal columns, like Popular destinations above it. */
+@media (min-width: 900px) {
+    .dpost-grid--three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

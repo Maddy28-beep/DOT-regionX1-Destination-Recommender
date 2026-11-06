@@ -60,6 +60,34 @@ class ItineraryItem extends Model
     }
 
     /**
+     * The same rule as ruleExplanation(), as separate pieces for a small card: the paired place, the confidence and
+     * support as the whole-number and one-decimal percentages the sentence uses, how many trips it rests on, and whether
+     * those trips are simulated. Nothing is added here that the stored rule row does not carry.
+     *
+     * @return array{basis: string, confidence: int, support: string, trips: int, simulated: 'none'|'some'|'all'}|null
+     */
+    public function ruleFacts(?int $simulatedTransactions = null, ?int $totalTransactions = null): ?array
+    {
+        if (blank($this->rule_basis) || $this->rule_confidence === null) {
+            return null;
+        }
+
+        $known = $simulatedTransactions !== null && $totalTransactions !== null && $totalTransactions > 0;
+
+        return [
+            'basis' => (string) $this->rule_basis,
+            'confidence' => (int) round((float) $this->rule_confidence * 100),
+            'support' => (string) round((float) $this->rule_support * 100, 1),
+            'trips' => (int) $this->rule_co_count,
+            'simulated' => match (true) {
+                $known && $simulatedTransactions >= $totalTransactions => 'all',
+                $known && $simulatedTransactions > 0 => 'some',
+                default => 'none',
+            },
+        ];
+    }
+
+    /**
      * What the schedule's right-hand column says for this row.
      *
      * Only a journey has a distance. Everything else is somewhere the traveller

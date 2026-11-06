@@ -273,7 +273,8 @@ html:has(.catalog-refresh) { scrollbar-gutter: stable; }
     .catalog-refresh .dcard__tags { margin-bottom: 6px; }
     .catalog-refresh .dcard__tags .dpost-tag { display: inline-flex; padding: 2px 8px; font-size: .66rem; }
     .catalog-refresh .dcard__tags .dpost-tag:nth-child(n + 3) { display: none; }
-    .catalog-refresh .dcard__foot { padding-top: 6px; }
+    /* Price on the left, distance on the right of the same line (the two-column cards elsewhere stack them). */
+    .catalog-refresh .dcard__foot { flex-direction: row; align-items: baseline; justify-content: space-between; gap: 8px; padding-top: 6px; }
     .catalog-refresh .dcard__price strong { font-size: 1rem; }
     .catalog-refresh .dcard__price small { font-size: .74rem; }
     .catalog-refresh .dcard__dist { font-size: .74rem; }

@@ -142,11 +142,23 @@ class Destination extends Model
         return self::illustrationScene($this->name);
     }
 
+    /**
+     * The chips on a card: what kind of place this is. Only the "category" tags count (Beach, Wildlife, Cultural
+     * Heritage...): the table also holds facilities (Restroom, Parking Area), which say nothing about the place and
+     * used to fill the chips when there was no category tag. A destination with none falls back to its own type
+     * (Cultural Heritage, Beach & Leisure...), which every destination has, so no card is left without one.
+     */
     public function posterTags(): array
     {
-        return $this->relationLoaded('tags')
-            ? $this->tags->take(2)->pluck('value')->all()
+        $categories = $this->relationLoaded('tags')
+            ? $this->tags->where('kind', 'category')->pluck('value')->filter()->unique()->values()->all()
             : [];
+
+        if ($categories === [] && filled($this->type)) {
+            $categories = [$this->type];
+        }
+
+        return array_slice($categories, 0, 2);
     }
 
     /**

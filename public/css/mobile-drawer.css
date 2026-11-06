@@ -1,0 +1,306 @@
+/* Phone navigation drawer (partials/header.blade.php + partials/navigation-links.blade.php).
+
+   A panel that slides in from the right (the side the menu button is on) over a dimmed page, in four groups that read
+   differently on purpose:
+     1. navigation       tinted icon tiles, plain rows
+     2. Log in / Saved   outlined pill buttons (actions, not destinations)
+     3. Account          the same rows, in a quieter text colour
+     4. Plan My Trip     the one solid button, pinned to the bottom
+   Coral is kept for the three places where it carries meaning: the Advisories dot and "N active" label, and the
+   count on Saved. Opened and closed by public/js/app.js. */
+
+:root {
+    --drawer-coral: #E05A2B;      /* the dot: decorative */
+    --drawer-coral-text: #B8431A; /* small coral text, 5:1 on the cream drawer */
+    --drawer-coral-fill: #C64A1C; /* behind white digits, 4.8:1 */
+    --drawer-label: #55665E;      /* small uppercase label, 5.3:1 */
+    --drawer-row-hover: rgba(11, 107, 79, .08);
+}
+
+.mobile-menu-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 59;
+    background: rgba(9, 26, 20, .58);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .28s ease, visibility 0s linear .28s;
+}
+.mobile-menu-overlay.open { opacity: 1; visibility: visible; transition: opacity .28s ease, visibility 0s linear 0s; }
+
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: min(336px, 88vw);
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    background: var(--paper);
+    box-shadow: -8px 0 30px rgba(8, 24, 18, .34);
+    transform: translateX(100%);
+    visibility: hidden; /* keeps the shadow from showing at the screen edge while closed */
+    transition: transform .28s cubic-bezier(.22, .61, .36, 1), visibility 0s linear .28s;
+}
+.mobile-menu.open { transform: none; visibility: visible; transition: transform .28s cubic-bezier(.22, .61, .36, 1), visibility 0s linear 0s; }
+
+@media (prefers-reduced-motion: reduce) {
+    .mobile-menu-overlay, .mobile-menu, .mobile-menu.open { transition: none; }
+}
+
+/* Header: logo and close button, with a rule under it. */
+.mobile-menu__head {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 68px;
+    padding: 0 14px 0 18px;
+    border-bottom: 1px solid var(--border);
+}
+.mobile-menu__head .brand { display: inline-flex; align-items: center; min-height: 44px; }
+.mobile-menu__close {
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    cursor: pointer;
+    transition: background .15s ease;
+}
+.mobile-menu__close:hover { background: #d3e8dd; }
+.mobile-menu__close svg { width: 20px; height: 20px; }
+
+/* The scrolling part. */
+.mobile-menu__body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 16px 14px 18px; }
+
+/* Quick search */
+.mobile-menu__search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 46px;
+    padding: 0 14px;
+    border-radius: 11px;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+}
+.mobile-menu__search svg { width: 18px; height: 18px; flex: none; }
+.mobile-menu__search input {
+    flex: 1;
+    min-width: 0;
+    height: 46px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: 16px; /* anything smaller makes iOS zoom the page when the field is focused */
+    font-weight: 500;
+    outline: 0;
+    box-shadow: none;
+}
+.mobile-menu__search input::placeholder { color: #3d5a4e; opacity: 1; }
+.mobile-menu__search:focus-within { box-shadow: 0 0 0 3px rgba(11, 107, 79, .35); }
+
+/* Rows: navigation, More and the account links share one treatment. */
+.mobile-menu__group { display: flex; flex-direction: column; gap: 2px; margin-top: 14px; }
+.mobile-menu__group > a,
+.mobile-menu .nav-more__toggle,
+.mobile-menu__utility {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 46px;
+    margin: 0;
+    padding: 5px 10px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: .97rem;
+    font-weight: 600;
+    text-align: left;
+    text-decoration: none;
+    white-space: normal;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+}
+.mobile-menu__group > a:hover,
+.mobile-menu__group > a:active,
+.mobile-menu .nav-more__toggle:hover,
+.mobile-menu__utility:hover { background: var(--drawer-row-hover); color: var(--primary-dark); }
+
+.mobile-menu a:focus-visible,
+.mobile-menu button:focus-visible,
+.mobile-menu input:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; border-radius: 12px; }
+.mobile-menu__search input:focus-visible { outline: 0; }
+
+/* The icon tile */
+.mobile-menu__icon {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    transition: background .15s ease, color .15s ease;
+}
+.mobile-menu__icon svg { width: 18px; height: 18px; }
+.mobile-menu__label { display: inline-flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+
+/* The page you are on: a tinted row with a solid tile (an underlined word in a drawer row reads as a mistake). */
+.mobile-menu .mobile-menu__group > a[aria-current="page"],
+.mobile-menu .nav-more__toggle.is-active { background: var(--primary-light); color: var(--primary-dark); text-decoration: none; }
+.mobile-menu a[aria-current="page"] .mobile-menu__icon,
+.mobile-menu .nav-more__toggle.is-active .mobile-menu__icon { background: var(--primary); color: #fff; }
+
+/* More: a real disclosure. Open, its tile fills solid green and the chevron turns from pointing right to pointing up. */
+.mobile-menu .nav-more { position: static; }
+.mobile-menu .nav-more__toggle[aria-expanded="true"] { color: var(--primary-dark); }
+.mobile-menu .nav-more__toggle[aria-expanded="true"] .mobile-menu__icon { background: var(--primary); color: #fff; }
+.mobile-menu .nav-more__toggle[aria-expanded="true"] svg { transform: none; }
+.mobile-menu__chev { flex: none; margin-left: auto; color: var(--muted); transition: transform .2s ease; }
+.mobile-menu .nav-more__toggle[aria-expanded="true"] .mobile-menu__chev { transform: rotate(-90deg); color: var(--primary-dark); }
+
+.mobile-menu .nav-more__links {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    margin: 2px 0 4px 27px;
+    padding: 0 0 0 14px;
+    border: 0;
+    border-left: 2px solid #cfe5db;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.mobile-menu .nav-more__links[hidden] { display: none; }
+.mobile-menu .nav-more__links a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    color: var(--ink);
+    font-size: .92rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+.mobile-menu .nav-more__links a:hover { background: var(--drawer-row-hover); color: var(--primary-dark); }
+.mobile-menu .nav-more__links a[aria-current="page"] { background: var(--primary-light); color: var(--primary-dark); text-decoration: none; }
+.mobile-menu .nav-more__links .mobile-menu__icon { width: 28px; height: 28px; border-radius: 8px; }
+.mobile-menu .nav-more__links .mobile-menu__icon svg { width: 15px; height: 15px; }
+
+/* Advisories: the one row that shows urgency. */
+.mobile-menu .main-nav__label { flex: 1; min-width: 0; }
+.mobile-menu .main-nav__dot--count { display: none; } /* the top bar's number pill: the drawer says "N active" instead */
+.mobile-menu__pip {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 11px;
+    height: 11px;
+    border: 2px solid var(--paper);
+    border-radius: 50%;
+    background: var(--drawer-coral);
+    box-sizing: content-box;
+}
+.mobile-menu__urgent { flex: none; margin-left: auto; color: var(--drawer-coral-text); font-size: .78rem; font-weight: 700; }
+
+/* Log in / Saved: two outlined pills side by side. They are actions, so they look like buttons. */
+.mobile-menu__pills { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
+.mobile-menu__pill {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 46px;
+    padding: 0 10px;
+    border: 1.5px solid var(--primary);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--primary-dark);
+    font-size: .9rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background .15s ease;
+}
+.mobile-menu__pill:hover, .mobile-menu__pill[aria-current="page"] { background: var(--primary-light); text-decoration: none; }
+.mobile-menu__pill svg { width: 18px; height: 18px; flex: none; }
+.mobile-menu__count {
+    position: absolute;
+    top: -8px;
+    right: 10px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border: 2px solid var(--paper);
+    border-radius: 999px;
+    background: var(--drawer-coral-fill);
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+    box-sizing: content-box;
+}
+.mobile-menu__count[hidden] { display: none; }
+
+/* Account: same rows, quieter. */
+.mobile-menu__label-small {
+    margin: 20px 10px 4px;
+    color: var(--drawer-label);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+}
+.mobile-menu__group--muted { margin-top: 0; }
+.mobile-menu__group--muted .mobile-menu__utility { color: var(--muted); font-weight: 500; }
+.mobile-menu__group--muted .mobile-menu__icon { background: #f1e9d6; color: var(--muted); }
+.mobile-menu__group--muted .mobile-menu__utility:hover { color: var(--primary-dark); }
+.mobile-menu__account { display: block; padding: 4px 10px 2px; color: var(--muted); font-size: .82rem; font-weight: 600; }
+
+/* A friendly line pointing at trip planning. */
+.mobile-menu__tip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: var(--primary-light);
+}
+.mobile-menu__mascot { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: #fff; }
+.mobile-menu__mascot svg { width: 22px; height: 22px; }
+.mobile-menu__tip p { margin: 0; color: var(--primary-dark); font-size: .85rem; font-weight: 500; line-height: 1.45; }
+
+/* Pinned to the bottom. */
+.mobile-menu__foot { flex: none; padding: 12px 14px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--border); }
+.mobile-menu__foot .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 52px;
+    padding: 0 20px;
+    border-radius: 999px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+.mobile-menu__foot .btn svg { width: 20px; height: 20px; flex: none; }
+.mobile-menu__foot .btn[aria-current="page"] { text-decoration: none; }

@@ -118,43 +118,54 @@
         </button>
     </div>
 
-    <nav class="mobile-menu__body" aria-label="Mobile navigation">
-        <div class="mobile-menu__group">
+    <div class="mobile-menu__body">
+        {{-- Sends the typed name to the same /search the homepage uses, which lands on the matching catalogue. --}}
+        <form class="mobile-menu__search" action="{{ route('search') }}" method="GET" role="search">
+            <x-icon name="search" aria-hidden="true" />
+            <label for="mobileMenuSearch" class="sr-only">Search Davao Region</label>
+            <input type="search" id="mobileMenuSearch" name="q" placeholder="Search Davao Region" maxlength="100" autocomplete="off" enterkeyhint="search">
+        </form>
+
+        <nav class="mobile-menu__group" aria-label="Mobile navigation">
             @include('partials.navigation-links', ['navId' => 'mobile', 'icons' => true])
-        </div>
+        </nav>
 
-        <div class="mobile-menu__divider"></div>
-
-        <div class="mobile-menu__group mobile-menu__group--plain">
+        <div class="mobile-menu__pills">
             @if ($isTouristAuthed)
-                <a href="{{ route('account.itineraries') }}" @if(request()->routeIs('account.itineraries')) aria-current="page" @endif class="mobile-menu__utility mobile-menu__saved"><x-icon name="map" /> My Itineraries</a>
+                <a href="{{ route('account.itineraries') }}" @if(request()->routeIs('account.itineraries')) aria-current="page" @endif class="mobile-menu__pill"><x-icon name="map" /> My Itineraries</a>
             @else
-                <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="mobile-menu__utility mobile-menu__saved"><x-icon name="log-in" /> Log in</a>
+                <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="mobile-menu__pill"><x-icon name="log-in" /> Log in</a>
             @endif
-            <a href="{{ $isTouristAuthed ? route('account.saved') : route('saved.index') }}" class="mobile-menu__utility mobile-menu__saved" @if(request()->routeIs('saved.*', 'account.saved')) aria-current="page" @endif>
+            <a href="{{ $isTouristAuthed ? route('account.saved') : route('saved.index') }}" class="mobile-menu__pill" data-saved-link
+               aria-label="Saved places{{ ($savedCount ?? 0) > 0 ? ', '.$savedCount.' saved' : '' }}"
+               @if(request()->routeIs('saved.*', 'account.saved')) aria-current="page" @endif>
                 <x-icon name="heart" />
                 Saved
+                <span class="mobile-menu__count" data-saved-count aria-hidden="true" @if(($savedCount ?? 0) < 1) hidden @endif>{{ $savedCount ?? 0 }}</span>
             </a>
-
         </div>
 
-        <div class="mobile-menu__divider"></div>
-
-        <div class="mobile-menu__group mobile-menu__group--muted">
+        <p class="mobile-menu__label-small" id="mobileMenuAccount">Account</p>
+        <div class="mobile-menu__group mobile-menu__group--muted" role="group" aria-labelledby="mobileMenuAccount">
             @if ($isTouristAuthed)
                 <span class="mobile-menu__account">Signed in as {{ auth('tourist')->user()->alias }}</span>
                 <form method="POST" action="{{ route('account.logout') }}">
                     @csrf
-                    <button type="submit" class="mobile-menu__utility mobile-menu__utility--btn"><x-icon name="log-out" /> Log out</button>
+                    <button type="submit" class="mobile-menu__utility"><span class="mobile-menu__icon" aria-hidden="true"><x-icon name="log-out" /></span>Log out</button>
                 </form>
             @else
-                <a href="{{ route('account.register') }}" class="mobile-menu__utility mobile-menu__utility--small"><x-icon name="user" /> Create a free account</a>
+                <a href="{{ route('account.register') }}" class="mobile-menu__utility"><span class="mobile-menu__icon" aria-hidden="true"><x-icon name="user" /></span>Create a free account</a>
             @endif
-            <a href="{{ route('portal.establishment.register') }}" class="mobile-menu__utility mobile-menu__utility--small"><x-icon name="building" /> List your establishment</a>
+            <a href="{{ route('portal.establishment.register') }}" class="mobile-menu__utility"><span class="mobile-menu__icon" aria-hidden="true"><x-icon name="building" /></span>List your establishment</a>
         </div>
-    </nav>
+
+        <div class="mobile-menu__tip">
+            <span class="mobile-menu__mascot" aria-hidden="true"><x-icon name="sparkles" /></span>
+            <p>New here? Tell us what you like and we&rsquo;ll plan your Davao days for you.</p>
+        </div>
+    </div>
 
     <div class="mobile-menu__foot">
-        <a href="{{ route('plan.choose') }}" @if(request()->routeIs('plan.*')) aria-current="page" @endif class="btn btn-primary btn-block"><x-icon name="compass" /> Plan My Trip</a>
+        <a href="{{ route('plan.choose') }}" @if(request()->routeIs('plan.*')) aria-current="page" @endif class="btn btn-primary btn-block"><x-icon name="map" /> Plan My Trip <x-icon name="arrow-right" /></a>
     </div>
 </div>
