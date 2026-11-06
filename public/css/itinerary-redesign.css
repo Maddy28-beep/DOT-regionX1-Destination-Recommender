@@ -130,6 +130,9 @@
 .itinerary-refine h2, .itinerary-feedback h2 { margin:0; font-family:'Poppins',sans-serif; font-size:1.2rem; line-height:1.4; color:var(--primary-dark); }
 .itinerary-refine-actions { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
 .itinerary-refine-actions form { margin:0; }
+.itinerary-refine-copy { min-width:0; flex:1 1 auto; }
+.itinerary-refine-note { margin:6px 0 0; max-width:60ch; font-size:.88rem; line-height:1.5; color:var(--muted); }
+.itinerary-refine-note--location { margin-top:2px; font-size:.82rem; }
 .itinerary-refine .btn, .itinerary-feedback .btn { border-radius:10px; clip-path:none; transform:none; }
 .itinerary-disclosure-hint { display:block; margin:4px 0 0; font-size:.86rem; font-weight:400; color:var(--muted); line-height:1.5; }
 .itinerary-page .itinerary-support-panel { padding:22px 24px 0; border-radius:14px; margin-top:18px; box-shadow:none; }

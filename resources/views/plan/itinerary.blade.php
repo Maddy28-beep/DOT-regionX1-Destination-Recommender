@@ -341,13 +341,18 @@
 
             @unless ($itinerary->package)
             <section class="itinerary-refine" aria-label="Adjust your itinerary">
-                <h2>Your itinerary, your way</h2>
+                <div class="itinerary-refine-copy">
+                    <h2>Your itinerary, your way</h2>
+                    <p class="itinerary-refine-note" id="regenerate-note">Regenerate creates a new itinerary variation using the same preferences. Your existing preferences remain unchanged.</p>
+                    {{-- Honest about the one thing Regenerate can do beyond that: see the location script at the bottom of this page. --}}
+                    <p class="itinerary-refine-note itinerary-refine-note--location">If your browser asks to share your location and you allow it, the plan is rebuilt from where you are now.</p>
+                </div>
                 <div class="itinerary-refine-actions">
                     <form method="POST" action="{{ route('plan.regenerate') }}" id="regenerate-form">
                         @csrf
                         <input type="hidden" name="lat" id="regenerate-lat">
                         <input type="hidden" name="lng" id="regenerate-lng">
-                        <button type="submit" class="btn btn-outline"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7v5h-5M20 12a8 8 0 1 0-2 5"/></svg> Regenerate itinerary</button>
+                        <button type="submit" class="btn btn-outline" aria-describedby="regenerate-note"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7v5h-5M20 12a8 8 0 1 0-2 5"/></svg> Regenerate itinerary</button>
                     </form>
                 </div>
             </section>

@@ -248,13 +248,15 @@ class ItineraryGenerationService
          * grouping and stays within its travelling limit; the transaction below still has to prove the built plan is no
          * worse before it is kept. Disabled, failed, slow or invalid: $aiPlan stays null and nothing below changes.
          */
+        // Ties this generation's AI evaluation (if any) to its log line. Random, carries nothing about the traveller.
+        $correlationId = (string) \Illuminate\Support\Str::uuid();
         $ai = ($this->aiSkeleton ?? app(AiSkeletonAdvisor::class))->advise($preference, $sequence, $routeSequence, $dayCapacities, $origin);
         $aiPlan = $ai['plan'];
         $aiStays = $aiPlan === null ? null : ($totalDays >= 2
             ? $this->pickStays($aiPlan['sequence'], $dayCapacities, $preference, $origin)
             : $this->pickAccommodation($aiPlan['sequence'], $preference));
 
-        return DB::transaction(function () use ($ai, $aiPlan, $aiStays, $routeAccommodationPick, $reserve, $preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
+        return DB::transaction(function () use ($correlationId, $ai, $aiPlan, $aiStays, $routeAccommodationPick, $reserve, $preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
             // The schedule builder keeps why it turned each place away, per build; start this trip with none.
             $this->schedule->forgetRecordedAttempts();
 
@@ -351,8 +353,9 @@ class ItineraryGenerationService
             }
 
             $aiApplied = false;
+            $aiGuard = null;
             if ($aiPlan !== null) {
-                $aiApplied = $this->tryAiSkeleton($itinerary, $build, $stays, $built, $sequence, $aiPlan, $aiStays);
+                $aiApplied = $this->tryAiSkeleton($itinerary, $build, $stays, $built, $sequence, $aiPlan, $aiStays, $aiGuard);
             }
 
             if ($totalDays >= 2 && $this->stayMode($preference) === 'far') {
@@ -381,6 +384,7 @@ class ItineraryGenerationService
 
             if ($ai['attempted']) {
                 $this->recordAiSkeleton($itinerary, $ai, $aiApplied ? $aiPlan : null);
+                $this->logAiEvaluation($correlationId, $itinerary, $ai, $aiApplied, $aiGuard);
             }
 
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);
@@ -396,7 +400,7 @@ class ItineraryGenerationService
      * @param  array<string, mixed>  $aiPlan
      * @param  array<int, array<string, mixed>>  $sequence  replaced by the AI sequence when it is kept
      */
-    private function tryAiSkeleton(Itinerary $itinerary, callable $build, ?array &$stays, array &$built, array &$sequence, array $aiPlan, ?array $aiStays): bool
+    private function tryAiSkeleton(Itinerary $itinerary, callable $build, ?array &$stays, array &$built, array &$sequence, array $aiPlan, ?array $aiStays, ?array &$guard = null): bool
     {
         $snapshot = $itinerary->items()->orderBy('id')->get()->map(fn ($r) => $r->getAttributes())->all();
         $placed = fn (): int => $itinerary->items()->whereNotNull('destination_id')->distinct()->count('destination_id');
@@ -409,7 +413,14 @@ class ItineraryGenerationService
         $stays = $aiStays;
         $build($aiPlan['sequence']);
 
-        if ($placed() >= $plannerPlaced && $this->feasibilityCost($itinerary) <= $plannerCost) {
+        $aiPlaced = $placed();
+        $aiCost = $this->feasibilityCost($itinerary);
+        $guard = [
+            'stops_placed' => ['planner' => $plannerPlaced, 'ai' => $aiPlaced],
+            'feasibility_cost' => ['planner' => $plannerCost, 'ai' => $aiCost],
+        ];
+
+        if ($aiPlaced >= $plannerPlaced && $aiCost <= $plannerCost) {
             $built = $aiPlan['sequence'];
             $sequence = $aiPlan['sequence'];
 
@@ -424,6 +435,47 @@ class ItineraryGenerationService
         $stays = $plannerStays;
 
         return false;
+    }
+
+    /**
+     * One structured line per AI evaluation (storage/logs/ai-skeleton-*.log): accepted or rejected, every reason it was
+     * rejected for, whether the deterministic plan was used instead, what was checked, and when. Written only when the
+     * outside service was actually asked, so it is empty while AI grouping is off. It holds no origin, coordinates,
+     * dates, times, browser token, preference id or anything the visitor typed, and never the prompt or the answer.
+     * A failure to write the line must never cost the traveller their itinerary.
+     *
+     * @param  array<string, mixed>  $ai  the advisor's result
+     * @param  array<string, mixed>|null  $guard  the built-plan comparison, when the suggestion got that far
+     */
+    private function logAiEvaluation(string $correlationId, Itinerary $itinerary, array $ai, bool $applied, ?array $guard): void
+    {
+        $reasons = [];
+        $decidedBy = 'advisor';
+        if ($applied) {
+            $decidedBy = 'planner_guard';
+        } elseif ($ai['plan'] === null) {
+            $reasons[] = $ai['reason'];
+        } else {
+            $decidedBy = 'planner_guard';
+            if (($guard['stops_placed']['ai'] ?? 0) < ($guard['stops_placed']['planner'] ?? 0)) {
+                $reasons[] = 'fewer_stops_placed';
+            }
+            if (($guard['feasibility_cost']['ai'] ?? 0) > ($guard['feasibility_cost']['planner'] ?? 0)) {
+                $reasons[] = 'less_feasible';
+            }
+        }
+
+        AiSkeletonEvaluationLog::record([
+            'correlation_id' => $correlationId,
+            'itinerary_id' => $itinerary->id,
+            'evaluated_at' => now()->toIso8601String(),
+            'outcome' => $applied ? 'accepted' : 'rejected',
+            'decided_by' => $decidedBy,
+            'reasons' => $reasons,
+            'fallback_used' => ! $applied,
+            'call_seconds' => $ai['seconds'],
+            'validation' => ($ai['checks'] ?? []) + ($guard !== null ? ['built_plan' => $guard] : []),
+        ]);
     }
 
     /**
