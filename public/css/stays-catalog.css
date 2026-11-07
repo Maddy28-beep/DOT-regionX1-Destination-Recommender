@@ -296,3 +296,13 @@ html:has(.catalog-refresh) { scrollbar-gutter: stable; }
     .catalog-refresh .dpost-card-wrap:hover .dpost-card,
     .catalog-refresh .dpost-card-wrap:hover .save-form--icon { transform: none; transition: none; }
 }
+
+/* The budget tiles in the narrow side panel: every label on ONE line ("Budget-Friendly" used to break at its hyphen).
+   The two columns are as wide as their longest label needs (the rest is shared), the tile text is a touch smaller, and the
+   tile padding and heights stay the same as the rest of the panel. */
+@media (min-width: 901px) {
+    .catalog-refresh .budget-tiles:not(.budget-tiles--3) { container-type: inline-size; grid-template-columns: repeat(2, minmax(max-content, 1fr)); }
+    .catalog-refresh .budget-tiles:not(.budget-tiles--3) .budget-tile { padding-inline: 4px; }
+    /* Sized from the panel's own width, so the labels also fit when the panel is a little narrower than usual. */
+    .catalog-refresh .budget-tiles:not(.budget-tiles--3) .budget-tile__name { font-size: clamp(.62rem, 5.6cqi, .74rem); white-space: nowrap; }
+}

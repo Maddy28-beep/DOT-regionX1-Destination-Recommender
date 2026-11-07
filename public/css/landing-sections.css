@@ -34,54 +34,69 @@
 
 .landing-section--cream { background: #f7f1e8; }
 
-.culinary .poster-title,
-.culinary__copy h3 { color: var(--ocean-teal-dark); }
+.culinary .poster-title { color: var(--ocean-teal-dark); }
 .culinary .dpost-head .btn svg { width: 1em; height: 1em; }
 .culinary__grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+    /* Three across on a desktop, two on a tablet, one on a phone: as many 330px columns as the row holds (narrower and the three dishes would not fit on one row). */
+    grid-template-columns: repeat(auto-fit, minmax(min(330px, 100%), 1fr));
+    gap: 18px;
 }
+/* Each card is one link to that area's dining list. A photo (or, when there is none, an icon for the signature dish) on
+   top, then the province and its three dishes as chips. Lifts and deepens its shadow on hover, with a clear ring on
+   keyboard focus. */
 .culinary__card {
-    padding: 5px;
+    display: block;
+    overflow: hidden;
     border: 1px solid #e1e8e2;
     border-radius: 16px;
     background: #fffefa;
     box-shadow: 0 3px 10px rgba(16, 40, 30, .06);
+    color: inherit;
+    text-decoration: none;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
-.culinary__card img {
-    display: block;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 19 / 9;
-    object-fit: cover;
-    border-radius: 11px;
-}
-.culinary__copy { padding: 9px 12px 12px; }
+.culinary__card:hover { transform: translateY(-4px); border-color: #c5d8cc; box-shadow: 0 14px 30px rgba(16, 40, 30, .14); }
+.culinary__card:focus-visible { outline: 3px solid var(--primary, #0b6b4f); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .culinary__card { transition: box-shadow .18s ease; } .culinary__card:hover { transform: none; } }
+
+.culinary__photo { display: grid; place-items: center; aspect-ratio: 19 / 9; background: #e3f1ea; color: var(--primary-dark, #084d39); }
+.culinary__photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.culinary__icon { width: 76px; height: 76px; }
+
+/* The three dishes stay on ONE row on every card. The pills are sized from the card's own width (container units), so
+   they shrink a little on a narrow card instead of wrapping, and every card lines up: same height of title, same row of
+   pills. */
+.culinary__copy { container-type: inline-size; padding: 14px 16px 18px; }
 .culinary__copy h3 {
-    margin: 0 0 5px;
+    margin: 0 0 10px;
+    color: var(--ocean-teal-dark);
     font-family: 'Alfa Slab One', serif;
     font-weight: 400;
     font-size: 1.15rem;
     letter-spacing: .01em;
     line-height: 1.2;
 }
-.culinary__copy p {
+.culinary__chips {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: .4em;
     margin: 0;
-    font-family: 'Poppins', sans-serif;
-    font-size: .9rem;
-    font-weight: 500;
-    line-height: 1.5;
-    color: var(--muted);
+    padding: 0;
+    list-style: none;
+    font-size: clamp(.62rem, 3.5cqi, .8rem);
+}
+.culinary__chips li {
+    flex: 0 0 auto;
+    padding: .3em .7em;
+    border-radius: 999px;
+    background: var(--primary-light, #e6f4ef);
+    color: var(--primary-dark, #084d39);
+    font: 600 1em/1.35 'Poppins', sans-serif;
+    white-space: nowrap;
 }
 .culinary .dpost-head p { font-family: 'Poppins', sans-serif; font-size: 1rem; color: var(--muted); }
 
-@media (max-width: 900px) {
-    .culinary__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 520px) {
-    .culinary__grid { grid-template-columns: 1fr; }
-}
 
 /* The featured destination banner: a medium height at every width instead of 340px plus whatever its text needs.
    (A phone and a tablet keep their own stacked layout from app.css.) */

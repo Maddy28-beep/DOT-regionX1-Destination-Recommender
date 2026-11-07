@@ -63,11 +63,9 @@
                @if ($heroVideo['webm']) data-webm="{{ $heroVideo['webm'] }}" @endif></video>
         <div class="poster-hero__video-scrim" aria-hidden="true"></div>
 
-        {{-- No script means no video, so the painted hero has to come back. --}}
+        {{-- No script means no video, so the plain hero ground shows instead. --}}
         <noscript>
             <style>
-                .poster-hero.has-footage .poster-hero__horizon,
-                .poster-hero.has-footage .poster-hero__banca { display: block; }
                 .poster-hero__video, .poster-hero__video-scrim { display: none; }
             </style>
         </noscript>
@@ -212,17 +210,6 @@
         <img src="{{ asset('images/tourism-logos/dot.png') }}" alt="Department of Tourism Philippines" class="hero-tourism-brands__dot">
         <img src="{{ asset('images/tourism-logos/love-philippines.png') }}" alt="Love the Philippines" class="hero-tourism-brands__love">
     </div>
-
-    <svg class="poster-hero__horizon" viewBox="0 0 1200 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path style="fill:var(--ocean-teal-dark)" d="M0,220 L0,150 L150,110 L300,150 L450,100 L600,140 L750,90 L900,150 L1050,120 L1200,150 L1200,220 Z"/>
-        <path style="fill:var(--forest)" d="M0,220 L0,170 L120,80 L260,170 L400,60 L560,170 L680,110 L800,170 L950,90 L1100,170 L1200,140 L1200,220 Z"/>
-    </svg>
-
-    <svg class="poster-hero__banca" viewBox="0 0 60 70" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path fill="currentColor" d="M8,55 L52,55 L42,59 L18,59 Z"/>
-        <line x1="28" y1="55" x2="28" y2="12" stroke="currentColor" stroke-width="1.5"/>
-        <path fill="currentColor" d="M28,54 L28,16 L47,50 Z"/>
-    </svg>
 
     <div class="poster-hero__content">
         <span class="poster-kicker poster-hero__kicker">welcome to</span>

@@ -39,7 +39,7 @@
                 'placeholder' => 'e.g. Samal Island',
                 'regions' => $regions,
                 'activeFilters' => $activeFilters,
-                'tiers' => [['Free', 'Free', ''], ['Budget-Friendly', 'Budget', ''], ['Mid-range', 'Mid-range', ''], ['Premium', 'Premium', '']],
+                'tiers' => [['Free', 'Free', ''], ['Budget-Friendly', 'Budget-friendly', ''], ['Mid-range', 'Mid-range', ''], ['Premium', 'Premium', '']],
                 'categoryParam' => 'type',
                 'formId' => 'destinationFilters',
                 'hidden' => [['name' => 'view', 'value' => request('view') === 'map' ? 'map' : 'grid', 'id' => 'destinationViewInput']],

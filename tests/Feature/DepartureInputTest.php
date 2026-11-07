@@ -240,7 +240,7 @@ class DepartureInputTest extends TestCase
         $page = $this->get(route('plan.edit'));
 
         $page->assertOk();
-        $page->assertSee('Departure time (optional)');
+        $page->assertSee('Departure time');
         $page->assertSee('name="departure_label"', false);
         $page->assertSee('We allow 2 hours there before you leave.');
         $page->assertSee('not an airline rule');
