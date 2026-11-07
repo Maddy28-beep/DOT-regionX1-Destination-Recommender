@@ -71,7 +71,7 @@
     font: 800 1.25rem Poppins, sans-serif;
 }
 .portal-poster__brand:hover { color: #fff; }
-.portal-poster__brand .brand-icon { width: 27px; height: 27px; margin-right: 8px; }
+.portal-poster__brand .brand-icon { width: 36px; height: 36px; margin-right: 8px; }
 .portal-poster__brand span { color: #ff9b75; }
 
 .portal-poster__badge {

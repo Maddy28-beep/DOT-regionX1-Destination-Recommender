@@ -22,8 +22,10 @@
     preload.
 --}}
 
-{{-- The same mark as <x-brand-mark />, standalone so the tab matches the page. --}}
-<link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+{{-- The same mark as <x-brand-mark />, so the tab matches the page. Kept under images/ so it also loads on the tunnelled survey. --}}
+<link rel="icon" href="{{ asset('favicon.ico') }}" sizes="48x48">
+<link rel="icon" href="{{ asset('images/logo/favicon-32.png') }}" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="{{ asset('images/logo/apple-touch-icon.png') }}">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -48,8 +48,10 @@
 
 .mood__count {
     position: absolute; top: 16px; right: 16px; z-index: 2;
-    padding: 4px 9px; border: 1px dashed rgba(255, 255, 255, .75); border-radius: 6px;
-    background: rgba(4, 55, 63, .65);
+    /* A plain pill: a thin solid edge and a soft dark fill so the white count reads on any photo. (It had a dashed edge,
+       which looked like a cut-out line.) */
+    padding: 5px 11px; border: 1px solid rgba(255, 255, 255, .4); border-radius: 999px;
+    background: rgba(4, 55, 63, .7);
     -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
     font: 700 .72rem/1.2 'Poppins', sans-serif; letter-spacing: .02em; white-space: nowrap;
 }

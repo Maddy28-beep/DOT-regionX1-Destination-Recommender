@@ -75,8 +75,8 @@ class HeroVideoTest extends TestCase
         $html = $this->get('/')->assertOk()->getContent();
 
         $this->assertStringNotContainsString('poster-hero__video', $html);
-        $this->assertStringContainsString('poster-hero__horizon', $html,
-            'The painted horizon is the hero without footage, not a placeholder for it.');
+        $this->assertStringNotContainsString('poster-hero__horizon', $html, 'No painted mountain band over the hero.');
+        $this->assertStringNotContainsString('poster-hero__banca', $html, 'No painted boat either.');
     }
 
     public function test_footage_is_offered_once_a_file_exists(): void

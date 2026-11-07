@@ -18,10 +18,11 @@
                 <span class="poster-kicker" style="font-size:1.05rem;">let's get started</span>
                 <h1 class="page-title" style="font-size:1.9rem; margin:0;">How would you like to plan your trip?</h1>
                 <div class="sub">Two ways to go about it &mdash; pick whichever fits, you're not locked in.</div>
-                <ol class="pc-steps" aria-label="How planning works">
-                    <li>1 &middot; Choose a path</li>
-                    <li>2 &middot; Tell us about your trip</li>
-                    <li>3 &middot; Get your plan</li>
+                {{-- Progress, not three look-alike pills: step 1 is filled, 2 and 3 are outlined and muted to show they are ahead. --}}
+                <ol class="pc-stepper" aria-label="How planning works">
+                    <li aria-current="step"><span class="pc-stepper__dot" aria-hidden="true">1</span><span class="pc-stepper__label"><span class="sr-only">Step 1, current: </span>Choose a path</span></li>
+                    <li><span class="pc-stepper__dot" aria-hidden="true">2</span><span class="pc-stepper__label"><span class="sr-only">Step 2: </span>Tell us about your trip</span></li>
+                    <li><span class="pc-stepper__dot" aria-hidden="true">3</span><span class="pc-stepper__label"><span class="sr-only">Step 3: </span>Get your plan</span></li>
                 </ol>
             </div>
         </div>
@@ -60,8 +61,8 @@
                 <div class="pcx-card">
                     <div class="feature-stamp feature-stamp--gold">
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path fill="currentColor" d="M4 9.4h16a1 1 0 0 1 1 1V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8.6a1 1 0 0 1 1-1z"/>
-                            <path style="fill:var(--stamp-ink)" d="M9 9.4V7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2.4h-2V7.4h-2v2z"/>
+                            <path fill="currentColor" d="M12 2.2 14.4 4l3-.2 1 2.8 2.6 1.6-.9 2.9.9 2.9-2.6 1.6-1 2.8-3-.2L12 21.8 9.6 20l-3 .2-1-2.8L3 15.8l.9-2.9L3 10l2.6-1.6 1-2.8 3 .2z"/>
+                            <path d="m8.4 12.1 2.5 2.5 4.8-5.2" fill="none" style="stroke:var(--stamp-ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </div>
                     <h3>Tour Packages</h3>
