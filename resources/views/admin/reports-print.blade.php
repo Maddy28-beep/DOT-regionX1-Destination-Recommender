@@ -35,6 +35,7 @@
 
     <h1>{{ $reportType }}</h1>
     <p class="summary">{{ $report['summary'] }}</p>
+    <p class="summary"><strong>Data included:</strong> {{ $report['data_note'] ?? '' }}</p>
 
     @if (empty($report['rows']))
         <p class="no-data">No records found for this report type in the selected date range.</p>

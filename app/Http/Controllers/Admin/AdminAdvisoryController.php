@@ -69,6 +69,7 @@ class AdminAdvisoryController extends Controller
         $data['admin_id'] = Auth::guard('admin')->id();
 
         $advisory = Advisory::create($data);
+        $request->attributes->set('audit_record_id', (string) $advisory->getKey()); // for the audit row (AuditLogger)
 
         return $this->modalSaved($request, route('admin.advisories.index'), Toast::success('Advisory posted', "\"{$advisory->title}\" is now visible to travelers."));
     }

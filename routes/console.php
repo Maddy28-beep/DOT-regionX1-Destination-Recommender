@@ -12,7 +12,9 @@ Artisan::command('inspire', function () {
 Schedule::command('accreditation:sync-status')->daily();
 
 // Retention (RA 10173): anonymous itineraries, their preferences, and chatbot questions are deleted after a fixed number of days.
-Schedule::command('privacy:purge-anonymous-data')->dailyAt('03:00')->withoutOverlapping();
+// Its output is also appended to storage/logs/privacy-purge.log (one timestamped block per run), so the last run is easy to confirm.
+Schedule::command('privacy:purge-anonymous-data')->dailyAt('03:00')->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/privacy-purge.log'));
 
 // Removes surveys submitted from /exit-survey?test=1 (and, by cascade, their places and activities).
 Artisan::command('exit-survey:purge-test', function () {

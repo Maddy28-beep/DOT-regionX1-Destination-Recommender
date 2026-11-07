@@ -128,6 +128,7 @@ class AprioriService
 
                 if ($query && method_exists($modelClass, 'scopePubliclyVisible')) {
                     $query->publiclyVisible();
+                    \App\Support\OfficialOnlyMode::apply($query);
                 }
 
                 // While a trip is being planned, a suggested restaurant, stay or

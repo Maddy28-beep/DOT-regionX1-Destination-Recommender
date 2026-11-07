@@ -61,9 +61,9 @@ class FreeTimeIdeas
 
         $candidates = [];
 
-        $shops = SouvenirCenter::query()
+        $shops = \App\Support\OfficialOnlyMode::apply(SouvenirCenter::query()
             ->publiclyVisible()
-            ->availableDuring($dayOne->copy(), $dayOne->copy())
+            ->availableDuring($dayOne->copy(), $dayOne->copy()))
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->when($scheduled !== [], fn ($q) => $q->whereNotIn('id', $scheduled))

@@ -104,7 +104,9 @@ class AdminFeedbackAnalysisController extends Controller
     {
         $model = self::KINDS[$kind] ?? null;
 
-        return ($model ? $model::find($id)?->name : null) ?? 'Listing #'.$id.' (removed)';
+        $listing = $model ? $model::find($id) : null;
+
+        return $listing ? app(\App\Support\SampleData::class)->labelledName($listing) : 'Listing #'.$id.' (removed)';
     }
 
     /**

@@ -883,7 +883,7 @@ class ItineraryGenerationService
             if (in_array($original, $inTrip, true)
                 && ! in_array($replacement, $inTrip, true)
                 && ! in_array($replacement, $valid, true)
-                && Destination::publiclyVisible()->availableForTrip()->whereKey($replacement)->exists()) {
+                && \App\Support\OfficialOnlyMode::apply(Destination::publiclyVisible()->availableForTrip())->whereKey($replacement)->exists()) {
                 $valid[$original] = $replacement;
             }
         }
@@ -1169,7 +1169,7 @@ class ItineraryGenerationService
         [$wanted, $setting] = $this->statedStay($preference);
         // A stay with a position can be placed on the map and costed; one without is offered only as a last resort,
         // when no stay with a position is eligible for any night ("an unlocatable stay is still offered rather than none").
-        $base = fn (bool $mapped) => Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip()
+        $base = fn (bool $mapped) => \App\Support\OfficialOnlyMode::apply(Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip())
             ->when($mapped, fn ($q) => $q->whereNotNull('latitude')->whereNotNull('longitude'),
                 fn ($q) => $q->where(fn ($w) => $w->whereNull('latitude')->orWhereNull('longitude')));
 
@@ -1756,7 +1756,7 @@ class ItineraryGenerationService
             }
         }
 
-        $query = Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip();
+        $query = \App\Support\OfficialOnlyMode::apply(Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip());
         if ($setting !== null) {
             $query->whereIn('type', self::RESORT_TYPES)->withResortSetting($setting);
         } elseif ($wanted !== null) {
@@ -1802,10 +1802,10 @@ class ItineraryGenerationService
             ?? $query->orderByDesc('rating')->first()
             // No resort of that setting is available: a resort of any setting is still closer to the ask than a hotel.
             ?? ($setting !== null
-                ? Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip()
+                ? \App\Support\OfficialOnlyMode::apply(Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip())
                     ->whereIn('type', self::RESORT_TYPES)->orderByDesc('rating')->first()
                 : null)
-            ?? Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip()
+            ?? \App\Support\OfficialOnlyMode::apply(Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip())
                 ->orderByDesc('rating')->first();
 
         return $listing ? ['listing' => $listing, 'rule' => null] : null;

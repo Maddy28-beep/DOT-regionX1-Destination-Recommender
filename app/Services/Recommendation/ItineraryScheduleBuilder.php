@@ -234,6 +234,7 @@ class ItineraryScheduleBuilder
         // Every journey estimate this build makes is at the pace of how the traveller said they will get around.
         $this->transport = $preference->transport_pref;
         $this->remoteTrip = $preference->distance_pref === 'far';
+        $this->pendingActivityNote = null;
         $this->mealRestaurants = null;
         $lastDay = array_key_last($dayCapacities);
 
@@ -288,6 +289,7 @@ class ItineraryScheduleBuilder
                  */
                 $choice = null;
                 $waiting = null;
+                $overlong = null;
                 // The last day, and the arrival day while nothing is placed yet, look past the first few: the best
                 // stop that can actually be reached and visited today is promoted to the front instead of the day
                 // staying empty behind stops that are too far to reach.
@@ -349,8 +351,10 @@ class ItineraryScheduleBuilder
                         $visit = $shorter;
                     }
 
-                    if ($scheduled === 0 && $this->remoteTrip && $driven + $leg + $back > self::MAX_DAILY_DRIVE_MINUTES) {
-                        $this->note($destination->id, $dayNumber, 'drive_budget_reached', $driven + $leg + $back, self::MAX_DAILY_DRIVE_MINUTES);
+                    // One driving ceiling for every trip, first stop included. A stop that alone is over it is not dropped: it is
+                    // kept as a last resort for a day with nothing else to offer, and then placed alone with a warning.
+                    if ($scheduled === 0 && $driven + $leg + $back > self::MAX_DAILY_DRIVE_MINUTES) {
+                        $overlong ??= compact('index', 'destination', 'there', 'visit', 'leg') + ['solo_minutes' => $leg + $back];
 
                         continue;
                     }
@@ -364,6 +368,13 @@ class ItineraryScheduleBuilder
                     }
 
                     $waiting ??= $candidate;
+                }
+
+                if ($choice === null && $waiting === null && $overlong !== null) {
+                    $choice = $overlong;
+                } elseif ($overlong !== null) {
+                    // Something else fills the day: the over-ceiling stop waits, and says why it was passed over today.
+                    $this->note($overlong['destination']->id, $dayNumber, 'drive_budget_reached', $overlong['solo_minutes'], self::MAX_DAILY_DRIVE_MINUTES);
                 }
 
                 // Nothing is done yet today and the only stop on offer opens later: set off later, so the
@@ -416,6 +427,12 @@ class ItineraryScheduleBuilder
 
                 array_splice($queue, $index, 1);
 
+                $soloDay = isset($choice['solo_minutes']);
+                if ($soloDay) {
+                    $hours = number_format($choice['solo_minutes'] / 60, 1);
+                    $this->pendingActivityNote = "About {$hours} hours of driving there and back for this one stop, more than a day should hold, so it has a day of its own. Consider staying closer, or spending a night nearby.";
+                }
+
                 // The journey, with the meal that falls before it, on the way, or on arrival (see planLeg).
                 $plan = $visit['plan'];
                 $clock = $this->commitLeg($itinerary, $dayNumber, $sortOrder, $plan, $here, $there, $destination, $date);
@@ -432,6 +449,11 @@ class ItineraryScheduleBuilder
                 $lastDestination = $destination;
                 $scheduled++;
 
+                // A stop that is a day's whole driving leaves no room for another.
+                if ($soloDay) {
+                    $capacity = $scheduled;
+                }
+
                 if (! $lunchTaken && $this->lunchIsDue($clock)) {
                     $clock = $this->addMeal($itinerary, $dayNumber, $sortOrder, $clock, 'Lunch', $there, $destination, $date, 'after');
                     $lunchTaken = true;
@@ -444,7 +466,7 @@ class ItineraryScheduleBuilder
             }
 
             if ($isLastDay && $this->finalDayDeparture !== null) {
-                $this->closeDepartureDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $lunchTaken, $lastDestination, $date, $scheduled > 0);
+                $this->closeDepartureDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $lunchTaken, $lastDestination, $date, $scheduled > 0, $driven);
             } elseif ($isLastDay) {
                 $this->closeTripDay($itinerary, $dayNumber, $sortOrder, $clock, $here, $origin, $lunchTaken, $lastDestination, $date, $driven);
             } else {
@@ -729,10 +751,9 @@ class ItineraryScheduleBuilder
             $begin = max($startMinute, $open);
             $minutes = min($visitMinutes, $close - $begin);
 
-            // Waiting for a place to open pushes the visit later: it still has to end before a departure cutoff.
-            if ($byDeparture) {
-                $minutes = min($minutes, ($cutoff->hour * 60 + $cutoff->minute) - $begin);
-            }
+            // Waiting for a place to open pushes the visit later: it still has to end by the cutoff (the 18:00 sightseeing hour,
+            // or the departure cutoff), however long the wait was.
+            $minutes = min($minutes, ($cutoff->hour * 60 + $cutoff->minute) - $begin);
 
             if ($minutes >= $enough) {
                 return [
@@ -1170,7 +1191,8 @@ class ItineraryScheduleBuilder
 
     private function mealRestaurants()
     {
-        return $this->mealRestaurants ??= Restaurant::publiclyVisible()->with('region')
+        // availableForTrip(): a restaurant that is closed on the trip dates (its own status, or a closing advisory) is never offered.
+        return $this->mealRestaurants ??= \App\Support\OfficialOnlyMode::apply(Restaurant::publiclyVisible()->availableForTrip()->with('region'))
             ->whereNotNull('latitude')->whereNotNull('longitude')->orderBy('id')->get();
     }
 
@@ -1273,15 +1295,16 @@ class ItineraryScheduleBuilder
         $suggestion = $this->souvenirStop($here, $lastDestination, $clock);
         $souvenirs = $suggestion['listing'] ?? null;
 
-        if ($souvenirs && $this->remoteTrip) {
+        if ($souvenirs) {
             // souvenirFits() only looks at the shop; here the whole journey home is counted, dinner break included.
             $shop = $this->place($souvenirs);
             $shopLeg = $this->estimateLeg($here, $shop)['max_minutes'];
             $homeLeg = $this->estimateLeg($shop, $origin)['max_minutes'];
 
             if ($driven + $shopLeg + $homeLeg > self::MAX_DAILY_DRIVE_MINUTES) {
+                // The driving ceiling holds on every trip: the shop would take the day past it.
                 $souvenirs = null;
-            } else {
+            } elseif ($this->remoteTrip) {
                 $shopping = $this->toQuarterHour($this->toQuarterHour($clock->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES))
                     ->addMinutes($shopLeg))->addMinutes(self::MEAL_MINUTES);
                 $home = $this->projectHomeArrival($shopping, $shop, $origin, $lunchTaken);
@@ -1496,7 +1519,7 @@ class ItineraryScheduleBuilder
      * sightseeing the day is just the journey, set off at the latest safe time, so no time is spent on stops that
      * would put the departure at risk.
      */
-    private function closeDepartureDay(Itinerary $itinerary, int $dayNumber, int &$sortOrder, Carbon $clock, array $here, bool $lunchTaken, $lastDestination, ?Carbon $date, bool $sawSights): void
+    private function closeDepartureDay(Itinerary $itinerary, int $dayNumber, int &$sortOrder, Carbon $clock, array $here, bool $lunchTaken, $lastDestination, ?Carbon $date, bool $sawSights, int $driven = 0): void
     {
         $d = $this->finalDayDeparture;
         $point = $d['place'];
@@ -1508,7 +1531,10 @@ class ItineraryScheduleBuilder
             $shopArrival = $this->toQuarterHour($this->toQuarterHour($clock->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES))->addMinutes($this->estimateLeg($here, $shop)['max_minutes']));
             $shopEnd = $shopArrival->copy()->addMinutes(self::MEAL_MINUTES);
 
-            if ($this->departureArrival($shopEnd, $shop)->greaterThan($deadline)) {
+            // The shop also counts against the day's driving ceiling, with the transfer to the departure point after it.
+            $shopDrive = $driven + $this->estimateLeg($here, $shop)['max_minutes'] + $this->estimateLeg($shop, $point)['max_minutes'];
+
+            if ($this->departureArrival($shopEnd, $shop)->greaterThan($deadline) || $shopDrive > self::MAX_DAILY_DRIVE_MINUTES) {
                 $suggestion = null;
             }
         }
@@ -1676,6 +1702,9 @@ class ItineraryScheduleBuilder
     /** Whether the current build() is planning a Remote (distance_pref 'far') trip. */
     private bool $remoteTrip = false;
 
+    /** Warning to put on the next sightseeing row (a stop whose drive alone is over the daily ceiling). */
+    private ?string $pendingActivityNote = null;
+
     /**
      * The latest stored start time of each day, and the days whose clock has run past midnight, both keyed
      * "itinerary-day". The schedule columns are `time` (no date), so a row after midnight would otherwise be
@@ -1693,6 +1722,11 @@ class ItineraryScheduleBuilder
     {
         $starts = $attributes['starts_at'] ?? null;
         $ends = $attributes['ends_at'] ?? null;
+
+        if ($this->pendingActivityNote !== null && ($attributes['kind'] ?? null) === 'activity' && ! empty($attributes['destination_id'])) {
+            $attributes['note'] = filled($attributes['note'] ?? null) ? $attributes['note'].' '.$this->pendingActivityNote : $this->pendingActivityNote;
+            $this->pendingActivityNote = null;
+        }
 
         // A row whose time precedes the one before it in the same day has crossed midnight, and so has every row
         // after it: those carry no time, only a note, rather than a time that reads as the next morning.
@@ -1866,13 +1900,13 @@ class ItineraryScheduleBuilder
         }
 
         if ($here['lat'] === null || $here['lng'] === null) {
-            $listing = \App\Models\SouvenirCenter::publiclyVisible()->availableForTrip()->orderByDesc('rating')->first();
+            $listing = \App\Support\OfficialOnlyMode::apply(\App\Models\SouvenirCenter::publiclyVisible()->availableForTrip())->orderByDesc('rating')->first();
 
             return $listing ? [...$candidates, ['listing' => $listing, 'rule' => null]] : $candidates;
         }
 
-        $listing = \App\Models\SouvenirCenter::publiclyVisible()
-            ->availableForTrip()
+        $listing = \App\Support\OfficialOnlyMode::apply(\App\Models\SouvenirCenter::publiclyVisible()
+            ->availableForTrip())
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->get()

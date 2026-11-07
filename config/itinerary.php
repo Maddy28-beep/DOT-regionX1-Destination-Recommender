@@ -4,6 +4,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Official-only mode
+    |--------------------------------------------------------------------------
+    |
+    | Off (the default): sample and unverified listings take part in planning, swaps, suggestions and the chatbot, always
+    | labelled as such. On (ITINERARY_OFFICIAL_ONLY=true): every candidate the system recommends or plans with must hold
+    | a genuine DOT accreditation record (App\Support\SampleData::restrictForPlanner). Browsing pages still list
+    | everything, with the labels. Turning it on shrinks the pool a lot until more official places are on file.
+    |
+    */
+
+    'official_only' => (bool) env('ITINERARY_OFFICIAL_ONLY', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Where the traveller sleeps
     |--------------------------------------------------------------------------
     |

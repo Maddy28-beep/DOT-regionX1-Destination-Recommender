@@ -72,6 +72,44 @@ class SampleData
         };
     }
 
+    /**
+     * The marker added to a name on plain-text surfaces (map popups, calendar files, CSV, pickers) where an HTML badge
+     * cannot go. Empty for an official record. The stored name is never changed: the 7 original sample places (Samal
+     * Island, Eden Nature Park, ...) carry no "[SAMPLE]" in their name, and this is what marks them everywhere else.
+     */
+    public static function suffix(string $status): string
+    {
+        return match ($status) {
+            self::SAMPLE => ' [SAMPLE]',
+            self::UNVERIFIED => ' [NOT YET VERIFIED]',
+            default => '',
+        };
+    }
+
+    /** A name with its provenance marker, unless it already carries one. */
+    public static function labelName(string $name, string $status): string
+    {
+        $suffix = self::suffix($status);
+
+        if ($suffix === '' || str_contains(mb_strtolower($name), trim(mb_strtolower($suffix)))) {
+            return $name;
+        }
+
+        return $name.$suffix;
+    }
+
+    /** The listing's name (or $text, when a different wording is wanted) with its provenance marker. */
+    public function labelledName(Model $listing, ?string $text = null): string
+    {
+        return self::labelName($text ?? (string) ($listing->name ?? ''), $this->status($listing));
+    }
+
+    /** Same, for a listing known only by kind and id (a report row). */
+    public function labelledNameOf(string $kind, int $id, string $name): string
+    {
+        return self::labelName($name, $this->statusOf($kind, $id));
+    }
+
     /** The sentence behind a badge (its tooltip). */
     public static function title(string $status): string
     {

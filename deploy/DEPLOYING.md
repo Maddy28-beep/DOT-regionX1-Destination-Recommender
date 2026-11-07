@@ -23,7 +23,7 @@ Afterwards, the read-only coverage check is `sudo -u www-data php artisan embedd
 
 ## Before and after any deploy
 
-* The script takes `pre-deploy-<time>-<sha>.sql.gz` in `/var/backups/exploredvo` (the latest 10 are kept) before it changes anything. Restore steps: `deploy/BACKUP-AND-RESTORE.md`.
+* The script takes `pre-deploy-<time>-<sha>.sql.gz` in `/var/backups/exploredvo` (the latest 10 are kept; hand-made `pre-*` copies such as `pre-cleanup-...` keep the latest 5) before it changes anything. Restore steps: `deploy/BACKUP-AND-RESTORE.md`.
 * Check `git diff <live sha> origin/main -- database` for new migrations first.
 * A deploy that must not change data of any kind (for example while a simulated-survey batch is being prepared) is the normal deploy above: migrations only add schema, and with no new migration `migrate` reports "Nothing to migrate".
 

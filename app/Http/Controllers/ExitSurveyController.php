@@ -123,7 +123,7 @@ class ExitSurveyController extends Controller
          */
         $placeOptions = collect($placeModels)
             ->flatMap(function (string $model, string $kind) {
-                $items = $this->labelDistinctly($model::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location']));
+                $items = $this->labelDistinctly($model::publiclyVisible()->orderBy('name')->get(['id', 'name', 'location']), $kind);
 
                 return $items->map(fn ($item) => [
                     'value' => "{$kind}:{$item->id}",
@@ -155,14 +155,18 @@ class ExitSurveyController extends Controller
      * went to. A listing with a name nobody else shares is left exactly as
      * it was.
      */
-    private function labelDistinctly(\Illuminate\Support\Collection $items): \Illuminate\Support\Collection
+    private function labelDistinctly(\Illuminate\Support\Collection $items, string $kind): \Illuminate\Support\Collection
     {
         $nameCounts = $items->countBy(fn ($item) => $item->name);
 
-        return $items->map(function ($item) use ($nameCounts) {
+        $sampleData = app(\App\Support\SampleData::class);
+
+        return $items->map(function ($item) use ($nameCounts, $sampleData, $kind) {
             $item->display_label = $nameCounts[$item->name] > 1 && filled($item->location)
                 ? "{$item->name} ({$item->location})"
                 : $item->name;
+            // A sample or unverified place says so in the picker, as it does everywhere else.
+            $item->display_label = $sampleData->labelledNameOf($kind, (int) $item->id, $item->display_label);
 
             return $item;
         });

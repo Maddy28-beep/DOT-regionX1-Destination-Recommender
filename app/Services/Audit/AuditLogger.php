@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 class AuditLogger
 {
     /** Form fields whose value is safe and useful to keep (a status, not personal text). */
-    private const VISIBLE_VALUES = ['operating_status', 'reopens_on', 'severity', 'status', 'is_accredited'];
+    private const VISIBLE_VALUES = ['operating_status', 'reopens_on', 'severity', 'status', 'is_accredited', 'decision', 'expiration_date'];
 
     /** Never recorded, not even by name. */
     private const NEVER = ['_token', '_method', 'password', 'password_confirmation', 'current_password'];
@@ -32,6 +32,9 @@ class AuditLogger
     {
         [$table, $recordId] = $this->subject($request);
 
+        // A record the request just created has no id in the address: the controller hands it over with auditRecord().
+        $recordId ??= $request->attributes->get('audit_record_id');
+
         $fields = collect(array_keys($request->except(self::NEVER)))->reject(fn ($k) => str_starts_with((string) $k, '_'))->values();
         $values = collect(self::VISIBLE_VALUES)
             ->filter(fn ($k) => $request->filled($k) && is_scalar($request->input($k)))
@@ -45,7 +48,7 @@ class AuditLogger
             $description .= ' | fields: '.$fields->take(20)->implode(', ');
         }
         if (is_array($request->input('ids'))) {
-            $description .= ' | records: '.count($request->input('ids'));
+            $description .= ' | records: '.count($request->input('ids')).' ('.collect($request->input('ids'))->filter(fn ($i) => is_scalar($i))->take(20)->implode(', ').')';
         }
 
         $this->record($admin->id, (string) ($request->route()?->getName() ?? $request->path()), $table, $recordId, $description);

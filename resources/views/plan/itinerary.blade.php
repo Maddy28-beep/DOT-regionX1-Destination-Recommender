@@ -380,6 +380,7 @@
                                 <span class="match-rank">{{ $match->rank }}</span>
                                 <div class="match-info">
                                     <a href="{{ route('destinations.show', $match->destination) }}">{{ $match->destination->name }}</a>
+                                    @if (app(\App\Support\SampleData::class)->isSample($match->destination))<x-sample-tag label="Sample data" title="Sample data, not DOT-verified: this place's accreditation number is a placeholder, not an official DOT number." />@endif
                                     <div class="match-bar-track">
                                         <div class="match-bar-fill match-bar-fill--{{ $tier }}" style="width: {{ min(100, max(0, $match->match_score / 5 * 100)) }}%;"></div>
                                     </div>

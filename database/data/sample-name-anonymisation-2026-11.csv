@@ -1,0 +1,17 @@
+table,id,name,new_name,reason
+destinations,57,Mainit Hot Springs Protected Landscape & Toyozu Mountain Resort [SAMPLE],Sample Hot Spring Mountain Resort [SAMPLE],names a private resort
+destinations,63,Calamba Farm Sea of Clouds [SAMPLE],Sample Highland Farm Cloud Viewpoint [SAMPLE],names a private farm
+destinations,65,Magnaga Waters Beach Resort [SAMPLE],Sample Coastal Beach Resort [SAMPLE],names a DOT-listed resort
+destinations,66,Passig Islet Aqua Eco Park [SAMPLE],Sample Islet Aqua Eco Park [SAMPLE],names a private park
+destinations,67,Camp Sabros [SAMPLE],Sample Mountain Camp [SAMPLE],names a private camp
+destinations,69,Kublai Art Garden (Agong House) [SAMPLE],Sample Art Garden House [SAMPLE],names a private attraction
+destinations,72,Jardin de Señorita Mountain Resort [SAMPLE],Sample Hillside Mountain Resort [SAMPLE],names a DOT-listed resort
+destinations,73,Montefrio Garden Resort [SAMPLE],Sample Garden Resort [SAMPLE],names a DOT-listed resort
+destinations,91,D' Bone Collector Museum [SAMPLE],Sample Private Natural History Museum [SAMPLE],names a private museum
+destinations,93,Jack's Ridge Resort and Shrine [SAMPLE],Sample Hilltop Resort and Shrine [SAMPLE],names a DOT-listed resort
+destinations,97,GAP Farming Resort [SAMPLE],Sample Farm Resort [SAMPLE],names a private resort
+accommodations,3,Paradise Island Park & Beach Resort,Sample Island Park & Beach Resort,names a DOT-listed resort
+restaurants,1,Marina Tuna Restaurant,Sample Seafood Grill Restaurant,names a real restaurant
+restaurants,2,Kublai Khan Mongolian Restaurant,Sample Mongolian Grill Restaurant,names a real restaurant
+restaurants,3,Blue Post Boiling Crabs & Shrimp,Sample Boiled Crab and Shrimp House,names a real restaurant
+souvenir_centers,2,Aldevinco Shopping Center,Sample Souvenir Shopping Center,names a real shopping center

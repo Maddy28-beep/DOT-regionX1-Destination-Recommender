@@ -86,7 +86,8 @@ class AdminReportsChartsTest extends TestCase
         // One bucket per day in the range, zero days included, and nothing from outside it.
         $this->assertSame(['2026-10-01', '2026-10-02', '2026-10-03', '2026-10-04', '2026-10-05'], $data['timeline']['labels']);
         $this->assertSame([0, 2, 0, 1, 0], $data['timeline']['values']);
-        $this->assertSame(['Inside Falls'], $data['top']['labels']);
+        // A place with no DOT accreditation record on file says so in the report.
+        $this->assertSame(['Inside Falls [NOT YET VERIFIED]'], $data['top']['labels']);
         $this->assertSame([2], $data['top']['values']);
         $this->assertStringNotContainsString('Outside Falls', json_encode($data));
         $this->assertSame(['Destination'], $data['breakdown']['labels']);
@@ -206,7 +207,9 @@ class AdminReportsChartsTest extends TestCase
         $response->assertOk();
         $csv = $response->streamedContent();
 
-        $this->assertSame("Place,Type,\"Unique Visitors\"\n\"CSV Falls\",Destination,2\n", $csv);
+        // The file opens with what it is made of, then the unchanged table (the place says it has no DOT record on file).
+        $this->assertStringContainsString('Data included', $csv);
+        $this->assertStringEndsWith("Place,Type,\"Unique Visitors\"\n\"CSV Falls [NOT YET VERIFIED]\",Destination,2\n", $csv);
         $this->assertStringNotContainsString('chart', strtolower($csv));
     }
 

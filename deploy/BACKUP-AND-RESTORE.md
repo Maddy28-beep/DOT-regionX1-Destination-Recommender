@@ -6,7 +6,7 @@
 |---|---|---|
 | The whole database (`daily-<time>.sql.gz`) | every night at 18:00 UTC (2:00 AM Philippine time), kept 14 days | on the server, in `/var/backups/exploredvo` |
 | Uploaded photos and files (`daily-<time>-uploads.tar.gz`) | same | same |
-| A database copy before every deploy and before data cleanups (`pre-deploy-...`, `pre-cleanup-...`) | each time | same |
+| A database copy before every deploy (`pre-deploy-...`, newest 10 kept) and before data cleanups (`pre-cleanup-...` and other hand-made `pre-*`, newest 5 kept; rotated by the next deploy) | each time | same |
 
 Backups on the server protect against mistakes (a bad update, a deleted record). They do **not**
 protect against losing the server itself, so copy them to your own PC:

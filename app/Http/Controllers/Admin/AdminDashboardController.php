@@ -737,8 +737,13 @@ class AdminDashboardController extends Controller
         $report = $this->buildReport($reportType, $from, $to);
         $filename = Str::slug($reportType).'-'.$from.'-to-'.$to.'.csv';
 
-        return response()->streamDownload(function () use ($report) {
+        return response()->streamDownload(function () use ($report, $reportType, $from, $to) {
             $out = fopen('php://output', 'w');
+            // What the figures are made of comes first, so the file cannot be read without it.
+            fputcsv($out, ['Report', $reportType]);
+            fputcsv($out, ['Date range', $from.' to '.$to]);
+            fputcsv($out, ['Data included', $report['data_note'] ?? '']);
+            fputcsv($out, []);
             fputcsv($out, $report['headers']);
             foreach ($report['rows'] as $row) {
                 fputcsv($out, array_map([self::class, 'csvSafe'], $row));
@@ -799,13 +804,41 @@ class AdminDashboardController extends Controller
         $start = \Illuminate\Support\Carbon::parse($from, 'Asia/Manila')->startOfDay()->utc()->toDateTimeString();
         $rangeEnd = \Illuminate\Support\Carbon::parse($to, 'Asia/Manila')->endOfDay()->utc()->toDateTimeString();
 
-        return match ($reportType) {
+        $report = match ($reportType) {
             'Exit Survey Responses' => $this->exitSurveyReport($start, $rangeEnd),
             'Accreditation Status' => $this->accreditationReport($start, $rangeEnd),
             'Destination Visits' => $this->destinationVisitsReport($start, $rangeEnd),
             'Trip Plans Created' => $this->tripPlansReport($start, $rangeEnd),
             default => $this->verifiedVisitsReport($from, $to),
         };
+
+        $report['data_note'] = $this->dataNote($reportType);
+
+        return $report;
+    }
+
+    /**
+     * What the figures in a report are made of, said on the screen, the print view and the CSV alike, so a number is never
+     * read as tourist behaviour when it is not.
+     */
+    private function dataNote(string $reportType): string
+    {
+        $placesNote = 'Places that are sample data are marked [SAMPLE]; places with no DOT accreditation record on file are marked [NOT YET VERIFIED].';
+
+        return match ($reportType) {
+            'Exit Survey Responses' => $this->simulatedNote(),
+            'Destination Visits' => $this->simulatedNote().' '.$placesNote,
+            'Accreditation Status' => 'Sample-data records are included, and each one is flagged in the Data column.',
+            'Trip Plans Created' => 'Every anonymous trip plan created in the range is counted. Plans have no simulated flag, so test plans made by staff are included.',
+            default => 'QR check-ins have no simulated flag: every scan in the range is counted, including scans of sample places and scans made while testing. '.$placesNote,
+        };
+    }
+
+    private function simulatedNote(): string
+    {
+        return request()->boolean('include_simulated')
+            ? 'Simulated demonstration survey rows ARE included in this report; they show how the system works and are not what visitors said.'
+            : 'Simulated demonstration survey rows are NOT included: real visitor responses only.';
     }
 
     /**
@@ -904,7 +937,7 @@ class AdminDashboardController extends Controller
             'headers' => ['Listing Type', 'Listing Name', 'Accreditation #', 'Status', 'Issue Date', 'Expiration Date', 'Data'],
             'rows' => $records->map(fn ($r) => [
                 ucfirst(str_replace('_', ' ', $r->listing_kind)),
-                $this->resolveListingName($r->listing_kind, $r->listing_id) ?? '—',
+                $this->resolveListingName($r->listing_kind, $r->listing_id, false) ?? '—',
                 $r->accreditation_number, $r->status,
                 optional($r->issue_date)->format('Y-m-d') ?? '—',
                 optional($r->expiration_date)->format('Y-m-d') ?? '—',
@@ -937,7 +970,8 @@ class AdminDashboardController extends Controller
         ];
     }
 
-    private function resolveListingName(string $kind, int $id): ?string
+    /** The listing's name for a report row, marked [SAMPLE] / [NOT YET VERIFIED] when it is not an official DOT record. */
+    private function resolveListingName(string $kind, int $id, bool $mark = true): ?string
     {
         $model = match ($kind) {
             'destination' => Destination::find($id),
@@ -949,6 +983,10 @@ class AdminDashboardController extends Controller
             default => null,
         };
 
-        return $model?->name;
+        if ($model === null) {
+            return null;
+        }
+
+        return $mark ? app(SampleData::class)->labelledName($model) : $model->name;
     }
 }

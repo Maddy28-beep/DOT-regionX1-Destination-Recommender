@@ -53,11 +53,11 @@ class DestinationEmbeddingService
         $amenities = $destination->tags->where('kind', 'amenity')->pluck('value')->filter()->implode(', ');
 
         return trim(implode('. ', array_filter([
-            $destination->name,
+            \App\Support\EmbeddingText::meaningOnly($destination->name),
             $destination->type,
             $categories !== '' ? 'Categories: '.$categories : null,
             $amenities !== '' ? 'Amenities: '.$amenities : null,
-            trim((string) $destination->description),
+            \App\Support\EmbeddingText::meaningOnly(trim((string) $destination->description)),
         ])));
     }
 

@@ -201,4 +201,23 @@ class PrivacyPurgeTest extends TestCase
         $scheduled = collect(app(Schedule::class)->events())->contains(fn ($e) => str_contains((string) $e->command, 'privacy:purge-anonymous-data'));
         $this->assertTrue($scheduled, 'the job must be on the daily schedule');
     }
+
+    public function test_every_run_leaves_a_log_line_even_when_nothing_was_removed_and_the_schedule_keeps_its_output(): void
+    {
+        \Illuminate\Support\Facades\Log::spy();
+
+        $this->artisan('privacy:purge-anonymous-data')->assertSuccessful();
+        \Illuminate\Support\Facades\Log::shouldHaveReceived('info')->withArgs(
+            fn ($message, $context = []) => $message === 'privacy:purge-anonymous-data' && ($context['removed'] ?? null) === true && ($context['itineraries'] ?? null) === 0 && isset($context['retention_days'])
+        )->once();
+
+        $this->artisan('privacy:purge-anonymous-data', ['--dry-run' => true])->assertSuccessful();
+        \Illuminate\Support\Facades\Log::shouldHaveReceived('info')->withArgs(
+            fn ($message, $context = []) => $message === 'privacy:purge-anonymous-data' && ($context['removed'] ?? null) === false
+        )->once();
+
+        $event = collect(app(Schedule::class)->events())->first(fn ($e) => str_contains((string) $e->command, 'privacy:purge-anonymous-data'));
+        $this->assertNotNull($event);
+        $this->assertStringEndsWith('privacy-purge.log', (string) $event->output, 'the scheduler appends each run to its own file');
+    }
 }

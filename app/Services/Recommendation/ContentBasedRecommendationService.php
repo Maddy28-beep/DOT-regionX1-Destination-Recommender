@@ -317,11 +317,11 @@ class ContentBasedRecommendationService
     {
         // Places closed on the traveller's dates (their own status, or a danger
         // advisory) are not candidates at all: a closed place must not be recommended.
-        $candidates ??= Destination::query()
+        $candidates ??= \App\Support\OfficialOnlyMode::apply(Destination::query()
             ->where('is_accredited', true)
             ->whereNull('archived_at')
             ->availableDuring(...$preference->travelWindow())
-            ->with('tags')
+            ->with('tags'))
             ->get();
 
         if ($candidates->isEmpty()) {
