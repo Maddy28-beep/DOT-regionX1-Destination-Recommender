@@ -112,6 +112,20 @@ class StayDistanceLimitTest extends TestCase
         $this->assertSame([$far->id], $this->eligible($this->preference(2), 1)[1]->pluck('id')->all());
     }
 
+    public function test_a_remote_trips_multi_night_planner_keeps_a_stay_on_the_way(): void
+    {
+        $onTheWay = $this->stay('Roadside Inn', 10);
+        $hub = $this->stay('Hub Inn', 140);
+        $this->setTripStops([140, 142]);
+        $preference = $this->preference(3);
+        $preference->update(['distance_pref' => 'far']);
+
+        $ids = $this->eligible($preference->fresh(), 2)[1]->pluck('id')->all();
+
+        $this->assertContains($onTheWay->id, $ids);
+        $this->assertContains($hub->id, $ids);
+    }
+
     public function test_with_no_stops_known_nothing_is_filtered(): void
     {
         $far = $this->stay('Distant Lodge', 100);

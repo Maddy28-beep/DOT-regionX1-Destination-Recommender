@@ -1216,14 +1216,17 @@ class ItineraryGenerationService
             }
         }
 
-        return $this->withinReachOfTrip($best);
+        // A Remote trip may sleep on the way (Stage C2 moves a late first night to a stay the traveller reaches in time, and
+        // stays can change as the trip moves on), so its multi-night planner keeps its own drive-time cost instead of this limit.
+        return $this->stayMode($preference) === 'far' ? $best : $this->withinReachOfTrip($best);
     }
 
     /** The stops (coordinates) of the trip being planned; every stay path is held to the same limit from them. */
     private ?\Illuminate\Support\Collection $tripStops = null;
 
     /**
-     * One rule for every path that chooses a stay: a stay more than STAY_MAX_KM from any stop of the trip is passed over. A
+     * One rule for every path that chooses a stay (the Remote multi-night planner excepted, see eligibleStays()): a stay more than
+     * STAY_MAX_KM from any stop of the trip is passed over. A
      * night that would be left with no stay at all keeps its stays, so a spread-out trip is never left without somewhere to sleep.
      *
      * @param  array<int, \Illuminate\Support\Collection<int, Accommodation>>  $byNight
