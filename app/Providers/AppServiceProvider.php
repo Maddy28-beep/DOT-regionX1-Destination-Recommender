@@ -97,6 +97,15 @@ class AppServiceProvider extends ServiceProvider
             Limit::perDay(40)->by('survey-day:'.$request->ip())->response($tooMany),
         ]);
 
+        // One counter per route. A plain 'throttle:N,M' keeps one counter per address for every route that uses it, so 12 chatbot
+        // messages used up 12 of the 20 QR check-ins an address was allowed. These keep the same limits, each with its own counter
+        // and the default 429 answer they always had.
+        RateLimiter::for('check-in', fn (Request $request) => Limit::perMinute(20)->by('check-in:'.$request->ip()));
+        RateLimiter::for('reviews', fn (Request $request) => Limit::perMinute(10)->by('reviews:'.$request->ip()));
+        RateLimiter::for('address-suggest', fn (Request $request) => Limit::perMinute(40)->by('address-suggest:'.$request->ip()));
+        RateLimiter::for('chatbot', fn (Request $request) => Limit::perMinute(30)->by('chatbot:'.$request->ip()));
+        RateLimiter::for('admin-search', fn (Request $request) => Limit::perMinute(90)->by('admin-search:'.($request->user('admin')?->getAuthIdentifier() ?? $request->ip())));
+
         // Heart / unheart buttons.
         RateLimiter::for('toggle', fn (Request $request) => Limit::perMinute(60)->by('toggle:'.$request->ip())->response($tooMany));
 
