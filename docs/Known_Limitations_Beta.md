@@ -13,3 +13,4 @@
 11. Chatbot: asking about a closed place gives a closure notice and no card.
 12. Stays: a stay more than 60 km from every stop is passed over, except on Remote trips.
 13. Sample (placeholder) places are labelled as samples.
+14. Package adoption ("Plan with this Package") is unavailable until partners publish day-by-day schedules. Today there are 5 live packages and 0 have schedule rows, so each package page offers "Plan My Trip" instead. The feature itself was tested on a restored copy with a schedule added.
