@@ -159,7 +159,7 @@ class AdminDashboardController extends Controller
                 ->orderByDesc('n')->orderBy('listing_id')
                 ->take(5)->get()
                 ->map(fn ($row) => [
-                    'name' => SampleData::displayName($this->resolveListingName($row->listing_kind, (int) $row->listing_id) ?? 'Removed listing'),
+                    'name' => SampleData::displayName($this->resolveListingName($row->listing_kind, (int) $row->listing_id, false) ?? 'Removed listing'),
                     'count' => (int) $row->n,
                 ])->all();
 

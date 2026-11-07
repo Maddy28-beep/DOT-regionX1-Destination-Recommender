@@ -77,7 +77,7 @@ class SampleLabelPlainTextTest extends TestCase
         }
 
         // Calendar lines fold at 75 bytes: unfold before reading the text.
-        $ics = preg_replace('/
+        $ics = preg_replace('/?
  /', '', app(ItineraryCalendar::class)->build($trip->fresh('items'), now()->addDays(3)->toDateString()));
 
         $this->assertStringContainsString('SUMMARY:Eden Nature Park [SAMPLE]', $ics);
