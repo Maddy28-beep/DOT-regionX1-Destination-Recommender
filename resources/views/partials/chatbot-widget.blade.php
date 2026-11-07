@@ -221,6 +221,9 @@
         .chatbot-toggle-badge svg { width: 11px; height: 11px; }
         .chatbot-hint { right: 64px; bottom: 8px; padding: 8px 12px; font-size: .82rem; }
         .chatbot-toggle[aria-expanded="true"] { visibility: hidden; }
+        /* While the page scrolls the button steps back (see the scroll handler below). */
+        .chatbot-widget .chatbot-toggle { transition: opacity .25s ease, transform .25s ease; }
+        .chatbot-widget.is-scrolling .chatbot-toggle { opacity: .35; transform: scale(.8); }
 
         body .chatbot-widget .chatbot-panel {
             position: fixed; left: 0; right: 0; bottom: var(--chat-kb, 0px); width: auto; max-width: none;
@@ -295,6 +298,21 @@
             }, 4000);
         }
     } catch (_) { /* storage can be unavailable; the hint still shows on hover */ }
+
+    // On a phone the button floats over whatever is at the bottom right (stats, card text, banner copy). While the page is
+    // moving it dims and shrinks (and the bubble goes away), and it comes back a moment after the scrolling stops, so the
+    // content reads clearly while you scroll and the button is still there when you want it.
+    var scrollTimer;
+    window.addEventListener('scroll', function () {
+        var widget = getWidget();
+        if (!widget || !getPanel().hidden) return;
+        if (!widget.classList.contains('is-scrolling')) {
+            widget.classList.add('is-scrolling');
+            hideHint();
+        }
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(function () { widget.classList.remove('is-scrolling'); }, 700);
+    }, { passive: true });
 
     // Keep the sheet on top of the on-screen keyboard: the visual viewport is what shrinks when it opens.
     var vv = window.visualViewport;

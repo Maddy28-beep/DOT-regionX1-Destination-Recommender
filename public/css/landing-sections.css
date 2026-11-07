@@ -178,7 +178,23 @@
    (still well past the 22px the next sheet slides over the bottom of this one). */
 @media (max-width: 640px) {
     .landing-section.section { padding-top: 40px; padding-bottom: 40px; }
-    .landing-section.about-region { padding-top: 36px; padding-bottom: 36px; }
+    .landing-section.about-region { padding-top: 40px; padding-bottom: 40px; }
+
+    /* One rhythm for every section heading on a phone. The kicker, the title and the sentence under it had picked up the
+       browser's default heading margins (about 20px each), so they floated apart and the title looked disconnected from the
+       content below. Now they read as one block: kicker, title and sentence close together, then a clear but shorter gap
+       to the cards. The two heading styles (dpost-head and section-head) share the same sizes. */
+    .landing-section .dpost-head,
+    .landing-section .section-head { margin-bottom: 20px; gap: 12px; }
+    .landing-section .dpost-kicker { margin: 0 0 4px; font-size: 1.1rem; line-height: 1.2; }
+    .landing-section .dpost-head h2,
+    .landing-section .section-head h2 { margin: 0 0 8px; font-size: 1.5rem; line-height: 1.2; }
+    .landing-section .dpost-head p,
+    .landing-section .section-head p { margin: 0; font-size: .95rem; line-height: 1.5; }
+
+    /* The same space between cards everywhere (the dining cards had 18px, the destination and package cards 12px). */
+    .landing-section .culinary__grid,
+    .landing-section .dpost-grid { gap: 14px; }
 }
 
 /* About Davao Region: on a phone the second paragraph folds behind "Read more" (public/js/read-more.js). */
