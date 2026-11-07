@@ -1609,7 +1609,9 @@ html:has(.site-topbar) { scroll-padding-top: calc(var(--site-topbar-height, 77px
     .menu-toggle-label { display: none; }
     .admin-menu-toggle { padding: 8px; }
     .header-actions { gap: 4px; }
-    .site-header .container.bar { padding-inline: 12px; }
+    /* Left edge lines up with the page content (20px). The right side stays at 12px because the menu button carries 8px of its own
+       padding, which puts the three lines 20px from the edge as well. */
+    .site-header .container.bar { padding-inline: 20px 12px; }
 }
 
 /* ---------- Poster hero ---------- */
@@ -3055,8 +3057,8 @@ select.site-dropdown-native {
 @media (max-width: 720px) {
     /* The phone version, compressed so the headline, the sentence and BOTH cards fit on one screen with nothing to scroll
        to: the spacing gives way first (the card padding, the gaps, the sentence's margins), never the buttons or the copy.
-       Warm coral-red at the top left easing to olive at the bottom right, a low sun's glow and a ridge along the foot of
-       the card. The reds are deep enough that the cream text clears 4.5:1 wherever it sits. */
+       Light orange easing to a soft olive at the bottom right, a low sun's glow and a ridge along the foot of the card,
+       with dark brown type that clears 4.5:1 wherever it sits. */
     .cta-banner {
         grid-template-columns: 1fr;
         align-items: start;
@@ -3064,29 +3066,40 @@ select.site-dropdown-native {
         padding: 18px 16px 70px;
         border-radius: 22px;
         background:
-            radial-gradient(70% 34% at 82% 97%, rgba(252, 227, 138, .30), rgba(252, 227, 138, 0) 70%),
-            radial-gradient(130% 75% at 100% 100%, rgba(91, 96, 53, .96) 0%, rgba(91, 96, 53, 0) 62%),
-            linear-gradient(150deg, #b53a14 0%, #a53515 58%, #8a4220 100%);
+            radial-gradient(70% 34% at 82% 97%, rgba(255, 236, 190, .55), rgba(255, 236, 190, 0) 70%),
+            radial-gradient(130% 75% at 100% 100%, rgba(150, 160, 96, .55) 0%, rgba(150, 160, 96, 0) 62%),
+            linear-gradient(155deg, #f8b27a 0%, #f4a265 58%, #eb9a62 100%);
     }
+    /* Light and warm: a soft orange card with dark brown type (not light type on a saturated red), no dot texture over the
+       text. The dark brown clears 7:1 on the orange; the buttons are the one deep colour so they stand out. */
+    .cta-banner > .halftone { display: none; }
+    .cta-banner .poster-kicker { color: #8a2f0f; }
+    .cta-banner h2 { color: #4a1c0b; }
+    .cta-banner > .cta-banner__copy > p { color: #3d1a0c; }
     .cta-banner__scene {
         width: 100%; height: 74px; top: auto; bottom: 0; opacity: .85;
         -webkit-mask-image: none; mask-image: none;
     }
     /* The artwork carries its own fade from the left (for the wide layout); in a bottom band the ridge runs the full width. */
     .cta-banner__scene g { mask: none; }
-    .cta-banner .poster-kicker { gap: 10px; margin-bottom: 6px; font-size: .72rem; letter-spacing: .16em; }
+    .cta-banner .poster-kicker { gap: 10px; margin-bottom: 12px; font-size: .72rem; letter-spacing: .16em; line-height: 1.2; }
     .cta-banner .poster-kicker::before { width: 26px; }
-    /* In the site's own BARABARA face: sized from the screen width so "DAVAO TRIP" fills the card on two lines. */
-    .cta-banner h2 { margin: 0 0 8px; font-size: clamp(1.9rem, 11.4vw, 3.2rem); line-height: .96; }
-    .cta-banner > .cta-banner__copy > p { font-size: .9rem; line-height: 1.42; }
+    /* In the site's own BARABARA face: sized from the screen width so "DAVAO TRIP" fills the card on two lines. The line
+       height leaves room for the tall letters so the title no longer runs into the small line above it. */
+    .cta-banner h2 { margin: 0 0 10px; font-size: clamp(1.9rem, 11.4vw, 3.2rem); line-height: 1.04; }
+    .cta-banner > .cta-banner__copy > p { font-size: .92rem; line-height: 1.5; }
     .cta-banner__paths { gap: 10px; }
     .cta-banner__path { padding: 14px 16px; border-radius: 14px; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
     /* Personalized itinerary: the lighter, more see-through glass. Tour packages: darker, less see-through. */
-    .cta-banner__path:first-child { background: rgba(255, 255, 255, .08); border-color: rgba(251, 244, 225, .46); }
-    .cta-banner__path:last-child { background: rgba(40, 30, 15, .30); border-color: rgba(251, 244, 225, .30); }
-    .cta-banner__path h3 { margin: 0 0 3px; font-size: 1.05rem; line-height: 1.25; }
-    .cta-banner__path p { margin: 0 0 10px; font-size: .85rem; line-height: 1.4; color: #fbf4e1; }
+    .cta-banner__path:first-child { background: rgba(255, 250, 240, .62); border-color: rgba(138, 47, 15, .22); }
+    .cta-banner__path:last-child { background: rgba(255, 250, 240, .30); border-color: rgba(138, 47, 15, .28); }
+    .cta-banner__path h3 { margin: 0 0 4px; font-size: 1.05rem; line-height: 1.25; color: #4a1c0b; }
+    .cta-banner__path p { margin: 0 0 10px; font-size: .86rem; line-height: 1.45; color: #3d1a0c; }
     .cta-banner .btn { min-height: 44px; padding: 10px 20px; }
+    .cta-banner .btn:not(.btn-ghost) { background: #a5381a; color: #fff6e6; box-shadow: none; }
+    .cta-banner .btn:not(.btn-ghost):hover { background: #8a2f0f; color: #fff6e6; }
+    .cta-banner .btn-ghost { border-color: #8a2f0f; color: #6b2711; background: transparent; }
+    .cta-banner .btn-ghost:hover { background: rgba(138, 47, 15, .1); color: #6b2711; border-color: #6b2711; }
 }
 @media (max-width: 720px) and (max-height: 700px) {
     /* A shorter phone: trim the spacing a little more, still never the copy or the buttons. */
