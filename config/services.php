@@ -39,7 +39,7 @@ return [
     // Get a key at https://console.groq.com/keys. If unset, the chatbot falls back to the
     // built-in rule-based responder automatically, so the feature never goes offline.
     'groq' => [
-        'key' => env('GROQ_API_KEY'),
+        'key' => env('GROQ_API_KEY') ?: null, // an empty value in .env means no key
         // Groq retires models regularly and llama-3.1-8b-instant now 404s, so
         // this default was as good as unset. Check what a key can actually
         // reach with GET https://api.groq.com/openai/v1/models before changing it.
