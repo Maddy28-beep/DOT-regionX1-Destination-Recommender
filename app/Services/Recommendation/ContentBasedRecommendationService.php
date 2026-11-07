@@ -112,6 +112,9 @@ class ContentBasedRecommendationService
      */
     private const NEUTRAL_SCORE = 3.0;
 
+    /** True when the catalogue has too few reviews for ratings and popularity to mean anything (see MIN_CATALOGUE_REVIEWS). */
+    private bool $reviewsAreInert = false;
+
     /** How many survey respondents reported visiting each candidate, as a fraction of the most visited (0 to 1). */
     private array $visitShare = [];
 
@@ -127,6 +130,15 @@ class ContentBasedRecommendationService
      * decays as real reviews accumulate.
      */
     private const REVIEW_PRIOR = 5;
+
+    /**
+     * Fewer reviews than this across the whole catalogue and ratings (RS) and popularity (PS) carry no information, so every
+     * place gets the neutral score (3.0) on both: no place is lifted or sunk by one or two reviews, and an unrated place no
+     * longer inherits the one rated place's mean (which used to put every unrated place at 5.0 when a single 5-star review
+     * existed). At or above the threshold the shrinkage below applies as before. The value is a decision, not a measurement:
+     * 30 reviews is about one per five places on a 150-place catalogue.
+     */
+    public const MIN_CATALOGUE_REVIEWS = 30;
 
     /**
      * How far to trust a distance derived from a region centroid rather than
@@ -340,6 +352,9 @@ class ContentBasedRecommendationService
 
         // STAGE 1: where can this trip go, before asking what it should
         // contain. See candidatesWithinRange().
+        // Counted over the whole catalogue (before the range filter) so the answer does not depend on the traveller's range.
+        $this->reviewsAreInert = (int) $candidates->sum('review_count') < self::MIN_CATALOGUE_REVIEWS;
+
         $candidates = $this->candidatesWithinRange($candidates, $preference);
 
         if ($candidates->isEmpty()) {
@@ -629,7 +644,6 @@ class ContentBasedRecommendationService
         return $matched / count($selectedActivities);
     }
 
-    /** Equation 4: Ratings Score = the destination's average rating (already on a 1-5 scale). */
     /**
      * Equation 4, with the unrated case handled honestly.
      *
@@ -642,6 +656,10 @@ class ContentBasedRecommendationService
     {
         $reviews = (int) $destination->review_count;
 
+        if ($this->reviewsAreInert) {
+            return self::NEUTRAL_SCORE;
+        }
+
         if ($reviews < 1) {
             return $catalogueMean;
         }
@@ -651,7 +669,6 @@ class ContentBasedRecommendationService
         return $catalogueMean + (((float) $destination->rating) - $catalogueMean) * $confidence;
     }
 
-    /** Equation 5: Popularity Score = review count relative to the highest in the candidate set, scaled to 1-5. */
     /**
      * Equation 5, shrunk the same way as the ratings factor.
      *
@@ -665,7 +682,7 @@ class ContentBasedRecommendationService
     {
         $reviews = (int) $destination->review_count;
 
-        if ($reviews < 1) {
+        if ($this->reviewsAreInert || $reviews < 1) {
             return self::NEUTRAL_SCORE;
         }
 
@@ -920,7 +937,15 @@ class ContentBasedRecommendationService
         };
     }
 
-    /** Equation 6: Amenities Score = proportion of tourist-selected amenities present at the destination, scaled to 1-5. */
+    /**
+     * Equation 6: Amenities Score, on a 3 to 5 range (not 1 to 5).
+     *
+     *   - no amenity requested            -> 5.0 (nothing to penalise)
+     *   - none of the requested ones is on record -> 3.0 (neutral: "not recorded" is not "missing")
+     *   - some are on record              -> 3.0 + proportion matched x 2.0 (all matched = 5.0)
+     *
+     * There is no way to score below 3.0: the factor can only lift a place, never push it down.
+     */
     private function amenitiesScore(Destination $destination, array $selectedAmenities): float
     {
         if (empty($selectedAmenities)) {
