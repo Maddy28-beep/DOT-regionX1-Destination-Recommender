@@ -79,4 +79,26 @@ class ChatbotClosedPlaceTest extends TestCase
             return str_contains($prompt, 'Bright Bay') && ! str_contains($prompt, 'Silver Cove');
         });
     }
+
+    public function test_a_closed_place_gets_no_card_but_an_open_one_does(): void
+    {
+        $this->place('Silver Cove', 'closed');
+        $this->place('Bright Bay');
+        Http::fake(['*' => Http::response(['choices' => [['message' => ['content' => 'Try Silver Cove or Bright Bay.']]]], 200)]);
+
+        $cards = collect($this->postJson('/chatbot/message', ['message' => 'Suggest something nice to do around Davao'])->json('cards'));
+
+        $this->assertSame(['Bright Bay'], $cards->pluck('name')->all());
+    }
+
+    public function test_asking_about_a_closed_place_by_name_says_it_is_closed_and_shows_no_card(): void
+    {
+        config(['services.groq.key' => null]);
+        $this->place('Silver Cove', 'closed');
+
+        $reply = $this->postJson('/chatbot/message', ['message' => 'Is Silver Cove open?']);
+
+        $this->assertStringContainsString('losed', (string) $reply->json('response'));
+        $this->assertSame([], $reply->json('cards'));
+    }
 }

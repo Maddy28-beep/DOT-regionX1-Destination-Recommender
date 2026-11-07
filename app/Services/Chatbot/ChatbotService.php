@@ -111,7 +111,9 @@ class ChatbotService
     {
         $listings = $source === 'groq' ? $this->listingsNamedIn($response) : $this->cardListings;
 
+        // A place that is closed (for good, for now, or under a closing advisory) gets no card: the words say so, and a card would invite a visit.
         return collect($listings)
+            ->reject(fn (array $pair) => in_array(HasOperatingStatus::class, class_uses_recursive($pair[0]), true) && $pair[0]->operatingNotice() !== null)
             ->take(self::MAX_CARDS)
             ->map(fn (array $pair) => $this->card($pair[0], $pair[1]))
             ->values()
