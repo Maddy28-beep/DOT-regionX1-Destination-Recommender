@@ -8,7 +8,7 @@
         <div class="container bar">
             <a href="{{ route('home') }}" class="brand poster-title">
                 <x-brand-mark class="brand-icon" />
-                Explore<span class="dot">DVO</span>
+                <span class="brand__name">Explore<span class="dot">DVO</span></span>
             </a>
 
             <nav class="main-nav" aria-label="Main navigation">
@@ -111,7 +111,7 @@
     <div class="mobile-menu__head">
         <a href="{{ route('home') }}" class="brand poster-title">
             <x-brand-mark class="brand-icon" />
-            Explore<span class="dot">DVO</span>
+            <span class="brand__name">Explore<span class="dot">DVO</span></span>
         </a>
         <button type="button" class="mobile-menu__close" id="mobileMenuClose" aria-label="Close menu">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>

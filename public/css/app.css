@@ -1049,6 +1049,13 @@ body.info-modal-open { overflow: hidden; }
 .brand { display: flex; align-items: center; gap: 8px; font-size: 1.35rem; color: var(--primary-dark); transition: color .2s ease; }
 .brand .dot { color: var(--accent); }
 .brand-icon { width: 36px; height: 36px; flex-shrink: 0; object-fit: contain; }
+/* The wordmark's letters should sit on the logo's centre line. BARABARA carries a lot of empty space under its capitals, and
+   iPhone Safari counts it differently from Chrome, so the letters rode a few pixels high there. Trimming the text box to the
+   capital letters makes the centring exact in every browser that supports it; Safari versions that do not get a small nudge. */
+.brand__name { text-box: trim-both cap alphabetic; }
+@supports (-webkit-hyphens: none) and (not (text-box: trim-both cap alphabetic)) {
+    .brand__name { position: relative; top: 5px; }
+}
 
 /*
    Spacing here is deliberately close to the original 14px/8px, not because
