@@ -268,11 +268,33 @@
    sentence under the headline and the "for every explorer" card are left out on a phone. The form starts in the first screen.
    Wide screens are unchanged. */
 @media (max-width: 720px) {
-    .portal-poster { gap: 16px; padding: 16px; min-height: 200px; justify-content: flex-end; }
+    .portal-poster { gap: 16px; padding: 16px; min-height: 230px; justify-content: flex-end; overflow: visible; }
     .portal-poster__intro { padding: 12px 14px; }
     .portal-poster__brand, .portal-poster__copy, .portal-poster__network { display: none; }
     .portal-poster__badge { font-size: .72rem; }
-    .portal-poster__headline { margin: 8px 0 0; font-size: 1.35rem; }
+    .portal-poster__headline { margin: 8px 0 0; font-size: 1.4rem; color: #fff; }
     .portal-signin__main { padding: 22px 20px 28px; }
+}
+
+/* Phones, second pass: the headline card hangs over the bottom edge of the photo (a negative bottom margin pulls it down onto
+   the form side), the picture gets a flat, even dark wash instead of a gradient, and the closing links are centred. The photo
+   itself is clipped to the band so the overhang is only the card. The form's top padding grows by the overhang so nothing
+   touches the card. The chat button is 76px and sits 20px from the corner, so the form keeps room under the last link. */
+@media (max-width: 720px) {
+    .portal-poster--photo { z-index: 1; }
+    .portal-poster__art { height: 100%; }
+    .portal-poster--photo::after { background: rgb(9 37 27 / 30%); }
+    .portal-poster__intro { position: relative; margin-bottom: -30px; background: rgb(11 59 42 / 94%); }
+    .portal-poster__badge { color: var(--portal-cream); }
+    .portal-signin__main { padding: 52px 20px 32px; }
+    .portal-signin__help, .portal-signin__partner { text-align: center; }
+    .portal-signin__partner a { font-weight: 700; white-space: nowrap; }
+    .portal-signin__subtitle, .portal-signin__help { text-wrap: balance; }
+    /* One line on a phone: a touch smaller, and no wrapping. */
+    .portal-signin__partner { font-size: .75rem; white-space: nowrap; }
+    .portal-signin--traveler .portal-signin__partner { margin-bottom: 8px; }
+    /* The same flat page background as every other page, not the green dotted one. */
+    .portal-signin { background: var(--bg); }
+    .portal-signin__card { box-shadow: 0 6px 24px #193e3014; }
 }
 
