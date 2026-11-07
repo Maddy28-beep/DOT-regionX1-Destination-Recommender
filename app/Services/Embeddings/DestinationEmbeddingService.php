@@ -215,6 +215,41 @@ class DestinationEmbeddingService
         return app(InterestEmbeddingService::class)->importRows($data['interests'] ?? []);
     }
 
+    /**
+     * What is wrong with a stored vector, or null when it can be used for similarity.
+     *
+     * A vector is unusable when it is empty, holds anything that is not a finite number, has no length (all zeros, so it
+     * points nowhere), or does not have the expected number of dimensions (similarity() would silently compare only the
+     * shorter prefix of two different-length vectors and return a meaningless number).
+     *
+     * @param  mixed  $vector
+     * @return string|null  empty | not_numeric | zero_length | wrong_dimensions
+     */
+    public static function vectorProblem(mixed $vector, ?int $expectedDimensions = null): ?string
+    {
+        if (! is_array($vector) || $vector === []) {
+            return 'empty';
+        }
+
+        $sum = 0.0;
+        foreach ($vector as $x) {
+            if ((! is_int($x) && ! is_float($x)) || ! is_finite((float) $x)) {
+                return 'not_numeric';
+            }
+            $sum += $x * $x;
+        }
+
+        if ($sum <= 0.0) {
+            return 'zero_length';
+        }
+
+        if ($expectedDimensions !== null && count($vector) !== $expectedDimensions) {
+            return 'wrong_dimensions';
+        }
+
+        return null;
+    }
+
     /** @param  array<int, float|int>  $v */
     public static function normalise(array $v): array
     {

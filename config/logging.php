@@ -73,6 +73,15 @@ return [
             'replace_placeholders' => true,
         ],
 
+        // The AI day-grouping's evaluations (accepted / rejected and why), one JSON line each. Empty while AI grouping is off.
+        'ai_skeleton' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ai-skeleton.log'),
+            'level' => 'info',
+            'days' => 30,
+            'replace_placeholders' => true,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

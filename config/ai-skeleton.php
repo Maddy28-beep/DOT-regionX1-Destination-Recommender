@@ -11,8 +11,10 @@
  */
 return [
     /*
-     * AI_SKELETON_ENABLED: unset = on only when a Groq key is configured; false = always off; true = on, but still
-     * never without a key. Raw env value, interpreted by AiSkeletonAdvisor::enabled().
+     * AI_SKELETON_ENABLED: OFF by default (beta: the deterministic planner alone decides the days, so identical answers
+     * give an identical trip). Unset, empty or false = off. true = on, and even then never without a Groq key. Raw env
+     * value, interpreted by AiSkeletonAdvisor::enabled(). To re-enable for a controlled test: AI_SKELETON_ENABLED=true in
+     * .env, then `php artisan config:cache`. Every evaluation is written to storage/logs/ai-skeleton-*.log.
      */
     'enabled' => env('AI_SKELETON_ENABLED'),
 
