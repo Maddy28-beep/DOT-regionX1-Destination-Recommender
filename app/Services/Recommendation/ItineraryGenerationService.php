@@ -150,6 +150,7 @@ class ItineraryGenerationService
         // now so it can be persisted, or it's gone once this method returns.
         $rangeTierUsed = $this->contentBased->lastRangeTierUsed;
         $rangeWidened = $this->contentBased->lastRangeWidened;
+        $rangeCapped = $this->contentBased->lastRangeCappedCount;
 
         if ($ranked->isEmpty()) {
             throw new \App\Exceptions\NoDestinationsAvailable();
@@ -254,7 +255,7 @@ class ItineraryGenerationService
             ? $this->pickStays($aiPlan['sequence'], $dayCapacities, $preference, $origin)
             : $this->pickAccommodation($aiPlan['sequence'], $preference));
 
-        return DB::transaction(function () use ($ai, $aiPlan, $aiStays, $routeAccommodationPick, $reserve, $preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
+        return DB::transaction(function () use ($ai, $aiPlan, $aiStays, $routeAccommodationPick, $reserve, $preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $rangeCapped, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
             // The schedule builder keeps why it turned each place away, per build; start this trip with none.
             $this->schedule->forgetRecordedAttempts();
 
@@ -265,6 +266,7 @@ class ItineraryGenerationService
                 'generated_at' => now(),
                 'range_tier_used' => $rangeTierUsed,
                 'range_widened' => $rangeWidened,
+                'range_capped_places' => $rangeCapped,
                 'swaps' => $swaps !== [] ? $swaps : null,
                 'day_themes' => $themes !== null ? ['days' => $themes['days'], 'summary' => $themes['summary']] : null,
             ]);

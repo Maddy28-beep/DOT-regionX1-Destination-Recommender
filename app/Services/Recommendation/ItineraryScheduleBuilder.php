@@ -234,6 +234,7 @@ class ItineraryScheduleBuilder
         // Every journey estimate this build makes is at the pace of how the traveller said they will get around.
         $this->transport = $preference->transport_pref;
         $this->remoteTrip = $preference->distance_pref === 'far';
+        $this->softDriveBudget = $this->driveBudget($preference);
         $this->pendingActivityNote = null;
         $this->mealRestaurants = null;
         $lastDay = array_key_last($dayCapacities);
@@ -1301,8 +1302,8 @@ class ItineraryScheduleBuilder
             $shopLeg = $this->estimateLeg($here, $shop)['max_minutes'];
             $homeLeg = $this->estimateLeg($shop, $origin)['max_minutes'];
 
-            if ($driven + $shopLeg + $homeLeg > self::MAX_DAILY_DRIVE_MINUTES) {
-                // The driving ceiling holds on every trip: the shop would take the day past it.
+            if ($driven + $shopLeg + $homeLeg > min(self::MAX_DAILY_DRIVE_MINUTES, $this->softDriveBudget)) {
+                // The day's driving budget holds on every trip, the shop and the way home included: the shop would take the day past it.
                 $souvenirs = null;
             } elseif ($this->remoteTrip) {
                 $shopping = $this->toQuarterHour($this->toQuarterHour($clock->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES))
@@ -1531,10 +1532,10 @@ class ItineraryScheduleBuilder
             $shopArrival = $this->toQuarterHour($this->toQuarterHour($clock->copy()->addMinutes(self::DEPARTURE_BUFFER_MINUTES))->addMinutes($this->estimateLeg($here, $shop)['max_minutes']));
             $shopEnd = $shopArrival->copy()->addMinutes(self::MEAL_MINUTES);
 
-            // The shop also counts against the day's driving ceiling, with the transfer to the departure point after it.
+            // The shop also counts against the day's driving budget, with the transfer to the departure point after it.
             $shopDrive = $driven + $this->estimateLeg($here, $shop)['max_minutes'] + $this->estimateLeg($shop, $point)['max_minutes'];
 
-            if ($this->departureArrival($shopEnd, $shop)->greaterThan($deadline) || $shopDrive > self::MAX_DAILY_DRIVE_MINUTES) {
+            if ($this->departureArrival($shopEnd, $shop)->greaterThan($deadline) || $shopDrive > min(self::MAX_DAILY_DRIVE_MINUTES, $this->softDriveBudget)) {
                 $suggestion = null;
             }
         }
@@ -1698,6 +1699,9 @@ class ItineraryScheduleBuilder
     }
     /** The TransportMode the current build() is planning for; null plans as a personal car. */
     private ?string $transport = null;
+
+    /** The current build()'s daily driving budget (3.5 / 5 / 7 hours by distance preference); a souvenir stop has to fit inside it too. */
+    private int $softDriveBudget = self::MAX_DAILY_DRIVE_MINUTES;
 
     /** Whether the current build() is planning a Remote (distance_pref 'far') trip. */
     private bool $remoteTrip = false;

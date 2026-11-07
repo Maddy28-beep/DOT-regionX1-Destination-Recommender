@@ -269,6 +269,7 @@ class TripPlannerController extends Controller
             'range_requested' => $preference->distance_pref,
             'range_tier_used' => $itinerary->range_tier_used,
             'range_widened' => $itinerary->range_widened,
+            'range_capped_places' => (int) $itinerary->range_capped_places,
         ];
 
         // The timeline shows each stop's photo and opening hours, so load them together rather than per row.

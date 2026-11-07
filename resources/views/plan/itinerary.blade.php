@@ -186,6 +186,14 @@
                             $lastDay = $itemsByDay->keys()->max();
                             $freeDays = $itemsByDay->filter(fn ($items, $d) => $d !== 1 && $d !== $lastDay && $items->where('kind', 'activity')->isEmpty())->count();
                         @endphp
+                        @if (($provenance['range_capped_places'] ?? 0) > 0 && ! $itinerary->package)
+                            <div class="itin-notice" role="note" style="margin:0 0 16px; padding:12px 16px; border-radius:12px; background:#fff7e6; border:1px solid #f0c36d;">
+                                <strong>We left out {{ $provenance['range_capped_places'] }} {{ \Illuminate\Support\Str::plural('place', $provenance['range_capped_places']) }} that are too far to visit in a day.</strong>
+                                There were not enough places inside your chosen range for a {{ $itinerary->total_days }}-day trip, so the search widened, but only to places you can drive to and back from within a day
+                                (about 8 hours of driving at most). Choosing a farther range lets the plan include them, one to a day.
+                            </div>
+                        @endif
+
                         @if ($freeDays > 0 && ! $itinerary->package)
                             <div class="itin-notice" role="note" style="margin:0 0 16px; padding:12px 16px; border-radius:12px; background:#fff7e6; border:1px solid #f0c36d;">
                                 <strong>{{ $freeDays }} {{ \Illuminate\Support\Str::plural('day', $freeDays) }} of this trip {{ $freeDays === 1 ? 'has' : 'have' }} no sightseeing planned.</strong>
