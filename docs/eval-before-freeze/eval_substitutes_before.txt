@@ -1,0 +1,19 @@
+trip stops: 2,67,102,144,3,5,110
+stop under test: #2 Eden Nature Park
+offered (top-10): 66(17.5km,74%) 150(39.1km,74%) 148(20.7km,72%) 11(13km,71%) 106(31.3km,71%) 116(43.7km,71%) 90(50.5km,71%) 65(55.9km,70%) 151(48.8km,70%) 72(15.8km,70%)
+max distance among offered = 55.9 km (limit 60)
+
+forged replacement -> would the swap endpoint accept? (re-evaluated AFTER the injected closures)
+  closed_for_good            id=52      accepted=no
+  temp_closed_no_reopen      id=60      accepted=no
+  danger_advisory            id=65      accepted=no
+  archived                   id=66      accepted=no
+  excluded_role              id=17      accepted=no
+  not_accredited             id=9       accepted=no
+  already_in_trip            id=67      accepted=no
+  far_over_60km              id=50      accepted=no
+  valid_but_rank_11_plus     id=105     accepted=YES  <-- FAIL  (valid place, just outside the 10 offered)
+  nonexistent_id             id=999999  accepted=no
+  the_stop_itself            id=2       accepted=no
+
+unmapped (no coordinates) plannable places with a vector: 0 ; offered despite unknown distance: 0

@@ -1,0 +1,27 @@
+Samal Island -> accommodation:70  co=3 support=0.60 confidence=0.75
+Samal Island -> restaurant:1  co=2 support=0.40 confidence=0.50
+(paper: Samal -> Altavista support 0.60, confidence 0.75; Samal -> Marina Tuna co=2 support 0.40 confidence 0.50)
+Altavista id=70 Marina id=1
+Eden -> anything with co>=2: 0 (T4 is the only basket with Eden, so co=1 and nothing qualifies)
+fields returned per rule: listing_kind, listing_id, co_count, support, confidence
+======
+== transactions by data_source ==
+  demo       transactions=787 visit rows=2602
+  real       transactions=2 visit rows=3
+  total surveys=789 visit rows=2605 distinct listing kinds: restaurant,package,accommodation,destination,souvenir_center
+  basket size: min=1 max=8 mean=3.33 ; baskets with 1 item=84, 2+=698, 3+=549
+
+== rule counts under the production thresholds ==
+  all sources (as the planner uses)  admin page (co>=2, conf>=15%):   750 | planner (co>=2, conf>=10%):   937 | every observed pair (co>=1):  5578
+  real only                          admin page (co>=2, conf>=15%):     0 | planner (co>=2, conf>=10%):     0 | every observed pair (co>=1):     6
+  itinerary only                     admin page (co>=2, conf>=15%):     0 | planner (co>=2, conf>=10%):     0 | every observed pair (co>=1):     0
+  demo only                          admin page (co>=2, conf>=15%):   749 | planner (co>=2, conf>=10%):   936 | every observed pair (co>=1):  5574
+  real+itinerary                     admin page (co>=2, conf>=15%):     0 | planner (co>=2, conf>=10%):     0 | every observed pair (co>=1):     6
+
+== independent recount (PHP brute force) vs service ==
+  brute-force rules=750  service rules (after dropping unresolvable listings)=750  mismatching/missing in service=0
+
+== what the planner actually receives ==
+  plannable destinations=104 ; destinations with >=1 usable stay rule=9, restaurant rule=65, souvenir rule=87 ; usable (destination->listing) rules=174
+  rules by source of the evidence for those pairs: real-only rules (co>=2,conf>=10%) = 0
+  (provenance split of planner-visible rules is reported above by source)

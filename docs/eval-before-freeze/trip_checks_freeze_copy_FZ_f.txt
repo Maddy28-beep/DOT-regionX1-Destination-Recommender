@@ -1,0 +1,58 @@
+injected: {"d_closed":4,"d_temp":4,"d_temp_mid":3,"d_archived":3,"d_excluded":3,"d_unaccredited":3,"d_danger":3,"a_closed":6,"a_temp":6,"a_archived":5,"a_unaccredited":5,"a_temp_mid":4,"r_closed":6,"r_temp":6,"r_archived":4,"s_closed":2,"s_temp":2,"s_archived":1,"r_danger":3}
+
+== stats ==
+{"trips":220,"stops":1200,"days":918,"by_dist":[],"groupings":220,"regrouped":162,"skipped_grouping":0,"max_drive":{"far":900,"moderate":660,"near":570},"over_budget_days":168,"over_budget_first_stop_only":0,"errors":0,"stay_nights_checked":{"far":236,"moderate":240,"near":222},"restaurant_rows":438,"souvenir_rows":72,"range_capped_trips":11,"range_capped_places":569,"range_capped_trips_nonremote":{"far":0,"moderate":3,"near":8},"souvenir_days":72,"stay_nights":698,"stay_changes":0,"trips_with_stay_change":47,"change_by_dist":{"far":55,"moderate":15,"near":1},"departure_trips":62,"stay_over_60km":{"far":7}}
+
+== failures by rule ==
+daily_drive_over_cap__single_stop_day(first stop exempt) 168 (distinct trips 73)
+    "day 2 drives 450 min (slow end, summed travel rows) vs cap 420 for \"far\"; 1 stops that day; hard ceiling 480; mode jeep"
+      input={"travel_days":5,"distance_pref":"far","transport_pref":"jeep","start_date":"2027-01-04T00:00:00.000000Z","arrival_time":"00:30","accommodation_pref":"Homestay","departure_time":null,"origin_label":null,"variation":0,"interests":["Shopping & Souvenirs","Beach & Island"],"id":1212}
+      day rows:
+        07:00 meal Breakfast — Sample West Island Homesta
+        08:00 travel Travel to Sample Coastal Mangrove Boar [44.3km 150-225min]
+        11:45-12:45 meal Lunch — Sample Seaside Eatery South [S
+        12:45-15:15 activity Nature walks and leisure activities
+        15:30 travel Travel to Sample West Island Homestay  [44.3km 150-225min]
+        19:15 meal Dinner — Sample West Island Homestay [
+        20:45 overnight Overnight stay
+    "day 3 drives 510 min (slow end, summed travel rows) vs cap 420 for \"far\"; 1 stops that day; hard ceiling 480; mode jeep"
+      input={"travel_days":5,"distance_pref":"far","transport_pref":"jeep","start_date":"2027-01-04T00:00:00.000000Z","arrival_time":"00:30","accommodation_pref":"Homestay","departure_time":null,"origin_label":null,"variation":0,"interests":["Shopping & Souvenirs","Beach & Island"],"id":1212}
+      day rows:
+        07:00 meal Breakfast — Sample West Island Homesta
+        08:00 travel Travel to Sample Coastal Fish Market & [58.1km 180-270min]
+        12:30-13:30 meal Lunch — Sample Coastal Fish Market & F
+        13:30-16:00 activity Cultural and heritage tour
+        16:15 travel Travel toward Sample Upland Homestay W [31.6km 84-135min]
+        18:30-19:30 meal Dinner — Sample Western Beach Grill [S
+        19:30 travel Travel to Sample Upland Homestay West  [24.5km 66-105min]
+        21:15 overnight Late check-in and overnight stay
+daily_drive_over_hard_ceiling_480__single_WITH_VISIBLE_WARNING(by design) 19 (distinct trips 8)
+    "day 3 drives 510 min; 1 stops; mode jeep"
+      input={"travel_days":5,"distance_pref":"far","transport_pref":"jeep","start_date":"2027-01-04T00:00:00.000000Z","arrival_time":"00:30","accommodation_pref":"Homestay","departure_time":null,"origin_label":null,"variation":0,"interests":["Shopping & Souvenirs","Beach & Island"],"id":1212}
+      day rows:
+        07:00 meal Breakfast — Sample West Island Homesta
+        08:00 travel Travel to Sample Coastal Fish Market & [58.1km 180-270min]
+        12:30-13:30 meal Lunch — Sample Coastal Fish Market & F
+        13:30-16:00 activity Cultural and heritage tour
+        16:15 travel Travel toward Sample Upland Homestay W [31.6km 84-135min]
+        18:30-19:30 meal Dinner — Sample Western Beach Grill [S
+        19:30 travel Travel to Sample Upland Homestay West  [24.5km 66-105min]
+        21:15 overnight Late check-in and overnight stay
+    "day 4 drives 570 min; 1 stops; mode personal_car"
+      input={"travel_days":6,"distance_pref":"far","transport_pref":"personal_car","start_date":"2026-12-30T00:00:00.000000Z","arrival_time":null,"accommodation_pref":"Homestay","departure_time":null,"origin_label":"Airport","variation":3,"interests":["Wildlife","Cultural Heritage","Hiking & Trekking"],"id":1225}
+      day rows:
+        07:00 meal Breakfast — Sample West Island Homesta
+        08:00 travel Travel to Sample Valley Craft & Pasalu [101.1km 195-285min]
+        12:45-13:45 meal Lunch — Arvie's Cafe
+        13:45-16:15 activity Cultural and heritage tour
+        16:30 travel Travel toward Sample West Island Homes [42.6km 82-120min]
+        18:30-19:30 meal Dinner — Pizzakaya - Maco (on the way)
+        19:30 travel Travel to Sample West Island Homestay  [58.5km 113-165min]
+        22:15 overnight Late check-in and overnight stay
+
+== F3 breakdown ==
+{"far":{"days":308,"multi_days":151,"single_days":121,"single_over_soft":32,"single_over_480":12,"none_days":36},"moderate":{"days":309,"none_days":37,"multi_days":156,"single_days":116,"single_over_soft":39,"single_over_480":4,"none_over_soft":1},"near":{"days":301,"multi_days":88,"single_days":173,"single_over_soft":96,"none_days":40,"single_over_480":3}}
+== F3 multi over soft cap ==
+[]
+== F3 solo over 480 ==
+[{"dist":"far","drive":510,"mode":"jeep","days":5,"trip":1212,"day":3},{"dist":"far","drive":570,"mode":"personal_car","days":6,"trip":1225,"day":4},{"dist":"far","drive":540,"mode":"personal_car","days":6,"trip":1225,"day":5},{"dist":"far","drive":540,"mode":"tour_operator","days":4,"trip":1241,"day":2},{"dist":"far","drive":540,"mode":"tour_operator","days":4,"trip":1241,"day":3},{"dist":"far","drive":540,"mode":"tour_operator","days":6,"trip":1286,"day":2},{"dist":"far","drive":510,"mode":"tour_operator","days":6,"trip":1286,"day":3},{"dist":"moderate","drive":570,"mode":"jeep","days":7,"trip":1294,"day":2},{"dist":"moderate","drive":570,"mode":"jeep","days":7,"trip":1294,"day":3},{"dist":"moderate","drive":600,"mode":"jeep","days":7,"trip":1294,"day":4},{"dist":"moderate","drive":660,"mode":"jeep","days":7,"trip":1294,"day":5},{"dist":"near","drive":510,"mode":"personal_car","days":6,"trip":1371,"day":3},{"dist":"far","drive":690,"mode":"jeep","days":7,"trip":1374,"day":2},{"dist":"far","drive":690,"mode":"jeep","days":7,"trip":1374,"day":3},{"dist":"far","drive":690,"mode":"jeep","days":7,"trip":1374,"day":4},{"dist":"far","drive":900,"mode":"jeep","days":7,"trip":1374,"day":5},{"dist":"far","drive":840,"mode":"jeep","days":7,"trip":1374,"day":6},{"dist":"near","drive":570,"mode":"jeep","days":4,"trip":1397,"day":2},{"dist":"near","drive":570,"mode":"jeep","days":4,"trip":1397,"day":3}]

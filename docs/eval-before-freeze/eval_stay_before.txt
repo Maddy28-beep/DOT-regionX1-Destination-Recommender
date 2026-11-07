@@ -1,0 +1,6 @@
+seed=2026 requested=150 trips per variant (rolled back)
+  farthest + total (shipped)   generated=150 measurable=150 trips with a stop >50 km from the stay:  25 (16.7%) | mean farthest stop 26.1 km | mean distance per stop 13.6 km
+  total distance alone         generated=150 measurable=150 trips with a stop >50 km from the stay:  25 (16.7%) | mean farthest stop 26.1 km | mean distance per stop 13.6 km
+seed=7 requested=150 trips per variant (rolled back)
+  farthest + total (shipped)   generated=150 measurable=150 trips with a stop >50 km from the stay:  29 (19.3%) | mean farthest stop 28.4 km | mean distance per stop 14.0 km
+  total distance alone         generated=150 measurable=150 trips with a stop >50 km from the stay:  29 (19.3%) | mean farthest stop 28.4 km | mean distance per stop 14.0 km

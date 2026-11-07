@@ -1,0 +1,126 @@
+Run: 2026-11-07 18:32:24 UTC | start date 2026-12-14 | destinations 151
+
+==== RANGE Close Proximity (near): TABLE 7 / TABLE 8 (top 5 of 54 candidates) ====
+  Destination                                            PM   RS   PS   DS   AS |   DRS Rank
+  109 Sample North Coast Heritage Park [sample]        3.86 3.00 3.00 5.00 5.00 |  3.86 1
+  106 Sample Island Mangrove Boardwalk [sample]        3.73 3.00 3.00 5.00 5.00 |  3.82 2
+  102 Sample Upland Botanical Park [sample]            3.92 3.00 3.00 3.00 5.00 |  3.58 3
+  144 Sample Highland Flower Park [sample]             3.78 3.00 3.00 3.00 5.00 |  3.53 4
+  2 Eden Nature Park [sample]                          3.75 3.00 3.00 3.00 5.00 |  3.52 5
+
+  -- TABLE 12 (Close Proximity): generated itinerary --
+  Day 1 | 08:00:00      | baseline  | Planned arrival
+  Day 1 | 08:30:00 - 09:15:00 | meal      | Breakfast — New Davao Famous Restaurant Corp
+  Day 1 | 09:15:00      | travel    | Travel to Sample North Coast Heritage Park [SAMPLE] | 2.2 km, 45-45 min
+  Day 1 | 10:00:00 - 12:30:00 | activity  | Cultural and heritage tour
+  Day 1 | 12:30:00 - 13:30:00 | meal      | Lunch — Sample North Port Eatery [SAMPLE]
+  Day 1 | 13:30:00      | travel    | Travel to Sample Island Mangrove Boardwalk [SAMPLE] | 1.2 km, 15-15 min
+  Day 1 | 13:45:00 - 16:15:00 | activity  | Nature walks and leisure activities
+  Day 1 | 16:30:00      | travel    | Travel to Mergrande Beach Resort | 23.7 km, 75-90 min
+  Day 1 | 18:00:00 - 18:30:00 | free      | Free time until dinner
+  Day 1 | 18:30:00      | meal      | Dinner — Mergrande Beach Resort
+  Day 1 | 20:00:00      | overnight | Overnight stay
+  Day 2 | 07:00:00      | meal      | Breakfast — Mergrande Beach Resort
+  Day 2 | 08:00:00      | travel    | Travel to Eden Nature Park | 18.8 km, 45-60 min
+  Day 2 | 09:00:00 - 11:30:00 | activity  | Nature and adventure activities
+  Day 2 | 11:30:00 - 12:30:00 | meal      | Lunch — Eden Nature Park Restaurant
+  Day 2 | 12:30:00      | travel    | Travel to Malagos Garden Resort | 23.6 km, 45-60 min
+  Day 2 | 13:30:00 - 16:00:00 | activity  | Nature walks and leisure activities
+  Day 2 | 16:15:00      | travel    | Travel to Mergrande Beach Resort | 27.2 km, 45-75 min
+  Day 2 | 17:30:00 - 18:30:00 | free      | Free time until dinner
+  Day 2 | 18:30:00      | meal      | Dinner — Mergrande Beach Resort
+  Day 2 | 20:00:00      | overnight | Overnight stay
+  Day 3 | 07:00:00      | meal      | Breakfast — Mergrande Beach Resort
+  Day 3 | 08:00:00      | travel    | Travel to Sample Upland Botanical Park [SAMPLE] | 1.6 km, 15-15 min
+  Day 3 | 08:15:00 - 10:45:00 | activity  | Nature walks and leisure activities
+  Day 3 | 11:00:00      | travel    | Travel to Apo Ni Lola Durian Delicacies | 5.7 km, 15-30 min
+  Day 3 | 11:30:00 - 12:30:00 | activity  | Souvenir shopping
+  Day 3 | 12:30:00 - 13:30:00 | meal      | Lunch — Jack's Ridge Resort and Restaurant
+  Day 3 | 13:45:00      | travel    | Travel to Francisco Bangoy International Airport | 14.5 km, 30-45 min
+  Day 3 | 14:30:00      | departure | Departure
+
+==== RANGE Commutable (moderate): TABLE 7 / TABLE 8 (top 5 of 54 candidates) ====
+  Destination                                            PM   RS   PS   DS   AS |   DRS Rank
+  102 Sample Upland Botanical Park [sample]            4.67 3.00 3.00 5.00 5.00 |  4.10 1
+  144 Sample Highland Flower Park [sample]             4.53 3.00 3.00 5.00 5.00 |  4.06 2
+  2 Eden Nature Park [sample]                          4.50 3.00 3.00 5.00 5.00 |  4.05 3
+  5 Malagos Garden Resort [sample]                     4.37 3.00 3.00 5.00 5.00 |  4.01 4
+  110 Sample East Reef Marine Learning Park [sample]   4.25 3.00 3.00 5.00 5.00 |  3.98 5
+
+  -- TABLE 12 (Commutable): generated itinerary --
+  Day 1 | 08:00:00      | baseline  | Planned arrival
+  Day 1 | 08:30:00 - 09:15:00 | meal      | Breakfast — New Davao Famous Restaurant Corp
+  Day 1 | 09:15:00      | travel    | Travel to Sample Upland Botanical Park [SAMPLE] | 20.1 km, 45-60 min
+  Day 1 | 10:15:00 - 12:45:00 | activity  | Nature walks and leisure activities
+  Day 1 | 12:45:00 - 13:45:00 | meal      | Lunch — Sample Upland Botanical Park [SAMPLE] Restaurant
+  Day 1 | 13:45:00      | travel    | Travel to Sample Highland Flower Park [SAMPLE] | 39.8 km, 75-105 min
+  Day 1 | 15:30:00 - 18:00:00 | activity  | Nature walks and leisure activities
+  Day 1 | 18:15:00 - 19:15:00 | meal      | Dinner — Sample Highland Restaurant South [SAMPLE]
+  Day 1 | 19:15:00      | travel    | Travel to Mergrande Beach Resort | 38.2 km, 60-105 min
+  Day 1 | 21:00:00      | overnight | Late check-in and overnight stay
+  Day 2 | 07:00:00      | meal      | Breakfast — Mergrande Beach Resort
+  Day 2 | 08:00:00      | travel    | Travel to Museo Dabawenyo [SAMPLE] | 12.1 km, 30-45 min
+  Day 2 | 09:00:00 - 11:30:00 | activity  | Cultural and heritage tour
+  Day 2 | 11:30:00 - 12:30:00 | meal      | Lunch — Tsuru Incorporated(Camus)
+  Day 2 | 12:30:00      | travel    | Travel to Sample East Reef Marine Learning Park [SAMPLE] | 18.7 km, 75-90 min
+  Day 2 | 14:00:00 - 16:00:00 | activity  | Wildlife exploration
+  Day 2 | 16:15:00      | travel    | Travel to Mergrande Beach Resort | 29.7 km, 90-105 min
+  Day 2 | 18:00:00 - 18:30:00 | free      | Free time until dinner
+  Day 2 | 18:30:00      | meal      | Dinner — Mergrande Beach Resort
+  Day 2 | 20:00:00      | overnight | Overnight stay
+  Day 3 | 07:00:00      | meal      | Breakfast — Mergrande Beach Resort
+  Day 3 | 08:00:00      | travel    | Travel to Eden Nature Park | 18.8 km, 45-60 min
+  Day 3 | 09:00:00 - 11:30:00 | activity  | Nature and adventure activities
+  Day 3 | 11:30:00 - 12:30:00 | meal      | Lunch — Eden Nature Park Restaurant
+  Day 3 | 12:30:00      | travel    | Travel to Malagos Garden Resort | 23.6 km, 45-60 min
+  Day 3 | 13:30:00 - 15:00:00 | activity  | Nature walks and leisure activities
+  Day 3 | 15:15:00      | travel    | Travel to Godel Agriventures Inc | 1.4 km, 15-15 min
+  Day 3 | 15:30:00 - 16:30:00 | activity  | Souvenir shopping
+  Day 3 | 16:45:00      | travel    | Travel to Francisco Bangoy International Airport | 33.4 km, 60-90 min
+  Day 3 | 18:15:00      | departure | Departure
+
+  -- SWAP EXAMPLE: stop 102 Sample Upland Botanical Park [sample] --
+     offered: 111 Sample Island Highland Garden [sample] | similarity 89% | 17.7 km away
+     offered: 150 Sample Cave & River Park [sample] | similarity 86% | 47.6 km away
+     offered: 151 Sample Southern Coastal Eco Park [sample] | similarity 85% | 53.5 km away
+
+  -- THEME-DAY EXAMPLE (Commutable) --
+     summary: {"regrouped":true,"mean_similarity_before":71,"mean_similarity_after":76,"distance_before_km":111.3,"distance_after_km":111.8,"types_per_day_before":2,"types_per_day_after":1.67}
+     days: {"1":{"label":"Cool Climate day","similarity":91,"stops":[102,144]},"2":{"label":"Mixed day","similarity":63,"stops":[92,110]},"3":{"label":"Nature day","similarity":73,"stops":[2,5]}}
+
+==== RANGE Remote (far): TABLE 7 / TABLE 8 (top 5 of 106 candidates) ====
+  Destination                                            PM   RS   PS   DS   AS |   DRS Rank
+  135 Sample Southern Coastal Viewpoint [sample]       4.34 3.00 3.00 5.00 5.00 |  4.00 1
+  122 Sample Highland Tiered Falls & Trail [sample]    4.28 3.00 3.00 5.00 5.00 |  3.99 2
+  130 Sample Coastal Mangrove & River Park [sample]    4.28 3.00 3.00 5.00 5.00 |  3.98 3
+  125 Sample Eastern River Falls Park [sample]         4.19 3.00 3.00 5.00 5.00 |  3.96 4
+  126 Sample Highland View Park [sample]               4.19 3.00 3.00 5.00 5.00 |  3.96 5
+
+  -- TABLE 12 (Remote): generated itinerary --
+  Day 1 | 08:00:00      | baseline  | Planned arrival
+  Day 1 | 08:30:00 - 09:15:00 | meal      | Breakfast — New Davao Famous Restaurant Corp
+  Day 1 | 09:15:00      | travel    | Travel to JKM Mini Zoo | 65.9 km, 105-165 min
+  Day 1 | 12:00:00 - 13:00:00 | meal      | Lunch break (your choice)
+  Day 1 | 13:00:00 - 15:30:00 | activity  | Wildlife exploration
+  Day 1 | 15:30:00      | travel    | Travel to Sample Highland Hot Spring Garden [SAMPLE] | 19.8 km, 45-60 min
+  Day 1 | 16:30:00 - 18:00:00 | activity  | Nature walks and leisure activities
+  Day 1 | 18:15:00 - 19:15:00 | meal      | Dinner break (your choice)
+  Day 1 | 19:15:00      | travel    | Travel to Sample Coastal Beach Resort North [SAMPLE] | 35.1 km, 60-90 min
+  Day 1 | 20:45:00      | overnight | Late check-in and overnight stay
+  Day 2 | 07:00:00      | meal      | Breakfast — Sample Coastal Beach Resort North [SAMPLE]
+  Day 2 | 08:00:00      | travel    | Travel to Kapalong Cave System (Okbot & Sua Caves) [SAMPLE] | 38.0 km, 60-105 min
+  Day 2 | 09:45:00 - 12:15:00 | activity  | Nature and adventure activities
+  Day 2 | 12:15:00 - 13:15:00 | meal      | Lunch break (your choice)
+  Day 2 | 13:15:00      | travel    | Travel to Sample Valley Craft & Pasalubong Market [SAMPLE] | 40.3 km, 75-105 min
+  Day 2 | 15:00:00 - 17:30:00 | activity  | Cultural and heritage tour
+  Day 2 | 18:00:00 - 19:00:00 | meal      | Dinner — Sample Valley Home Kitchen (split) [SAMPLE]
+  Day 2 | 19:00:00      | travel    | Travel to Sample Coastal Beach Resort North [SAMPLE] | 48.3 km, 90-120 min
+  Day 2 | 21:00:00      | overnight | Late check-in and overnight stay
+  Day 3 | 07:00:00      | meal      | Breakfast — Sample Coastal Beach Resort North [SAMPLE]
+  Day 3 | 08:00:00      | travel    | Travel to Sample Valley Hot Spring Pools [SAMPLE] | 45.5 km, 75-120 min
+  Day 3 | 10:00:00 - 12:30:00 | activity  | Nature walks and leisure activities
+  Day 3 | 12:30:00 - 13:30:00 | meal      | Lunch — Sample Valley Hot Spring Pools [SAMPLE] Restaurant
+  Day 3 | 13:45:00      | travel    | Travel to Sample Valley Craft Market [SAMPLE] | 11.0 km, 30-30 min
+  Day 3 | 14:15:00 - 15:15:00 | activity  | Souvenir shopping
+  Day 3 | 15:30:00      | travel    | Travel to Francisco Bangoy International Airport | 82.6 km, 135-210 min
+  Day 3 | 19:00:00      | departure | Departure
