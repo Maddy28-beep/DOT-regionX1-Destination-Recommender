@@ -60,7 +60,17 @@ class ItineraryCalendar
                 default => $item->title,
             };
 
+            // Plain text cannot carry a badge: a sample or unverified place is marked in the event title itself.
+            $sampleData = app(\App\Support\SampleData::class);
+            $marked = $listing instanceof \Illuminate\Database\Eloquent\Model && $sampleData->status($listing) !== \App\Support\SampleData::OFFICIAL;
             $description = trim($item->title !== $summary ? $item->title : '');
+            if ($marked) {
+                $summary = \App\Support\SampleData::labelName($summary, $sampleData->status($listing));
+            }
+
+            if ($marked) {
+                $description .= ($description !== '' ? "\n" : '').'This place is '.mb_strtolower(\App\Support\SampleData::label($sampleData->status($listing))).' (not an official DOT record).';
+            }
             $description .= ($description !== '' ? "\n" : '').'Planned by ExploreDVO. Times are estimates, so check opening hours before you go.';
 
             $lines[] = 'BEGIN:VEVENT';

@@ -104,6 +104,7 @@ class ItineraryGenerationService
         // Every place picked below is checked against the traveller's own dates.
         TravelWindow::set(...$preference->travelWindow());
         $this->regionNames = null;
+        $this->stayMinutesMemo = [];
 
         try {
             return $this->generateWithinWindow($preference, $originLat, $originLng, $swaps);
@@ -150,6 +151,7 @@ class ItineraryGenerationService
         // now so it can be persisted, or it's gone once this method returns.
         $rangeTierUsed = $this->contentBased->lastRangeTierUsed;
         $rangeWidened = $this->contentBased->lastRangeWidened;
+        $rangeCapped = $this->contentBased->lastRangeCappedCount;
 
         if ($ranked->isEmpty()) {
             throw new \App\Exceptions\NoDestinationsAvailable();
@@ -207,6 +209,9 @@ class ItineraryGenerationService
             }
         }
 
+        // Every stay chosen for this trip, on any path, is held to the same distance from the trip's stops (see tooFarFromTrip()).
+        $this->tripStops = $this->mappedStopCoordinates($sequence);
+
         /*
          * Theme-based days (pretrained embeddings): decide which stops share a day
          * so that a day's places are alike, within a travelling limit. The stops
@@ -215,6 +220,8 @@ class ItineraryGenerationService
          */
         $routeSequence = $sequence;
         $themes = $this->themeDays->group($sequence, $dayCapacities, $origin);
+        $themeSkip = $this->themeDays->skipReason(); // set (and logged) when a missing or unusable vector kept the plain order
+        $guardReverted = false; // set below when the Theme Guard puts the plain order back
         $themedSequence = ($themes !== null && $themes['sequence'] !== $routeSequence) ? $themes['sequence'] : null;
         if ($themes !== null) {
             $sequence = $themes['sequence'];
@@ -248,13 +255,15 @@ class ItineraryGenerationService
          * grouping and stays within its travelling limit; the transaction below still has to prove the built plan is no
          * worse before it is kept. Disabled, failed, slow or invalid: $aiPlan stays null and nothing below changes.
          */
+        // Ties this generation's AI evaluation (if any) to its log line. Random, carries nothing about the traveller.
+        $correlationId = (string) \Illuminate\Support\Str::uuid();
         $ai = ($this->aiSkeleton ?? app(AiSkeletonAdvisor::class))->advise($preference, $sequence, $routeSequence, $dayCapacities, $origin);
         $aiPlan = $ai['plan'];
         $aiStays = $aiPlan === null ? null : ($totalDays >= 2
             ? $this->pickStays($aiPlan['sequence'], $dayCapacities, $preference, $origin)
             : $this->pickAccommodation($aiPlan['sequence'], $preference));
 
-        return DB::transaction(function () use ($ai, $aiPlan, $aiStays, $routeAccommodationPick, $reserve, $preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
+        return DB::transaction(function () use (&$guardReverted, $themeSkip, $correlationId, $ai, $aiPlan, $aiStays, $routeAccommodationPick, $reserve, $preference, $totalDays, $ranked, $sequence, $dayCapacities, $origin, $rangeTierUsed, $rangeWidened, $rangeCapped, $accommodationPick, $swaps, $themes, $routeSequence, $themedSequence) {
             // The schedule builder keeps why it turned each place away, per build; start this trip with none.
             $this->schedule->forgetRecordedAttempts();
 
@@ -265,6 +274,7 @@ class ItineraryGenerationService
                 'generated_at' => now(),
                 'range_tier_used' => $rangeTierUsed,
                 'range_widened' => $rangeWidened,
+                'range_capped_places' => $rangeCapped,
                 'swaps' => $swaps !== [] ? $swaps : null,
                 'day_themes' => $themes !== null ? ['days' => $themes['days'], 'summary' => $themes['summary']] : null,
             ]);
@@ -334,6 +344,7 @@ class ItineraryGenerationService
                     || ($preference->distance_pref === 'far' && $themedPlaced === $routePlaced && $this->feasibilityCost($itinerary) > $routeCost);
 
                 if ($routeWins) {
+                    $guardReverted = true;
                     $itinerary->items()->delete();
                     $itinerary->unsetRelation('items');
                     $stays = $routeStays;
@@ -351,8 +362,9 @@ class ItineraryGenerationService
             }
 
             $aiApplied = false;
+            $aiGuard = null;
             if ($aiPlan !== null) {
-                $aiApplied = $this->tryAiSkeleton($itinerary, $build, $stays, $built, $sequence, $aiPlan, $aiStays);
+                $aiApplied = $this->tryAiSkeleton($itinerary, $build, $stays, $built, $sequence, $aiPlan, $aiStays, $aiGuard);
             }
 
             if ($totalDays >= 2 && $this->stayMode($preference) === 'far') {
@@ -381,6 +393,14 @@ class ItineraryGenerationService
 
             if ($ai['attempted']) {
                 $this->recordAiSkeleton($itinerary, $ai, $aiApplied ? $aiPlan : null);
+                $this->logAiEvaluation($correlationId, $itinerary, $ai, $aiApplied, $aiGuard, [
+                    'engine' => $themes === null ? 'route_order' : 'theme_day_grouper',
+                    'ran' => $themes !== null,
+                    'regrouped' => $themedSequence !== null,
+                    'reverted_by_guard' => $guardReverted,
+                    'skipped_for' => $themeSkip,
+                    'stops' => count($routeSequence),
+                ]);
             }
 
             return $itinerary->load(['matches.destination', 'items.destination', 'items.accommodation']);
@@ -396,7 +416,7 @@ class ItineraryGenerationService
      * @param  array<string, mixed>  $aiPlan
      * @param  array<int, array<string, mixed>>  $sequence  replaced by the AI sequence when it is kept
      */
-    private function tryAiSkeleton(Itinerary $itinerary, callable $build, ?array &$stays, array &$built, array &$sequence, array $aiPlan, ?array $aiStays): bool
+    private function tryAiSkeleton(Itinerary $itinerary, callable $build, ?array &$stays, array &$built, array &$sequence, array $aiPlan, ?array $aiStays, ?array &$guard = null): bool
     {
         $snapshot = $itinerary->items()->orderBy('id')->get()->map(fn ($r) => $r->getAttributes())->all();
         $placed = fn (): int => $itinerary->items()->whereNotNull('destination_id')->distinct()->count('destination_id');
@@ -409,7 +429,14 @@ class ItineraryGenerationService
         $stays = $aiStays;
         $build($aiPlan['sequence']);
 
-        if ($placed() >= $plannerPlaced && $this->feasibilityCost($itinerary) <= $plannerCost) {
+        $aiPlaced = $placed();
+        $aiCost = $this->feasibilityCost($itinerary);
+        $guard = [
+            'stops_placed' => ['planner' => $plannerPlaced, 'ai' => $aiPlaced],
+            'feasibility_cost' => ['planner' => $plannerCost, 'ai' => $aiCost],
+        ];
+
+        if ($aiPlaced >= $plannerPlaced && $aiCost <= $plannerCost) {
             $built = $aiPlan['sequence'];
             $sequence = $aiPlan['sequence'];
 
@@ -424,6 +451,61 @@ class ItineraryGenerationService
         $stays = $plannerStays;
 
         return false;
+    }
+
+    /**
+     * One structured line per AI evaluation (storage/logs/ai-skeleton-*.log): accepted or rejected, every reason it was
+     * rejected for, whether the deterministic plan was used instead, what was checked, and when. Written only when the
+     * outside service was actually asked, so it is empty while AI grouping is off. It holds no origin, coordinates,
+     * dates, times, browser token, preference id or anything the visitor typed, and never the prompt or the answer.
+     * A failure to write the line must never cost the traveller their itinerary.
+     *
+     * @param  array<string, mixed>  $ai  the advisor's result
+     * @param  array<string, mixed>|null  $guard  the built-plan comparison, when the suggestion got that far
+     * @param  array<string, mixed>  $grouping  what the deterministic ThemeDayGrouper did for this trip (it runs whether or not the AI is asked)
+     */
+    private function logAiEvaluation(string $correlationId, Itinerary $itinerary, array $ai, bool $applied, ?array $guard, array $grouping): void
+    {
+        $reasons = [];
+        $decidedBy = 'advisor';
+        if ($applied) {
+            $decidedBy = 'planner_guard';
+        } elseif ($ai['plan'] === null) {
+            $reasons[] = $ai['reason'];
+        } else {
+            $decidedBy = 'planner_guard';
+            if (($guard['stops_placed']['ai'] ?? 0) < ($guard['stops_placed']['planner'] ?? 0)) {
+                $reasons[] = 'fewer_stops_placed';
+            }
+            if (($guard['feasibility_cost']['ai'] ?? 0) > ($guard['feasibility_cost']['planner'] ?? 0)) {
+                $reasons[] = 'less_feasible';
+            }
+        }
+
+        AiSkeletonEvaluationLog::record([
+            'correlation_id' => $correlationId,
+            'itinerary_id' => $itinerary->id,
+            'evaluated_at' => now()->toIso8601String(),
+            'outcome' => $applied ? 'accepted' : 'rejected',
+            'decided_by' => $decidedBy,
+            'reasons' => $reasons,
+            'fallback_used' => ! $applied,
+            // The model asked, and how long the call took (null when it never got as far as a reply).
+            'model' => (string) config('services.groq.model'),
+            'call_seconds' => $ai['seconds'],
+            // The embedding grouping is the planner's own and is not switched off by the AI: whether it ran, and whether it was kept.
+            'deterministic_grouping' => $grouping,
+            'comparison' => [
+                // Travel between the stops of the planner's grouping and the AI's (km, with the limit the AI had to stay within).
+                'travel_km' => $ai['checks']['travel_km'] ?? null,
+                // Stops the planner chose, and how many each built plan placed once the schedule rules were applied.
+                'stops_chosen' => $grouping['stops'],
+                'stops_placed' => $guard['stops_placed'] ?? null,
+                // Late check-ins + empty days + days over the driving ceiling; lower is better.
+                'feasibility_cost' => $guard['feasibility_cost'] ?? null,
+            ],
+            'validation' => ($ai['checks'] ?? []) + ($guard !== null ? ['built_plan' => $guard] : []),
+        ]);
     }
 
     /**
@@ -501,7 +583,12 @@ class ItineraryGenerationService
     private function withinOneNeighbourhood(\Illuminate\Support\Collection $ranked, int $stops, TouristPreference $preference, float $originLat, float $originLng): \Illuminate\Support\Collection
     {
         $rows = $ranked->values()->all();
-        $minutes = fn (Destination $a, Destination $b): int => $this->stayMinutes($this->placeOf($a), $this->placeOf($b), $preference);
+        // Each place's position is worked out once, not once per pair (the pairing below is every place against every other).
+        $places = [];
+        foreach ($rows as $row) {
+            $places[$row['destination']->id] = $this->placeOf($row['destination']);
+        }
+        $minutes = fn (Destination $a, Destination $b): int => $this->stayMinutes($places[$a->id] ?? $this->placeOf($a), $places[$b->id] ?? $this->placeOf($b), $preference);
         $mapped = fn (array $row): bool => $row['destination']->latitude !== null && $row['destination']->longitude !== null;
 
         $start = ['lat' => $originLat, 'lng' => $originLng, 'region' => null];
@@ -883,7 +970,7 @@ class ItineraryGenerationService
             if (in_array($original, $inTrip, true)
                 && ! in_array($replacement, $inTrip, true)
                 && ! in_array($replacement, $valid, true)
-                && Destination::publiclyVisible()->availableForTrip()->whereKey($replacement)->exists()) {
+                && \App\Support\OfficialOnlyMode::apply(Destination::publiclyVisible()->availableForTrip())->whereKey($replacement)->exists()) {
                 $valid[$original] = $replacement;
             }
         }
@@ -1070,6 +1157,11 @@ class ItineraryGenerationService
         ];
     }
 
+    /** @var array<string, int> stayMinutes() answers, kept for the plan being built only */
+    private array $stayMinutesMemo = [];
+
+    private ?TravelTimeEstimator $travelEstimator = null;
+
     /** Region names by id, read once per plan (see generate()). */
     private ?\Illuminate\Support\Collection $regionNames = null;
 
@@ -1080,7 +1172,10 @@ class ItineraryGenerationService
             return 0;
         }
 
-        return app(TravelTimeEstimator::class)->estimate(
+        // A pure function of the two places and the way of travelling, asked for the same pair many times in one plan.
+        $key = $a['lat'].'|'.$a['lng'].'|'.$a['region'].'>'.$b['lat'].'|'.$b['lng'].'|'.$b['region'].'|'.$preference->transport_pref;
+
+        return $this->stayMinutesMemo[$key] ??= ($this->travelEstimator ??= app(TravelTimeEstimator::class))->estimate(
             $this->haversineKm($a['lat'], $a['lng'], $b['lat'], $b['lng']), $a['region'], $b['region'], $preference->transport_pref,
         )['max_minutes'];
     }
@@ -1169,7 +1264,7 @@ class ItineraryGenerationService
         [$wanted, $setting] = $this->statedStay($preference);
         // A stay with a position can be placed on the map and costed; one without is offered only as a last resort,
         // when no stay with a position is eligible for any night ("an unlocatable stay is still offered rather than none").
-        $base = fn (bool $mapped) => Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip()
+        $base = fn (bool $mapped) => \App\Support\OfficialOnlyMode::apply(Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip())
             ->when($mapped, fn ($q) => $q->whereNotNull('latitude')->whereNotNull('longitude'),
                 fn ($q) => $q->where(fn ($w) => $w->whereNull('latitude')->orWhereNull('longitude')));
 
@@ -1211,7 +1306,36 @@ class ItineraryGenerationService
             }
         }
 
-        return $best;
+        // A Remote trip may sleep on the way (Stage C2 moves a late first night to a stay the traveller reaches in time, and
+        // stays can change as the trip moves on), so its multi-night planner keeps its own drive-time cost instead of this limit.
+        return $this->stayMode($preference) === 'far' ? $best : $this->withinReachOfTrip($best);
+    }
+
+    /** The stops (coordinates) of the trip being planned; every stay path is held to the same limit from them. */
+    private ?\Illuminate\Support\Collection $tripStops = null;
+
+    /**
+     * One rule for every path that chooses a stay (the Remote multi-night planner excepted, see eligibleStays()): a stay more than
+     * STAY_MAX_KM from any stop of the trip is passed over. A
+     * night that would be left with no stay at all keeps its stays, so a spread-out trip is never left without somewhere to sleep.
+     *
+     * @param  array<int, \Illuminate\Support\Collection<int, Accommodation>>  $byNight
+     * @return array<int, \Illuminate\Support\Collection<int, Accommodation>>
+     */
+    private function withinReachOfTrip(array $byNight): array
+    {
+        if ($this->tripStops === null || $this->tripStops->isEmpty()) {
+            return $byNight;
+        }
+
+        foreach ($byNight as $night => $stays) {
+            $near = $stays->reject(fn (Accommodation $s) => $this->tooFarFromTrip($s, $this->tripStops))->values();
+            if ($near->isNotEmpty()) {
+                $byNight[$night] = $near;
+            }
+        }
+
+        return $byNight;
     }
 
     /**
@@ -1756,7 +1880,7 @@ class ItineraryGenerationService
             }
         }
 
-        $query = Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip();
+        $query = \App\Support\OfficialOnlyMode::apply(Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip());
         if ($setting !== null) {
             $query->whereIn('type', self::RESORT_TYPES)->withResortSetting($setting);
         } elseif ($wanted !== null) {
@@ -1783,8 +1907,11 @@ class ItineraryGenerationService
          * still breaks ties among stays at similar total distance; an
          * unlocatable stay is still offered rather than none at all.
          */
-        $listing = $mappedStops->isNotEmpty()
-                ? (clone $query)->whereNotNull('latitude')->whereNotNull('longitude')->get()
+        $mapped = $mappedStops->isNotEmpty() ? (clone $query)->whereNotNull('latitude')->whereNotNull('longitude')->get() : null;
+        // The same limit as every other path; if nothing is within it, the closest stay is still offered.
+        $withinReach = $mapped?->reject(fn (Accommodation $a) => $this->tooFarFromTrip($a, $mappedStops))->values();
+        $listing = $mapped !== null
+                ? ($withinReach->isNotEmpty() ? $withinReach : $mapped)
                     ->sortBy(function (Accommodation $a) use ($mappedStops) {
                         $distances = $mappedStops->map(fn (array $stop) => $this->haversineKm(
                             (float) $a->latitude, (float) $a->longitude, $stop['lat'], $stop['lng']
@@ -1802,10 +1929,10 @@ class ItineraryGenerationService
             ?? $query->orderByDesc('rating')->first()
             // No resort of that setting is available: a resort of any setting is still closer to the ask than a hotel.
             ?? ($setting !== null
-                ? Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip()
+                ? \App\Support\OfficialOnlyMode::apply(Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip())
                     ->whereIn('type', self::RESORT_TYPES)->orderByDesc('rating')->first()
                 : null)
-            ?? Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip()
+            ?? \App\Support\OfficialOnlyMode::apply(Accommodation::where('is_accredited', true)->whereNull('archived_at')->availableForTrip())
                 ->orderByDesc('rating')->first();
 
         return $listing ? ['listing' => $listing, 'rule' => null] : null;

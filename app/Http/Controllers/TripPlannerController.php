@@ -198,6 +198,8 @@ class TripPlannerController extends Controller
         $data['transport_pref'] = $data['transport_pref'] ?? null;
 
         $preference = $this->currentPreference($request) ?? new TouristPreference();
+        $isExisting = $preference->exists;
+        $listsBefore = $isExisting ? $this->answerLists($preference) : null;
 
         $preference->fill(collect($data)->except([
             'activities', 'amenities', 'health_conditions', 'health_other',
@@ -207,6 +209,17 @@ class TripPlannerController extends Controller
 
         $this->applyOrigin($preference, $data);
         $this->applyDeparture($preference, $data);
+
+        /*
+         * "Regenerate" bumps `variation`, which only breaks ties between equally good plans. It belongs to the answers it
+         * was asked for: when the traveller changes an answer here the plan is a new question and starts from the standard
+         * result again, instead of inheriting a variation chosen for different answers. Saving the form without changing
+         * anything keeps the variation, so Generate shows the plan that is already on screen.
+         */
+        if ($isExisting && $preference->variation > 0 && ($preference->isDirty() || $listsBefore !== $this->answerListsFromInput($data, $request))) {
+            $preference->variation = 0;
+        }
+
         $preference->save();
 
         $preference->activities()->delete();
@@ -269,6 +282,7 @@ class TripPlannerController extends Controller
             'range_requested' => $preference->distance_pref,
             'range_tier_used' => $itinerary->range_tier_used,
             'range_widened' => $itinerary->range_widened,
+            'range_capped_places' => (int) $itinerary->range_capped_places,
         ];
 
         // The timeline shows each stop's photo and opening hours, so load them together rather than per row.
@@ -504,6 +518,47 @@ class TripPlannerController extends Controller
      * standalone profile used to offer, now reachable from the one form the
      * visitor already uses.
      */
+    /**
+     * The list-valued answers (kinds of activity, amenities, health conditions) in a form that can be compared.
+     *
+     * @return array{activities: list<string>, amenities: list<string>, health: list<string>}
+     */
+    private function answerLists(TouristPreference $preference): array
+    {
+        $preference->loadMissing('activities', 'amenities', 'healthProfile.conditions');
+        $profile = $preference->healthProfile;
+
+        return $this->sortedLists(
+            $preference->activities->pluck('activity')->all(),
+            $preference->amenities->pluck('amenity')->all(),
+            $profile ? [...$profile->conditions->pluck('condition')->all(), 'other:'.trim((string) $profile->other_text)] : [],
+        );
+    }
+
+    /** The same lists as they would be saved from this request. */
+    private function answerListsFromInput(array $data, Request $request): array
+    {
+        $health = [];
+        $other = trim((string) ($data['health_other'] ?? ''));
+        if ($request->boolean('health_consent') && ! (empty($data['health_conditions'] ?? []) && $other === '')) {
+            $health = [...($data['health_conditions'] ?? []), 'other:'.$other];
+        }
+
+        return $this->sortedLists($data['activities'] ?? [], $data['amenities'] ?? [], $health);
+    }
+
+    private function sortedLists(array $activities, array $amenities, array $health): array
+    {
+        $sort = static function (array $list): array {
+            $list = array_values(array_unique(array_map('strval', $list)));
+            sort($list);
+
+            return $list;
+        };
+
+        return ['activities' => $sort($activities), 'amenities' => $sort($amenities), 'health' => $sort($health)];
+    }
+
     private function saveHealthProfile(Request $request, TouristPreference $preference, array $data): void
     {
         $conditions = $data['health_conditions'] ?? [];

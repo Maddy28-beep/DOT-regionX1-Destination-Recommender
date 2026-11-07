@@ -32,7 +32,7 @@ class TourOperatorSuggester
         $lat ??= ContentBasedRecommendationService::DEFAULT_ORIGIN_LAT;
         $lng ??= ContentBasedRecommendationService::DEFAULT_ORIGIN_LNG;
 
-        $operators = TourOperator::publiclyVisible()->where('is_accredited', true)->with('region')->get();
+        $operators = \App\Support\OfficialOnlyMode::apply(TourOperator::publiclyVisible()->where('is_accredited', true)->with('region'))->get();
 
         if (TransportMode::isRentalCar($transport)) {
             $rentalPool = $operators->filter(fn (TourOperator $o) => $this->isRentalOrTransportOperator($o))->values();

@@ -111,7 +111,9 @@ class ChatbotService
     {
         $listings = $source === 'groq' ? $this->listingsNamedIn($response) : $this->cardListings;
 
+        // A place that is closed (for good, for now, or under a closing advisory) gets no card: the words say so, and a card would invite a visit.
         return collect($listings)
+            ->reject(fn (array $pair) => in_array(HasOperatingStatus::class, class_uses_recursive($pair[0]), true) && $pair[0]->operatingNotice() !== null)
             ->take(self::MAX_CARDS)
             ->map(fn (array $pair) => $this->card($pair[0], $pair[1]))
             ->values()
@@ -156,8 +158,8 @@ class ChatbotService
         $found = [];
 
         foreach (self::LISTING_CONFIG as $config) {
-            $ids = $config['model']::query()
-                ->where('is_accredited', true)->whereNull('archived_at')
+            $ids = \App\Support\OfficialOnlyMode::apply($config['model']::query()
+                ->where('is_accredited', true)->whereNull('archived_at'))
                 ->get(['id', 'name'])
                 // Under its stored name or the same name without a trailing "[SAMPLE]" / parenthetical, which a model leaves off.
                 ->filter(fn ($l) => collect($this->guard->nameVariants($l->name))->contains(fn ($v) => str_contains($haystack, strtolower($v))))
@@ -205,9 +207,12 @@ class ChatbotService
     {
         $sampleData = app(SampleData::class);
         $listings = collect(self::LISTING_CONFIG)->flatMap(function ($config, $type) use ($sampleData) {
-            return $config['model']::query()
-                ->where('is_accredited', true)
-                ->whereNull('archived_at')
+            $query = $config['model']::query()->where('is_accredited', true)->whereNull('archived_at');
+            if (in_array(HasOperatingStatus::class, class_uses_recursive($config['model']), true)) {
+                $query->availableDuring(now(), now());   // a place that is closed today is not offered to the model either
+            }
+
+            return $query
                 ->orderByDesc('rating')
                 ->limit(10)
                 ->get(['id', 'name'])
@@ -414,8 +419,8 @@ class ChatbotService
             return 'Which place do you mean? Ask me with its name, for example "is Eden Nature Park open?" or "what time does the Philippine Eagle Center open?".';
         }
 
-        $top = Destination::query()->where('is_accredited', true)->whereNull('archived_at')
-            ->availableDuring(now(), now())->orderByDesc('rating')->take(self::MAX_CARDS)->get();
+        $top = \App\Support\OfficialOnlyMode::apply(Destination::query()->where('is_accredited', true)->whereNull('archived_at')
+            ->availableDuring(now(), now()))->orderByDesc('rating')->take(self::MAX_CARDS)->get();
         $this->cardListings = $top->map(fn ($d) => [$d, 'destinations.show'])->all();
 
         return "I'm not sure I understood that. You could ask things like \"where can I see wildlife?\", \"is Eden Nature Park open?\", \"where to stay in Davao City\", or \"plan a 3-day trip\". Here are a few places visitors like in the meantime.";

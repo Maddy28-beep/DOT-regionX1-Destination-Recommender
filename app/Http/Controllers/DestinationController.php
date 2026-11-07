@@ -57,9 +57,10 @@ class DestinationController extends Controller
         $query->orderBy('id');
 
         // Map results use the same filters, across all pages of the catalogue.
+        $sampleData = app(\App\Support\SampleData::class);
         $mapDestinations = (clone $query)->get()->map(fn (Destination $destination) => [
             'id' => $destination->id,
-            'name' => $destination->displayName(),
+            'name' => $sampleData->labelledName($destination),
             'location' => $destination->location,
             'type' => $destination->type,
             'latitude' => $destination->latitude,

@@ -37,6 +37,7 @@ class SampleSuffixDisplayTest extends TestCase
         $this->assertSame('Guang-guang Mangrove Forest', $destination->displayName());
 
         $list = $this->get(route('destinations.index'))->assertOk()->getContent();
-        $this->assertStringNotContainsString('[SAMPLE]', $list);
+        // The cards say "Sample Data" by badge; the map's pop-up data (a script, no badge there) carries the plain-text marker.
+        $this->assertStringNotContainsString('[SAMPLE]', preg_replace('#<script.*?</script>#s', '', $list));
     }
 }

@@ -122,13 +122,15 @@ class AiSkeletonAdvisorTest extends TestCase
         return $signature;
     }
 
-    public function test_it_is_off_when_the_flag_is_false_or_there_is_no_key(): void
+    public function test_it_is_off_unless_the_flag_is_true_and_there_is_a_key(): void
     {
         $fake = $this->fake($this->reversing());
         config(['services.groq.key' => 'test-key', 'ai-skeleton.enabled' => 'false']);
         $this->assertFalse(app(AiSkeletonAdvisor::class)->enabled());
         config(['ai-skeleton.enabled' => null]);
-        $this->assertTrue(app(AiSkeletonAdvisor::class)->enabled(), 'unset flag + key = on');
+        $this->assertFalse(app(AiSkeletonAdvisor::class)->enabled(), 'beta default: unset flag + key = off');
+        config(['ai-skeleton.enabled' => 'true']);
+        $this->assertTrue(app(AiSkeletonAdvisor::class)->enabled(), 'explicitly true + key = on');
 
         $this->fake($this->reversing(), configured: false);
         config(['ai-skeleton.enabled' => 'true']);
@@ -444,6 +446,9 @@ class AiSkeletonAdvisorTest extends TestCase
 
         config(['ai-skeleton.enabled' => null]);
         $this->fake(fn () => '', configured: true);
+        $this->assertStringNotContainsString('AI-assisted day plan', $text(), 'unset flag = off, so no disclosure either');
+
+        config(['ai-skeleton.enabled' => 'true']);
         $on = $text();
         $this->assertStringContainsString('AI-assisted day plan (Groq). When you generate an itinerary, ExploreDVO\'s server sends Groq, an outside AI service whose servers are outside the Philippines, a description of the trip so that it can suggest which of the places the planner has already chosen go together on each day and name each day. It receives the number of days, the distance range, budget level and interests you chose, and, for each candidate place, its name, type, price level and category tags. It does not receive your name, browser token, starting point, dates, arrival time or anything you typed.', $on);
         $this->assertStringContainsString('if Groq does not answer in time or answers badly, the itinerary is made without it.', $on);

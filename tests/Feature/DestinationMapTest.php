@@ -28,7 +28,8 @@ class DestinationMapTest extends TestCase
             ->assertViewHas('destinations', fn ($results) => $results->count() === 9)
             ->assertViewHas('mapDestinations', fn ($results) => $results->count() === 12
                 && $results->every(fn ($place) => str_starts_with($place['name'], 'Park '))
-                && $results->firstWhere('name', 'Park 1')['latitude'] === null);
+                // No accreditation record on file: the map says so in the name too.
+                && $results->firstWhere('name', 'Park 1 [NOT YET VERIFIED]')['latitude'] === null);
         $this->get('/destinations?view=map&q=nonexistent')->assertOk()
             ->assertViewHas('mapDestinations', fn ($results) => $results->isEmpty());
     }

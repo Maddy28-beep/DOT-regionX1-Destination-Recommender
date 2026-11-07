@@ -30,6 +30,9 @@ mkdir -p "$BACKUPS"
 TS=$(date +%Y%m%d-%H%M%S)
 sudo -u postgres pg_dump exploredvo | gzip > "$BACKUPS/pre-deploy-$TS-$SHA.sql.gz"
 ls -1t "$BACKUPS"/pre-deploy-*.sql.gz 2>/dev/null | tail -n +11 | xargs -r rm -f   # keep the latest 10
+# Copies taken by hand before a data cleanup or import (pre-cleanup-..., pre-<anything>-...) were never rotated and would
+# pile up: keep the latest 5 of those too. pre-deploy-* has its own rule above; daily-* is rotated by the nightly job.
+{ ls -1t "$BACKUPS"/pre-*.sql.gz 2>/dev/null || true; } | { grep -v '/pre-deploy-' || true; } | tail -n +6 | xargs -r rm -f
 echo "      saved $BACKUPS/pre-deploy-$TS-$SHA.sql.gz"
 
 echo "[2/8] Unpacking $SHA"

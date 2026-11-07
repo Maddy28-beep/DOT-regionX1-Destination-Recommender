@@ -127,7 +127,9 @@ class SampleDataSurfacesTest extends TestCase
 
         $params = ['report_type' => 'Accreditation Status', 'from' => now()->subDay()->toDateString(), 'to' => now()->addDay()->toDateString()];
         $csv = $this->actingAs($admin, 'admin')->get(route('admin.reports.export-csv', $params))->assertOk()->streamedContent();
-        $this->assertStringContainsString('Data', explode("\n", $csv)[0]);
+        $lines = explode("\n", $csv);
+        $this->assertStringContainsString('Data included', $lines[2], 'The file says what it is made of before the table.');
+        $this->assertStringContainsString('Data', $lines[4]);
         $this->assertSame(1, substr_count($csv, 'Sample data, not DOT-verified'));
         $this->assertSame(1, substr_count($csv, 'DOT record'));
     }

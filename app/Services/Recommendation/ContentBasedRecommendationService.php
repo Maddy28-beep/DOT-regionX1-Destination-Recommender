@@ -64,6 +64,9 @@ class ContentBasedRecommendationService
 
     public bool $lastRangeWidened = false;
 
+    /** How many places a widened Close or Commutable range left out because their round trip would not fit the day's driving ceiling. */
+    public int $lastRangeCappedCount = 0;
+
     /**
      * Table 5. Preference Category Weights (sum = 100).
      *
@@ -317,11 +320,11 @@ class ContentBasedRecommendationService
     {
         // Places closed on the traveller's dates (their own status, or a danger
         // advisory) are not candidates at all: a closed place must not be recommended.
-        $candidates ??= Destination::query()
+        $candidates ??= \App\Support\OfficialOnlyMode::apply(Destination::query()
             ->where('is_accredited', true)
             ->whereNull('archived_at')
             ->availableDuring(...$preference->travelWindow())
-            ->with('tags')
+            ->with('tags'))
             ->get();
 
         if ($candidates->isEmpty()) {
@@ -698,6 +701,8 @@ class ContentBasedRecommendationService
 
         $target = max(self::TARGET_STOPS_PER_DAY, (int) $preference->travel_days * self::TARGET_STOPS_PER_DAY);
 
+        $this->lastRangeCappedCount = 0;
+
         for ($i = $start; $i < count($tiers); $i++) {
             $tier = $tiers[$i];
             $radius = self::radiusKm($tier, $preference->transport_pref);
@@ -714,6 +719,18 @@ class ContentBasedRecommendationService
                 $this->lastRangeTierUsed = $tier;
                 $this->lastRangeWidened = $i > $start;
 
+                // A Close or Commutable trip that had to widen never reaches a place it could not drive to and back in a day.
+                // Remote (the traveller asked for the whole region) keeps them; the schedule warns where one is alone on its day.
+                if ($i > $start && $preference->distance_pref !== 'far') {
+                    $reachable = $eligible->filter(fn (Destination $d) => $this->roundTripMinutes($d, $preference) <= ItineraryScheduleBuilder::MAX_DAILY_DRIVE_MINUTES)->values();
+
+                    if ($reachable->isNotEmpty()) {
+                        $this->lastRangeCappedCount = $eligible->count() - $reachable->count();
+
+                        return $reachable;
+                    }
+                }
+
                 return $eligible;
             }
         }
@@ -721,6 +738,18 @@ class ContentBasedRecommendationService
         // Unreachable in practice: the last tier is always uncapped, and the
         // loop always returns on an uncapped tier.
         return $candidates;
+    }
+
+    /** Slow-end driving time there and back from where the traveller starts, by their way of getting about; 0 when the place cannot be measured. */
+    private function roundTripMinutes(Destination $destination, TouristPreference $preference): int
+    {
+        $distance = $this->distanceKmFor($destination, $preference);
+
+        if ($distance === null) {
+            return 0;
+        }
+
+        return 2 * (new TravelTimeEstimator())->estimate($distance['km'], null, null, $preference->transport_pref)['max_minutes'];
     }
 
     /** Table 6: Distance Score, graded by how close the destination's distance is to the preferred bucket. */

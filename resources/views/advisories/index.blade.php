@@ -95,7 +95,7 @@
                             <h3 class="advisory-card__title">{{ $advisory->title }}</h3>
                             <p class="advisory-card__message">{{ $advisory->message }}</p>
                             <div class="advisory-card__meta">
-                                <span class="advisory-pill"><x-icon name="map-pin" />{{ $listing->name ?? 'All of the Davao Region' }}</span>
+                                <span class="advisory-pill"><x-icon name="map-pin" />{{ $listing ? app(\App\Support\SampleData::class)->labelledName($listing) : 'All of the Davao Region' }}</span>
                                 <span class="advisory-pill"><x-icon name="calendar" />{{ $advisory->ends_at ? 'Until '.$advisory->ends_at->format('M j') : 'Until further notice' }}</span>
                                 <span class="advisory-pill"><x-icon name="shield-check" />DOT Region XI</span>
                                 @if ($listingRoute)

@@ -13,7 +13,7 @@ use Tests\TestCase;
 
 /**
  * On a Remote trip the way home is already long, so the last day's souvenir stop is only added when the traveller is
- * still back by 8 pm with it, counting the dinner break a late journey needs. Other trips are planned as before.
+ * still back by 8 pm with it, counting the dinner break a late journey needs. Other trips are held to their own daily driving budget instead.
  */
 class RemoteLastDaySouvenirTest extends TestCase
 {
@@ -81,8 +81,8 @@ class RemoteLastDaySouvenirTest extends TestCase
 
     private function setUpStopAndShop(float $stopKm = 50): Destination
     {
-        $stop = $this->destination('Remote Falls', $stopKm);
-        $this->shop('Local Crafts', $stopKm + 4);   // 4 km past the stop, so it passes the shop's own distance and time checks
+        $stop = $this->destination('Remote Falls '.$stopKm, $stopKm);
+        $this->shop('Local Crafts '.$stopKm, $stopKm + 4);   // 4 km past the stop, so it passes the shop's own distance and time checks
 
         return $stop;
     }
@@ -105,20 +105,22 @@ class RemoteLastDaySouvenirTest extends TestCase
         $this->assertLessThanOrEqual('20:00:00', $this->homeAt($itinerary));
     }
 
-    public function test_the_same_day_on_a_moderate_trip_is_planned_as_before(): void
+    public function test_a_moderate_trip_is_held_to_its_own_driving_budget_not_the_eight_pm_rule(): void
     {
+        // The 50 km stop alone is 5.5 hours of driving: over a Commutable day's 5 hour budget, so no souvenir stop is added.
         $itinerary = $this->schedule($this->setUpStopAndShop(), 'moderate', '09:00');
 
-        $this->assertTrue($this->hasSouvenirStop($itinerary), 'only Remote trips are held to the 8 pm rule');
-        $this->assertGreaterThan('20:00:00', $this->homeAt($itinerary));
-        $this->assertTrue($itinerary->items->contains(fn ($item) => $item->kind === 'meal' && str_contains($item->title, 'Dinner')), 'the dinner break is still counted in that late return');
+        $this->assertNotNull($itinerary->items->firstWhere('kind', 'activity'), 'the trip itself is untouched');
+        $this->assertFalse($this->hasSouvenirStop($itinerary), 'the shop would take the day past its driving budget');
+
+        // A nearer stop leaves room in the budget: the shop is added, and the 8 pm rule is not what decides it.
+        $nearer = $this->schedule($this->setUpStopAndShop(38), 'moderate', '09:00');
+        $this->assertTrue($this->hasSouvenirStop($nearer));
     }
 
     public function test_one_build_does_not_leak_remote_planning_into_the_next(): void
     {
-        $stop = $this->setUpStopAndShop();
-
-        $this->assertFalse($this->hasSouvenirStop($this->schedule($stop, 'far', '09:00')));
-        $this->assertTrue($this->hasSouvenirStop($this->schedule($stop, 'moderate', '09:00')), 'the same builder, planning a moderate trip straight after, adds it');
+        $this->assertFalse($this->hasSouvenirStop($this->schedule($this->setUpStopAndShop(), 'far', '09:00')));
+        $this->assertTrue($this->hasSouvenirStop($this->schedule($this->setUpStopAndShop(38), 'moderate', '09:00')), 'the same builder, planning a moderate trip straight after, adds it');
     }
 }

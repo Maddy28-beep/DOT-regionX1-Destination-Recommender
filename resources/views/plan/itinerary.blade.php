@@ -186,6 +186,12 @@
                             $lastDay = $itemsByDay->keys()->max();
                             $freeDays = $itemsByDay->filter(fn ($items, $d) => $d !== 1 && $d !== $lastDay && $items->where('kind', 'activity')->isEmpty())->count();
                         @endphp
+                        @if (($provenance['range_capped_places'] ?? 0) > 0 && ! $itinerary->package)
+                            <div class="itin-notice" role="note" style="margin:0 0 16px; padding:12px 16px; border-radius:12px; background:#fff7e6; border:1px solid #f0c36d;">
+                                <strong>Some distant places were left out because they are too far for a single day. Choose 'Remote' to include them.</strong>
+                            </div>
+                        @endif
+
                         @if ($freeDays > 0 && ! $itinerary->package)
                             <div class="itin-notice" role="note" style="margin:0 0 16px; padding:12px 16px; border-radius:12px; background:#fff7e6; border:1px solid #f0c36d;">
                                 <strong>{{ $freeDays }} {{ \Illuminate\Support\Str::plural('day', $freeDays) }} of this trip {{ $freeDays === 1 ? 'has' : 'have' }} no sightseeing planned.</strong>
@@ -353,13 +359,18 @@
 
             @unless ($itinerary->package)
             <section class="itinerary-refine" aria-label="Adjust your itinerary">
-                <h2>Your itinerary, your way</h2>
+                <div class="itinerary-refine-copy">
+                    <h2>Your itinerary, your way</h2>
+                    <p class="itinerary-refine-note" id="regenerate-note">Regenerate creates a new itinerary variation using the same preferences. Your existing preferences remain unchanged.</p>
+                    {{-- Honest about the one thing Regenerate can do beyond that: see the location script at the bottom of this page. --}}
+                    <p class="itinerary-refine-note itinerary-refine-note--location">If your browser asks to share your location and you allow it, the plan is rebuilt from where you are now.</p>
+                </div>
                 <div class="itinerary-refine-actions">
                     <form method="POST" action="{{ route('plan.regenerate') }}" id="regenerate-form">
                         @csrf
                         <input type="hidden" name="lat" id="regenerate-lat">
                         <input type="hidden" name="lng" id="regenerate-lng">
-                        <button type="submit" class="btn btn-outline"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7v5h-5M20 12a8 8 0 1 0-2 5"/></svg> Regenerate itinerary</button>
+                        <button type="submit" class="btn btn-outline" aria-describedby="regenerate-note"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7v5h-5M20 12a8 8 0 1 0-2 5"/></svg> Regenerate itinerary</button>
                     </form>
                 </div>
             </section>
@@ -380,6 +391,7 @@
                                 <span class="match-rank">{{ $match->rank }}</span>
                                 <div class="match-info">
                                     <a href="{{ route('destinations.show', $match->destination) }}">{{ $match->destination->name }}</a>
+                                    @if (app(\App\Support\SampleData::class)->isSample($match->destination))<x-sample-tag label="Sample data" title="Sample data, not DOT-verified: this place's accreditation number is a placeholder, not an official DOT number." />@endif
                                     <div class="match-bar-track">
                                         <div class="match-bar-fill match-bar-fill--{{ $tier }}" style="width: {{ min(100, max(0, $match->match_score / 5 * 100)) }}%;"></div>
                                     </div>

@@ -108,8 +108,8 @@ class SimilarDestinationService
         $inTrip = $itinerary->items()->whereNotNull('destination_id')->pluck('destination_id')
             ->map(fn ($id) => (int) $id)->all();
 
-        $candidates = Destination::publiclyVisible()
-            ->availableDuring(...$this->windowFor($itinerary))
+        $candidates = \App\Support\OfficialOnlyMode::apply(Destination::publiclyVisible()
+            ->availableDuring(...$this->windowFor($itinerary)))
             ->where(fn ($q) => $q->whereNull('itinerary_role')->orWhere('itinerary_role', 'sightseeing'))
             ->whereNotIn('id', array_merge($inTrip, [$original->id]))
             ->with('tags')

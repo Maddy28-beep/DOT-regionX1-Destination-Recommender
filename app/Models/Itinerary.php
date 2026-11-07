@@ -15,7 +15,7 @@ class Itinerary extends Model
 
     protected $fillable = [
         'preference_id', 'package_id', 'total_days', 'est_budget_total',
-        'est_party_size', 'generated_at', 'range_tier_used', 'range_widened',
+        'est_party_size', 'generated_at', 'range_tier_used', 'range_widened', 'range_capped_places',
         'tourist_account_id', 'title', 'swaps', 'day_themes', 'stay_plan',
         'ml_skeleton_applied', 'ml_skeleton_seconds',
     ];

@@ -121,6 +121,7 @@
         <div>
             <h2>{{ $reportType }}</h2>
             <p>{{ $report['summary'] }}</p>
+            <p class="small text-body-secondary"><strong>Data included:</strong> {{ $report['data_note'] ?? '' }}</p>
         </div>
         <div class="util-row">
             <a href="{{ route('admin.reports.print', ['from' => $from, 'to' => $to, 'report_type' => $reportType] + ($includeSimulated ? ['include_simulated' => 1] : [])) }}" target="_blank" class="btn btn-outline">Export PDF</a>

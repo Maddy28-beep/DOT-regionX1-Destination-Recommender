@@ -32,11 +32,16 @@ class AiSkeletonAdvisor
 
     public function __construct(private readonly GroqChatbotClient $client) {}
 
-    /** On when a key is configured and AI_SKELETON_ENABLED is not switched off. Never on without a key. */
+    /**
+     * Off unless it is switched on. During the beta the deterministic planner alone decides the days, so the same
+     * answers always give the same trip. It runs only when AI_SKELETON_ENABLED is explicitly true AND a Groq key is
+     * configured: unset, empty, false or any unreadable value means off. (Before the beta it was on whenever a key was
+     * set; that default was reversed here. The Groq client, the prompt and this class are untouched.)
+     */
     public function enabled(): bool
     {
         $flag = config('ai-skeleton.enabled');
-        if ($flag !== null && $flag !== '' && filter_var($flag, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) === false) {
+        if (filter_var($flag, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== true) {
             return false;
         }
 
@@ -48,11 +53,15 @@ class AiSkeletonAdvisor
      * @param  array<int, array{row: array, distance_km: float|null}>  $route  the plain route order, used to order stops within a day
      * @param  array<int, array<int, string>>  $dayCapacities  day number => slot labels
      * @param  array{lat: float, lng: float}  $origin  used only locally for the distance check, never sent
-     * @return array{attempted: bool, seconds: float|null, plan: array{sequence: array, days: array<int, array{theme: string, stops: array<int, int>}>}|null, reason: string}
+     * @return array{attempted: bool, seconds: float|null, plan: array{sequence: array, days: array<int, array{theme: string, stops: array<int, int>}>}|null, reason: string, checks: array<string, mixed>}
      */
     public function advise(TouristPreference $preference, array $baseline, array $route, array $dayCapacities, array $origin): array
     {
-        $none = fn (string $reason, bool $attempted = false, ?float $seconds = null): array => ['attempted' => $attempted, 'seconds' => $seconds, 'plan' => null, 'reason' => $reason];
+        // $checks records what was examined, so a rejection is never just "no": it travels to the evaluation log.
+        $checks = [];
+        $none = function (string $reason, bool $attempted = false, ?float $seconds = null) use (&$checks): array {
+            return ['attempted' => $attempted, 'seconds' => $seconds, 'plan' => null, 'reason' => $reason, 'checks' => $checks];
+        };
 
         if (! $this->enabled()) {
             return $none('disabled');
@@ -65,6 +74,7 @@ class AiSkeletonAdvisor
         }
 
         $candidates = $this->candidates($route);
+        $checks = ['candidates' => count($candidates), 'trip_days' => count($sizes)];
         $started = microtime(true);
 
         try {
@@ -81,21 +91,29 @@ class AiSkeletonAdvisor
         }
         $seconds = round(microtime(true) - $started, 2);
 
-        $days = $this->validate($raw, array_keys($candidates), $sizes);
+        [$days, $failure] = $this->inspect($raw, array_keys($candidates), $sizes);
+        $checks['answer_valid'] = $days !== null;
         if ($days === null) {
+            $checks['validation_failure'] = $failure;
+
             return $none('invalid_answer', true, $seconds);
         }
 
         $sequence = $this->sequenceFor($days, $route);
-        if ($this->sameOrder($sequence, $baseline)) {
+        $checks['same_as_planner'] = $this->sameOrder($sequence, $baseline);
+        if ($checks['same_as_planner']) {
             return $none('same_as_planner', true, $seconds);
         }
 
-        if ($this->travel($sequence, $sizes, $origin) > $this->travel($baseline, $sizes, $origin) * (1 + ThemeDayGrouper::MAX_EXTRA_DISTANCE) + ThemeDayGrouper::DISTANCE_ALLOWANCE_KM) {
+        $aiKm = $this->travel($sequence, $sizes, $origin);
+        $plannerKm = $this->travel($baseline, $sizes, $origin);
+        $limitKm = $plannerKm * (1 + ThemeDayGrouper::MAX_EXTRA_DISTANCE) + ThemeDayGrouper::DISTANCE_ALLOWANCE_KM;
+        $checks['travel_km'] = ['planner' => round($plannerKm, 1), 'ai' => round($aiKm, 1), 'limit' => round($limitKm, 1)];
+        if ($aiKm > $limitKm) {
             return $none('too_much_travel', true, $seconds);
         }
 
-        return ['attempted' => true, 'seconds' => $seconds, 'plan' => ['sequence' => $sequence, 'days' => $days], 'reason' => 'candidate'];
+        return ['attempted' => true, 'seconds' => $seconds, 'plan' => ['sequence' => $sequence, 'days' => $days], 'reason' => 'candidate', 'checks' => $checks];
     }
 
     /**
@@ -108,6 +126,18 @@ class AiSkeletonAdvisor
      */
     public function validate(string $raw, array $candidateIds, array $sizes): ?array
     {
+        return $this->inspect($raw, $candidateIds, $sizes)[0];
+    }
+
+    /**
+     * The same check as validate(), but it also says which rule an answer broke (a short code, never the answer itself).
+     *
+     * @param  array<int, int>  $candidateIds
+     * @param  array<int, int>  $sizes
+     * @return array{0: array<int, array{theme: string, stops: array<int, int>}>|null, 1: string|null}
+     */
+    public function inspect(string $raw, array $candidateIds, array $sizes): array
+    {
         $json = trim($raw);
         if (preg_match('/^```(?:json)?\s*(.*?)\s*```$/s', $json, $m)) {
             $json = $m[1];
@@ -115,10 +145,10 @@ class AiSkeletonAdvisor
 
         $data = json_decode($json, true);
         if (! is_array($data) || ! isset($data['days']) || ! is_array($data['days']) || ! array_is_list($data['days'])) {
-            return null;
+            return [null, 'not_the_expected_json'];
         }
         if (count($data['days']) !== count($sizes)) {
-            return null;
+            return [null, 'wrong_number_of_days'];
         }
 
         $dayNumbers = array_keys($sizes);
@@ -128,20 +158,23 @@ class AiSkeletonAdvisor
 
         foreach ($data['days'] as $i => $entry) {
             if (! is_array($entry) || ! isset($entry['day'], $entry['theme'], $entry['destination_ids'])) {
-                return null;
+                return [null, 'day_entry_missing_fields'];
             }
             $day = $dayNumbers[$i];
             if (! is_int($entry['day']) || $entry['day'] !== $day || ! is_string($entry['theme']) || ! is_array($entry['destination_ids']) || ! array_is_list($entry['destination_ids'])) {
-                return null;
+                return [null, 'day_entry_wrong_type_or_number'];
             }
             if (count($entry['destination_ids']) !== $sizes[$day]) {
-                return null;
+                return [null, 'wrong_stops_per_day'];
             }
 
             $ids = [];
             foreach ($entry['destination_ids'] as $id) {
-                if (! is_int($id) || ! isset($known[$id]) || isset($seen[$id])) {
-                    return null;
+                if (! is_int($id) || ! isset($known[$id])) {
+                    return [null, 'unknown_destination_id'];
+                }
+                if (isset($seen[$id])) {
+                    return [null, 'repeated_destination_id'];
                 }
                 $seen[$id] = true;
                 $ids[] = $id;
@@ -149,12 +182,12 @@ class AiSkeletonAdvisor
 
             $theme = $this->cleanTheme($entry['theme']);
             if ($theme === null) {
-                return null;
+                return [null, 'unusable_day_theme'];
             }
             $days[$day] = ['theme' => $theme, 'stops' => $ids];
         }
 
-        return count($seen) === count($candidateIds) ? $days : null;
+        return count($seen) === count($candidateIds) ? [$days, null] : [null, 'candidates_missing'];
     }
 
     /** A short plain-text label: tags and control characters removed, whitespace collapsed, no longer than MAX_THEME_LENGTH. */
