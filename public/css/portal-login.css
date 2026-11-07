@@ -246,7 +246,7 @@
 .portal-next span { display: inline-grid; place-items: center; width: 22px; height: 22px; flex: none; border-radius: 50%; background: #0a4f38; color: #fff; font-size: .72rem; font-weight: 700; }
 .portal-signin--partner .portal-signin__main { padding-top: clamp(20px, 3vw, 34px); padding-bottom: clamp(20px, 3vw, 34px); }
 .portal-signin--partner .form-section { margin: 0; padding: 0; border: 0; }
-.portal-form-label { display: flex; align-items: center; gap: 9px; margin: 16px 0 8px; color: #4b6258; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.portal-form-label { display: flex; align-items: center; gap: 9px; margin: 16px 0 8px; color: #4b6258; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .portal-form-label span { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #e8f3ec; color: #0a4f38; font-size: .75rem; letter-spacing: 0; }
 .portal-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
 .portal-form-grid__full { grid-column: 1 / -1; }
@@ -262,3 +262,17 @@
     .portal-form-grid { grid-template-columns: minmax(0, 1fr); }
     .portal-next { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Phones: the sign-in and register pages opened with a tall picture and two big cards, so the first field sat at the very foot
+   of the screen. The picture is now a short banner with the badge and the headline; the logo (already in the top bar), the
+   sentence under the headline and the "for every explorer" card are left out on a phone. The form starts in the first screen.
+   Wide screens are unchanged. */
+@media (max-width: 720px) {
+    .portal-poster { gap: 16px; padding: 16px; min-height: 200px; justify-content: flex-end; }
+    .portal-poster__intro { padding: 12px 14px; }
+    .portal-poster__brand, .portal-poster__copy, .portal-poster__network { display: none; }
+    .portal-poster__badge { font-size: .72rem; }
+    .portal-poster__headline { margin: 8px 0 0; font-size: 1.35rem; }
+    .portal-signin__main { padding: 22px 20px 28px; }
+}
+

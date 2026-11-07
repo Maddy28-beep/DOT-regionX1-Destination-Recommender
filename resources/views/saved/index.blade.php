@@ -2,8 +2,12 @@
 
 @section('title', 'Saved Places — ExploreDVO')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/saved-page.css') }}?v={{ filemtime(public_path('css/saved-page.css')) }}">
+@endpush
+
 @section('content')
-<div class="page-head">
+<div class="page-head saved-page__head">
     <div class="container">
         <span class="poster-kicker">your shortlist</span>
         <h1 class="poster-title">Saved Places</h1>
@@ -14,7 +18,7 @@
     </div>
 </div>
 
-<div class="section-tight">
+<div class="section-tight saved-page">
     <div class="container">
         @forelse ($groups as $segment => $group)
             <div class="section-head">

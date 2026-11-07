@@ -399,7 +399,11 @@
     .itin-banner__sub { font-size: .92rem; }
     .itin-banner__buttons .btn { padding-inline: 8px; font-size: .9rem; }
     .itin-bar { margin-bottom: 16px; }
-    .itin-bar__links { width: 100%; justify-content: space-between; }
+    /* The four tools in a tidy grid instead of pills that wrap into three uneven rows: the first and the last run the full
+       width, the two between share a row. */
+    .itin-bar__links { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+    .itin-bar__links > * { justify-content: center; min-width: 0; }
+    .itin-bar__links > :first-child, .itin-bar__links > :last-child { grid-column: 1 / -1; }
     .itin-tabs a { min-width: 0; }
     .itin-omissions summary { flex-wrap: wrap; }
     .itin-omissions summary > span:first-of-type { flex: 1 1 180px; }

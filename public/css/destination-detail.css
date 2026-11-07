@@ -179,3 +179,23 @@
     .standard-gallery-detail .gallery-hero-mobile .gallery-hero__title { padding: 56px 18px 58px; }
     .standard-gallery-detail .detail-hero { min-height: 220px; padding-inline: 18px; }
 }
+
+/* Phones: the small labels on detail pages were as low as 8.6px (the strip under the photo) and 10px (the visit and about
+   cards), too small to read on a phone. Capital-letter labels are now 11.2px at the least and everything else 12px. The
+   labels wrap to a second line where they need it, so nothing is cut off. */
+@media (max-width: 640px) {
+    .listing-detail-refresh .stat-strip__label,
+    .listing-detail-refresh .about-card__label,
+    .listing-detail-refresh .visit-card__kicker,
+    .listing-detail-refresh .visit-card__label,
+    .listing-detail-refresh .dcard__new { font-size: .7rem; letter-spacing: .05em; }
+    .listing-detail-refresh .breadcrumb,
+    .listing-detail-refresh .dest-detail-hero > .photo-illustration-tag,
+    .listing-detail-refresh .dpost-badge-accredited,
+    .listing-detail-refresh .dpost-badge-rating,
+    .listing-detail-refresh .dcard__dot,
+    .listing-detail-refresh .about-card__label--row small { font-size: .75rem; }
+    .standard-gallery-detail .gallery-hero > .g-main .photo-illustration-tag,
+    .gallery-categorized .photo-illustration-tag,
+    .listing-detail-refresh .photo-illustration-tag--card { font-size: .7rem; }
+}

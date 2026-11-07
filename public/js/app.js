@@ -546,8 +546,10 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateSavedBadge(delta) {
         // The header's heart and the phone drawer's Saved button each carry one.
         document.querySelectorAll('[data-saved-count]').forEach(function (badge) {
-            var next = Math.max(0, (parseInt(badge.textContent, 10) || 0) + delta);
-            badge.textContent = String(next);
+            // The real count is kept in data-count: the badge shows "99+" past 99 so a long number never covers the heart.
+            var next = Math.max(0, (parseInt(badge.dataset.count || badge.textContent, 10) || 0) + delta);
+            badge.dataset.count = String(next);
+            badge.textContent = next > 99 ? '99+' : String(next);
             badge.hidden = next < 1;
 
             var link = badge.closest('[data-saved-link]');
