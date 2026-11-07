@@ -205,9 +205,12 @@ class ChatbotService
     {
         $sampleData = app(SampleData::class);
         $listings = collect(self::LISTING_CONFIG)->flatMap(function ($config, $type) use ($sampleData) {
-            return $config['model']::query()
-                ->where('is_accredited', true)
-                ->whereNull('archived_at')
+            $query = $config['model']::query()->where('is_accredited', true)->whereNull('archived_at');
+            if (in_array(HasOperatingStatus::class, class_uses_recursive($config['model']), true)) {
+                $query->availableDuring(now(), now());   // a place that is closed today is not offered to the model either
+            }
+
+            return $query
                 ->orderByDesc('rating')
                 ->limit(10)
                 ->get(['id', 'name'])

@@ -232,6 +232,14 @@ class ChatbotReplyGuard
             }
         }
 
+        // A closed place the model named is never left standing as if it were open: the record's own notice follows it.
+        foreach ($named as [$listing, $config]) {
+            $notice = in_array(\App\Models\Concerns\HasOperatingStatus::class, class_uses_recursive($listing), true) ? $listing->operatingNotice() : null;
+            if ($notice !== null) {
+                $lines[] = "{$listing->name}: {$notice}. You may want to pick another place for now.";
+            }
+        }
+
         $text = trim(implode("\n", $lines));
         if ($text === '') {
             return null;
