@@ -1,4 +1,4 @@
-Snapshot: 2026-11-07 18:30:55 | model nomic-embed-text | destinations 151 | with a stored vector 151
+Snapshot: 2026-11-07 18:45:24 | model nomic-embed-text | destinations 151 | with a stored vector 151
 
 FIXTURE official: 24 places, ids 17,9,15,10,11,13,12,14,16,22,23,8,18,19,20,24,21,43,44,45,46,47,48,49
   17 Apo Golf and Country Club | 9 Belviz Farm | 15 Davao Crocodile Park Inc | 10 Bemwa Farm Fresh Inc. | 11 Bukid Amara Tourism Agriventures Corporation | 13 Isla- Agri Ventures Inc | 12 Damosa Land Inc. / Agriya Naturetainment | 14 Lao Integrated Farms | 16 JKM Mini Zoo | 22 Elysia Wellness Spa | 23 Elysia Wellness Spa | 8 SMX Convention Center Davao | 18 Rancho Palos Verdes Golf & Sports Club Inc. | 19 Rancho Palos Verdes Golf & Sports Club Inc. | 20 South Pacific Davao Country Club Inc. | 24 Elysia Wellness Spa | 21 IMIN The Philippine-Japan Historical Museum | 43 Bankerohan Public Market | 44 Cacao Culture Chocolate Shop - Poblacion Market Central | 45 National Museum of the Philippines - Davao | 46 San Pedro Cathedral | 47 Osmeña Park | 48 Kaputian Beach | 49 Paradise Island Park & Beach Resort
@@ -50,3 +50,13 @@ FIXTURE plannable
                          BOTTOM: 58 Lake Leonard (56%); 78 Carolina Lake (57%); 114 Sample Wetland Bird Sanctuary (58%)
   Wildlife               TOP: 3 Philippine Eagle Center (86%); 114 Sample Wetland Bird Sanctuary (76%); 129 Sample Western Marine Sanctuary (74%)
                          BOTTOM: 146 Sample Weaving & Culture House (56%); 134 Sample Town Heritage & Weaving Hou (57%); 139 Sample Provincial Museum Annex (57%)
+
+== PLACES NAMED IN THE PAPER (before freeze): rank among all embedded destinations, 1 = most similar to the interest ==
+  Wildlife               Philippine Eagle Center    in plannable       : rank 1 of 115
+  Wildlife               Philippine Eagle Center    in whole catalogue : rank 1 of 151
+  Hiking & Trekking      Mount Apo Natural Park     in plannable       : rank 11 of 115
+  Hiking & Trekking      Mount Apo Natural Park     in whole catalogue : rank 16 of 151
+  Shopping & Souvenirs   SMX Convention Center      in plannable       : not in this fixture
+  Shopping & Souvenirs   SMX Convention Center      in whole catalogue : rank 15 of 151
+  Nature & Adventure     SMX Convention Center      in plannable       : not in this fixture
+  Nature & Adventure     SMX Convention Center      in whole catalogue : rank 149 of 151

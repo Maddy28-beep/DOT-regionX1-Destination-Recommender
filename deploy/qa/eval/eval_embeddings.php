@@ -119,3 +119,15 @@ foreach ($fixtures as $name => $set) {
         printf("  %-22s TOP: %s\n  %-22s BOTTOM: %s\n", $i->interest, $fmt($ranked->take(3)), '', $fmt($ranked->slice(-3)->reverse()));
     }
 }
+
+echo "\n== PLACES NAMED IN THE PAPER (before freeze): rank among all embedded destinations, 1 = most similar to the interest ==\n";
+$fixtures['whole catalogue'] = $all;
+foreach ([['Wildlife', 3, 'Philippine Eagle Center'], ['Hiking & Trekking', 6, 'Mount Apo Natural Park'], ['Shopping & Souvenirs', 8, 'SMX Convention Center'], ['Nature & Adventure', 8, 'SMX Convention Center']] as [$interest, $id, $nm]) {
+    $iv = $interests->firstWhere('interest', $interest);
+    foreach (['plannable', 'whole catalogue'] as $fx) {
+        $set = $fixtures[$fx];
+        $ranked = $set->map(fn ($d) => ['id' => $d->id, 's' => $sim($iv->vector, $vec[$d->id])])->sortByDesc('s')->values();
+        $pos = $ranked->search(fn ($r) => $r['id'] === $id);
+        printf("  %-22s %-26s in %-16s: %s\n", $interest, $nm, $fx, $pos === false ? 'not in this fixture' : 'rank '.($pos + 1).' of '.$set->count());
+    }
+}
