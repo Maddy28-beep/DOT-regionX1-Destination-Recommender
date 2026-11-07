@@ -18,7 +18,7 @@ use Tests\TestCase;
 
 /**
  * F3 follow-up. (a) A Close or Commutable trip that has to widen its range never admits a place whose round trip would not
- * fit the 8-hour driving ceiling, and the traveller is told how many were left out; Remote keeps them. (b) A souvenir stop
+ * fit the 8-hour driving ceiling, and the traveller is told some were left out (no count); Remote keeps them. (b) A souvenir stop
  * has to fit inside the day's driving budget (3.5 / 5 / 7 hours), not only the 8-hour ceiling.
  */
 class RangeCapAndSoftBudgetTest extends TestCase
@@ -124,7 +124,9 @@ class RangeCapAndSoftBudgetTest extends TestCase
 
         $page = $this->withSession([TripPlannerController::ITINERARY_KEY => $trip->id, TripPlannerController::PREFERENCE_KEY => $preference->id])
             ->get(route('plan.itinerary'))->assertOk()->getContent();
-        $this->assertStringContainsString('too far to visit in a day', $page);
+        $this->assertStringContainsString('Some distant places were left out because they are too far for a single day.', $page);
+        $this->assertStringContainsString('to include them.', $page);
+        $this->assertDoesNotMatchRegularExpression('/left out \d+ place/i', $page, 'no count is shown');
     }
 
     public function test_a_remote_trip_shows_no_such_notice(): void
@@ -137,7 +139,7 @@ class RangeCapAndSoftBudgetTest extends TestCase
         $this->assertSame(0, (int) $trip->range_capped_places);
         $page = $this->withSession([TripPlannerController::ITINERARY_KEY => $trip->id, TripPlannerController::PREFERENCE_KEY => $preference->id])
             ->get(route('plan.itinerary'))->assertOk()->getContent();
-        $this->assertStringNotContainsString('too far to visit in a day', $page);
+        $this->assertStringNotContainsString('Some distant places were left out', $page);
     }
 
     public function test_a_souvenir_stop_that_fits_the_ceiling_but_not_the_days_budget_is_left_out(): void
