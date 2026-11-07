@@ -19,7 +19,7 @@ class PlanResumeDraftTest extends TestCase
             ->assertOk()
             ->assertSee('id="planResume"', false)
             ->assertSee('data-draft-owner="guest"', false)
-            ->assertSee('Dates, location and health details aren', false)
+            ->assertSee('Dates, location, and health details aren’t saved in this draft', false)
             ->assertSeeInOrder(['id="planResume"', 'hidden>'], false);
     }
 
