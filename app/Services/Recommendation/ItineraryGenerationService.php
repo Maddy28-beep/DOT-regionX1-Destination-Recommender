@@ -104,6 +104,7 @@ class ItineraryGenerationService
         // Every place picked below is checked against the traveller's own dates.
         TravelWindow::set(...$preference->travelWindow());
         $this->regionNames = null;
+        $this->stayMinutesMemo = [];
 
         try {
             return $this->generateWithinWindow($preference, $originLat, $originLng, $swaps);
@@ -506,7 +507,12 @@ class ItineraryGenerationService
     private function withinOneNeighbourhood(\Illuminate\Support\Collection $ranked, int $stops, TouristPreference $preference, float $originLat, float $originLng): \Illuminate\Support\Collection
     {
         $rows = $ranked->values()->all();
-        $minutes = fn (Destination $a, Destination $b): int => $this->stayMinutes($this->placeOf($a), $this->placeOf($b), $preference);
+        // Each place's position is worked out once, not once per pair (the pairing below is every place against every other).
+        $places = [];
+        foreach ($rows as $row) {
+            $places[$row['destination']->id] = $this->placeOf($row['destination']);
+        }
+        $minutes = fn (Destination $a, Destination $b): int => $this->stayMinutes($places[$a->id] ?? $this->placeOf($a), $places[$b->id] ?? $this->placeOf($b), $preference);
         $mapped = fn (array $row): bool => $row['destination']->latitude !== null && $row['destination']->longitude !== null;
 
         $start = ['lat' => $originLat, 'lng' => $originLng, 'region' => null];
@@ -1075,6 +1081,11 @@ class ItineraryGenerationService
         ];
     }
 
+    /** @var array<string, int> stayMinutes() answers, kept for the plan being built only */
+    private array $stayMinutesMemo = [];
+
+    private ?TravelTimeEstimator $travelEstimator = null;
+
     /** Region names by id, read once per plan (see generate()). */
     private ?\Illuminate\Support\Collection $regionNames = null;
 
@@ -1085,7 +1096,10 @@ class ItineraryGenerationService
             return 0;
         }
 
-        return app(TravelTimeEstimator::class)->estimate(
+        // A pure function of the two places and the way of travelling, asked for the same pair many times in one plan.
+        $key = $a['lat'].'|'.$a['lng'].'|'.$a['region'].'>'.$b['lat'].'|'.$b['lng'].'|'.$b['region'].'|'.$preference->transport_pref;
+
+        return $this->stayMinutesMemo[$key] ??= ($this->travelEstimator ??= app(TravelTimeEstimator::class))->estimate(
             $this->haversineKm($a['lat'], $a['lng'], $b['lat'], $b['lng']), $a['region'], $b['region'], $preference->transport_pref,
         )['max_minutes'];
     }
