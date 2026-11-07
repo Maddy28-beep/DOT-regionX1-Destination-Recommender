@@ -208,6 +208,9 @@ class ItineraryGenerationService
             }
         }
 
+        // Every stay chosen for this trip, on any path, is held to the same distance from the trip's stops (see tooFarFromTrip()).
+        $this->tripStops = $this->mappedStopCoordinates($sequence);
+
         /*
          * Theme-based days (pretrained embeddings): decide which stops share a day
          * so that a day's places are alike, within a travelling limit. The stops
@@ -1213,7 +1216,33 @@ class ItineraryGenerationService
             }
         }
 
-        return $best;
+        return $this->withinReachOfTrip($best);
+    }
+
+    /** The stops (coordinates) of the trip being planned; every stay path is held to the same limit from them. */
+    private ?\Illuminate\Support\Collection $tripStops = null;
+
+    /**
+     * One rule for every path that chooses a stay: a stay more than STAY_MAX_KM from any stop of the trip is passed over. A
+     * night that would be left with no stay at all keeps its stays, so a spread-out trip is never left without somewhere to sleep.
+     *
+     * @param  array<int, \Illuminate\Support\Collection<int, Accommodation>>  $byNight
+     * @return array<int, \Illuminate\Support\Collection<int, Accommodation>>
+     */
+    private function withinReachOfTrip(array $byNight): array
+    {
+        if ($this->tripStops === null || $this->tripStops->isEmpty()) {
+            return $byNight;
+        }
+
+        foreach ($byNight as $night => $stays) {
+            $near = $stays->reject(fn (Accommodation $s) => $this->tooFarFromTrip($s, $this->tripStops))->values();
+            if ($near->isNotEmpty()) {
+                $byNight[$night] = $near;
+            }
+        }
+
+        return $byNight;
     }
 
     /**
@@ -1785,8 +1814,11 @@ class ItineraryGenerationService
          * still breaks ties among stays at similar total distance; an
          * unlocatable stay is still offered rather than none at all.
          */
-        $listing = $mappedStops->isNotEmpty()
-                ? (clone $query)->whereNotNull('latitude')->whereNotNull('longitude')->get()
+        $mapped = $mappedStops->isNotEmpty() ? (clone $query)->whereNotNull('latitude')->whereNotNull('longitude')->get() : null;
+        // The same limit as every other path; if nothing is within it, the closest stay is still offered.
+        $withinReach = $mapped?->reject(fn (Accommodation $a) => $this->tooFarFromTrip($a, $mappedStops))->values();
+        $listing = $mapped !== null
+                ? ($withinReach->isNotEmpty() ? $withinReach : $mapped)
                     ->sortBy(function (Accommodation $a) use ($mappedStops) {
                         $distances = $mappedStops->map(fn (array $stop) => $this->haversineKm(
                             (float) $a->latitude, (float) $a->longitude, $stop['lat'], $stop['lng']
