@@ -71,7 +71,7 @@
                    aria-label="Saved places{{ ($savedCount ?? 0) > 0 ? ', '.$savedCount.' saved' : '' }}" title="Saved places"
                    @if(request()->routeIs('saved.*', 'account.saved')) aria-current="page" @endif>
                     <x-icon name="heart" />
-                    <span class="header-saved__count" data-saved-count @if(($savedCount ?? 0) < 1) hidden @endif>{{ $savedCount ?? 0 }}</span>
+                    <span class="header-saved__count" data-count="{{ $savedCount ?? 0 }}" data-saved-count @if(($savedCount ?? 0) < 1) hidden @endif>{{ ($savedCount ?? 0) > 99 ? '99+' : ($savedCount ?? 0) }}</span>
                 </a>
                 <a href="{{ route('plan.choose') }}" @if(request()->routeIs('plan.*')) aria-current="page" @endif class="btn btn-primary header-plan">Plan My Trip <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
 
@@ -141,7 +141,7 @@
                @if(request()->routeIs('saved.*', 'account.saved')) aria-current="page" @endif>
                 <x-icon name="heart" />
                 Saved
-                <span class="mobile-menu__count" data-saved-count aria-hidden="true" @if(($savedCount ?? 0) < 1) hidden @endif>{{ $savedCount ?? 0 }}</span>
+                <span class="mobile-menu__count" data-count="{{ $savedCount ?? 0 }}" data-saved-count aria-hidden="true" @if(($savedCount ?? 0) < 1) hidden @endif>{{ ($savedCount ?? 0) > 99 ? '99+' : ($savedCount ?? 0) }}</span>
             </a>
         </div>
 

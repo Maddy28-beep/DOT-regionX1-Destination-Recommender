@@ -55,6 +55,7 @@
         transition: transform .15s ease;
     }
     .chatbot-toggle:hover { transform: scale(1.05); }
+    .chatbot-toggle:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
     .chatbot-toggle:hover .chatbot-avatar { box-shadow: 0 10px 26px rgba(0,0,0,.34); }
     /* A soft green ring that spreads out twice from the button when the hint appears, to say "talk to me". */
     .chatbot-toggle.is-pinging { animation: chatbot-ping 1.6s ease-out 2; }
@@ -241,7 +242,7 @@
         .chatbot-toggle.is-pinging { animation: none; }
         .chatbot-hint { transition: none; transform: none; }
         .chatbot-toggle.is-waving .chatbot-wave-pose { animation: none; }
-        .chatbot-toggle { transition: none; } .chatbot-toggle:hover { transform: none; }
+        .chatbot-toggle, .chatbot-widget .chatbot-toggle { transition: none; } .chatbot-toggle:hover { transform: none; }
         .chatbot-typing i { animation: none; opacity: .7; }
         .chatbot-thinking .chatbot-mini-avatar img { animation: none; }
     }

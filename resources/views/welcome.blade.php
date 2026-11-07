@@ -206,9 +206,9 @@
     @endif
 
     <div class="hero-tourism-brands" aria-label="Tourism logos">
-        <img src="{{ asset('images/tourism-logos/davao.png') }}" alt="Davao" class="hero-tourism-brands__davao">
-        <img src="{{ asset('images/tourism-logos/dot.png') }}" alt="Department of Tourism Philippines" class="hero-tourism-brands__dot">
-        <img src="{{ asset('images/tourism-logos/love-philippines.png') }}" alt="Love the Philippines" class="hero-tourism-brands__love">
+        <img src="{{ asset('images/tourism-logos/davao.png') }}" alt="Davao" class="hero-tourism-brands__davao" width="400" height="134">
+        <img src="{{ asset('images/tourism-logos/dot.png') }}" alt="Department of Tourism Philippines" class="hero-tourism-brands__dot" width="200" height="197">
+        <img src="{{ asset('images/tourism-logos/love-philippines.png') }}" alt="Love the Philippines" class="hero-tourism-brands__love" width="420" height="179">
     </div>
 
     <div class="poster-hero__content">

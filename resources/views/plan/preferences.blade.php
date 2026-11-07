@@ -65,7 +65,7 @@
                         <button type="button" id="planResumeContinue">Continue planning <span aria-hidden="true">&rarr;</span></button>
                         <button type="button" id="planResumeDiscard">Start over</button>
                     </div>
-                    <p class="plan-resume-note">You can review your answers before creating your itinerary.<br>Dates, location, and health details aren’t saved in this draft.</p>
+                    <p class="plan-resume-note"><x-icon name="info" class="plan-resume-note__icon" /><span>You can review your answers before creating your itinerary. <br>Dates, location, and health details aren’t saved in this draft.</span></p>
                 </div>
             </section>
             <nav class="plan-wizard-steps" aria-label="Trip planning steps" hidden>
@@ -454,6 +454,8 @@
 <script src="{{ asset('js/plan-departure.js') }}?v={{ filemtime(public_path('js/plan-departure.js')) }}" defer></script>
 <script src="{{ asset('js/plan-comfort.js') }}?v={{ filemtime(public_path('js/plan-comfort.js')) }}" defer></script>
 <script src="{{ asset('js/plan-wizard.js') }}?v={{ filemtime(public_path('js/plan-wizard.js')) }}" defer></script>
+{{-- After the wizard script: it builds the step panels this one folds parts of. --}}
+<script src="{{ asset('js/plan-collapse.js') }}?v={{ filemtime(public_path('js/plan-collapse.js')) }}" defer></script>
 <script src="{{ asset('js/plan-interest-summary.js') }}?v={{ filemtime(public_path('js/plan-interest-summary.js')) }}" defer></script>
 <script src="{{ asset('js/plan-stay-summary.js') }}?v={{ filemtime(public_path('js/plan-stay-summary.js')) }}" defer></script>
 

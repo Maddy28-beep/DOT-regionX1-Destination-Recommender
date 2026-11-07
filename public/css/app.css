@@ -1148,11 +1148,11 @@ body:not(.portal):not(.admin) .header-actions { gap: 10px; }
 .header-saved svg { width: 17px; height: 17px; }
 .header-saved__count {
     position: absolute;
-    top: -5px;
-    right: -5px;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 4px;
+    top: -6px;
+    right: -6px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1160,7 +1160,7 @@ body:not(.portal):not(.admin) .header-actions { gap: 10px; }
     border-radius: 999px;
     background: var(--stamp-red);
     color: #fff;
-    font-size: .64rem;
+    font-size: .72rem;
     font-weight: 700;
     line-height: 1;
 }

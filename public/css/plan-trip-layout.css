@@ -381,3 +381,46 @@
         grid-column: 2; grid-row: 2; justify-self: center; align-self: start; min-height: 44px; padding: 8px 18px; font-size: .86rem; background: #fff;
     }
 }
+
+/* Phones: the three optional parts of step 1 (arrival time, departure details, where you start) fold behind a one-line row.
+   public/js/plan-collapse.js adds the rows and the is-collapsed class; on a wide screen the rows never show and nothing is
+   hidden, and without JavaScript nothing is folded. */
+.pc-collapse { display: none; }
+@media (max-width: 640px) {
+    .plan-wizard #plan-step-0 .pc-collapsible.is-collapsed { display: none; }
+    .plan-wizard #plan-step-0 .pc-collapse {
+        display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 48px;
+        margin-top: 10px; padding: 10px 14px; border: 1px dashed #9db8ab; border-radius: 10px; background: #f2f8f4;
+        color: var(--primary-dark); font: 600 .9rem 'Poppins', sans-serif; text-align: left; cursor: pointer;
+    }
+    .plan-wizard #plan-step-0 .pc-collapse[aria-expanded="true"] { border-style: solid; background: #e6f3ec; }
+    .plan-wizard #plan-step-0 .pc-collapse__hint { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: .8rem; font-weight: 500; }
+    .plan-wizard #plan-step-0 .pc-collapse__hint::after {
+        content: ''; width: 7px; height: 7px; border: solid currentColor; border-width: 0 2px 2px 0; transform: translateY(-2px) rotate(45deg);
+    }
+    .plan-wizard #plan-step-0 .pc-collapse[aria-expanded="true"] .pc-collapse__hint::after { transform: translateY(1px) rotate(-135deg); }
+    .plan-wizard #plan-step-0 .pc-collapse:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+    /* The row already names the part, so the part's own title is not repeated once it is open. */
+    .plan-wizard #plan-step-0 .pc-trip-start > .pc-block__head h3,
+    .plan-wizard #plan-step-0 .pc-trip-departure > legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .plan-wizard #plan-step-0 .pc-trip-departure { margin-top: 8px; }
+}
+
+/* Phones, steps 2 to 4 of the trip form: nothing smaller than 12px. The interest and amenity chips, the "selected" count, the
+   stay and getting-around descriptions and the health options had slipped to between 10.6 and 11.8px, which is hard to read
+   on a phone (the step ids are in the selector so these win over the per-step sizes above). Raised to 12 to 12.5px; the layout is unchanged. */
+@media (max-width: 640px) {
+    .plan-wizard :is(#plan-step-1, #plan-step-2, #plan-step-3) .pc-chip > span,
+    .plan-wizard :is(#plan-step-1, #plan-step-2, #plan-step-3) .pc-check__text,
+    .plan-wizard :is(#plan-step-1, #plan-step-2, #plan-step-3) .pc-stay-choice__name { font-size: .78rem; }
+    .plan-wizard :is(#plan-step-1, #plan-step-2, #plan-step-3) .field-required-hint,
+    .plan-wizard :is(#plan-step-1, #plan-step-2, #plan-step-3) .pc-selection-count,
+    .plan-wizard :is(#plan-step-1, #plan-step-2, #plan-step-3) .pc-card__text small,
+    .plan-wizard :is(#plan-step-1, #plan-step-2, #plan-step-3) .pc-card__text em,
+    .plan-wizard :is(#plan-step-1, #plan-step-2, #plan-step-3) .pc-compare__estimate,
+    .plan-wizard :is(#plan-step-1, #plan-step-2, #plan-step-3) .pc-compare__foot,
+    .plan-wizard :is(#plan-step-1, #plan-step-2, #plan-step-3) .pc-compare__foot span,
+    .plan-wizard :is(#plan-step-1, #plan-step-2, #plan-step-3) .pc-option__name,
+    .plan-wizard :is(#plan-step-1, #plan-step-2, #plan-step-3) .pc-option__caption,
+    .plan-wizard :is(#plan-step-1, #plan-step-2, #plan-step-3) .pc-health-name { font-size: .75rem; }
+}

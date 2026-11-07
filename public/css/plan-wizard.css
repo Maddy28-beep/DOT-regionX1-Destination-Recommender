@@ -183,3 +183,25 @@
     margin: 0; padding: 0;
 }
 .plan-wizard .field { min-width: 0; }
+
+/* "Pick up where you left off" on a phone: two full-width buttons, one above the other, and the note under them as a calm
+   green box with an info icon (the same note as before, just set apart from the buttons). The wide-screen card is unchanged. */
+.plan-resume-note__icon { display: none; }
+@media (max-width: 640px) {
+    .plan-resume-actions { display: grid; gap: 10px; }
+    .plan-resume-actions button { width: 100%; min-height: 48px; padding: 12px 18px; border-radius: 12px; font-size: 1rem; }
+    .plan-resume-actions #planResumeDiscard { min-height: 46px; padding: 10px 18px; border-width: 1.5px; }
+    .plan-resume .plan-resume-note {
+        display: flex; align-items: flex-start; gap: 10px; margin: 14px 0 0; padding: 12px 14px; border-radius: 12px;
+        background: #e6f0e8; color: #3d5a4c; font-size: .82rem; line-height: 1.5; text-align: left;
+    }
+    .plan-resume .plan-resume-note br { display: none; }
+    .plan-resume-note__icon { display: block; flex: none; width: 18px; height: 18px; margin-top: 2px; color: #4b6b5a; }
+}
+
+/* Phones, while the itinerary is being built: the small "Hang tight" line is readable (it was 10.4px), and the chat button
+   steps out of the way, because the page is short here and the button sat right on the progress bar. */
+@media (max-width: 640px) {
+    .plan-loading-kicker { font-size: .75rem; }
+    body:has(#planWizard.is-building) #chatbot-widget { visibility: hidden; }
+}
