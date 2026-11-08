@@ -7,14 +7,14 @@
     <title>ExploreDVO — Discover the Wonders of Davao Region</title>
     @include('partials.share-meta', ['metaTitle' => 'ExploreDVO — Discover the Wonders of Davao Region'])
     @include('partials.head-assets')
-    <link rel="stylesheet" href="{{ asset('css/landing-sections.css') }}?v={{ filemtime(public_path('css/landing-sections.css')) }}">
-    <link rel="stylesheet" href="{{ asset('css/mood-cards.css') }}?v={{ filemtime(public_path('css/mood-cards.css')) }}">
-    <link rel="stylesheet" href="{{ asset('css/hero-search.css') }}?v={{ filemtime(public_path('css/hero-search.css')) }}">
-    <link rel="stylesheet" href="{{ asset('css/home-slides.css') }}?v={{ filemtime(public_path('css/home-slides.css')) }}">
+    <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/landing-sections.css') }}">
+    <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/mood-cards.css') }}">
+    <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/hero-search.css') }}">
+    <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/home-slides.css') }}">
     @if ($heroVideo && $heroVideo['poster'])
         {{-- Fetched in parallel with the stylesheet so the hero's ground is
              ready at first paint, rather than arriving after it. --}}
-        <link rel="preload" as="image" href="{{ $heroVideo['poster'] }}">
+        <link rel="preload" as="image" href="{{ $heroVideo['poster'] }}" fetchpriority="high">
     @endif
 </head>
 <body class="hero-page">
@@ -147,40 +147,6 @@
                 // say it is wanted.
                 video.preload = 'auto';
 
-                /*
-                 * If no frame ever arrives, put the illustration back. Both
-                 * paths are needed: `error` does not fire reliably on a media
-                 * element whose sources are <source> children, and a clip can
-                 * also simply stall. loadeddata re-commits if it turns up late.
-                 */
-                var giveUp = setTimeout(function () {
-                    if (video.readyState < 2) fallBack();
-                }, 2500);
-
-                video.addEventListener('error', function () {
-                    clearTimeout(giveUp);
-                    fallBack();
-                }, { once: true });
-
-                ['webm', 'mp4'].forEach(function (type) {
-                    var url = video.getAttribute('data-' + type);
-                    if (!url) return;
-
-                    var source = document.createElement('source');
-                    source.src = url;
-                    source.type = type === 'webm' ? 'video/webm' : 'video/mp4';
-                    video.appendChild(source);
-                });
-
-                video.load();
-
-                // Re-commit if the clip turns up after the deadline above had
-                // already put the illustration back.
-                video.addEventListener('loadeddata', function () {
-                    clearTimeout(giveUp);
-                    hero.classList.add('has-video');
-                }, { once: true });
-
                 // play() can reject on its own even when muted (a phone in
                 // low-power mode, for one). The first frame stays on screen if
                 // it does, and the first touch or scroll is allowed to start it.
@@ -190,7 +156,72 @@
                         attempt.catch(function () {});
                     }
                 };
-                start();
+                /*
+                 * Everything that touches the network lives in begin(). On a computer it runs at once, as before.
+                 * On a phone it waits for the page's own load event: the 0.6 MB clip would otherwise share a slow
+                 * connection with the stylesheet and the poster, and delay the first paint by seconds. The poster and
+                 * the dark ground are already on screen, so the footage simply arrives a moment later.
+                 */
+                var begin = function () {
+                    /*
+                     * If no frame ever arrives, put the illustration back. Both
+                     * paths are needed: `error` does not fire reliably on a media
+                     * element whose sources are <source> children, and a clip can
+                     * also simply stall. loadeddata re-commits if it turns up late.
+                     */
+                    var giveUp = setTimeout(function () {
+                        if (video.readyState < 2) fallBack();
+                    }, 2500);
+
+                    video.addEventListener('error', function () {
+                        clearTimeout(giveUp);
+                        fallBack();
+                    }, { once: true });
+
+                    ['webm', 'mp4'].forEach(function (type) {
+                        var url = video.getAttribute('data-' + type);
+                        if (!url) return;
+
+                        var source = document.createElement('source');
+                        source.src = url;
+                        source.type = type === 'webm' ? 'video/webm' : 'video/mp4';
+                        video.appendChild(source);
+                    });
+
+                    video.load();
+
+                    // Re-commit if the clip turns up after the deadline above had
+                    // already put the illustration back.
+                    video.addEventListener('loadeddata', function () {
+                        clearTimeout(giveUp);
+                        hero.classList.add('has-video');
+                    }, { once: true });
+
+                    start();
+                };
+
+                /*
+                 * On a phone the clip's first frame was the "largest paint" PageSpeed waited for (2.8 s, against 1.3 s
+                 * for the poster on its own). So a phone starts the footage only once the page has settled: on the
+                 * visitor's first touch, scroll or key press, or at the latest 8 s after load. The poster stays on
+                 * screen until then. A computer still starts it at once.
+                 */
+                if (window.matchMedia('(max-width: 767px)').matches && document.readyState !== 'complete') {
+                    var kick = ['touchstart', 'pointerdown', 'scroll', 'keydown'];
+                    var began = false;
+                    var wait;
+                    var go = function () {
+                        if (began) return;
+                        began = true;
+                        clearTimeout(wait);
+                        kick.forEach(function (name) { window.removeEventListener(name, go); });
+                        begin();
+                    };
+                    kick.forEach(function (name) { window.addEventListener(name, go, { passive: true }); });
+                    window.addEventListener('load', function () { wait = setTimeout(go, 8000); }, { once: true });
+                } else {
+                    begin();
+                }
 
                 var retry = function () {
                     if (video.paused) start();
@@ -206,9 +237,9 @@
     @endif
 
     <div class="hero-tourism-brands" aria-label="Tourism logos">
-        <img src="{{ asset('images/tourism-logos/davao.png') }}" alt="Davao" class="hero-tourism-brands__davao" width="400" height="134">
-        <img src="{{ asset('images/tourism-logos/dot.png') }}" alt="Department of Tourism Philippines" class="hero-tourism-brands__dot" width="200" height="197">
-        <img src="{{ asset('images/tourism-logos/love-philippines.png') }}" alt="Love the Philippines" class="hero-tourism-brands__love" width="420" height="179">
+        <img src="{{ asset('images/tourism-logos/davao.webp') }}" alt="Davao" class="hero-tourism-brands__davao" width="200" height="67">
+        <img src="{{ asset('images/tourism-logos/dot.webp') }}" alt="Department of Tourism Philippines" class="hero-tourism-brands__dot" width="100" height="99">
+        <img src="{{ asset('images/tourism-logos/love-philippines.webp') }}" alt="Love the Philippines" class="hero-tourism-brands__love" width="220" height="94">
     </div>
 
     <div class="poster-hero__content">
@@ -458,7 +489,7 @@
             <a href="{{ route('destinations.show', $featuredDestination) }}" class="dpost-banner">
                 <div class="dpost-banner__art">
                     @if ($featuredPhoto = $featuredDestination->coverPhoto())
-                        <img src="{{ $featuredPhoto->url() }}" alt="" class="dpost-card__photo" loading="lazy">
+                        <img src="{{ $featuredPhoto->cardUrl() }}" alt="" class="dpost-card__photo" loading="lazy" decoding="async">
                     @else
                         @include('partials.poster-illustration', ['scene' => $featuredScene])
                     @endif

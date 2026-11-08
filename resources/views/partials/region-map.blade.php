@@ -19,10 +19,9 @@
     region pills beside it already link everywhere the pins do.
 --}}
 @if (!empty($regions))
-    @once
-        <link rel="stylesheet" href="{{ asset('vendor/leaflet/leaflet.css') }}" />
-        <script src="{{ asset('vendor/leaflet/leaflet.js') }}"></script>
-    @endonce
+    {{-- Leaflet (144 KB of script plus its stylesheet) is NOT loaded with the page any more. This one small map sits far down
+         the landing page, and on a phone those bytes delayed everything above it. The script at the foot of this file
+         loads Leaflet only when the map is about to scroll into view. --}}
 
     <div id="region-map" class="region-map" role="img"
          aria-label="Map of the Davao Region showing accredited listings in each province"></div>
@@ -119,10 +118,50 @@
                 });
             }
 
+            // Load Leaflet (script and stylesheet) when the map is about to be seen, then draw it.
+            var leafletCss = {!! Illuminate\Support\Js::from(asset('vendor/leaflet/leaflet.css')) !!};
+            var leafletJs = {!! Illuminate\Support\Js::from(asset('vendor/leaflet/leaflet.js')) !!};
+
+            function loadLeaflet(done) {
+                if (window.L) { done(); return; }
+                var pending = 2;
+                var one = function () { if (--pending === 0) done(); };
+
+                var link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = leafletCss;
+                link.onload = one;
+                link.onerror = one;
+                document.head.appendChild(link);
+
+                var script = document.createElement('script');
+                script.src = leafletJs;
+                script.onload = one;
+                script.onerror = function () { /* no map; the province links beside it still work */ };
+                document.head.appendChild(script);
+            }
+
+            function watch() {
+                var el = document.getElementById('region-map');
+                if (!el) return;
+                var start = function () { loadLeaflet(init); };
+
+                if ('IntersectionObserver' in window) {
+                    new IntersectionObserver(function (entries, observer) {
+                        if (entries.some(function (e) { return e.isIntersecting; })) {
+                            observer.disconnect();
+                            start();
+                        }
+                    }, { rootMargin: '600px 0px' }).observe(el);
+                } else {
+                    window.addEventListener('load', function () { setTimeout(start, 1500); });
+                }
+            }
+
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', init);
+                document.addEventListener('DOMContentLoaded', watch);
             } else {
-                init();
+                watch();
             }
         })();
     </script>

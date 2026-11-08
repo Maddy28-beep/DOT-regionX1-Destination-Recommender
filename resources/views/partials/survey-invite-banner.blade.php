@@ -11,7 +11,7 @@
            data-check-in="{{ session('show_survey_invite') ? 'true' : 'false' }}">
         <button type="button" class="survey-invite__close" data-survey-dismiss aria-label="Close survey invitation">&times;</button>
         <div class="survey-invite__intro">
-            <img class="survey-invite__davo" src="{{ asset('images/davo-survey-v2.webp') }}" alt="" width="72" height="86">
+            <img class="survey-invite__davo" src="{{ asset('images/davo-survey-v2-160.webp') }}" alt="" width="72" height="86" loading="lazy" decoding="async">
             <div>
                 <span class="survey-invite__kicker">A moment with Davo</span>
                 <h2 id="surveyInviteTitle">How was your Davao trip?</h2>
