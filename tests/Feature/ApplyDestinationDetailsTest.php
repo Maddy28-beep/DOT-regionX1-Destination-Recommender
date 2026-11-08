@@ -203,7 +203,8 @@ class ApplyDestinationDetailsTest extends TestCase
         foreach (glob(base_path('database/data/destination-amenities-2026-11-09*.csv')) as $path) {
             $h = fopen($path, 'r');
             $header = fgetcsv($h);
-            $this->assertSame(['id', 'name', 'field', 'value', 'source'], $header, basename($path));
+            // By slug, not id: ids differ between this machine and the live server.
+            $this->assertSame(['slug', 'name', 'field', 'value', 'source'], $header, basename($path));
             while (($r = fgetcsv($h)) !== false) {
                 [$id, $name, $field, $value, $source] = $r;
                 $this->assertSame('amenity', $field);
@@ -215,5 +216,54 @@ class ApplyDestinationDetailsTest extends TestCase
             fclose($h);
         }
         $this->assertNotEmpty($seen);
+    }
+
+    // ---- rows matched by slug (database ids differ between copies of the data)
+
+    private function slugCsv(array $rows, string $header = 'slug,name,field,value,source'): string
+    {
+        $path = tempnam(sys_get_temp_dir(), 'slugs').'.csv';
+        $lines = [$header];
+        foreach ($rows as $r) {
+            $lines[] = implode(',', array_map(fn ($c) => '"'.str_replace('"', '""', (string) $c).'"', $r));
+        }
+        file_put_contents($path, implode("
+", $lines));
+
+        return $path;
+    }
+
+    public function test_rows_can_name_the_place_by_slug_and_never_need_its_id(): void
+    {
+        $d = $this->destination('Hagimit Falls [SAMPLE]');
+        $file = $this->slugCsv([['hagimit-falls-sample', 'Hagimit Falls [SAMPLE]', 'amenity', 'parking', self::SOURCE]]);
+
+        $this->artisan('destinations:apply-details', ['file' => $file, '--apply' => true])->assertSuccessful();
+
+        $this->assertSame(['Parking Area'], $d->tags()->where('kind', 'amenity')->pluck('value')->all());
+    }
+
+    public function test_a_slug_whose_place_has_another_name_stops_the_whole_file(): void
+    {
+        $a = $this->destination('Hagimit Falls [SAMPLE]');
+        $b = $this->destination('Eden Nature Park');
+        $file = $this->slugCsv([
+            ['hagimit-falls-sample', 'Hagimit Falls [SAMPLE]', 'amenity', 'parking', self::SOURCE],
+            ['eden-nature-park', 'Some Other Park', 'amenity', 'restroom', self::SOURCE],
+        ]);
+
+        $this->artisan('destinations:apply-details', ['file' => $file, '--apply' => true])->expectsOutputToContain('Nothing changed')->assertFailed();
+        $this->assertSame(0, $a->tags()->where('kind', 'amenity')->count() + $b->tags()->where('kind', 'amenity')->count());
+    }
+
+    public function test_an_unknown_slug_and_a_file_with_neither_id_nor_slug_are_refused(): void
+    {
+        $this->destination('Eden Nature Park');
+
+        $this->artisan('destinations:apply-details', ['file' => $this->slugCsv([['no-such-place', 'Eden Nature Park', 'amenity', 'parking', self::SOURCE]])])
+            ->expectsOutputToContain('Nothing changed')->assertFailed();
+
+        $this->artisan('destinations:apply-details', ['file' => $this->slugCsv([['Eden Nature Park', 'amenity', 'parking', self::SOURCE]], 'name,field,value,source')])
+            ->expectsOutputToContain('Missing column(s): id (or slug)')->assertFailed();
     }
 }
