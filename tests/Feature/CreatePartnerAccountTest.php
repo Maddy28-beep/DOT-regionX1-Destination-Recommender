@@ -30,7 +30,7 @@ class CreatePartnerAccountTest extends TestCase
         ] + ($class === Accommodation::class ? ['type' => 'Hotel'] : []));
         AccreditationRecord::create([
             'listing_kind' => $kind, 'listing_id' => $listing->id, 'status' => 'Active', 'is_placeholder' => $sample,
-            'accreditation_number' => ($sample ? 'SAMPLE-' : 'DOT-R11-REAL-').$listing->id,
+            'accreditation_number' => ($sample ? 'SAMPLE-' : 'DOT-R11-REAL-').$kind.'-'.$listing->id,
         ]);
 
         return $listing;
@@ -78,6 +78,28 @@ class CreatePartnerAccountTest extends TestCase
 
         $this->assertSame(1, EstablishmentAccount::count());
         $this->assertSame('approved', EstablishmentAccount::first()->status);
+    }
+
+    public function test_the_password_can_come_from_a_named_environment_variable_and_must_be_long_enough(): void
+    {
+        $this->listing(Accommodation::class, 'accommodation', 'Sample Inn', true);
+        $this->listing(TourOperator::class, 'tour_operator', 'Sample Tours', true);
+
+        putenv('PARTNER_TEST_PW=short');
+        $this->artisan('partners:create', ['kind' => 'accommodation', 'listing' => 'sample-inn', 'email' => 'inn@example.com', '--password-env' => 'PARTNER_TEST_PW', '--apply' => true])
+            ->expectsOutputToContain('shorter than 8')->assertFailed();
+        $this->assertSame(0, EstablishmentAccount::count());
+
+        putenv('PARTNER_TEST_PW=a-shared-test-pass');
+        foreach ([['accommodation', 'sample-inn', 'inn@example.com'], ['tour_operator', 'sample-tours', 'tours@example.com']] as [$kind, $slug, $email]) {
+            $this->artisan('partners:create', ['kind' => $kind, 'listing' => $slug, 'email' => $email, '--password-env' => 'PARTNER_TEST_PW', '--apply' => true])->assertSuccessful();
+        }
+        putenv('PARTNER_TEST_PW');
+
+        $this->assertSame(2, EstablishmentAccount::count());
+        foreach (EstablishmentAccount::all() as $account) {
+            $this->assertTrue(Hash::check('a-shared-test-pass', $account->password_hash));
+        }
     }
 
     public function test_a_password_that_is_short_or_mistyped_creates_nothing(): void
@@ -136,7 +158,8 @@ class CreatePartnerAccountTest extends TestCase
     {
         $source = file_get_contents(app_path('Console/Commands/CreatePartnerAccount.php'));
 
-        $this->assertDoesNotMatchRegularExpression('/\{--?password/i', $source);
+        // --password-env names a variable; the password itself is never an option.
+        $this->assertDoesNotMatchRegularExpression('/\{--?password(?!-env)/i', $source);
         $this->assertDoesNotMatchRegularExpression('/\{password/i', $source);
         $this->assertStringContainsString("\$this->secret(", $source);
         // The log line names the account, not the password.

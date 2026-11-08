@@ -22,8 +22,9 @@ use Illuminate\Support\Str;
  *   php artisan partners:create accommodation paradise-island-park-beach-resort owner@example.com --apply
  *
  * The password is never an argument or an option (it would sit in the shell history and the process list): it is typed at
- * a hidden prompt, or made up by --generate and shown once on the screen. Without --apply nothing is written and no
- * password is asked for.
+ * a hidden prompt, read from an environment variable the caller names with --password-env (so one hidden entry can serve
+ * several accounts: `read -s PW; export PW`, then --password-env=PW), or made up by --generate and shown once on the
+ * screen. Without --apply nothing is written and no password is asked for.
  *
  * Safe by design:
  *  - a partner account can edit the listing it is linked to, so a listing that is real DOT data (not sample data) is
@@ -42,6 +43,7 @@ class CreatePartnerAccount extends Command
         {--person=Test Contact : contact person}
         {--phone=09000000000 : contact number}
         {--generate : make up a strong password and show it once, instead of asking for one}
+        {--password-env= : the NAME of an environment variable that holds the password (never the password itself)}
         {--allow-real : allow a listing that is real DOT data, not sample data}
         {--apply : create the account (default is a report only)}';
 
@@ -107,7 +109,7 @@ class CreatePartnerAccount extends Command
             ['sign-in e-mail', $email],
             ['contact', $this->option('person').', '.$this->option('phone')],
             ['status', 'approved and linked'],
-            ['password', $this->option('generate') ? 'will be generated and shown once' : 'will be asked for, hidden'],
+            ['password', $this->option('generate') ? 'will be generated and shown once' : ($this->option('password-env') ? 'read from the environment variable '.$this->option('password-env') : 'will be asked for, hidden')],
         ]);
 
         if (! $this->option('apply')) {
@@ -117,7 +119,15 @@ class CreatePartnerAccount extends Command
         }
 
         $shown = null;
-        if ($this->option('generate')) {
+        if ($this->option('password-env')) {
+            $name = (string) $this->option('password-env');
+            $password = (string) (getenv($name) ?: '');
+            if (mb_strlen($password) < 8) {
+                $this->error("The environment variable {$name} is empty or shorter than 8 characters. Nothing changed.");
+
+                return self::FAILURE;
+            }
+        } elseif ($this->option('generate')) {
             $password = Str::password(16, symbols: false);
             $shown = $password;
         } else {
