@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Destination;
 use App\Models\DestinationTag;
+use App\Support\Amenities;
 use App\Support\OpeningHours;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +13,9 @@ use Illuminate\Support\Facades\Log;
 /**
  * Applies researched details (coordinates, hours, fees, durations, category tags) to destinations from a CSV, one
  * change per row, each with the source it came from. A category_tag row adds that tag (the words the planner matches
- * against a traveller's interests, such as "Nature" or "Museum") if the place does not have it already.
+ * against a traveller's interests, such as "Nature" or "Museum") if the place does not have it already. An amenity row
+ * adds that amenity (the value is one of the keys a destination is offered, such as "parking" or "viewing_decks") the
+ * same way. Neither ever removes or changes what the place already has.
  *
  * Meant for filling gaps in the catalogue safely: a change is only accepted with a source, only for a place whose id
  * AND name both match (so a file prepared against one copy of the data cannot rewrite the wrong row on another),
@@ -29,7 +32,7 @@ class ApplyDestinationDetails extends Command
 
     protected $description = 'Apply sourced coordinate, hours, fee and duration details to destinations from a CSV (dry run by default).';
 
-    private const FIELDS = ['latitude', 'longitude', 'hours', 'visit_duration', 'best_time', 'price_tier', 'entry_fee_min', 'entry_fee_max', 'category_tag'];
+    private const FIELDS = ['latitude', 'longitude', 'hours', 'visit_duration', 'best_time', 'price_tier', 'entry_fee_min', 'entry_fee_max', 'category_tag', 'amenity'];
 
     private const TIERS = ['Free', 'Budget-Friendly', 'Mid-range', 'Premium'];
 
@@ -79,9 +82,11 @@ class ApplyDestinationDetails extends Command
                 $errors = $this->checkValue($row['field'], $row['value'], $destination);
             }
 
-            $current = $row['field'] === 'category_tag'
-                ? $this->tagIfPresent($destination, $row['value'])
-                : ($destination?->{$row['field']} ?? null);
+            $current = match ($row['field']) {
+                'category_tag' => $this->tagIfPresent($destination, $row['value']),
+                'amenity' => $this->tagIfPresent($destination, Amenities::label($row['value']), 'amenity') === null ? null : $row['value'],
+                default => $destination?->{$row['field']} ?? null,
+            };
             $bad += $errors ? 1 : 0;
             $plan[] = ['line' => $line, 'destination' => $destination, 'row' => $row, 'current' => $current, 'errors' => $errors];
         }
@@ -120,6 +125,14 @@ class ApplyDestinationDetails extends Command
                     }
                     $before = null;
                     DestinationTag::create(['destination_id' => $destination->id, 'kind' => 'category', 'value' => $p['row']['value']]);
+                } elseif ($p['row']['field'] === 'amenity') {
+                    $label = Amenities::label($p['row']['value']);
+                    if ($this->tagIfPresent($destination, $label, 'amenity') !== null) {
+                        continue;
+                    }
+                    $before = null;
+                    // Stored as the standard label, which is what the recommender and the planner read.
+                    DestinationTag::create(['destination_id' => $destination->id, 'kind' => 'amenity', 'value' => $label]);
                 } else {
                     $before = $destination->{$p['row']['field']};
                     $destination->{$p['row']['field']} = $p['row']['value'];
@@ -157,6 +170,8 @@ class ApplyDestinationDetails extends Command
             case 'entry_fee_min':
             case 'entry_fee_max':
                 return (! is_numeric($value) || $value < 0) ? ["{$field} must be a number of pesos, 0 or more"] : [];
+            case 'amenity':
+                return in_array($value, Amenities::FOR_KIND['destination'], true) ? [] : ["amenity '{$value}' is not one of the amenities a destination is offered"];
             case 'category_tag':
                 return preg_match('/^[A-Za-z][A-Za-z &\-]{1,39}$/', $value) ? [] : ['category_tag must be a short word or phrase, such as Nature or Cultural Heritage'];
             default:
@@ -165,13 +180,13 @@ class ApplyDestinationDetails extends Command
     }
 
     /** The tag as the place already has it (any letter case), or null. */
-    private function tagIfPresent(?Destination $destination, string $value): ?string
+    private function tagIfPresent(?Destination $destination, string $value, string $kind = 'category'): ?string
     {
         if (! $destination) {
             return null;
         }
 
-        $found = DestinationTag::where('destination_id', $destination->id)->where('kind', 'category')
+        $found = DestinationTag::where('destination_id', $destination->id)->where('kind', $kind)
             ->get()->first(fn ($tag) => mb_strtolower($tag->value) === mb_strtolower($value));
 
         return $found ? $value : null;
