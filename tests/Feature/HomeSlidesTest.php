@@ -15,7 +15,7 @@ class HomeSlidesTest extends TestCase
         $html = $this->get('/')->assertOk()->getContent();
 
         $this->assertStringContainsString('<html lang="en" class="home-slides">', $html);
-        $this->assertStringContainsString('css/home-slides.css', $html);
+        $this->assertMatchesRegularExpression('#css/home-slides(\.min)?\.css\?v=#', $html);
         // The two sections longer than a screen are split into two slide parts each.
         $this->assertMatchesRegularExpression('/id="destinations"[^>]*>|class="[^"]*home-split[^"]*" id="destinations"/', $html);
         $this->assertSame(4, substr_count($html, 'class="slide-part"'));

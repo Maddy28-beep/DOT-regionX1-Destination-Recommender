@@ -188,7 +188,7 @@ class HeroSearchTest extends TestCase
         $this->assertStringContainsString('name="duration"', $html);
         $this->assertStringContainsString('name="budget"', $html);
         $this->assertStringContainsString('name="interest"', $html);
-        $this->assertStringContainsString('css/hero-search.css', $html);
+        $this->assertMatchesRegularExpression('#css/hero-search(\.min)?\.css\?v=#', $html);
         $this->assertStringContainsString('js/hero-search.js', $html);
     }
 

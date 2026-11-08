@@ -76,7 +76,11 @@ class MobilePerformanceTest extends TestCase
         // Everything that touches the network is inside begin(); a phone waits for 'load', a computer runs it at once.
         $this->assertStringContainsString('var begin = function', $html);
         $this->assertStringContainsString("window.matchMedia('(max-width: 767px)').matches && document.readyState !== 'complete'", $html);
-        $this->assertStringContainsString("window.addEventListener('load', begin, { once: true });", $html);
+        // ...and on a phone it starts on the first touch/scroll/key, or 8 s after load, so the clip's first frame is not
+        // the "largest paint" (it was 2.8 s against 1.3 s for the poster).
+        $this->assertStringContainsString('wait = setTimeout(go, 8000)', $html);
+        $this->assertStringContainsString("var kick = ['touchstart', 'pointerdown', 'scroll', 'keydown'];", $html);
+        $this->assertStringNotContainsString("window.addEventListener('load', begin, { once: true });", $html);
         // The clip's network calls exist once, inside begin(), not a second time outside it.
         $this->assertSame(1, substr_count($html, 'video.load();'));
         $this->assertSame(1, substr_count($html, 'var giveUp'));
@@ -135,6 +139,65 @@ class MobilePerformanceTest extends TestCase
             $this->assertStringContainsString("images/tourism-logos/{$logo}.webp", $html);
             $this->assertStringNotContainsString("images/tourism-logos/{$logo}.png", $html);
             $this->assertLessThan(15 * 1024, filesize(public_path("images/tourism-logos/{$logo}.webp")));
+        }
+    }
+
+    public function test_the_chat_and_survey_pictures_are_sent_at_the_size_they_are_shown(): void
+    {
+        $html = $this->home();
+
+        // 512 px and 374 px originals were shown at 28 to 48 px; the small copies are about 6 KB each.
+        $this->assertStringNotContainsString('images/davo.webp', $html);
+        $this->assertStringNotContainsString('images/davo-wave-green.webp', $html);
+        $this->assertStringContainsString('images/davo-128.webp', $html);
+        foreach (['davo-128', 'davo-wave-green-128', 'davo-survey-v2-160'] as $name) {
+            $this->assertLessThan(10 * 1024, filesize(public_path("images/{$name}.webp")));
+        }
+        // The wave pose is hidden until Davo waves, so it is not fetched with the page.
+        $this->assertMatchesRegularExpression('/chatbot-wave-pose[^>]*loading="lazy"/', $html);
+    }
+
+    public function test_the_landing_page_links_the_minified_stylesheets(): void
+    {
+        $html = $this->home();
+
+        foreach (\App\Console\Commands\MinifyStyles::FILES as $file) {
+            $min = preg_replace('/\.css$/', '.min.css', $file);
+            $this->assertStringContainsString($min.'?v=', $html, "{$file} should be linked as its minified copy");
+        }
+    }
+
+    public function test_the_minified_stylesheets_are_current_and_smaller(): void
+    {
+        foreach (\App\Console\Commands\MinifyStyles::FILES as $file) {
+            $min = preg_replace('/\.css$/', '.min.css', $file);
+
+            $this->assertSame(sha1_file(public_path($file)), \App\Support\StyleAsset::fingerprintOf($min),
+                "{$min} is out of date: run php artisan styles:minify and commit it");
+            $this->assertLessThan(filesize(public_path($file)) * 0.8, filesize(public_path($min)));
+        }
+    }
+
+    public function test_a_stylesheet_edited_after_minifying_is_served_as_it_is(): void
+    {
+        $dir = public_path('css');
+        $probe = $dir.'/zz-probe.css';
+        $probeMin = $dir.'/zz-probe.min.css';
+        file_put_contents($probe, "a { color: red; }
+");
+        file_put_contents($probeMin, \App\Support\StyleAsset::HEADER.sha1_file($probe)."*/
+a{color:red}
+");
+
+        try {
+            $this->assertSame('css/zz-probe.min.css', \App\Support\StyleAsset::choose('css/zz-probe.css'));
+
+            file_put_contents($probe, "a { color: blue; }
+");
+            $this->assertSame('css/zz-probe.css', \App\Support\StyleAsset::choose('css/zz-probe.css'));
+        } finally {
+            @unlink($probe);
+            @unlink($probeMin);
         }
     }
 }

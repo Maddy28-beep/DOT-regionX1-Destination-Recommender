@@ -7,10 +7,10 @@
     <title>ExploreDVO — Discover the Wonders of Davao Region</title>
     @include('partials.share-meta', ['metaTitle' => 'ExploreDVO — Discover the Wonders of Davao Region'])
     @include('partials.head-assets')
-    <link rel="stylesheet" href="{{ asset('css/landing-sections.css') }}?v={{ filemtime(public_path('css/landing-sections.css')) }}">
-    <link rel="stylesheet" href="{{ asset('css/mood-cards.css') }}?v={{ filemtime(public_path('css/mood-cards.css')) }}">
-    <link rel="stylesheet" href="{{ asset('css/hero-search.css') }}?v={{ filemtime(public_path('css/hero-search.css')) }}">
-    <link rel="stylesheet" href="{{ asset('css/home-slides.css') }}?v={{ filemtime(public_path('css/home-slides.css')) }}">
+    <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/landing-sections.css') }}">
+    <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/mood-cards.css') }}">
+    <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/hero-search.css') }}">
+    <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/home-slides.css') }}">
     @if ($heroVideo && $heroVideo['poster'])
         {{-- Fetched in parallel with the stylesheet so the hero's ground is
              ready at first paint, rather than arriving after it. --}}
@@ -200,8 +200,25 @@
                     start();
                 };
 
+                /*
+                 * On a phone the clip's first frame was the "largest paint" PageSpeed waited for (2.8 s, against 1.3 s
+                 * for the poster on its own). So a phone starts the footage only once the page has settled: on the
+                 * visitor's first touch, scroll or key press, or at the latest 8 s after load. The poster stays on
+                 * screen until then. A computer still starts it at once.
+                 */
                 if (window.matchMedia('(max-width: 767px)').matches && document.readyState !== 'complete') {
-                    window.addEventListener('load', begin, { once: true });
+                    var kick = ['touchstart', 'pointerdown', 'scroll', 'keydown'];
+                    var began = false;
+                    var wait;
+                    var go = function () {
+                        if (began) return;
+                        began = true;
+                        clearTimeout(wait);
+                        kick.forEach(function (name) { window.removeEventListener(name, go); });
+                        begin();
+                    };
+                    kick.forEach(function (name) { window.addEventListener(name, go, { passive: true }); });
+                    window.addEventListener('load', function () { wait = setTimeout(go, 8000); }, { once: true });
                 } else {
                     begin();
                 }
