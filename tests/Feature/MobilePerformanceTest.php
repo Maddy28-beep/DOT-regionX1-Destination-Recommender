@@ -118,4 +118,23 @@ class MobilePerformanceTest extends TestCase
         $this->assertStringNotContainsString("\r", $script);
         $this->assertStringStartsWith('#!/usr/bin/env bash', $script);
     }
+
+    public function test_the_google_fonts_stylesheet_does_not_block_the_first_paint(): void
+    {
+        $html = $this->home();
+
+        $this->assertMatchesRegularExpression('#<link rel="stylesheet" href="https://fonts\.googleapis\.com/css2\?[^"]*" media="print" onload="this\.media=\'all\'">#', $html);
+        $this->assertMatchesRegularExpression('#<noscript><link rel="stylesheet" href="https://fonts\.googleapis\.com/css2\?[^"]*"></noscript>#', $html);
+    }
+
+    public function test_the_landing_logos_are_sent_at_the_size_they_are_shown(): void
+    {
+        $html = $this->home();
+
+        foreach (['davao', 'dot', 'love-philippines'] as $logo) {
+            $this->assertStringContainsString("images/tourism-logos/{$logo}.webp", $html);
+            $this->assertStringNotContainsString("images/tourism-logos/{$logo}.png", $html);
+            $this->assertLessThan(15 * 1024, filesize(public_path("images/tourism-logos/{$logo}.webp")));
+        }
+    }
 }
