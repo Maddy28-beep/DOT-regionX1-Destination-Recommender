@@ -1,6 +1,6 @@
 # ExploreDVO beta: known limitations (plain language)
 
-For the professor's trial, 9 November 2026. Build: tag `beta-2026-11-09`.
+For the professor's trial, 9 November 2026. Build: `main` at `04a6f1d` (production, verified on 8 November 2026 by comparing the server's files with that commit). It is the `beta-2026-11-09` build plus four front-end and photo-speed changes (#232 to #235) and docs; the planner, recommender and chatbot logic are unchanged from the beta tag.
 
 1. No booking. The system plans; it does not reserve or pay for anything.
 2. No real-time traffic. Drive times are estimates from distance, not live conditions.
@@ -18,3 +18,4 @@ For the professor's trial, 9 November 2026. Build: tag `beta-2026-11-09`.
 14. Package adoption ("Plan with this Package") needs a published day-by-day schedule. At deployment there were 5 live packages and 0 had schedule rows, so every package page offered "Plan My Trip" instead. For the trial two sample packages (Samal Island Hopping Day Tour and Davao City Cultural Heritage Tour) carry one illustrative sample day each, marked "[SAMPLE]"; the other 3 still have none.
 15. Test setting to remove after the trial: `ACCREDITATION_TEST_GRACE_UNTIL=2026-12-31` is set on production, so listings whose accreditation expired stay visible and plannable until 31 December 2026. With the setting removed, an expired listing disappears from the public pages (checked on a restored copy). This is deliberate for the trial and must be removed afterwards.
 16. People's Park is marked temporarily closed in the data (until the admin reopens it). While it is closed it is left out of trips and the chatbot says so.
+17. The package page check ("Plan with this Package" on exactly the two sample packages, "Plan My Trip" with the hint on the other three) was verified on production only by the manual check of 8 November. It has not been re-run on the current build `04a6f1d`; repeat it on the live site before the trial.

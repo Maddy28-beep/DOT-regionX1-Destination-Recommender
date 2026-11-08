@@ -1,6 +1,6 @@
 # ExploreDVO beta: demo-safe scenarios
 
-Every scenario below was run on the live site on 8 November 2026 (build `beta-2026-11-09`) and produced a readable result with no error. Use these inputs exactly.
+Every scenario below was run on the live site on 8 November 2026 (build `beta-2026-11-09`; production now runs `main` at `04a6f1d`, the same planner and chatbot plus front-end speed changes) and produced a readable result with no error. Use these inputs exactly.
 
 ## Trip planner (`/plan`)
 
@@ -39,6 +39,7 @@ Not confirmed as demo-safe: any date inside the first two weeks, other interests
 
 ## Packages (`/packages`)
 
+- Verified on production only by the manual check of 8 November, not re-run on `04a6f1d`: repeat it on the live site before the trial.
 - **Samal Island Hopping Day Tour** and **Davao City Cultural Heritage Tour** show "Plan with this Package" (one illustrative day marked [SAMPLE]).
 - The other three packages show "Plan My Trip" with the hint that the provider has not published a day-by-day schedule.
 
