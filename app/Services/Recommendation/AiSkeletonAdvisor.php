@@ -30,6 +30,9 @@ class AiSkeletonAdvisor
 {
     public const MAX_THEME_LENGTH = 40;
 
+    /** The optional one-line summary under a day's theme. */
+    public const MAX_SUMMARY_LENGTH = 90;
+
     public function __construct(private readonly GroqChatbotClient $client) {}
 
     /**
@@ -185,9 +188,35 @@ class AiSkeletonAdvisor
                 return [null, 'unusable_day_theme'];
             }
             $days[$day] = ['theme' => $theme, 'stops' => $ids];
+            // Optional: a missing or unusable summary never rejects the plan, it just shows no summary line.
+            $summary = $this->cleanSummary($entry['summary'] ?? null);
+            if ($summary !== null) {
+                $days[$day]['summary'] = $summary;
+            }
         }
 
         return count($seen) === count($candidateIds) ? [$days, null] : [null, 'candidates_missing'];
+    }
+
+    /**
+     * The one-line summary: plain text, one short sentence, and no digits (the model must not state a time, a price or a
+     * distance; those come from the planner). Anything else is dropped, not repaired.
+     */
+    private function cleanSummary(mixed $summary): ?string
+    {
+        if (! is_string($summary)) {
+            return null;
+        }
+
+        $summary = preg_replace('/[\x00-\x1F\x7F]/u', ' ', $summary);
+        $summary = trim(preg_replace('/\s+/u', ' ', strip_tags((string) $summary)));
+        $summary = trim((string) preg_replace('/[<>{}\[\]`]/u', '', $summary));
+
+        if ($summary === '' || mb_strlen($summary) > self::MAX_SUMMARY_LENGTH || preg_match('/\d/u', $summary)) {
+            return null;
+        }
+
+        return $summary;
     }
 
     /** A short plain-text label: tags and control characters removed, whitespace collapsed, no longer than MAX_THEME_LENGTH. */
@@ -280,7 +309,8 @@ You help a tourism planner for Davao Region, Philippines split an already-chosen
 The user message is JSON: a trip (days, stops_per_day, distance_range, budget, interests) and candidates (id, name, type, price_tier, tags).
 Decide which candidates go together on each day so that each day has a coherent theme, matching the traveller's interests where possible, and give each day a theme of at most 40 characters.
 Rules: use every candidate id exactly once; day N must contain exactly stops_per_day[N-1] ids; do not invent ids; no other text.
-Reply with JSON only, exactly: {"days":[{"day":1,"theme":"short theme","destination_ids":[1,2]}]}
+Also give each day a summary: one plain sentence of at most 90 characters about why those places go together. Do not put any number, time, price or distance in it, and name no place that is not in that day's list.
+Reply with JSON only, exactly: {"days":[{"day":1,"theme":"short theme","summary":"one short sentence","destination_ids":[1,2]}]}
 TXT;
     }
 

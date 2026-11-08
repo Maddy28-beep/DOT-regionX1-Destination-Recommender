@@ -83,14 +83,6 @@
         $what = trim(str_replace(' — '.$listing->name, '', $what));
     }
 
-    // A stop's price band against the band the traveller chose (the same order the audit's budget check uses). This compares
-    // bands, not prices, so the tag says "fits your budget band" and never claims a cost. Nothing is said when either is
-    // unknown: an unpriced place does not fit a band, it just has no claim.
-    $tierOrder = ['Free' => 0, 'Budget-Friendly' => 1, 'Mid-range' => 2, 'Premium' => 3];
-    $budgetLimit = $tierOrder[$preference?->budget ?? null] ?? null;
-    $stopTier = $kind === 'activity' && $item->destination_id ? ($tierOrder[$listing?->price_tier ?? null] ?? null) : null;
-    $withinBudget = $budgetLimit !== null && $stopTier !== null && $stopTier <= $budgetLimit;
-
     $icon = match ($kind) {
         'baseline', 'departure' => 'map-pin',
         'overnight' => 'moon',
@@ -162,9 +154,6 @@
                             <x-provenance-badge :ok="$accreditationOk" :label="$accreditationLabel" />
                         @endif
                         <p class="tl-card__what">{{ $what }}</p>
-                        @if ($withinBudget)
-                            <p class="tl-card__tags"><span class="tl-tag tl-tag--match"><x-icon name="check" /> Fits your budget band</span></p>
-                        @endif
                     @elseif ($isStay && $route)
                         {{-- The night's stay is named, like every other stop, instead of only "Overnight stay". --}}
                         <h4><a href="{{ route($route, $listing) }}">{{ $listing->displayName() }}</a></h4>
@@ -197,14 +186,38 @@
                         <p class="tl-card__note">{{ $item->note }}</p>
                     @endif
 
-                    @php $pairing = $item->ruleFacts($provenance['transactions_demo'] ?? null, $provenance['transactions'] ?? null); @endphp
+                    @php
+                        $pairing = $item->ruleFacts($provenance['transactions_demo'] ?? null, $provenance['transactions'] ?? null);
+                        // Every other stop gets the same "Why this pick?" panel, built only from what the planner knows:
+                        // the interests it matches, its rating, and whether its price level fits the budget.
+                        $why = (! $pairing && $kind === 'activity' && $listing instanceof \App\Models\Destination)
+                            ? \App\Support\StopReasons::for($listing, $preference) : null;
+                    @endphp
+                    @if (! $pairing && $why && $why['facts'] !== [])
+                        <div class="tl-card__pairing">
+                            <div class="pairing-why" data-pairing>
+                                <button type="button" class="pairing-why__btn" aria-expanded="false" aria-controls="pairing-{{ $item->day_number * 1000 + $item->sort_order }}">Why this pick? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+                                <div class="pairing-why__panel" id="pairing-{{ $item->day_number * 1000 + $item->sort_order }}" role="dialog" aria-label="Why this pick?" hidden>
+                                    <div class="pairing-why__head"><strong>Why this pick?</strong><button type="button" class="pairing-why__close" aria-label="Close">&times;</button></div>
+                                    <p>{{ $why['sentence'] }}</p>
+                                    <ul class="pairing-why__stats">
+                                        @foreach ($why['facts'] as $fact)<li>{{ $fact }}</li>@endforeach
+                                    </ul>
+                                    @if (app(\App\Support\SampleData::class)->status($listing) === \App\Support\SampleData::SAMPLE)
+                                        <div class="pairing-why__sample"><x-provenance-badge :ok="false" :label="$accreditationLabel" /></div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                     @if ($pairing)
                         @php $paired = \App\Support\SampleData::displayName($pairing['basis']); @endphp
                         <div class="tl-card__pairing">
                             <span class="pairing-tag">Popular pairing with {{ $paired }}</span>
                             <div class="pairing-why" data-pairing>
-                                <button type="button" class="pairing-why__btn" aria-expanded="false" aria-controls="pairing-{{ $item->id }}">Why this pick? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
-                                <div class="pairing-why__panel" id="pairing-{{ $item->id }}" hidden>
+                                <button type="button" class="pairing-why__btn" aria-expanded="false" aria-controls="pairing-{{ $item->day_number * 1000 + $item->sort_order }}">Why this pick? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
+                                <div class="pairing-why__panel" id="pairing-{{ $item->day_number * 1000 + $item->sort_order }}" role="dialog" aria-label="Why this pick?" hidden>
+                                    <div class="pairing-why__head"><strong>Why this pick?</strong><button type="button" class="pairing-why__close" aria-label="Close">&times;</button></div>
                                     <p>Frequently visited together with {{ $paired }}.</p>
                                     <ul class="pairing-why__stats">
                                         <li>Confidence {{ $pairing['confidence'] }}%</li>
