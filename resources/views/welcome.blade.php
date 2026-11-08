@@ -220,9 +220,9 @@
     @endif
 
     <div class="hero-tourism-brands" aria-label="Tourism logos">
-        <img src="{{ asset('images/tourism-logos/davao.png') }}" alt="Davao" class="hero-tourism-brands__davao" width="400" height="134">
-        <img src="{{ asset('images/tourism-logos/dot.png') }}" alt="Department of Tourism Philippines" class="hero-tourism-brands__dot" width="200" height="197">
-        <img src="{{ asset('images/tourism-logos/love-philippines.png') }}" alt="Love the Philippines" class="hero-tourism-brands__love" width="420" height="179">
+        <img src="{{ asset('images/tourism-logos/davao.webp') }}" alt="Davao" class="hero-tourism-brands__davao" width="200" height="67">
+        <img src="{{ asset('images/tourism-logos/dot.webp') }}" alt="Department of Tourism Philippines" class="hero-tourism-brands__dot" width="100" height="99">
+        <img src="{{ asset('images/tourism-logos/love-philippines.webp') }}" alt="Love the Philippines" class="hero-tourism-brands__love" width="220" height="94">
     </div>
 
     <div class="poster-hero__content">
@@ -472,7 +472,7 @@
             <a href="{{ route('destinations.show', $featuredDestination) }}" class="dpost-banner">
                 <div class="dpost-banner__art">
                     @if ($featuredPhoto = $featuredDestination->coverPhoto())
-                        <img src="{{ $featuredPhoto->url() }}" alt="" class="dpost-card__photo" loading="lazy">
+                        <img src="{{ $featuredPhoto->cardUrl() }}" alt="" class="dpost-card__photo" loading="lazy" decoding="async">
                     @else
                         @include('partials.poster-illustration', ['scene' => $featuredScene])
                     @endif

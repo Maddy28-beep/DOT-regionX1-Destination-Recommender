@@ -29,7 +29,11 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Alfa+Slab+One&family=Caveat:wght@600;700&display=swap">
+{{-- Loaded without blocking the first paint: it is a second server away, so as a normal stylesheet the page waited for it
+     (PageSpeed: render-blocking requests). The text shows in the fallback face and switches when the font arrives
+     (display=swap), as it already did. The noscript line keeps it working with JavaScript off. --}}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Alfa+Slab+One&family=Caveat:wght@600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Alfa+Slab+One&family=Caveat:wght@600;700&display=swap"></noscript>
 
 <link rel="preload" href="{{ asset('fonts/BARABARA-final.otf') }}" as="font" type="font/otf" crossorigin>
 
