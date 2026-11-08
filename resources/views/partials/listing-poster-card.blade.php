@@ -52,7 +52,7 @@
             {{-- alt is empty deliberately: .dpost-card__name below already
                  names the place and the whole card is a single link, so
                  describing it here would only be read out twice. --}}
-            <img src="{{ $coverPhoto->url() }}" alt="" class="dpost-card__photo" loading="lazy" decoding="async">
+            <img src="{{ $coverPhoto->cardUrl() }}" alt="" class="dpost-card__photo" loading="lazy" decoding="async">
         @else
             @include('partials.poster-illustration', ['scene' => $listing->posterScene()])
         @endif

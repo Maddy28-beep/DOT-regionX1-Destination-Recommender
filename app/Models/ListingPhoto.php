@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\PhotoCardCopy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Storage;
@@ -64,5 +65,19 @@ class ListingPhoto extends Model
     public function url(): string
     {
         return Storage::disk('public')->url($this->path);
+    }
+
+    /**
+     * The picture for a list card. When a smaller card copy exists (made by `php artisan photos:make-card-copies`) that is
+     * used, otherwise the original, so nothing breaks where no copy has been made. Detail pages and galleries keep url().
+     */
+    public function cardUrl(): string
+    {
+        static $known = [];
+
+        $variant = PhotoCardCopy::variantPath((string) $this->path);
+        $known[$variant] ??= ! $this->isIllustration() && Storage::disk('public')->exists($variant);
+
+        return $known[$variant] ? Storage::disk('public')->url($variant) : $this->url();
     }
 }
