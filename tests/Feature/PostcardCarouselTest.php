@@ -120,7 +120,8 @@ class PostcardCarouselTest extends TestCase
 
         $this->assertStringContainsString('island-beach-card.webp', $html, 'Not the 1.4MB full-size photograph.');
         $this->assertStringNotContainsString('-enhanced.webp', $html);
-        $this->assertSame(0, substr_count($html, 'fetchpriority="high"'), 'The row is below the fold, so nothing in it is a priority image.');
+        // The hero poster is preloaded at high priority (a <link>); no picture in the row below the fold is.
+        $this->assertDoesNotMatchRegularExpression('/<img[^>]*fetchpriority="high"/', $html, 'The row is below the fold, so nothing in it is a priority image.');
     }
 
     public function test_the_row_loads_the_slideshow_script_which_leaves_reduced_motion_alone(): void

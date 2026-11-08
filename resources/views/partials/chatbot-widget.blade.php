@@ -1,8 +1,8 @@
 <div id="chatbot-widget" class="chatbot-widget">
     <button type="button" id="chatbot-toggle" class="chatbot-toggle" aria-label="Chat with Davo, your Davao travel buddy" aria-controls="chatbot-panel" aria-expanded="false">
         <span class="chatbot-avatar" aria-hidden="true">
-            <img class="chatbot-rest-pose" src="{{ asset('images/davo.webp') }}" alt="" width="512" height="512">
-            <img class="chatbot-wave-pose" src="{{ asset('images/davo-wave-green.webp') }}" alt="" width="374" height="504">
+            <img class="chatbot-rest-pose" src="{{ asset('images/davo-128.webp') }}" alt="" width="128" height="128">
+            <img class="chatbot-wave-pose" src="{{ asset('images/davo-wave-green-128.webp') }}" alt="" width="95" height="128" loading="lazy" decoding="async">
         </span>
         <span class="chatbot-toggle-badge" aria-hidden="true"><x-icon name="chat" /></span>
     </button>
@@ -10,7 +10,7 @@
 
     <div id="chatbot-panel" class="chatbot-panel" hidden role="region" aria-labelledby="chatbot-title">
         <div class="chatbot-panel-head">
-            <span class="chatbot-avatar chatbot-head-avatar" aria-hidden="true"><img src="{{ asset('images/davo.webp') }}" alt="" width="512" height="512"></span>
+            <span class="chatbot-avatar chatbot-head-avatar" aria-hidden="true"><img src="{{ asset('images/davo-128.webp') }}" alt="" width="128" height="128" loading="lazy" decoding="async"></span>
             <div class="chatbot-heading">
                 <strong id="chatbot-title">Davo</strong>
                 <div class="sub">Your Davao travel buddy</div>
@@ -24,7 +24,7 @@
         </div>
         <div id="chatbot-messages" class="chatbot-messages" role="log" aria-label="Conversation with Davo" aria-live="polite">
             <div class="chatbot-row chatbot-intro">
-                <span class="chatbot-avatar chatbot-mini-avatar" aria-hidden="true"><img src="{{ asset('images/davo.webp') }}" alt="" width="64" height="64" loading="lazy"></span>
+                <span class="chatbot-avatar chatbot-mini-avatar" aria-hidden="true"><img src="{{ asset('images/davo-128.webp') }}" alt="" width="64" height="64" loading="lazy"></span>
                 <div class="chatbot-msg chatbot-msg-bot"><strong>Hi, I'm Davo!</strong> 👋 What would you like to explore?</div>
             </div>
             <div class="chatbot-suggest" id="chatbot-suggest">
@@ -256,7 +256,7 @@
 
     function getPanel() { return document.getElementById('chatbot-panel'); }
     function getWidget() { return document.getElementById('chatbot-widget'); }
-    var AVATAR = @json(asset('images/davo.webp'));
+    var AVATAR = @json(asset('images/davo-128.webp'));
     var greeting = null; // the opening message and chips, kept so "new chat" can put them back
     var waveTimer;
     var lastWave = 0;

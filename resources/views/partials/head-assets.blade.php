@@ -37,6 +37,6 @@
 
 <link rel="preload" href="{{ asset('fonts/BARABARA-final.otf') }}" as="font" type="font/otf" crossorigin>
 
-<link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
+<link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/app.css') }}">
 {{-- The phone navigation drawer: kept in its own file so app.css is not carrying it. --}}
-<link rel="stylesheet" href="{{ asset('css/mobile-drawer.css') }}?v={{ filemtime(public_path('css/mobile-drawer.css')) }}">
+<link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/mobile-drawer.css') }}">
