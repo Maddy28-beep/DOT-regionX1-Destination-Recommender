@@ -18,11 +18,13 @@ use Illuminate\Support\Facades\Log;
  * same way. Neither ever removes or changes what the place already has.
  *
  * Meant for filling gaps in the catalogue safely: a change is only accepted with a source, only for a place whose id
+ * (or, when the file has no id, whose slug: the last part of its web address, which is the same on every copy of the site)
  * AND name both match (so a file prepared against one copy of the data cannot rewrite the wrong row on another),
  * and only for the fields below. All or nothing: one bad row stops the whole file. Without --apply nothing is
  * written. Unknown stays blank: a row with an empty value is rejected rather than treated as zero.
  *
- * CSV columns (header row required): id, name, field, value, source
+ * CSV columns (header row required): id or slug, name, field, value, source. Database ids differ between copies of the
+ * data (this machine, the live server), so a file meant for more than one copy uses slug; the name is checked either way.
  */
 class ApplyDestinationDetails extends Command
 {
@@ -62,12 +64,16 @@ class ApplyDestinationDetails extends Command
         $bad = 0;
         foreach ($rows as $line => $row) {
             $errors = [];
-            $destination = Destination::find($row['id']);
+            $byId = $row['id'] !== '';
+            $who = $byId ? "id {$row['id']}" : "slug '{$row['slug']}'";
+            $destination = $byId
+                ? Destination::find($row['id'])
+                : ($row['slug'] !== '' ? Destination::where('slug', $row['slug'])->first() : null);
 
             if (! $destination) {
-                $errors[] = "no destination with id {$row['id']}";
+                $errors[] = "no destination with {$who}";
             } elseif ($this->plain($destination->name) !== $this->plain($row['name'])) {
-                $errors[] = "id {$row['id']} is '{$destination->name}', not '{$row['name']}'";
+                $errors[] = "{$who} is '{$destination->name}', not '{$row['name']}'";
             }
             if (! in_array($row['field'], self::FIELDS, true)) {
                 $errors[] = "field '{$row['field']}' is not one of: ".implode(', ', self::FIELDS);
@@ -92,7 +98,7 @@ class ApplyDestinationDetails extends Command
         }
 
         $this->table(['line', 'id', 'name', 'field', 'now', 'new', 'result'], array_map(fn ($p) => [
-            $p['line'], $p['row']['id'], mb_substr($p['row']['name'], 0, 34), $p['row']['field'],
+            $p['line'], $p['row']['id'] !== '' ? $p['row']['id'] : mb_substr($p['row']['slug'], 0, 20), mb_substr($p['row']['name'], 0, 34), $p['row']['field'],
             $p['current'] === null || $p['current'] === '' ? '(blank)' : mb_substr((string) $p['current'], 0, 22), mb_substr($p['row']['value'], 0, 22),
             $p['errors'] ? 'ERROR: '.implode('; ', $p['errors']) : ($this->same($p['current'], $p['row']['value']) ? 'no change' : 'will update'),
         ], $plan));
@@ -212,7 +218,10 @@ class ApplyDestinationDetails extends Command
     {
         $handle = fopen($file, 'r');
         $header = array_map(fn ($h) => mb_strtolower(trim(preg_replace('/^\xEF\xBB\xBF/', '', (string) $h))), fgetcsv($handle) ?: []);
-        $missing = array_diff(['id', 'name', 'field', 'value', 'source'], $header);
+        $missing = array_diff(['name', 'field', 'value', 'source'], $header);
+        if (! in_array('id', $header, true) && ! in_array('slug', $header, true)) {
+            $missing[] = 'id (or slug)';
+        }
         if ($missing) {
             fclose($handle);
             throw new \InvalidArgumentException('Missing column(s): '.implode(', ', $missing));
@@ -226,8 +235,9 @@ class ApplyDestinationDetails extends Command
                 continue;
             }
             $row = [];
-            foreach (['id', 'name', 'field', 'value', 'source'] as $col) {
-                $row[$col] = trim((string) ($cells[array_search($col, $header, true)] ?? ''));
+            foreach (['id', 'slug', 'name', 'field', 'value', 'source'] as $col) {
+                $at = array_search($col, $header, true);
+                $row[$col] = $at === false ? '' : trim((string) ($cells[$at] ?? ''));
             }
             $rows[$line] = $row;
         }
