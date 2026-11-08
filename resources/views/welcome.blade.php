@@ -14,7 +14,7 @@
     @if ($heroVideo && $heroVideo['poster'])
         {{-- Fetched in parallel with the stylesheet so the hero's ground is
              ready at first paint, rather than arriving after it. --}}
-        <link rel="preload" as="image" href="{{ $heroVideo['poster'] }}">
+        <link rel="preload" as="image" href="{{ $heroVideo['poster'] }}" fetchpriority="high">
     @endif
 </head>
 <body class="hero-page">
@@ -147,40 +147,6 @@
                 // say it is wanted.
                 video.preload = 'auto';
 
-                /*
-                 * If no frame ever arrives, put the illustration back. Both
-                 * paths are needed: `error` does not fire reliably on a media
-                 * element whose sources are <source> children, and a clip can
-                 * also simply stall. loadeddata re-commits if it turns up late.
-                 */
-                var giveUp = setTimeout(function () {
-                    if (video.readyState < 2) fallBack();
-                }, 2500);
-
-                video.addEventListener('error', function () {
-                    clearTimeout(giveUp);
-                    fallBack();
-                }, { once: true });
-
-                ['webm', 'mp4'].forEach(function (type) {
-                    var url = video.getAttribute('data-' + type);
-                    if (!url) return;
-
-                    var source = document.createElement('source');
-                    source.src = url;
-                    source.type = type === 'webm' ? 'video/webm' : 'video/mp4';
-                    video.appendChild(source);
-                });
-
-                video.load();
-
-                // Re-commit if the clip turns up after the deadline above had
-                // already put the illustration back.
-                video.addEventListener('loadeddata', function () {
-                    clearTimeout(giveUp);
-                    hero.classList.add('has-video');
-                }, { once: true });
-
                 // play() can reject on its own even when muted (a phone in
                 // low-power mode, for one). The first frame stays on screen if
                 // it does, and the first touch or scroll is allowed to start it.
@@ -190,7 +156,55 @@
                         attempt.catch(function () {});
                     }
                 };
-                start();
+                /*
+                 * Everything that touches the network lives in begin(). On a computer it runs at once, as before.
+                 * On a phone it waits for the page's own load event: the 0.6 MB clip would otherwise share a slow
+                 * connection with the stylesheet and the poster, and delay the first paint by seconds. The poster and
+                 * the dark ground are already on screen, so the footage simply arrives a moment later.
+                 */
+                var begin = function () {
+                    /*
+                     * If no frame ever arrives, put the illustration back. Both
+                     * paths are needed: `error` does not fire reliably on a media
+                     * element whose sources are <source> children, and a clip can
+                     * also simply stall. loadeddata re-commits if it turns up late.
+                     */
+                    var giveUp = setTimeout(function () {
+                        if (video.readyState < 2) fallBack();
+                    }, 2500);
+
+                    video.addEventListener('error', function () {
+                        clearTimeout(giveUp);
+                        fallBack();
+                    }, { once: true });
+
+                    ['webm', 'mp4'].forEach(function (type) {
+                        var url = video.getAttribute('data-' + type);
+                        if (!url) return;
+
+                        var source = document.createElement('source');
+                        source.src = url;
+                        source.type = type === 'webm' ? 'video/webm' : 'video/mp4';
+                        video.appendChild(source);
+                    });
+
+                    video.load();
+
+                    // Re-commit if the clip turns up after the deadline above had
+                    // already put the illustration back.
+                    video.addEventListener('loadeddata', function () {
+                        clearTimeout(giveUp);
+                        hero.classList.add('has-video');
+                    }, { once: true });
+
+                    start();
+                };
+
+                if (window.matchMedia('(max-width: 767px)').matches && document.readyState !== 'complete') {
+                    window.addEventListener('load', begin, { once: true });
+                } else {
+                    begin();
+                }
 
                 var retry = function () {
                     if (video.paused) start();

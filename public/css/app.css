@@ -2927,7 +2927,8 @@ select.site-dropdown-native {
    caption underneath a real product component now, not an overlay label on
    top of decoration -- toned down a step so it reads as a caption rather
    than repeating the section's own kicker at full volume. */
-.about-map:has(.region-map) .about-map__caption { font-size: .85rem; opacity: .85; }
+/* Full strength and a darker red: at 85% opacity the caption failed the contrast check on the page behind it. */
+.about-map:has(.region-map) .about-map__caption { font-size: .85rem; color: #8a2f0f; }
 
 /* Postcard captions, not a stat block: dashed rules between, star per line,
    key phrase carrying the weight. */

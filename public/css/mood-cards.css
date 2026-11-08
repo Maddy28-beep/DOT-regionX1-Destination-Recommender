@@ -110,15 +110,18 @@
     .moods__controls {
         display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: -6px; min-height: 20px;
     }
-    .moods__dots { display: flex; align-items: center; gap: 8px; }
+    .moods__dots { display: flex; align-items: center; gap: 0; }
+    /* The button itself is a 24px square, the size a thumb needs; the small dot is drawn inside it.
+       (It used to be a 9px button with a bigger invisible area, which accessibility checks rightly counted as too small.) */
     .moods__dot {
-        width: 9px; height: 9px; padding: 0; border: 0; border-radius: 999px; cursor: pointer;
-        background: rgba(11, 94, 82, .25); transition: width .25s ease, background .25s ease;
-        /* a bigger tap area than the dot itself */
-        position: relative;
+        position: relative; width: 24px; height: 24px; padding: 0; border: 0; background: none; cursor: pointer;
     }
-    .moods__dot::after { content: ""; position: absolute; inset: -12px -5px; }
-    .moods__dot[aria-current="true"] { width: 26px; background: var(--primary); }
+    .moods__dot::before {
+        content: ""; position: absolute; top: 50%; left: 50%; width: 9px; height: 9px; transform: translate(-50%, -50%);
+        border-radius: 999px; background: rgba(11, 94, 82, .25); transition: width .25s ease, background .25s ease;
+    }
+    .moods__dot[aria-current="true"] { width: 40px; }
+    .moods__dot[aria-current="true"]::before { width: 26px; background: var(--primary); }
     .moods__dot:focus-visible { outline: 3px solid var(--accent, #ff693b); outline-offset: 3px; }
 }
-@media (prefers-reduced-motion: reduce) { .moods__dot { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .moods__dot::before { transition: none; } }
