@@ -529,6 +529,10 @@ class ItineraryGenerationService
             // The embedding grouping's before/after figures describe a grouping that is no longer the plan's.
             $themes['summary'] = null;
             $themes['ai_skeleton'] = ['applied' => true, 'days' => array_map(fn (array $d) => $d['theme'], $applied['days'])];
+            $summaries = array_filter(array_map(fn (array $d) => $d['summary'] ?? null, $applied['days']));
+            if ($summaries !== []) {
+                $themes['ai_skeleton']['summaries'] = $summaries;
+            }
             $update['day_themes'] = $themes;
         }
 

@@ -262,6 +262,11 @@
                                 <header class="itin-day__head">
                                     <div>
                                         <h3 id="itinerary-day-title-{{ $day }}">Day {{ $day }}@if ($theme && $theme['label']) <span>&middot; {{ $theme['label'] }}</span>@elseif ($dayArea) <span>&middot; {{ $dayArea }}</span>@endif</h3>
+                                        @if (data_get($itinerary->day_themes, 'ai_skeleton.applied') === true && ($theme['label'] ?? null))
+                                            {{-- Only when an AI service named this day: its one-line summary, when it gave one. --}}
+                                            @php $aiSummary = data_get($itinerary->day_themes, 'ai_skeleton.summaries.'.$day); @endphp
+                                            @if ($aiSummary)<p class="itin-day__ai"><em>{{ $aiSummary }}</em></p>@endif
+                                        @endif
                                         <p class="itin-day__tag">
                                             @if ($dayDate){{ $dayDate }} &middot; @endif
                                             @if ($dayStops === 0 && $day !== 1 && $day !== $lastDay)Free day, no sightseeing planned
