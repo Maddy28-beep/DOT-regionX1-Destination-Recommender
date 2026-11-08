@@ -145,4 +145,75 @@ class ApplyDestinationDetailsTest extends TestCase
             }
         }
     }
+
+    // ---- amenities
+
+    public function test_an_amenity_row_adds_the_standard_amenity_and_a_second_run_changes_nothing(): void
+    {
+        $d = $this->destination('Hagimit Falls');
+        $file = $this->csv([
+            [$d->id, 'Hagimit Falls', 'amenity', 'parking', self::SOURCE],
+            [$d->id, 'Hagimit Falls', 'amenity', 'day_use_cottages', self::SOURCE],
+        ]);
+
+        $this->artisan('destinations:apply-details', ['file' => $file])->expectsOutputToContain('Dry run')->assertSuccessful();
+        $this->assertSame(0, $d->tags()->where('kind', 'amenity')->count(), 'a dry run writes nothing');
+
+        $this->artisan('destinations:apply-details', ['file' => $file, '--apply' => true])->assertSuccessful();
+        $this->assertEqualsWithDelta(
+            ['Day-use Cottages & Gazebos', 'Parking Area'],
+            $d->tags()->where('kind', 'amenity')->pluck('value')->sort()->values()->all(),
+            0,
+            'stored under the standard label, which the planner and the recommender read',
+        );
+
+        $this->artisan('destinations:apply-details', ['file' => $file, '--apply' => true])->expectsOutputToContain('Updated 0 values')->assertSuccessful();
+        $this->assertSame(2, $d->tags()->where('kind', 'amenity')->count());
+    }
+
+    public function test_an_amenity_never_removes_or_duplicates_what_the_place_already_has(): void
+    {
+        $d = $this->destination('Eden Nature Park');
+        $d->tags()->create(['kind' => 'amenity', 'value' => 'Restroom']);
+        $file = $this->csv([
+            [$d->id, 'Eden Nature Park', 'amenity', 'restroom', self::SOURCE],
+            [$d->id, 'Eden Nature Park', 'amenity', 'viewing_decks', self::SOURCE],
+        ]);
+
+        $this->artisan('destinations:apply-details', ['file' => $file, '--apply' => true])->assertSuccessful();
+
+        $this->assertSame(['Restroom', 'Viewing Decks'], $d->tags()->where('kind', 'amenity')->pluck('value')->sort()->values()->all());
+    }
+
+    public function test_an_amenity_a_destination_is_not_offered_stops_the_whole_file(): void
+    {
+        $d = $this->destination('Eden Nature Park');
+        $file = $this->csv([
+            [$d->id, 'Eden Nature Park', 'amenity', 'parking', self::SOURCE],
+            [$d->id, 'Eden Nature Park', 'amenity', 'helipad', self::SOURCE],
+        ]);
+
+        $this->artisan('destinations:apply-details', ['file' => $file, '--apply' => true])->expectsOutputToContain('Nothing changed')->assertFailed();
+        $this->assertSame(0, $d->tags()->where('kind', 'amenity')->count(), 'one bad row stops the file');
+    }
+
+    public function test_the_audit_files_only_use_amenities_a_destination_is_offered_and_every_row_has_a_source(): void
+    {
+        $seen = [];
+        foreach (glob(base_path('database/data/destination-amenities-2026-11-09*.csv')) as $path) {
+            $h = fopen($path, 'r');
+            $header = fgetcsv($h);
+            $this->assertSame(['id', 'name', 'field', 'value', 'source'], $header, basename($path));
+            while (($r = fgetcsv($h)) !== false) {
+                [$id, $name, $field, $value, $source] = $r;
+                $this->assertSame('amenity', $field);
+                $this->assertContains($value, \App\Support\Amenities::FOR_KIND['destination'], "{$name}: {$value}");
+                $this->assertGreaterThan(8, strlen($source), "{$name} has no source");
+                $this->assertArrayNotHasKey($id.'|'.$value, $seen, "{$name} lists {$value} twice");
+                $seen[$id.'|'.$value] = true;
+            }
+            fclose($h);
+        }
+        $this->assertNotEmpty($seen);
+    }
 }
