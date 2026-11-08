@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Accommodation;
+use App\Models\Destination;
 use App\Models\EstablishmentAccount;
 use App\Models\Package;
 use App\Models\Restaurant;
@@ -36,7 +37,7 @@ use Illuminate\Support\Str;
 class CreatePartnerAccount extends Command
 {
     protected $signature = 'partners:create
-        {kind : accommodation, restaurant, package, souvenir_center or tour_operator}
+        {kind : destination, accommodation, restaurant, package, souvenir_center or tour_operator}
         {listing : the listing\'s slug (the last part of its web address)}
         {email : the sign-in e-mail address}
         {--name= : business name to show (default: the listing\'s own name)}
@@ -50,6 +51,7 @@ class CreatePartnerAccount extends Command
     protected $description = 'Create an approved partner account linked to a listing, from the server (dry run by default; the password is never an argument).';
 
     private const KINDS = [
+        'destination' => Destination::class,
         'accommodation' => Accommodation::class,
         'restaurant' => Restaurant::class,
         'package' => Package::class,

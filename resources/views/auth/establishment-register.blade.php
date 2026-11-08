@@ -46,6 +46,7 @@
                                  control and supplies the shared chevron, so no extra class. --}}
                             <select id="listing_kind" name="listing_kind" required>
                                 <option value="">Select...</option>
+                                <option value="destination" @selected(old('listing_kind') === 'destination')>Destination / Attraction</option>
                                 <option value="accommodation" @selected(old('listing_kind') === 'accommodation')>Accommodation</option>
                                 <option value="restaurant" @selected(old('listing_kind') === 'restaurant')>Restaurant</option>
                                 <option value="package" @selected(old('listing_kind') === 'package')>Tour Package Provider</option>

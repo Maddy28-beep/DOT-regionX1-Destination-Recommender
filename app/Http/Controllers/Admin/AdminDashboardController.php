@@ -35,6 +35,7 @@ class AdminDashboardController extends Controller
 
     /** listing_kind values an establishment account can register under, mapped to their model class. */
     private const ESTABLISHMENT_LISTING_KINDS = [
+        'destination' => Destination::class,
         'accommodation' => Accommodation::class,
         'restaurant' => Restaurant::class,
         'package' => Package::class,
