@@ -23,9 +23,31 @@ class DriveBatchPhotoSeeder extends Seeder
     /** Where manifest.json and the images are; null means the 2026-11 batch folder. Set by tests. */
     public ?string $directory = null;
 
+    /** The batch folder when none is set. A batch of another origin overrides this (see CommonsBatchPhotoSeeder). */
+    protected function defaultDirectory(): string
+    {
+        return database_path('data/listing-photos/drive-2026-11');
+    }
+
+    /** Where the copied pictures are stored on the public disk. */
+    protected function storageDirectory(): string
+    {
+        return 'listings/batch-2026-11';
+    }
+
+    /**
+     * The names to look a listing up by, most exact first. This batch uses the entry's name as written.
+     *
+     * @return list<string>
+     */
+    protected function namesFor(array $entry): array
+    {
+        return [$entry['name']];
+    }
+
     public function run(): void
     {
-        $manifest = new ListingPhotoManifest($this->directory ?? database_path('data/listing-photos/drive-2026-11'));
+        $manifest = new ListingPhotoManifest($this->directory ?? $this->defaultDirectory());
         $directory = $manifest->directory();
         $done = 0;
         $skipped = 0;
@@ -40,11 +62,17 @@ class DriveBatchPhotoSeeder extends Seeder
             }
 
             $matches = [];
-            // An entry may name its kind when the same name exists as more than one kind of listing.
-            foreach (isset($entry['kind']) ? [$entry['kind']] : self::KINDS as $kind) {
-                $class = 'App\\Models\\'.$kind;
-                foreach ($class::where('name', $entry['name'])->get() as $listing) {
-                    $matches[] = $listing;
+            // The first name that matches any listing decides, and it must match exactly one.
+            foreach ($this->namesFor($entry) as $name) {
+                // An entry may name its kind when the same name exists as more than one kind of listing.
+                foreach (isset($entry['kind']) ? [$entry['kind']] : self::KINDS as $kind) {
+                    $class = 'App\\Models\\'.$kind;
+                    foreach ($class::where('name', $name)->get() as $listing) {
+                        $matches[] = $listing;
+                    }
+                }
+                if ($matches !== []) {
+                    break;
                 }
             }
             if (count($matches) !== 1) {
@@ -55,7 +83,7 @@ class DriveBatchPhotoSeeder extends Seeder
             }
             $listing = $matches[0];
 
-            $path = 'listings/batch-2026-11/'.$entry['file'];
+            $path = $this->storageDirectory().'/'.$entry['file'];
             Storage::disk('public')->put($path, file_get_contents($directory.'/'.$entry['file']));
 
             $others = $listing->photos()->where('path', '!=', $path);
