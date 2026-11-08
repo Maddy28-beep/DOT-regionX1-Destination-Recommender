@@ -97,7 +97,7 @@
         <div class="dpost-card__art dcard__art {{ $saveSegment ? 'has-save' : '' }} {{ $closedBadge ? 'is-closed' : '' }}" @if ($closedBadge) data-closed="{{ $closedBadge }}" @endif>
             @if ($coverPhoto)
                 {{-- alt is empty on purpose: the name below already names the place and the card is one link. --}}
-                <img src="{{ $coverPhoto->url() }}" alt="" class="dpost-card__photo" loading="lazy" decoding="async">
+                <img src="{{ $coverPhoto->cardUrl() }}" alt="" class="dpost-card__photo" loading="lazy" decoding="async">
                 @if ($coverPhoto->isIllustration())
                     <span class="photo-illustration-tag photo-illustration-tag--card">Illustration</span>
                 @endif
