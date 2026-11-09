@@ -7,7 +7,9 @@
        and the two amount boxes when "Custom budget" is chosen, checked before the form is sent,
      - the +/- guest counters (never below their minimum or above their maximum) and their total,
      - a check-out date that cannot be before the check-in date,
-     - Reset, which puts every box back on "Any".
+     - Reset, which puts every box back on "Any",
+     - one fixed card height: every tab shows different boxes, so the card is kept as tall as the tallest tab
+       needs and the page below it stays where it is while the visitor switches tabs (screens 700 px and wider).
    Nothing else. */
 (function () {
     'use strict';
@@ -179,6 +181,61 @@
         });
     }
 
+    /*
+     * Measures every tab's card on a hidden copy of the body (never the real form, so nothing the visitor typed or
+     * picked is touched), and gives the real body the height of the tallest. Run again when the width or the fonts
+     * change, because the same boxes wrap differently. A tab that opens the "Custom budget" amounts still grows past
+     * it, which is the visitor's own choice inside that tab.
+     */
+    var body = form.querySelector('.hero-search__body');
+    function lockHeight() {
+        if (!body) return;
+        // On a phone the boxes stack one under another, so the tallest tab is several times the shortest and a fixed height
+        // would leave a wide blank space on the short tabs. Phones keep each tab's own height.
+        if (window.matchMedia && !window.matchMedia('(min-width: 700px)').matches) {
+            body.style.minHeight = '';
+            return;
+        }
+        var probe = body.cloneNode(true);
+        [].slice.call(probe.querySelectorAll('[id]')).forEach(function (n) { n.removeAttribute('id'); });
+        [].slice.call(probe.querySelectorAll('[name]')).forEach(function (n) { n.removeAttribute('name'); });
+        probe.setAttribute('aria-hidden', 'true');
+        probe.setAttribute('inert', '');
+        probe.style.cssText = 'position:absolute;left:0;right:0;top:0;margin:0;min-height:0;visibility:hidden;pointer-events:none';
+        form.appendChild(probe);
+
+        var probeBoxes = [].slice.call(probe.querySelectorAll('[data-for], [data-budget-box]'));
+        var probeHint = probe.querySelector('[data-search-hint]');
+        var probeCustom = probe.querySelector('[data-custom-budget]');
+        if (probeCustom) probeCustom.hidden = true;
+
+        var tallest = 0;
+        radios.forEach(function (radio) {
+            var allowed = (radio.getAttribute('data-tab-fields') || '').split(/\s+/).filter(Boolean);
+            probeBoxes.forEach(function (box) {
+                var kind = box.getAttribute('data-for');
+                box.hidden = !(kind === 'budget'
+                    ? allowed.indexOf('budget') !== -1 && box.getAttribute('data-budget-box') === radio.value
+                    : allowed.indexOf(kind) !== -1);
+            });
+            if (probeHint) probeHint.textContent = HINTS[radio.value] || '';
+            // offsetHeight, not getBoundingClientRect(): the hero is scaled to fit short screens, and a scaled rectangle would lock a smaller height.
+            tallest = Math.max(tallest, probe.offsetHeight);
+        });
+        form.removeChild(probe);
+
+        var style = window.getComputedStyle(body);
+        var padding = style.boxSizing === 'border-box' ? 0 : (parseFloat(style.paddingTop) || 0) + (parseFloat(style.paddingBottom) || 0);
+        body.style.minHeight = tallest ? Math.ceil(tallest - padding) + 'px' : '';
+    }
+
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(lockHeight, 120);
+    });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(lockHeight);
+
     // On a phone the tab strip scrolls: keep the chosen tab in view, so picking "Packages" never hides it.
     function reveal(radio) {
         var tab = radio.parentNode;
@@ -196,4 +253,5 @@
     // Back/forward navigation can restore a different tab than the markup's default.
     window.addEventListener('pageshow', sync);
     sync();
+    lockHeight();
 })();

@@ -38,21 +38,6 @@ class PopularSearchesTest extends TestCase
     }
 
     /** @return list<string> the chip labels in order */
-    private function chips(): array
-    {
-        $html = $this->get('/')->assertOk()->getContent();
-        preg_match_all('/class="hero-popular-searches__chip">([^<]+)</', $html, $m);
-
-        return array_map('trim', $m[1]);
-    }
-
-    private function label(): string
-    {
-        preg_match('/class="hero-popular-searches__label">([^<]+)</', $this->get('/')->getContent(), $m);
-
-        return trim($m[1] ?? '');
-    }
-
     // ---- counting ----
 
     public function test_a_search_that_finds_something_is_counted(): void
@@ -150,51 +135,25 @@ class PopularSearchesTest extends TestCase
         $this->assertStringContainsString('q=beach', $popular->first()['url']);
     }
 
-    public function test_four_real_searches_make_the_row_and_the_label_says_so(): void
+    public function test_the_landing_page_no_longer_shows_a_popular_searches_row(): void
     {
         foreach (['samal', 'eden', 'eagle', 'apo'] as $i => $term) {
             $this->searched($term, 10 - $i);
         }
         $this->destination('alpha-falls');
 
-        $chips = $this->chips();
+        $html = $this->get('/')->assertOk()->getContent();
 
-        $this->assertSame(['samal', 'eden', 'eagle', 'apo'], $chips);
-        $this->assertSame('Popular searches:', $this->label());
-    }
-
-    public function test_with_too_few_searches_the_row_is_topped_up_and_labelled_popular(): void
-    {
-        foreach (['alpha-falls', 'bravo-beach', 'charlie-peak', 'delta-park'] as $i => $slug) {
-            $this->destination($slug, $slug === 'delta-park' ? 'Free' : 'Mid-range', 5 - $i * 0.1);
-        }
-        $this->searched('bravo beach', 5);
-
-        $chips = $this->chips();
-
-        $this->assertCount(4, $chips);
-        $this->assertSame('bravo beach', $chips[0], 'Real searches come first.');
-        $this->assertNotContains('Bravo Beach', $chips, 'A place already shown as a search is not repeated.');
-        $this->assertSame('Popular:', $this->label(), 'Not all four are searches, so the label does not claim they are.');
-    }
-
-    public function test_never_more_than_four_chips(): void
-    {
-        foreach (['alpha-falls', 'bravo-beach', 'charlie-peak', 'delta-park', 'echo-island'] as $i => $slug) {
-            $this->destination($slug, 'Mid-range', 5 - $i * 0.1);
-        }
-        foreach (['one', 'two', 'three', 'four', 'five', 'six'] as $term) {
-            $this->searched($term, 5);
-        }
-
-        $this->assertCount(4, $this->chips());
+        $this->assertStringNotContainsString('hero-popular-searches', $html);
+        $this->assertStringNotContainsString('Popular searches:', $html);
+        // The search card itself is still there.
+        $this->assertStringContainsString('data-hero-search', $html);
     }
 
     public function test_the_landing_page_still_works_when_nothing_has_been_searched(): void
     {
         $this->destination('alpha-falls');
 
-        $this->assertSame(['Alpha Falls'], $this->chips());
-        $this->assertSame('Popular:', $this->label());
+        $this->get('/')->assertOk()->assertDontSee('hero-popular-searches', false);
     }
 }

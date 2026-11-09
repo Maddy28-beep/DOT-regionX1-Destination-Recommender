@@ -359,4 +359,31 @@ class HeroSearchTest extends TestCase
         $this->assertStringContainsString('Grand Tour', $open);
         $this->assertStringNotContainsString('Day Tour', $open);
     }
+
+    public function test_the_search_card_keeps_one_height_on_every_tab_on_wide_screens(): void
+    {
+        $js = file_get_contents(public_path('js/hero-search.js'));
+
+        // Every tab shows different boxes; the card is measured on a hidden copy and kept as tall as the tallest tab.
+        $this->assertStringContainsString('function lockHeight()', $js);
+        $this->assertStringContainsString('body.cloneNode(true)', $js, 'measured on a copy, so nothing the visitor typed is touched');
+        $this->assertStringContainsString('body.style.minHeight', $js);
+        // Layout pixels, because the hero is scaled to fit short screens.
+        $this->assertStringContainsString('probe.offsetHeight', $js);
+        $this->assertStringNotContainsString('probe.getBoundingClientRect', $js);
+        // Not on a phone, where stacked boxes would leave a wide blank space.
+        $this->assertStringContainsString("(min-width: 700px)", $js);
+        // Measured again when the width or the fonts change, and once on load.
+        $this->assertStringContainsString("addEventListener('resize'", $js);
+        $this->assertStringContainsString('document.fonts.ready.then(lockHeight)', $js);
+        $this->assertMatchesRegularExpression('/sync\(\);\s*lockHeight\(\);\s*\}\)\(\);/', $js);
+    }
+
+    public function test_the_landing_page_has_no_popular_searches_row(): void
+    {
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('hero-popular-searches', $html);
+        $this->assertStringContainsString('data-hero-search', $html);
+    }
 }
