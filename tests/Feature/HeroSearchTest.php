@@ -360,23 +360,23 @@ class HeroSearchTest extends TestCase
         $this->assertStringNotContainsString('Day Tour', $open);
     }
 
-    public function test_the_search_card_keeps_one_height_on_every_tab_on_wide_screens(): void
+    public function test_picking_a_tab_eases_the_card_to_its_new_height_instead_of_jumping(): void
     {
         $js = file_get_contents(public_path('js/hero-search.js'));
 
-        // Every tab shows different boxes; the card is measured on a hidden copy and kept as tall as the tallest tab.
-        $this->assertStringContainsString('function lockHeight()', $js);
-        $this->assertStringContainsString('body.cloneNode(true)', $js, 'measured on a copy, so nothing the visitor typed is touched');
-        $this->assertStringContainsString('body.style.minHeight', $js);
-        // Layout pixels, because the hero is scaled to fit short screens.
-        $this->assertStringContainsString('probe.offsetHeight', $js);
-        $this->assertStringNotContainsString('probe.getBoundingClientRect', $js);
-        // Not on a phone, where stacked boxes would leave a wide blank space.
-        $this->assertStringContainsString("(min-width: 700px)", $js);
-        // Measured again when the width or the fonts change, and once on load.
-        $this->assertStringContainsString("addEventListener('resize'", $js);
-        $this->assertStringContainsString('document.fonts.ready.then(lockHeight)', $js);
-        $this->assertMatchesRegularExpression('/sync\(\);\s*lockHeight\(\);\s*\}\)\(\);/', $js);
+        // The card keeps its own height per tab (like before); the change is animated.
+        $this->assertStringContainsString('function changeTab()', $js);
+        $this->assertStringContainsString("body.style.transition = 'height 280ms ease'", $js);
+        $this->assertStringContainsString("el.style.transition = 'opacity 240ms ease 60ms'", $js);
+        // In layout pixels, because the hero is scaled to fit short screens.
+        $this->assertStringContainsString('body.offsetHeight', $js);
+        // A visitor who asks for less motion gets the plain swap, and nothing is left behind afterwards.
+        $this->assertStringContainsString("(prefers-reduced-motion: reduce)", $js);
+        $this->assertStringContainsString('function clearMotion()', $js);
+        $this->assertStringContainsString("r.addEventListener('change', function () { changeTab(); reveal(r); });", $js);
+        // No fixed height any more.
+        $this->assertStringNotContainsString('lockHeight', $js);
+        $this->assertStringNotContainsString('minHeight', $js);
     }
 
     public function test_the_landing_page_has_no_popular_searches_row(): void
