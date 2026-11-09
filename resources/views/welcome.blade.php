@@ -463,15 +463,6 @@
 
 
 
-    @if ($popularSearchChips->isNotEmpty())
-        <div class="hero-popular-searches">
-            <span class="hero-popular-searches__label">{{ $popularSearchLabel }}</span>
-            @foreach ($popularSearchChips as $chip)
-                <a href="{{ $chip['url'] }}" class="hero-popular-searches__chip">{{ $chip['label'] }}</a>
-            @endforeach
-        </div>
-    @endif
-
     <div class="stats">
         <div class="stats-strip">
             <div class="stat-item">

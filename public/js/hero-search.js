@@ -7,7 +7,9 @@
        and the two amount boxes when "Custom budget" is chosen, checked before the form is sent,
      - the +/- guest counters (never below their minimum or above their maximum) and their total,
      - a check-out date that cannot be before the check-in date,
-     - Reset, which puts every box back on "Any".
+     - Reset, which puts every box back on "Any",
+     - a short animation when a tab is picked: every tab shows different boxes, so the card eases to its new height and
+       the boxes fade in, instead of the page below jumping (skipped for visitors who ask for less motion).
    Nothing else. */
 (function () {
     'use strict';
@@ -190,8 +192,43 @@
         strip.scrollTo({ left: offset - (strip.clientWidth - tab.offsetWidth) / 2, behavior: calm ? 'auto' : 'smooth' });
     }
 
+    /*
+     * Picking a tab swaps the boxes, which changes the card's height. Rather than jumping, the body is held at its old
+     * height, eased to the new one, and the boxes fade in as it settles. Only inline styles are used, and they are
+     * removed again when it ends, so a script that never finishes leaves nothing behind.
+     */
+    var body = form.querySelector('.hero-search__body');
+    var fading = [grid, form.querySelector('.hero-search__foot')].filter(Boolean);
+    var calm = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var settle;
+
+    function clearMotion() {
+        clearTimeout(settle);
+        if (body) { body.style.height = ''; body.style.transition = ''; }
+        fading.forEach(function (el) { el.style.opacity = ''; el.style.transition = ''; });
+    }
+
+    function changeTab() {
+        if (!body || calm) { sync(); return; }
+        // The height before the swap, in layout pixels (the hero may be scaled to fit a short screen). If an earlier
+        // animation is still running this is where it has got to, so a quick second click carries on smoothly.
+        var from = body.offsetHeight;
+        clearMotion();
+        sync();
+        var to = body.offsetHeight;
+        if (from === to) return;
+
+        body.style.height = from + 'px';
+        fading.forEach(function (el) { el.style.opacity = '0'; });
+        body.getBoundingClientRect(); // start the animation from these values
+        body.style.transition = 'height 280ms ease';
+        body.style.height = to + 'px';
+        fading.forEach(function (el) { el.style.transition = 'opacity 240ms ease 60ms'; el.style.opacity = '1'; });
+        settle = setTimeout(clearMotion, 340);
+    }
+
     radios.forEach(function (r) {
-        r.addEventListener('change', function () { sync(); reveal(r); });
+        r.addEventListener('change', function () { changeTab(); reveal(r); });
     });
     // Back/forward navigation can restore a different tab than the markup's default.
     window.addEventListener('pageshow', sync);

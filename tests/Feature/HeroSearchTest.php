@@ -359,4 +359,31 @@ class HeroSearchTest extends TestCase
         $this->assertStringContainsString('Grand Tour', $open);
         $this->assertStringNotContainsString('Day Tour', $open);
     }
+
+    public function test_picking_a_tab_eases_the_card_to_its_new_height_instead_of_jumping(): void
+    {
+        $js = file_get_contents(public_path('js/hero-search.js'));
+
+        // The card keeps its own height per tab (like before); the change is animated.
+        $this->assertStringContainsString('function changeTab()', $js);
+        $this->assertStringContainsString("body.style.transition = 'height 280ms ease'", $js);
+        $this->assertStringContainsString("el.style.transition = 'opacity 240ms ease 60ms'", $js);
+        // In layout pixels, because the hero is scaled to fit short screens.
+        $this->assertStringContainsString('body.offsetHeight', $js);
+        // A visitor who asks for less motion gets the plain swap, and nothing is left behind afterwards.
+        $this->assertStringContainsString("(prefers-reduced-motion: reduce)", $js);
+        $this->assertStringContainsString('function clearMotion()', $js);
+        $this->assertStringContainsString("r.addEventListener('change', function () { changeTab(); reveal(r); });", $js);
+        // No fixed height any more.
+        $this->assertStringNotContainsString('lockHeight', $js);
+        $this->assertStringNotContainsString('minHeight', $js);
+    }
+
+    public function test_the_landing_page_has_no_popular_searches_row(): void
+    {
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('hero-popular-searches', $html);
+        $this->assertStringContainsString('data-hero-search', $html);
+    }
 }
