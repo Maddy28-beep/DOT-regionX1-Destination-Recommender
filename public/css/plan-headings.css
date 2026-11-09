@@ -1,0 +1,91 @@
+/* Plan My Trip: a clear order of headings.
+   Every heading, label and option used to be the same dark green at nearly the same size, so a step title, a section
+   heading, a question and an answer all looked alike. This sheet loads last and changes only colour, weight and a small
+   marker, never the layout, so each step still fits the screen the way plan-compact.css arranged it.
+
+     Level 1  the step title ......... large, near-black, extra bold
+     Level 2  a section heading ...... bold, near-black, with a short green bar beside it
+     Level 3  a field label / question  medium dark grey, no green
+     Hints and "optional" notes ...... light grey, small
+     Answers (cards, chips, ticks) ... dark text; green is kept for what is chosen, buttons and the bar
+
+   Green now means "this is chosen" or "this is the heading's marker", not "this is text". */
+
+.plan-wizard {
+    --ph-ink: #14231d;
+    --ph-heading: #1c2b25;
+    --ph-label: #394841;
+    --ph-muted: #5c6b64;
+}
+
+/* ---- Level 1: the step title ---- */
+.plan-wizard .plan-wizard-step > h2 {
+    color: var(--ph-ink);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.3rem, 1.15rem + .6vw, 1.5rem);
+    letter-spacing: -.01em;
+    line-height: 1.25;
+}
+.plan-wizard .plan-step-intro { color: var(--ph-muted); font-weight: 400; }
+
+/* ---- Level 2: a section heading, with a green bar as its marker ---- */
+.plan-wizard .pc-block__head h3,
+.plan-wizard .pc-group > legend:not(.sr-only),
+.plan-wizard .pc-legend:not(summary),
+.plan-wizard .plan-section__title {
+    color: var(--ph-heading);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 1.02rem;
+    line-height: 1.25;
+    padding-left: 10px;
+    border-left: 4px solid var(--primary);
+}
+.plan-wizard .plan-section__title svg { color: var(--primary); }
+
+/* ---- Level 3: the question or label above a field: plain dark grey, no green ---- */
+.plan-wizard .pc-field > label,
+.plan-wizard .pc-field > legend,
+.plan-wizard .pc-label,
+.plan-wizard .field label,
+.plan-wizard .pc-other-needs > label {
+    color: var(--ph-label);
+    font-weight: 600;
+}
+
+/* Disclosures ("More amenities", "Health, accessibility...") and small panel titles read as headings too, not as green text. */
+.plan-wizard details > summary,
+.plan-wizard summary.pc-legend,
+.plan-wizard .pc-collapse__name,
+.plan-wizard h4 {
+    color: var(--ph-heading);
+}
+
+/* ---- Hints and notes: quieter than every heading ---- */
+.plan-wizard .pc-block__head p,
+.plan-wizard .pc-help,
+.plan-wizard .pc-hint:not(.is-set),
+.plan-wizard .field-optional-hint,
+.plan-wizard .field-required-hint {
+    color: var(--ph-muted);
+    font-weight: 500;
+}
+.plan-wizard .field-optional-hint,
+.plan-wizard .field-required-hint { font-size: .74rem; letter-spacing: 0; }
+
+/* ---- Answers: dark text, so green is left for what is chosen ---- */
+.plan-wizard .pc-chip,
+.plan-wizard .pc-card strong,
+.plan-wizard .pc-check__text,
+.plan-wizard .pc-option__name,
+.plan-wizard .pc-health-name {
+    color: var(--ph-heading);
+}
+
+@media (max-width: 760px) {
+    .plan-wizard .pc-block__head h3,
+    .plan-wizard .pc-group > legend:not(.sr-only),
+    .plan-wizard .pc-legend:not(summary),
+    .plan-wizard .plan-section__title { font-size: 1.05rem; }
+}

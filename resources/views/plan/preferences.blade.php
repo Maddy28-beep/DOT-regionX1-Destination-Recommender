@@ -21,6 +21,7 @@
 <link rel="stylesheet" href="{{ asset('css/plan-comfort.css') }}?v={{ filemtime(public_path('css/plan-comfort.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/plan-compact.css') }}?v={{ filemtime(public_path('css/plan-compact.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/plan-trip-layout.css') }}?v={{ filemtime(public_path('css/plan-trip-layout.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/plan-headings.css') }}?v={{ filemtime(public_path('css/plan-headings.css')) }}">
 <div class="plan-shell plan-wizard" id="planWizard" data-draft-owner="{{ auth()->id() ?? 'guest' }}">
     <div class="page-head page-head--with-action">
         <div class="container plan-introduction">
