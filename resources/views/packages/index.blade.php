@@ -32,6 +32,7 @@
             @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, 'type'); @endphp
 
             @include('partials.catalog-filters', [
+                'hidden' => \App\Support\ActiveFilters::carry(request(), ['price_min','price_max','travelers']),
                 'route' => 'packages.index',
                 'placeholder' => 'e.g. Samal',
                 'regions' => $regions,

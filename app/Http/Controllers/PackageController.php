@@ -74,6 +74,21 @@ class PackageController extends Controller
             $query->where('price_tier', $request->string('price_tier'));
         }
 
+        // A peso range from the hero search's Budget dropdown, on the total price: the per-person price times
+        // the number of travellers asked for (one when none is given).
+        [$priceMin, $priceMax] = \App\Support\BudgetRanges::bounds($request);
+        if ($priceMin !== null || $priceMax !== null) {
+            $travelers = max(1, min(30, $request->integer('travelers')));
+            $query->whereNotNull('price_per_pax');
+            // Total = per person x travellers, so the range is divided down to a per-person price.
+            if ($priceMin !== null) {
+                $query->where('price_per_pax', '>=', $priceMin / $travelers);
+            }
+            if ($priceMax !== null) {
+                $query->where('price_per_pax', '<=', $priceMax / $travelers);
+            }
+        }
+
         match ($request->string('sort')->toString()) {
             // See RanksByRating / DestinationController::index().
             'rating' => $query->orderByWeightedRating(),

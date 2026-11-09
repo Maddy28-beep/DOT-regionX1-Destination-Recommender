@@ -78,13 +78,14 @@ class HeroSearchTest extends TestCase
      */
     public function test_budget_and_interest_reach_the_results(): void
     {
-        $this->destination('davao-crocodile-park', 'Wildlife');
-        $this->destination('peoples-park', 'Cultural Heritage');
+        $this->destination('davao-crocodile-park', 'Wildlife')->update(['entry_fee_min' => 150, 'entry_fee_max' => 250]);
+        $this->destination('peoples-park', 'Cultural Heritage')->update(['entry_fee_min' => 150, 'entry_fee_max' => 250]);
 
-        $location = (string) $this->get('/search?purpose=destinations&budget=Mid-range&interest=Wildlife')
+        $location = (string) $this->get('/search?purpose=destinations&budget=101-300&interest=Wildlife')
             ->assertRedirect()->headers->get('Location');
 
-        $this->assertStringContainsString('price_tier=Mid-range', urldecode($location));
+        $this->assertStringContainsString('price_min=101', urldecode($location));
+        $this->assertStringContainsString('price_max=300', urldecode($location));
         $this->assertStringContainsString('interest=Wildlife', urldecode($location));
 
         $html = $this->get($location)->assertOk()->getContent();
@@ -132,10 +133,10 @@ class HeroSearchTest extends TestCase
     public function test_filters_that_cannot_apply_are_not_carried_over(): void
     {
         $location = urldecode((string) $this->get(
-            '/search?purpose=accommodations&budget=Mid-range&interest=Wildlife&duration=1-2'
+            '/search?purpose=accommodations&budget=custom&budget_min=1500&interest=Wildlife&duration=1-2'
         )->assertRedirect()->headers->get('Location'));
 
-        $this->assertStringContainsString('price_tier=Mid-range', $location);
+        $this->assertStringContainsString('price_min=1500', $location);
         $this->assertStringNotContainsString('interest=', $location);
         $this->assertStringNotContainsString('duration=', $location);
     }
@@ -172,7 +173,7 @@ class HeroSearchTest extends TestCase
         $this->assertStringNotContainsString('Eden Nature Park', $html);
     }
 
-    public function test_the_landing_page_shows_the_five_catalogues_as_tabs_and_a_name_search(): void
+    public function test_the_landing_page_shows_the_five_catalogues_as_tabs_and_no_name_search(): void
     {
         $html = $this->get('/')->assertOk()->getContent();
 
@@ -184,7 +185,11 @@ class HeroSearchTest extends TestCase
         }
 
         $this->assertSame(1, preg_match_all('/name="purpose"[^>]*checked/', $html), 'Exactly one tab starts selected.');
-        $this->assertStringContainsString('name="q"', $html);
+        $card = substr($html, strpos($html, 'data-hero-search'));
+        $card = substr($card, 0, strpos($card, '</form>'));
+        $this->assertStringNotContainsString('name="q"', $card, 'The general search box is removed from the card, not just hidden.');
+        $this->assertStringNotContainsString('Search a place', $html);
+        $this->assertStringNotContainsString('Search a hotel or resort', $html);
         $this->assertStringContainsString('name="duration"', $html);
         $this->assertStringContainsString('name="budget"', $html);
         $this->assertStringContainsString('name="interest"', $html);
@@ -192,43 +197,42 @@ class HeroSearchTest extends TestCase
         $this->assertStringContainsString('js/hero-search.js', $html);
     }
 
-    public function test_budget_is_a_row_of_pills_with_any_budget_as_the_default(): void
+    public function test_budget_is_a_dropdown_not_a_row_of_buttons(): void
     {
         $html = $this->get('/')->assertOk()->getContent();
 
-        foreach (['Budget-Friendly', 'Mid-range', 'Premium'] as $tier) {
-            $this->assertMatchesRegularExpression('/<input type="radio" name="budget" value="'.$tier.'"/', $html);
-        }
+        $this->assertStringNotContainsString('type="radio" name="budget"', $html, 'The fixed budget buttons are gone.');
+        $this->assertStringNotContainsString('hero-search__pill', $html);
+        $this->assertSame(4, substr_count($html, 'data-budget-select'), 'One dropdown each for destinations, stays, dining and packages; souvenirs have no price.');
 
-        $this->assertMatchesRegularExpression('/<input type="radio" name="budget" value="" checked>/', $html,
-            '"Any budget" is the one selected by default.');
-        $this->assertSame(1, preg_match_all('/name="budget"[^>]*checked/', $html));
+        // Every dropdown opens on Any budget, first in its list.
+        $this->assertSame(4, preg_match_all('/<select id="search-budget-[a-z]+" name="budget"[^>]*>\s*<option value="">Any budget<\/option>/', $html));
+        $this->assertSame(3, substr_count($html, 'Custom budget'), 'Custom budget only where an amount can be filtered on.');
+        $this->assertStringContainsString('name="budget_min"', $html);
+        $this->assertStringContainsString('name="budget_max"', $html);
     }
 
-    public function test_an_empty_budget_from_the_default_pill_is_not_sent_along(): void
+    public function test_an_empty_budget_from_the_default_option_is_not_sent_along(): void
     {
         $location = urldecode((string) $this->get('/search?purpose=destinations&budget=&q=')->assertRedirect()->headers->get('Location'));
 
-        $this->assertStringNotContainsString('price_tier=', $location);
+        $this->assertStringNotContainsString('price_', $location);
         $this->assertStringNotContainsString('q=', $location);
     }
 
-    /** Which tab can use which filter is stated in the markup, so the script and the server agree. */
-    public function test_each_tab_declares_which_filters_it_can_use(): void
+    /** Which tab uses which box is stated in the markup, so the script and the server agree. */
+    public function test_each_tab_declares_which_boxes_it_uses(): void
     {
         $html = $this->get('/')->assertOk()->getContent();
 
         foreach ([
-            'destinations' => ['region_id interest', 1],
-            'accommodations' => ['region_id type', 1],
-            'restaurants' => ['region_id cuisine_type', 1],
-            'packages' => ['region_id interest duration', 1],
-            'souvenir_centers' => ['region_id', 0],
-        ] as $purpose => [$filters, $budget]) {
-            $this->assertMatchesRegularExpression(
-                '/value="'.$purpose.'"[^>]*data-filters="'.$filters.'"\s+data-budget="'.$budget.'"/s', $html,
-                "{$purpose} should declare filters [{$filters}] and budget={$budget}."
-            );
+            'destinations' => 'budget where interest',
+            'accommodations' => 'budget where stay_mode from to guests',
+            'restaurants' => 'budget meal date cuisine where',
+            'packages' => 'budget where interest duration travelers',
+            'souvenir_centers' => 'where',
+        ] as $purpose => $boxes) {
+            $this->assertStringContainsString('value="'.$purpose.'" data-tab-fields="'.$boxes.'"', $html, "{$purpose} should use [{$boxes}].");
         }
     }
 
@@ -246,46 +250,49 @@ class HeroSearchTest extends TestCase
 
         $html = $this->get('/')->assertOk()->getContent();
 
-        $this->assertStringContainsString('<option value="Beach Resort">Beach Resort</option>', $html, 'Kinds of stay come from the stays on the site.');
         $this->assertStringContainsString('<option value="Filipino Seafood">Filipino Seafood</option>', $html, 'Cuisines come from the restaurants on the site.');
         $this->assertStringContainsString('<option value="'.$region->id.'">Davao City</option>', $html, 'Places are the provinces and cities.');
         $this->assertStringContainsString('name="region_id"', $html);
-        $this->assertStringContainsString('name="type"', $html);
+        $this->assertStringContainsString('name="stay_mode"', $html);
         $this->assertStringContainsString('name="cuisine_type"', $html);
         $this->assertStringContainsString('name="duration"', $html);
+        $this->assertStringNotContainsString('name="type"', $html, 'The stay card asks Any / Overnight / Day use, not the accommodation type.');
     }
 
     public function test_each_catalogue_is_sent_only_the_filters_its_page_reads(): void
     {
-        $query = '&region_id=2&budget=Mid-range&interest=Wildlife&type=Hotel&cuisine_type=Cafe&duration=3-4';
+        $query = '&region_id=2&budget=custom&budget_min=1500&budget_max=2500&interest=Wildlife&type=Hotel&cuisine_type=Cafe&duration=3-4&meal=lunch&stay_mode=overnight&adults=2&travelers=3';
         $go = fn (string $purpose) => urldecode((string) $this->get('/search?purpose='.$purpose.$query)->assertRedirect()->headers->get('Location'));
 
         $stays = $go('accommodations');
-        $this->assertStringContainsString('region_id=2', $stays);
-        $this->assertStringContainsString('type=Hotel', $stays);
-        $this->assertStringContainsString('price_tier=Mid-range', $stays);
-        foreach (['interest=', 'cuisine_type=', 'duration='] as $other) {
+        foreach (['region_id=2', 'stay_mode=overnight', 'adults=2'] as $kept) {
+            $this->assertStringContainsString($kept, $stays);
+        }
+        foreach (['interest=', 'cuisine_type=', 'duration=', 'meal=', 'travelers=', 'type=Hotel'] as $other) {
             $this->assertStringNotContainsString($other, $stays);
         }
 
         $dining = $go('restaurants');
         $this->assertStringContainsString('cuisine_type=Cafe', $dining);
+        $this->assertStringContainsString('meal=lunch', $dining);
         $this->assertStringContainsString('region_id=2', $dining);
-        foreach (['type=Hotel', 'interest=', 'duration='] as $other) {
+        foreach (['type=Hotel', 'interest=', 'duration=', 'stay_mode=', 'adults=', 'price_min='] as $other) {
             $this->assertStringNotContainsString($other, $dining);
         }
 
         $packages = $go('packages');
-        foreach (['region_id=2', 'interest=Wildlife', 'duration=3-4', 'price_tier=Mid-range'] as $kept) {
+        foreach (['region_id=2', 'interest=Wildlife', 'duration=3-4', 'price_min=1500', 'travelers=3'] as $kept) {
             $this->assertStringContainsString($kept, $packages);
         }
-        $this->assertStringNotContainsString('cuisine_type=', $packages);
+        foreach (['cuisine_type=', 'meal=', 'stay_mode=', 'adults='] as $other) {
+            $this->assertStringNotContainsString($other, $packages);
+        }
 
         $destinations = $go('destinations');
-        foreach (['region_id=2', 'interest=Wildlife', 'price_tier=Mid-range'] as $kept) {
+        foreach (['region_id=2', 'interest=Wildlife', 'price_min=1500'] as $kept) {
             $this->assertStringContainsString($kept, $destinations);
         }
-        foreach (['duration=', 'cuisine_type=', 'type=Hotel'] as $other) {
+        foreach (['duration=', 'cuisine_type=', 'type=Hotel', 'meal=', 'adults=', 'travelers='] as $other) {
             $this->assertStringNotContainsString($other, $destinations);
         }
     }
@@ -322,6 +329,7 @@ class HeroSearchTest extends TestCase
             ]);
         }
 
+        // The listing page still reads `type` (old links), though the card no longer sends it.
         $html = $this->get('/accommodations?type=Beach+Resort&region_id='.$samal->id)->assertOk()->getContent();
 
         $this->assertStringContainsString('Beach Stay', $html);

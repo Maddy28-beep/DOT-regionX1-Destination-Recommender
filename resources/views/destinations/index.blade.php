@@ -42,7 +42,7 @@
                 'tiers' => [['Free', 'Free', ''], ['Budget-Friendly', 'Budget-friendly', ''], ['Mid-range', 'Mid-range', ''], ['Premium', 'Premium', '']],
                 'categoryParam' => 'type',
                 'formId' => 'destinationFilters',
-                'hidden' => [['name' => 'view', 'value' => request('view') === 'map' ? 'map' : 'grid', 'id' => 'destinationViewInput']],
+                'hidden' => array_merge([['name' => 'view', 'value' => request('view') === 'map' ? 'map' : 'grid', 'id' => 'destinationViewInput']], \App\Support\ActiveFilters::carry(request(), ['price_min','price_max'])),
                 'clearParams' => request('view') === 'map' ? ['view' => 'map'] : [],
             ])
 

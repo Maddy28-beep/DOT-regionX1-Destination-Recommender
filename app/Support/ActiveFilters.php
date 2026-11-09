@@ -2,7 +2,9 @@
 
 namespace App\Support;
 
+use App\Http\Controllers\SearchController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 /**
@@ -43,6 +45,56 @@ class ActiveFilters
 
         $filters->put('interest', $request->filled('interest') ? 'Interest: '.$request->input('interest') : null);
 
+        // What the hero search's per-catalogue boxes can add (see SearchController).
+        [$min, $max] = BudgetRanges::bounds($request);
+        $filters->put('price_min', $min !== null ? 'From '.BudgetRanges::peso($min) : null);
+        $filters->put('price_max', $max !== null ? 'Up to '.BudgetRanges::peso($max) : null);
+        $filters->put('stay_mode', SearchController::STAY_MODES[(string) $request->input('stay_mode')] ?? null);
+        $filters->put('from', self::dateLabel($request->input('from'), 'Check-in'));
+        $filters->put('to', self::dateLabel($request->input('to'), 'Check-out'));
+        foreach (['adults' => 'adult', 'children' => 'child', 'seniors' => 'senior citizen', 'pwd' => 'PWD'] as $key => $noun) {
+            $n = (int) $request->input($key);
+            $filters->put($key, $n > 0 ? $n.' '.($key === 'children' ? 'children' : ($n === 1 || $key === 'pwd' ? $noun : $noun.'s')) : null);
+        }
+        $filters->put('meal', MealTimes::label((string) $request->input('meal')) ? 'Meal: '.MealTimes::label((string) $request->input('meal')) : null);
+        $filters->put('date', self::dateLabel($request->input('date'), 'Date'));
+        $travelers = (int) $request->input('travelers');
+        $filters->put('travelers', $travelers > 1 ? $travelers.' travelers' : null);
+        $filters->put('duration', match ((string) $request->input('duration')) {
+            '1-2' => 'Trip: 1–2 days', '3-4' => 'Trip: 3–4 days', '5-plus' => 'Trip: 5+ days', default => null,
+        });
+
         return $filters->filter(fn ($label) => $label !== null && $label !== '');
+    }
+
+    /**
+     * The hero-search answers a page's own filter form has no box for, as hidden fields, so applying a filter
+     * there keeps them (a price range, the dates and guests, a meal).
+     *
+     * @return list<array{name: string, value: string}>
+     */
+    public static function carry(Request $request, array $keys): array
+    {
+        $fields = [];
+        foreach ($keys as $key) {
+            if ($request->filled($key) && is_scalar($request->input($key))) {
+                $fields[] = ['name' => $key, 'value' => (string) $request->input($key)];
+            }
+        }
+
+        return $fields;
+    }
+
+    private static function dateLabel(mixed $value, string $prefix): ?string
+    {
+        $text = (string) $value;
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $text)) {
+            return null;
+        }
+        try {
+            return $prefix.': '.Carbon::createFromFormat('Y-m-d', $text)->format('j M Y');
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }

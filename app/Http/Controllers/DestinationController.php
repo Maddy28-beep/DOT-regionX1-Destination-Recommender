@@ -43,6 +43,19 @@ class DestinationController extends Controller
             $query->where('price_tier', $request->string('price_tier'));
         }
 
+        // A peso range from the hero search's Budget dropdown: the entry fee on file overlaps it. A place with
+        // no fee on file is left out only while a budget is set.
+        [$priceMin, $priceMax] = \App\Support\BudgetRanges::bounds($request);
+        if ($priceMin !== null || $priceMax !== null) {
+            $query->whereNotNull('entry_fee_max');
+            if ($priceMax !== null) {
+                $query->where('entry_fee_min', '<=', $priceMax);
+            }
+            if ($priceMin !== null) {
+                $query->where('entry_fee_max', '>=', $priceMin);
+            }
+        }
+
         match ($request->string('sort')->toString()) {
             // Weighted, so "no reviews yet" sorts as average rather than as
             // nought stars -- see RanksByRating. Raw rating buried all 17

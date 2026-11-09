@@ -97,10 +97,10 @@ class ProvenanceStatusTest extends TestCase
 
         $html = $this->get('/destinations')->assertOk()->getContent();
 
-        $this->assertMatchesRegularExpression('/dcard__dot is-official[^>]*>.*?DOT Accredited/s', $html);
-        $this->assertMatchesRegularExpression('/dcard__dot is-sample[^>]*>.*?Sample Data/s', $html);
-        $this->assertMatchesRegularExpression('/dcard__dot is-unverified[^>]*>.*?Not Yet Verified/s', $html);
-        $this->assertSame(1, substr_count($html, 'DOT Accredited</span>'), 'only the one official record is called accredited');
+        $this->assertMatchesRegularExpression('/dcard__mark is-official[^>]*aria-label="DOT Accredited"/s', $html);
+        $this->assertMatchesRegularExpression('/dcard__mark is-sample[^>]*aria-label="Sample Data"/s', $html);
+        $this->assertMatchesRegularExpression('/dcard__mark is-unverified[^>]*aria-label="Not Yet Verified"/s', $html);
+        $this->assertSame(1, substr_count($html, 'aria-label="DOT Accredited"'), 'only the one official record is called accredited');
     }
 
     public function test_a_listing_with_no_record_is_never_called_dot_accredited_on_its_page_or_card(): void

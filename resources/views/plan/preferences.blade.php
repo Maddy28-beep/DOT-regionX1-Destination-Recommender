@@ -118,7 +118,7 @@
                             TripPlannerController::applyOrigin).
                         --}}
                         <div class="plan-section pc-block pc-trip-start">
-                            <header class="pc-block__head"><h3>Where you start</h3><p>Optional &mdash; your stops are ordered from here.</p></header>
+                            <header class="pc-block__head"><h3>Where will you start each day?</h3><p>Optional. We order your stops from the nearest to the furthest.</p></header>
 
                             <input type="hidden" name="origin_lat" id="origin_lat" value="{{ old('origin_lat', $preference->origin_lat) }}">
                             <input type="hidden" name="origin_lng" id="origin_lng" value="{{ old('origin_lng', $preference->origin_lng) }}">
@@ -178,12 +178,7 @@
                                             @endif
                                         </span>
                                     </div>
-                                    <div class="pc-start-guide">
-                                        <span class="pc-start-guide__icon" aria-hidden="true"><x-icon name="map-pin" /></span>
-                                        <strong>Start somewhere familiar</strong>
-                                        <p>Your hotel, an airport or a landmark. Choose where your day begins and we&rsquo;ll order your stops from there.</p>
-                                    </div>
-                                    <p class="pc-privacy"><x-icon name="shield-check" /> Your hotel, the airport, or any address. We order your stops from nearest to furthest. Rounded to about 100 metres before we store it, never linked to your name, and cleared when you clear the trip.</p>
+                                    <p class="pc-privacy"><x-icon name="shield-check" /> Private: rounded to about 100 metres, never linked to your name, and cleared when you clear the trip.</p>
                                 </div>
                             </div>
                         </div>

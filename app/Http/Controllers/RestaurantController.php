@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Region;
 use App\Models\Restaurant;
+use App\Support\MealTimes;
+use App\Support\OpeningHours;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -27,6 +30,24 @@ class RestaurantController extends Controller
 
         if ($request->filled('price_tier')) {
             $query->where('price_tier', $request->string('price_tier'));
+        }
+
+        // A meal (and, optionally, a date): the restaurants open at the hour the planner schedules that meal.
+        // Opening hours are free text, so this is read in PHP and kept to the matching ids. See MealTimes.
+        $meal = $request->string('meal')->toString();
+        if (MealTimes::valid($meal)) {
+            $date = null;
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $request->input('date'))) {
+                try {
+                    $date = Carbon::createFromFormat('Y-m-d', (string) $request->input('date'), OpeningHours::TIMEZONE)->startOfDay();
+                } catch (\Throwable) {
+                    $date = null;
+                }
+            }
+            $ids = (clone $query)->reorder()->get(['restaurants.id', 'restaurants.opening_hours'])
+                ->filter(fn ($r) => MealTimes::servedAt($r->opening_hours, $meal, $date))
+                ->pluck('id');
+            $query->whereIn('restaurants.id', $ids);
         }
 
         match ($request->string('sort')->toString()) {

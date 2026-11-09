@@ -110,16 +110,20 @@
             @if ($listing->review_count < 1)
                 <span class="dcard__new">New</span>
             @endif
+
+            {{-- Provenance as a small mark on the picture: the DOT medal for a listing backed by an official record, a gray "i" for
+                 sample or unverified data. The words are in the tooltip and the accessible name. --}}
+            @php $provenance = app(\App\Support\SampleData::class)->status($listing); @endphp
+            @if ($provenance === \App\Support\SampleData::OFFICIAL)
+                <span class="dcard__mark is-official" role="img" aria-label="{{ \App\Support\SampleData::label($provenance) }}" title="{{ \App\Support\SampleData::label($provenance) }}: {{ \App\Support\SampleData::title($provenance) }}"><img src="{{ asset('images/dot-accredited-badge.webp') }}" alt="" width="30" height="30" loading="lazy" decoding="async"></span>
+            @else
+                <span class="dcard__mark is-{{ $provenance }}" role="img" aria-label="{{ \App\Support\SampleData::label($provenance) }}" title="{{ \App\Support\SampleData::label($provenance) }}: {{ \App\Support\SampleData::title($provenance) }}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="6.4" r="2.1"/><rect x="10" y="10" width="4" height="9.5" rx="1.4"/></svg></span>
+            @endif
         </div>
 
         <div class="dcard__body">
             <div class="dcard__top">
-                @if ($listing->is_accredited)
-                    @php $provenance = app(\App\Support\SampleData::class)->status($listing); @endphp
-                    <span class="dcard__dot is-{{ $provenance }}" title="{{ \App\Support\SampleData::title($provenance) }}"><x-icon name="shield-check" /> {{ \App\Support\SampleData::label($provenance) }}</span>
-                @else
-                    <span></span>
-                @endif
+                <span></span>
 
                 @if ($listing->review_count > 0)
                     <span class="dcard__rating">
