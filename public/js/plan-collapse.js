@@ -1,5 +1,6 @@
-/* Trip form, step 1, on a phone: the three optional parts (arrival time, departure details, where you start) fold behind
-   a one-line row so the step is not four screens long. Nothing is removed or renamed: the fields stay in the page and in the
+/* Trip form, step 1: the optional parts fold behind a one-line row. On a phone that is arrival time, departure details and where
+   you start, so the step is not four screens long; on every screen the departure details fold (most visitors have no flight to
+   plan around yet). Nothing is removed or renamed: the fields stay in the page and in the
    submitted form, and the CSS only hides them on a phone (public/css/plan-trip-layout.css). A part opens by itself when it
    already holds an answer (a saved draft, a server error) or when the browser's own check lands on a field inside it, so a
    hidden field can never block "Next". Without JavaScript nothing is folded. */
@@ -19,7 +20,7 @@
     }
     var parts = [
         { selector: '[data-arrival]', label: 'Arrival time', choice: arrivalChoice },
-        { selector: '.pc-trip-departure', label: 'Departure details' },
+        { selector: '.pc-trip-departure', label: 'I have a flight or bus to catch', always: true },
         { selector: '.pc-trip-start', label: 'Where you start' }
     ];
 
@@ -41,10 +42,11 @@
         var id = section.id || 'plan-collapsible-' + index;
         section.id = id;
         section.classList.add('pc-collapsible');
+        if (part.always) section.classList.add('pc-collapsible--always');
 
         var toggle = document.createElement('button');
         toggle.type = 'button';
-        toggle.className = 'pc-collapse pc-col-12';
+        toggle.className = 'pc-collapse pc-col-12' + (part.always ? ' pc-collapse--always' : '');
         toggle.setAttribute('aria-controls', id);
 
         var name = document.createElement('span');

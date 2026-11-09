@@ -9,6 +9,9 @@ use Illuminate\View\View;
 
 class AccommodationController extends Controller
 {
+    /** Wording that says a stay can be used for the day. See index(). */
+    private const DAY_USE_PHRASES = ['day use', 'day-use', 'day tour', 'day pass', 'day guest'];
+
     public function index(Request $request): View
     {
         $query = Accommodation::publiclyVisible()->with('region', 'photos')->withCount('reviews');
@@ -44,6 +47,28 @@ class AccommodationController extends Controller
 
         if ($request->filled('price_tier')) {
             $query->where('price_tier', $request->string('price_tier'));
+        }
+
+        // A peso range from the hero search's Budget dropdown: the price per night.
+        [$priceMin, $priceMax] = \App\Support\BudgetRanges::bounds($request);
+        if ($priceMin !== null || $priceMax !== null) {
+            $query->whereNotNull('price_per_night');
+            if ($priceMin !== null) {
+                $query->where('price_per_night', '>=', $priceMin);
+            }
+            if ($priceMax !== null) {
+                $query->where('price_per_night', '<=', $priceMax);
+            }
+        }
+
+        // Kind of stay. Every accredited lodging type is somewhere to sleep, so "overnight" adds no limit.
+        // No listing carries a day-use flag, so day use can only be read from the listing's own description.
+        if ($request->string('stay_mode')->toString() === 'day_use') {
+            $query->where(function ($q) {
+                foreach (self::DAY_USE_PHRASES as $phrase) {
+                    $q->orWhereRaw('LOWER(description) LIKE ?', ['%'.$phrase.'%']);
+                }
+            });
         }
 
         match ($request->string('sort')->toString()) {

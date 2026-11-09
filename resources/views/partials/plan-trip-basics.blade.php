@@ -55,7 +55,7 @@
 </div>
 
 <div class="plan-section pc-block pc-trip-dates">
-    <header class="pc-block__head"><h3>Dates &amp; arrival</h3><p>Only the number of days is required.</p></header>
+    <header class="pc-block__head"><h3>When are you visiting?</h3><p>Only the number of days is required. Everything else is optional.</p></header>
     <div class="pc-grid">
         <div class="field pc-field pc-col-3">
             <label for="travel_days">Number of travel days
@@ -79,7 +79,7 @@
         </div>
 
         <div class="field pc-field pc-col-6" data-quick-dates hidden>
-            <span class="pc-label" id="quickDatesLabel">Quick pick</span>
+            <span class="pc-label" id="quickDatesLabel">Or pick quickly</span>
             <div class="pc-quick" role="group" aria-labelledby="quickDatesLabel">
                 <button type="button" data-quick="weekend">This weekend</button>
                 <button type="button" data-quick="week">Next week</button>
@@ -103,11 +103,12 @@
                 </div>
             </div>
             <input type="time" id="arrival_time" name="arrival_time" value="{{ $arrivalValue }}">
+            <p class="pc-hint">Helps us plan your first day. Leave it blank and we assume {{ $earliestStart }}.</p>
         </div>
     </div>
 
     <fieldset class="pc-trip-departure">
-        <legend>Departure <span>Optional</span></legend>
+        <legend>Leaving Davao <span>Optional</span></legend>
         <div class="pc-departure-grid">
             {{-- Leaving: all optional. The point is chosen here, never guessed from where the trip starts. The buttons only
                  fill the box and the two hidden coordinates (public/js/plan-departure.js); the server also reads a typed place. --}}
@@ -136,13 +137,13 @@
                 <button type="button" data-departure-pick="Davao City Overland Transport Terminal, Ecoland" data-lat="7.056" data-lng="125.602">Bus terminal</button>
                 <button type="button" data-departure-same>Same as where I start</button>
             </div>
-            <p class="pc-hint">We allow {{ $departureBufferText }} there before you leave.</p>
+            <p class="pc-hint">Add this only if you have a flight or bus to catch. We allow {{ $departureBufferText }} there before you leave.</p>
         </div>
     </fieldset>
 </div>
 
 <div class="plan-section pc-block pc-trip-visitor">
-    <header class="pc-block__head"><h3>Where you&rsquo;re from</h3></header>
+    <header class="pc-block__head"><h3>About you</h3></header>
     <div class="pc-grid">
         <fieldset class="pc-group pc-field pc-col-8">
             <legend>Is this your first visit to Davao?</legend>

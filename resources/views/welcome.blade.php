@@ -279,33 +279,34 @@
     --}}
     {{--
         The search card, in two parts: a white bar of tabs (the five catalogues, as radio inputs named
-        "purpose", so the form works without script) floating over a light body holding the budget as quick
-        choices, a name search and one box for Duration and Interest, with Explore on the lower edge.
+        "purpose", so the form works without script) floating over a light body, with Explore on the lower edge.
 
-        The boxes under the name search belong to the chosen tab: every tab can narrow by place (province or
-        city), and then by what only that catalogue records -- an interest for destinations and packages, a
-        kind of stay, a cuisine, a trip length. The script shows only the boxes the chosen tab can use (and
-        disables the rest so they are not sent); SearchController drops anything else on the server too.
-        Budget is radio pills, with "Any budget" (an empty value, which the search ignores) as the default,
-        and is left out for souvenir shops, which record no price tier.
+        Each tab is its own short form. A box carries data-for="<what it is>" and the script shows only the
+        boxes the chosen tab uses (data-tab-fields on the radio), disabling the rest so they are never sent;
+        SearchController ignores anything else on the server too. Everything is optional: every box opens on
+        "Any ...", and the guest counters on 0, which put no limit on the results.
+
+        There is no name search. Budget is a dropdown whose choices depend on the tab (App\Support\BudgetRanges):
+        peso ranges where the catalogue records a price, the existing price levels for dining, and nothing for
+        souvenir shops, which record no price.
     --}}
-    <form class="hero-search" action="{{ route('search') }}" method="GET" data-hero-search>
+    @php
+        $stayGuests = ['adults' => 'Adults', 'children' => 'Children', 'seniors' => 'Senior citizens', 'pwd' => 'PWD'];
+        $today = now('Asia/Manila')->toDateString();
+    @endphp
+    <form class="hero-search" id="search" action="{{ route('search') }}" method="GET" data-hero-search>
         <div class="hero-search__bar">
             <fieldset class="hero-search__tabs">
                 <legend class="sr-only">I want to&hellip;</legend>
                 @foreach ([
-                    ['destinations', 'Destinations', 'map-pin', 'Search a place', 'region_id interest', 1],
-                    ['accommodations', 'Stays', 'building', 'Search a hotel or resort', 'region_id type', 1],
-                    ['restaurants', 'Dining', 'utensils', 'Search a restaurant', 'region_id cuisine_type', 1],
-                    ['packages', 'Packages', 'ticket', 'Search a tour package', 'region_id interest duration', 1],
-                    ['souvenir_centers', 'Souvenirs', 'tag', 'Search a souvenir shop', 'region_id', 0],
-                ] as [$value, $label, $icon, $placeholder, $filterKeys, $hasBudget])
+                    ['destinations', 'Destinations', 'map-pin', 'budget where interest'],
+                    ['accommodations', 'Stays', 'building', 'budget where stay_mode from to guests'],
+                    ['restaurants', 'Dining', 'utensils', 'budget meal date cuisine where'],
+                    ['packages', 'Packages', 'ticket', 'budget where interest duration travelers'],
+                    ['souvenir_centers', 'Souvenirs', 'tag', 'where'],
+                ] as [$value, $label, $icon, $fields])
                     <label class="hero-search__tab">
-                        <input type="radio" name="purpose" value="{{ $value }}"
-                            data-placeholder="{{ $placeholder }}"
-                            data-filters="{{ $filterKeys }}"
-                            data-budget="{{ $hasBudget }}"
-                            @checked($loop->first)>
+                        <input type="radio" name="purpose" value="{{ $value }}" data-tab-fields="{{ $fields }}" @checked($loop->first)>
                         <span class="hero-search__tab-body"><x-icon :name="$icon" /> {{ $label }}</span>
                     </label>
                 @endforeach
@@ -313,58 +314,51 @@
         </div>
 
         <div class="hero-search__body">
-            <fieldset class="hero-search__pills" data-budget-pills>
-                <legend class="sr-only">Budget</legend>
-                @foreach ([['', 'Any budget'], ['Budget-Friendly', 'Budget-friendly'], ['Mid-range', 'Mid-range'], ['Premium', 'Premium']] as [$value, $label])
-                    <label class="hero-search__pill">
-                        <input type="radio" name="budget" value="{{ $value }}" @checked($loop->first)>
-                        <span>{{ $label }}</span>
-                    </label>
+            <div class="hero-search__grid" data-search-filters>
+                {{-- Budget: one dropdown per tab, because what a budget means (and offers) differs by catalogue. --}}
+                @foreach ($budgetOptions as $purpose => $options)
+                    <div class="hero-search__box" data-for="budget" data-budget-box="{{ $purpose }}" @if ($purpose !== 'destinations') hidden @endif>
+                        <x-icon name="tag" />
+                        <label for="search-budget-{{ $purpose }}">Budget &middot; {{ $budgetBasis[$purpose] }}</label>
+                        <select id="search-budget-{{ $purpose }}" name="budget" data-budget-select data-empty-select @if ($purpose !== 'destinations') disabled @endif>
+                            @foreach ($options as $key => $label)
+                                <option value="{{ $key }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 @endforeach
-            </fieldset>
 
-            <div class="hero-search__field">
-                <x-icon name="search" />
-                <label for="hero-search-q" class="sr-only">Search by name</label>
-                <input id="hero-search-q" type="search" name="q" maxlength="100" placeholder="Search a place"
-                    autocomplete="off" enterkeyhint="search" data-search-field>
-            </div>
+                <div class="hero-search__box hero-search__box--amounts hero-search__box--wide" data-custom-budget hidden>
+                    <x-icon name="tag" />
+                    <span class="hero-search__box-title" id="custom-budget-title">Your budget (&#8369;) &middot; either box can stay empty</span>
+                    <div class="hero-search__amounts" role="group" aria-labelledby="custom-budget-title">
+                        <label><span class="sr-only">Minimum budget in pesos</span>
+                            <input type="text" inputmode="decimal" name="budget_min" placeholder="Minimum, e.g. 500" maxlength="9" autocomplete="off" disabled data-budget-min>
+                        </label>
+                        <span aria-hidden="true">to</span>
+                        <label><span class="sr-only">Maximum budget in pesos</span>
+                            <input type="text" inputmode="decimal" name="budget_max" placeholder="Maximum, e.g. 3000" maxlength="9" autocomplete="off" disabled data-budget-max>
+                        </label>
+                    </div>
+                    <p class="hero-search__error" role="alert" data-budget-error hidden></p>
+                </div>
 
-            <div class="hero-search__pair" data-search-filters>
-                <div class="hero-search__box" data-filter="region_id">
-                    <x-icon name="map-pin" />
-                    <label for="search-region">Where</label>
-                    <select id="search-region" name="region_id" data-empty-select>
-                        <option value="">Anywhere in Region XI</option>
-                        @foreach ($regions as $region)
-                            <option value="{{ $region->id }}">{{ $region->name }}</option>
+                <div class="hero-search__box" data-for="meal" hidden>
+                    <x-icon name="clock" />
+                    <label for="search-meal">Meal</label>
+                    <select id="search-meal" name="meal" data-empty-select disabled>
+                        <option value="">Any meal</option>
+                        @foreach ($mealOptions as $key => $label)
+                            <option value="{{ $key }}">{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="hero-search__box" data-filter="interest">
-                    <x-icon name="heart" />
-                    <label for="interest">Interest</label>
-                    {{-- Same list the Plan Your Trip survey uses (HomeController's
-                         $interestOptions, reused from ExitSurveyController::ACTIVITIES)
-                         so the two can't drift apart. --}}
-                    <select id="interest" name="interest" data-empty-select>
-                        <option value="">Any interest</option>
-                        @foreach ($interestOptions as $interest)
-                            <option value="{{ $interest }}">{{ $interest }}</option>
-                        @endforeach
-                    </select>
+                <div class="hero-search__box" data-for="date" hidden>
+                    <x-icon name="calendar" />
+                    <label for="search-dining-date">Date</label>
+                    <input type="date" id="search-dining-date" name="date" min="{{ $today }}" disabled>
                 </div>
-                <div class="hero-search__box" data-filter="type" hidden>
-                    <x-icon name="building" />
-                    <label for="search-stay-type">Kind of stay</label>
-                    <select id="search-stay-type" name="type" data-empty-select disabled>
-                        <option value="">Any kind of stay</option>
-                        @foreach ($stayTypes as $stayType)
-                            <option value="{{ $stayType }}">{{ $stayType }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="hero-search__box" data-filter="cuisine_type" hidden>
+                <div class="hero-search__box" data-for="cuisine" hidden>
                     <x-icon name="utensils" />
                     <label for="search-cuisine">Cuisine</label>
                     <select id="search-cuisine" name="cuisine_type" data-empty-select disabled>
@@ -374,7 +368,53 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="hero-search__box" data-filter="duration" hidden>
+
+                <div class="hero-search__box" data-for="where">
+                    <x-icon name="map-pin" />
+                    <label for="search-region">Where</label>
+                    <select id="search-region" name="region_id" data-empty-select>
+                        <option value="">Anywhere in Region XI</option>
+                        @foreach ($regions as $region)
+                            <option value="{{ $region->id }}">{{ $region->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="hero-search__box" data-for="interest">
+                    <x-icon name="heart" />
+                    <label for="interest">Interest</label>
+                    {{-- Same list the Plan Your Trip survey uses (HomeController's $interestOptions, reused from
+                         ExitSurveyController::ACTIVITIES) so the two can't drift apart. --}}
+                    <select id="interest" name="interest" data-empty-select>
+                        <option value="">Any interest</option>
+                        @foreach ($interestOptions as $interest)
+                            <option value="{{ $interest }}">{{ $interest }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="hero-search__box" data-for="stay_mode" hidden>
+                    <x-icon name="building" />
+                    <label for="search-stay-mode">Kind of stay</label>
+                    <select id="search-stay-mode" name="stay_mode" data-empty-select disabled>
+                        <option value="">Any</option>
+                        @foreach ($stayModes as $key => $label)
+                            <option value="{{ $key }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="hero-search__box" data-for="from" hidden>
+                    <x-icon name="calendar" />
+                    <label for="search-from">From (check-in)</label>
+                    <input type="date" id="search-from" name="from" min="{{ $today }}" disabled data-date-from>
+                </div>
+                <div class="hero-search__box" data-for="to" hidden>
+                    <x-icon name="calendar" />
+                    <label for="search-to">To (check-out)</label>
+                    <input type="date" id="search-to" name="to" min="{{ $today }}" disabled data-date-to>
+                </div>
+
+                <div class="hero-search__box" data-for="duration" hidden>
                     <x-icon name="calendar" />
                     <label for="duration">Trip length</label>
                     <select id="duration" name="duration" data-empty-select disabled>
@@ -384,8 +424,37 @@
                         <option value="5-plus">5+ days</option>
                     </select>
                 </div>
+                <div class="hero-search__box hero-search__box--guests" data-for="travelers" hidden>
+                    <x-icon name="users" />
+                    <div class="hero-search__guest" data-counter>
+                        <span class="hero-search__guest-name" id="guest-travelers">Travelers</span>
+                        <div class="hero-search__stepper">
+                            <button type="button" data-step="-1" aria-label="Fewer travelers" disabled>&minus;</button>
+                            <input type="text" name="travelers" value="1" readonly data-min="1" data-max="30" aria-labelledby="guest-travelers" disabled>
+                            <button type="button" data-step="1" aria-label="More travelers">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <fieldset class="hero-search__box hero-search__box--guests hero-search__box--wide" data-for="guests" hidden>
+                    <legend class="hero-search__box-title">Guests &middot; optional</legend>
+                    @foreach ($stayGuests as $key => $label)
+                        <div class="hero-search__guest" data-counter>
+                            <span class="hero-search__guest-name" id="guest-{{ $key }}">{{ $label }}</span>
+                            <div class="hero-search__stepper">
+                                <button type="button" data-step="-1" aria-label="Fewer {{ strtolower($label) }}" disabled>&minus;</button>
+                                <input type="text" name="{{ $key }}" value="0" readonly data-min="0" data-max="20" aria-labelledby="guest-{{ $key }}" disabled data-guest>
+                                <button type="button" data-step="1" aria-label="More {{ strtolower($label) }}">+</button>
+                            </div>
+                        </div>
+                    @endforeach
+                    <p class="hero-search__guest-total" aria-live="polite" data-guest-total>Any group size</p>
+                </fieldset>
             </div>
-            <p class="hero-search__hint" data-search-hint aria-live="polite"></p>
+            <div class="hero-search__foot">
+                <p class="hero-search__hint" data-search-hint aria-live="polite"></p>
+                <button type="button" class="hero-search__reset" data-search-reset>Reset</button>
+            </div>
         </div>
 
         <button type="submit" class="btn btn-accent hero-search__go">Explore <x-icon name="arrow-right" /></button>

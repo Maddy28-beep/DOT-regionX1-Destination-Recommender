@@ -1,10 +1,10 @@
 /* The landing page search card, in the manner of a travel site's search panel: a white bar of tabs (the five
-   catalogues) floating over a light body, budget as quick choices, a name search, one box for Duration and
-   Interest, and a wide Explore button on the card's lower edge.
+   catalogues) floating over a light body holding a short form for the chosen catalogue (a budget dropdown and the
+   boxes that catalogue can use), and a wide Explore button on the card's lower edge.
 
-   It replaces the single row of four selects (.ticket-search). The tabs and the budget pills are real radio
-   inputs, so the form works without script and the keyboard and screen readers get proper groups;
-   hero-search.js only adds the placeholder and the greyed-out filters.
+   It replaces the single row of four selects (.ticket-search). The tabs are real radio inputs, so the form
+   works without script and the keyboard and screen readers get proper groups; hero-search.js shows only the
+   boxes of the chosen tab and runs the budget, guest counters and Reset.
 
    One view, one focal point: the headline and the whole card fit on a laptop screen without scrolling, and
    Explore is the only strongly coloured control on it. */
@@ -175,92 +175,24 @@ body.hero-page { --hs-overlap: clamp(150px, 24vh, 210px); }
     box-shadow: 0 16px 40px rgba(0, 0, 0, .26);
 }
 
-/* ---------- Budget pills ---------- */
-.hero-search__pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 0 0 14px;
-    padding: 0;
-    border: 0;
-    min-width: 0;
-}
-.hero-search__pill { position: relative; margin: 0; cursor: pointer; }
-.hero-search__pill input {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    opacity: 0;
-    cursor: pointer;
-}
-.hero-search__pill span {
-    display: block;
-    padding: 10px 20px;
-    border: 1.5px solid #d7dcd5;
-    border-radius: 999px;
-    background: #fff;
-    color: var(--ink);
-    font-size: .92rem;
-    font-weight: 500;
-    transition: border-color .15s ease, background .15s ease, color .15s ease;
-}
-.hero-search__pill:hover span { border-color: var(--primary); }
-.hero-search__pill input:checked + span {
-    border-color: var(--primary);
-    background: #e4f1ea;
-    color: var(--primary-dark);
-    font-weight: 700;
-}
-.hero-search__pill input:focus-visible + span { outline: 3px solid var(--primary); outline-offset: 2px; }
-
-/* ---------- Name search ---------- */
-.hero-search__field { position: relative; }
-.hero-search__field svg {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    width: 21px;
-    height: 21px;
-    transform: translateY(-50%);
-    color: var(--muted, #6b7a73);
-    pointer-events: none;
-}
-.hero-search__field input {
-    display: block;
-    width: 100%;
-    height: 56px;
-    padding: 0 16px 0 48px;
-    border: 1px solid #dde1db;
-    border-radius: 14px;
-    background: #fff;
-    color: var(--ink);
-    font: inherit;
-    font-size: 1rem;
-}
-.hero-search__field input::placeholder { color: var(--muted, #6b7a73); opacity: 1; }
-.hero-search__field input:focus-visible {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(11, 107, 79, .18);
-}
-
-/* ---------- Duration | Interest in one box ---------- */
-.hero-search__pair {
+/* ---------- The boxes: one short form per tab ---------- */
+.hero-search__grid {
     display: grid;
-    /* The script sets how many boxes this tab uses (one to three). */
-    grid-template-columns: repeat(var(--hs-cols, 2), minmax(0, 1fr));
-    margin-top: 12px;
-    overflow: hidden;
+    /* Three across where there is room; boxes marked --wide take the whole row. */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+.hero-search__box {
+    position: relative;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
     border: 1px solid #dde1db;
     border-radius: 14px;
     background: #fff;
 }
-.hero-search__box { position: relative; min-width: 0; }
-.hero-search__box[hidden],
-.hero-search__pills[hidden] { display: none; }
-.hero-search__box + .hero-search__box { border-left: 1px solid #dde1db; }
+.hero-search__box[hidden] { display: none; }
+.hero-search__box--wide { grid-column: 1 / -1; }
 .hero-search__box > svg {
     position: absolute;
     left: 16px;
@@ -272,36 +204,43 @@ body.hero-page { --hs-overlap: clamp(150px, 24vh, 210px); }
     color: var(--primary);
     pointer-events: none;
 }
-.hero-search__box label {
+.hero-search__box > label {
     position: absolute;
     left: 50px;
     top: 10px;
     z-index: 2;
+    max-width: calc(100% - 64px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-size: .72rem;
     font-weight: 600;
     letter-spacing: .02em;
     color: var(--muted, #6b7a73);
     pointer-events: none;
 }
-/* The native select, before the shared dropdown script replaces it. */
-.hero-search__box select {
+/* The native select, before the shared dropdown script replaces it; dates share the same look. */
+.hero-search__box select,
+.hero-search__box input[type="date"] {
     width: 100%;
     height: 60px;
     padding: 26px 34px 6px 50px;
     border: 0;
-    border-radius: 0;
+    border-radius: 14px;
     background: transparent;
     color: var(--ink);
     font: inherit;
     font-size: .95rem;
     font-weight: 600;
 }
+.hero-search__box input[type="date"] { padding-right: 12px; }
+.hero-search__box input[type="date"]:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
 /* The shared dropdown's trigger, restyled to sit flat inside the box. */
 .hero-search__box .site-dropdown-trigger {
     min-height: 60px;
     padding: 26px 38px 6px 50px;
     border: 0;
-    border-radius: 0;
+    border-radius: 14px;
     background: transparent;
     color: var(--ink);
     font-size: .95rem;
@@ -311,14 +250,100 @@ body.hero-page { --hs-overlap: clamp(150px, 24vh, 210px); }
 .hero-search__box .site-dropdown-trigger[aria-expanded="true"] { background: #f2f6f3; border: 0; }
 .hero-search__box .site-dropdown-trigger:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
 .hero-search__box .site-dropdown-trigger.is-empty { color: var(--muted, #4a5a52); font-weight: 500; }
-
+/* Custom budget: two amounts in one wide box. */
+.hero-search__box--amounts { padding: 30px 16px 14px 50px; }
+.hero-search__box-title {
+    display: block;
+    padding: 0;
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+    color: var(--muted, #6b7a73);
+}
+.hero-search__box--amounts .hero-search__box-title { position: absolute; left: 50px; top: 10px; }
+.hero-search__amounts { display: flex; align-items: center; gap: 10px; }
+.hero-search__amounts label { flex: 1 1 0; min-width: 0; }
+.hero-search__amounts input {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #dde1db;
+    border-radius: 10px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    font-size: .95rem;
+    font-weight: 600;
+}
+.hero-search__amounts input::placeholder { color: var(--muted, #6b7a73); font-weight: 400; opacity: 1; }
+.hero-search__amounts input:focus-visible { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(11, 107, 79, .18); }
+.hero-search__amounts span { color: var(--muted, #6b7a73); font-size: .9rem; }
+.hero-search__error { margin: 8px 0 0; color: #a0301a; font-size: .85rem; font-weight: 600; }
+.hero-search__error[hidden] { display: none; }
+/* Guests: four counters in a row, with a total. */
+.hero-search__box--guests { padding: 12px 16px 12px 50px; }
+fieldset.hero-search__box--guests {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px 14px;
+    padding-left: 16px;
+}
+fieldset.hero-search__box--guests .hero-search__box-title { grid-column: 1 / -1; padding: 0; }
+.hero-search__guest { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.hero-search__guest-name { font-size: .82rem; font-weight: 600; color: var(--ink); }
+.hero-search__stepper { display: inline-flex; align-items: center; gap: 8px; }
+.hero-search__stepper button {
+    width: 36px;
+    height: 36px;
+    flex: none;
+    border: 1.5px solid #c9d1ca;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--primary-dark);
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+}
+.hero-search__stepper button:hover:not(:disabled) { border-color: var(--primary); background: #e4f1ea; }
+.hero-search__stepper button:disabled { opacity: .4; cursor: not-allowed; }
+.hero-search__stepper button:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.hero-search__stepper input {
+    width: 40px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-align: center;
+}
+.hero-search__guest-total { grid-column: 1 / -1; margin: 2px 0 0; font-size: .82rem; color: var(--muted, #6b7a73); }
+/* A lone travellers counter sits in a box like the others. */
+.hero-search__box--guests:not(fieldset) { display: flex; align-items: center; min-height: 60px; }
+/* The line under the boxes: what this tab can and cannot narrow by, and Reset. */
+.hero-search__foot { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-top: 12px; }
 .hero-search__hint:empty { display: none; }
 .hero-search__hint {
-    margin: 12px 4px 0;
+    margin: 0 4px;
     font-size: .82rem;
     color: var(--muted, #6b7a73);
 }
-
+.hero-search__reset {
+    flex: none;
+    margin-left: auto;
+    padding: 4px 6px;
+    border: 0;
+    background: none;
+    color: var(--primary-dark);
+    font: inherit;
+    font-size: .85rem;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.hero-search__reset:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
 /* ---------- Explore: the one strongly coloured control ---------- */
 .hero-search .hero-search__go {
     position: absolute;
@@ -350,7 +375,6 @@ body.hero-page { --hs-overlap: clamp(150px, 24vh, 210px); }
     .poster-hero .hero-tourism-brands { display: none; }
     .hero-search__tab-body { padding-block: 12px 9px; }
     .hero-search__body { padding: 34px 20px 42px; }
-    .hero-search__pills { margin-bottom: 10px; }
     .hero-search__hint { margin-top: 8px; }
 }
 
@@ -372,10 +396,8 @@ body.hero-page { --hs-overlap: clamp(150px, 24vh, 210px); }
         mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
         padding-right: 28px;
     }
-    .hero-search__pills { gap: 8px; }
-    .hero-search__pill span { padding: 9px 14px; font-size: .86rem; }
-    .hero-search__pair { grid-template-columns: 1fr; }
-    .hero-search__box + .hero-search__box { border-left: 0; border-top: 1px solid #dde1db; }
+    .hero-search__grid { grid-template-columns: 1fr; }
+    fieldset.hero-search__box--guests { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .hero-search .hero-search__go { width: min(86%, 340px); }
 
     /* All five tabs fit a phone: icon over label, equal widths, so nothing hides behind a scroll. */
@@ -384,9 +406,6 @@ body.hero-page { --hs-overlap: clamp(150px, 24vh, 210px); }
     .hero-search__tab-body { flex-direction: column; justify-content: center; gap: 4px; padding: 10px 2px 9px; font-size: .68rem; line-height: 1.15; text-align: center; }
     .hero-search__tab-body svg { width: 20px; height: 20px; }
 
-    /* Four budget pills as a tidy 2 x 2 grid instead of three and a lonely fourth. */
-    .hero-search__pills { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-    .hero-search__pill span { padding: 10px 8px; text-align: center; }
 
     /* On a phone the first screen is not stretched to the full height of the window: that left a wide empty band under
        the numbers. It ends after them, with a planner call to action, and the top of the next section shows beneath. */
@@ -416,8 +435,7 @@ body.hero-page { --hs-overlap: clamp(150px, 24vh, 210px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .hero-search__tab-body,
-    .hero-search__pill span { transition: none; }
+    .hero-search__tab-body { transition: none; }
 }
 
 /* ---------- The first screen ----------

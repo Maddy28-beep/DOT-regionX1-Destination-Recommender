@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\BudgetRanges;
 use App\Models\Accommodation;
 use App\Models\Destination;
 use App\Models\Event;
@@ -248,11 +249,15 @@ class HomeController extends Controller
         // list eventually do.
         $interestOptions = ExitSurveyController::ACTIVITIES;
 
-        // What each tab of the hero search can narrow by besides a name and a place: a kind of stay for the
-        // Stays tab, a cuisine for Dining. Only values some listing on the site actually has, so a choice
-        // never leads to an empty page.
-        $stayTypes = Accommodation::publiclyVisible()->whereNotNull('type')->distinct()->orderBy('type')->pluck('type');
+        // What the hero search's Dining tab can narrow by: a cuisine some restaurant on the site actually has, so
+        // a choice never leads to an empty page.
         $cuisineTypes = Restaurant::publiclyVisible()->whereNotNull('cuisine_type')->distinct()->orderBy('cuisine_type')->pluck('cuisine_type');
+
+        // The Budget dropdown of each tab: only the peso ranges that still hold a listing (BudgetRanges).
+        $budgetOptions = $this->budgetOptions();
+        $budgetBasis = ['destinations' => 'entry fee', 'accommodations' => 'per night', 'restaurants' => 'price level', 'packages' => 'total price'];
+        $mealOptions = collect(\App\Support\MealTimes::MEALS)->map(fn ($meal) => $meal[0])->all();
+        $stayModes = \App\Http\Controllers\SearchController::STAY_MODES;
 
         [$popularSearchChips, $popularSearchLabel] = $this->popularSearchChips($destinations);
 
@@ -260,7 +265,53 @@ class HomeController extends Controller
 
         $postcardSlides = PostcardSlide::active()->ordered()->get();
 
-        return view('welcome', compact('destinations', 'packages', 'stats', 'regions', 'heroVideo', 'interestOptions', 'stayTypes', 'cuisineTypes', 'popularSearchChips', 'popularSearchLabel', 'upcomingEvents', 'postcardSlides'))
+        return view('welcome', compact('destinations', 'packages', 'stats', 'regions', 'heroVideo', 'interestOptions', 'cuisineTypes', 'budgetOptions', 'budgetBasis', 'mealOptions', 'stayModes', 'popularSearchChips', 'popularSearchLabel', 'upcomingEvents', 'postcardSlides'))
             ->with('regionMap', $this->regionMap($regions));
+    }
+    /**
+     * The Budget dropdown's choices for each tab that has one. A peso range is offered only while some visible
+     * listing falls in it (and Custom budget always), so a choice never leads to an empty page.
+     *
+     * @return array<string, array<string, string>>
+     */
+    private function budgetOptions(): array
+    {
+        $options = [];
+
+        foreach ([
+            'destinations' => fn () => Destination::publiclyVisible()->whereNotNull('entry_fee_max'),
+            'accommodations' => fn () => Accommodation::publiclyVisible()->whereNotNull('price_per_night'),
+            'packages' => fn () => Package::publiclyVisible()->whereNotNull('price_per_pax'),
+        ] as $purpose => $base) {
+            $config = BudgetRanges::for($purpose);
+            $options[$purpose] = ['' => 'Any budget'];
+
+            foreach ($config['brackets'] as [$key, $label, $min, $max]) {
+                $query = $base();
+                match ($purpose) {
+                    'destinations' => $query
+                        ->when($max !== null, fn ($q) => $q->where('entry_fee_min', '<=', $max))
+                        ->when($min !== null, fn ($q) => $q->where('entry_fee_max', '>=', $min)),
+                    default => $query
+                        ->when($min !== null, fn ($q) => $q->where($purpose === 'packages' ? 'price_per_pax' : 'price_per_night', '>=', $min))
+                        ->when($max !== null, fn ($q) => $q->where($purpose === 'packages' ? 'price_per_pax' : 'price_per_night', '<=', $max)),
+                };
+                if ($query->exists()) {
+                    $options[$purpose][$key] = $label;
+                }
+            }
+            $options[$purpose][BudgetRanges::CUSTOM] = 'Custom budget';
+        }
+
+        // Dining records a price level, not an amount: offer the levels some restaurant carries.
+        $levels = Restaurant::publiclyVisible()->whereNotNull('price_tier')->distinct()->pluck('price_tier')->all();
+        $options['restaurants'] = ['' => 'Any budget'];
+        foreach (BudgetRanges::DINING_LEVELS as $value => $label) {
+            if (in_array($value, $levels, true)) {
+                $options['restaurants']['level:'.$value] = $label;
+            }
+        }
+
+        return $options;
     }
 }

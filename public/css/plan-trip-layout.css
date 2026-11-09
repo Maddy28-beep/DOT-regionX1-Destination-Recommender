@@ -382,6 +382,24 @@
     }
 }
 
+/* On every screen: the departure details (a flight or bus to catch) fold behind a row, open when they already hold an answer. */
+.plan-wizard #plan-step-0 .pc-collapsible--always.is-collapsed { display: none; }
+.plan-wizard #plan-step-0 .pc-collapse--always {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 44px;
+    margin-top: 12px; padding: 10px 14px; border: 1px dashed #9db8ab; border-radius: 10px; background: #f2f8f4;
+    color: var(--primary-dark); font: 600 .9rem 'Poppins', sans-serif; text-align: left; cursor: pointer;
+}
+.plan-wizard #plan-step-0 .pc-collapse--always[aria-expanded="true"] { border-style: solid; background: #e6f3ec; }
+.plan-wizard #plan-step-0 .pc-collapse--always .pc-collapse__hint { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: .8rem; font-weight: 500; }
+.plan-wizard #plan-step-0 .pc-collapse--always .pc-collapse__hint::after {
+    content: ''; width: 7px; height: 7px; border: solid currentColor; border-width: 0 2px 2px 0; transform: translateY(-2px) rotate(45deg);
+}
+.plan-wizard #plan-step-0 .pc-collapse--always[aria-expanded="true"] .pc-collapse__hint::after { transform: translateY(1px) rotate(-135deg); }
+.plan-wizard #plan-step-0 .pc-collapse--always:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+/* The row already names it, so the box's own title is not repeated once it is open. */
+.plan-wizard #plan-step-0 .pc-trip-departure.pc-collapsible--always > legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.plan-wizard #plan-step-0 .pc-trip-departure.pc-collapsible--always { margin-top: 8px; }
+
 /* Phones: the three optional parts of step 1 (arrival time, departure details, where you start) fold behind a one-line row.
    public/js/plan-collapse.js adds the rows and the is-collapsed class; on a wide screen the rows never show and nothing is
    hidden, and without JavaScript nothing is folded. */

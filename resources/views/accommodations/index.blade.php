@@ -32,6 +32,7 @@
             @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, 'type'); @endphp
 
             @include('partials.catalog-filters', [
+                'hidden' => \App\Support\ActiveFilters::carry(request(), ['price_min','price_max','stay_mode','from','to','adults','children','seniors','pwd']),
                 'route' => 'accommodations.index',
                 'placeholder' => 'e.g. Pearl Farm',
                 'regions' => $regions,
@@ -63,7 +64,7 @@
 
                     @include('partials.pagination', ['paginator' => $accommodations, 'panel' => 'grid'])
                 @else
-                    <x-davo-empty-state title="No accommodations match your filters" message="Try another category or clear your filters to explore more options." :action-url="route('accommodations.index')" action-label="Clear filters" />
+                    <x-davo-empty-state title="No accommodations match your filters" :message="request('stay_mode') === 'day_use' ? 'No listing says it offers day use yet. That is not recorded as its own detail, so this reads the listing text. Try Any or Overnight.' : 'Try another category or clear your filters to explore more options.'" :action-url="route('accommodations.index')" action-label="Clear filters" />
                 @endif
             </div>
         </div>

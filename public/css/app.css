@@ -5905,3 +5905,14 @@ main:focus { outline: none; }
     .listing-promo__copy { flex-basis: 100%; }
     .listing-promo svg.listing-promo__frond { opacity: .2; }
 }
+
+/* Provenance mark on a listing card's picture: the DOT medal (official record) or a gray "i" (sample / not yet verified). */
+.dcard__mark { position: absolute; right: 8px; bottom: 8px; z-index: 3; display: grid; place-items: center; width: 30px; height: 30px; cursor: help; }
+.dcard__mark.is-official img { width: 30px; height: 30px; display: block; filter: drop-shadow(0 1px 3px rgba(11, 40, 30, .45)); }
+.dcard__mark.is-sample, .dcard__mark.is-unverified { width: 24px; height: 24px; border-radius: 999px; background: rgba(255, 253, 247, .92); box-shadow: 0 1px 4px rgba(11, 40, 30, .28); }
+.dcard__mark svg { width: 16px; height: 16px; fill: #8a918d; display: block; }
+@media (max-width: 640px) {
+    .dcard__mark { right: 6px; bottom: 6px; width: 26px; height: 26px; }
+    .dcard__mark.is-official img { width: 26px; height: 26px; }
+    .dcard__mark.is-sample, .dcard__mark.is-unverified { width: 22px; height: 22px; }
+}
