@@ -17,6 +17,14 @@ use Illuminate\Support\Carbon;
  */
 class ListingPhotoManifest
 {
+    /**
+     * The longest text each column of listing_photos takes. PostgreSQL (the live database) refuses a longer value and stops
+     * the whole import, while SQLite (development) accepts it silently, so an approved entry is checked against these here.
+     */
+    public const MAX_LENGTH = [
+        'source_type' => 30, 'permission_basis' => 40, 'permission_ref' => 160, 'licence' => 120, 'credit_text' => 255, 'verified_by' => 100,
+    ];
+
     public function __construct(private readonly string $directory) {}
 
     public static function default(): self
@@ -129,6 +137,11 @@ class ListingPhotoManifest
         }
         if (blank($e['source_url'] ?? null) && ! in_array($e['source_type'] ?? null, ['own_photo', 'establishment_supplied'], true)) {
             $problems[] = "$label: an approved picture from another source needs source_url";
+        }
+        foreach (self::MAX_LENGTH as $key => $max) {
+            if (is_string($e[$key] ?? null) && mb_strlen($e[$key]) > $max) {
+                $problems[] = "$label: $key is ".mb_strlen($e[$key])." characters; the database takes at most $max";
+            }
         }
 
         return $problems;

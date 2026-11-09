@@ -139,4 +139,25 @@ class CommonsBatchPhotoSeederTest extends TestCase
         $this->assertSame(1, $inn->photos()->count());
         $this->assertTrue($inn->photos()->first()->is_primary);
     }
+
+    public function test_an_approved_entry_with_a_text_longer_than_its_column_is_refused_before_the_database_sees_it(): void
+    {
+        $manifest = new ListingPhotoManifest(database_path('data/listing-photos/commons-2026-11'));
+        $entry = $manifest->entries()[0];
+
+        $this->assertSame([], $manifest->problemsWith($entry));
+
+        $tooLong = $manifest->problemsWith(['verified_by' => str_repeat('x', 101), 'permission_ref' => str_repeat('y', 161)] + $entry);
+        $this->assertCount(2, $tooLong);
+        $all = implode(' | ', $tooLong);
+        $this->assertStringContainsString('verified_by is 101 characters; the database takes at most 100', $all);
+        $this->assertStringContainsString('permission_ref is 161 characters; the database takes at most 160', $all);
+
+        // The shipped entries sit inside every limit, with room to spare for a longer file name.
+        foreach ($manifest->entries() as $e) {
+            foreach (ListingPhotoManifest::MAX_LENGTH as $key => $max) {
+                $this->assertLessThanOrEqual($max, mb_strlen((string) ($e[$key] ?? '')), $e['name'].' '.$key);
+            }
+        }
+    }
 }
