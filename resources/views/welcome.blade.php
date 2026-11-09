@@ -846,6 +846,7 @@
 
 @include('partials.footer')
 @include('partials.chatbot-widget')
+@include('partials.login-modal')
 
 <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
 <script src="{{ asset('js/hero-fit.js') }}?v={{ filemtime(public_path('js/hero-fit.js')) }}" defer></script>

@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Tourist\TouristSavedDestinationController;
 use App\Models\TouristAccount;
+use App\Models\TouristSavedDestination;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -53,20 +56,67 @@ class TouristAuthController extends Controller
         return view('auth.tourist-login');
     }
 
-    public function login(Request $request): RedirectResponse
+    /**
+     * The sign-in page posts here and is sent on; the sign-in modal (opened by the heart on a listing) posts here over
+     * fetch and gets JSON back, staying on the page it was opened from. The modal may also say which place the visitor
+     * was trying to save: it is saved to their account right after they sign in (never toggled off), so the click
+     * that asked them to sign in is not lost.
+     */
+    public function login(Request $request): RedirectResponse|JsonResponse
     {
         $data = $request->validate([
             'alias' => ['required', 'string'],
             'password' => ['required', 'string'],
+            'save_type' => ['nullable', 'string', 'max:40'],
+            'save_id' => ['nullable', 'integer', 'min:1'],
         ]);
+        $credentials = ['alias' => $data['alias'], 'password' => $data['password']];
 
-        if (! Auth::guard('tourist')->attempt($data, $request->boolean('remember'))) {
-            return back()->withErrors(['alias' => 'Those credentials do not match our records.'])->onlyInput('alias');
+        if (! Auth::guard('tourist')->attempt($credentials, $request->boolean('remember'))) {
+            $message = 'Those credentials do not match our records.';
+
+            return $request->expectsJson()
+                ? response()->json(['message' => $message, 'errors' => ['alias' => [$message]]], 422)
+                : back()->withErrors(['alias' => $message])->onlyInput('alias');
         }
 
         $request->session()->regenerate();
 
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => true, 'saved' => $this->saveFromModal($request, $data['save_type'] ?? null, $data['save_id'] ?? null)]);
+        }
+
         return $this->postAuthRedirect($request, 'Welcome back', null);
+    }
+
+    /**
+     * Saves the place the modal was opened for, once, and flashes the message the page shows after it reloads. A type or
+     * id that is not a public listing is ignored: signing in still works, and nothing is saved.
+     */
+    private function saveFromModal(Request $request, ?string $type, ?int $id): bool
+    {
+        $config = $type !== null ? (TouristSavedDestinationController::TYPES[$type] ?? null) : null;
+        $listing = ($config && $id) ? $config['model']::find($id) : null;
+
+        if (! $listing || ! $listing->is_accredited || $listing->archived_at) {
+            foreach (Toast::success('Welcome back', null) as $key => $value) {
+                $request->session()->flash($key, $value);
+            }
+
+            return false;
+        }
+
+        TouristSavedDestination::firstOrCreate([
+            'tourist_account_id' => Auth::guard('tourist')->id(),
+            'listing_kind' => $config['kind'],
+            'listing_id' => $listing->id,
+        ], ['saved_at' => now()]);
+
+        foreach (Toast::success('Added to Saved Places', "{$listing->name} is now in your list.") as $key => $value) {
+            $request->session()->flash($key, $value);
+        }
+
+        return true;
     }
 
     public function logout(Request $request): RedirectResponse

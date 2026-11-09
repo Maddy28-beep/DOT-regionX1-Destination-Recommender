@@ -38,8 +38,9 @@
     $isSaved = in_array($kind.':'.$listing->id, $savedKeys, true);
 @endphp
 
+{{-- A visitor who is not signed in gets the sign-in modal (public/js/login-modal.js); without script the form still posts and saves to the browser token, as before. --}}
 <form method="POST" action="{{ $toggleRoute }}"
-      class="save-form save-form--{{ $variant }} {{ $class }}">
+      class="save-form save-form--{{ $variant }} {{ $class }}"@unless ($isTourist) data-login-required data-save-type="{{ $type }}" data-save-id="{{ $listing->id }}" data-save-name="{{ $listing->displayName() }}"@endunless>
     @csrf
     @if ($variant === 'button')
         <button type="submit" class="btn btn-poster-ghost btn-block {{ $isSaved ? 'is-saved' : '' }}"
