@@ -53,13 +53,13 @@ Route::view('/accessibility', 'legal.accessibility')->name('legal.accessibility'
  * and printed on a poster.
  */
 Route::get('/check-in/{type}/{id}', [CheckInController::class, 'checkIn'])
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:check-in')
     ->name('check-in');
 
 // Leaving a review, open only to a browser that checked in at the listing by
 // scanning its QR code. Throttled like the check-in it depends on.
 Route::post('/reviews/{type}/{id}', [\App\Http\Controllers\ReviewController::class, 'store'])
-    ->middleware('throttle:10,1')
+    ->middleware('throttle:reviews')
     ->name('reviews.store');
 
 // Homepage hero search: routes the visitor to the catalogue that answers
@@ -123,7 +123,7 @@ Route::get('/plan', [TripPlannerController::class, 'edit'])->name('plan.edit');
  * misses the cache -- see AddressSuggestionService.
  */
 Route::get('/plan/address-suggest', AddressSuggestionController::class)
-    ->middleware('throttle:40,1')
+    ->middleware('throttle:address-suggest')
     ->name('plan.address-suggest');
 Route::post('/plan', [TripPlannerController::class, 'update'])->middleware('throttle:trip-build')->name('plan.update');
 Route::get('/plan/itinerary', [TripPlannerController::class, 'itinerary'])->name('plan.itinerary');
@@ -152,7 +152,7 @@ Route::get('/exit-survey/recap', [ExitSurveyController::class, 'recap'])->name('
 
 // Chatbot Assistance Module (2.2.1.13, Sec. 2.2.3.1.10)
 Route::post('/chatbot/message', [ChatbotController::class, 'respond'])
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:chatbot')
     ->name('chatbot.respond');
 
 /*
@@ -226,7 +226,7 @@ Route::prefix('portal/admin')->name('admin.')->middleware(['auth:admin', \App\Ht
     Route::get('/exit-surveys/qr.svg', [QrCodeController::class, 'exitSurveyImage'])->name('exit-survey-qr.svg');
     Route::get('/association-rules', [AdminDashboardController::class, 'associationRules'])->name('association-rules');
     Route::get('/audit-log', [\App\Http\Controllers\Admin\AdminAuditLogController::class, 'index'])->name('audit-log');
-    Route::get('/search', \App\Http\Controllers\Admin\AdminSearchController::class)->middleware('throttle:90,1')->name('search');
+    Route::get('/search', \App\Http\Controllers\Admin\AdminSearchController::class)->middleware('throttle:admin-search')->name('search');
     Route::get('/data-completeness', [\App\Http\Controllers\Admin\AdminDataCompletenessController::class, 'index'])->name('data-completeness');
     Route::post('/data-completeness/{type}/{id}', [\App\Http\Controllers\Admin\AdminDataCompletenessController::class, 'fix'])->name('data-completeness.fix');
     Route::get('/reports', [AdminDashboardController::class, 'reports'])->name('reports');

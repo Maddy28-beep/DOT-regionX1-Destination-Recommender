@@ -1,0 +1,62 @@
+Snapshot: 2026-11-07 18:45:24 | model nomic-embed-text | destinations 151 | with a stored vector 151
+
+FIXTURE official: 24 places, ids 17,9,15,10,11,13,12,14,16,22,23,8,18,19,20,24,21,43,44,45,46,47,48,49
+  17 Apo Golf and Country Club | 9 Belviz Farm | 15 Davao Crocodile Park Inc | 10 Bemwa Farm Fresh Inc. | 11 Bukid Amara Tourism Agriventures Corporation | 13 Isla- Agri Ventures Inc | 12 Damosa Land Inc. / Agriya Naturetainment | 14 Lao Integrated Farms | 16 JKM Mini Zoo | 22 Elysia Wellness Spa | 23 Elysia Wellness Spa | 8 SMX Convention Center Davao | 18 Rancho Palos Verdes Golf & Sports Club Inc. | 19 Rancho Palos Verdes Golf & Sports Club Inc. | 20 South Pacific Davao Country Club Inc. | 24 Elysia Wellness Spa | 21 IMIN The Philippine-Japan Historical Museum | 43 Bankerohan Public Market | 44 Cacao Culture Chocolate Shop - Poblacion Market Central | 45 National Museum of the Philippines - Davao | 46 San Pedro Cathedral | 47 Osmeña Park | 48 Kaputian Beach | 49 Paradise Island Park & Beach Resort
+
+FIXTURE plannable: 115 places, ids 50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,2,7,72,73,74,11,13,12,75,76,77,78,79,80,81,82,83,14,16,6,84,85,86,87,88,89,90,91,92,93,3,5,94,95,22,23,96,97,134,24,135,136,137,138,139,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,140,141,142,143,144,145,146,147,148,149,150,151
+
+== TAG TEST (before freeze) ==
+  official, stored vectors                     n=24  evaluable=24  closest shares a tag:  19 ( 79.2%) | random other  12.7% | 6.24x | mean closest similarity 83.4%
+  plannable, stored vectors                    n=115 evaluable=65  closest shares a tag:  61 ( 93.8%) | random other  30.4% | 3.08x | mean closest similarity 84.7%
+  official, with tags (fresh embed, current text) n=24  evaluable=24  closest shares a tag:  19 ( 79.2%) | random other  12.7% | 6.24x | mean closest similarity 83.4%
+  official, WITHOUT tags (fresh embed)         n=24  evaluable=24  closest shares a tag:  19 ( 79.2%) | random other  12.7% | 6.24x | mean closest similarity 81.2%
+  plannable, with tags (fresh embed, current text) n=115 evaluable=65  closest shares a tag:  65 (100.0%) | random other  30.4% | 3.29x | mean closest similarity 83.0%
+  plannable, WITHOUT tags (fresh embed)        n=115 evaluable=61  closest shares a tag:  59 ( 96.7%) | random other  30.4% | 3.18x | mean closest similarity 81.3%
+
+== INTEREST RANKING (before freeze): top 3 and bottom 3 places per interest, by similarity to the interest vector ==
+
+FIXTURE official
+  Beach & Island         TOP: 49 Paradise Island Park & Beach Resor (72%); 48 Kaputian Beach (69%); 13 Isla- Agri Ventures Inc (66%)
+                         BOTTOM: 8 SMX Convention Center Davao (55%); 44 Cacao Culture Chocolate Shop - Pob (56%); 46 San Pedro Cathedral (57%)
+  Cultural Heritage      TOP: 46 San Pedro Cathedral (76%); 21 IMIN The Philippine-Japan Historic (72%); 45 National Museum of the Philippines (72%)
+                         BOTTOM: 49 Paradise Island Park & Beach Resor (52%); 24 Elysia Wellness Spa (54%); 23 Elysia Wellness Spa (54%)
+  Food Tourism           TOP: 43 Bankerohan Public Market (79%); 11 Bukid Amara Tourism Agriventures C (77%); 13 Isla- Agri Ventures Inc (76%)
+                         BOTTOM: 8 SMX Convention Center Davao (59%); 17 Apo Golf and Country Club (60%); 19 Rancho Palos Verdes Golf & Sports  (60%)
+  Hiking & Trekking      TOP: 47 Osmeña Park (66%); 13 Isla- Agri Ventures Inc (63%); 14 Lao Integrated Farms (60%)
+                         BOTTOM: 44 Cacao Culture Chocolate Shop - Pob (57%); 8 SMX Convention Center Davao (57%); 49 Paradise Island Park & Beach Resor (58%)
+  Nature & Adventure     TOP: 47 Osmeña Park (72%); 13 Isla- Agri Ventures Inc (70%); 12 Damosa Land Inc. / Agriya Natureta (69%)
+                         BOTTOM: 8 SMX Convention Center Davao (53%); 46 San Pedro Cathedral (54%); 21 IMIN The Philippine-Japan Historic (56%)
+  Relaxation & Wellness  TOP: 22 Elysia Wellness Spa (80%); 23 Elysia Wellness Spa (80%); 24 Elysia Wellness Spa (80%)
+                         BOTTOM: 16 JKM Mini Zoo (54%); 21 IMIN The Philippine-Japan Historic (55%); 8 SMX Convention Center Davao (55%)
+  Shopping & Souvenirs   TOP: 44 Cacao Culture Chocolate Shop - Pob (73%); 43 Bankerohan Public Market (72%); 45 National Museum of the Philippines (69%)
+                         BOTTOM: 49 Paradise Island Park & Beach Resor (62%); 15 Davao Crocodile Park Inc (63%); 16 JKM Mini Zoo (64%)
+  Wildlife               TOP: 15 Davao Crocodile Park Inc (77%); 16 JKM Mini Zoo (73%); 11 Bukid Amara Tourism Agriventures C (69%)
+                         BOTTOM: 8 SMX Convention Center Davao (58%); 48 Kaputian Beach (60%); 44 Cacao Culture Chocolate Shop - Pob (60%)
+
+FIXTURE plannable
+  Beach & Island         TOP: 104 Sample South Coast White Beach (75%); 137 Sample Bay Island Day Park (75%); 51 Olanivan Island (75%)
+                         BOTTOM: 115 Sample City Heritage Plaza & Museu (54%); 139 Sample Provincial Museum Annex (54%); 84 Christ the King Cathedral & Giant  (55%)
+  Cultural Heritage      TOP: 92 Museo Dabawenyo (80%); 115 Sample City Heritage Plaza & Museu (79%); 101 Sample Riverside Heritage Museum (78%)
+                         BOTTOM: 6 Mount Apo Natural Park (53%); 67 Camp Sabros (53%); 24 Elysia Wellness Spa (54%)
+  Food Tourism           TOP: 149 Sample Inland Farm & Food Park (78%); 113 Sample Banana & Cacao Farm Experie (77%); 11 Bukid Amara Tourism Agriventures C (77%)
+                         BOTTOM: 79 Centennial Balite Tree (500-Year-O (55%); 95 San Pedro Cathedral (56%); 76 San Salvador del Mundo Church (Car (56%)
+  Hiking & Trekking      TOP: 122 Sample Highland Tiered Falls & Tra (75%); 123 Sample Crater Lake Viewpoint Trek (74%); 145 Sample Foothills Forest Trail (73%)
+                         BOTTOM: 95 San Pedro Cathedral (54%); 76 San Salvador del Mundo Church (Car (55%); 147 Sample Coastal Fish Market & Food  (55%)
+  Nature & Adventure     TOP: 122 Sample Highland Tiered Falls & Tra (81%); 126 Sample Highland View Park (79%); 144 Sample Highland Flower Park (79%)
+                         BOTTOM: 95 San Pedro Cathedral (50%); 70 Tibolo Cultural Village (53%); 84 Christ the King Cathedral & Giant  (53%)
+  Relaxation & Wellness  TOP: 22 Elysia Wellness Spa (80%); 23 Elysia Wellness Spa (80%); 24 Elysia Wellness Spa (80%)
+                         BOTTOM: 95 San Pedro Cathedral (53%); 70 Tibolo Cultural Village (54%); 16 JKM Mini Zoo (54%)
+  Shopping & Souvenirs   TOP: 124 Sample Valley Craft & Pasalubong M (80%); 100 Sample Artisan Craft & Souvenir Ce (77%); 146 Sample Weaving & Culture House (73%)
+                         BOTTOM: 58 Lake Leonard (56%); 78 Carolina Lake (57%); 114 Sample Wetland Bird Sanctuary (58%)
+  Wildlife               TOP: 3 Philippine Eagle Center (86%); 114 Sample Wetland Bird Sanctuary (76%); 129 Sample Western Marine Sanctuary (74%)
+                         BOTTOM: 146 Sample Weaving & Culture House (56%); 134 Sample Town Heritage & Weaving Hou (57%); 139 Sample Provincial Museum Annex (57%)
+
+== PLACES NAMED IN THE PAPER (before freeze): rank among all embedded destinations, 1 = most similar to the interest ==
+  Wildlife               Philippine Eagle Center    in plannable       : rank 1 of 115
+  Wildlife               Philippine Eagle Center    in whole catalogue : rank 1 of 151
+  Hiking & Trekking      Mount Apo Natural Park     in plannable       : rank 11 of 115
+  Hiking & Trekking      Mount Apo Natural Park     in whole catalogue : rank 16 of 151
+  Shopping & Souvenirs   SMX Convention Center      in plannable       : not in this fixture
+  Shopping & Souvenirs   SMX Convention Center      in whole catalogue : rank 15 of 151
+  Nature & Adventure     SMX Convention Center      in plannable       : not in this fixture
+  Nature & Adventure     SMX Convention Center      in whole catalogue : rank 149 of 151

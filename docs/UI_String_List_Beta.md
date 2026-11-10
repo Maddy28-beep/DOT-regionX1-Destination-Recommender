@@ -1,6 +1,6 @@
 # ExploreDVO beta: strings the backend sends to the UI (for the UI team)
 
-Exact text as built (`beta-2026-11-09`). `{N}`, `{name}`, `{day}` are filled in by the backend. Change wording only in the file named in "Source", never in the page copy, so the tests keep passing.
+Exact text as built (`beta-2026-11-09`; production now runs `main` at `04a6f1d`, which does not change any of these strings). `{N}`, `{name}`, `{day}` are filled in by the backend. Change wording only in the file named in "Source", never in the page copy, so the tests keep passing.
 
 | Where it appears | Exact string | Backend value / source |
 |---|---|---|

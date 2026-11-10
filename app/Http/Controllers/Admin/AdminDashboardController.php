@@ -566,6 +566,9 @@ class AdminDashboardController extends Controller
 
     private const ASSOCIATION_MIN_CONFIDENCE = 0.15;
 
+    /** When at least this share of the transactions behind the rules is simulated, every rule row carries a "Simulated" label. */
+    public const SIMULATED_LABEL_SHARE = 0.90;
+
     public function associationRules(Request $request, AprioriService $apriori): View
     {
         // Which transaction sources to mine: everything, or one kind on its own.
@@ -590,6 +593,13 @@ class AdminDashboardController extends Controller
         $totalTransactions = $source === 'all' ? $sourceCounts->sum() : (int) ($sourceCounts[$source] ?? 0);
         $demoTransactions = (int) ($sourceCounts['demo'] ?? 0);
 
+        // The share of the mined transactions that is simulated: all of them on the 'demo' tab, none on the others' own tab,
+        // and demo / all when every source is mixed.
+        $simulatedShare = $totalTransactions > 0
+            ? ($source === 'demo' ? 1.0 : ($source === 'all' ? $demoTransactions / $totalTransactions : 0.0))
+            : 0.0;
+        $rulesSimulated = $simulatedShare >= self::SIMULATED_LABEL_SHARE;
+
         /*
          * "Rules Found" reports every rule that actually clears both
          * thresholds, not just the top self::ASSOCIATION_RULE_LIMIT shown in
@@ -606,7 +616,7 @@ class AdminDashboardController extends Controller
 
         return view('admin.association-rules', compact(
             'rules', 'sort', 'dir', 'totalTransactions', 'demoTransactions', 'sourceCounts', 'source', 'totalRulesFound',
-            'minSupportPct'
+            'minSupportPct', 'simulatedShare', 'rulesSimulated'
         ))->with('minConfidencePct', round(self::ASSOCIATION_MIN_CONFIDENCE * 100));
     }
 

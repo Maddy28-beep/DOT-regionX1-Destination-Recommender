@@ -132,6 +132,9 @@
                                     &rarr;
                                     <strong>{{ $rule['b_listing']->name }}</strong>
                                     <span class="cell-muted">({{ str_replace('_', ' ', $rule['b_kind']) }})</span>
+                                    @if ($rulesSimulated)
+                                        <x-sample-tag label="Simulated" title="At least 90% of the transactions behind these rules are simulated, not real visitor behaviour." />
+                                    @endif
                                     @if ($sampleData->isSample($rule['a_listing']) || $sampleData->isSample($rule['b_listing']))
                                         <x-sample-tag />
                                     @endif

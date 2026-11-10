@@ -57,6 +57,11 @@ class TouristItineraryController extends Controller
         $healthProfile?->conditions()->delete();
         $healthProfile?->delete();
 
+        // An account must not be reachable from an exit survey: a survey that already points at this trip's
+        // preference record is unlinked now (the survey's own answers stay), and ExitSurveyController does not
+        // link a later survey to a preference whose itinerary an account has claimed.
+        \App\Models\ExitSurvey::withoutGlobalScopes()->where('preference_id', $itinerary->preference_id)->update(['preference_id' => null]);
+
         $itinerary->tourist_account_id = Auth::guard('tourist')->id();
         $itinerary->title = ($data['title'] ?? null) ?: $this->defaultTitle($itinerary);
         $itinerary->save();

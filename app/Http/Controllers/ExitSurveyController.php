@@ -242,6 +242,11 @@ class ExitSurveyController extends Controller
             $preferenceId = null;
         }
 
+        // A trip an account has saved is never linked to a survey (survey -> preference -> itinerary -> account).
+        if ($preferenceId && \App\Models\Itinerary::where('preference_id', $preferenceId)->whereNotNull('tourist_account_id')->exists()) {
+            $preferenceId = null;
+        }
+
         // Only places that exist, and each place once.
         $places = collect($data['places_visited'] ?? [])->unique()->filter(function (string $place) {
             [$kind, $id] = explode(':', $place, 2);

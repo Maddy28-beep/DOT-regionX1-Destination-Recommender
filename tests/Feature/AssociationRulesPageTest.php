@@ -117,4 +117,42 @@ class AssociationRulesPageTest extends TestCase
         $this->assertStringContainsString('100.0%', $html);
         $this->assertStringContainsString('Confidence should be interpreted alongside support and co-visit counts', $html);
     }
+
+    /** @param  array<string, int>  $mix  data_source => number of surveys that visit both A and B */
+    private function pageWith(array $mix): string
+    {
+        $a = $this->destination('Kiosk A');
+        $b = $this->destination('Kiosk B');
+        foreach ($mix as $source => $n) {
+            for ($i = 0; $i < $n; $i++) {
+                $survey = ExitSurvey::create(['overall_rating' => 5, 'would_recommend' => 'Yes', 'data_source' => $source]);
+                ExitSurveyVisit::create(['exit_survey_id' => $survey->id, 'listing_kind' => 'destination', 'listing_id' => $a->id]);
+                ExitSurveyVisit::create(['exit_survey_id' => $survey->id, 'listing_kind' => 'destination', 'listing_id' => $b->id]);
+            }
+        }
+
+        return $this->actingAs($this->admin(), 'admin')->get(route('admin.association-rules'))->getContent();
+    }
+
+    public function test_rule_rows_are_labelled_simulated_when_at_least_90_percent_of_the_data_is_simulated(): void
+    {
+        $this->assertSame(0.90, \App\Http\Controllers\Admin\AdminDashboardController::SIMULATED_LABEL_SHARE);
+
+        $this->assertStringContainsString('class="sample-tag" title="At least 90%', $this->pageWith(['demo' => 10]), '100% simulated');
+    }
+
+    public function test_exactly_90_percent_simulated_still_gets_the_label(): void
+    {
+        $this->assertStringContainsString('>Simulated</span>', $this->pageWith(['demo' => 9, 'real' => 1]));
+    }
+
+    public function test_89_percent_simulated_does_not_get_the_label(): void
+    {
+        $this->assertStringNotContainsString('>Simulated</span>', $this->pageWith(['demo' => 8, 'real' => 1]));
+    }
+
+    public function test_real_only_data_is_never_labelled_simulated(): void
+    {
+        $this->assertStringNotContainsString('>Simulated</span>', $this->pageWith(['real' => 4]));
+    }
 }

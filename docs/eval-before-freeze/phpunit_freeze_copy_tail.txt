@@ -1,0 +1,12 @@
+C:\Users\Admin\AppData\Local\Temp\claude\558a204baa60231c\294a1846-8ac5-4347-bd23-cb12fce4afc5\scratchpad\p27\vendor\laravel\framework\src\Illuminate\Http\Testing\FileFactory.php:59
+C:\Users\Admin\AppData\Local\Temp\claude\558a204baa60231c\294a1846-8ac5-4347-bd23-cb12fce4afc5\scratchpad\p27\tests\Feature\PostcardCarouselTest.php:174
+
+5) Tests\Feature\PostcardCarouselTest::test_a_photo_that_is_too_small_is_rejected
+LogicException: GD extension is not installed.
+
+C:\Users\Admin\AppData\Local\Temp\claude\558a204baa60231c\294a1846-8ac5-4347-bd23-cb12fce4afc5\scratchpad\p27\vendor\laravel\framework\src\Illuminate\Http\Testing\FileFactory.php:77
+C:\Users\Admin\AppData\Local\Temp\claude\558a204baa60231c\294a1846-8ac5-4347-bd23-cb12fce4afc5\scratchpad\p27\vendor\laravel\framework\src\Illuminate\Http\Testing\FileFactory.php:59
+C:\Users\Admin\AppData\Local\Temp\claude\558a204baa60231c\294a1846-8ac5-4347-bd23-cb12fce4afc5\scratchpad\p27\tests\Feature\PostcardCarouselTest.php:200
+
+ERRORS!
+Tests: 1751, Assertions: 14266, Errors: 5, PHPUnit Deprecations: 2.

@@ -196,7 +196,8 @@ class ChatbotService
 
             return [$safe, 'groq'];
         } catch (Throwable $e) {
-            Log::warning('Groq chatbot call failed, falling back to rule-based response.', ['error' => $e->getMessage()]);
+            // Only the kind of failure is logged: the exception message can echo the request, which holds the visitor's own words.
+            Log::warning('Groq chatbot call failed, falling back to rule-based response.', ['exception' => $e::class]);
 
             return [$this->buildResponse($intent, $message), 'rule_based'];
         }

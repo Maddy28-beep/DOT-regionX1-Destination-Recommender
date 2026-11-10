@@ -1,0 +1,7 @@
+Trips evaluated: 60 of 60 generated (the rest had too few stops or days to regroup, or no stored vectors)
+Trips whose days were regrouped: 38 of 60 (63.3%)
+Average similarity of places sharing a day: 74.3% -> 76.8% (+2.5 points)
+Independent check (place types per day, lower = more alike, not using the vectors): 1.59 -> 1.54
+Trips where regrouping was undone because it would have placed fewer stops: 15
+Total travelling across all trips: 9484 km -> 9875 km (+4.1%)
+Largest single-trip increase in travelling: +40.0% (limit +25% plus 3 km allowance)

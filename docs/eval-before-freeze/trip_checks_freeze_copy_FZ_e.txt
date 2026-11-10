@@ -1,0 +1,57 @@
+injected: {"d_closed":4,"d_temp":4,"d_temp_mid":3,"d_archived":3,"d_excluded":3,"d_unaccredited":3,"d_danger":3,"a_closed":6,"a_temp":6,"a_archived":5,"a_unaccredited":5,"a_temp_mid":4,"r_closed":6,"r_temp":6,"r_archived":4,"s_closed":2,"s_temp":2,"s_archived":1,"r_danger":3}
+
+== stats ==
+{"trips":240,"stops":1306,"days":955,"by_dist":[],"groupings":240,"regrouped":164,"skipped_grouping":0,"max_drive":{"near":690,"far":600,"moderate":660},"over_budget_days":159,"over_budget_first_stop_only":0,"errors":0,"stay_nights_checked":{"near":205,"far":237,"moderate":270},"restaurant_rows":396,"souvenir_rows":71,"range_capped_trips":12,"range_capped_places":588,"range_capped_trips_nonremote":{"near":4,"far":0,"moderate":8},"departure_trips":75,"stay_nights":715,"stay_changes":0,"trips_with_stay_change":55,"change_by_dist":{"far":69,"moderate":15},"souvenir_days":71,"stay_over_60km":{"far":4}}
+
+== failures by rule ==
+daily_drive_over_cap__single_stop_day(first stop exempt) 159 (distinct trips 77)
+    "day 3 drives 270 min (slow end, summed travel rows) vs cap 210 for \"near\"; 1 stops that day; hard ceiling 480; mode rental_car"
+      input={"travel_days":5,"distance_pref":"near","transport_pref":"rental_car","start_date":"2026-11-10T00:00:00.000000Z","arrival_time":"05:30","accommodation_pref":"Homestay","departure_time":"20:30","origin_label":null,"variation":0,"interests":["Shopping & Souvenirs","Wildlife"],"id":929}
+      day rows:
+        07:00 meal Breakfast — Grand8 Guesthouse
+        08:00 travel Travel to Philippine Eagle Center [38.1km 90-135min]
+        10:15-12:45 activity Wildlife exploration
+        12:45-13:45 meal Lunch break (your choice)
+        14:00 travel Travel to Grand8 Guesthouse [38.1km 90-135min]
+        16:15-18:30 free Free time until dinner
+        18:30 meal Dinner — Grand8 Guesthouse
+        20:00 overnight Overnight stay
+    "day 5 drives 450 min (slow end, summed travel rows) vs cap 420 for \"far\"; 1 stops that day; hard ceiling 480; mode tour_operator"
+      input={"travel_days":5,"distance_pref":"far","transport_pref":"tour_operator","start_date":"2026-12-30T00:00:00.000000Z","arrival_time":"12:00","accommodation_pref":"Hotel","departure_time":null,"origin_label":null,"variation":0,"interests":["Relaxation & Wellness"],"id":930}
+      day rows:
+        07:00 meal Breakfast — Waterfront Insular Hotel D
+        08:00 travel Travel to Sample Highland Wellness & T [83.7km 135-210min]
+        11:30-12:30 meal Lunch — Jenniel's Caf
+        12:30-15:00 activity Wellness and spa session
+        15:15 travel Travel to Davao City centre [90.7km 150-240min]
+        19:15 departure Departure
+daily_drive_over_hard_ceiling_480__single_WITH_VISIBLE_WARNING(by design) 5 (distinct trips 5)
+    "day 6 drives 660 min; 1 stops; mode jeep"
+      input={"travel_days":7,"distance_pref":"moderate","transport_pref":"jeep","start_date":"2027-02-27T00:00:00.000000Z","arrival_time":"21:30","accommodation_pref":"Resort","departure_time":"14:30","origin_label":"Airport","variation":1,"interests":["Shopping & Souvenirs","Relaxation & Wellness","Wildlife"],"id":944}
+      day rows:
+        07:00 meal Breakfast — Sample Highland Mountain R
+        08:00 travel Travel toward Sample Southern River Na [56.4km 142-240min]
+        12:00-13:00 meal Lunch break on the way (your choice)
+        13:00 travel Travel to Sample Southern River Nature [21.2km 53-90min]
+        14:30-16:00 activity Nature and adventure activities
+        16:15 travel Travel toward Sample Highland Mountain [31.7km 80-135min]
+        18:30-19:30 meal Dinner break on the way (your choice)
+        19:30 travel Travel to Sample Highland Mountain Res [45.9km 115-195min]
+        22:45 overnight Late check-in and overnight stay
+    "day 2 drives 510 min; 1 stops; mode personal_car"
+      input={"travel_days":3,"distance_pref":"far","transport_pref":"personal_car","start_date":"2027-01-04T00:00:00.000000Z","arrival_time":"03:00","accommodation_pref":"Resort","departure_time":"20:30","origin_label":null,"variation":3,"interests":["Cultural Heritage","Shopping & Souvenirs","Wildlife"],"id":1011}
+      day rows:
+        07:00 meal Breakfast — Sample Highland Mountain R
+        08:00 travel Travel to Tagum City Night Market & Ro [104.7km 165-255min]
+        12:15-13:15 meal Lunch — BigFat Tummy's Steak and Seafo
+        16:00-18:00 activity Cultural and heritage tour
+        18:15-19:15 meal Dinner — BigFat Tummy's Steak and Seaf
+        19:15 travel Travel to Sample Highland Mountain Res [104.7km 165-255min]
+        23:30 overnight Late check-in and overnight stay
+
+== F3 breakdown ==
+{"near":{"days":278,"multi_days":92,"single_days":148,"single_over_soft":79,"none_days":38,"single_over_480":1},"far":{"days":318,"single_days":84,"multi_days":197,"single_over_soft":12,"none_days":37,"single_over_480":2},"moderate":{"days":359,"multi_days":174,"single_days":148,"single_over_soft":68,"none_days":37,"single_over_480":2}}
+== F3 multi over soft cap ==
+[]
+== F3 solo over 480 ==
+[{"dist":"moderate","drive":660,"mode":"jeep","days":7,"trip":944,"day":6},{"dist":"far","drive":510,"mode":"personal_car","days":3,"trip":1011,"day":2},{"dist":"moderate","drive":510,"mode":"jeep","days":3,"trip":1020,"day":2},{"dist":"far","drive":600,"mode":null,"days":6,"trip":1115,"day":2},{"dist":"near","drive":690,"mode":"jeep","days":7,"trip":1145,"day":4}]
