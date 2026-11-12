@@ -302,6 +302,52 @@ class TripLocationV2Test extends TestCase
         $this->assertSame('Seoul', $p->visitor_origin_city);
     }
 
+    public function test_a_province_is_never_saved_with_a_country_other_than_the_philippines(): void
+    {
+        $this->post(route('plan.update'), $this->form([
+            'visitor_type' => 'Regular / Foreign',
+            'visitor_origin_country' => 'AS', 'visitor_origin_province' => 'Ilocos Norte', 'visitor_origin_city' => 'Pago Pago',
+        ]))->assertSessionHasNoErrors();
+
+        $p = TouristPreference::first();
+        $this->assertSame('AS', $p->visitor_origin_country_code);
+        $this->assertNull($p->visitor_origin_province);
+        $this->assertNull($p->visitor_origin_region);
+        $this->assertStringNotContainsString('Ilocos', (string) $p->place_of_origin);
+    }
+
+    public function test_a_province_is_kept_for_the_philippines_and_cleared_when_the_country_changes(): void
+    {
+        $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Domestic', 'visitor_origin_country' => 'PH', 'visitor_origin_province' => 'Ilocos Norte']))
+            ->assertSessionHasNoErrors();
+        $this->assertSame('Ilocos Norte', TouristPreference::first()->visitor_origin_province);
+
+        // The same visitor changes the country and the hidden province box still carries its old value.
+        $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Foreign', 'visitor_origin_country' => 'AS', 'visitor_origin_province' => 'Ilocos Norte']))
+            ->assertSessionHasNoErrors();
+        $p = TouristPreference::first();
+        $this->assertSame('AS', $p->visitor_origin_country_code);
+        $this->assertNull($p->visitor_origin_province);
+    }
+
+    public function test_a_province_without_a_country_or_with_prefer_not_to_say_is_not_saved(): void
+    {
+        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => '', 'visitor_origin_province' => 'Cebu']))->assertSessionHasNoErrors();
+        $this->assertNull(TouristPreference::first()->visitor_origin_province);
+
+        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'NONE', 'visitor_origin_province' => 'Cebu']))->assertSessionHasNoErrors();
+        $this->assertNull(TouristPreference::first()->visitor_origin_province);
+    }
+
+    public function test_the_province_box_is_hidden_unless_the_country_is_the_philippines_and_the_script_clears_it(): void
+    {
+        $html = $this->get(route('plan.edit'))->assertOk()->getContent();
+        $this->assertMatchesRegularExpression('/<select[^>]*data-origin-province[^>]*hidden/', $html, 'hidden until the Philippines is chosen');
+
+        $js = file_get_contents(public_path('js/plan-origin-select.js'));
+        $this->assertStringContainsString("if (!isPh) province.value = '';", $js);
+    }
+
     public function test_prefer_not_to_say_stores_nothing_but_the_choice(): void
     {
         $this->post(route('plan.update'), $this->form([
