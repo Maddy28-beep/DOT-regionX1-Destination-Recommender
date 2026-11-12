@@ -126,3 +126,12 @@ body:has(.listing-detail-refresh) .site-header .container.bar { max-width: 1840p
     font-size: .95rem;
 }
 .site-topbar .nav-more__links a[aria-current="page"] { box-shadow: inset 3px 0 0 var(--accent-strong, #c8501f); background: var(--primary-light); text-decoration: none; }
+
+/* Closer together: the menu sits next to the logo instead of floating in the middle, and its links are tighter. */
+@media (min-width: 1100px) {
+    .site-topbar .main-nav { margin-right: auto; margin-left: clamp(8px, 1.6vw, 32px); gap: 0; }
+    .site-topbar .main-nav > a,
+    .site-topbar .main-nav .nav-more__toggle { padding: 0 10px; }
+    .site-topbar .main-nav > a[aria-current="page"]::after,
+    .site-topbar .main-nav .nav-more__toggle.is-active::after { left: 10px; right: 10px; }
+}
