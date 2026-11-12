@@ -32,6 +32,7 @@
             'rating' => number_format($destination->rating, 1),
             'reviewCount' => $destination->review_count,
             'fallbackGradient' => '#163b30',
+            'niche' => \App\Support\ProvinceBrand::for($destination->region?->name),
         ])
     @else
         @include('partials.dest-detail-hero', ['destination' => $destination])

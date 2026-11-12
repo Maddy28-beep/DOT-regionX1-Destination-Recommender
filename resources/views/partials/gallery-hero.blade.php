@@ -67,6 +67,7 @@
             <div class="gallery-hero__title">
                 <h1>{{ $title }}</h1>
                 <div class="loc">{{ $subtitle }}</div>
+                @if (! empty($niche))<div class="province-niche province-niche--hero">{{ $niche }}</div>@endif
             </div>
             @if ($total > 1)
                 <div class="carousel-dots">
@@ -131,6 +132,7 @@
             <div class="gallery-hero__title">
                 <h1>{{ $title }}</h1>
                 <div class="loc">{{ $subtitle }}</div>
+                @if (! empty($niche))<div class="province-niche province-niche--hero">{{ $niche }}</div>@endif
             </div>
         </div>
 
@@ -176,6 +178,7 @@
         <div class="detail-hero-content">
             <h1>{{ $title }}</h1>
             <div class="loc">{{ $subtitle }}</div>
+            @if (! empty($niche))<div class="province-niche province-niche--hero">{{ $niche }}</div>@endif
         </div>
     </div>
 @endif

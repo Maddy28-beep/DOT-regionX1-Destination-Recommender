@@ -12,6 +12,7 @@
     <div class="container">
         <h1 class="poster-title">Bring Home Davao</h1>
         <p>Find local crafts, keepsakes, and pasalubong.</p>
+        @include('partials.catalog-brand-line')
     </div>
 </header>
 

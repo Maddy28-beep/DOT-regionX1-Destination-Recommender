@@ -13,6 +13,7 @@
     <div class="container">
         <h1 class="poster-title">Davao, Locally Guided</h1>
         <p>Find local tour operators for your next adventure.</p>
+        @include('partials.catalog-brand-line')
     </div>
 </header>
 

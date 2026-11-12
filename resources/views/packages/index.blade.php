@@ -13,6 +13,7 @@
     <div class="container">
         <h1 class="poster-title">Explore Davao Together</h1>
         <p>Find your next adventure with local tour packages.</p>
+        @include('partials.catalog-brand-line')
     </div>
 </header>
 

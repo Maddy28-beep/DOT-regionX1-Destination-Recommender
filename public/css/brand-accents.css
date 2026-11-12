@@ -33,3 +33,17 @@
     margin: 14px 0 0; font-family: 'Barabara', 'Alfa Slab One', serif; text-transform: uppercase; letter-spacing: .06em;
     font-size: .95rem; color: #fff;
 }
+
+/* Listing pages: the regional line above, and the chosen province's niche below, the heading's own text. */
+.catalog-banner .brand-line {
+    margin: 0 0 4px; font-family: 'Barabara', 'Alfa Slab One', serif; text-transform: uppercase;
+    letter-spacing: .08em; font-size: .78rem; opacity: .92;
+}
+.catalog-banner .province-niche {
+    display: inline-block; margin-top: 10px; padding: 4px 12px; border-radius: 999px; max-width: none;
+    background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.4); font-size: .85rem;
+}
+.province-niche--hero {
+    display: inline-block; margin-top: 8px; padding: 3px 12px; border-radius: 999px; font-size: .82rem; font-weight: 600;
+    background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.45); color: #fff;
+}
