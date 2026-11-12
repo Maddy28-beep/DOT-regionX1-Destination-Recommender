@@ -116,3 +116,13 @@ body:has(.listing-detail-refresh) .site-header .container.bar { max-width: 1840p
 .site-topbar .main-nav .nav-more__toggle.is-active { font-weight: 400; }
 .site-topbar .main-nav > a[aria-current="page"]::after,
 .site-topbar .main-nav .nav-more__toggle.is-active::after { left: 12px; right: 12px; }
+
+/* The "More" dropdown's links match the menu. */
+.site-topbar .nav-more__links a {
+    font-family: 'Barabara', 'Alfa Slab One', serif;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 400;
+    font-size: .95rem;
+}
+.site-topbar .nav-more__links a[aria-current="page"] { box-shadow: inset 3px 0 0 var(--accent-strong, #c8501f); background: var(--primary-light); text-decoration: none; }
