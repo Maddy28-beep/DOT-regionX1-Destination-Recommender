@@ -97,7 +97,6 @@ body.hero-page .site-header:not(.scrolled) .main-nav .nav-more__toggle.is-active
 
 /* ===== Detail pages (a destination, a stay, a restaurant, a package...) use the width of the screen too ===== */
 .container.listing-detail-refresh { max-width: 1840px; padding-inline: clamp(16px, 2.4vw, 48px); }
-body:has(.listing-detail-refresh) .site-header .container.bar { max-width: 1840px; padding-inline: clamp(16px, 2.4vw, 48px) clamp(12px, 2vw, 40px); }
 @media (min-width: 1500px) {
     .listing-detail-refresh .detail-layout { grid-template-columns: minmax(0, 1fr) 440px; gap: 40px; }
 }
@@ -143,3 +142,4 @@ body:has(.listing-detail-refresh) .site-header .container.bar { max-width: 1840p
     .site-header .container.bar > .header-actions { margin-left: auto; }
     .site-header .container.bar > .main-nav { margin-left: clamp(8px, 1.6vw, 32px); margin-right: 0; }
 }
+

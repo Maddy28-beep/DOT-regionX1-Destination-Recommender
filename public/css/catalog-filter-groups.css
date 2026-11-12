@@ -162,7 +162,6 @@
 
 /* ===== Use the width of the screen: the listing pages (and the header above them) no longer stop at 1320px. ===== */
 .catalog-refresh .container { max-width: 1840px; padding-inline: clamp(16px, 2.4vw, 48px); }
-body:has(.catalog-refresh) .site-header .container.bar { max-width: 1840px; padding-inline: clamp(16px, 2.4vw, 48px) clamp(12px, 2vw, 40px); }
 @media (min-width: 1500px) {
     .catalog-refresh .card-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
