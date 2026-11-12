@@ -101,3 +101,18 @@ body:has(.listing-detail-refresh) .site-header .container.bar { max-width: 1840p
 @media (min-width: 1500px) {
     .listing-detail-refresh .detail-layout { grid-template-columns: minmax(0, 1fr) 440px; gap: 40px; }
 }
+
+/* ===== The menu links in Barabara, like the page titles (an uppercase-only face, so the case is set here) ===== */
+.site-topbar .main-nav > a,
+.site-topbar .main-nav .nav-more__toggle {
+    font-family: 'Barabara', 'Alfa Slab One', serif;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 400;
+    font-size: .95rem;
+    padding: 0 12px;
+}
+.site-topbar .main-nav > a[aria-current="page"],
+.site-topbar .main-nav .nav-more__toggle.is-active { font-weight: 400; }
+.site-topbar .main-nav > a[aria-current="page"]::after,
+.site-topbar .main-nav .nav-more__toggle.is-active::after { left: 12px; right: 12px; }
