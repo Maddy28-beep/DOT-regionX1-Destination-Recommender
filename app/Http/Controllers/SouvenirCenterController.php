@@ -21,6 +21,9 @@ class SouvenirCenterController extends Controller
             $query->where('region_id', $request->integer('region_id'));
         }
 
+        // The filters this page's panel offers beyond search, province and budget: rating, amenities, and its own extras.
+        \App\Support\ListingFilters::apply($query, $request, 'souvenir_center');
+
         match ($request->string('sort')->toString()) {
             'rating' => $query->orderByDesc('rating'),
             'name' => $query->orderBy('name'),

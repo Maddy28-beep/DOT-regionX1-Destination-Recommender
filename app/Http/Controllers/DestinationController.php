@@ -56,6 +56,9 @@ class DestinationController extends Controller
             }
         }
 
+        // The filters this page's panel offers beyond search, province and budget: rating, amenities, and its own extras.
+        \App\Support\ListingFilters::apply($query, $request, 'destination');
+
         match ($request->string('sort')->toString()) {
             // Weighted, so "no reviews yet" sorts as average rather than as
             // nought stars -- see RanksByRating. Raw rating buried all 17

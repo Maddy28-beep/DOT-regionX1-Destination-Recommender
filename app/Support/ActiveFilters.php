@@ -64,6 +64,10 @@ class ActiveFilters
             '1-2' => 'Trip: 1–2 days', '3-4' => 'Trip: 3–4 days', '5-plus' => 'Trip: 5+ days', default => null,
         });
 
+        foreach (ListingFilters::labels($request) as $param => $label) {
+            $filters->put($param, $label);
+        }
+
         return $filters->filter(fn ($label) => $label !== null && $label !== '');
     }
 

@@ -36,6 +36,7 @@
             @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, 'type'); @endphp
 
             @include('partials.catalog-filters', [
+                'groups' => \App\Support\ListingFilters::groups('destination', request()),
                 'route' => 'destinations.index',
                 'placeholder' => 'e.g. Samal Island',
                 'regions' => $regions,

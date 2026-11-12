@@ -25,6 +25,10 @@
         array_unshift($tiers, ['', 'Any budget', $tileHasSub ? 'All' : '']);
     }
     $hidden = $hidden ?? [];
+    $groups = $groups ?? [];
+    // A box the panel draws itself (the price range) is not also carried as a hidden field.
+    $managed = collect($groups)->flatMap(fn ($g) => $g['names'])->all();
+    $hidden = array_values(array_filter($hidden, fn ($f) => ! in_array($f['name'], $managed, true)));
     $formId = $formId ?? 'catalogFilters';
     $clearParams = $clearParams ?? [];
     $filterCount = $activeFilters->count();
@@ -84,6 +88,8 @@
                 </div>
             </fieldset>
         @endif
+
+        @include('partials.catalog-filter-groups', ['groups' => $groups])
 
         <button type="submit" class="btn btn-poster-primary btn-block" data-filter-submit>
             Show results{{ $filterCount ? ' ('.$filterCount.' '.\Illuminate\Support\Str::plural('filter', $filterCount).')' : '' }}

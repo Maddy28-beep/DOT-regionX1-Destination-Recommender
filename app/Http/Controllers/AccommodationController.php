@@ -71,6 +71,9 @@ class AccommodationController extends Controller
             });
         }
 
+        // The filters this page's panel offers beyond search, province and budget: rating, amenities, and its own extras.
+        \App\Support\ListingFilters::apply($query, $request, 'accommodation');
+
         match ($request->string('sort')->toString()) {
             'rating' => $query->orderByDesc('rating'),
             'price_low' => $query->orderBy('price_per_night'),

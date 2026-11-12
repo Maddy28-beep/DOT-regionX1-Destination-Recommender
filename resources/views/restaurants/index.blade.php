@@ -38,6 +38,7 @@
             @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, 'cuisine_type'); @endphp
 
             @include('partials.catalog-filters', [
+                'groups' => \App\Support\ListingFilters::groups('restaurant', request()),
                 'hidden' => \App\Support\ActiveFilters::carry(request(), ['meal','date']),
                 'route' => 'restaurants.index',
                 'placeholder' => 'e.g. Marina Tuna',

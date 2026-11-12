@@ -29,6 +29,9 @@ class TourOperatorController extends Controller
             $query->where('price_tier', $request->string('price_tier'));
         }
 
+        // The filters this page's panel offers beyond search, province and budget: rating, amenities, and its own extras.
+        \App\Support\ListingFilters::apply($query, $request, 'tour_operator');
+
         match ($request->string('sort')->toString()) {
             'rating' => $query->orderByDesc('rating'),
             'name' => $query->orderBy('name'),

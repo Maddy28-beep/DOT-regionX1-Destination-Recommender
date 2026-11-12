@@ -89,6 +89,9 @@ class PackageController extends Controller
             }
         }
 
+        // The filters this page's panel offers beyond search, province and budget: rating, amenities, and its own extras.
+        \App\Support\ListingFilters::apply($query, $request, 'package');
+
         match ($request->string('sort')->toString()) {
             // See RanksByRating / DestinationController::index().
             'rating' => $query->orderByWeightedRating(),

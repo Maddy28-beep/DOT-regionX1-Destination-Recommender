@@ -38,6 +38,7 @@
             @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, 'specialization'); @endphp
 
             @include('partials.catalog-filters', [
+                'groups' => \App\Support\ListingFilters::groups('tour_operator', request()),
                 'route' => 'tour-operators.index',
                 'placeholder' => 'e.g. Apo Summit Guides',
                 'regions' => $regions,
