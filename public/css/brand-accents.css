@@ -47,3 +47,50 @@
     display: inline-block; margin-top: 8px; padding: 3px 12px; border-radius: 999px; font-size: .82rem; font-weight: 600;
     background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.45); color: #fff;
 }
+
+/* ===== The top bar's menu: roomier links that light up on hover, and a clear mark for the page you are on ===== */
+.site-topbar .main-nav { gap: 2px; }
+.site-topbar .main-nav > a,
+.site-topbar .main-nav .nav-more__toggle {
+    position: relative;
+    min-height: 40px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+    font-size: .92rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color .15s ease, background-color .15s ease;
+}
+.site-topbar .main-nav > a:hover,
+.site-topbar .main-nav .nav-more__toggle:hover,
+.site-topbar .main-nav .nav-more__toggle[aria-expanded="true"] { background: var(--primary-light); color: var(--primary-dark); }
+.site-topbar .main-nav > a:focus-visible,
+.site-topbar .main-nav .nav-more__toggle:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+/* The current page: bold, in the green, with a short stamp-orange bar under it (no underline). */
+.site-topbar .main-nav > a[aria-current="page"],
+.site-topbar .main-nav .nav-more__toggle.is-active {
+    color: var(--primary-dark);
+    font-weight: 800;
+    text-decoration: none;
+}
+.site-topbar .main-nav > a[aria-current="page"]::after,
+.site-topbar .main-nav .nav-more__toggle.is-active::after {
+    content: "";
+    position: absolute;
+    left: 14px; right: 14px; bottom: 2px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--accent-strong, #c8501f);
+}
+.site-topbar .main-nav .main-nav__advisories[aria-current="page"] .main-nav__label { text-decoration: none; }
+
+/* On the landing picture, before the bar turns white: the same shapes in light tints. */
+body.hero-page .site-header:not(.scrolled) .main-nav > a:hover,
+body.hero-page .site-header:not(.scrolled) .main-nav .nav-more__toggle:hover,
+body.hero-page .site-header:not(.scrolled) .main-nav .nav-more__toggle[aria-expanded="true"] { background: rgba(255, 255, 255, .18); color: #fff; }
+body.hero-page .site-header:not(.scrolled) .main-nav > a[aria-current="page"],
+body.hero-page .site-header:not(.scrolled) .main-nav .nav-more__toggle.is-active { color: #fff; }
