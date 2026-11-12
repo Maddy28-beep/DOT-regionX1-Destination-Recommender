@@ -22,6 +22,7 @@
                 <span class="portal-poster__badge">DOT Region XI · Davao</span>
                 <p class="portal-poster__headline">Your gateway to Davao’s tourism network.</p>
                 <p class="portal-poster__copy">Manage your listing and help travelers discover the Davao Region.</p>
+                @include('partials.tourism-logos')
             </div>
             <div class="portal-poster__network">
                 <span class="portal-poster__compass" aria-hidden="true">

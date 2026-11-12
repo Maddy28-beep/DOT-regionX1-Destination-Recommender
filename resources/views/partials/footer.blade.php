@@ -9,6 +9,8 @@
                 <p>A tourism information and DOT-accreditation platform built for the Department of Tourism
                     Region XI, covering Davao City, Davao del Norte, Davao de Oro, Davao Occidental, Davao Oriental,
                     and Davao del Sur.</p>
+                <p class="footer-tagline">Davao: Diversity is our Beauty</p>
+                @include('partials.tourism-logos')
                 <div class="footer-contact">
                     <p>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

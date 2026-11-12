@@ -1,0 +1,35 @@
+/* Brand accents: carries the Department of Tourism look (Barabara headings, the three tourism marks, the regional line)
+   past the landing hero. Only type, a strip of logos and one line of text; no layout of existing pages changes. */
+
+/* 1. Titles that were still in Poppins: the itinerary banner and a destination's name. (The listing and plan pages already use
+   Barabara.) Uppercase only face, so the case is set here. */
+.itin-banner__title,
+.dest-detail-hero__content h1 {
+    font-family: 'Barabara', 'Alfa Slab One', serif;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+    font-weight: 400;
+}
+.itin-banner__title { line-height: 1.1; }
+
+/* 3. The tourism marks on a light strip. */
+.tourism-strip {
+    display: inline-flex; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; border-radius: 12px; padding: 8px 14px;
+}
+.tourism-strip img { display: block; height: auto; object-fit: contain; }
+.tourism-strip__davao { width: 84px; }
+.tourism-strip__dot { width: 40px; }
+.tourism-strip__love { width: 92px; }
+.site-footer .tourism-strip { margin: 18px 0 0; }
+.portal-poster .tourism-strip { margin-top: 14px; }
+
+/* 4. The regional line. */
+.poster-hero .region-tagline {
+    margin: 10px 0 0; font-family: 'Barabara', 'Alfa Slab One', serif; text-transform: uppercase;
+    letter-spacing: .06em; font-size: clamp(.85rem, 1.4vw, 1.05rem); color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.45);
+}
+.footer-tagline {
+    margin: 14px 0 0; font-family: 'Barabara', 'Alfa Slab One', serif; text-transform: uppercase; letter-spacing: .06em;
+    font-size: .95rem; color: #fff;
+}

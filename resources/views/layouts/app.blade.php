@@ -7,6 +7,7 @@
     <title>@yield('title', 'ExploreDVO')</title>
     @include('partials.share-meta')
     @include('partials.head-assets')
+    <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/brand-accents.css') }}">
     @stack('styles')
 </head>
 <body>

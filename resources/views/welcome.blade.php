@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/mood-cards.css') }}">
     <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/hero-search.css') }}">
     <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/home-slides.css') }}">
+    <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/brand-accents.css') }}">
     @if ($heroVideo && $heroVideo['poster'])
         {{-- Fetched in parallel with the stylesheet so the hero's ground is
              ready at first paint, rather than arriving after it. --}}
@@ -246,6 +247,7 @@
         <span class="poster-kicker poster-hero__kicker">welcome to</span>
         <h1 class="poster-title poster-hero__title">DAVAO REGION</h1>
         <p class="poster-hero__subhead">Sun-warmed islands, misty highlands, and the Philippine Eagle's home &mdash; discover stays, tours, and eats across Region XI.</p>
+        <p class="region-tagline">Davao: Diversity is our Beauty</p>
     </div>
 
     {{-- The picture ends on a soft curve, not a ruler-straight line: it bulges down behind the search card and
