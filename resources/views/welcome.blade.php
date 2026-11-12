@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/landing-sections.css') }}">
     <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/mood-cards.css') }}">
     <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/hero-search.css') }}">
-    <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/hero-search-refresh.css') }}">
     <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/home-slides.css') }}">
     <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/brand-accents.css') }}">
     @if ($heroVideo && $heroVideo['poster'])
