@@ -75,6 +75,16 @@
                             example, too many sign-in attempts), and are deleted automatically after about
                             14&nbsp;days.</li>
                     </ul>
+                    @if (\App\Support\Features::tripLocation())
+                        <p data-origin-privacy><strong>Where you travel from (optional):</strong> if you say
+                            where you are travelling from (a country, a province and a city or municipality), or
+                            choose &ldquo;Prefer not to say&rdquo;, we keep only those place names with your trip
+                            plan. We never ask for your home address, and this question does not use your
+                            position. The answer is not linked to your name. DOT Region XI sees it only as
+                            counts for tourism statistics, and a group of fewer than 5 visitors is never shown on
+                            its own. It is deleted or cleared automatically together with the rest of the plan
+                            after 30&nbsp;days.</p>
+                    @endif
                     <p><strong>How long this is kept:</strong></p>
                     <ul>
                         <li>Anonymous trip plans, the preferences they were built from, and any

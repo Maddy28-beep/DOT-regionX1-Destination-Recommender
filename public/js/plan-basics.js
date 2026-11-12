@@ -100,7 +100,13 @@
         quick.addEventListener('click', event => {
             const kind = event.target.closest('[data-quick]')?.dataset.quick;
             if (!kind) return;
-            const date = new Date();
+            // With the trip_location_v2 form the date input carries a minimum (today in the Philippines): "today" is then
+            // Philippine time whatever the device clock or time zone says. Without it the device's own date is used, as before.
+            let date = new Date();
+            if (startDate.min) {
+                const ph = new Intl.DateTimeFormat('en-CA', {timeZone: 'Asia/Manila', year: 'numeric', month: '2-digit', day: '2-digit'}).format(date).split('-').map(Number);
+                date = new Date(ph[0], ph[1] - 1, ph[2]);
+            }
             date.setHours(0, 0, 0, 0);
             if (kind === 'weekend') date.setDate(date.getDate() + ((6 - date.getDay() + 7) % 7 || 7));   // the coming Saturday
             if (kind === 'week') date.setDate(date.getDate() + ((8 - date.getDay()) % 7 || 7));          // the coming Monday

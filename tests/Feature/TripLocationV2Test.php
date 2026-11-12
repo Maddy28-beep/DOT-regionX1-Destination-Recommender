@@ -378,6 +378,51 @@ class TripLocationV2Test extends TestCase
         $this->assertNotNull($id);
     }
 
+    // ---- privacy notice, only with the switch on ------------------------------------------------------------
+
+    private const FORM_NOTICE = 'Optional. Used for tourism statistics. Not linked to your name. Deleted after 30 days.';
+
+    public function test_the_origin_question_carries_the_privacy_notice_when_the_switch_is_on(): void
+    {
+        $this->get(route('plan.edit'))->assertOk()->assertSee(self::FORM_NOTICE)->assertSee('data-origin-privacy', false);
+    }
+
+    public function test_the_origin_notice_is_not_on_the_form_when_the_switch_is_off(): void
+    {
+        config(['features.trip_location_v2' => false]);
+
+        $this->get(route('plan.edit'))->assertOk()->assertDontSee(self::FORM_NOTICE)->assertDontSee('data-origin-privacy', false);
+    }
+
+    public function test_the_privacy_page_has_the_origin_paragraph_only_when_the_switch_is_on(): void
+    {
+        $this->get(route('legal.privacy'))->assertOk()
+            ->assertSee('Where you travel from (optional)')
+            ->assertSee('fewer than 5 visitors')
+            ->assertSee('deleted or cleared automatically', false);
+
+        config(['features.trip_location_v2' => false]);
+        $this->get(route('legal.privacy'))->assertOk()->assertDontSee('Where you travel from')->assertDontSee('data-origin-privacy', false);
+    }
+
+    public function test_the_terms_page_is_the_same_with_the_switch_on_and_off(): void
+    {
+        $strip = fn (string $html) => preg_replace('/<input[^>]*name="_token"[^>]*>|<meta name="csrf-token"[^>]*>|brand-mark-grad-[A-Za-z0-9]+/', '', $html);
+        $on = $strip($this->get(route('legal.terms'))->assertOk()->getContent());
+        config(['features.trip_location_v2' => false]);
+        $off = $strip($this->get(route('legal.terms'))->assertOk()->getContent());
+
+        $this->assertSame($on, $off);
+    }
+
+    public function test_the_quick_dates_use_philippine_time_when_the_form_has_the_minimum_date(): void
+    {
+        $js = file_get_contents(public_path('js/plan-basics.js'));
+
+        $this->assertStringContainsString("timeZone: 'Asia/Manila'", $js);
+        $this->assertStringContainsString('if (startDate.min)', $js, 'without the minimum (switch off) the device date is used as before');
+    }
+
     // ---- the switch itself ----------------------------------------------------------------------------------
 
     public function test_the_database_row_overrides_the_config_and_can_be_cleared(): void
