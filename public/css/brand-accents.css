@@ -143,3 +143,11 @@ body.hero-page .site-header:not(.scrolled) .main-nav .nav-more__toggle.is-active
     .site-header .container.bar > .main-nav { margin-left: clamp(8px, 1.6vw, 32px); margin-right: 0; }
 }
 
+
+/* ===== The strip above the top bar: Davaos weather today (computers only) ===== */
+.topstrip { display: none; background: #0d221b; color: #dcebe3; font-size: .8rem; }
+@media (min-width: 1100px) { .topstrip { display: block; } }
+.topstrip__in { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 34px; }
+.topstrip__side { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.topstrip__chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: rgba(255, 255, 255, .1); color: #e8f3ed; white-space: nowrap; text-decoration: none; }
+.topstrip__chip svg { width: 14px; height: 14px; flex: none; }

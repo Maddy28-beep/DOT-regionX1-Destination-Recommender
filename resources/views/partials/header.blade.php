@@ -4,6 +4,17 @@
         <x-advisory-ribbon :advisories="$ribbonAdvisories" />
     @endif
 
+    {{-- A slim strip above the bar, on computers only: Davao's weather today. It is left out when the weather cannot be read. --}}
+    @if (! empty($davaoWeather))
+        <div class="topstrip">
+            <div class="container topstrip__in">
+                <div class="topstrip__side">
+                    <span class="topstrip__chip"><x-icon name="sun" aria-hidden="true" /> Davao today &middot; {{ $davaoWeather['temp'] }}&deg;C &middot; {{ $davaoWeather['words'] }}</span>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <header class="site-header">
         <div class="container bar">
             <a href="{{ route('home') }}" class="brand poster-title">
