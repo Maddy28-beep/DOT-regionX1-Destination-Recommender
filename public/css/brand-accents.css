@@ -143,11 +143,28 @@ body.hero-page .site-header:not(.scrolled) .main-nav .nav-more__toggle.is-active
     .site-header .container.bar > .main-nav { margin-left: clamp(8px, 1.6vw, 32px); margin-right: 0; }
 }
 
+/* ===== The weather and the language, inside the top bar ===== */
+.site-header .container.bar { max-width: 1380px; }
+.header-weather {
+    display: none; align-items: center; gap: 5px; height: 34px; padding: 0 11px; margin-right: 2px; border-radius: 999px;
+    background: var(--primary-light); color: var(--primary-dark); font-size: .84rem; font-weight: 700; white-space: nowrap;
+}
+.header-weather svg { width: 16px; height: 16px; flex: none; color: var(--accent-strong, #c8501f); }
+@media (min-width: 1500px) { .header-weather { display: inline-flex; } }
+body.hero-page .site-header:not(.scrolled) .header-weather { background: rgba(255, 255, 255, .2); color: #fff; }
+body.hero-page .site-header:not(.scrolled) .header-weather svg { color: #fff; }
 
-/* ===== The strip above the top bar: Davaos weather today (computers only) ===== */
-.topstrip { display: none; background: #0d221b; color: #dcebe3; font-size: .8rem; }
-@media (min-width: 1100px) { .topstrip { display: block; } }
-.topstrip__in { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 34px; }
-.topstrip__side { display: flex; align-items: center; gap: 14px; min-width: 0; }
-.topstrip__chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: rgba(255, 255, 255, .1); color: #e8f3ed; white-space: nowrap; text-decoration: none; }
-.topstrip__chip svg { width: 14px; height: 14px; flex: none; }
+.lang-switch { display: inline-flex; align-items: stretch; height: 34px; margin-right: 4px; border: 1px solid var(--border, #dde3dd); border-radius: 999px; overflow: hidden; }
+.lang-switch a { display: inline-grid; place-items: center; padding: 0 10px; font-size: .78rem; font-weight: 800; letter-spacing: .03em; color: var(--primary-dark); text-decoration: none; }
+.lang-switch a + a { border-left: 1px solid var(--border, #dde3dd); }
+.lang-switch a:hover { background: var(--primary-light); }
+.lang-switch a[aria-current="true"] { background: var(--primary); color: #fff; }
+.lang-switch a:focus-visible { outline: 3px solid var(--primary); outline-offset: -3px; }
+body.hero-page .site-header:not(.scrolled) .lang-switch { border-color: rgba(255, 255, 255, .6); }
+body.hero-page .site-header:not(.scrolled) .lang-switch a { color: #fff; }
+body.hero-page .site-header:not(.scrolled) .lang-switch a + a { border-left-color: rgba(255, 255, 255, .6); }
+body.hero-page .site-header:not(.scrolled) .lang-switch a[aria-current="true"] { background: #fff; color: var(--primary-dark); }
+/* Below the full bar the language lives in the phone menu. */
+.site-header .header-actions .lang-switch { display: none; }
+@media (min-width: 1366px) { .site-header .header-actions .lang-switch { display: inline-flex; } }
+.mobile-menu__utility { padding: 4px 2px 14px; }

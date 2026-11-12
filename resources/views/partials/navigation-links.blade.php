@@ -10,14 +10,14 @@
     'restaurants' => ['Dining', 'utensils'],
     'packages' => ['Packages', 'ticket'],
 ] as $routePrefix => [$label, $icon])
-    <a href="{{ route($routePrefix.'.index') }}" @if(request()->routeIs($routePrefix.'.*')) aria-current="page" @endif>@if ($icons)<span class="mobile-menu__icon" aria-hidden="true"><x-icon :name="$icon" /></span>@endif{{ $label }}</a>
+    <a href="{{ route($routePrefix.'.index') }}" @if(request()->routeIs($routePrefix.'.*')) aria-current="page" @endif>@if ($icons)<span class="mobile-menu__icon" aria-hidden="true"><x-icon :name="$icon" /></span>@endif{{ __($label) }}</a>
 @endforeach
 <div class="nav-more" data-nav-more>
     <button type="button" class="nav-more__toggle {{ request()->routeIs('souvenir-centers.*', 'tour-operators.*', 'events.*') ? 'is-active' : '' }}" aria-expanded="false" aria-controls="{{ $navId }}-more-links">
         @if ($icons)
-            <span class="mobile-menu__label"><span class="mobile-menu__icon" aria-hidden="true"><x-icon name="grid" /></span>More</span>
+            <span class="mobile-menu__label"><span class="mobile-menu__icon" aria-hidden="true"><x-icon name="grid" /></span>{{ __('More') }}</span>
         @else
-            More
+            {{ __('More') }}
         @endif
         @if ($icons)
             {{-- The drawer's chevron points right when closed and turns to point up when open (see mobile-drawer.css). --}}
@@ -27,14 +27,14 @@
         @endif
     </button>
     <div class="nav-more__links" id="{{ $navId }}-more-links" hidden>
-        <a href="{{ route('souvenir-centers.index') }}" @if(request()->routeIs('souvenir-centers.*')) aria-current="page" @endif>@if ($icons)<span class="mobile-menu__icon" aria-hidden="true"><x-icon name="tag" /></span>@endif Souvenir Centers</a>
-        <a href="{{ route('tour-operators.index') }}" @if(request()->routeIs('tour-operators.*')) aria-current="page" @endif>@if ($icons)<span class="mobile-menu__icon" aria-hidden="true"><x-icon name="compass" /></span>@endif Tour Operators</a>
-        <a href="{{ route('events.index') }}" @if(request()->routeIs('events.*')) aria-current="page" @endif>@if ($icons)<span class="mobile-menu__icon" aria-hidden="true"><x-icon name="calendar" /></span>@endif Events</a>
+        <a href="{{ route('souvenir-centers.index') }}" @if(request()->routeIs('souvenir-centers.*')) aria-current="page" @endif>@if ($icons)<span class="mobile-menu__icon" aria-hidden="true"><x-icon name="tag" /></span>@endif {{ __('Souvenir Centers') }}</a>
+        <a href="{{ route('tour-operators.index') }}" @if(request()->routeIs('tour-operators.*')) aria-current="page" @endif>@if ($icons)<span class="mobile-menu__icon" aria-hidden="true"><x-icon name="compass" /></span>@endif {{ __('Tour Operators') }}</a>
+        <a href="{{ route('events.index') }}" @if(request()->routeIs('events.*')) aria-current="page" @endif>@if ($icons)<span class="mobile-menu__icon" aria-hidden="true"><x-icon name="calendar" /></span>@endif {{ __('Events') }}</a>
     </div>
 </div>
 <a href="{{ route('advisories.index') }}" class="main-nav__advisories" @if(request()->routeIs('advisories.*')) aria-current="page" @endif>
     @if ($icons)<span class="mobile-menu__icon" aria-hidden="true"><x-icon name="alert-triangle" />@if (($activeAdvisoryCount ?? 0) > 0)<i class="mobile-menu__pip"></i>@endif</span>@endif
-    <span class="main-nav__label">Advisories</span>
+    <span class="main-nav__label">{{ __('Advisories') }}</span>
     @if (($activeAdvisoryCount ?? 0) > 0)
         <span class="main-nav__dot main-nav__dot--count" aria-hidden="true">{{ $activeAdvisoryCount > 9 ? '9+' : $activeAdvisoryCount }}</span>
         @if ($icons)<span class="mobile-menu__urgent" aria-hidden="true">{{ $activeAdvisoryCount > 9 ? '9+' : $activeAdvisoryCount }} active</span>@endif

@@ -4,17 +4,6 @@
         <x-advisory-ribbon :advisories="$ribbonAdvisories" />
     @endif
 
-    {{-- A slim strip above the bar, on computers only: Davao's weather today. It is left out when the weather cannot be read. --}}
-    @if (! empty($davaoWeather))
-        <div class="topstrip">
-            <div class="container topstrip__in">
-                <div class="topstrip__side">
-                    <span class="topstrip__chip"><x-icon name="sun" aria-hidden="true" /> Davao today &middot; {{ $davaoWeather['temp'] }}&deg;C &middot; {{ $davaoWeather['words'] }}</span>
-                </div>
-            </div>
-        </div>
-    @endif
-
     <header class="site-header">
         <div class="container bar">
             <a href="{{ route('home') }}" class="brand poster-title">
@@ -27,6 +16,11 @@
             </nav>
 
             <div class="header-actions">
+                {{-- Davao's weather today (left out when it cannot be read; shown on wide screens only) and the language. --}}
+                @if (! empty($davaoWeather))
+                    <span class="header-weather" title="{{ __('Davao today') }}: {{ $davaoWeather['words'] }}"><x-icon name="sun" aria-hidden="true" /> {{ $davaoWeather['temp'] }}&deg;C<span class="sr-only"> {{ $davaoWeather['words'] }}</span></span>
+                @endif
+                @include('partials.language-switch')
                 {{--
                     Exactly one extra element added here for the optional tourist
                     account, not a whole button row -- this bar already fought a
@@ -69,7 +63,7 @@
                         </div>
                     </div>
                 @else
-                    <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="header-account-link">Log in</a>
+                    <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="header-account-link">{{ __('Log in') }}</a>
                 @endauth
                 {{-- This used to always point at the anonymous, browser-only
                      list, so a signed-in traveler's own "Saved" button opened
@@ -84,7 +78,7 @@
                     <x-icon name="heart" />
                     <span class="header-saved__count" data-count="{{ $savedCount ?? 0 }}" data-saved-count @if(($savedCount ?? 0) < 1) hidden @endif>{{ ($savedCount ?? 0) > 99 ? '99+' : ($savedCount ?? 0) }}</span>
                 </a>
-                <a href="{{ route('plan.choose') }}" @if(request()->routeIs('plan.*')) aria-current="page" @endif class="btn btn-primary header-plan">Plan My Trip <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="{{ route('plan.choose') }}" @if(request()->routeIs('plan.*')) aria-current="page" @endif class="btn btn-primary header-plan">{{ __('Plan My Trip') }} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
 
                 <button type="button" class="nav-toggle" id="mobileMenuToggle" aria-label="Open menu" aria-haspopup="dialog" aria-expanded="false" aria-controls="mobileMenu">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -134,12 +128,14 @@
         <form class="mobile-menu__search" action="{{ route('search') }}" method="GET" role="search">
             <x-icon name="search" aria-hidden="true" />
             <label for="mobileMenuSearch" class="sr-only">Search Davao Region</label>
-            <input type="search" id="mobileMenuSearch" name="q" placeholder="Search Davao Region" maxlength="100" autocomplete="off" enterkeyhint="search">
+            <input type="search" id="mobileMenuSearch" name="q" placeholder="{{ __('Search Davao Region') }}" maxlength="100" autocomplete="off" enterkeyhint="search">
         </form>
 
         <nav class="mobile-menu__group" aria-label="Mobile navigation">
             @include('partials.navigation-links', ['navId' => 'mobile', 'icons' => true])
         </nav>
+
+        <div class="mobile-menu__utility">@include('partials.language-switch')</div>
 
         <div class="mobile-menu__pills">
             @if ($isTouristAuthed)
