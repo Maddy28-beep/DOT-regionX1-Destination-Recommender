@@ -11,6 +11,11 @@
     $preference, $travelTypes, $visitorTypes
 --}}
 @php
+    // trip_location_v2 (13 Nov 2026): no past arrival date, a finish-by time instead of a departure point, and the visitor's
+    // origin as country / province / city. Off = the form below is exactly the one that was there before.
+    $v2 = \App\Support\Features::tripLocation();
+    $todayManila = \Illuminate\Support\Carbon::now('Asia/Manila')->toDateString();
+    $endValue = old('end_time', $preference->end_time ? substr((string) $preference->end_time, 0, 5) : '');
     $typeIcons = ['Solo' => 'user', 'Couple' => 'users', 'Family' => 'family', 'Friends' => 'group', 'Business' => 'briefcase'];
     $visitorIcons = ['First-time Visitor' => 'plane', 'Returning Visitor' => 'repeat', 'Regular / Local' => 'home'];
     $chosenType = old('travel_type', $preference->travel_type) ?: 'Solo';
@@ -74,8 +79,13 @@
 
         <div class="field pc-field pc-col-3">
             <label for="start_date">Arrival date (optional)</label>
-            <input type="date" id="start_date" name="start_date" value="{{ old('start_date', optional($preference->start_date)->format('Y-m-d')) }}">
-            <p class="pc-hint">Not sure yet? Leave it blank.</p>
+            <input type="date" id="start_date" name="start_date" value="{{ old('start_date', optional($preference->start_date)->format('Y-m-d')) }}" @if ($v2) min="{{ $todayManila }}" @endif>
+            @if ($v2)
+                @error('start_date')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
+                <p class="pc-hint">Not sure yet? Leave it blank. Weekday opening hours are then not checked. Dates are in Philippine time.</p>
+            @else
+                <p class="pc-hint">Not sure yet? Leave it blank.</p>
+            @endif
         </div>
 
         <div class="field pc-field pc-col-6" data-quick-dates hidden>
@@ -107,6 +117,19 @@
         </div>
     </div>
 
+    @if ($v2)
+        {{-- The trip's end. The date is the last day of the trip (arrival date + days - 1) and is only shown; the time is the
+             traveller's own "finish by". The allowance before it covers the journey back to where the trip started. --}}
+        <div class="field pc-field pc-trip-finish">
+            <label for="end_time">Finish by <span class="pc-hint">(optional)</span>
+                <span class="field-help" tabindex="0" title="The latest you want to be finished on your last day, in Philippine time. We keep {{ $departureBufferText }} free before it for the journey back to where you started, so your last stops end earlier. Leave it blank and your last day ends at its usual time." aria-label="The latest you want to be finished on your last day, in Philippine time. We keep {{ $departureBufferText }} free before it for the journey back to where you started."><x-icon name="info" /></span>
+            </label>
+            <input type="time" id="end_time" name="end_time" value="{{ $endValue }}">
+            @error('end_time')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
+            <p class="pc-hint" data-finish-date aria-live="polite">{{ $leavingDay ? 'Your trip ends '.$leavingDay->format('l, F j') : 'Add your arrival date to see when your trip ends.' }}</p>
+            <p class="pc-hint">Philippine time. We keep {{ $departureBufferText }} free before this time for the journey back to where you started.</p>
+        </div>
+    @else
     <fieldset class="pc-trip-departure">
         <legend>Leaving Davao <span>Optional</span></legend>
         <div class="pc-departure-grid">
@@ -140,6 +163,7 @@
             <p class="pc-hint">Add this only if you have a flight or bus to catch. We allow {{ $departureBufferText }} there before you leave.</p>
         </div>
     </fieldset>
+    @endif
 </div>
 
 <div class="plan-section pc-block pc-trip-visitor">
@@ -158,6 +182,47 @@
             </div>
         </fieldset>
 
+        @if ($v2)
+        @php
+            $countryChosen = old('visitor_origin_country', $preference->visitor_origin_source === 'unspecified' ? 'NONE' : $preference->visitor_origin_country_code);
+            $provinceChosen = old('visitor_origin_province', $preference->visitor_origin_province);
+            $cityTyped = old('visitor_origin_city', $preference->visitor_origin_city);
+        @endphp
+        <div class="field pc-field pc-col-4" data-origin-field data-origin-v2>
+            <label for="visitor_origin_country"><span data-origin-label>Where are you travelling from?</span>
+                <span class="field-help" tabindex="0" title="Helps DOT understand where visitors are travelling from. We keep only the place names, never your position or an address." aria-label="Helps DOT understand where visitors are travelling from. We keep only the place names, never your position or an address."><x-icon name="info" /></span>
+            </label>
+            <select id="visitor_origin_country" name="visitor_origin_country" data-origin-required @unless ($isLocal) required @endunless>
+                <option value="">Choose a country</option>
+                <option value="PH" @selected($countryChosen === 'PH')>Philippines</option>
+                <option value="NONE" @selected($countryChosen === 'NONE')>Prefer not to say</option>
+                <optgroup label="Other countries">
+                    @foreach (\App\Support\Geo\Countries::ALL as $code => $countryName)
+                        @continue($code === 'PH')
+                        <option value="{{ $code }}" @selected($countryChosen === $code)>{{ $countryName }}</option>
+                    @endforeach
+                </optgroup>
+            </select>
+            @error('visitor_origin_country')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
+
+            <select id="visitor_origin_province" name="visitor_origin_province" aria-label="Province" data-origin-province @if ($countryChosen !== 'PH') hidden @endif>
+                <option value="">Province (optional)</option>
+                @foreach (\App\Support\Geo\PhProvinces::BY_REGION as $regionName => $provinceList)
+                    <optgroup label="{{ $regionName }}">
+                        @foreach ($provinceList as $provinceName)
+                            <option value="{{ $provinceName }}" @selected($provinceChosen === $provinceName)>{{ $provinceName }}</option>
+                        @endforeach
+                    </optgroup>
+                @endforeach
+            </select>
+            @error('visitor_origin_province')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
+
+            <input type="text" id="visitor_origin_city" name="visitor_origin_city" value="{{ $cityTyped }}" maxlength="100" autocomplete="off"
+                   aria-label="City or municipality" placeholder="City or municipality (type it)" data-origin-city
+                   @if ($countryChosen === '' || $countryChosen === null || $countryChosen === 'NONE') hidden @endif>
+            <p class="pc-hint" data-origin-hint>Choose a country, then a province and a city or municipality if you like. We never ask for your home address.</p>
+        </div>
+        @else
         <div class="field pc-field pc-col-4" data-origin-field>
             <label for="place_of_origin"><span data-origin-label>Where are you visiting from?</span>
                 <span class="field-help" tabindex="0" title="Helps DOT understand where visitors are travelling from." aria-label="Helps DOT understand where visitors are travelling from."><x-icon name="info" /></span>
@@ -180,5 +245,6 @@
             </div>
             <p class="pc-hint" data-origin-hint>City, province or country is enough. We never ask for your home address.</p>
         </div>
+        @endif
     </div>
 </div>

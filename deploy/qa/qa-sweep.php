@@ -122,7 +122,7 @@ final class Sweep extends FrameworkTestCase
     {
         return $over + [
             'travel_days' => 3, 'travel_type' => 'Family', 'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time Visitor',
-            'place_of_origin' => 'Manila', 'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => 'moderate',
+            'place_of_origin' => 'Manila', 'visitor_origin_country' => 'PH', 'visitor_origin_province' => 'Metro Manila', 'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => 'moderate',
             'start_date' => now('Asia/Manila')->addDays(14)->toDateString(), 'arrival_time' => '09:00',
             'activities' => ['Nature & Adventure', 'Cultural Heritage'],
         ];
@@ -168,7 +168,7 @@ final class Sweep extends FrameworkTestCase
             $problems[] = 'empty itinerary without an explanation';
         }
         if ($expectRefusal) {
-            $shownError = (bool) preg_match('/(is required|must be|may not|invalid|before or equal|at least|at most|greater than|less than|please (select|choose|pick)|select at least|choose at least)/i', strip_tags($body));
+            $shownError = (bool) preg_match('/(is required|must be|may not|invalid|already passed|outside Davao Region|has to be after|before or equal|at least|at most|greater than|less than|please (select|choose|pick)|select at least|choose at least)/i', strip_tags($body));
             $planned = str_contains($body, 'Day 1') && ! str_contains($body, 'Travel Preferences');
             if ($planned || ! $shownError) {
                 $problems[] = $planned ? 'the trip was planned although the input is invalid' : 'refused, but no readable message on the page';
@@ -223,10 +223,28 @@ if (section('D1')) {
     }
     Results::add('D1', "matrix of $n budget x distance x transport x length combinations ran", true, "$n trips");
 
-    $t->plan(['start_date' => now('Asia/Manila')->subDays(30)->toDateString()], 'start date in the past');
+    $v2 = \App\Support\Features::tripLocation();
+    if ($v2) {
+        $t->plan(['start_date' => now('Asia/Manila')->subDays(30)->toDateString()], 'start date in the past is refused with a message (trip_location_v2)', 'D1', true);
+    } else {
+        $t->plan(['start_date' => now('Asia/Manila')->subDays(30)->toDateString()], 'start date in the past');
+    }
     $t->plan(['start_date' => now('Asia/Manila')->addDays(700)->toDateString()], 'start date far in the future (within the 2-year limit)');
     $t->plan(['start_date' => now('Asia/Manila')->addYears(5)->toDateString()], 'start date beyond 2 years is refused with a message', 'D1', true);
     $t->plan(['activities' => []], 'no interests (must be refused with a message)', 'D1', true);
+    if ($v2) {
+        // trip_location_v2 (13 Nov 2026): start point inside Region XI, blank date, finish-by, origin answer.
+        $t->plan(['origin_lat' => '14.5995', 'origin_lng' => '120.9842', 'origin_label' => 'Manila'], 'a start point outside Davao Region is refused with a message', 'D10', true);
+        $t->plan(['origin_lat' => '7.130', 'origin_lng' => '125.645', 'origin_label' => 'Davao International Airport'], 'a start point inside Davao Region is planned', 'D10');
+        $body = $t->plan(['start_date' => null], 'a blank arrival date is planned, not replaced by today', 'D10');
+        Results::add('D10', 'the blank-date plan says weekday hours were not checked', is_string($body) && str_contains($body, 'No arrival date was given'), 'notice on the itinerary');
+        $body = $t->plan(['end_time' => '17:00', 'travel_days' => 2], 'finish-by time is planned', 'D10');
+        Results::add('D10', 'finish-by keeps the allowance and shows start and end in PHT', is_string($body) && str_contains($body, 'Trip ends: back at') && str_contains($body, 'PHT'), 'return stop + PHT labels');
+        $t->plan(['visitor_origin_country' => 'ZZ'], 'an origin country not on our list is refused', 'D10', true);
+        $t->plan(['visitor_type' => 'First-time Visitor', 'visitor_origin_country' => 'NONE'], 'prefer not to say is accepted', 'D10');
+        $last = TouristPreference::query()->latest('id')->first();
+        Results::add('D10', 'prefer not to say stores only the choice', $last && $last->visitor_origin_source === 'unspecified' && $last->visitor_origin_country_code === null, 'source=unspecified, no country');
+    }
     $all = ['Beach & Island', 'Nature & Adventure', 'Cultural Heritage', 'Food & Culinary', 'Wildlife', 'Shopping & Souvenirs', 'Wellness & Spa', 'Festivals & Events'];
     $t->plan(['activities' => $all], 'all interests at once');
     foreach (['00:30', '04:00', '05:59', '19:45', '23:30'] as $time) {

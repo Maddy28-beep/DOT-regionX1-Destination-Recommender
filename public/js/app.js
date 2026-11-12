@@ -955,7 +955,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var field = document.querySelector('[data-origin-field]');
     if (!toggles.length || !field) return;
 
-    var input = field.querySelector('input');
+    var input = field.querySelector('[data-origin-required]') || field.querySelector('input');
     var hint = field.querySelector('[data-origin-hint]');
     var label = field.querySelector('[data-origin-label]');
     var defaultHint = hint ? hint.textContent : '';
