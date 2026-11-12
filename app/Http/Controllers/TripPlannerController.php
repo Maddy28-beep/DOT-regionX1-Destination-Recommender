@@ -22,8 +22,15 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use App\Services\Recommendation\ItineraryScheduleBuilder;
+use App\Support\Features;
+use App\Support\Geo\Countries;
+use App\Support\Geo\PhProvinces;
+use App\Support\Geo\RegionXi;
 use App\Support\ItineraryCalendar;
 use App\Support\Toast;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Http\Response;
 
 /**
@@ -127,6 +134,8 @@ class TripPlannerController extends Controller
             $request->merge(['transport_pref' => in_array($kind, [TransportMode::JEEP, TransportMode::TAXI], true) ? $kind : TransportMode::JEEP]);
         }
 
+        $v2 = Features::tripLocation();
+
         $data = $request->validate([
             'travel_days' => ['required', 'integer', 'min:1', 'max:30'],
             'travel_type' => ['required', 'string', 'max:20'],
@@ -155,7 +164,18 @@ class TripPlannerController extends Controller
              * they're local (Regular / Local), for whom "where are you
              * visiting from" isn't a question that makes sense to force.
              */
-            'place_of_origin' => ['nullable', 'string', 'max:150', 'required_unless:visitor_type,Regular / Local'],
+            // With the trip_location_v2 switch on, the visitor's home place is the country / province / city answer below and
+            // this free-text box is no longer on the form.
+            'place_of_origin' => $v2
+                ? ['nullable', 'string', 'max:150']
+                : ['nullable', 'string', 'max:150', 'required_unless:visitor_type,Regular / Local'],
+            // Visitor origin (switch on). The country is a code from our own list, or "none" for "Prefer not to say". The
+            // province is checked against our list in applyVisitorOrigin; the city or municipality is typed.
+            'visitor_origin_country' => $v2 ? ['nullable', 'string', 'max:10', 'required_unless:visitor_type,Regular / Local'] : ['nullable', 'string', 'max:10'],
+            'visitor_origin_province' => ['nullable', 'string', 'max:80'],
+            'visitor_origin_city' => ['nullable', 'string', 'max:100'],
+            // The latest the traveller wants to be done on the last day ("finish by"). Philippine time.
+            'end_time' => ['nullable', 'date_format:H:i'],
             'budget' => ['required', 'string', 'max:20'],
             'accommodation_pref' => ['required', 'string', 'max:20'],
             // Which kind of resort, when a resort was asked for; ignored (and cleared) for anything else.
@@ -191,7 +211,11 @@ class TripPlannerController extends Controller
             'health_other' => ['nullable', 'string', 'max:300'],
         ]);
 
-        $this->validateDeparture($request, $data);
+        if ($v2) {
+            $this->validateTripLocation($request, $data);
+        } else {
+            $this->validateDeparture($request, $data);
+        }
 
         // A setting only means something for a resort, and an unanswered field must clear a previous answer.
         $data['resort_setting'] = $data['accommodation_pref'] === 'Resort' ? ($data['resort_setting'] ?? null) : null;
@@ -205,10 +229,17 @@ class TripPlannerController extends Controller
             'activities', 'amenities', 'health_conditions', 'health_other',
             'origin_lat', 'origin_lng', 'origin_label',
             'departure_lat', 'departure_lng', 'departure_label',
+            'visitor_origin_country', 'visitor_origin_province', 'visitor_origin_city',
         ])->all());
 
         $this->applyOrigin($preference, $data);
-        $this->applyDeparture($preference, $data);
+        if ($v2) {
+            // No departure point any more: the old columns are left as they were and are not read (see TouristPreference::departure).
+            $this->applyTripEnd($preference, $data);
+            $this->applyVisitorOrigin($preference, $data);
+        } else {
+            $this->applyDeparture($preference, $data);
+        }
 
         /*
          * "Regenerate" bumps `variation`, which only breaks ties between equally good plans. It belongs to the answers it
@@ -357,6 +388,7 @@ class TripPlannerController extends Controller
                 ->with(Toast::success('Nothing to regenerate', 'This itinerary comes from a package, not the trip planner.'));
         }
 
+        $regenerateNote = null;
         $position = $request->validate([
             'lat' => ['nullable', 'numeric', 'between:-90,90', 'required_with:lng'],
             'lng' => ['nullable', 'numeric', 'between:-180,180', 'required_with:lat'],
@@ -368,6 +400,12 @@ class TripPlannerController extends Controller
          * where the traveller is now while the page still described distances
          * from where they were when they filled in the survey.
          */
+        if (isset($position['lat'], $position['lng']) && Features::tripLocation() && ! RegionXi::contains((float) $position['lat'], (float) $position['lng'])) {
+            // A reading from outside Davao Region is never used as the start point: keep the one already saved.
+            unset($position['lat'], $position['lng']);
+            $regenerateNote = 'Your current location is outside Davao Region, so your saved start point was kept.';
+        }
+
         if (isset($position['lat'], $position['lng'])) {
             $this->applyOrigin($preference, [
                 'origin_lat' => $position['lat'],
@@ -389,7 +427,115 @@ class TripPlannerController extends Controller
 
         $request->session()->put(self::ITINERARY_KEY, $itinerary->id);
 
-        return redirect()->route('plan.itinerary')->with(Toast::success('Itinerary regenerated', 'Rebuilt from your current preferences.'));
+        return redirect()->route('plan.itinerary')->with(Toast::success('Itinerary regenerated', $regenerateNote ?? 'Rebuilt from your current preferences.'));
+    }
+
+    /**
+     * The checks added by the trip_location_v2 switch (13 Nov 2026), in one place so the old path stays untouched:
+     *
+     *  - the arrival date may not be before today in the Philippines (a date already saved with this trip is left alone, so
+     *    editing a trip that is under way does not fail on its own date);
+     *  - the start point must be inside Region XI (the typed place is looked up once, the same lookup that plans from it);
+     *  - "finish by" must come after the start on a one-day trip, and the allowance before it must fit.
+     *
+     * @param  array<string, mixed>  $data  the validated input
+     */
+    private function validateTripLocation(Request $request, array $data): void
+    {
+        $errors = [];
+        $existing = $this->currentPreference($request);
+
+        if (filled($data['start_date'] ?? null)) {
+            $today = Carbon::now('Asia/Manila')->toDateString();
+            $same = $existing?->start_date !== null && $existing->start_date->toDateString() === Carbon::parse($data['start_date'])->toDateString();
+            if (! $same && Carbon::parse($data['start_date'])->toDateString() < $today) {
+                $errors['start_date'] = 'That date has already passed. Choose today or a later date (Philippine time), or leave the date blank.';
+            }
+        }
+
+        $point = null;
+        if (isset($data['origin_lat'], $data['origin_lng'])) {
+            $point = [(float) $data['origin_lat'], (float) $data['origin_lng']];
+        } elseif (trim((string) ($data['origin_label'] ?? '')) !== '') {
+            $match = $this->addresses->resolve(trim((string) $data['origin_label']));
+            $point = $match ? [(float) $match['lat'], (float) $match['lng']] : null;
+        }
+        if ($point !== null && ! RegionXi::contains($point[0], $point[1])) {
+            $errors['origin_label'] = RegionXi::MESSAGE;
+        }
+
+        $end = $data['end_time'] ?? null;
+        if ($end !== null && (int) $data['travel_days'] === 1) {
+            $start = filled($data['arrival_time'] ?? null) ? $data['arrival_time'] : ItineraryScheduleBuilder::EARLIEST_DEPARTURE;
+            if ($end <= $start) {
+                $errors['end_time'] = 'Your finish-by time has to be after your start time on a one-day trip.';
+            }
+        }
+
+        if ($errors !== []) {
+            throw \Illuminate\Validation\ValidationException::withMessages($errors);
+        }
+    }
+
+    /** The trip's last day and the finish-by time. The date is derived (start + days - 1), never entered. */
+    private function applyTripEnd(TouristPreference $preference, array $data): void
+    {
+        $preference->end_time = blank($data['end_time'] ?? null) ? null : $data['end_time'];
+        $preference->end_date = $preference->departureDate()?->toDateString();
+    }
+
+    /**
+     * Where the visitor comes from: a country from our list (or "Prefer not to say"), a province for the Philippines and a
+     * typed city or municipality. Only these names are stored, never a position. Anything not on our lists is refused, so
+     * free text cannot reach the statistics.
+     */
+    private function applyVisitorOrigin(TouristPreference $preference, array $data): void
+    {
+        $country = strtoupper(trim((string) ($data['visitor_origin_country'] ?? '')));
+        $reset = ['visitor_origin_country_code' => null, 'visitor_origin_region' => null, 'visitor_origin_province' => null, 'visitor_origin_city' => null, 'visitor_origin_source' => null];
+
+        if ($country === '') {
+            $preference->forceFill($reset);   // a local who was not asked, or nothing chosen
+            $preference->place_of_origin = $preference->place_of_origin ?: null;
+
+            return;
+        }
+
+        if ($country === 'NONE') {
+            $preference->forceFill(array_merge($reset, ['visitor_origin_source' => 'unspecified']));
+            $preference->place_of_origin = 'Prefer not to say';
+
+            return;
+        }
+
+        if (! Countries::has($country)) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['visitor_origin_country' => 'Choose a country from the list, or "Prefer not to say".']);
+        }
+
+        $province = trim((string) ($data['visitor_origin_province'] ?? ''));
+        $region = null;
+        if ($country === 'PH' && $province !== '') {
+            $region = PhProvinces::regionOf($province);
+            if ($region === null) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['visitor_origin_province' => 'Choose a province from the list.']);
+            }
+        } else {
+            $province = '';
+        }
+
+        // A typed place: plain text only, one line, no markup.
+        $city = trim(preg_replace('/\s+/u', ' ', strip_tags((string) ($data['visitor_origin_city'] ?? ''))) ?? '');
+        $city = Str::limit(preg_replace('/[\x00-\x1F\x7F]/u', '', $city) ?? '', 100, '');
+
+        $preference->forceFill([
+            'visitor_origin_country_code' => $country,
+            'visitor_origin_region' => $region,
+            'visitor_origin_province' => $province !== '' ? $province : null,
+            'visitor_origin_city' => $city !== '' ? $city : null,
+            'visitor_origin_source' => 'chosen',
+        ]);
+        // Kept readable for anything that still reads the old text column.
+        $preference->place_of_origin = implode(', ', array_filter([$city !== '' ? $city : null, $province !== '' ? $province : null, Countries::name($country)]));
     }
 
     /**

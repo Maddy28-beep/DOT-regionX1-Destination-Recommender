@@ -5,6 +5,7 @@ namespace App\Services\Recommendation;
 use App\Models\Accommodation;
 use App\Models\Destination;
 use App\Models\Restaurant;
+use App\Support\Features;
 use App\Support\OpeningHours;
 use App\Models\Itinerary;
 use App\Models\TouristPreference;
@@ -247,6 +248,7 @@ class ItineraryScheduleBuilder
          */
         $queue = $sequence;
         $tripStart = $preference->travelWindow()[0];
+        $weekdayUnknown = Features::tripLocation() && $preference->start_date === null;
         $this->departure = $this->departurePlan($preference);
         $this->finalDayDeparture = null;
         if ($this->departure !== null && $this->departure['place'] !== null && $lastDay > 1) {
@@ -263,6 +265,12 @@ class ItineraryScheduleBuilder
             $isLastDay = $dayNumber === $lastDay;
             // The calendar date of this day, so a place that is closed on this weekday is not scheduled on it.
             $date = $tripStart->copy()->addDays($dayNumber - 1);
+            // trip_location_v2 and no arrival date: there is no weekday to plan for, so no place is dropped for being closed on
+            // "today's" weekday (the old behaviour planned a trip for next March as if it started today). Closures and danger
+            // advisories are still checked as of today (TravelWindow), and the itinerary says so.
+            if ($weekdayUnknown) {
+                $date = null;
+            }
             $capacity = count($slots);
 
             // The stay of tonight, and of last night (where this morning starts: breakfast, and the first journey).
@@ -408,7 +416,7 @@ class ItineraryScheduleBuilder
                             $freshRejection = (string) $this->planRejection;
 
                             // Closed only on today's weekday: keep it for a later day instead of dropping it.
-                            $closedToday = OpeningHours::windowsOn($front->hours ?? null, $date) === [];
+                            $closedToday = $date !== null && OpeningHours::windowsOn($front->hours ?? null, $date) === [];
 
                             if ($closedToday && ! $isLastDay && $this->planVisit($freshMorning, $here, $this->place($front), self::VISIT_MINUTES, false, $front, $date->copy()->addDay()) !== null) {
                                 break;
@@ -1389,6 +1397,8 @@ class ItineraryScheduleBuilder
             'deadline' => $at->copy()->subMinutes($buffer),
             'buffer' => $buffer,
             'place' => $departure['point'] === null ? null : $departure['point'] + ['region' => null],
+            // A finish-by time (not a flight): only the wording changes, the allowance and the journey are the same.
+            'finish' => (bool) ($departure['finish'] ?? false),
         ];
     }
 
@@ -1577,7 +1587,9 @@ class ItineraryScheduleBuilder
                         'title' => 'Free time until '.$setOff->format('g:i A'),
                         'starts_at' => $clock->copy(),
                         'ends_at' => $setOff->copy(),
-                        'note' => 'Nothing is planned: the journey to '.$point['label'].' needs the time that is left before your departure.',
+                        'note' => $d['finish']
+                            ? 'Nothing is planned: the journey back to '.$point['label'].' needs the time that is left before your finish-by time.'
+                            : 'Nothing is planned: the journey to '.$point['label'].' needs the time that is left before your departure.',
                     ]);
                 }
             } else {
@@ -1587,7 +1599,9 @@ class ItineraryScheduleBuilder
 
         $arrival = $this->toQuarterHour($this->addTravel($itinerary, $dayNumber, $sortOrder, $setOff, $here, $point));
 
-        $notes = ['Be at '.$point['label'].' by '.$deadline->format('g:i A').': that is '.$this->durationText($d['buffer']).' before your '.$d['at']->format('g:i A').' departure, a planning allowance and not an airline or airport rule.'];
+        $notes = $d['finish']
+            ? ['Be back at '.$point['label'].' by '.$deadline->format('g:i A').': that is '.$this->durationText($d['buffer']).' before your '.$d['at']->format('g:i A').' finish-by time, a planning allowance.']
+            : ['Be at '.$point['label'].' by '.$deadline->format('g:i A').': that is '.$this->durationText($d['buffer']).' before your '.$d['at']->format('g:i A').' departure, a planning allowance and not an airline or airport rule.'];
         $notes[] = $estimate['distance_km'] === null
             ? 'The distance to '.$point['label'].' could not be measured from here, so a time allowance was used.'
             : 'The journey is an estimate (straight line plus a detour allowance, at the slowest pace), not a routed time.';
@@ -1597,7 +1611,7 @@ class ItineraryScheduleBuilder
 
         $this->row($itinerary, $dayNumber, $sortOrder, [
             'kind' => 'departure',
-            'title' => 'Departure from '.$point['label'],
+            'title' => $d['finish'] ? 'Trip ends: back at '.$point['label'] : 'Departure from '.$point['label'],
             'starts_at' => $arrival,
             'ends_at' => $d['at']->copy(),
             'note' => implode(' ', $notes),

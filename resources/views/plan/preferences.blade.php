@@ -150,7 +150,7 @@
 
                                 <div class="field pc-field pc-col-4">
                                     <span class="pc-label" aria-hidden="true">&nbsp;</span>
-                                    <button type="button" class="btn btn-outline pc-locate" id="origin-btn"><x-icon name="locate" /> Use my current location</button>
+                                    <button type="button" class="btn btn-outline pc-locate" id="origin-btn" @if (\App\Support\Features::tripLocation()) data-region-xi="{{ \App\Support\Geo\RegionXi::json() }}" @endif><x-icon name="locate" /> Use my current location</button>
                                 </div>
 
                                 {{-- Where most visitors arrive. A tap fills the box and the two hidden coordinates, so the plan never depends on
@@ -179,6 +179,10 @@
                                             @endif
                                         </span>
                                     </div>
+                                    @error('origin_label')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
+                                    @if (\App\Support\Features::tripLocation())
+                                        <p class="pc-hint">Your start point has to be inside Davao Region. Leave it blank and we plan from Davao City centre.</p>
+                                    @endif
                                     <p class="pc-privacy"><x-icon name="shield-check" /> Private: rounded to about 100 metres, never linked to your name, and cleared when you clear the trip.</p>
                                 </div>
                             </div>
@@ -424,6 +428,18 @@
 
             navigator.geolocation.getCurrentPosition(
                 function (pos) {
+                    // trip_location_v2: a position outside Davao Region is not used as the start point (the server checks too).
+                    if (btn.dataset.regionXi) {
+                        var poly = JSON.parse(btn.dataset.regionXi), inside = false, x = pos.coords.longitude, y = pos.coords.latitude;
+                        for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+                            if (((poly[i][1] > y) !== (poly[j][1] > y)) && (x < (poly[j][0] - poly[i][0]) * (y - poly[i][1]) / (poly[j][1] - poly[i][1]) + poly[i][0])) inside = !inside;
+                        }
+                        if (!inside) {
+                            btn.disabled = false;
+                            say('Your location looks to be outside Davao Region, so we cannot start the trip from there. Choose where you will stay or arrive in the region instead.');
+                            return;
+                        }
+                    }
                     lat.value = pos.coords.latitude.toFixed(3);
                     lng.value = pos.coords.longitude.toFixed(3);
                     input.value = 'My current location';
@@ -448,6 +464,7 @@
 <script src="{{ asset('js/plan-basics.js') }}?v={{ filemtime(public_path('js/plan-basics.js')) }}" defer></script>
 <script src="{{ asset('js/plan-origin.js') }}?v={{ filemtime(public_path('js/plan-origin.js')) }}" defer></script>
 <script src="{{ asset('js/plan-departure.js') }}?v={{ filemtime(public_path('js/plan-departure.js')) }}" defer></script>
+<script src="{{ asset('js/plan-origin-select.js') }}?v={{ filemtime(public_path('js/plan-origin-select.js')) }}" defer></script>
 <script src="{{ asset('js/plan-comfort.js') }}?v={{ filemtime(public_path('js/plan-comfort.js')) }}" defer></script>
 <script src="{{ asset('js/plan-wizard.js') }}?v={{ filemtime(public_path('js/plan-wizard.js')) }}" defer></script>
 {{-- After the wizard script: it builds the step panels this one folds parts of. --}}

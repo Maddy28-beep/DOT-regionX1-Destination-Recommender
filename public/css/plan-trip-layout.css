@@ -442,3 +442,14 @@
     .plan-wizard :is(#plan-step-1, #plan-step-2, #plan-step-3) .pc-option__caption,
     .plan-wizard :is(#plan-step-1, #plan-step-2, #plan-step-3) .pc-health-name { font-size: .75rem; }
 }
+
+/* trip_location_v2 (13 Nov 2026): the "finish by" time and the country / province / city answer. */
+.plan-wizard #plan-step-0 [data-origin-v2] [hidden] { display: none !important; }
+.plan-wizard #plan-step-0 [data-origin-v2] select,
+.plan-wizard #plan-step-0 [data-origin-v2] input[type="text"] { width: 100%; }
+.plan-wizard #plan-step-0 [data-origin-v2] select + select,
+.plan-wizard #plan-step-0 [data-origin-v2] select + p + select,
+.plan-wizard #plan-step-0 [data-origin-v2] select + input,
+.plan-wizard #plan-step-0 [data-origin-v2] select + p + input { margin-top: 8px; }
+.plan-wizard #plan-step-0 .pc-trip-finish { margin-top: 10px; }
+.plan-wizard #plan-step-0 .pc-hint.is-error { color: var(--danger, #b42318); font-weight: 600; }
