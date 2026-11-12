@@ -135,3 +135,11 @@ body:has(.listing-detail-refresh) .site-header .container.bar { max-width: 1840p
     .site-topbar .main-nav > a[aria-current="page"]::after,
     .site-topbar .main-nav .nav-more__toggle.is-active::after { left: 10px; right: 10px; }
 }
+
+/* The same, stated through the bar itself so nothing can pull the menu back to the centre: the logo and menu from the left,
+   the account buttons pushed to the right. */
+@media (min-width: 1100px) {
+    .site-header .container.bar { justify-content: flex-start; }
+    .site-header .container.bar > .header-actions { margin-left: auto; }
+    .site-header .container.bar > .main-nav { margin-left: clamp(8px, 1.6vw, 32px); margin-right: 0; }
+}
