@@ -84,16 +84,12 @@
                         @endunless
                         <span><x-icon name="clock" aria-hidden="true" /> Generated {{ $itinerary->generated_at->timezone('Asia/Manila')->format('F j, Y g:i A') }}</span>
                     </p>
-                    {{-- trip_location_v2: every itinerary states when it starts and ends (Philippine time). --}}
+                    {{-- trip_location_v2: every itinerary states where it starts and when it starts and ends (Philippine time). --}}
                     @if (\App\Support\Features::tripLocation() && ! $itinerary->package && $preference)
                         @php $span = \App\Support\TripSpan::for($preference, $itinerary); @endphp
                         <p class="itin-banner__meta" data-trip-span>
-                            <span><x-icon name="calendar" aria-hidden="true" /> Starts {{ $span['start_label'] }}</span>
-                            <span><x-icon name="clock" aria-hidden="true" /> Ends {{ $span['end_label'] }}</span>
+                            <span><x-icon name="calendar" aria-hidden="true" /> {{ $span['summary'] }}</span>
                         </p>
-                        @if ($span['weekday_unknown'])
-                            <p class="itin-banner__meta" role="note" data-no-date-notice>No arrival date was given, so weekday opening hours were not checked. Closures and advisories are checked as of today. Add a date and regenerate for a plan that fits your days.</p>
-                        @endif
                     @endif
                     @if (data_get($itinerary->day_themes, 'ai_skeleton.applied') === true)
                         <span class="plan-badge plan-badge--ai" title="An outside AI service suggested which of the already-chosen places share a day, and the day names. The planner checked the suggestion and kept it only because it fit, with no fewer stops and no more travelling than its own plan."><x-icon name="sparkles" aria-hidden="true" /> Day themes suggested with AI assistance</span>

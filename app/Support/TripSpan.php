@@ -4,58 +4,48 @@ namespace App\Support;
 
 use App\Models\Itinerary;
 use App\Models\TouristPreference;
-use App\Services\Recommendation\ItineraryScheduleBuilder;
 use Illuminate\Support\Carbon;
 
 /**
- * "Every itinerary has a start and an end, each with a date and a time", in Philippine time.
+ * "Every itinerary has a start and an end, each with a date and a time", in Philippine time, and the line the itinerary
+ * header shows: "From <origin> · Pick-up at <location> · <start> → <end> (<duration>)".
  *
- *  - Start: the arrival date and time the traveller gave. A blank time is the planner's earliest start (said to be assumed);
- *    a blank date is said to be missing, never replaced by today's date.
- *  - End: the last day of the trip (arrival date + days - 1) and the "finish by" time. With no finish-by time it is the
- *    time the last day's schedule actually ends.
- *
- * Dates and times carry no zone of their own: they are the wall-clock time in the Philippines, and are labelled "PHT".
+ * The start and end are the traveller's own moments (TouristPreference::tripStart / tripEnd). A trip saved before they
+ * existed gets them mapped from its arrival date and time (TripWindow::fromLegacy). Dates and times carry no zone of their
+ * own: they are wall-clock time in the Philippines, and are labelled "PHT".
  */
 final class TripSpan
 {
     /**
-     * @return array{start_label: string, end_label: string, start_date: ?string, end_date: ?string, start_assumed: bool, end_source: string, weekday_unknown: bool}
+     * @return array{start_label: string, end_label: string, duration: ?string, duration_days: ?int, from: ?string, pickup: string, summary: string, known: bool}
      */
-    public static function for(TouristPreference $preference, Itinerary $itinerary): array
+    public static function for(TouristPreference $preference, ?Itinerary $itinerary = null): array
     {
-        $startAssumed = blank($preference->arrival_time);
-        $startTime = Carbon::parse($startAssumed ? ItineraryScheduleBuilder::EARLIEST_DEPARTURE : substr((string) $preference->arrival_time, 0, 5));
+        $start = $preference->tripStart();
+        $end = $preference->tripEnd();
 
-        $startDate = $preference->start_date;
-        $endDate = $preference->departureDate();
+        $from = trim((string) $preference->place_of_origin);
+        $from = ($from === '' || $from === 'Prefer not to say') ? null : $from;
+        $pickup = $preference->startLabel();
 
-        if (filled($preference->end_time)) {
-            $endTime = Carbon::parse(substr((string) $preference->end_time, 0, 5));
-            $endSource = 'finish_by';
-        } else {
-            $last = $itinerary->items->where('day_number', (int) $itinerary->total_days);
-            $stamps = $last->map(fn ($item) => $item->ends_at ?: $item->starts_at)->filter()->map(fn ($t) => Carbon::parse($t));
-            $endTime = $stamps->isNotEmpty() ? $stamps->max() : null;
-            $endSource = $endTime ? 'planned' : 'unknown';
-        }
+        $label = fn (?Carbon $moment) => $moment ? $moment->format('D, j M Y, g:i A').' PHT' : 'not set';
+        $duration = $start && $end ? TripWindow::text($start, $end) : null;
 
-        $when = fn (?Carbon $date, ?Carbon $time, string $noDate) => trim(
-            ($date ? $date->format('D, j M Y') : $noDate).($time ? ', '.$time->format('g:i A').' PHT' : '')
-        );
+        $parts = array_filter([
+            $from ? 'From '.$from : null,
+            'Pick-up at '.$pickup,
+            $start && $end ? $label($start).' → '.$label($end).' ('.$duration.')' : null,
+        ]);
 
         return [
-            'start_label' => $when($startDate, $startTime, 'date not set').($startAssumed ? ' (assumed start)' : ''),
-            'end_label' => $when($endDate, $endTime, 'date not set').match ($endSource) {
-                'finish_by' => ' (finish by)',
-                'planned' => ' (when the plan ends)',
-                default => '',
-            },
-            'start_date' => $startDate?->toDateString(),
-            'end_date' => $endDate?->toDateString(),
-            'start_assumed' => $startAssumed,
-            'end_source' => $endSource,
-            'weekday_unknown' => $startDate === null,
+            'start_label' => $label($start),
+            'end_label' => $label($end),
+            'duration' => $duration,
+            'duration_days' => $preference->tripDurationDays(),
+            'from' => $from,
+            'pickup' => $pickup,
+            'summary' => implode(' · ', $parts),
+            'known' => $start !== null && $end !== null,
         ];
     }
 }

@@ -9,7 +9,9 @@
         const field = form.elements.namedItem(name);
         return (field && !field.closest ? field[0] : field)?.closest('.plan-section');
     };
-    const basics = sectionFor('travel_days');
+    // With trip_location_v2 the block is the trip's start and end; without it, the days and the arrival date.
+    const tripWindow = Boolean(form.elements.namedItem('start_at'));
+    const basics = sectionFor('travel_days') || sectionFor('start_at');
     const style = sectionFor('travel_type');
     const visit = sectionFor('visitor_type');
     const budget = sectionFor('budget');
@@ -28,7 +30,9 @@
     const status = document.getElementById('planStepStatus');
     const headings = ['Tell us about your trip.', 'What would you love to do?', 'Where will you rest, and what’s your budget?', 'How will you get around?'];
     const descriptions = [
-        'The basics — when you’re coming and who’s coming with you.',
+        tripWindow
+            ? 'The basics — who’s coming, where you’re coming from, where we pick you up, and when your trip starts and ends.'
+            : 'The basics — when you’re coming and who’s coming with you.',
         'Choose the interests you’d like your trip to include.',
         'Two quick choices. A budget and a place to stay are already picked, so you can go straight on.',
         'How far you’d like to explore, and how you’ll get from your starting point.'
@@ -50,7 +54,9 @@
         return step;
     });
     // Who is coming, when, where from, where they start: the order the blocks read in.
-    steps[0].append(style, basics, visit, origin);
+    // With the start and end: who is coming, where from (in "About you"), the pick-up location, then when it starts and ends.
+    if (tripWindow) steps[0].append(style, visit, origin, basics);
+    else steps[0].append(style, basics, visit, origin);
     steps[1].append(interests);
     steps[2].append(budget);
     steps[3].append(travel);
@@ -150,7 +156,7 @@
         panel.hidden = true;
         nav.hidden = true;
         loading.hidden = false;
-        document.getElementById('planLoadingTitle').textContent = `Davo is planning your ${form.elements.namedItem('travel_days').value}-day trip…`;
+        document.getElementById('planLoadingTitle').textContent = (form.elements.namedItem('travel_days') ? `Davo is planning your ${form.elements.namedItem('travel_days').value}-day trip…` : 'Davo is planning your trip…');
         rows.forEach(row => row.classList.add('is-active'));
         loading.focus();
         loading.scrollIntoView({block: 'start'});

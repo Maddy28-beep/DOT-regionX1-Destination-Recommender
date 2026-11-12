@@ -453,3 +453,8 @@
 .plan-wizard #plan-step-0 [data-origin-v2] select + p + input { margin-top: 8px; }
 .plan-wizard #plan-step-0 .pc-trip-finish { margin-top: 10px; }
 .plan-wizard #plan-step-0 .pc-hint.is-error { color: var(--danger, #b42318); font-weight: 600; }
+
+/* trip_location_v2: the trip's start and end, and the length they make. */
+.plan-wizard #plan-step-0 .pc-trip-window input[type="datetime-local"] { width: 100%; }
+.plan-wizard #plan-step-0 .pc-trip-duration { margin: 4px 2px 0; font-size: .9rem; font-weight: 600; color: var(--primary-dark); }
+.plan-wizard #plan-step-0 .pc-trip-duration.is-error { color: var(--danger, #b42318); }

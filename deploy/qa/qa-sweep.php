@@ -138,13 +138,49 @@ final class Sweep extends FrameworkTestCase
         return null;
     }
 
+    /**
+     * With trip_location_v2 the form sends the trip's start and end (Philippine time) instead of days, arrival date, arrival
+     * time and finish-by. The checks below are still described the old way, so they are translated here: start = date +
+     * arrival time (09:00 without one); end = the last day at the finish-by time, or 23:59, and never under 3 hours.
+     */
+    public function toWindow(array $p): array
+    {
+        $date = $p['start_date'] ?? null;
+        if ($date === null || $date === '') {
+            $p['start_at'] = '';
+            $p['end_at'] = '';
+
+            return $p;
+        }
+        $days = (int) ($p['travel_days'] ?? 1);
+        $start = \Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i', $date.' '.($p['arrival_time'] ?? '09:00'), 'Asia/Manila');
+        $last = \Illuminate\Support\Carbon::createFromFormat('Y-m-d', $date, 'Asia/Manila')->startOfDay()->addDays(max(1, $days) - 1);
+        $end = $last->copy()->setTime(23, 59);
+        if (! empty($p['end_time'])) {
+            [$h, $m] = array_map('intval', explode(':', $p['end_time']));
+            $candidate = $last->copy()->setTime($h, $m);
+            if ($candidate->gt($start)) {
+                $end = $candidate;
+            }
+        }
+        if ($days < 1) {
+            $end = $start->copy();   // zero days: refused
+        } elseif ($end->lt($start->copy()->addHours(3))) {
+            $end = $start->copy()->addHours(3);
+        }
+        $p['start_at'] = $start->format('Y-m-d\TH:i');
+        $p['end_at'] = $end->format('Y-m-d\TH:i');
+
+        return $p;
+    }
+
     public function plan(array $over, string $label, string $section = 'D1', bool $expectRefusal = false): ?string
     {
         $this->withoutMiddleware(ThrottleRequests::class);
         $this->flushSession();   // each check starts as a new visitor; an invalid POST must not fall back to a previous trip
         $t = microtime(true);
         try {
-            $response = $this->followingRedirects()->post(route('plan.update'), $this->payload($over));
+            $response = $this->followingRedirects()->post(route('plan.update'), \App\Support\Features::tripLocation() ? $this->toWindow($this->payload($over)) : $this->payload($over));
         } catch (Throwable $e) {
             Results::add($section, $label, false, 'EXCEPTION '.get_class($e).': '.mb_substr($e->getMessage(), 0, 160));
 
@@ -236,10 +272,9 @@ if (section('D1')) {
         // trip_location_v2 (13 Nov 2026): start point inside Region XI, blank date, finish-by, origin answer.
         $t->plan(['origin_lat' => '14.5995', 'origin_lng' => '120.9842', 'origin_label' => 'Manila'], 'a start point outside Davao Region is refused with a message', 'D10', true);
         $t->plan(['origin_lat' => '7.130', 'origin_lng' => '125.645', 'origin_label' => 'Davao International Airport'], 'a start point inside Davao Region is planned', 'D10');
-        $body = $t->plan(['start_date' => null], 'a blank arrival date is planned, not replaced by today', 'D10');
-        Results::add('D10', 'the blank-date plan says weekday hours were not checked', is_string($body) && str_contains($body, 'No arrival date was given'), 'notice on the itinerary');
+        $t->plan(['start_date' => null], 'a missing start and end is refused with a message', 'D10', true);
         $body = $t->plan(['end_time' => '17:00', 'travel_days' => 2], 'finish-by time is planned', 'D10');
-        Results::add('D10', 'finish-by keeps the allowance and shows start and end in PHT', is_string($body) && str_contains($body, 'Trip ends: back at') && str_contains($body, 'PHT'), 'return stop + PHT labels');
+        Results::add('D10', 'the end shows a return stop and start and end in PHT', is_string($body) && str_contains($body, 'Trip ends: back at') && str_contains($body, 'PHT') && str_contains($body, 'Pick-up at'), 'return stop + PHT labels + pick-up in the header');
         $t->plan(['visitor_origin_country' => 'ZZ'], 'an origin country not on our list is refused', 'D10', true);
         $t->plan(['visitor_type' => 'First-time Visitor', 'visitor_origin_country' => 'NONE'], 'prefer not to say is accepted', 'D10');
         $last = TouristPreference::query()->latest('id')->first();
@@ -452,7 +487,7 @@ if (section('D3')) {
     // An unsaved trip belongs to the browser session that made it.
     $t->flushSession();
     $mine = asVisitor($t);
-    $body = (string) $t->followingRedirects()->post(route('plan.update'), $t->payload())->getContent();
+    $body = (string) $t->followingRedirects()->post(route('plan.update'), \App\Support\Features::tripLocation() ? $t->toWindow($t->payload()) : $t->payload())->getContent();
     Results::add('D3', 'positive control: the visitor who planned a trip sees it', str_contains($body, 'Day 1'), '');
     $t->flushSession();
     asVisitor($t);   // someone else, on another browser
@@ -580,7 +615,7 @@ if (section('D6')) {
         auth($g)->logout();
     }
     $t->withoutMiddleware(ThrottleRequests::class);
-    $t->followingRedirects()->post(route('plan.update'), $t->payload());
+    $t->followingRedirects()->post(route('plan.update'), \App\Support\Features::tripLocation() ? $t->toWindow($t->payload()) : $t->payload());
     $codes = [];
     for ($i = 0; $i < 5; $i++) {
         $codes[] = $t->post(route('plan.regenerate'))->getStatusCode();

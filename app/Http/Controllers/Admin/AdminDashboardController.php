@@ -894,12 +894,14 @@ class AdminDashboardController extends Controller
 
         return [
             'summary' => $plans->count().' trip plan'.($plans->count() === 1 ? '' : 's').' created in the selected range.',
-            'headers' => ['Travel Type', 'Purpose', 'Budget', 'Days', 'Created'],
+            'headers' => ['Travel Type', 'Purpose', 'Budget', 'Days', 'Starts', 'Created'],
             'rows' => $plans->map(fn ($p) => [
                 $p->travel_type ?? '-',
                 $p->travel_purpose ?? '-',
                 $p->budget ?? '-',
-                $p->travel_days,
+                // The derived length (rounded up) of the trip's real start and end; an older trip works it out from its days.
+                $p->tripDurationDays() ?? $p->travel_days,
+                $p->tripStart()?->format('Y-m-d H:i') ?? '-',
                 $p->created_at->timezone('Asia/Manila')->format('Y-m-d H:i'),
             ])->all(),
         ];

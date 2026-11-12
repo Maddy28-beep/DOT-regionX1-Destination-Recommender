@@ -15,7 +15,15 @@
     // origin as country / province / city. Off = the form below is exactly the one that was there before.
     $v2 = \App\Support\Features::tripLocation();
     $todayManila = \Illuminate\Support\Carbon::now('Asia/Manila')->toDateString();
-    $endValue = old('end_time', $preference->end_time ? substr((string) $preference->end_time, 0, 5) : '');
+    // The trip's real start and end (Philippine time), one date-time each. A trip saved before they existed shows the
+    // start and end it works out to (arrival date and time; the last day to its finish-by time or 23:59).
+    $inputFormat = \App\Support\TripWindow::INPUT_FORMAT;
+    $startAtValue = old('start_at', $preference->tripStart()?->format($inputFormat));
+    $endAtValue = old('end_at', $preference->tripEnd()?->format($inputFormat));
+    $nowManilaInput = \App\Support\TripWindow::now()->format($inputFormat);
+    $allowPastStart = (bool) config('itinerary.trip_window.allow_past_start') || auth('admin')->check();
+    $tripMinHours = \App\Support\TripWindow::minHours();
+    $tripMaxDays = \App\Support\TripWindow::maxDays();
     $typeIcons = ['Solo' => 'user', 'Couple' => 'users', 'Family' => 'family', 'Friends' => 'group', 'Business' => 'briefcase'];
     $visitorIcons = ['First-time Visitor' => 'plane', 'Returning Visitor' => 'repeat', 'Regular / Local' => 'home'];
     $chosenType = old('travel_type', $preference->travel_type) ?: 'Solo';
@@ -59,6 +67,33 @@
     </fieldset>
 </div>
 
+@if ($v2)
+{{-- The trip's real start and end, in Philippine time. Nothing else says how long the trip is: there is no number of days,
+     arrival date, arrival time or finish-by to fill in. The days follow from these two moments (public/js/plan-trip-window.js
+     shows the length as you type; the server checks it again). The wizard places this block after the pick-up location. --}}
+<div class="plan-section pc-block pc-trip-dates pc-trip-window" data-trip-window data-min-hours="{{ $tripMinHours }}" data-max-days="{{ $tripMaxDays }}" data-now="{{ $nowManilaInput }}" data-allow-past="{{ $allowPastStart ? '1' : '0' }}">
+    <header class="pc-block__head"><h3>When does your trip start and end?</h3><p>Philippine time. The start is when you are free at your pick-up location; the end is when you have to be finished, for example back at the airport.</p></header>
+    <div class="pc-grid">
+        <div class="field pc-field pc-col-6">
+            <label for="start_at">Start date &amp; time</label>
+            <input type="datetime-local" id="start_at" name="start_at" value="{{ $startAtValue }}" step="60" required @unless ($allowPastStart) min="{{ $nowManilaInput }}" @endunless>
+            @error('start_at')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
+            <p class="pc-hint">Nothing is planned before this moment. We count the travel from your pick-up location to the first stop.</p>
+        </div>
+        <div class="field pc-field pc-col-6">
+            <label for="end_at">End date &amp; time
+                <span class="field-help" tabindex="0" title="The moment your trip has to be finished. Your last stop ends early enough to get you back to your pick-up location, with {{ $departureBufferText }} to spare, a planning allowance and not a routed time." aria-label="The moment your trip has to be finished. Your last stop ends early enough to get you back to your pick-up location, with {{ $departureBufferText }} to spare."><x-icon name="info" /></span>
+            </label>
+            <input type="datetime-local" id="end_at" name="end_at" value="{{ $endAtValue }}" step="60" required>
+            @error('end_at')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
+            <p class="pc-hint">At least {{ $tripMinHours }} hours after the start, and at most {{ $tripMaxDays }} days.</p>
+        </div>
+        <div class="pc-col-12">
+            <p class="pc-hint pc-trip-duration" data-trip-duration aria-live="polite">Choose a start and an end to see how long your trip is.</p>
+        </div>
+    </div>
+</div>
+@else
 <div class="plan-section pc-block pc-trip-dates">
     <header class="pc-block__head"><h3>When are you visiting?</h3><p>Only the number of days is required. Everything else is optional.</p></header>
     <div class="pc-grid">
@@ -165,6 +200,8 @@
     </fieldset>
     @endif
 </div>
+
+@endif
 
 <div class="plan-section pc-block pc-trip-visitor">
     <header class="pc-block__head"><h3>About you</h3></header>

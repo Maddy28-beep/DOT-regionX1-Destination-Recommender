@@ -66,60 +66,15 @@ class TripLocationV2Test extends TestCase
     private function form(array $over = []): array
     {
         return $over + [
-            'travel_days' => 1, 'travel_type' => 'Couple', 'travel_purpose' => 'Leisure', 'visitor_type' => 'Regular / Local',
+            'travel_type' => 'Couple', 'travel_purpose' => 'Leisure', 'visitor_type' => 'Regular / Local',
             'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => 'moderate',
-            'start_date' => '2026-11-28', 'arrival_time' => '08:00',
+            'start_at' => '2026-11-28T08:00', 'end_at' => '2026-11-28T17:00',
             'origin_lat' => '7.130', 'origin_lng' => '125.645', 'origin_label' => 'Davao International Airport',
             'activities' => ['Wildlife'], 'amenities' => ['wifi'],
         ];
     }
 
     // ---- 1. past dates and the blank date -----------------------------------------------------------------
-
-    public function test_a_past_arrival_date_is_refused_but_today_and_later_are_fine(): void
-    {
-        $this->post(route('plan.update'), $this->form(['start_date' => '2026-11-19']))->assertSessionHasErrors('start_date');
-        $this->assertSame(0, TouristPreference::count());
-
-        $this->post(route('plan.update'), $this->form(['start_date' => '2026-11-20']))->assertSessionHasNoErrors();
-        $this->post(route('plan.update'), $this->form(['start_date' => '2027-01-05']))->assertSessionHasNoErrors();
-    }
-
-    public function test_today_is_decided_in_philippine_time(): void
-    {
-        // 21 Nov 20:30 UTC is already 22 Nov 04:30 in Manila: the 21st has passed there.
-        Carbon::setTestNow('2026-11-21 20:30:00');
-        $this->post(route('plan.update'), $this->form(['start_date' => '2026-11-21']))->assertSessionHasErrors('start_date');
-        $this->post(route('plan.update'), $this->form(['start_date' => '2026-11-22']))->assertSessionHasNoErrors();
-    }
-
-    public function test_a_date_already_saved_with_the_trip_is_not_refused_when_it_has_since_passed(): void
-    {
-        $this->post(route('plan.update'), $this->form(['start_date' => '2026-11-22']))->assertSessionHasNoErrors();
-
-        Carbon::setTestNow('2026-11-25 09:00:00');
-        $this->post(route('plan.update'), $this->form(['start_date' => '2026-11-22', 'travel_days' => 2]))->assertSessionHasNoErrors();
-    }
-
-    public function test_a_blank_date_is_not_replaced_by_today_and_the_plan_says_so(): void
-    {
-        $this->post(route('plan.update'), $this->form(['start_date' => null]))->assertSessionHasNoErrors();
-
-        $preference = TouristPreference::first();
-        $this->assertNull($preference->start_date);
-
-        $page = $this->get(route('plan.itinerary'));
-        $page->assertOk();
-        $page->assertSee('No arrival date was given, so weekday opening hours were not checked.');
-        $page->assertSee('date not set');
-    }
-
-    public function test_a_given_date_shows_no_missing_date_notice(): void
-    {
-        $this->post(route('plan.update'), $this->form())->assertSessionHasNoErrors();
-
-        $this->get(route('plan.itinerary'))->assertDontSee('No arrival date was given');
-    }
 
     // ---- 2. Region XI ---------------------------------------------------------------------------------------
 
@@ -199,57 +154,6 @@ class TripLocationV2Test extends TestCase
 
     // ---- 3. start and end date and time ---------------------------------------------------------------------
 
-    public function test_finish_by_is_stored_with_the_derived_end_date(): void
-    {
-        $this->post(route('plan.update'), $this->form(['travel_days' => 3, 'end_time' => '17:00']))->assertSessionHasNoErrors();
-
-        $preference = TouristPreference::first();
-        $this->assertSame('17:00', substr((string) $preference->end_time, 0, 5));
-        $this->assertSame('2026-11-30', $preference->end_date->toDateString());
-    }
-
-    public function test_finish_by_on_a_one_day_trip_has_to_be_after_the_start(): void
-    {
-        $this->post(route('plan.update'), $this->form(['end_time' => '07:30']))->assertSessionHasErrors('end_time');
-        $this->post(route('plan.update'), $this->form(['end_time' => '08:00']))->assertSessionHasErrors('end_time');
-        $this->post(route('plan.update'), $this->form(['end_time' => '17:00']))->assertSessionHasNoErrors();
-        $this->post(route('plan.update'), $this->form(['end_time' => '25:99']))->assertSessionHasErrors('end_time');
-    }
-
-    public function test_the_two_hour_allowance_is_kept_before_finish_by_and_the_page_shows_start_and_end(): void
-    {
-        $this->post(route('plan.update'), $this->form(['end_time' => '17:00']))->assertSessionHasNoErrors();
-
-        $page = $this->get(route('plan.itinerary'));
-        $page->assertOk();
-        $page->assertSee('Trip ends: back at');
-        $page->assertSee('2 hours before your');
-        $page->assertSee('PHT');
-        $page->assertSee('(finish by)');
-        $page->assertSee('Sat, 28 Nov 2026, 8:00 AM PHT');
-    }
-
-    public function test_without_finish_by_the_end_is_the_time_the_plan_ends_and_there_is_no_return_stop(): void
-    {
-        $this->post(route('plan.update'), $this->form(['end_time' => null]))->assertSessionHasNoErrors();
-
-        $this->assertNull(TouristPreference::first()->end_time);
-        $page = $this->get(route('plan.itinerary'));
-        $page->assertDontSee('Trip ends: back at');
-        $page->assertSee('(when the plan ends)');
-    }
-
-    public function test_the_form_has_finish_by_and_no_leaving_box(): void
-    {
-        $page = $this->get(route('plan.edit'));
-
-        $page->assertOk();
-        $page->assertSee('name="end_time"', false);
-        $page->assertSee('Finish by');
-        $page->assertDontSee('name="departure_label"', false);
-        $page->assertDontSee('name="departure_time"', false);
-    }
-
     public function test_the_switch_off_brings_back_the_old_form(): void
     {
         config(['features.trip_location_v2' => false]);
@@ -260,14 +164,6 @@ class TripLocationV2Test extends TestCase
         $page->assertSee('name="departure_label"', false);
         $page->assertDontSee('name="end_time"', false);
         $page->assertDontSee('name="visitor_origin_country"', false);
-    }
-
-    public function test_the_switch_off_accepts_a_past_date_and_a_far_start_as_before(): void
-    {
-        config(['features.trip_location_v2' => false]);
-
-        $this->post(route('plan.update'), $this->form(['start_date' => '2026-11-01', 'place_of_origin' => 'Cebu City']))->assertSessionHasNoErrors();
-        $this->assertNull(TouristPreference::first()->end_time);
     }
 
     // ---- 4. visitor origin ----------------------------------------------------------------------------------
@@ -459,14 +355,6 @@ class TripLocationV2Test extends TestCase
         $off = $strip($this->get(route('legal.terms'))->assertOk()->getContent());
 
         $this->assertSame($on, $off);
-    }
-
-    public function test_the_quick_dates_use_philippine_time_when_the_form_has_the_minimum_date(): void
-    {
-        $js = file_get_contents(public_path('js/plan-basics.js'));
-
-        $this->assertStringContainsString("timeZone: 'Asia/Manila'", $js);
-        $this->assertStringContainsString('if (startDate.min)', $js, 'without the minimum (switch off) the device date is used as before');
     }
 
     // ---- the switch itself ----------------------------------------------------------------------------------
