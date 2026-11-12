@@ -76,3 +76,86 @@
         scrollbar-width: thin;
     }
 }
+
+/* ===== A flat panel, as on a booking site's results page: no card around it, plain bold group titles, big plain
+   checkboxes, thin rules between groups, a price slider, and a map card on top. Green and stamp-orange keep it DOT. ===== */
+
+/* Group titles: plain and bold, the chevron gone (a click on the title still folds the group). */
+.fgroups { border-top: 0; margin-top: 8px; }
+.fgroup { padding: 18px 0 14px; border-bottom: 1px solid #e3e9e4; }
+.fgroup__title { padding-left: 0; border-left: 0; font-size: 1rem; font-weight: 800; letter-spacing: 0; }
+.fgroup__title::after { display: none; }
+.fgroup__dot { margin-right: 0; }
+
+/* Rows: tall, with a 26px box. */
+.fgroup__list { gap: 0; margin-top: 8px; }
+.fcheck { gap: 14px; padding: 10px 2px; font-size: 1rem; border-radius: 6px; }
+.fcheck:hover { background: transparent; }
+.fcheck:hover .fcheck__box { border-color: var(--primary); }
+.fcheck__box { width: 26px; height: 26px; border: 2px solid #6b7770; border-radius: 5px; }
+.fcheck input:checked + .fcheck__box::after { width: 7px; height: 13px; margin-top: -3px; }
+.fcheck__n { font-size: .85rem; }
+
+/* The price slider. */
+.fslider { position: relative; height: 34px; margin: 14px 11px 4px; }
+.fslider__track { position: absolute; left: 0; right: 0; top: 14px; height: 5px; border-radius: 3px; background: #dfe7e1; }
+.fslider__fill { position: absolute; top: 0; bottom: 0; background: var(--primary); border-radius: 3px; }
+.fslider input[type="range"] {
+    position: absolute; left: -11px; top: 0; width: calc(100% + 22px); height: 34px; margin: 0;
+    background: none; pointer-events: none; -webkit-appearance: none; appearance: none;
+}
+.fslider input[type="range"]::-webkit-slider-runnable-track { background: none; border: 0; height: 34px; }
+.fslider input[type="range"]::-moz-range-track { background: none; border: 0; height: 34px; }
+.fslider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; pointer-events: auto; width: 24px; height: 24px; margin-top: 5px; border-radius: 50%;
+    background: #fff; border: 2px solid var(--primary); box-shadow: 0 1px 4px rgba(6, 26, 19, .25); cursor: grab;
+}
+.fslider input[type="range"]::-moz-range-thumb {
+    pointer-events: auto; width: 20px; height: 20px; border-radius: 50%;
+    background: #fff; border: 2px solid var(--primary); box-shadow: 0 1px 4px rgba(6, 26, 19, .25); cursor: grab;
+}
+.fslider input[type="range"]:focus-visible::-webkit-slider-thumb { outline: 3px solid var(--primary); outline-offset: 2px; }
+.fslider input[type="range"]:focus-visible::-moz-range-thumb { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+/* MIN / MAX boxes under it. */
+.fgroup__range { align-items: flex-end; gap: 14px; margin-top: 12px; }
+.fgroup__range-cap { display: block; margin-bottom: 4px; font-size: .75rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #1c2b25; }
+.fgroup__money {
+    display: flex; align-items: center; gap: 4px; height: 42px; padding: 0 8px;
+    border: 1.5px solid #6b7770; border-radius: 4px; background: #fff; font-size: .7rem; font-weight: 700; color: #1c2b25;
+}
+.fgroup__money:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(11, 107, 79, .18); }
+.fgroup__money input { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; border-radius: 0; background: transparent; text-align: right; font: inherit; font-size: .95rem; }
+.fgroup__money input:focus-visible { outline: none; box-shadow: none; }
+
+/* The map card. */
+.see-area {
+    position: relative; display: block; width: 100%; margin: 0 0 16px; padding: 0; overflow: hidden; border: 0; border-radius: 12px;
+    cursor: pointer; background: #e9eee9; aspect-ratio: 320 / 130;
+}
+.see-area[hidden] { display: none; }
+.see-area svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.see-area span {
+    position: absolute; left: 0; right: 0; bottom: 14px; text-align: center;
+    font-family: 'Barabara', 'Alfa Slab One', serif; text-transform: uppercase; letter-spacing: .06em; font-size: 1.15rem; color: #1c2b25;
+}
+.see-area:hover span { color: var(--accent-strong, #c8501f); }
+.see-area:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+
+/* On a computer: the card around the panel goes, the search box and the province become soft pills, and the panel gets room. */
+@media (min-width: 901px) {
+    .catalog-refresh .catalog-layout { grid-template-columns: clamp(250px, 24vw, 320px) minmax(0, 1fr); gap: clamp(24px, 3vw, 44px); }
+    .catalog-refresh .filter-panel--v2 { background: transparent; border: 0; border-radius: 0; box-shadow: none; padding: 0 10px 0 0; }
+    .catalog-refresh .filter-panel--v2 .filter-panel__head { margin-bottom: 14px; padding-bottom: 12px; }
+    .catalog-refresh .filter-panel--v2 input[type="text"],
+    .catalog-refresh .filter-panel--v2 select,
+    .catalog-refresh .filter-panel--v2 .site-dropdown-trigger {
+        min-height: 52px; border: 0; border-radius: 999px; background-color: #eef5f1; font-size: .95rem;
+    }
+    .catalog-refresh .filter-panel--v2 .field > label,
+    .catalog-refresh .filter-panel--v2 legend { font-size: 1rem; font-weight: 800; color: #1c2b25; }
+    .catalog-refresh .filter-panel--v2 [data-filter-submit] { margin-top: 12px; border-radius: 999px; min-height: 50px; font-size: .95rem; }
+}
+@media (max-width: 900px) {
+    .see-area { display: none; }
+}

@@ -24,12 +24,21 @@
                 <summary class="fgroup__title">{{ $g['label'] }}@if ($isSet)<span class="fgroup__dot" role="img" aria-label="in use"></span>@endif</summary>
 
                 @if ($g['type'] === 'range')
+                    @php
+                        [$lo, $hi, $step] = $g['bounds'];
+                        $from = max($lo, min($hi, (int) ($one('price_min') !== '' ? $one('price_min') : $lo)));
+                        $to = max($lo, min($hi, (int) ($one('price_max') !== '' ? $one('price_max') : $hi)));
+                    @endphp
+                    <div class="fslider" data-slider data-min="{{ $lo }}" data-max="{{ $hi }}">
+                        <div class="fslider__track"><span class="fslider__fill"></span></div>
+                        <input type="range" min="{{ $lo }}" max="{{ $hi }}" step="{{ $step }}" value="{{ $from }}" data-slider-lo aria-label="Lowest price">
+                        <input type="range" min="{{ $lo }}" max="{{ $hi }}" step="{{ $step }}" value="{{ $to }}" data-slider-hi aria-label="Highest price">
+                    </div>
                     <div class="fgroup__range">
-                        <label><span class="sr-only">Lowest</span>
-                            <input type="number" name="price_min" inputmode="numeric" min="0" step="1" placeholder="Min" value="{{ $one('price_min') }}"></label>
-                        <span aria-hidden="true">&ndash;</span>
-                        <label><span class="sr-only">Highest</span>
-                            <input type="number" name="price_max" inputmode="numeric" min="0" step="1" placeholder="Max" value="{{ $one('price_max') }}"></label>
+                        <label><span class="fgroup__range-cap">Min</span>
+                            <span class="fgroup__money"><span aria-hidden="true">PHP</span><input type="number" name="price_min" inputmode="numeric" min="{{ $lo }}" step="1" placeholder="{{ $lo }}" value="{{ $one('price_min') }}" data-slider-min></span></label>
+                        <label><span class="fgroup__range-cap">Max</span>
+                            <span class="fgroup__money"><span aria-hidden="true">PHP</span><input type="number" name="price_max" inputmode="numeric" min="{{ $lo }}" step="1" placeholder="{{ number_format($hi, 0, '', '') }}" value="{{ $one('price_max') }}" data-slider-max></span></label>
                     </div>
                 @elseif ($g['type'] === 'rating')
                     <div class="fgroup__pills" role="radiogroup" aria-label="{{ $g['label'] }}">
@@ -70,6 +79,36 @@
         @endforeach
     </div>
     <script>
+        (function () {
+            var box = document.querySelector('[data-slider]');
+            if (!box) return;
+            var lo = box.querySelector('[data-slider-lo]'), hi = box.querySelector('[data-slider-hi]');
+            var form = box.closest('form');
+            var nMin = form.querySelector('[data-slider-min]'), nMax = form.querySelector('[data-slider-max]');
+            var fill = box.querySelector('.fslider__fill');
+            var MIN = +box.dataset.min, MAX = +box.dataset.max;
+            function paint() {
+                var a = +lo.value, b = +hi.value;
+                fill.style.left = ((a - MIN) / (MAX - MIN) * 100) + '%';
+                fill.style.right = (100 - (b - MIN) / (MAX - MIN) * 100) + '%';
+            }
+            function fromSlider(which) {
+                if (+lo.value > +hi.value) { if (which === lo) lo.value = hi.value; else hi.value = lo.value; }
+                nMin.value = +lo.value > MIN ? lo.value : '';
+                nMax.value = +hi.value < MAX ? hi.value : '';
+                paint();
+            }
+            function fromNumbers() {
+                lo.value = nMin.value === '' ? MIN : Math.min(Math.max(+nMin.value, MIN), MAX);
+                hi.value = nMax.value === '' ? MAX : Math.min(Math.max(+nMax.value, MIN), MAX);
+                paint();
+            }
+            lo.addEventListener('input', function () { fromSlider(lo); });
+            hi.addEventListener('input', function () { fromSlider(hi); });
+            nMin.addEventListener('input', fromNumbers);
+            nMax.addEventListener('input', fromNumbers);
+            paint();
+        })();
         document.querySelectorAll('[data-fold-toggle]').forEach(function (b) {
             b.addEventListener('click', function () {
                 var open = b.getAttribute('aria-expanded') !== 'true';

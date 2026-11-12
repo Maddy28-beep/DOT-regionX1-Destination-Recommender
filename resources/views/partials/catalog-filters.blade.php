@@ -48,6 +48,33 @@
         </button>
     </div>
 
+    {{-- Opens the page's own Map view (the Grid / Map switch above the results). Hidden when the page has none. --}}
+    <button type="button" class="see-area" data-see-area hidden>
+        <svg viewBox="0 0 320 130" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+            <rect width="320" height="130" fill="#e9eee9"/>
+            <path d="M-10 30 C60 10 110 70 190 40 S300 10 340 30" fill="none" stroke="#f3d26b" stroke-width="16"/>
+            <path d="M40 140 L120 -10" stroke="#fff" stroke-width="12"/><path d="M230 140 L300 -10" stroke="#fff" stroke-width="12"/>
+            <path d="M0 100 L330 80" stroke="#fff" stroke-width="10"/>
+            <path d="M250 0 L320 0 L320 50 Z" fill="#9fd3b6"/><path d="M0 60 L0 130 L60 130 Z" fill="#a8d8f0"/>
+            <path d="M160 24c-13 0-23 10-23 23 0 17 23 40 23 40s23-23 23-40c0-13-10-23-23-23z" fill="#c8501f"/><circle cx="160" cy="47" r="8" fill="#fff"/>
+        </svg>
+        <span>See area</span>
+    </button>
+    <script>
+        // After the page is parsed, because the Grid / Map switch comes later in the page than this panel.
+        document.addEventListener('DOMContentLoaded', function () {
+            var card = document.querySelector('[data-see-area]');
+            var toggle = document.querySelector('[data-view="map"], [data-destination-view="map"]');
+            if (!card || !toggle) return;
+            card.hidden = false;
+            card.addEventListener('click', function () {
+                toggle.click();
+                var top = toggle.getBoundingClientRect().top + window.scrollY - 110;
+                window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+            });
+        });
+    </script>
+
     <form method="GET" action="{{ route($route) }}" id="{{ $formId }}" data-filter-form>
         @foreach ($hidden as $field)
             <input type="hidden" name="{{ $field['name'] }}" value="{{ $field['value'] }}" @if (! empty($field['id'])) id="{{ $field['id'] }}" @endif>

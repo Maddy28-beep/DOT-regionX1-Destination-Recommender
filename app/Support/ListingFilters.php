@@ -50,7 +50,7 @@ final class ListingFilters
         $groups = [];
 
         if ($cfg['price']) {
-            $groups[] = ['key' => 'price', 'type' => 'range', 'label' => $cfg['price'], 'names' => ['price_min', 'price_max']];
+            $groups[] = ['key' => 'price', 'type' => 'range', 'label' => $cfg['price'], 'names' => ['price_min', 'price_max'], 'bounds' => self::priceBounds($kind)];
         }
         $groups[] = ['key' => 'rating', 'type' => 'rating', 'label' => 'Guest rating', 'names' => ['rating_min'], 'options' => self::RATINGS];
 
@@ -172,6 +172,18 @@ final class ListingFilters
         }
 
         return $labels;
+    }
+
+    /** @return array{0: int, 1: int, 2: int} the lowest, highest and step of the price slider, from the prices on file */
+    private static function priceBounds(string $kind): array
+    {
+        $cfg = self::KINDS[$kind];
+        $column = ['accommodation' => 'price_per_night', 'destination' => 'entry_fee_max', 'package' => 'price_per_pax'][$kind] ?? null;
+        $top = $column ? (float) $cfg['model']::publiclyVisible()->max($column) : 0.0;
+        $step = $top > 20000 ? 500 : ($top > 3000 ? 100 : 50);
+        $max = max(1000, (int) (ceil($top / $step) * $step));
+
+        return [0, $max, $step];
     }
 
     private static function scalar(Request $request, string $param): string
