@@ -58,10 +58,13 @@ class CategoryIconsTest extends TestCase
 
     public function test_the_chips_on_a_listing_page_carry_their_icons(): void
     {
-        Destination::create([
-            'slug' => 'a-beach', 'name' => 'A Beach', 'location' => 'Davao City', 'region_id' => Region::firstOrCreate(['name' => 'Davao City'])->id,
-            'type' => 'Beach & Leisure', 'is_accredited' => true, 'rating' => 4, 'review_count' => 1, 'price_tier' => 'Mid-range',
-        ]);
+        // A chip needs three places behind it.
+        foreach ([1, 2, 3] as $n) {
+            Destination::create([
+                'slug' => "a-beach-$n", 'name' => "A Beach $n", 'location' => 'Davao City', 'region_id' => Region::firstOrCreate(['name' => 'Davao City'])->id,
+                'type' => 'Beach & Leisure', 'is_accredited' => true, 'rating' => 4, 'review_count' => 1, 'price_tier' => 'Mid-range',
+            ]);
+        }
 
         $html = $this->get(route('destinations.index'))->assertOk()->getContent();
 

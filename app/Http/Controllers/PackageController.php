@@ -108,9 +108,11 @@ class PackageController extends Controller
         \App\Support\SearchLog::record($request, 'packages', $packages->total());
 
         $regions = Region::orderBy('name')->get();
-        $types = Package::query()->whereNotNull('type')->distinct()->orderBy('type')->pluck('type');
+        $types = \App\Support\CategoryChips::visible(Package::publiclyVisible(), 'type', $request->input('type'));
+        // Category chips only once there are enough packages for a category to mean something.
+        $showCategories = Package::publiclyVisible()->count() > \App\Support\CategoryChips::PACKAGES_NEEDED || $request->filled('type');
 
-        return view('packages.index', compact('packages', 'regions', 'types'));
+        return view('packages.index', compact('packages', 'regions', 'types', 'showCategories'));
     }
 
     public function show(Package $package): View

@@ -27,7 +27,9 @@
             $moreTypes = $types->reject(fn ($type) => $featuredTypes->has($type));
             $moreTypeSelected = $moreTypes->contains(request('type'));
         @endphp
-        @include('partials.catalog-categories', ['categoryLabel' => 'Tour package categories'])
+        @if ($showCategories)
+            @include('partials.catalog-categories', ['categoryLabel' => 'Tour package categories'])
+        @endif
 
         <div class="catalog-layout">
             @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, 'type'); @endphp

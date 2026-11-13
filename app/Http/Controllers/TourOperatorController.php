@@ -45,7 +45,8 @@ class TourOperatorController extends Controller
         \App\Support\SearchLog::record($request, 'tour-operators', $tourOperators->total());
 
         $regions = Region::orderBy('name')->get();
-        $specializations = TourOperator::query()->whereNotNull('specialization')->distinct()->orderBy('specialization')->pluck('specialization');
+        // "Tour Operator" is what every one of them is, not a kind; the catch-all "General Travel & Tours" goes after the specific kinds.
+        $specializations = \App\Support\CategoryChips::visible(TourOperator::publiclyVisible(), 'specialization', $request->input('specialization'), ['Tour Operator'], ['General Travel & Tours']);
 
         return view('tour-operators.index', compact('tourOperators', 'regions', 'specializations'));
     }

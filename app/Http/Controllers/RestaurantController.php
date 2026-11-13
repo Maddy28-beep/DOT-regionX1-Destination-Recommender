@@ -25,7 +25,10 @@ class RestaurantController extends Controller
         }
 
         if ($request->filled('cuisine_type')) {
-            $query->where('cuisine_type', $request->string('cuisine_type'));
+            // A chip such as "Filipino" stands for every stored cuisine that carries the word (Filipino Seafood, Cafe & Filipino...).
+            $cuisine = $request->string('cuisine_type')->toString();
+            $members = \App\Support\CategoryChips::cuisineMembers($cuisine);
+            $members === null ? $query->where('cuisine_type', $cuisine) : $query->whereIn('cuisine_type', $members);
         }
 
         if ($request->filled('price_tier')) {
@@ -66,7 +69,7 @@ class RestaurantController extends Controller
         \App\Support\SearchLog::record($request, 'restaurants', $restaurants->total());
 
         $regions = Region::orderBy('name')->get();
-        $cuisineTypes = Restaurant::query()->whereNotNull('cuisine_type')->distinct()->orderBy('cuisine_type')->pluck('cuisine_type');
+        $cuisineTypes = \App\Support\CategoryChips::cuisines($request->input('cuisine_type'));
 
         return view('restaurants.index', compact('restaurants', 'regions', 'cuisineTypes'));
     }

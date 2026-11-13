@@ -87,7 +87,7 @@ class DestinationController extends Controller
         \App\Support\SearchLog::record($request, 'destinations', $destinations->total());
 
         $regions = Region::orderBy('name')->get();
-        $types = Destination::query()->whereNotNull('type')->distinct()->orderBy('type')->pluck('type');
+        $types = \App\Support\CategoryChips::visible(Destination::publiclyVisible(), 'type', $request->input('type'));
 
         return view('destinations.index', compact('destinations', 'regions', 'types', 'mapDestinations'));
     }
