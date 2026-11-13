@@ -458,3 +458,8 @@
 .plan-wizard #plan-step-0 .pc-trip-window input[type="datetime-local"] { width: 100%; }
 .plan-wizard #plan-step-0 .pc-trip-duration { margin: 4px 2px 0; font-size: .9rem; font-weight: 600; color: var(--primary-dark); }
 .plan-wizard #plan-step-0 .pc-trip-duration.is-error { color: var(--danger, #b42318); }
+
+/* The shared dropdown (app.js) wraps each select in .site-dropdown, whose own display:block would beat the hidden attribute:
+   without this the province button stayed on screen for every country. */
+[data-origin-v2] .site-dropdown[hidden],
+[data-origin-v2] .site-dropdown:has(> select[hidden]) { display: none; }

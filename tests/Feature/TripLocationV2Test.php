@@ -241,7 +241,8 @@ class TripLocationV2Test extends TestCase
         $this->assertMatchesRegularExpression('/<select[^>]*data-origin-province[^>]*hidden/', $html, 'hidden until the Philippines is chosen');
 
         $js = file_get_contents(public_path('js/plan-origin-select.js'));
-        $this->assertStringContainsString("if (!isPh) province.value = '';", $js);
+        $this->assertStringContainsString("if (!isPh && hadValue) {", $js);
+        $this->assertStringContainsString("province.value = '';", $js);
     }
 
     public function test_the_province_follows_the_country_however_the_country_changed(): void
@@ -253,6 +254,24 @@ class TripLocationV2Test extends TestCase
         $this->assertStringContainsString("window.addEventListener('pageshow', sync);", $js);
         $this->assertStringContainsString("country.form.addEventListener('submit', sync, true);", $js);
         $this->assertStringContainsString('province.hidden = !isPh;', $js);
+    }
+
+    public function test_the_province_control_the_shared_dropdown_builds_is_hidden_with_the_select(): void
+    {
+        // app.js wraps every select in .site-dropdown and shows its own button; hiding only the native select left the
+        // "Province (optional)" button on screen for every country (found on production, 14 Nov 2026).
+        $js = file_get_contents(public_path('js/plan-origin-select.js'));
+        $this->assertStringContainsString("const wrapper = province.closest('.site-dropdown');", $js);
+        $this->assertStringContainsString('if (wrapper) wrapper.hidden = !isPh;', $js);
+        $this->assertStringContainsString("window.addEventListener('load', sync);", $js);
+        $this->assertStringContainsString('new MutationObserver(sync).observe(', $js, 'the wrapper is built after this script runs');
+        $this->assertStringContainsString("province.dispatchEvent(new Event('change', { bubbles: true }));", $js, 'the dropdown label is reset when the province is cleared');
+
+        // ... and the hidden wrapper really disappears (the dropdown's own display:block would otherwise win).
+        $css = file_get_contents(public_path('css/plan-trip-layout.css'));
+        $this->assertStringContainsString('[data-origin-v2] .site-dropdown[hidden]', $css);
+        $this->assertStringContainsString('[data-origin-v2] .site-dropdown:has(> select[hidden]) { display: none; }', $css);
+        $this->assertStringContainsString('.site-dropdown { position:relative; display:block;', file_get_contents(public_path('css/app.css')), 'the rule it has to beat');
     }
 
     public function test_a_fresh_form_has_a_neutral_country_placeholder_and_no_country_selected(): void
