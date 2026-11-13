@@ -244,6 +244,46 @@ class TripLocationV2Test extends TestCase
         $this->assertStringContainsString("if (!isPh) province.value = '';", $js);
     }
 
+    public function test_the_province_follows_the_country_however_the_country_changed(): void
+    {
+        $js = file_get_contents(public_path('js/plan-origin-select.js'));
+
+        // Not only "change": keyboard and type-ahead ("input", "keyup"), leaving the box, Back / form restore, and submit.
+        $this->assertStringContainsString("['change', 'input', 'keyup', 'focusout'].forEach(type => country.addEventListener(type, sync));", $js);
+        $this->assertStringContainsString("window.addEventListener('pageshow', sync);", $js);
+        $this->assertStringContainsString("country.form.addEventListener('submit', sync, true);", $js);
+        $this->assertStringContainsString('province.hidden = !isPh;', $js);
+    }
+
+    public function test_a_fresh_form_has_a_neutral_country_placeholder_and_no_country_selected(): void
+    {
+        $html = $this->get(route('plan.edit'))->assertOk()->getContent();
+        preg_match('/<select id="visitor_origin_country".*?<\/select>/s', $html, $m);
+
+        $this->assertNotEmpty($m);
+        $this->assertDoesNotMatchRegularExpression('/<option[^>]*\bselected\b/', $m[0], 'no country is preselected');
+        $this->assertMatchesRegularExpression('/<select id="visitor_origin_country"[^>]*>\s*<option value="">Choose a country<\/option>/', $m[0], 'the first option is the placeholder');
+        $this->assertMatchesRegularExpression('/<select[^>]*data-origin-province[^>]*hidden/', $html);
+    }
+
+    public function test_a_visitor_who_never_touches_the_country_saves_no_country(): void
+    {
+        // A local is not required to answer; leaving the placeholder saves no country, no province, no source.
+        $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Local', 'visitor_origin_country' => '', 'visitor_origin_province' => 'Cebu']))
+            ->assertSessionHasNoErrors();
+
+        $p = TouristPreference::first();
+        $this->assertNull($p->visitor_origin_country_code);
+        $this->assertNull($p->visitor_origin_province);
+        $this->assertNull($p->visitor_origin_region);
+        $this->assertNull($p->visitor_origin_source);
+
+        // Anyone else has to choose: the placeholder is refused, nothing is saved as a default.
+        $before = TouristPreference::count();
+        $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Foreign', 'visitor_origin_country' => '']))->assertSessionHasErrors('visitor_origin_country');
+        $this->assertSame($before, TouristPreference::count());
+    }
+
     public function test_prefer_not_to_say_stores_nothing_but_the_choice(): void
     {
         $this->post(route('plan.update'), $this->form([
