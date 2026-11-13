@@ -1588,7 +1588,7 @@ class ItineraryScheduleBuilder
                         'starts_at' => $clock->copy(),
                         'ends_at' => $setOff->copy(),
                         'note' => $d['finish']
-                            ? 'Nothing is planned: the journey back to '.$point['label'].' needs the time that is left before your finish-by time.'
+                            ? 'Nothing is planned: the journey back to '.$point['label'].' needs the time that is left before your end time.'
                             : 'Nothing is planned: the journey to '.$point['label'].' needs the time that is left before your departure.',
                     ]);
                 }
@@ -1600,7 +1600,7 @@ class ItineraryScheduleBuilder
         $arrival = $this->toQuarterHour($this->addTravel($itinerary, $dayNumber, $sortOrder, $setOff, $here, $point));
 
         $notes = $d['finish']
-            ? ['Be back at '.$point['label'].' by '.$deadline->format('g:i A').': that is '.$this->durationText($d['buffer']).' before your '.$d['at']->format('g:i A').' finish-by time, a planning allowance.']
+            ? ['Be back at '.$point['label'].' by '.$deadline->format('g:i A').': that is '.$this->durationText($d['buffer']).' before your '.$d['at']->format('g:i A').' end time, a planning allowance.']
             : ['Be at '.$point['label'].' by '.$deadline->format('g:i A').': that is '.$this->durationText($d['buffer']).' before your '.$d['at']->format('g:i A').' departure, a planning allowance and not an airline or airport rule.'];
         $notes[] = $estimate['distance_km'] === null
             ? 'The distance to '.$point['label'].' could not be measured from here, so a time allowance was used.'

@@ -965,7 +965,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var chosen = document.querySelector('[data-local-toggle]:checked');
         var isLocal = !!chosen && chosen.value === 'Regular / Local';
         input.required = !isLocal;
-        if (label) label.textContent = 'Where are you visiting from?';
+        if (label && !field.hasAttribute('data-origin-v2')) label.textContent = 'Where are you visiting from?';
         if (hint) hint.textContent = isLocal ? 'Optional. Skip it if you live in Davao.' : defaultHint;
     }
 
