@@ -150,6 +150,7 @@ class TripLocationV2Test extends TestCase
         $page->assertOk();
         $page->assertSee('data-region-xi', false);
         $page->assertSee('inside Davao Region');
+        $page->assertSee('Planning from abroad? Pick where you will arrive or stay in Davao Region.');
     }
 
     // ---- 3. start and end date and time ---------------------------------------------------------------------
@@ -164,6 +165,7 @@ class TripLocationV2Test extends TestCase
         $page->assertSee('name="departure_label"', false);
         $page->assertDontSee('name="end_time"', false);
         $page->assertDontSee('name="visitor_origin_country"', false);
+        $page->assertDontSee('Planning from abroad?');
     }
 
     // ---- 4. visitor origin ----------------------------------------------------------------------------------
