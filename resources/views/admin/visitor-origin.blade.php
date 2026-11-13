@@ -2,7 +2,7 @@
 
 @section('title', 'Visitor origin — DOT Admin')
 @section('page-title', 'Visitor origin')
-@section('page-sub', 'Where visitors say they travel from, counts only')
+@section('page-sub', 'Where visitors say they travel from, anonymous counts only')
 
 @section('content')
 <div class="adm-origin" data-visitor-origin>
@@ -10,16 +10,19 @@
         <label>From <input type="date" name="from" value="{{ $from }}"></label>
         <label>To <input type="date" name="to" value="{{ $to }}"></label>
         <button class="adm-btn" type="submit">Apply</button>
-        <span class="adm-toolbar__note">Dates are in Philippine time; "To" includes the whole day.</span>
+        <a class="adm-btn" data-origin-export href="{{ route('admin.visitor-origin.export', array_filter(['from' => $from, 'to' => $to])) }}">Download CSV</a>
+        <span class="adm-toolbar__note">Dates are in Philippine time; "To" includes the whole day. The day is the day the visitor first planned a trip.</span>
     </form>
 
     <p class="adm-origin__note" data-origin-note>
-        Counts are per browser session; a new submission replaces the earlier one.
-        Groups smaller than {{ $min }} are never shown on their own: they are added together under "Other".
-        Individual answers are kept for 30 days only, so this page covers the last 30 days at most.
+        These counts are kept permanently and are anonymous: only the day, the country, the province (Philippines) and the city are stored, with a number.
+        No name, browser, IP address, time of day, trip or pick-up place is kept with them, and they cannot be traced back to a person or a trip.
+        <strong>Counting rule:</strong> one count per browser session; a changed answer replaces the earlier one. The same person using two browsers or devices counts twice,
+        and someone who comes back after the trip details were deleted (30 days) counts as a new visit.
+        Groups smaller than {{ $min }} are never shown on their own: they are added together under "Other". The CSV has the same totals, not one row per day.
     </p>
 
-    @foreach ([['Domestic or international', $split], ['By country', $countries], ['Philippine visitors by province', $provinces]] as [$title, $t])
+    @foreach ($tables as $title => $t)
         <section class="adm-card" aria-label="{{ $title }}">
             <div class="adm-card__head"><div><h2>{{ $title }}</h2></div></div>
             <div class="adm-card__body">

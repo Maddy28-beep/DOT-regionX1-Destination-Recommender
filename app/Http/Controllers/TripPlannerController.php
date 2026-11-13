@@ -12,6 +12,7 @@ use App\Models\TouristHealthCondition;
 use App\Models\TouristHealthProfile;
 use App\Models\TouristPreference;
 use App\Services\Geocoding\AddressSuggestionService;
+use App\Services\Privacy\VisitorOriginStats;
 use App\Services\Embeddings\SimilarDestinationService;
 use App\Services\Recommendation\ContentBasedRecommendationService;
 use App\Services\Recommendation\FreeTimeIdeas;
@@ -255,6 +256,8 @@ class TripPlannerController extends Controller
                 'duration_days' => TripWindow::durationDays($window[0], $window[1]),
                 'end_date' => $window[1]->toDateString(),
             ]);
+            // The answer this session gave before (none for a new trip), so the permanent anonymous count can be moved.
+            $originBefore = VisitorOriginStats::answerOf($preference);
             $this->applyVisitorOrigin($preference, $data);
         } else {
             $this->applyDeparture($preference, $data);
@@ -271,6 +274,10 @@ class TripPlannerController extends Controller
         }
 
         $preference->save();
+
+        if ($v2) {
+            VisitorOriginStats::move($originBefore, VisitorOriginStats::answerOf($preference), $preference->created_at ?? now());
+        }
 
         $preference->activities()->delete();
         foreach ($data['activities'] ?? [] as $activity) {

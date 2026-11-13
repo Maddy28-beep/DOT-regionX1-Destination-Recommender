@@ -78,12 +78,15 @@
                     @if (\App\Support\Features::tripLocation())
                         <p data-origin-privacy><strong>Where you travel from (optional):</strong> if you say
                             where you are travelling from (a country, a province and a city or municipality), or
-                            choose &ldquo;Prefer not to say&rdquo;, we keep only those place names with your trip
-                            plan. We never ask for your home address, and this question does not use your
-                            position. The answer is not linked to your name. DOT Region XI sees it only as
-                            counts for tourism statistics, and a group of fewer than 5 visitors is never shown on
-                            its own. It is deleted or cleared automatically together with the rest of the plan
-                            after 30&nbsp;days.</p>
+                            choose &ldquo;Prefer not to say&rdquo;, the answer is kept in two separate ways. With
+                            your trip plan it is deleted or cleared automatically together with the rest of the
+                            plan after 30&nbsp;days. Separately, we keep an <strong>anonymous count</strong> for
+                            tourism statistics: only the date, your country, your province (for the Philippines)
+                            and your city or municipality, as a number in a table. We do not keep your name,
+                            browser, IP address, trip, the time of day or your pick-up place with that count, and
+                            it cannot be traced back to you or to your trip. DOT Region XI sees these counts only
+                            as totals, and a group of fewer than 5 visitors is never shown on its own. We never
+                            ask for your home address, and this question does not use your position.</p>
                     @endif
                     <p><strong>How long this is kept:</strong></p>
                     <ul>
@@ -93,6 +96,11 @@
                             plan, the plan's personal details (accessibility notes and starting point) are
                             cleared instead, and the survey answers stay for statistics.</li>
                         <li>Chatbot questions: <strong>deleted automatically after 30&nbsp;days</strong>.</li>
+                        @if (\App\Support\Features::tripLocation())
+                            <li data-origin-counts-kept>Anonymous &ldquo;where you travel from&rdquo; counts (the date, a country, a
+                                province, a city and a number, with nothing that identifies a person or a trip):
+                                <strong>kept</strong>, because DOT Region XI uses them for tourism statistics.</li>
+                        @endif
                         <li>QR check-ins, reviews, saved places and exit survey answers: kept, because DOT
                             Region XI uses them for visit counts and tourism statistics. They are linked
                             only to the random browser token (or to nothing), never to a name.</li>

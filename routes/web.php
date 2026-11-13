@@ -228,6 +228,7 @@ Route::prefix('portal/admin')->name('admin.')->middleware(['auth:admin', \App\Ht
     Route::get('/audit-log', [\App\Http\Controllers\Admin\AdminAuditLogController::class, 'index'])->name('audit-log');
     Route::get('/search', \App\Http\Controllers\Admin\AdminSearchController::class)->middleware('throttle:90,1')->name('search');
     Route::get('/visitor-origin', [\App\Http\Controllers\Admin\AdminVisitorOriginController::class, 'index'])->name('visitor-origin');
+    Route::get('/visitor-origin/export.csv', [\App\Http\Controllers\Admin\AdminVisitorOriginController::class, 'export'])->middleware('throttle:30,1')->name('visitor-origin.export');
     Route::get('/data-completeness', [\App\Http\Controllers\Admin\AdminDataCompletenessController::class, 'index'])->name('data-completeness');
     Route::post('/data-completeness/{type}/{id}', [\App\Http\Controllers\Admin\AdminDataCompletenessController::class, 'fix'])->name('data-completeness.fix');
     Route::get('/reports', [AdminDashboardController::class, 'reports'])->name('reports');

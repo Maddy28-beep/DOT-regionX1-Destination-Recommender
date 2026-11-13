@@ -268,7 +268,7 @@
                    aria-label="City or municipality" placeholder="City or municipality (type it)" data-origin-city
                    @if ($countryChosen === '' || $countryChosen === null || $countryChosen === 'NONE') hidden @endif>
             <p class="pc-hint" data-origin-hint>Choose a country, then a province and a city or municipality if you like. We never ask for your home address.</p>
-            <p class="pc-hint" data-origin-privacy>Optional. Used for tourism statistics. Not linked to your name. Deleted after 30 days.</p>
+            <p class="pc-hint" data-origin-privacy>Optional. Your country, province and city are kept as an anonymous statistic for tourism planning, not linked to you. The rest of your trip details are deleted after 30 days.</p>
         </div>
         @else
         <div class="field pc-field pc-col-4" data-origin-field>

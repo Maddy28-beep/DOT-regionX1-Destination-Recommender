@@ -3,13 +3,16 @@
 namespace Tests\Feature;
 
 use App\Models\AdminUser;
-use App\Models\TouristPreference;
 use App\Support\SmallGroupSuppression;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
-/** The admin view of visitor origin: counts only, groups under 5 never shown alone, behind the trip_location_v2 switch. */
+/**
+ * The admin view of visitor origin: permanent anonymous counts, groups under 5 never shown alone, a CSV of the same totals,
+ * all behind the trip_location_v2 switch.
+ */
 class VisitorOriginAdminTest extends TestCase
 {
     use RefreshDatabase;
@@ -19,17 +22,12 @@ class VisitorOriginAdminTest extends TestCase
         return AdminUser::create(['email' => 'a@x.test', 'password_hash' => Hash::make('x'), 'full_name' => 'Admin', 'role' => 'super_admin']);
     }
 
-    private function visitors(int $n, string $country, ?string $province = null, string $source = 'chosen'): void
+    /** Put $n visitors into one group of the permanent table (one row per day, as the app keeps it). */
+    private function visitors(int $n, string $country, ?string $province = null, string $source = 'chosen', string $city = '', string $day = '2026-11-13'): void
     {
-        for ($i = 0; $i < $n; $i++) {
-            $p = new TouristPreference();
-            $p->forceFill([
-                'travel_days' => 1, 'travel_type' => 'Couple', 'travel_purpose' => 'Leisure', 'visitor_type' => 'Regular / Domestic',
-                'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => 'moderate',
-                'visitor_origin_country_code' => $source === 'unspecified' ? null : $country,
-                'visitor_origin_province' => $province, 'visitor_origin_source' => $source,
-            ])->save();
-        }
+        $key = ['day' => $day, 'answer' => $source, 'country_code' => $source === 'unspecified' ? '' : $country, 'province' => (string) $province, 'city' => $city];
+        DB::table('visitor_origin_daily')->insertOrIgnore($key + ['visitors' => 0]);
+        DB::table('visitor_origin_daily')->where($key)->increment('visitors', $n);
     }
 
     // ---- the suppression rule itself ----------------------------------------------------------------------
@@ -43,7 +41,6 @@ class VisitorOriginAdminTest extends TestCase
 
     public function test_an_other_row_that_would_still_be_small_takes_the_smallest_group_with_it(): void
     {
-        // C alone (2) would reveal "2 people": B (5) is folded in so Other is 7 and no shown row can be subtracted to find 2.
         $r = SmallGroupSuppression::apply(['A' => 9, 'B' => 5, 'C' => 2], 5);
 
         $this->assertSame([['label' => 'A', 'count' => 9], ['label' => 'Other (groups under 5)', 'count' => 7]], $r['rows']);
@@ -73,7 +70,9 @@ class VisitorOriginAdminTest extends TestCase
     {
         config(['features.trip_location_v2' => false]);
 
-        $this->actingAs($this->admin(), 'admin')->get(route('admin.visitor-origin'))->assertRedirect(route('admin.overview'));
+        $admin = $this->admin();
+        $this->actingAs($admin, 'admin')->get(route('admin.visitor-origin'))->assertRedirect(route('admin.overview'));
+        $this->actingAs($admin, 'admin')->get(route('admin.visitor-origin.export'))->assertRedirect(route('admin.overview'));
     }
 
     public function test_it_needs_an_admin_login(): void
@@ -81,6 +80,7 @@ class VisitorOriginAdminTest extends TestCase
         config(['features.trip_location_v2' => true]);
 
         $this->get(route('admin.visitor-origin'))->assertRedirect();
+        $this->get(route('admin.visitor-origin.export'))->assertRedirect();
     }
 
     public function test_it_shows_big_groups_and_hides_small_ones(): void
@@ -103,8 +103,22 @@ class VisitorOriginAdminTest extends TestCase
         $page->assertSee('Other (groups under 5)');
         $page->assertDontSee('Bohol');
         $page->assertDontSee('Japan');
-        $page->assertDontSee('export', false);
-        $page->assertDontSee('.csv', false);
+    }
+
+    public function test_the_city_table_shows_only_cities_with_five_or_more_visitors(): void
+    {
+        config(['features.trip_location_v2' => true]);
+        $this->visitors(6, 'PH', 'Cebu', 'chosen', 'Cebu City');
+        $this->visitors(3, 'PH', 'Bohol', 'chosen', 'Tagbilaran');
+        $this->visitors(2, 'PH', 'Leyte', 'chosen', 'Tacloban');
+        $this->visitors(5, 'JP', null, 'chosen', 'Tokyo');
+
+        $html = $this->actingAs($this->admin(), 'admin')->get(route('admin.visitor-origin'))->assertOk()->getContent();
+        preg_match('/By city or municipality.*$/s', $html, $m);
+
+        $this->assertStringContainsString('Cebu City (Philippines)', $m[0]);
+        $this->assertStringContainsString('Tokyo (Japan)', $m[0]);
+        $this->assertStringNotContainsString('Tagbilaran', $html);
     }
 
     public function test_with_too_few_answers_it_says_so_and_lists_nothing(): void
@@ -132,18 +146,16 @@ class VisitorOriginAdminTest extends TestCase
         config(['features.trip_location_v2' => true]);
         $admin = $this->admin();
 
-        // No answers at all.
         $this->actingAs($admin, 'admin')->get(route('admin.visitor-origin'))->assertOk()
             ->assertSee('Not enough answers yet: 0 answers so far; at least 5 are needed.');
 
-        // Two answers: the count is shown, the places are not.
         $this->visitors(1, 'KR');
         $this->visitors(1, 'PH', 'Cebu');
         $html = $this->actingAs($admin, 'admin')->get(route('admin.visitor-origin'))->assertOk()->getContent();
         $this->assertStringContainsString('Not enough answers yet: 2 answers so far; at least 5 are needed.', $html);
         $this->assertStringContainsString('Not enough answers yet: 1 answer so far; at least 5 are needed.', $html);
         $this->assertStringNotContainsString('South Korea', $html);
-        $this->assertSame(3, substr_count($html, 'data-origin-empty'), 'one message per table');
+        $this->assertSame(4, substr_count($html, 'data-origin-empty'), 'one message per table');
     }
 
     public function test_the_page_does_not_use_the_one_screen_layout_that_squeezed_empty_cards(): void
@@ -156,38 +168,47 @@ class VisitorOriginAdminTest extends TestCase
         $this->assertStringNotContainsString('adm-fit', $html);
     }
 
-    public function test_the_page_says_counts_are_per_browser_session(): void
+    public function test_the_page_states_the_counting_rule_and_that_the_counts_are_kept(): void
     {
         config(['features.trip_location_v2' => true]);
 
-        $this->actingAs($this->admin(), 'admin')->get(route('admin.visitor-origin'))->assertOk()
-            ->assertSee('Counts are per browser session; a new submission replaces the earlier one.');
+        $html = $this->actingAs($this->admin(), 'admin')->get(route('admin.visitor-origin'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('Counting rule:', $html);
+        $this->assertStringContainsString('one count per browser session; a changed answer replaces the earlier one', $html);
+        $this->assertStringContainsString('counts twice', $html);
+        $this->assertStringContainsString('kept permanently and are anonymous', $html);
+        $this->assertStringNotContainsString('kept for 30 days only', $html);
     }
 
-    public function test_the_date_filter_reads_days_in_philippine_time_and_to_includes_the_whole_day(): void
+    public function test_the_date_filter_reads_the_philippine_day_and_to_includes_the_whole_day(): void
     {
         config(['features.trip_location_v2' => true]);
         $admin = $this->admin();
 
-        // 12 Nov 15:59:59 UTC is 12 Nov 23:59:59 in Manila; 12 Nov 17:00 UTC is 13 Nov 01:00; 13 Nov 15:59:59 UTC is 13 Nov 23:59:59; 13 Nov 16:00 UTC is 14 Nov 00:00.
-        foreach (['2026-11-12 15:59:59' => 'JP', '2026-11-12 17:00:00' => 'KR', '2026-11-13 15:59:59' => 'US', '2026-11-13 16:00:00' => 'AU'] as $utc => $country) {
-            for ($i = 0; $i < 5; $i++) {
-                $p = new TouristPreference();
-                $p->forceFill([
-                    'travel_days' => 1, 'travel_type' => 'Couple', 'travel_purpose' => 'Leisure', 'visitor_type' => 'Regular / Foreign',
-                    'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => 'moderate',
-                    'visitor_origin_country_code' => $country, 'visitor_origin_source' => 'chosen', 'created_at' => $utc,
-                ])->save();
-            }
-        }
+        $this->visitors(5, 'JP', null, 'chosen', '', '2026-11-12');
+        $this->visitors(5, 'KR', null, 'chosen', '', '2026-11-13');
+        $this->visitors(5, 'US', null, 'chosen', '', '2026-11-13');
+        $this->visitors(5, 'AU', null, 'chosen', '', '2026-11-14');
 
         $html = $this->actingAs($admin, 'admin')->get(route('admin.visitor-origin', ['from' => '2026-11-13', 'to' => '2026-11-13']))->assertOk()->getContent();
 
-        $this->assertStringContainsString('South Korea', $html, '13 Nov 01:00 Manila is inside the 13th');
-        $this->assertStringContainsString('United States', $html, '13 Nov 23:59 Manila is inside the 13th (the whole day is included)');
-        $this->assertStringNotContainsString('Japan', $html, '12 Nov 23:59 Manila is the 12th');
-        $this->assertStringNotContainsString('Australia', $html, '14 Nov 00:00 Manila is the 14th');
+        $this->assertStringContainsString('South Korea', $html);
+        $this->assertStringContainsString('United States', $html, 'the whole of the last day is included');
+        $this->assertStringNotContainsString('Japan', $html, 'the 12th is before From');
+        $this->assertStringNotContainsString('Australia', $html, 'the 14th is after To');
         $this->assertStringContainsString('Philippine time', $html);
+    }
+
+    public function test_the_same_group_on_different_days_is_added_together(): void
+    {
+        config(['features.trip_location_v2' => true]);
+        $this->visitors(3, 'KR', null, 'chosen', '', '2026-11-12');
+        $this->visitors(3, 'KR', null, 'chosen', '', '2026-11-13');
+
+        $html = $this->actingAs($this->admin(), 'admin')->get(route('admin.visitor-origin'))->assertOk()->getContent();
+
+        $this->assertMatchesRegularExpression('#South Korea</td><td>6</td>#', $html, '3 + 3 reaches the minimum of 5 only when added');
     }
 
     public function test_a_bad_date_is_refused(): void
@@ -205,7 +226,7 @@ class VisitorOriginAdminTest extends TestCase
         $this->visitors(6, 'AS', 'Ilocos Norte');
 
         $html = $this->actingAs($this->admin(), 'admin')->get(route('admin.visitor-origin'))->assertOk()->getContent();
-        preg_match('/Philippine visitors by province.*$/s', $html, $m);
+        preg_match('/Philippine visitors by province.*?By city or municipality/s', $html, $m);
 
         $this->assertStringContainsString('Ilocos Norte', $m[0]);
         $this->assertMatchesRegularExpression('#Ilocos Norte</td><td>6</td>#', $m[0], 'only the 6 Philippine rows are counted, not 12');
@@ -220,5 +241,47 @@ class VisitorOriginAdminTest extends TestCase
 
         config(['features.trip_location_v2' => false]);
         $this->actingAs($admin, 'admin')->get(route('admin.overview'))->assertDontSee('Visitor origin');
+    }
+
+    // ---- the CSV ------------------------------------------------------------------------------------------
+
+    public function test_the_csv_holds_the_same_suppressed_totals_and_no_per_day_rows(): void
+    {
+        config(['features.trip_location_v2' => true]);
+        $this->visitors(3, 'KR', null, 'chosen', '', '2026-11-12');
+        $this->visitors(3, 'KR', null, 'chosen', '', '2026-11-13');
+        $this->visitors(2, 'JP');
+        $this->visitors(3, 'TH');
+
+        $admin = $this->admin();
+        $response = $this->actingAs($admin, 'admin')->get(route('admin.visitor-origin.export'))->assertOk();
+        $csv = $response->streamedContent();
+
+        $this->assertStringContainsString('text/csv', $response->headers->get('Content-Type'));
+        $this->assertStringContainsString('"South Korea",6', $csv, 'added over the days, and over the minimum');
+        $this->assertStringNotContainsString('Japan', $csv, 'a group under 5 is never in the file');
+        $this->assertStringNotContainsString('2026-11-12', $csv, 'no per-day rows');
+        $this->assertStringContainsString('Counting rule', $this->actingAs($admin, 'admin')->get(route('admin.visitor-origin'))->getContent());
+    }
+
+    public function test_the_csv_follows_the_date_filter_and_says_when_there_is_too_little(): void
+    {
+        config(['features.trip_location_v2' => true]);
+        $this->visitors(6, 'KR', null, 'chosen', '', '2026-11-12');
+
+        $csv = $this->actingAs($this->admin(), 'admin')->get(route('admin.visitor-origin.export', ['from' => '2026-11-13']))->assertOk()->streamedContent();
+
+        $this->assertStringNotContainsString('South Korea', $csv);
+        $this->assertStringContainsString('Not enough answers yet: 0 so far; at least 5 are needed.', $csv);
+    }
+
+    public function test_a_csv_cell_can_never_start_a_spreadsheet_formula(): void
+    {
+        $method = new \ReflectionMethod(\App\Http\Controllers\Admin\AdminVisitorOriginController::class, 'safeCell');
+
+        foreach (['=1+1', '+1', '-1', '@x', "\tx"] as $value) {
+            $this->assertStringStartsWith("'", $method->invoke(null, $value), $value);
+        }
+        $this->assertSame('Cebu City (Philippines)', $method->invoke(null, 'Cebu City (Philippines)'));
     }
 }
