@@ -28,6 +28,7 @@
             $moreTypeSelected = $moreTypes->contains(request('specialization'));
         @endphp
         @include('partials.catalog-categories', [
+            'fallbackIcon' => 'compass',
             'categoryLabel' => 'Tour operator specializations',
             'categoryParam' => 'specialization',
             'allCategoriesLabel' => 'All Specializations',

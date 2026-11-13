@@ -168,3 +168,9 @@ body.hero-page .site-header:not(.scrolled) .lang-switch a[aria-current="true"] {
 .site-header .header-actions .lang-switch { display: none; }
 @media (min-width: 1366px) { .site-header .header-actions .lang-switch { display: inline-flex; } }
 .mobile-menu__utility { padding: 4px 2px 14px; }
+
+/* ===== An icon in front of each category chip on the listing pages ===== */
+.catalog-categories > a.chip { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.catalog-categories .chip__icon { width: 18px; height: 18px; flex: none; }
+.catalog-categories__menu a { display: flex; align-items: center; gap: 10px; }
+.catalog-categories__menu .chip__icon { color: var(--primary); }

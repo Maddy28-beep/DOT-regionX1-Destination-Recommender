@@ -28,6 +28,7 @@
             $moreTypeSelected = $moreTypes->contains(request('cuisine_type'));
         @endphp
         @include('partials.catalog-categories', [
+            'fallbackIcon' => 'utensils',
             'categoryLabel' => 'Restaurant cuisines',
             'categoryParam' => 'cuisine_type',
             'allCategoriesLabel' => 'All Cuisines',
