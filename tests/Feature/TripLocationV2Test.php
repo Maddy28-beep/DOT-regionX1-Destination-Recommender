@@ -383,7 +383,7 @@ class TripLocationV2Test extends TestCase
 
     // ---- privacy notice, only with the switch on ------------------------------------------------------------
 
-    private const FORM_NOTICE = 'Optional. Used for tourism statistics. Not linked to your name. Deleted after 30 days.';
+    private const FORM_NOTICE = 'Optional. Your country, province and city are kept as an anonymous statistic for tourism planning, not linked to you. The rest of your trip details are deleted after 30 days.';
 
     public function test_the_origin_question_carries_the_privacy_notice_when_the_switch_is_on(): void
     {
