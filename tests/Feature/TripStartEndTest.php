@@ -492,6 +492,24 @@ class TripStartEndTest extends TestCase
             ->assertSee('The end time includes the return to your pick-up location, with 2 hours to spare.', false);
     }
 
+    public function test_the_return_line_says_end_time_not_finish_by(): void
+    {
+        $this->post(route('plan.update'), $this->form())->assertSessionHasNoErrors();
+
+        $html = $this->get(route('plan.itinerary'))->assertOk()->getContent();
+        $this->assertStringContainsString('before your 10:00 AM end time, a planning allowance.', $html);
+        $this->assertStringNotContainsString('finish-by', $html);
+    }
+
+    public function test_the_origin_label_keeps_travelling_from_and_the_old_script_leaves_it_alone(): void
+    {
+        $this->get(route('plan.edit'))->assertOk()->assertSee('Where are you travelling from?', false);
+
+        // app.js used to overwrite the label with "visiting from" for everyone; it must skip the new origin block.
+        $js = file_get_contents(public_path('js/app.js'));
+        $this->assertStringContainsString("if (label && !field.hasAttribute('data-origin-v2')) label.textContent = 'Where are you visiting from?';", $js);
+    }
+
     public function test_the_form_for_an_old_trip_shows_the_start_and_end_it_works_out_to(): void
     {
         $p = TouristPreference::create([
