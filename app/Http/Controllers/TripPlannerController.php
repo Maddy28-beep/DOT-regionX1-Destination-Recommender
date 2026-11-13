@@ -24,6 +24,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use App\Services\Recommendation\ItineraryScheduleBuilder;
 use App\Support\Features;
+use App\Support\TripWindow;
 use App\Support\Geo\Countries;
 use App\Support\Geo\PhProvinces;
 use App\Support\Geo\RegionXi;
@@ -137,7 +138,11 @@ class TripPlannerController extends Controller
         $v2 = Features::tripLocation();
 
         $data = $request->validate([
-            'travel_days' => ['required', 'integer', 'min:1', 'max:30'],
+            // With trip_location_v2 on there is no number of days to enter: the days follow from the start and the end below.
+            'travel_days' => $v2 ? ['nullable'] : ['required', 'integer', 'min:1', 'max:30'],
+            // The trip's real start and end, in Philippine time (trip_location_v2). Read as one browser date-time each.
+            'start_at' => $v2 ? ['required', 'string', 'max:16'] : ['nullable'],
+            'end_at' => $v2 ? ['required', 'string', 'max:16'] : ['nullable'],
             'travel_type' => ['required', 'string', 'max:20'],
             /*
              * Both required as of the forced-input pass: travel_purpose and
@@ -174,8 +179,8 @@ class TripPlannerController extends Controller
             'visitor_origin_country' => $v2 ? ['nullable', 'string', 'max:10', 'required_unless:visitor_type,Regular / Local'] : ['nullable', 'string', 'max:10'],
             'visitor_origin_province' => ['nullable', 'string', 'max:80'],
             'visitor_origin_city' => ['nullable', 'string', 'max:100'],
-            // The latest the traveller wants to be done on the last day ("finish by"). Philippine time.
-            'end_time' => ['nullable', 'date_format:H:i'],
+            // Not on the form with the switch on (the end is end_at); an old form may still post it, and it is not read.
+            'end_time' => $v2 ? ['nullable'] : ['nullable', 'date_format:H:i'],
             'budget' => ['required', 'string', 'max:20'],
             'accommodation_pref' => ['required', 'string', 'max:20'],
             // Which kind of resort, when a resort was asked for; ignored (and cleared) for anything else.
@@ -184,8 +189,8 @@ class TripPlannerController extends Controller
             // How they will get around. Optional: no answer plans as a personal car, as every trip did before this.
             'transport_pref' => ['nullable', Rule::in(TransportMode::keys())],
             // Not more than two years ahead: a typo such as 2062 would otherwise be planned as written.
-            'start_date' => ['nullable', 'date', 'before_or_equal:'.now('Asia/Manila')->addYears(2)->toDateString()],
-            'arrival_time' => ['nullable', 'date_format:H:i'],
+            'start_date' => $v2 ? ['nullable'] : ['nullable', 'date', 'before_or_equal:'.now('Asia/Manila')->addYears(2)->toDateString()],
+            'arrival_time' => $v2 ? ['nullable'] : ['nullable', 'date_format:H:i'],
             /*
              * Leaving (all optional). The time is what the planner uses. There is no departure date to enter: the traveller
              * leaves on the last day of the trip, arrival date + (days - 1), derived in TouristPreference::departureDate().
@@ -211,11 +216,20 @@ class TripPlannerController extends Controller
             'health_other' => ['nullable', 'string', 'max:300'],
         ]);
 
+        $window = null;
         if ($v2) {
+            $window = $this->validateTripWindow($data);
             $this->validateTripLocation($request, $data);
+            // The planner is fed from the same columns as before: the days, the arrival date and time and the end time are
+            // all derived from the two moments, never entered.
+            $data['travel_days'] = TripWindow::calendarDays($window[0], $window[1]);
+            $data['start_date'] = $window[0]->toDateString();
+            $data['arrival_time'] = $window[0]->format('H:i');
+            $data['end_time'] = $window[1]->format('H:i');
         } else {
             $this->validateDeparture($request, $data);
         }
+        unset($data['start_at'], $data['end_at']);
 
         // A setting only means something for a resort, and an unanswered field must clear a previous answer.
         $data['resort_setting'] = $data['accommodation_pref'] === 'Resort' ? ($data['resort_setting'] ?? null) : null;
@@ -235,7 +249,12 @@ class TripPlannerController extends Controller
         $this->applyOrigin($preference, $data);
         if ($v2) {
             // No departure point any more: the old columns are left as they were and are not read (see TouristPreference::departure).
-            $this->applyTripEnd($preference, $data);
+            $preference->forceFill([
+                'start_at' => TripWindow::toStorage($window[0]),
+                'end_at' => TripWindow::toStorage($window[1]),
+                'duration_days' => TripWindow::durationDays($window[0], $window[1]),
+                'end_date' => $window[1]->toDateString(),
+            ]);
             $this->applyVisitorOrigin($preference, $data);
         } else {
             $this->applyDeparture($preference, $data);
@@ -443,15 +462,6 @@ class TripPlannerController extends Controller
     private function validateTripLocation(Request $request, array $data): void
     {
         $errors = [];
-        $existing = $this->currentPreference($request);
-
-        if (filled($data['start_date'] ?? null)) {
-            $today = Carbon::now('Asia/Manila')->toDateString();
-            $same = $existing?->start_date !== null && $existing->start_date->toDateString() === Carbon::parse($data['start_date'])->toDateString();
-            if (! $same && Carbon::parse($data['start_date'])->toDateString() < $today) {
-                $errors['start_date'] = 'That date has already passed. Choose today or a later date (Philippine time), or leave the date blank.';
-            }
-        }
 
         $point = null;
         if (isset($data['origin_lat'], $data['origin_lng'])) {
@@ -464,24 +474,40 @@ class TripPlannerController extends Controller
             $errors['origin_label'] = RegionXi::MESSAGE;
         }
 
-        $end = $data['end_time'] ?? null;
-        if ($end !== null && (int) $data['travel_days'] === 1) {
-            $start = filled($data['arrival_time'] ?? null) ? $data['arrival_time'] : ItineraryScheduleBuilder::EARLIEST_DEPARTURE;
-            if ($end <= $start) {
-                $errors['end_time'] = 'Your finish-by time has to be after your start time on a one-day trip.';
-            }
-        }
-
         if ($errors !== []) {
             throw \Illuminate\Validation\ValidationException::withMessages($errors);
         }
     }
 
-    /** The trip's last day and the finish-by time. The date is derived (start + days - 1), never entered. */
-    private function applyTripEnd(TouristPreference $preference, array $data): void
+    /**
+     * The trip's real start and end (trip_location_v2). Both have to be real dates and times in Philippine time; the start
+     * cannot be in the past (an administrator who is signed in, or TRIP_ALLOW_PAST_START for a demo, can); the end is at
+     * least 3 hours after it and the trip at most 30 days (TripWindow).
+     *
+     * @param  array<string, mixed>  $data  the validated input
+     * @return array{0: Carbon, 1: Carbon}
+     */
+    private function validateTripWindow(array $data): array
     {
-        $preference->end_time = blank($data['end_time'] ?? null) ? null : $data['end_time'];
-        $preference->end_date = $preference->departureDate()?->toDateString();
+        $start = TripWindow::parse($data['start_at'] ?? null);
+        $end = TripWindow::parse($data['end_at'] ?? null);
+
+        $errors = [];
+        if ($start === null) {
+            $errors['start_at'] = 'Enter a real start date and time.';
+        }
+        if ($end === null) {
+            $errors['end_at'] = 'Enter a real end date and time.';
+        }
+
+        $allowPast = (bool) config('itinerary.trip_window.allow_past_start') || auth('admin')->check();
+        $errors += TripWindow::errors($start, $end, $allowPast);
+
+        if ($errors !== []) {
+            throw \Illuminate\Validation\ValidationException::withMessages($errors);
+        }
+
+        return [$start, $end];
     }
 
     /**
@@ -496,7 +522,7 @@ class TripPlannerController extends Controller
 
         if ($country === '') {
             $preference->forceFill($reset);   // a local who was not asked, or nothing chosen
-            $preference->place_of_origin = $preference->place_of_origin ?: null;
+            $preference->place_of_origin = null;   // the free-text box is gone with the switch on: nothing answered means no origin, not last trip's
 
             return;
         }

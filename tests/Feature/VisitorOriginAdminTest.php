@@ -127,6 +127,90 @@ class VisitorOriginAdminTest extends TestCase
             ->assertOk()->assertSee('Not enough answers yet');
     }
 
+    public function test_an_empty_table_always_says_why_and_how_many_answers_there_are(): void
+    {
+        config(['features.trip_location_v2' => true]);
+        $admin = $this->admin();
+
+        // No answers at all.
+        $this->actingAs($admin, 'admin')->get(route('admin.visitor-origin'))->assertOk()
+            ->assertSee('Not enough answers yet: 0 answers so far; at least 5 are needed.');
+
+        // Two answers: the count is shown, the places are not.
+        $this->visitors(1, 'KR');
+        $this->visitors(1, 'PH', 'Cebu');
+        $html = $this->actingAs($admin, 'admin')->get(route('admin.visitor-origin'))->assertOk()->getContent();
+        $this->assertStringContainsString('Not enough answers yet: 2 answers so far; at least 5 are needed.', $html);
+        $this->assertStringContainsString('Not enough answers yet: 1 answer so far; at least 5 are needed.', $html);
+        $this->assertStringNotContainsString('South Korea', $html);
+        $this->assertSame(3, substr_count($html, 'data-origin-empty'), 'one message per table');
+    }
+
+    public function test_the_page_does_not_use_the_one_screen_layout_that_squeezed_empty_cards(): void
+    {
+        config(['features.trip_location_v2' => true]);
+
+        $html = $this->actingAs($this->admin(), 'admin')->get(route('admin.visitor-origin'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('adm-origin', $html);
+        $this->assertStringNotContainsString('adm-fit', $html);
+    }
+
+    public function test_the_page_says_counts_are_per_browser_session(): void
+    {
+        config(['features.trip_location_v2' => true]);
+
+        $this->actingAs($this->admin(), 'admin')->get(route('admin.visitor-origin'))->assertOk()
+            ->assertSee('Counts are per browser session; a new submission replaces the earlier one.');
+    }
+
+    public function test_the_date_filter_reads_days_in_philippine_time_and_to_includes_the_whole_day(): void
+    {
+        config(['features.trip_location_v2' => true]);
+        $admin = $this->admin();
+
+        // 12 Nov 15:59:59 UTC is 12 Nov 23:59:59 in Manila; 12 Nov 17:00 UTC is 13 Nov 01:00; 13 Nov 15:59:59 UTC is 13 Nov 23:59:59; 13 Nov 16:00 UTC is 14 Nov 00:00.
+        foreach (['2026-11-12 15:59:59' => 'JP', '2026-11-12 17:00:00' => 'KR', '2026-11-13 15:59:59' => 'US', '2026-11-13 16:00:00' => 'AU'] as $utc => $country) {
+            for ($i = 0; $i < 5; $i++) {
+                $p = new TouristPreference();
+                $p->forceFill([
+                    'travel_days' => 1, 'travel_type' => 'Couple', 'travel_purpose' => 'Leisure', 'visitor_type' => 'Regular / Foreign',
+                    'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => 'moderate',
+                    'visitor_origin_country_code' => $country, 'visitor_origin_source' => 'chosen', 'created_at' => $utc,
+                ])->save();
+            }
+        }
+
+        $html = $this->actingAs($admin, 'admin')->get(route('admin.visitor-origin', ['from' => '2026-11-13', 'to' => '2026-11-13']))->assertOk()->getContent();
+
+        $this->assertStringContainsString('South Korea', $html, '13 Nov 01:00 Manila is inside the 13th');
+        $this->assertStringContainsString('United States', $html, '13 Nov 23:59 Manila is inside the 13th (the whole day is included)');
+        $this->assertStringNotContainsString('Japan', $html, '12 Nov 23:59 Manila is the 12th');
+        $this->assertStringNotContainsString('Australia', $html, '14 Nov 00:00 Manila is the 14th');
+        $this->assertStringContainsString('Philippine time', $html);
+    }
+
+    public function test_a_bad_date_is_refused(): void
+    {
+        config(['features.trip_location_v2' => true]);
+
+        $this->actingAs($this->admin(), 'admin')->get(route('admin.visitor-origin', ['from' => 'yesterday']))->assertSessionHasErrors('from');
+    }
+
+    public function test_the_province_table_counts_only_philippine_rows(): void
+    {
+        config(['features.trip_location_v2' => true]);
+        $this->visitors(6, 'PH', 'Ilocos Norte');
+        // A row that should never exist (a province saved with another country) must not reach the Philippine table.
+        $this->visitors(6, 'AS', 'Ilocos Norte');
+
+        $html = $this->actingAs($this->admin(), 'admin')->get(route('admin.visitor-origin'))->assertOk()->getContent();
+        preg_match('/Philippine visitors by province.*$/s', $html, $m);
+
+        $this->assertStringContainsString('Ilocos Norte', $m[0]);
+        $this->assertMatchesRegularExpression('#Ilocos Norte</td><td>6</td>#', $m[0], 'only the 6 Philippine rows are counted, not 12');
+    }
+
     public function test_the_menu_link_shows_only_with_the_switch_on(): void
     {
         $admin = $this->admin();

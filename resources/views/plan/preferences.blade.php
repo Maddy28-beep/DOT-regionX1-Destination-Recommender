@@ -118,11 +118,25 @@
                             Coordinates are rounded to ~110 m before storage (see
                             TripPlannerController::applyOrigin).
                         --}}
+                        @php
+                            // trip_location_v2: this is the PICK-UP location, where the itinerary physically starts. A trip with no
+                            // pick-up yet starts from Davao International Airport (the arrival point for the region), which the
+                            // traveller can change to a hotel, a port or any address, or clear to plan from Davao City centre.
+                            $pickupV2 = \App\Support\Features::tripLocation();
+                            $pickupDefault = $pickupV2 && ! session()->hasOldInput() && blank($preference->origin_label) && $preference->origin_lat === null;
+                            $pickupLabel = $pickupDefault ? 'Davao International Airport' : old('origin_label', $preference->origin_label);
+                            $pickupLat = $pickupDefault ? '7.13' : old('origin_lat', $preference->origin_lat);
+                            $pickupLng = $pickupDefault ? '125.645' : old('origin_lng', $preference->origin_lng);
+                        @endphp
                         <div class="plan-section pc-block pc-trip-start">
-                            <header class="pc-block__head"><h3>Where will you start each day?</h3><p>Optional. We order your stops from the nearest to the furthest.</p></header>
+                            @if ($pickupV2)
+                                <header class="pc-block__head"><h3>Pick-up location</h3><p>Where your trip physically starts: your hotel, the airport or port you arrive at, or any address in Davao Region. Free text is fine. Your first stop is planned from here, and your last stop has to get you back here before your trip ends.</p></header>
+                            @else
+                                <header class="pc-block__head"><h3>Where will you start each day?</h3><p>Optional. We order your stops from the nearest to the furthest.</p></header>
+                            @endif
 
-                            <input type="hidden" name="origin_lat" id="origin_lat" value="{{ old('origin_lat', $preference->origin_lat) }}">
-                            <input type="hidden" name="origin_lng" id="origin_lng" value="{{ old('origin_lng', $preference->origin_lng) }}">
+                            <input type="hidden" name="origin_lat" id="origin_lat" value="{{ $pickupLat }}">
+                            <input type="hidden" name="origin_lng" id="origin_lng" value="{{ $pickupLng }}">
 
                             <div class="pc-grid">
                                 <div class="field pc-field pc-col-8">
@@ -136,7 +150,7 @@
                                         <input type="text"
                                                id="origin_label"
                                                name="origin_label"
-                                               value="{{ old('origin_label', $preference->origin_label) }}"
+                                               value="{{ $pickupLabel }}"
                                                placeholder="Hotel, airport or address"
                                                autocomplete="off"
                                                role="combobox"
@@ -170,10 +184,10 @@
                                 <div class="pc-col-12 pc-start-notes">
                                     <div class="origin-control">
                                         <button type="button" class="btn btn-outline btn-sm" id="origin-clear"
-                                                @if (! $preference->origin_lat && ! $preference->origin_label) hidden @endif>Clear</button>
+                                                @if (! $pickupLat && ! $pickupLabel) hidden @endif>Clear</button>
                                         <span class="origin-status" id="origin-status" role="status">
-                                            @if ($preference->origin_label)
-                                                Starting from {{ $preference->origin_label }}.
+                                            @if ($pickupLabel)
+                                                Starting from {{ $pickupLabel }}.
                                             @else
                                                 Not set &mdash; we'll plan from Davao City centre.
                                             @endif
@@ -465,6 +479,7 @@
 <script src="{{ asset('js/plan-origin.js') }}?v={{ filemtime(public_path('js/plan-origin.js')) }}" defer></script>
 <script src="{{ asset('js/plan-departure.js') }}?v={{ filemtime(public_path('js/plan-departure.js')) }}" defer></script>
 <script src="{{ asset('js/plan-origin-select.js') }}?v={{ filemtime(public_path('js/plan-origin-select.js')) }}" defer></script>
+<script src="{{ asset('js/plan-trip-window.js') }}?v={{ filemtime(public_path('js/plan-trip-window.js')) }}" defer></script>
 <script src="{{ asset('js/plan-comfort.js') }}?v={{ filemtime(public_path('js/plan-comfort.js')) }}" defer></script>
 <script src="{{ asset('js/plan-wizard.js') }}?v={{ filemtime(public_path('js/plan-wizard.js')) }}" defer></script>
 {{-- After the wizard script: it builds the step panels this one folds parts of. --}}
