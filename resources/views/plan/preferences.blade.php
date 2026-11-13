@@ -165,6 +165,9 @@
                                 <div class="field pc-field pc-col-4">
                                     <span class="pc-label" aria-hidden="true">&nbsp;</span>
                                     <button type="button" class="btn btn-outline pc-locate" id="origin-btn" @if (\App\Support\Features::tripLocation()) data-region-xi="{{ \App\Support\Geo\RegionXi::json() }}" @endif><x-icon name="locate" /> Use my current location</button>
+                                    @if (\App\Support\Features::tripLocation())
+                                        <p class="pc-hint" data-origin-abroad-help>Planning from abroad? Pick where you will arrive or stay in Davao Region.</p>
+                                    @endif
                                 </div>
 
                                 {{-- Where most visitors arrive. A tap fills the box and the two hidden coordinates, so the plan never depends on
