@@ -16,6 +16,15 @@ use Illuminate\Support\Carbon;
  */
 final class TripSpan
 {
+    private static function allowanceText(): string
+    {
+        $minutes = max(0, (int) config('itinerary.departure.airport_buffer_minutes', 120));
+
+        return $minutes % 60 === 0 && $minutes > 0
+            ? ($minutes / 60).' '.($minutes === 60 ? 'hour' : 'hours')
+            : $minutes.' minutes';
+    }
+
     /**
      * @return array{start_label: string, end_label: string, duration: ?string, duration_days: ?int, from: ?string, pickup: string, summary: string, known: bool}
      */
@@ -45,6 +54,8 @@ final class TripSpan
             'from' => $from,
             'pickup' => $pickup,
             'summary' => implode(' · ', $parts),
+            // The end includes the way back to the pick-up, with the planning allowance (config) to spare.
+            'note' => 'The end time includes the return to your pick-up location, with '.self::allowanceText().' to spare.',
             'known' => $start !== null && $end !== null,
         ];
     }

@@ -60,7 +60,7 @@ class TouristPreference extends Model
         return TripWindow::fromStorage($this->attributes['end_at'] ?? null) ?? $this->legacyWindow()[1] ?? null;
     }
 
-    /** The derived length in days (rounded up). The stored value, or the one an older trip works out to. */
+    /** The calendar days the trip touches (the Day 1, 2, 3 tabs). The stored value, or the one an older trip works out to. */
     public function tripDurationDays(): ?int
     {
         if (($this->attributes['duration_days'] ?? null) !== null) {

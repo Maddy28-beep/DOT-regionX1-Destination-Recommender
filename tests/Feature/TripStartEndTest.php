@@ -165,7 +165,7 @@ class TripStartEndTest extends TestCase
         $start = TripWindow::parse('2026-12-01T14:00');
         $end = TripWindow::parse('2026-12-03T10:00');
 
-        $this->assertSame(2, TripWindow::durationDays($start, $end), '44 hours is 1.83 days, rounded up');
+        $this->assertSame(3, TripWindow::durationDays($start, $end), 'the calendar days touched, like the Day 1, 2, 3 tabs');
         $this->assertSame('1 day, 20 hours', TripWindow::text($start, $end));
         $this->assertSame(3, TripWindow::calendarDays($start, $end), 'the plan has a partial first day, a full day and a partial last day');
     }
@@ -176,11 +176,11 @@ class TripStartEndTest extends TestCase
         return [
             'three hours' => ['2026-12-01T09:00', '2026-12-01T12:00', '3 hours', 1, 1],
             'a day and a half' => ['2026-12-01T09:00', '2026-12-02T21:00', '1 day, 12 hours', 2, 2],
-            'exactly two days' => ['2026-12-01T09:00', '2026-12-03T09:00', '2 days', 2, 3],
+            'exactly two days' => ['2026-12-01T09:00', '2026-12-03T09:00', '2 days', 3, 3],
             'minutes count' => ['2026-12-01T09:00', '2026-12-01T12:30', '3 hours, 30 minutes', 1, 1],
             'three days five hours' => ['2026-12-01T08:00', '2026-12-04T13:00', '3 days, 5 hours', 4, 4],
-            'across midnight' => ['2026-12-01T22:00', '2026-12-02T03:00', '5 hours', 1, 2],
-            'across new year' => ['2026-12-31T20:00', '2027-01-01T08:00', '12 hours', 1, 2],
+            'across midnight' => ['2026-12-01T22:00', '2026-12-02T03:00', '5 hours', 2, 2],
+            'across new year' => ['2026-12-31T20:00', '2027-01-01T08:00', '12 hours', 2, 2],
         ];
     }
 
@@ -202,7 +202,7 @@ class TripStartEndTest extends TestCase
         $p = TouristPreference::first();
         $this->assertSame('2026-12-01 14:00:00', substr((string) $p->getRawOriginal('start_at'), 0, 19));
         $this->assertSame('2026-12-03 10:00:00', substr((string) $p->getRawOriginal('end_at'), 0, 19));
-        $this->assertSame(2, $p->duration_days);
+        $this->assertSame(3, $p->duration_days, 'calendar days touched; the exact length is shown separately');
         // What the planner is fed from, derived and never entered.
         $this->assertSame(3, (int) $p->travel_days);
         $this->assertSame('2026-12-01', $p->start_date->toDateString());
@@ -456,6 +456,42 @@ class TripStartEndTest extends TestCase
         $this->assertSame('2026-12-01', $row($withoutTime)->start_date->toDateString());
     }
 
+    public function test_a_saved_trip_whose_start_has_passed_asks_for_a_new_start_instead_of_showing_the_old_one(): void
+    {
+        $p = TouristPreference::create([
+            'travel_days' => 2, 'travel_type' => 'Solo', 'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => 'moderate',
+            'start_date' => '2026-11-10', 'arrival_time' => '08:00:00',
+        ]);
+        $html = $this->withSession([\App\Http\Controllers\TripPlannerController::PREFERENCE_KEY => $p->id])->get(route('plan.edit'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('data-start-passed', $html);
+        $this->assertStringContainsString('Your saved trip started on Tue, 10 Nov 2026, 8:00 AM (Philippine time), which has passed. Please choose a new start and end date and time.', $html);
+        $this->assertStringNotContainsString('value="2026-11-10T08:00"', $html);
+        $this->assertMatchesRegularExpression('/id="start_at" name="start_at" value=""/', $html);
+
+        // A future saved trip is shown as it was, with no message; an administrator keeps a past one.
+        $future = TouristPreference::create([
+            'travel_days' => 2, 'travel_type' => 'Solo', 'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => 'moderate',
+            'start_date' => '2026-12-05', 'arrival_time' => '08:00:00',
+        ]);
+        $ok = $this->withSession([\App\Http\Controllers\TripPlannerController::PREFERENCE_KEY => $future->id])->get(route('plan.edit'))->getContent();
+        $this->assertStringNotContainsString('data-start-passed', $ok);
+        $this->assertStringContainsString('value="2026-12-05T08:00"', $ok);
+
+        $admin = $this->actingAs($this->admin(), 'admin')->withSession([\App\Http\Controllers\TripPlannerController::PREFERENCE_KEY => $p->id])->get(route('plan.edit'))->getContent();
+        $this->assertStringNotContainsString('data-start-passed', $admin);
+        $this->assertStringContainsString('value="2026-11-10T08:00"', $admin);
+    }
+
+    public function test_the_itinerary_says_the_end_includes_the_return_to_the_pick_up(): void
+    {
+        $this->post(route('plan.update'), $this->form())->assertSessionHasNoErrors();
+
+        $this->get(route('plan.itinerary'))->assertOk()
+            ->assertSee('data-trip-span-note', false)
+            ->assertSee('The end time includes the return to your pick-up location, with 2 hours to spare.', false);
+    }
+
     public function test_the_form_for_an_old_trip_shows_the_start_and_end_it_works_out_to(): void
     {
         $p = TouristPreference::create([
@@ -482,6 +518,6 @@ class TripStartEndTest extends TestCase
             ->assertOk()->streamedContent();
 
         $this->assertStringContainsString('"Travel Type",Purpose,Budget,Days,Starts,Created', $csv);
-        $this->assertStringContainsString('Couple,Leisure,Mid-range,2,"2026-12-01 14:00"', $csv, 'Days is the derived length (2), not the three planning days');
+        $this->assertStringContainsString('Couple,Leisure,Mid-range,3,"2026-12-01 14:00"', $csv, 'Days is the calendar days touched (3), like the Day 1, 2, 3 tabs');
     }
 }

@@ -90,6 +90,11 @@
                         <p class="itin-banner__meta" data-trip-span>
                             <span><x-icon name="calendar" aria-hidden="true" /> {{ $span['summary'] }}</span>
                         </p>
+                        @if ($span['known'])
+                            <p class="itin-banner__meta" data-trip-span-note>
+                                <span><x-icon name="info" aria-hidden="true" /> {{ $span['note'] }}</span>
+                            </p>
+                        @endif
                     @endif
                     @if (data_get($itinerary->day_themes, 'ai_skeleton.applied') === true)
                         <span class="plan-badge plan-badge--ai" title="An outside AI service suggested which of the already-chosen places share a day, and the day names. The planner checked the suggestion and kept it only because it fit, with no fewer stops and no more travelling than its own plan."><x-icon name="sparkles" aria-hidden="true" /> Day themes suggested with AI assistance</span>

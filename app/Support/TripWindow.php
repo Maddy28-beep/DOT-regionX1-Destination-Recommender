@@ -140,10 +140,13 @@ final class TripWindow
         return $out === [] ? '0 minutes' : implode(', ', $out);
     }
 
-    /** The derived length stored for queries and reports: the duration in days, rounded up (44 hours is 2). Never below 1. */
+    /**
+     * The length stored for queries and reports: the calendar days the trip touches, so it matches the Day 1, 2, 3 tabs
+     * (1 Dec 14:00 to 3 Dec 10:00 is 3). The exact length ("1 day, 20 hours") is shown separately by text().
+     */
     public static function durationDays(Carbon $start, Carbon $end): int
     {
-        return max(1, (int) ceil($start->diffInMinutes($end) / 1440));
+        return max(1, self::calendarDays($start, $end));
     }
 
     /**

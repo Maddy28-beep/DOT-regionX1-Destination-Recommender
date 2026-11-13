@@ -22,6 +22,13 @@
     $endAtValue = old('end_at', $preference->tripEnd()?->format($inputFormat));
     $nowManilaInput = \App\Support\TripWindow::now()->format($inputFormat);
     $allowPastStart = (bool) config('itinerary.trip_window.allow_past_start') || auth('admin')->check();
+    // A saved trip whose start has passed: do not pre-fill a date that can no longer be chosen, ask for a new one instead.
+    $savedStart = $preference->tripStart();
+    $startHasPassed = ! $allowPastStart && ! session()->hasOldInput() && $savedStart !== null && $savedStart->format($inputFormat) < $nowManilaInput;
+    if ($startHasPassed) {
+        $startAtValue = '';
+        $endAtValue = '';
+    }
     $tripMinHours = \App\Support\TripWindow::minHours();
     $tripMaxDays = \App\Support\TripWindow::maxDays();
     $typeIcons = ['Solo' => 'user', 'Couple' => 'users', 'Family' => 'family', 'Friends' => 'group', 'Business' => 'briefcase'];
@@ -73,6 +80,9 @@
      shows the length as you type; the server checks it again). The wizard places this block after the pick-up location. --}}
 <div class="plan-section pc-block pc-trip-dates pc-trip-window" data-trip-window data-min-hours="{{ $tripMinHours }}" data-max-days="{{ $tripMaxDays }}" data-now="{{ $nowManilaInput }}" data-allow-past="{{ $allowPastStart ? '1' : '0' }}">
     <header class="pc-block__head"><h3>When does your trip start and end?</h3><p>Philippine time. The start is when you are free at your pick-up location; the end is when you have to be finished, for example back at the airport.</p></header>
+    @if ($startHasPassed)
+        <p class="pc-hint is-error" role="alert" data-start-passed>Your saved trip started on {{ $savedStart->format('D, j M Y, g:i A') }} (Philippine time), which has passed. Please choose a new start and end date and time.</p>
+    @endif
     <div class="pc-grid">
         <div class="field pc-field pc-col-6">
             <label for="start_at">Start date &amp; time</label>
