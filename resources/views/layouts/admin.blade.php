@@ -32,6 +32,9 @@
             <a href="{{ route('admin.exit-surveys') }}" class="{{ request()->routeIs('admin.exit-surveys') ? 'active' : '' }}"><x-icon name="chat" /><span>Exit Survey Insights</span></a>
             <a href="{{ route('admin.association-rules') }}" class="{{ request()->routeIs('admin.association-rules') ? 'active' : '' }}"><x-icon name="link" /><span>Association Rules</span></a>
             <a href="{{ route('admin.audit-log') }}" class="{{ request()->routeIs('admin.audit-log') ? 'active' : '' }}"><x-icon name="shield-check" /><span>Audit Log</span></a>
+            @if (\App\Support\Features::tripLocation())
+                <a href="{{ route('admin.visitor-origin') }}" class="{{ request()->routeIs('admin.visitor-origin') ? 'active' : '' }}"><x-icon name="map-pin" /><span>Visitor origin</span></a>
+            @endif
             <a href="{{ route('admin.data-completeness') }}" class="{{ request()->routeIs('admin.data-completeness*') ? 'active' : '' }}"><x-icon name="database" /><span>Data completeness</span></a>
 
             <div class="group-label">Accreditation</div>

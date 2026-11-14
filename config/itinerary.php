@@ -104,4 +104,24 @@ return [
     'departure' => [
         'airport_buffer_minutes' => (int) env('ITINERARY_DEPARTURE_BUFFER_MINUTES', 120),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Trip start and end (trip_location_v2)
+    |--------------------------------------------------------------------------
+    |
+    | The traveller gives the real start (when they are free at the pick-up location) and the real end (when the trip has
+    | to be finished), both in Philippine time. The end has to be at least min_hours after the start and the trip at most
+    | max_days long (days counted both ways: the length, and the calendar days it touches).
+    |
+    | allow_past_start (TRIP_ALLOW_PAST_START=true) lets a start in the past through for everyone, for a demo. An
+    | administrator who is signed in is always allowed. Visitors are anonymous, so there is no "demo account" to key on.
+    |
+    */
+
+    'trip_window' => [
+        'min_hours' => (int) env('TRIP_MIN_HOURS', 3),
+        'max_days' => (int) env('TRIP_MAX_DAYS', 30),
+        'allow_past_start' => (bool) env('TRIP_ALLOW_PAST_START', false),
+    ],
 ];

@@ -955,7 +955,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var field = document.querySelector('[data-origin-field]');
     if (!toggles.length || !field) return;
 
-    var input = field.querySelector('input');
+    var input = field.querySelector('[data-origin-required]') || field.querySelector('input');
     var hint = field.querySelector('[data-origin-hint]');
     var label = field.querySelector('[data-origin-label]');
     var defaultHint = hint ? hint.textContent : '';
@@ -965,7 +965,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var chosen = document.querySelector('[data-local-toggle]:checked');
         var isLocal = !!chosen && chosen.value === 'Regular / Local';
         input.required = !isLocal;
-        if (label) label.textContent = 'Where are you visiting from?';
+        if (label && !field.hasAttribute('data-origin-v2')) label.textContent = 'Where are you visiting from?';
         if (hint) hint.textContent = isLocal ? 'Optional. Skip it if you live in Davao.' : defaultHint;
     }
 

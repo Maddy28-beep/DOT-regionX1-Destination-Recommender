@@ -339,3 +339,9 @@ body.admin .admin-sidebar .adm-nb { margin-left: auto; min-width: 20px; height: 
 .fb-dist__bar i { display: block; height: 100%; background: var(--primary); }
 .fb-dist__n { color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
 .fb-trend { margin: 10px 0 0; font-size: .82rem; color: var(--muted); }
+
+/* Visitor origin: a normal flowing page (not the one-screen layout), so a card is never squeezed to nothing. */
+.adm-origin { display: flex; flex-direction: column; gap: 14px; }
+.adm-origin .adm-card__body { max-height: none; overflow: visible; }
+.adm-origin__note { margin: 0; font-size: .8rem; color: var(--muted); }
+.adm-origin__empty { margin: 0; padding: 18px 16px; font-size: .88rem; color: var(--text, inherit); }

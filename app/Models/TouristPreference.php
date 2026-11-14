@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Services\Recommendation\ContentBasedRecommendationService;
+use App\Support\Features;
+use App\Support\TripWindow;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -22,6 +25,8 @@ class TouristPreference extends Model
         'resort_setting', 'distance_pref', 'transport_pref', 'accessibility_notes', 'start_date', 'arrival_time',
         'origin_lat', 'origin_lng', 'origin_label', 'variation',
         'departure_date', 'departure_time', 'departure_lat', 'departure_lng', 'departure_label',
+        'end_date', 'end_time', 'start_at', 'end_at', 'duration_days',
+        'visitor_origin_country_code', 'visitor_origin_region', 'visitor_origin_province', 'visitor_origin_city', 'visitor_origin_source',
     ];
 
     protected function casts(): array
@@ -29,11 +34,48 @@ class TouristPreference extends Model
         return [
             'start_date' => 'date',
             'departure_date' => 'date',
+            'end_date' => 'date',
             'departure_lat' => 'float',
             'departure_lng' => 'float',
             'origin_lat' => 'float',
             'origin_lng' => 'float',
         ];
+    }
+
+    /**
+     * The trip's real start, in Philippine time: the moment the traveller is free at the pick-up location.
+     * A trip saved before start and end existed is mapped from its arrival date and time (09:00 when none).
+     */
+    public function tripStart(): ?Carbon
+    {
+        return TripWindow::fromStorage($this->attributes['start_at'] ?? null) ?? $this->legacyWindow()[0] ?? null;
+    }
+
+    /**
+     * The trip's real end, in Philippine time. A trip saved before start and end existed ends on its last day at the
+     * finish-by time, or at 23:59 when there was none.
+     */
+    public function tripEnd(): ?Carbon
+    {
+        return TripWindow::fromStorage($this->attributes['end_at'] ?? null) ?? $this->legacyWindow()[1] ?? null;
+    }
+
+    /** The calendar days the trip touches (the Day 1, 2, 3 tabs). The stored value, or the one an older trip works out to. */
+    public function tripDurationDays(): ?int
+    {
+        if (($this->attributes['duration_days'] ?? null) !== null) {
+            return (int) $this->attributes['duration_days'];
+        }
+        $start = $this->tripStart();
+        $end = $this->tripEnd();
+
+        return $start && $end ? TripWindow::durationDays($start, $end) : ((int) $this->travel_days ?: null);
+    }
+
+    /** @return array{0: Carbon, 1: Carbon}|null */
+    private function legacyWindow(): ?array
+    {
+        return TripWindow::fromLegacy($this->start_date, $this->arrival_time, (int) $this->travel_days, $this->end_time);
     }
 
     /**
@@ -88,6 +130,26 @@ class TouristPreference extends Model
      */
     public function departure(): ?array
     {
+        // trip_location_v2: there is no departure point any more. The traveller gives a "finish by" time, and the allowance
+        // before it covers the journey from the last stop back to where the trip started (the start point, or the Davao City
+        // centre baseline when none was given). 'finish' lets the schedule word it as a finish-by time, not a flight.
+        if (Features::tripLocation()) {
+            if (blank($this->end_time)) {
+                return null;
+            }
+
+            $start = $this->origin() ?? [
+                'lat' => ContentBasedRecommendationService::DEFAULT_ORIGIN_LAT,
+                'lng' => ContentBasedRecommendationService::DEFAULT_ORIGIN_LNG,
+            ];
+
+            return [
+                'time' => substr((string) $this->end_time, 0, 5),
+                'point' => $start + ['label' => $this->startLabel()],
+                'finish' => true,
+            ];
+        }
+
         if (blank($this->departure_time)) {
             return null;
         }
