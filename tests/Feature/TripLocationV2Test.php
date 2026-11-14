@@ -167,7 +167,7 @@ class TripLocationV2Test extends TestCase
             $this->assertStringContainsString('&quot;'.$province.'&quot;', $html);
         }
         $js = file_get_contents(public_path('js/plan-origin-select.js'));
-        $this->assertStringContainsString("el.disabled = outside", $js);
+        $this->assertStringContainsString("locate.disabled = outside", $js);
     }
 
     public function test_from_inside_region_xi_the_pick_up_is_kept_as_chosen(): void
@@ -187,23 +187,37 @@ class TripLocationV2Test extends TestCase
         ]))->assertSessionHasErrors('origin_label');
     }
 
-    public function test_from_outside_region_xi_nothing_posted_for_the_pick_up_is_read(): void
+    public function test_from_outside_region_xi_a_typed_pick_up_inside_the_region_is_kept(): void
     {
         foreach ([['PH', 'Cebu'], ['JP', ''], ['US', '']] as [$country, $province]) {
             TouristPreference::query()->delete();
-            // Even a pick-up outside the region, which would be refused from inside, is simply ignored.
             $this->post(route('plan.update'), $this->form([
                 'visitor_origin_country' => $country, 'visitor_origin_province' => $province,
-                'origin_lat' => '14.5995', 'origin_lng' => '120.9842', 'origin_label' => 'Manila Hotel',
+                'origin_lat' => '7.056', 'origin_lng' => '125.602', 'origin_label' => 'Davao City Overland Transport Terminal, Ecoland',
             ]))->assertSessionHasNoErrors()->assertRedirect(route('plan.itinerary'));
 
             $p = TouristPreference::first();
-            $this->assertNull($p->origin_lat, $country);
-            $this->assertNull($p->origin_lng, $country);
-            $this->assertNull($p->origin_label, $country);
-            $this->assertNotNull($p->start_at, 'the trip window is saved as usual');
-            $this->assertGreaterThan(0, \App\Models\ItineraryItem::count(), 'an itinerary is still planned (from Davao City centre)');
+            $this->assertEqualsWithDelta(7.056, (float) $p->origin_lat, 0.001, $country);
+            $this->assertSame('Davao City Overland Transport Terminal, Ecoland', $p->origin_label, $country);
+            $this->assertGreaterThan(0, \App\Models\ItineraryItem::count(), 'an itinerary is planned from it');
         }
+    }
+
+    public function test_from_outside_region_xi_a_pick_up_outside_the_region_is_still_refused_and_none_means_davao_city_centre(): void
+    {
+        foreach ([['PH', 'Cebu'], ['JP', '']] as [$country, $province]) {
+            $this->post(route('plan.update'), $this->form([
+                'visitor_origin_country' => $country, 'visitor_origin_province' => $province,
+                'origin_lat' => '14.5995', 'origin_lng' => '120.9842', 'origin_label' => 'Manila Hotel',
+            ]))->assertSessionHasErrors('origin_label');
+        }
+        $this->assertSame(0, TouristPreference::count());
+
+        // Nothing typed: planned from Davao City centre, as before.
+        $this->post(route('plan.update'), $this->form([
+            'visitor_origin_country' => 'JP', 'origin_lat' => null, 'origin_lng' => null, 'origin_label' => null,
+        ]))->assertSessionHasNoErrors();
+        $this->assertNull(TouristPreference::first()->origin_label);
     }
 
     public function test_the_end_cannot_be_before_the_start_in_either_flow(): void

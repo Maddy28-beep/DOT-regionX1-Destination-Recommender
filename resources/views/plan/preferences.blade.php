@@ -136,8 +136,8 @@
                             @endif
 
                             @if ($pickupV2)
-                                {{-- Shown (by plan-origin-select.js) while "Where are you travelling from?" is outside Davao Region. The pick-up
-                                     is then switched off; the server ignores anything posted for it and plans from Davao City centre. --}}
+                                {{-- Shown (by plan-origin-select.js) while "Where are you travelling from?" is outside Davao Region. Only "Use my
+                                     current location" is then switched off; a typed or picked pick-up is checked by the server as always. --}}
                                 <p class="pc-hint is-warning" role="status" data-pickup-lock-note hidden>Your current location is outside Davao Region. Pick-up location selection is not available for your location. If you wish to continue, please indicate your preferred pick-up location.</p>
                             @endif
 

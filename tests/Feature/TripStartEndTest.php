@@ -378,7 +378,7 @@ class TripStartEndTest extends TestCase
         ]))->assertSessionHasNoErrors();
 
         $this->get(route('plan.itinerary'))->assertOk()->assertSee(
-            'From Cebu City, Cebu, Philippines · Pick-up at Davao City centre · Tue, 1 Dec 2026, 2:00 PM PHT → Thu, 3 Dec 2026, 10:00 AM PHT (1 day, 20 hours)',
+            'From Cebu City, Cebu, Philippines · Pick-up at Davao International Airport · Tue, 1 Dec 2026, 2:00 PM PHT → Thu, 3 Dec 2026, 10:00 AM PHT (1 day, 20 hours)',
             false
         );
     }

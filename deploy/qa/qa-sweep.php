@@ -270,11 +270,12 @@ if (section('D1')) {
     $t->plan(['activities' => []], 'no interests (must be refused with a message)', 'D1', true);
     if ($v2) {
         // trip_location_v2 (13 Nov 2026): start point inside Region XI, blank date, finish-by, origin answer.
-        // From inside Region XI the pick-up has to be inside it too; from anywhere else the pick-up is not offered and is ignored.
+        // The pick-up has to be inside Region XI whatever the home place; only "Use my current location" is off for visitors from elsewhere.
         $t->plan(['visitor_origin_province' => 'Davao del Sur', 'origin_lat' => '14.5995', 'origin_lng' => '120.9842', 'origin_label' => 'Manila'], 'a pick-up outside Davao Region is refused with a message (home in Davao Region)', 'D10', true);
-        $t->plan(['origin_lat' => '14.5995', 'origin_lng' => '120.9842', 'origin_label' => 'Manila'], 'from outside Davao Region the pick-up is ignored and the trip is planned from Davao City centre', 'D10');
+        $t->plan(['origin_lat' => '14.5995', 'origin_lng' => '120.9842', 'origin_label' => 'Manila'], 'a pick-up outside Davao Region is refused for a visitor from outside it too', 'D10', true);
+        $t->plan(['origin_lat' => '7.056', 'origin_lng' => '125.602', 'origin_label' => 'Davao City Overland Transport Terminal, Ecoland'], 'a visitor from outside Davao Region can set a pick-up inside it by hand', 'D10');
         $last = TouristPreference::query()->latest('id')->first();
-        Results::add('D10', 'no pick-up is saved for a visitor from outside Davao Region', $last && $last->origin_lat === null && $last->origin_label === null, 'origin_lat/label null');
+        Results::add('D10', 'that hand-set pick-up is saved', $last && $last->origin_label === 'Davao City Overland Transport Terminal, Ecoland', 'origin_label kept');
         $t->plan(['visitor_origin_province' => 'Davao del Sur', 'origin_lat' => '7.130', 'origin_lng' => '125.645', 'origin_label' => 'Davao International Airport'], 'a start point inside Davao Region is planned', 'D10');
         $t->plan(['start_date' => null], 'a missing start and end is refused with a message', 'D10', true);
         $body = $t->plan(['end_time' => '17:00', 'travel_days' => 2], 'finish-by time is planned', 'D10');

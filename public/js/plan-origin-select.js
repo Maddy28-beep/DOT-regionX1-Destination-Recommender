@@ -24,39 +24,40 @@
     if (!country) return;
 
     /*
-     * The pick-up location follows the home place. From outside Davao Region (another country, or a Philippine province
-     * outside Region XI) the pick-up box, the location button and the arrival buttons are switched off, the advisory shows,
-     * and what was in them is set aside (the server ignores it as well). Back inside Region XI they work again as before and
-     * the earlier values return. Nothing here ever switches the pick-up on for someone outside the region.
+     * From outside Davao Region (another country, or a Philippine province outside Region XI) only "Use my current location"
+     * is switched off, and the advisory shows. The pick-up box and the arrival buttons stay usable: the visitor types or picks
+     * where they want to be picked up, and the server still refuses a place outside Davao Region. The pre-filled Davao
+     * airport default is cleared (so nothing is chosen for them) and comes back if they are in Region XI again.
      */
     const field = country.closest('[data-origin-field]');
     const regionXi = (() => { try { return JSON.parse(field?.dataset.regionXiProvinces || '[]'); } catch (e) { return []; } })();
     const pickup = document.querySelector('.pc-trip-start');
     const note = pickup?.querySelector('[data-pickup-lock-note]');
-    const parts = pickup ? [
-        ...pickup.querySelectorAll('#origin_label, #origin_lat, #origin_lng, #origin-btn, #origin-clear, [data-start-pick]')
-    ] : [];
-    let kept = null;
+    const locate = document.getElementById('origin-btn');
+    let cleared = null;
     const lockPickup = () => {
         if (!pickup || !note || !regionXi.length) return;
         const chosen = country.value;
         const where = province ? province.value : '';
         // Not decided yet (no country, or the Philippines without a province): leave it alone, the form cannot be sent yet.
-        const outside = chosen !== '' && (chosen !== 'PH' || (where !== '' && !regionXi.includes(where)));
-        const undecided = chosen === '' || (chosen === 'PH' && where === '');
-        if (undecided) return;
+        if (chosen === '' || (chosen === 'PH' && where === '')) return;
+        const outside = chosen !== 'PH' || !regionXi.includes(where);
         note.hidden = !outside;
-        pickup.classList.toggle('is-locked', outside);
-        if (outside && kept === null) {
-            kept = {};
-            parts.forEach(el => { if ('value' in el && el.type !== 'button') { kept[el.id] = el.value; el.value = ''; } });
+        if (locate) locate.disabled = outside;
+        const label = document.getElementById('origin_label');
+        const lat = document.getElementById('origin_lat');
+        const lng = document.getElementById('origin_lng');
+        if (outside && cleared === null && label && label.value === 'Davao International Airport') {
+            cleared = { label: label.value, lat: lat?.value || '', lng: lng?.value || '' };
+            label.value = '';
+            if (lat) lat.value = '';
+            if (lng) lng.value = '';
             const status = document.getElementById('origin-status');
             if (status) status.textContent = '';
-        } else if (!outside && kept !== null) {
-            parts.forEach(el => { if (el.id in kept) el.value = kept[el.id]; });
-            kept = null;
+        } else if (!outside && cleared !== null) {
+            if (label && label.value === '') { label.value = cleared.label; if (lat) lat.value = cleared.lat; if (lng) lng.value = cleared.lng; }
+            cleared = null;
         }
-        parts.forEach(el => { el.disabled = outside; });
     };
 
     const sync = () => {

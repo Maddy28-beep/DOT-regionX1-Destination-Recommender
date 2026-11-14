@@ -219,11 +219,6 @@ class TripPlannerController extends Controller
 
         $window = null;
         if ($v2) {
-            // Where the visitor travels from comes first. From outside Davao Region the pick-up is not offered: nothing posted
-            // for it is read, so the trip is planned from Davao City centre (and the Region XI check has nothing to refuse).
-            if ($this->originOutsideRegion($data)) {
-                $data['origin_lat'] = $data['origin_lng'] = $data['origin_label'] = null;
-            }
             $window = $this->validateTripWindow($data);
             $this->validateTripLocation($request, $data);
             // The planner is fed from the same columns as before: the days, the arrival date and time and the end time are
@@ -527,17 +522,6 @@ class TripPlannerController extends Controller
      * typed city or municipality. Only these names are stored, never a position. Anything not on our lists is refused, so
      * free text cannot reach the statistics.
      */
-    /** True when the chosen home place is outside Davao Region: any other country, or a Philippine province outside Region XI. */
-    private function originOutsideRegion(array $data): bool
-    {
-        $country = strtoupper(trim((string) ($data['visitor_origin_country'] ?? '')));
-        if ($country === '') {
-            return false;   // nothing chosen: the required rule refuses the form before this matters
-        }
-
-        return $country !== 'PH' || ! PhProvinces::isRegionXi((string) ($data['visitor_origin_province'] ?? ''));
-    }
-
     private function applyVisitorOrigin(TouristPreference $preference, array $data): void
     {
         $country = strtoupper(trim((string) ($data['visitor_origin_country'] ?? '')));
