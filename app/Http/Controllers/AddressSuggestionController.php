@@ -21,7 +21,7 @@ class AddressSuggestionController extends Controller
         ]);
 
         return response()->json([
-            'results' => $addresses->suggest($data['q'])->all(),
+            'results' => $addresses->suggest($data['q'], \App\Support\Features::tripLocation())->all(),
         ]);
     }
 }
