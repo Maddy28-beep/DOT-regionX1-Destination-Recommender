@@ -83,7 +83,7 @@ class DestinationController extends Controller
             'longitude' => $destination->longitude,
             'url' => route('destinations.show', $destination),
         ]);
-        $destinations = $query->paginate(9)->withQueryString();
+        $destinations = $query->paginate(12)->withQueryString();
         \App\Support\SearchLog::record($request, 'destinations', $destinations->total());
 
         $regions = Region::orderBy('name')->get();

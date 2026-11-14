@@ -41,7 +41,7 @@ class TourOperatorController extends Controller
         // Last, so rows that tie on the chosen sort keep one fixed order: without it a page can repeat or skip a place.
         $query->orderBy('id');
 
-        $tourOperators = $query->paginate(9)->withQueryString();
+        $tourOperators = $query->paginate(12)->withQueryString();
         \App\Support\SearchLog::record($request, 'tour-operators', $tourOperators->total());
 
         $regions = Region::orderBy('name')->get();

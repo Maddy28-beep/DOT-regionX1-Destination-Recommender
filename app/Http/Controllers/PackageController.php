@@ -104,7 +104,7 @@ class PackageController extends Controller
         // Last, so rows that tie on the chosen sort keep one fixed order: without it a page can repeat or skip a place.
         $query->orderBy('id');
 
-        $packages = $query->paginate(9)->withQueryString();
+        $packages = $query->paginate(12)->withQueryString();
         \App\Support\SearchLog::record($request, 'packages', $packages->total());
 
         $regions = Region::orderBy('name')->get();

@@ -33,7 +33,7 @@ class SouvenirCenterController extends Controller
         // Last, so rows that tie on the chosen sort keep one fixed order: without it a page can repeat or skip a place.
         $query->orderBy('id');
 
-        $souvenirCenters = $query->paginate(9)->withQueryString();
+        $souvenirCenters = $query->paginate(12)->withQueryString();
         \App\Support\SearchLog::record($request, 'souvenir-centers', $souvenirCenters->total());
 
         $regions = Region::orderBy('name')->get();
