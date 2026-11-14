@@ -49,6 +49,9 @@ final class Amenities
         'guided_tours' => ['Guided Tours', self::FACILITY],
         'grilling' => ['Grilling Areas & Fire Pits', self::FACILITY],
         'adventure_facilities' => ['Adventure Facilities', self::FACILITY],
+        // what a stay looks out on (a stay's own list only)
+        'view_city' => ['City view', self::FACILITY], 'view_island' => ['Island view', self::FACILITY],
+        'view_nature' => ['Nature view', self::FACILITY], 'view_mountain' => ['Mountain view', self::FACILITY],
         'ramp' => ['Accessibility Ramp', self::ACCESS], 'stepfree' => ['Step-free entrance', self::ACCESS], 'accroom' => ['Accessible room', self::ACCESS],
         'elevator' => ['Elevator', self::ACCESS], 'accwc' => ['Accessible restroom', self::ACCESS], 'firstaid' => ['First aid on site', self::ACCESS],
         // packages
@@ -67,7 +70,7 @@ final class Amenities
             'sports_courts', 'golf_practice', 'games_karaoke', 'hot_springs', 'event_spaces', 'grilling', 'adventure_facilities',
             'elevator', 'guided_tours',
         ],
-        'accommodation' => ['wifi', 'pool', 'ac', 'parking', 'restaurant', 'airport', 'accroom', 'elevator', 'ramp', 'accwc'],
+        'accommodation' => ['wifi', 'pool', 'ac', 'parking', 'restaurant', 'airport', 'accroom', 'elevator', 'ramp', 'accwc', 'view_city', 'view_island', 'view_nature', 'view_mountain'],
         'restaurant' => ['parking', 'restroom', 'ac', 'wifi', 'outdoor', 'kids', 'stepfree', 'accwc'],
         'souvenir_center' => ['parking', 'restroom', 'ac', 'gcash', 'stepfree', 'accwc'],
         'package' => ['wheel', 'seniors', 'children', 'pregnant', 'route_rest', 'route_water', 'route_firstaid', 'route_lift'],
@@ -84,6 +87,7 @@ final class Amenities
         'Dining & shopping' => ['restaurant', 'souvenir_shops', 'outdoor', 'gcash'],
         'Outdoor & adventure' => ['picnic', 'viewing_decks', 'walking_trails', 'visitor_bridges', 'grilling', 'adventure_facilities', 'guided_tours'],
         'Stay & relaxation' => ['overnight_lodging', 'day_use_cottages', 'campsites', 'pool', 'spa', 'hot_springs'],
+        'Views' => ['view_city', 'view_island', 'view_nature', 'view_mountain'],
         'Sports & entertainment' => ['playgrounds', 'gyms', 'sports_courts', 'golf_practice', 'games_karaoke', 'event_spaces', 'kids'],
     ];
 

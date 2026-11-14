@@ -29,6 +29,18 @@
         @case('restaurant')
             <path d="M6 3v7a2 2 0 002 2v9M10 3v7a2 2 0 01-2 2M18 21V3c-2.5 1-4 4-4 7.5 0 1.5 1 2.5 4 2.5"/>
             @break
+        @case('city-view')
+            <path d="M3 21V9l5-3v15M8 21V4l7 3v14M15 21V11l6 2v8M2 21h20M11 9v.01M11 12v.01M11 15v.01M5.5 12v.01M5.5 15v.01"/>
+            @break
+        @case('island-view')
+            <path d="M12 12c0-4 2-7 6-8-1 4-3 7-6 8zM12 12c-1-4-4-6-8-5 2 3 5 5 8 5zM12 12v6M3 21c2 0 2-1.5 4.5-1.5S10 21 12 21s2.5-1.5 4.5-1.5S19 21 21 21"/>
+            @break
+        @case('nature-view')
+            <path d="M12 3c4 3 6 6 6 9a6 6 0 01-12 0c0-3 2-6 6-9zM12 21v-9M12 15l3-3M12 17l-3-3"/>
+            @break
+        @case('mountain-view')
+            <path d="M2 20l6.5-11 4 6 2.5-4L22 20zM8.5 9l1.8 2.6"/>
+            @break
         @default
             <path d="M5 12.5l4.5 4.5L19 7.5"/>
     @endswitch
