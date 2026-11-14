@@ -15,6 +15,8 @@
 @php
     $coverPhoto = $listing->coverPhoto();
     $closedBadge = method_exists($listing, 'operatingBadge') ? $listing->operatingBadge() : null;
+    // A stay with a live promo wears its title on the picture.
+    $promoTitle = $listing instanceof \App\Models\Accommodation ? (\App\Models\Promotion::activeTitles($listing->getMorphClass())[$listing->id] ?? null) : null;
     $saveSegment = \App\Http\Controllers\SavedListingController::segmentFor($listing);
     $tier = $listing->posterTier();
 
@@ -94,7 +96,7 @@
         <x-save-heart :type="$saveSegment" :listing="$listing" />
     @endif
     <a href="{{ $listing->posterUrl() }}" class="dpost-card">
-        <div class="dpost-card__art dcard__art {{ $saveSegment ? 'has-save' : '' }} {{ $closedBadge ? 'is-closed' : '' }}" @if ($closedBadge) data-closed="{{ $closedBadge }}" @endif>
+        <div class="dpost-card__art dcard__art {{ $saveSegment ? 'has-save' : '' }} {{ $closedBadge ? 'is-closed' : '' }} {{ $promoTitle ? 'has-promo' : '' }}" @if ($closedBadge) data-closed="{{ $closedBadge }}" @endif>
             @if ($coverPhoto)
                 {{-- alt is empty on purpose: the name below already names the place and the card is one link. --}}
                 <img src="{{ $coverPhoto->cardUrl() }}" alt="" class="dpost-card__photo" loading="lazy" decoding="async">
@@ -109,6 +111,10 @@
 
             @if ($listing->review_count < 1)
                 <span class="dcard__new">New</span>
+            @endif
+
+            @if ($promoTitle)
+                <span class="dcard__promo" title="{{ $promoTitle }}"><x-icon name="ticket" aria-hidden="true" /><span>{{ $promoTitle }}</span></span>
             @endif
 
             {{-- Provenance as a small mark on the picture: the DOT medal for a listing backed by an official record, a gray "i" for

@@ -9,6 +9,9 @@
     @foreach ($featuredTypes as $type => $label)
         <a href="{{ request()->fullUrlWithQuery([$categoryParam => $type, 'page' => null]) }}" class="chip {{ request($categoryParam) === $type ? 'active' : '' }}" @if (request($categoryParam) === $type) aria-current="true" @endif><x-icon :name="\App\Support\CategoryIcons::for($label, $fallbackIcon)" class="chip__icon" aria-hidden="true" />{{ $label }}</a>
     @endforeach
+    @if (($dealsCount ?? 0) > 0 || request()->boolean('deals'))
+        <a href="{{ request()->fullUrlWithQuery(['deals' => request()->boolean('deals') ? null : 1, 'page' => null]) }}" class="chip chip--deal {{ request()->boolean('deals') ? 'active' : '' }}" @if (request()->boolean('deals')) aria-current="true" @endif><x-icon name="ticket" class="chip__icon" aria-hidden="true" />Deals</a>
+    @endif
     {{-- On a phone the chips are one scrolling row, where the "More" dropdown below would be clipped, so the rest of
          the categories are chips of their own there (and hidden on a wide screen, which has the dropdown). --}}
     @foreach ($moreTypes as $type)

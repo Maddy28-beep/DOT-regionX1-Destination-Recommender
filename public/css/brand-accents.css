@@ -174,3 +174,84 @@ body.hero-page .site-header:not(.scrolled) .lang-switch a[aria-current="true"] {
 .catalog-categories .chip__icon { width: 18px; height: 18px; flex: none; }
 .catalog-categories__menu a { display: flex; align-items: center; gap: 10px; }
 .catalog-categories__menu .chip__icon { color: var(--primary); }
+
+/* ===== Promos and deals: the card on a stay's page, the badge on a stay's card, the Deals chip, the homepage row ===== */
+.promo-card {
+    background: #fff; border: 1px solid var(--border, #dde3dd); border-left: 5px solid var(--accent-strong, #c8501f); border-radius: 16px;
+    padding: 18px 20px; margin: 20px 0; box-shadow: 0 1px 3px rgba(17, 104, 78, .08), 0 4px 14px rgba(17, 104, 78, .05);
+}
+.promo-card__top { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.promo-card__eyebrow {
+    display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px; border-radius: 999px; background: var(--accent-strong, #c8501f); color: #fff;
+    font-size: .72rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+}
+.promo-card__eyebrow svg { width: 14px; height: 14px; }
+.promo-card__status {
+    display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px; border: 1px solid #cfe0d6; border-radius: 999px; background: #fff;
+    color: var(--primary-dark, #0b6b4f); font-size: .8rem; font-weight: 500;
+}
+.promo-card__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--primary, #0b6b4f); }
+.promo-card__title {
+    margin: 0 0 8px; font-family: 'Barabara', 'Alfa Slab One', serif; font-weight: 400; text-transform: uppercase; letter-spacing: .02em;
+    font-size: clamp(1.15rem, 2.2vw, 1.5rem); line-height: 1.25; color: var(--primary-dark, #0b6b4f);
+}
+.promo-card__text { margin: 0 0 14px; white-space: pre-line; line-height: 1.65; }
+.promo-card__meta { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; margin-bottom: 14px; }
+.promo-card__valid { display: inline-flex; align-items: center; gap: 7px; font-size: .88rem; color: var(--ink-soft, #4d5f56); }
+.promo-card__valid svg { width: 16px; height: 16px; color: var(--accent-strong, #c8501f); flex: none; }
+.promo-copy {
+    display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px dashed var(--accent-strong, #c8501f); border-radius: 8px;
+    background: #fbf2df; color: #8a3512; font: inherit; cursor: pointer;
+}
+.promo-copy__code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .95rem; letter-spacing: .06em; }
+.promo-copy__icon { width: 16px; height: 16px; }
+.promo-copy__msg { font-size: .74rem; min-width: 3.2em; }
+.promo-copy:focus-visible, .promo-card__cta:focus-visible { outline: 3px solid var(--primary, #0b6b4f); outline-offset: 2px; }
+.promo-card__cta {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 20px; border-radius: 999px; background: var(--primary, #0b6b4f);
+    color: #fff; font-size: .9rem; font-weight: 600; text-decoration: none;
+}
+.promo-card__cta:hover { background: var(--primary-dark, #08543e); }
+.promo-card__cta svg { width: 16px; height: 16px; }
+
+/* The Deals chip: orange when chosen. */
+.catalog-categories > a.chip--deal { color: #8a3512; border-color: #e8b99f; }
+.catalog-categories > a.chip--deal .chip__icon { color: var(--accent-strong, #c8501f); }
+.catalog-categories > a.chip--deal.active { background: var(--accent-strong, #c8501f); border-color: var(--accent-strong, #c8501f); color: #fff; }
+.catalog-categories > a.chip--deal.active .chip__icon { color: #fff; }
+
+/* A stay's promo title on its card's picture, along the bottom left (the medal sits bottom right). */
+.dcard__promo {
+    position: absolute; left: 10px; bottom: 10px; z-index: 3; display: inline-flex; align-items: center; gap: 5px; max-width: calc(100% - 62px);
+    padding: 3px 10px; border-radius: 999px; background: var(--accent-strong, #c8501f); color: #fff; font-size: .72rem; font-weight: 600; line-height: 1.5;
+}
+.dcard__promo svg { width: 13px; height: 13px; flex: none; }
+.dcard__promo span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dpost-card__art.has-promo .photo-illustration-tag--card { bottom: 42px; }
+
+/* Homepage row. */
+.deals-home { background: #faf8f0; }
+.deals-home__head { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; margin-bottom: 20px; }
+.deals-home__eyebrow { margin: 0 0 4px; color: var(--accent-strong, #c8501f); font-size: .78rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+.deals-home__title { margin: 0; font-family: 'Barabara', 'Alfa Slab One', serif; font-weight: 400; text-transform: uppercase; letter-spacing: .02em; color: var(--primary-dark, #0b6b4f); font-size: clamp(1.5rem, 3vw, 2.1rem); line-height: 1.15; }
+.deals-home__sub { margin: 6px 0 0; color: var(--ink-soft, #4d5f56); }
+.deals-home__all { display: inline-flex; align-items: center; gap: 6px; color: var(--primary-dark, #0b6b4f); font-weight: 600; text-decoration: none; border-bottom: 2px solid currentColor; padding-bottom: 2px; }
+.deals-home__all svg, .deal-card svg { width: 16px; height: 16px; flex: none; }
+.deals-home__row { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.deal-card {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 16px; background: #fff; border-radius: 16px;
+    border-top: 4px solid var(--accent-strong, #c8501f); color: inherit; text-decoration: none;
+    box-shadow: 0 1px 3px rgba(17, 104, 78, .08), 0 4px 14px rgba(17, 104, 78, .05); transition: transform .15s ease, box-shadow .15s ease;
+}
+.deal-card:hover { transform: translateY(-2px); box-shadow: 0 2px 6px rgba(17, 104, 78, .12), 0 10px 24px rgba(17, 104, 78, .1); }
+.deal-card:focus-visible { outline: 3px solid var(--primary, #0b6b4f); outline-offset: 3px; }
+.deal-card__tag {
+    display: inline-flex; align-items: center; gap: 5px; margin-bottom: 6px; padding: 3px 10px; border-radius: 999px; background: var(--accent-strong, #c8501f);
+    color: #fff; font-size: .7rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+}
+.deal-card__tag svg { width: 13px; height: 13px; }
+.deal-card__title { font-size: 1.02rem; line-height: 1.35; }
+.deal-card__stay { font-size: .92rem; }
+.deal-card__loc { display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; color: var(--ink-soft, #4d5f56); font-size: .85rem; }
+.deal-card__code { padding: 3px 9px; border: 1px dashed var(--accent-strong, #c8501f); border-radius: 7px; background: #fbf2df; color: #8a3512; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .85rem; letter-spacing: .06em; }
+.deal-card__go { display: inline-flex; align-items: center; gap: 6px; color: var(--primary-dark, #0b6b4f); font-size: .88rem; font-weight: 600; }

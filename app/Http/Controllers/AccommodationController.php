@@ -71,6 +71,11 @@ class AccommodationController extends Controller
             });
         }
 
+        // Stays with a live promo (the "Deals" chip).
+        if ($request->boolean('deals')) {
+            $query->whereIn('id', \App\Models\Promotion::listingIdsWithDeal('accommodation'));
+        }
+
         // The filters this page's panel offers beyond search, province and budget: rating, amenities, and its own extras.
         \App\Support\ListingFilters::apply($query, $request, 'accommodation');
 
@@ -100,7 +105,10 @@ class AccommodationController extends Controller
             ->map(fn ($pair) => ($pair[0] === 'All-Inclusive' ? 'All Inclusive' : $pair[0]).' Resort');
         $types = $baseTypes->merge($resortCategoryTypes)->unique()->values();
 
-        return view('accommodations.index', compact('accommodations', 'regions', 'types'));
+        // The Deals chip is only offered while some visible stay has a live promo (or while it is the chosen filter).
+        $dealsCount = Accommodation::publiclyVisible()->whereIn('id', \App\Models\Promotion::listingIdsWithDeal('accommodation'))->count();
+
+        return view('accommodations.index', compact('accommodations', 'regions', 'types', 'dealsCount'));
     }
 
     public function show(Accommodation $accommodation): View

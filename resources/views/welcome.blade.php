@@ -506,6 +506,7 @@
 </div>{{-- /.hero-screen --}}
 
 @include('partials.mood-cards')
+@include('partials.home-deals', ['deals' => $deals])
 @include('partials.culinary-highlights')
 
 @php

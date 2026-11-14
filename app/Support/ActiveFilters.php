@@ -49,6 +49,7 @@ class ActiveFilters
         [$min, $max] = BudgetRanges::bounds($request);
         $filters->put('price_min', $min !== null ? 'From '.BudgetRanges::peso($min) : null);
         $filters->put('price_max', $max !== null ? 'Up to '.BudgetRanges::peso($max) : null);
+        $filters->put('deals', $request->boolean('deals') ? 'Deals' : null);
         $filters->put('stay_mode', SearchController::STAY_MODES[(string) $request->input('stay_mode')] ?? null);
         $filters->put('from', self::dateLabel($request->input('from'), 'Check-in'));
         $filters->put('to', self::dateLabel($request->input('to'), 'Check-out'));

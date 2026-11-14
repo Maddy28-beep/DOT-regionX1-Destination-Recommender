@@ -213,7 +213,15 @@ class HomeController extends Controller
 
         $postcardSlides = PostcardSlide::active()->ordered()->get();
 
-        return view('welcome', compact('destinations', 'packages', 'stats', 'regions', 'heroVideo', 'interestOptions', 'cuisineTypes', 'budgetOptions', 'budgetBasis', 'mealOptions', 'stayModes', 'upcomingEvents', 'postcardSlides'))
+        // "Deals in Davao Region": the live promo of each visible stay, newest first. Left out of the page when there are none.
+        $dealStays = \App\Models\Accommodation::publiclyVisible()
+            ->whereIn('id', \App\Models\Promotion::listingIdsWithDeal('accommodation'))
+            ->get(['id', 'slug', 'name', 'location'])->keyBy('id');
+        $deals = \App\Models\Promotion::active()->where('listing_kind', 'accommodation')->whereIn('listing_id', $dealStays->keys())
+            ->latest('id')->get()->unique('listing_id')->take(6)
+            ->each(fn ($promotion) => $promotion->setRelation('stay', $dealStays[$promotion->listing_id]))->values();
+
+        return view('welcome', compact('destinations', 'packages', 'stats', 'regions', 'heroVideo', 'interestOptions', 'cuisineTypes', 'budgetOptions', 'budgetBasis', 'mealOptions', 'stayModes', 'upcomingEvents', 'postcardSlides', 'deals'))
             ->with('regionMap', $this->regionMap($regions));
     }
     /**
