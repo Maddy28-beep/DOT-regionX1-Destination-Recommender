@@ -64,6 +64,7 @@ class TripStartEndTest extends TestCase
             'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => 'moderate',
             'start_at' => '2026-12-01T14:00', 'end_at' => '2026-12-03T10:00',
             'origin_lat' => '7.130', 'origin_lng' => '125.645', 'origin_label' => 'Davao International Airport',
+            'visitor_origin_country' => 'PH', 'visitor_origin_province' => 'Davao del Sur',
             'activities' => ['Wildlife'], 'amenities' => ['wifi'],
         ];
     }
@@ -266,9 +267,8 @@ class TripStartEndTest extends TestCase
         $js = file_get_contents(public_path('js/plan-wizard.js'));
         $html = $this->get(route('plan.edit'))->assertOk()->getContent();
 
-        // Who is coming and where from (About you), then the pick-up location, then the start and end.
-        $this->assertStringContainsString('if (tripWindow) steps[0].append(style, visit, origin, basics);', $js);
-        $this->assertLessThan(strpos($html, 'Pick-up location'), strpos($html, 'Where are you travelling from?'));
+        // Where from first (About you), then the start and end, then the pick-up location, then who is coming.
+        $this->assertStringContainsString('if (tripWindow) steps[0].append(visit, basics, origin, style);', $js);
         $this->assertStringContainsString('visitor_origin_country', $html);
     }
 
@@ -367,7 +367,7 @@ class TripStartEndTest extends TestCase
         ]))->assertSessionHasNoErrors();
 
         $this->get(route('plan.itinerary'))->assertOk()->assertSee(
-            'From Cebu City, Cebu, Philippines · Pick-up at Davao International Airport · Tue, 1 Dec 2026, 2:00 PM PHT → Thu, 3 Dec 2026, 10:00 AM PHT (1 day, 20 hours)',
+            'From Cebu City, Cebu, Philippines · Pick-up at Davao City centre · Tue, 1 Dec 2026, 2:00 PM PHT → Thu, 3 Dec 2026, 10:00 AM PHT (1 day, 20 hours)',
             false
         );
     }
@@ -377,14 +377,15 @@ class TripStartEndTest extends TestCase
         $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Foreign', 'visitor_origin_country' => 'JP']))->assertSessionHasNoErrors();
         $this->assertStringContainsString('From Japan', $this->get(route('plan.itinerary'))->getContent());
 
-        $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Local']))->assertSessionHasNoErrors();
-        $this->assertStringNotContainsString('From Japan', $this->get(route('plan.itinerary'))->getContent());
-        $this->assertNull(TouristPreference::latest('id')->first()->place_of_origin);
+        // A local has to say where from too now: with no answer the form is refused and the last trip's origin is not kept.
+        $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Local', 'visitor_origin_country' => '']))->assertSessionHasErrors('visitor_origin_country');
     }
 
     public function test_the_header_leaves_out_the_origin_when_it_was_not_given(): void
     {
-        $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Foreign', 'visitor_origin_country' => 'NONE']))->assertSessionHasNoErrors();
+        // "Prefer not to say" is no longer an answer, and a home place in Davao Region keeps the pick-up.
+        $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Foreign', 'visitor_origin_country' => 'NONE']))->assertSessionHasErrors('visitor_origin_country');
+        $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Local']))->assertSessionHasNoErrors();
 
         $html = $this->get(route('plan.itinerary'))->assertOk()->getContent();
         $this->assertStringContainsString('Pick-up at Davao International Airport · Tue, 1 Dec 2026, 2:00 PM PHT', $html);

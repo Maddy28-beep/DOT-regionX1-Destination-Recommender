@@ -964,9 +964,10 @@ document.addEventListener('DOMContentLoaded', function () {
     function sync() {
         var chosen = document.querySelector('[data-local-toggle]:checked');
         var isLocal = !!chosen && chosen.value === 'Regular / Local';
-        input.required = !isLocal;
+        // With the new origin question (data-origin-v2) every visitor, local or not, has to say where they travel from.
+        if (!field.hasAttribute('data-origin-v2')) input.required = !isLocal;
         if (label && !field.hasAttribute('data-origin-v2')) label.textContent = 'Where are you visiting from?';
-        if (hint) hint.textContent = isLocal ? 'Optional. Skip it if you live in Davao.' : defaultHint;
+        if (hint && !field.hasAttribute('data-origin-v2')) hint.textContent = isLocal ? 'Optional. Skip it if you live in Davao.' : defaultHint;
     }
 
     toggles.forEach(function (toggle) { toggle.addEventListener('change', sync); });

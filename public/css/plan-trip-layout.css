@@ -463,3 +463,7 @@
    without this the province button stayed on screen for every country. */
 [data-origin-v2] .site-dropdown[hidden],
 [data-origin-v2] .site-dropdown:has(> select[hidden]) { display: none; }
+
+/* Pick-up location while the visitor travels from outside Davao Region: shown, but switched off. */
+.pc-trip-start.is-locked .pc-field, .pc-trip-start.is-locked .pc-arrivals, .pc-trip-start.is-locked .origin-control { opacity: .5; }
+.pc-trip-start .pc-hint.is-warning { color: var(--warning-dark, #92400e); font-weight: 600; }

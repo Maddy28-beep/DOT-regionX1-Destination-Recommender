@@ -216,6 +216,48 @@
 <div class="plan-section pc-block pc-trip-visitor">
     <header class="pc-block__head"><h3>About you</h3></header>
     <div class="pc-grid">
+        @if ($v2)
+        @php
+            $countryChosen = old('visitor_origin_country', $preference->visitor_origin_country_code);
+            $provinceChosen = old('visitor_origin_province', $preference->visitor_origin_province);
+            $cityTyped = old('visitor_origin_city', $preference->visitor_origin_city);
+        @endphp
+        <div class="field pc-field pc-col-12" data-origin-field data-origin-v2 data-region-xi-provinces="{{ json_encode(\App\Support\Geo\PhProvinces::BY_REGION['Region XI (Davao Region)']) }}">
+            <label for="visitor_origin_country"><span data-origin-label>Where are you travelling from?</span>
+                <span class="field-help" tabindex="0" title="Helps DOT understand where visitors are travelling from. We keep only the place names, never your position or an address." aria-label="Helps DOT understand where visitors are travelling from. We keep only the place names, never your position or an address."><x-icon name="info" /></span>
+            </label>
+            <select id="visitor_origin_country" name="visitor_origin_country" data-origin-required required>
+                <option value="">Choose a country</option>
+                <option value="PH" @selected($countryChosen === 'PH')>Philippines</option>
+                <optgroup label="Other countries">
+                    @foreach (\App\Support\Geo\Countries::ALL as $code => $countryName)
+                        @continue($code === 'PH')
+                        <option value="{{ $code }}" @selected($countryChosen === $code)>{{ $countryName }}</option>
+                    @endforeach
+                </optgroup>
+            </select>
+            @error('visitor_origin_country')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
+
+            <select id="visitor_origin_province" name="visitor_origin_province" aria-label="Province" data-origin-province @if ($countryChosen === 'PH') required @endif @if ($countryChosen !== 'PH') hidden @endif>
+                <option value="">Choose your province</option>
+                @foreach (\App\Support\Geo\PhProvinces::BY_REGION as $regionName => $provinceList)
+                    <optgroup label="{{ $regionName }}">
+                        @foreach ($provinceList as $provinceName)
+                            <option value="{{ $provinceName }}" @selected($provinceChosen === $provinceName)>{{ $provinceName }}</option>
+                        @endforeach
+                    </optgroup>
+                @endforeach
+            </select>
+            @error('visitor_origin_province')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
+
+            <input type="text" id="visitor_origin_city" name="visitor_origin_city" value="{{ $cityTyped }}" maxlength="100" autocomplete="off"
+                   aria-label="City or municipality" placeholder="City or municipality (type it)" data-origin-city
+                   @if ($countryChosen === '' || $countryChosen === null) hidden @endif>
+            <p class="pc-hint" data-origin-hint>Choose a country; for the Philippines, choose your province too. A city or municipality is optional. We never ask for your home address.</p>
+            <p class="pc-hint" data-origin-privacy>Your country, province and city are kept as an anonymous statistic for tourism planning, not linked to you. The rest of your trip details are deleted after 30 days.</p>
+        </div>
+        @endif
+
         <fieldset class="pc-group pc-field pc-col-8">
             <legend>Is this your first visit to Davao?</legend>
             <div class="pc-cards pc-cards--3 pc-cards--rows">
@@ -229,48 +271,7 @@
             </div>
         </fieldset>
 
-        @if ($v2)
-        @php
-            $countryChosen = old('visitor_origin_country', $preference->visitor_origin_source === 'unspecified' ? 'NONE' : $preference->visitor_origin_country_code);
-            $provinceChosen = old('visitor_origin_province', $preference->visitor_origin_province);
-            $cityTyped = old('visitor_origin_city', $preference->visitor_origin_city);
-        @endphp
-        <div class="field pc-field pc-col-4" data-origin-field data-origin-v2>
-            <label for="visitor_origin_country"><span data-origin-label>Where are you travelling from?</span>
-                <span class="field-help" tabindex="0" title="Helps DOT understand where visitors are travelling from. We keep only the place names, never your position or an address." aria-label="Helps DOT understand where visitors are travelling from. We keep only the place names, never your position or an address."><x-icon name="info" /></span>
-            </label>
-            <select id="visitor_origin_country" name="visitor_origin_country" data-origin-required @unless ($isLocal) required @endunless>
-                <option value="">Choose a country</option>
-                <option value="PH" @selected($countryChosen === 'PH')>Philippines</option>
-                <option value="NONE" @selected($countryChosen === 'NONE')>Prefer not to say</option>
-                <optgroup label="Other countries">
-                    @foreach (\App\Support\Geo\Countries::ALL as $code => $countryName)
-                        @continue($code === 'PH')
-                        <option value="{{ $code }}" @selected($countryChosen === $code)>{{ $countryName }}</option>
-                    @endforeach
-                </optgroup>
-            </select>
-            @error('visitor_origin_country')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
-
-            <select id="visitor_origin_province" name="visitor_origin_province" aria-label="Province" data-origin-province @if ($countryChosen !== 'PH') hidden @endif>
-                <option value="">Province (optional)</option>
-                @foreach (\App\Support\Geo\PhProvinces::BY_REGION as $regionName => $provinceList)
-                    <optgroup label="{{ $regionName }}">
-                        @foreach ($provinceList as $provinceName)
-                            <option value="{{ $provinceName }}" @selected($provinceChosen === $provinceName)>{{ $provinceName }}</option>
-                        @endforeach
-                    </optgroup>
-                @endforeach
-            </select>
-            @error('visitor_origin_province')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
-
-            <input type="text" id="visitor_origin_city" name="visitor_origin_city" value="{{ $cityTyped }}" maxlength="100" autocomplete="off"
-                   aria-label="City or municipality" placeholder="City or municipality (type it)" data-origin-city
-                   @if ($countryChosen === '' || $countryChosen === null || $countryChosen === 'NONE') hidden @endif>
-            <p class="pc-hint" data-origin-hint>Choose a country, then a province and a city or municipality if you like. We never ask for your home address.</p>
-            <p class="pc-hint" data-origin-privacy>Optional. Your country, province and city are kept as an anonymous statistic for tourism planning, not linked to you. The rest of your trip details are deleted after 30 days.</p>
-        </div>
-        @else
+        @if (! $v2)
         <div class="field pc-field pc-col-4" data-origin-field>
             <label for="place_of_origin"><span data-origin-label>Where are you visiting from?</span>
                 <span class="field-help" tabindex="0" title="Helps DOT understand where visitors are travelling from." aria-label="Helps DOT understand where visitors are travelling from."><x-icon name="info" /></span>

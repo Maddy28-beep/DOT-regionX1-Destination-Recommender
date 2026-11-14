@@ -23,13 +23,50 @@
     const city = document.querySelector('[data-origin-city]');
     if (!country) return;
 
+    /*
+     * The pick-up location follows the home place. From outside Davao Region (another country, or a Philippine province
+     * outside Region XI) the pick-up box, the location button and the arrival buttons are switched off, the advisory shows,
+     * and what was in them is set aside (the server ignores it as well). Back inside Region XI they work again as before and
+     * the earlier values return. Nothing here ever switches the pick-up on for someone outside the region.
+     */
+    const field = country.closest('[data-origin-field]');
+    const regionXi = (() => { try { return JSON.parse(field?.dataset.regionXiProvinces || '[]'); } catch (e) { return []; } })();
+    const pickup = document.querySelector('.pc-trip-start');
+    const note = pickup?.querySelector('[data-pickup-lock-note]');
+    const parts = pickup ? [
+        ...pickup.querySelectorAll('#origin_label, #origin_lat, #origin_lng, #origin-btn, #origin-clear, [data-start-pick]')
+    ] : [];
+    let kept = null;
+    const lockPickup = () => {
+        if (!pickup || !note || !regionXi.length) return;
+        const chosen = country.value;
+        const where = province ? province.value : '';
+        // Not decided yet (no country, or the Philippines without a province): leave it alone, the form cannot be sent yet.
+        const outside = chosen !== '' && (chosen !== 'PH' || (where !== '' && !regionXi.includes(where)));
+        const undecided = chosen === '' || (chosen === 'PH' && where === '');
+        if (undecided) return;
+        note.hidden = !outside;
+        pickup.classList.toggle('is-locked', outside);
+        if (outside && kept === null) {
+            kept = {};
+            parts.forEach(el => { if ('value' in el && el.type !== 'button') { kept[el.id] = el.value; el.value = ''; } });
+            const status = document.getElementById('origin-status');
+            if (status) status.textContent = '';
+        } else if (!outside && kept !== null) {
+            parts.forEach(el => { if (el.id in kept) el.value = kept[el.id]; });
+            kept = null;
+        }
+        parts.forEach(el => { el.disabled = outside; });
+    };
+
     const sync = () => {
         const value = country.value;
         const isPh = value === 'PH';
-        const answered = value !== '' && value !== 'NONE';
+        const answered = value !== '';
         if (province) {
             const hadValue = province.value !== '';
             province.hidden = !isPh;
+            province.required = isPh;
             // The visible control the shared dropdown built around the select, once it exists.
             const wrapper = province.closest('.site-dropdown');
             if (wrapper) wrapper.hidden = !isPh;
@@ -39,6 +76,7 @@
                 province.dispatchEvent(new Event('change', { bubbles: true }));
             }
         }
+        lockPickup();
         if (city) {
             city.hidden = !answered;
             if (!answered) city.value = '';
@@ -46,6 +84,7 @@
     };
 
     ['change', 'input', 'keyup', 'focusout'].forEach(type => country.addEventListener(type, sync));
+    if (province) ['change', 'input', 'keyup', 'focusout'].forEach(type => province.addEventListener(type, sync));
     window.addEventListener('pageshow', sync);
     window.addEventListener('load', sync);
     if (country.form) country.form.addEventListener('submit', sync, true);

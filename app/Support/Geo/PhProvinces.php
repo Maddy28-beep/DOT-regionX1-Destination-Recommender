@@ -43,6 +43,12 @@ final class PhProvinces
         return $out;
     }
 
+    /** True for a province of Region XI (Davao Region). */
+    public static function isRegionXi(string $province): bool
+    {
+        return in_array($province, self::BY_REGION['Region XI (Davao Region)'], true);
+    }
+
     public static function regionOf(?string $province): ?string
     {
         return $province === null ? null : (self::all()[$province] ?? null);

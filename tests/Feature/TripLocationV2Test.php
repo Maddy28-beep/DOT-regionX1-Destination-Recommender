@@ -70,6 +70,7 @@ class TripLocationV2Test extends TestCase
             'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => 'moderate',
             'start_at' => '2026-11-28T08:00', 'end_at' => '2026-11-28T17:00',
             'origin_lat' => '7.130', 'origin_lng' => '125.645', 'origin_label' => 'Davao International Airport',
+            'visitor_origin_country' => 'PH', 'visitor_origin_province' => 'Davao del Sur',
             'activities' => ['Wildlife'], 'amenities' => ['wifi'],
         ];
     }
@@ -150,7 +151,84 @@ class TripLocationV2Test extends TestCase
         $page->assertOk();
         $page->assertSee('data-region-xi', false);
         $page->assertSee('inside Davao Region');
-        $page->assertSee('Planning from abroad? Pick where you will arrive or stay in Davao Region.');
+        $page->assertSee('Pick-up location selection is not available for your location.');
+    }
+
+    // ---- 5. the order of the questions and the pick-up for visitors from outside Davao Region -----------------
+
+    private const ADVISORY = 'Your current location is outside Davao Region. Pick-up location selection is not available for your location. If you wish to continue, please indicate your preferred pick-up location.';
+
+    public function test_the_form_carries_the_advisory_and_the_region_xi_provinces_for_the_script(): void
+    {
+        $html = $this->get(route('plan.edit'))->assertOk()->assertSee(self::ADVISORY)->getContent();
+
+        $this->assertMatchesRegularExpression('/<p[^>]*data-pickup-lock-note[^>]*hidden/', $html, 'hidden until the script finds an origin outside the region');
+        foreach (['Davao de Oro', 'Davao del Norte', 'Davao del Sur', 'Davao Occidental', 'Davao Oriental'] as $province) {
+            $this->assertStringContainsString('&quot;'.$province.'&quot;', $html);
+        }
+        $js = file_get_contents(public_path('js/plan-origin-select.js'));
+        $this->assertStringContainsString("el.disabled = outside", $js);
+    }
+
+    public function test_from_inside_region_xi_the_pick_up_is_kept_as_chosen(): void
+    {
+        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'PH', 'visitor_origin_province' => 'Davao de Oro']))->assertSessionHasNoErrors();
+
+        $p = TouristPreference::first();
+        $this->assertEqualsWithDelta(7.130, (float) $p->origin_lat, 0.001);
+        $this->assertSame('Davao International Airport', $p->origin_label);
+    }
+
+    public function test_from_inside_region_xi_a_pick_up_outside_it_is_still_refused(): void
+    {
+        $this->post(route('plan.update'), $this->form([
+            'visitor_origin_country' => 'PH', 'visitor_origin_province' => 'Davao del Sur',
+            'origin_lat' => '14.5995', 'origin_lng' => '120.9842', 'origin_label' => 'Manila Hotel',
+        ]))->assertSessionHasErrors('origin_label');
+    }
+
+    public function test_from_outside_region_xi_nothing_posted_for_the_pick_up_is_read(): void
+    {
+        foreach ([['PH', 'Cebu'], ['JP', ''], ['US', '']] as [$country, $province]) {
+            TouristPreference::query()->delete();
+            // Even a pick-up outside the region, which would be refused from inside, is simply ignored.
+            $this->post(route('plan.update'), $this->form([
+                'visitor_origin_country' => $country, 'visitor_origin_province' => $province,
+                'origin_lat' => '14.5995', 'origin_lng' => '120.9842', 'origin_label' => 'Manila Hotel',
+            ]))->assertSessionHasNoErrors()->assertRedirect(route('plan.itinerary'));
+
+            $p = TouristPreference::first();
+            $this->assertNull($p->origin_lat, $country);
+            $this->assertNull($p->origin_lng, $country);
+            $this->assertNull($p->origin_label, $country);
+            $this->assertNotNull($p->start_at, 'the trip window is saved as usual');
+            $this->assertGreaterThan(0, \App\Models\ItineraryItem::count(), 'an itinerary is still planned (from Davao City centre)');
+        }
+    }
+
+    public function test_the_end_cannot_be_before_the_start_in_either_flow(): void
+    {
+        foreach ([['PH', 'Davao del Sur'], ['JP', '']] as [$country, $province]) {
+            $this->post(route('plan.update'), $this->form([
+                'visitor_origin_country' => $country, 'visitor_origin_province' => $province,
+                'start_at' => '2026-11-28T17:00', 'end_at' => '2026-11-28T08:00',
+            ]))->assertSessionHasErrors('end_at');
+        }
+        $this->assertSame(0, TouristPreference::count());
+    }
+
+    public function test_the_origin_is_saved_and_the_admin_page_reads_it_from_the_permanent_count(): void
+    {
+        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'JP']))->assertSessionHasNoErrors();
+
+        $this->assertSame('JP', TouristPreference::first()->visitor_origin_country_code);
+        $this->assertSame(1, (int) \Illuminate\Support\Facades\DB::table('visitor_origin_daily')->where('country_code', 'JP')->sum('visitors'));
+    }
+
+    public function test_the_wizard_puts_the_origin_first_then_start_end_pick_up_and_the_rest(): void
+    {
+        $js = file_get_contents(public_path('js/plan-wizard.js'));
+        $this->assertStringContainsString('steps[0].append(visit, basics, origin, style);', $js);
     }
 
     // ---- 3. start and end date and time ---------------------------------------------------------------------
@@ -228,13 +306,11 @@ class TripLocationV2Test extends TestCase
         $this->assertNull($p->visitor_origin_province);
     }
 
-    public function test_a_province_without_a_country_or_with_prefer_not_to_say_is_not_saved(): void
+    public function test_a_province_without_a_country_or_with_prefer_not_to_say_is_refused(): void
     {
-        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => '', 'visitor_origin_province' => 'Cebu']))->assertSessionHasNoErrors();
-        $this->assertNull(TouristPreference::first()->visitor_origin_province);
-
-        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'NONE', 'visitor_origin_province' => 'Cebu']))->assertSessionHasNoErrors();
-        $this->assertNull(TouristPreference::first()->visitor_origin_province);
+        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => '', 'visitor_origin_province' => 'Cebu']))->assertSessionHasErrors('visitor_origin_country');
+        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'NONE', 'visitor_origin_province' => 'Cebu']))->assertSessionHasErrors('visitor_origin_country');
+        $this->assertSame(0, TouristPreference::count());
     }
 
     public function test_the_province_box_is_hidden_unless_the_country_is_the_philippines_and_the_script_clears_it(): void
@@ -287,40 +363,22 @@ class TripLocationV2Test extends TestCase
         $this->assertMatchesRegularExpression('/<select[^>]*data-origin-province[^>]*hidden/', $html);
     }
 
-    public function test_a_visitor_who_never_touches_the_country_saves_no_country(): void
+    public function test_every_visitor_has_to_choose_a_real_place_a_local_included(): void
     {
-        // A local is not required to answer; leaving the placeholder saves no country, no province, no source.
-        $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Local', 'visitor_origin_country' => '', 'visitor_origin_province' => 'Cebu']))
-            ->assertSessionHasNoErrors();
+        foreach (['Regular / Local', 'Regular / Foreign'] as $type) {
+            foreach (['', 'NONE'] as $answer) {
+                $this->post(route('plan.update'), $this->form(['visitor_type' => $type, 'visitor_origin_country' => $answer]))->assertSessionHasErrors('visitor_origin_country');
+            }
+        }
+        $this->assertSame(0, TouristPreference::count(), 'nothing is saved without an origin');
 
-        $p = TouristPreference::first();
-        $this->assertNull($p->visitor_origin_country_code);
-        $this->assertNull($p->visitor_origin_province);
-        $this->assertNull($p->visitor_origin_region);
-        $this->assertNull($p->visitor_origin_source);
-
-        // Anyone else has to choose: the placeholder is refused, nothing is saved as a default.
-        $before = TouristPreference::count();
-        $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Foreign', 'visitor_origin_country' => '']))->assertSessionHasErrors('visitor_origin_country');
-        $this->assertSame($before, TouristPreference::count());
-    }
-
-    public function test_prefer_not_to_say_stores_nothing_but_the_choice(): void
-    {
-        $this->post(route('plan.update'), $this->form([
-            'visitor_type' => 'Regular / Foreign', 'visitor_origin_country' => 'NONE', 'visitor_origin_city' => 'Hidden',
-        ]))->assertSessionHasNoErrors();
-
-        $p = TouristPreference::first();
-        $this->assertNull($p->visitor_origin_country_code);
-        $this->assertNull($p->visitor_origin_city);
-        $this->assertSame('unspecified', $p->visitor_origin_source);
-    }
-
-    public function test_origin_is_required_for_visitors_from_outside_but_not_for_locals(): void
-    {
-        $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Foreign']))->assertSessionHasErrors('visitor_origin_country');
         $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Local']))->assertSessionHasNoErrors();
+        $this->assertSame(1, TouristPreference::count());
+    }
+
+    public function test_the_philippines_needs_a_province(): void
+    {
+        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'PH', 'visitor_origin_province' => '']))->assertSessionHasErrors('visitor_origin_province');
     }
 
     public function test_countries_and_provinces_have_to_come_from_our_lists(): void
@@ -334,7 +392,7 @@ class TripLocationV2Test extends TestCase
     public function test_a_typed_city_is_plain_text_and_limited(): void
     {
         $this->post(route('plan.update'), $this->form([
-            'visitor_type' => 'Regular / Domestic', 'visitor_origin_country' => 'PH',
+            'visitor_type' => 'Regular / Domestic', 'visitor_origin_country' => 'PH', 'visitor_origin_province' => 'Iloilo',
             'visitor_origin_city' => '<b>Iloilo</b>'.str_repeat('x', 80),
         ]))->assertSessionHasNoErrors();
 
@@ -352,7 +410,7 @@ class TripLocationV2Test extends TestCase
         $page = $this->get(route('plan.edit'));
 
         $page->assertSee('name="visitor_origin_country"', false);
-        $page->assertSee('Prefer not to say');
+        $page->assertDontSee('Prefer not to say');
         $page->assertSee('name="visitor_origin_province"', false);
         $page->assertSee('name="visitor_origin_city"', false);
     }
@@ -383,7 +441,7 @@ class TripLocationV2Test extends TestCase
 
     // ---- privacy notice, only with the switch on ------------------------------------------------------------
 
-    private const FORM_NOTICE = 'Optional. Your country, province and city are kept as an anonymous statistic for tourism planning, not linked to you. The rest of your trip details are deleted after 30 days.';
+    private const FORM_NOTICE = 'Your country, province and city are kept as an anonymous statistic for tourism planning, not linked to you. The rest of your trip details are deleted after 30 days.';
 
     public function test_the_origin_question_carries_the_privacy_notice_when_the_switch_is_on(): void
     {
@@ -400,7 +458,7 @@ class TripLocationV2Test extends TestCase
     public function test_the_privacy_page_has_the_origin_paragraph_only_when_the_switch_is_on(): void
     {
         $this->get(route('legal.privacy'))->assertOk()
-            ->assertSee('Where you travel from (optional)')
+            ->assertSee('Where you travel from:')
             ->assertSee('fewer than 5 visitors')
             ->assertSee('deleted or cleared automatically', false);
 
