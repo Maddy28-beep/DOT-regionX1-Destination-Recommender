@@ -93,13 +93,8 @@
 
 @media (min-width: 1060px) {
     .plan-wizard.is-wizard #plan-step-0 .pc-block { margin-bottom: 8px; padding-bottom: 8px; }
-    .plan-wizard.is-wizard #plan-step-0:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); column-gap: 22px; }
-    .plan-wizard #plan-step-0 > h2,
-    .plan-wizard #plan-step-0 > .plan-step-intro { grid-column: 1 / -1; }
-    .plan-wizard.is-wizard #plan-step-0 .pc-trip-companions { grid-column: 1; grid-row: 3; }
-    .plan-wizard.is-wizard #plan-step-0 .pc-trip-dates { grid-column: 1; grid-row: 4; }
-    .plan-wizard.is-wizard #plan-step-0 .pc-trip-visitor { grid-column: 1; grid-row: 5; }
-    .plan-wizard.is-wizard #plan-step-0 .pc-trip-start { grid-column: 2; grid-row: 3 / 6; border-left: 1px solid var(--border); border-bottom: 0; padding-left: 22px; }
+    /* One column on every width, in the order the blocks are asked: where from, start and end, pick-up, who is coming. */
+    .plan-wizard.is-wizard #plan-step-0:not([hidden]) { display: block; }
     .plan-wizard #plan-step-0 .pc-trip-dates > .pc-grid > .pc-field:nth-child(1) { grid-column: 1 / 6; grid-row: 1; }
     .plan-wizard #plan-step-0 .pc-trip-dates > .pc-grid > .pc-field:nth-child(2) { grid-column: 6 / -1; grid-row: 1; }
     .plan-wizard #plan-step-0 .pc-trip-dates .pc-grid > [data-quick-dates] { grid-column: 6 / -1; grid-row: 2; }
@@ -107,7 +102,7 @@
     .plan-wizard #plan-step-0 .pc-trip-visitor .pc-field { grid-column: 1 / -1; }
     .plan-wizard #plan-step-0 .pc-trip-visitor .pc-group { margin-bottom: 0; }
     .plan-wizard #plan-step-0 [data-quick-dates] .pc-label { display: none; }
-    .plan-wizard #plan-step-0 .pc-trip-visitor { border-bottom: 0; }
+    .plan-wizard #plan-step-0 .pc-trip-companions { border-bottom: 0; }
     .plan-wizard #plan-step-0 .pc-trip-companions .pc-group { margin-bottom: 0; }
 }
 

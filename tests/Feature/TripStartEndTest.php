@@ -272,6 +272,17 @@ class TripStartEndTest extends TestCase
         $this->assertStringContainsString('visitor_origin_country', $html);
     }
 
+    public function test_the_wide_layout_is_one_column_so_the_order_is_the_asked_order(): void
+    {
+        $css = str_replace("
+", "
+", file_get_contents(public_path('css/plan-trip-layout.css')));
+
+        $this->assertStringContainsString('#plan-step-0:not([hidden]) { display: block; }', $css);
+        $this->assertStringNotContainsString('.pc-trip-visitor { grid-column', $css, 'no fixed grid row can put a block out of order');
+        $this->assertStringNotContainsString('.pc-trip-start { grid-column', $css);
+    }
+
     public function test_the_script_shows_the_length_and_blocks_a_bad_end(): void
     {
         $js = file_get_contents(public_path('js/plan-trip-window.js'));
