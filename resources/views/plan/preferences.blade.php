@@ -135,6 +135,12 @@
                                 <header class="pc-block__head"><h3>Where will you start each day?</h3><p>Optional. We order your stops from the nearest to the furthest.</p></header>
                             @endif
 
+                            @if ($pickupV2)
+                                {{-- Shown (by plan-origin-select.js) while "Where are you travelling from?" is outside Davao Region. The pick-up
+                                     is then switched off; the server ignores anything posted for it and plans from Davao City centre. --}}
+                                <p class="pc-hint is-warning" role="status" data-pickup-lock-note hidden>Your current location is outside Davao Region. Pick-up location selection is not available for your location. If you wish to continue, please indicate your preferred pick-up location.</p>
+                            @endif
+
                             <input type="hidden" name="origin_lat" id="origin_lat" value="{{ $pickupLat }}">
                             <input type="hidden" name="origin_lng" id="origin_lng" value="{{ $pickupLng }}">
 
@@ -165,9 +171,6 @@
                                 <div class="field pc-field pc-col-4">
                                     <span class="pc-label" aria-hidden="true">&nbsp;</span>
                                     <button type="button" class="btn btn-outline pc-locate" id="origin-btn" @if (\App\Support\Features::tripLocation()) data-region-xi="{{ \App\Support\Geo\RegionXi::json() }}" @endif><x-icon name="locate" /> Use my current location</button>
-                                    @if (\App\Support\Features::tripLocation())
-                                        <p class="pc-hint" data-origin-abroad-help>Planning from abroad? Pick where you will arrive or stay in Davao Region.</p>
-                                    @endif
                                 </div>
 
                                 {{-- Where most visitors arrive. A tap fills the box and the two hidden coordinates, so the plan never depends on

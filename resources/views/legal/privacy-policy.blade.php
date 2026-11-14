@@ -76,9 +76,9 @@
                             14&nbsp;days.</li>
                     </ul>
                     @if (\App\Support\Features::tripLocation())
-                        <p data-origin-privacy><strong>Where you travel from (optional):</strong> if you say
-                            where you are travelling from (a country, a province and a city or municipality), or
-                            choose &ldquo;Prefer not to say&rdquo;, the answer is kept in two separate ways. With
+                        <p data-origin-privacy><strong>Where you travel from:</strong> if you say
+                            where you are travelling from (a country, a province and a city or municipality),
+                            the answer is kept in two separate ways. With
                             your trip plan it is deleted or cleared automatically together with the rest of the
                             plan after 30&nbsp;days. Separately, we keep an <strong>anonymous count</strong> for
                             tourism statistics: only the date, your country, your province (for the Philippines)

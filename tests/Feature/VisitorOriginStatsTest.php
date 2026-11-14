@@ -62,6 +62,7 @@ class VisitorOriginStatsTest extends TestCase
             'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => 'moderate',
             'start_at' => '2026-11-28T08:00', 'end_at' => '2026-11-28T17:00',
             'origin_lat' => '7.130', 'origin_lng' => '125.645', 'origin_label' => 'Davao International Airport',
+            'visitor_origin_country' => 'PH', 'visitor_origin_province' => 'Davao del Sur',
             'activities' => ['Wildlife'], 'amenities' => ['wifi'],
         ];
     }
@@ -143,21 +144,21 @@ class VisitorOriginStatsTest extends TestCase
     public function test_a_cleared_answer_takes_the_count_off_and_a_new_answer_adds_it_again(): void
     {
         $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'JP']))->assertSessionHasNoErrors();
-        // Now a local, who is not asked and answers nothing.
-        $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Local', 'visitor_origin_country' => '']))->assertSessionHasNoErrors();
+        // Nobody is let through without an origin any more, a local included: the count is not touched.
+        $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Local', 'visitor_origin_country' => '']))->assertSessionHasErrors('visitor_origin_country');
+        $this->assertSame(1, $this->total());
 
-        $this->assertSame(0, $this->total());
-
-        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'JP']))->assertSessionHasNoErrors();
+        // A different answer moves the count; it does not add a second one.
+        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'KR']))->assertSessionHasNoErrors();
         $this->assertSame(1, $this->total());
     }
 
-    public function test_prefer_not_to_say_is_counted_as_its_own_answer(): void
+    public function test_prefer_not_to_say_is_no_longer_an_answer_and_nothing_is_counted(): void
     {
-        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'NONE', 'visitor_origin_city' => 'Hidden']))->assertSessionHasNoErrors();
+        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'NONE', 'visitor_origin_city' => 'Hidden']))->assertSessionHasErrors('visitor_origin_country');
 
-        $this->assertSame(1, $this->groupCount('', '', '', 'unspecified'));
-        $this->assertSame(0, (int) DB::table('visitor_origin_daily')->where('city', 'Hidden')->count(), 'no city is kept with it');
+        $this->assertSame(0, $this->total());
+        $this->assertSame(0, DB::table('visitor_origin_daily')->count());
     }
 
     // ---- concurrent saves ---------------------------------------------------------------------------------
@@ -236,19 +237,19 @@ class VisitorOriginStatsTest extends TestCase
 
     public function test_two_spellings_of_a_city_are_one_group(): void
     {
-        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'PH', 'visitor_origin_city' => 'davao city']))->assertSessionHasNoErrors();
+        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'PH', 'visitor_origin_province' => 'Cebu', 'visitor_origin_city' => 'davao city']))->assertSessionHasNoErrors();
         $this->flushSession();
-        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'PH', 'visitor_origin_city' => ' Davao  City ']))->assertSessionHasNoErrors();
+        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'PH', 'visitor_origin_province' => 'Cebu', 'visitor_origin_city' => ' Davao  City ']))->assertSessionHasNoErrors();
 
-        $this->assertSame(2, $this->groupCount('PH', '', 'Davao City'));
+        $this->assertSame(2, $this->groupCount('PH', 'Cebu', 'Davao City'));
         $this->assertSame(1, DB::table('visitor_origin_daily')->count());
     }
 
     public function test_an_address_typed_as_a_city_is_not_kept_but_the_country_still_counts(): void
     {
-        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'PH', 'visitor_origin_city' => '12 Rizal St, mia@x.com']))->assertSessionHasNoErrors();
+        $this->post(route('plan.update'), $this->form(['visitor_origin_country' => 'PH', 'visitor_origin_province' => 'Cebu', 'visitor_origin_city' => '12 Rizal St, mia@x.com']))->assertSessionHasNoErrors();
 
-        $this->assertSame(1, $this->groupCount('PH', '', ''));
+        $this->assertSame(1, $this->groupCount('PH', 'Cebu', ''));
         $this->assertSame(0, (int) DB::table('visitor_origin_daily')->where('city', '!=', '')->count());
     }
 

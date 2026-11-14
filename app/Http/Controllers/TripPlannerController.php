@@ -177,7 +177,7 @@ class TripPlannerController extends Controller
                 : ['nullable', 'string', 'max:150', 'required_unless:visitor_type,Regular / Local'],
             // Visitor origin (switch on). The country is a code from our own list, or "none" for "Prefer not to say". The
             // province is checked against our list in applyVisitorOrigin; the city or municipality is typed.
-            'visitor_origin_country' => $v2 ? ['nullable', 'string', 'max:10', 'required_unless:visitor_type,Regular / Local'] : ['nullable', 'string', 'max:10'],
+            'visitor_origin_country' => $v2 ? ['required', 'string', 'max:10'] : ['nullable', 'string', 'max:10'],
             'visitor_origin_province' => ['nullable', 'string', 'max:80'],
             'visitor_origin_city' => ['nullable', 'string', 'max:100'],
             // Not on the form with the switch on (the end is end_at); an old form may still post it, and it is not read.
@@ -219,6 +219,11 @@ class TripPlannerController extends Controller
 
         $window = null;
         if ($v2) {
+            // Where the visitor travels from comes first. From outside Davao Region the pick-up is not offered: nothing posted
+            // for it is read, so the trip is planned from Davao City centre (and the Region XI check has nothing to refuse).
+            if ($this->originOutsideRegion($data)) {
+                $data['origin_lat'] = $data['origin_lng'] = $data['origin_label'] = null;
+            }
             $window = $this->validateTripWindow($data);
             $this->validateTripLocation($request, $data);
             // The planner is fed from the same columns as before: the days, the arrival date and time and the end time are
@@ -522,6 +527,17 @@ class TripPlannerController extends Controller
      * typed city or municipality. Only these names are stored, never a position. Anything not on our lists is refused, so
      * free text cannot reach the statistics.
      */
+    /** True when the chosen home place is outside Davao Region: any other country, or a Philippine province outside Region XI. */
+    private function originOutsideRegion(array $data): bool
+    {
+        $country = strtoupper(trim((string) ($data['visitor_origin_country'] ?? '')));
+        if ($country === '') {
+            return false;   // nothing chosen: the required rule refuses the form before this matters
+        }
+
+        return $country !== 'PH' || ! PhProvinces::isRegionXi((string) ($data['visitor_origin_province'] ?? ''));
+    }
+
     private function applyVisitorOrigin(TouristPreference $preference, array $data): void
     {
         $country = strtoupper(trim((string) ($data['visitor_origin_country'] ?? '')));
@@ -534,19 +550,16 @@ class TripPlannerController extends Controller
             return;
         }
 
-        if ($country === 'NONE') {
-            $preference->forceFill(array_merge($reset, ['visitor_origin_source' => 'unspecified']));
-            $preference->place_of_origin = 'Prefer not to say';
-
-            return;
-        }
-
+        // "Prefer not to say" is no longer an answer: a real place is needed before the trip can be planned.
         if (! Countries::has($country)) {
-            throw \Illuminate\Validation\ValidationException::withMessages(['visitor_origin_country' => 'Choose a country from the list, or "Prefer not to say".']);
+            throw \Illuminate\Validation\ValidationException::withMessages(['visitor_origin_country' => 'Choose a country from the list.']);
         }
 
         $province = trim((string) ($data['visitor_origin_province'] ?? ''));
         $region = null;
+        if ($country === 'PH' && $province === '') {
+            throw \Illuminate\Validation\ValidationException::withMessages(['visitor_origin_province' => 'Choose your province.']);
+        }
         if ($country === 'PH' && $province !== '') {
             $region = PhProvinces::regionOf($province);
             if ($region === null) {
