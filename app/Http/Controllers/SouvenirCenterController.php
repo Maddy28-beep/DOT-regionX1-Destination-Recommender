@@ -21,6 +21,9 @@ class SouvenirCenterController extends Controller
             $query->where('region_id', $request->integer('region_id'));
         }
 
+        // The filters this page's panel offers beyond search, province and budget: rating, amenities, and its own extras.
+        \App\Support\ListingFilters::apply($query, $request, 'souvenir_center');
+
         match ($request->string('sort')->toString()) {
             'rating' => $query->orderByDesc('rating'),
             'name' => $query->orderBy('name'),
@@ -30,7 +33,7 @@ class SouvenirCenterController extends Controller
         // Last, so rows that tie on the chosen sort keep one fixed order: without it a page can repeat or skip a place.
         $query->orderBy('id');
 
-        $souvenirCenters = $query->paginate(9)->withQueryString();
+        $souvenirCenters = $query->paginate(12)->withQueryString();
         \App\Support\SearchLog::record($request, 'souvenir-centers', $souvenirCenters->total());
 
         $regions = Region::orderBy('name')->get();
@@ -48,8 +51,9 @@ class SouvenirCenterController extends Controller
             ->where('region_id', $souvenirCenter->region_id)
             ->where('id', '!=', $souvenirCenter->id)
             ->orderByDesc('rating')
-            ->take(3)
-            ->get();
+            ->take(12)
+            ->get()
+            ->pipe(fn ($found) => \App\Support\RelatedListings::pick($found));
 
         return view('souvenir-centers.show', compact('souvenirCenter', 'nearby'));
     }

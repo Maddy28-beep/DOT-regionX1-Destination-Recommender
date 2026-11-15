@@ -41,5 +41,6 @@
     <div class="dest-detail-hero__content">
         <h1>{{ $destination->displayName() }}</h1>
         <div class="loc">{{ $destination->location }}@if($destination->region) &middot; {{ $destination->region->name }}@endif</div>
+        @if ($niche = \App\Support\ProvinceBrand::for($destination->region?->name))<div class="province-niche province-niche--hero">{{ $niche }}</div>@endif
     </div>
 </div>

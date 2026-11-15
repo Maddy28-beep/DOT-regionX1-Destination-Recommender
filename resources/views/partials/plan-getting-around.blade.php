@@ -106,11 +106,11 @@
                     <div class="pc-option" data-compare-mode="{{ $mode }}">
                         <div class="pc-option__top">
                             <span class="pc-option__icon" aria-hidden="true"><x-icon :name="['tour_operator' => 'van', 'jeep' => 'bus', 'taxi' => 'car', 'personal_car' => 'car'][$mode]" /></span>
-                            <span class="pc-option__selected" hidden><x-icon name="check" aria-hidden="true" /> Selected</span>
+                            <strong class="pc-option__name">{{ $profile['label'] }}</strong>
                         </div>
-                        <strong class="pc-option__name">{{ $profile['label'] }}</strong>
                         <span class="pc-option__time" data-compare-time></span>
                         <span class="pc-option__caption">Estimated travel time</span>
+                        <span class="pc-option__selected" hidden><x-icon name="check" aria-hidden="true" /> Selected</span>
                     </div>
                 @endforeach
             </div>

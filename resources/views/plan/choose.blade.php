@@ -11,13 +11,12 @@
 
 <link rel="stylesheet" href="{{ asset('css/plan-choice.css') }}?v={{ filemtime(public_path('css/plan-choice.css')) }}">
 
-<div class="dash-shell">
+<div class="dash-shell plan-choice">
     <div class="dash-header">
         <div class="container">
             <div>
-                <span class="poster-kicker" style="font-size:1.05rem;">let's get started</span>
-                <h1 class="page-title" style="font-size:1.9rem; margin:0;">How would you like to plan your trip?</h1>
-                <div class="sub">Two ways to go about it &mdash; pick whichever fits, you're not locked in.</div>
+                <h1 class="page-title">How would you like to plan your trip?</h1>
+                <div class="sub">Choose the way you’d like to explore Davao.</div>
                 {{-- Progress, not three look-alike pills: step 1 is filled, 2 and 3 are outlined and muted to show they are ahead. --}}
                 <ol class="pc-stepper" aria-label="How planning works">
                     <li aria-current="step"><span class="pc-stepper__dot" aria-hidden="true">1</span><span class="pc-stepper__label"><span class="sr-only">Step 1, current: </span>Choose a path</span></li>
@@ -32,55 +31,50 @@
         <div class="container">
             <div class="pcx-grid">
 
-                <div class="pcx-card pcx-card--rec">
-                    <span class="pcx-badge">Recommended</span>
-                    <div class="feature-stamp feature-stamp--leaf">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path fill="currentColor" d="M5 3.6h14a1.6 1.6 0 0 1 1.6 1.6v14.4A1.6 1.6 0 0 1 19 21.2H5a1.6 1.6 0 0 1-1.6-1.6V5.2A1.6 1.6 0 0 1 5 3.6z"/>
-                            <path style="fill:var(--stamp-ink)" d="M6.6 8.6h10.8v2.4H6.6zM6.6 13h6.4v2.4H6.6z"/>
-                        </svg>
-                    </div>
+                <div class="pcx-card">
+                    <div class="pcx-card__head">
+                    <div class="pcx-icon"><x-icon name="map" aria-hidden="true" /></div>
+                    <div>
                     <h3>Personalized Itinerary</h3>
                     <p class="pcx-lead">
-                        Answer a few questions about your budget, duration, interests and travel
-                        style, and we'll build a custom day-by-day plan around your own preferences.
+                        Tell us your interests, budget, and travel style. Build a day-by-day plan around you.
                     </p>
+                    </div>
+                    </div>
                     <ul class="pcx-meta">
                         <li>About 2 minutes</li>
-                        <li>3 short steps</li>
+                        <li>4 planning steps</li>
                     </ul>
                     <ul class="pcx-get">
-                        <li>{!! $tick !!} Places picked to fit your interests</li>
-                        <li>{!! $tick !!} A route with travel times, plus a stay, meals and shops</li>
-                        <li>{!! $tick !!} Change it and regenerate as often as you like</li>
+                        <li>{!! $tick !!} Places matched to your interests</li>
+                        <li>{!! $tick !!} Travel times, stays, meals &amp; shops</li>
+                        <li>{!! $tick !!} Edit and regenerate your plan</li>
                     </ul>
-                    <p class="pcx-best"><strong>Best if</strong> you want a trip built just for you.</p>
+                    <p class="pcx-best">For travelers who want a flexible, personalized plan.</p>
                     <a href="{{ route('plan.edit') }}" class="btn btn-primary">Plan My Trip &rarr;</a>
                 </div>
 
                 <div class="pcx-card">
-                    <div class="feature-stamp feature-stamp--gold">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path fill="currentColor" d="M12 2.2 14.4 4l3-.2 1 2.8 2.6 1.6-.9 2.9.9 2.9-2.6 1.6-1 2.8-3-.2L12 21.8 9.6 20l-3 .2-1-2.8L3 15.8l.9-2.9L3 10l2.6-1.6 1-2.8 3 .2z"/>
-                            <path d="m8.4 12.1 2.5 2.5 4.8-5.2" fill="none" style="stroke:var(--stamp-ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
+                    <div class="pcx-card__head">
+                    <div class="pcx-icon"><x-icon name="ticket" aria-hidden="true" /></div>
+                    <div>
                     <h3>Tour Packages</h3>
                     <p class="pcx-lead">
-                        Already know you want a guided trip? Browse ready-made, day-by-day
-                        itineraries offered directly by tour operators.
+                        Explore ready-made itineraries from local tour operators and find a trip that fits.
                     </p>
+                    </div>
+                    </div>
                     <ul class="pcx-meta">
-                        <li>Browse in seconds</li>
+                        <li>Ready-made itineraries</li>
                         <li>Price per person shown</li>
                     </ul>
                     <ul class="pcx-get">
-                        <li>{!! $tick !!} Trips run by tour operators, each marked as an official DOT record or sample data</li>
-                        <li>{!! $tick !!} Inclusions and the day-by-day schedule up front</li>
-                        <li>{!! $tick !!} Open any package to see who provides it</li>
+                        <li>{!! $tick !!} See the operator behind each trip</li>
+                        <li>{!! $tick !!} View inclusions and day-by-day schedules</li>
+                        <li>{!! $tick !!} Accreditation and sample-data labels shown</li>
                     </ul>
-                    <p class="pcx-best"><strong>Best if</strong> you want a guided trip without planning it yourself.</p>
-                    <a href="{{ route('packages.index') }}" class="btn btn-outline">Browse Tour Packages &rarr;</a>
+                    <p class="pcx-best">For travelers who prefer an operator-led trip.</p>
+                    <a href="{{ route('packages.index') }}" class="btn btn-primary">Browse Tour Packages &rarr;</a>
                 </div>
             </div>
 

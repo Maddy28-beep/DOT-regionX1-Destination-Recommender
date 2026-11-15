@@ -18,6 +18,8 @@
     $amenityIcons = [
         'Parking Area' => 'parking', 'Restaurant' => 'utensils', 'Swimming Pool' => 'pool', 'Wi-Fi' => 'wifi',
         'Restroom' => 'restroom', 'Accessibility Ramp' => 'accessibility', 'Air Conditioning' => 'snowflake',
+        'Viewing Decks' => 'map-pin', 'Campsites' => 'mountain',
+        'Walking Trails & Boardwalks' => 'boot', 'Playgrounds' => 'family',
     ];
     $chosenPurpose = old('travel_purpose', $preference->travel_purpose);
     $chosenAmenities = (array) old('amenities', $selectedAmenities);
@@ -28,6 +30,8 @@
     <legend>Purpose of travel</legend>
     <div class="pc-chips">
         @foreach ($travelPurposes as $purpose)
+            {{-- "Other" is not offered: it told the planner nothing, and sat alone on a second row. The server still accepts it. --}}
+            @continue($purpose === 'Other')
             <label class="pc-chip pc-chip--icon">
                 <input type="radio" name="travel_purpose" value="{{ $purpose }}" @checked($chosenPurpose === $purpose) required>
                 <x-icon :name="$purposeIcons[$purpose] ?? 'dots'" />
@@ -61,7 +65,7 @@
         <span class="pc-selection-count" data-selection-count="amenities" hidden></span>
     </div>
     <div class="pc-checks">
-        @foreach ($amenityOptions as $amenity)
+        @foreach (array_unique(array_merge($amenityOptions, $moreAmenities)) as $amenity)
             <label class="pc-check">
                 <input type="checkbox" name="amenities[]" value="{{ $amenity }}" @checked(in_array($amenity, $chosenAmenities, true))>
                 <span class="pc-check__icon"><x-icon :name="$amenityIcons[$amenity] ?? 'star'" /></span>
@@ -70,22 +74,6 @@
             </label>
         @endforeach
     </div>
-    <details class="field pc-more-amenities" @if (array_intersect($moreAmenities, $chosenAmenities)) open @endif>
-        <summary class="pc-legend">More amenities</summary>
-        <div class="pc-chips">
-            @foreach ($moreAmenities as $amenity)
-                <label class="pc-chip pc-chip--extra">
-                    <input type="checkbox" name="amenities[]" value="{{ $amenity }}" @checked(in_array($amenity, $chosenAmenities, true))>
-                    <span class="pc-extra-check" aria-hidden="true"><x-icon name="check" /></span>
-                    <span>{{ $amenity }}</span>
-                </label>
-            @endforeach
-        </div>
-    </details>
 </div>
-</div>
-<div class="pc-picks-summary" data-picks-summary hidden>
-    <p><x-icon name="mountain" /><span><strong>Interests:</strong> <span data-picks-text="activities"></span></span></p>
-    <p><x-icon name="check" /><span><strong>Amenities:</strong> <span data-picks-text="amenities"></span></span></p>
 </div>
 <span class="sr-only" data-selection-status role="status" aria-live="polite" aria-atomic="true"></span>

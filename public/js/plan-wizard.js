@@ -55,7 +55,10 @@
     });
     // Who is coming, when, where from, where they start: the order the blocks read in.
     // With the start and end: where from (first, in "About you"), when it starts and ends, the pick-up location, then who is coming.
-    if (tripWindow) steps[0].append(visit, basics, origin, style);
+    if (tripWindow) {
+        steps[0].classList.add('has-trip-window');
+        steps[0].append(visit, basics, origin, style);
+    }
     else steps[0].append(style, basics, visit, origin);
     steps[1].append(interests);
     steps[2].append(budget);
@@ -126,8 +129,6 @@
         const target = Number(button.dataset.planStep);
         if (target <= current || validate(Array.from({length: target}, (_, i) => i))) show(target, true);
     }));
-    const rows = [...loading.querySelectorAll('.plan-loading-workflow li')];
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const errorBox = document.createElement('div');
     errorBox.className = 'alert alert-error';
     errorBox.setAttribute('role', 'alert');
@@ -142,8 +143,8 @@
         loading.hidden = true;
         loading.classList.remove('is-ready', 'is-finishing');
         loading.style.removeProperty('--plan-progress');
-        rows.forEach(row => { row.classList.remove('is-complete', 'is-active'); row.querySelector('span').textContent = ''; });
-        document.getElementById('planLoadingTitle').textContent = 'Davo is planning your trip…';
+        document.getElementById('planLoadingTitle').textContent = 'I’m putting your trip together.';
+        document.getElementById('planLoadingStatus').textContent = 'Building your itinerary…';
     }
     form.addEventListener('submit', async event => {
         event.preventDefault();
@@ -156,8 +157,7 @@
         panel.hidden = true;
         nav.hidden = true;
         loading.hidden = false;
-        document.getElementById('planLoadingTitle').textContent = (form.elements.namedItem('travel_days') ? `Davo is planning your ${form.elements.namedItem('travel_days').value}-day trip…` : 'Davo is planning your trip…');
-        rows.forEach(row => row.classList.add('is-active'));
+        document.getElementById('planLoadingTitle').textContent = 'I’m putting your trip together.';
         loading.focus();
         loading.scrollIntoView({block: 'start'});
         try {
@@ -186,19 +186,9 @@
             if (!data.redirect || new URL(data.redirect, location.href).origin !== location.origin) throw new Error('Invalid response');
             clearDraft();
             draftDirty = false;
-            // The operations have finished on the server. Reveal their
-            // checks in sequence as a completion animation, not fake live progress.
-            loading.classList.add('is-finishing');
-            for (const [index, row] of rows.entries()) {
-                row.classList.remove('is-active');
-                row.classList.add('is-complete');
-                row.querySelector('span').textContent = '✓';
-                loading.style.setProperty('--plan-progress', `${(index + 1) / rows.length * 100}%`);
-                if (!reducedMotion) await new Promise(resolve => setTimeout(resolve, 250));
-            }
             loading.classList.add('is-ready');
             document.getElementById('planLoadingTitle').textContent = 'Your itinerary is ready';
-            await new Promise(resolve => setTimeout(resolve, 400));
+            document.getElementById('planLoadingStatus').textContent = 'Opening your itinerary…';
             location.assign(data.redirect);
         } catch (_) {
             resetLoading();

@@ -138,9 +138,12 @@ class EstablishmentPromotionTest extends TestCase
             'title' => '15% Off Walk-ins', 'code' => 'PROMO15',
         ]);
 
+        // The other stay has no promo card of its own and never shows the first one's code. (The first stay's card in
+        // "More in ..." below may carry its promo's title as a badge, which is that stay's own promo, not this one's.)
         $this->get(route('accommodations.show', $otherListing))
             ->assertOk()
-            ->assertDontSee('15% Off Walk-ins');
+            ->assertDontSee('Your Promo')
+            ->assertDontSee('PROMO15');
     }
 
     public function test_a_promo_outside_its_scheduled_window_does_not_show(): void

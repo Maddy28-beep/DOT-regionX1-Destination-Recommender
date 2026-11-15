@@ -89,6 +89,9 @@ class PackageController extends Controller
             }
         }
 
+        // The filters this page's panel offers beyond search, province and budget: rating, amenities, and its own extras.
+        \App\Support\ListingFilters::apply($query, $request, 'package');
+
         match ($request->string('sort')->toString()) {
             // See RanksByRating / DestinationController::index().
             'rating' => $query->orderByWeightedRating(),
@@ -101,13 +104,15 @@ class PackageController extends Controller
         // Last, so rows that tie on the chosen sort keep one fixed order: without it a page can repeat or skip a place.
         $query->orderBy('id');
 
-        $packages = $query->paginate(9)->withQueryString();
+        $packages = $query->paginate(12)->withQueryString();
         \App\Support\SearchLog::record($request, 'packages', $packages->total());
 
         $regions = Region::orderBy('name')->get();
-        $types = Package::query()->whereNotNull('type')->distinct()->orderBy('type')->pluck('type');
+        $types = \App\Support\CategoryChips::visible(Package::publiclyVisible(), 'type', $request->input('type'));
+        // Category chips only once there are enough packages for a category to mean something.
+        $showCategories = Package::publiclyVisible()->count() > \App\Support\CategoryChips::PACKAGES_NEEDED || $request->filled('type');
 
-        return view('packages.index', compact('packages', 'regions', 'types'));
+        return view('packages.index', compact('packages', 'regions', 'types', 'showCategories'));
     }
 
     public function show(Package $package): View
@@ -120,8 +125,9 @@ class PackageController extends Controller
             ->where('region_id', $package->region_id)
             ->where('id', '!=', $package->id)
             ->orderByDesc('rating')
-            ->take(3)
-            ->get();
+            ->take(12)
+            ->get()
+            ->pipe(fn ($found) => \App\Support\RelatedListings::pick($found));
 
         return view('packages.show', compact('package', 'nearby'));
     }

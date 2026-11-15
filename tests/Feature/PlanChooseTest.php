@@ -19,17 +19,18 @@ class PlanChooseTest extends TestCase
             ->assertSee('Personalized Itinerary')
             ->assertSee('Tour Packages')
             ->assertSee('About 2 minutes')
-            ->assertSee('3 short steps')
-            ->assertSee('Best if')
+            ->assertSee('4 planning steps')
+            ->assertSee('For travelers who want a flexible, personalized plan.')
             ->assertSee(route('plan.edit'), false)
             ->assertSee(route('packages.index'), false);
     }
 
-    public function test_it_marks_one_path_as_recommended_and_helps_the_undecided(): void
+    public function test_it_offers_neutral_choices_and_helps_the_undecided(): void
     {
         $this->get(route('plan.choose'))
             ->assertOk()
-            ->assertSee('Recommended')
+            ->assertDontSee('Recommended')
+            ->assertDontSee('pcx-card--rec', false)
             ->assertSee('Not sure which to pick?')
             ->assertSee('I\'m just exploring', false);
     }
@@ -57,7 +58,7 @@ class PlanChooseTest extends TestCase
     {
         $html = $this->get(route('plan.choose'))->assertOk()->getContent();
 
-        preg_match_all('/<div class="feature-stamp[^"]*">\s*<svg[^>]*>\s*<path[^>]*d="([^"]+)"/', $html, $icons);
+        preg_match_all('/<div class="pcx-icon">\s*<svg[^>]*>\s*<path[^>]*d="([^"]+)"/', $html, $icons);
 
         $this->assertCount(2, $icons[1]);
         $this->assertNotSame($icons[1][0], $icons[1][1], 'the two cards do not share an icon');

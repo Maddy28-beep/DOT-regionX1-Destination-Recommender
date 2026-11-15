@@ -222,10 +222,6 @@
 .plan-wizard #plan-step-2 [data-resort-setting-field] .pc-chips { gap: 8px; }
 .plan-wizard #plan-step-2 [data-resort-setting-field] .pc-chip { min-height: 40px; padding: 8px 12px; gap: 7px; font-size: .74rem; border-radius: 9px; }
 .plan-wizard #plan-step-2 [data-resort-setting-field] .pc-chip svg { flex: none; width: 17px; height: 17px; }
-.plan-wizard #plan-step-2 .pc-stay-summary { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; margin-top: 6px; border-radius: 10px; background: #edf6f0; color: var(--primary-dark); }
-.plan-wizard #plan-step-2 .pc-stay-summary__icon { flex: none; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: #fff; }
-.plan-wizard #plan-step-2 .pc-stay-summary__icon svg { width: 13px; height: 13px; }
-.plan-wizard #plan-step-2 .pc-stay-summary p { margin: 0; font-size: .75rem; line-height: 1.6; overflow-wrap: anywhere; }
 .plan-wizard .plan-panel:has(#plan-step-2:not([hidden])) .plan-wizard-actions { background: #fff; border-top: 1px solid var(--border); margin-top: 18px; }
 @media (max-width: 1000px) {
     .plan-wizard #plan-step-2 .pc-stay-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -242,7 +238,6 @@
     .plan-wizard #plan-step-2 [data-resort-setting-field] { padding: 12px; }
     .plan-wizard #plan-step-2 [data-resort-setting-field] .pc-chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .plan-wizard #plan-step-2 [data-resort-setting-field] .pc-chip { min-width: 0; min-height: 44px; padding: 8px; font-size: .71rem; line-height: 1.4; }
-    .plan-wizard #plan-step-2 .pc-stay-summary { padding: 10px; }
 }
 @media (max-width: 360px) {
     .plan-wizard #plan-step-2 .pc-stay-options,
@@ -459,5 +454,48 @@
 [data-origin-v2] .site-dropdown[hidden],
 [data-origin-v2] .site-dropdown:has(> select[hidden]) { display: none; }
 
+/* A shorter first step: keep every answer visible; disclose extended guidance. */
+.plan-wizard #plan-step-0 .pc-trip-help { margin-top: 8px; color: var(--muted); font-size: .8rem; }
+.plan-wizard #plan-step-0 .pc-trip-help summary { width: fit-content; padding: 8px 0; color: var(--primary-dark); cursor: pointer; font-weight: 600; }
+.plan-wizard #plan-step-0 .pc-trip-help summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: 4px; }
+.plan-wizard #plan-step-0 .pc-trip-help p { margin: 6px 0; line-height: 1.6; }
+.plan-wizard #plan-step-0.has-trip-window .pc-block__head h3,
+.plan-wizard #plan-step-0.has-trip-window .pc-group > legend { border-left: 0; padding-left: 0; }
+.plan-wizard #plan-step-0.has-trip-window .pc-block__head { margin-bottom: 10px; }
+.plan-wizard #plan-step-0.has-trip-window .pc-start-notes { gap: 0; }
+.plan-wizard #plan-step-0.has-trip-window .pc-trip-duration { padding: 10px 12px; border-radius: 10px; background: #edf6f0; font-size: .82rem; }
+.plan-wizard.is-wizard #plan-step-0.has-trip-window:not([hidden]) { display: block; max-width: 900px; margin-inline: auto; }
+.plan-wizard.is-wizard #plan-step-0.has-trip-window .pc-block { margin-bottom: 12px; padding-bottom: 12px; }
+.plan-wizard.is-wizard #plan-step-0.has-trip-window .pc-trip-start { border-left: 0; padding-left: 0; }
+.plan-wizard #plan-step-0.has-trip-window .pc-block__head { margin-bottom: 6px; }
+.plan-wizard #plan-step-0.has-trip-window .pc-grid { gap: 8px 12px; }
+.plan-wizard #plan-step-0.has-trip-window .pc-group { margin-bottom: 0; }
+.plan-wizard #plan-step-0.has-trip-window .pc-field > label,
+.plan-wizard #plan-step-0.has-trip-window .pc-label { margin-bottom: 4px; }
+.plan-wizard #plan-step-0.has-trip-window .pc-field input:not([type="radio"]):not([type="checkbox"]),
+.plan-wizard #plan-step-0.has-trip-window .site-dropdown-trigger { min-height: 44px; height: 44px; padding-block: 9px; }
+.plan-wizard #plan-step-0.has-trip-window .pc-hint { margin-top: 4px; line-height: 1.4; }
+.plan-wizard #plan-step-0.has-trip-window .pc-trip-duration { margin-top: 6px; padding: 8px 12px; }
+.plan-wizard #plan-step-0.has-trip-window .pc-arrivals { margin-top: 0; }
+.plan-wizard #plan-step-0.has-trip-window .pc-arrivals .pc-label { margin-bottom: 5px; }
+.plan-wizard #plan-step-0.has-trip-window .pc-trip-help { margin-top: 2px; }
+.plan-wizard #plan-step-0.has-trip-window .pc-trip-help summary { padding-block: 6px; }
+@media (min-width: 761px) {
+    .plan-wizard #plan-step-0.has-trip-window .pc-trip-start .pc-grid > .pc-field:first-child { grid-column: 1 / 9; }
+    .plan-wizard #plan-step-0.has-trip-window .pc-trip-start .pc-grid > .pc-field:has(#origin-btn) { grid-column: 9 / -1; align-self: end; }
+    .plan-wizard #plan-step-0.has-trip-window .pc-locate { min-height: 44px; padding: 8px 10px; font-size: .8rem; }
+    .plan-wizard #plan-step-0.has-trip-window .pc-trip-start .pc-block__head { display: flex; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; }
+    .plan-wizard #plan-step-0.has-trip-window .pc-trip-start .pc-block__head p { margin: 0; }
+}
+@media (min-width: 1060px) {
+    .plan-wizard #plan-step-0.has-trip-window .pc-trip-dates > .pc-grid > .pc-field:nth-child(1) { grid-column: 1 / 7; }
+    .plan-wizard #plan-step-0.has-trip-window .pc-trip-dates > .pc-grid > .pc-field:nth-child(2) { grid-column: 7 / -1; }
+}
+@media (max-width: 640px) {
+    .plan-wizard #plan-step-0.has-trip-window .pc-block { padding-bottom: 10px; margin-bottom: 10px; }
+    .plan-wizard #plan-step-0.has-trip-window .pc-trip-help { font-size: .8rem; }
+    .plan-wizard #plan-step-0.has-trip-window .pc-hint { font-size: .78rem; }
+    .plan-wizard #plan-step-0.has-trip-window .pc-trip-visitor .pc-cards--rows { grid-template-columns: 1fr; }
+}
 /* Pick-up location while the visitor travels from outside Davao Region: only the location button is switched off. */
 .pc-trip-start .pc-hint.is-warning { color: var(--warning-dark, #92400e); font-weight: 600; }

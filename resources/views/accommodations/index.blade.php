@@ -13,6 +13,7 @@
     <div class="container">
         <h1 class="poster-title">Stay in Davao</h1>
         <p>Find your perfect stay, from city hotels to island resorts.</p>
+        @include('partials.catalog-brand-line')
     </div>
 </header>
 
@@ -26,13 +27,14 @@
             $moreTypes = $types->reject(fn ($type) => $featuredTypes->has($type));
             $moreTypeSelected = $moreTypes->contains(request('type'));
         @endphp
-        @include('partials.catalog-categories', ['categoryLabel' => 'Accommodation categories'])
+        @include('partials.catalog-categories', ['categoryLabel' => 'Accommodation categories', 'dealsCount' => $dealsCount])
 
         <div class="catalog-layout">
             @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, 'type'); @endphp
 
             @include('partials.catalog-filters', [
-                'hidden' => \App\Support\ActiveFilters::carry(request(), ['price_min','price_max','stay_mode','from','to','adults','children','seniors','pwd']),
+                'groups' => \App\Support\ListingFilters::groups('accommodation', request()),
+                'hidden' => \App\Support\ActiveFilters::carry(request(), ['price_min','price_max','stay_mode','from','to','adults','children','seniors','pwd','deals']),
                 'route' => 'accommodations.index',
                 'placeholder' => 'e.g. Pearl Farm',
                 'regions' => $regions,

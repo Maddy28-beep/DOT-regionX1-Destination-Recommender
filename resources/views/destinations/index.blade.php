@@ -13,6 +13,7 @@
     <div class="container">
         <h1 class="poster-title">Discover Davao</h1>
         <p>Explore Davao's mountains, islands, and local wonders.</p>
+        @include('partials.catalog-brand-line')
     </div>
 </header>
 
@@ -35,6 +36,7 @@
             @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, 'type'); @endphp
 
             @include('partials.catalog-filters', [
+                'groups' => \App\Support\ListingFilters::groups('destination', request()),
                 'route' => 'destinations.index',
                 'placeholder' => 'e.g. Samal Island',
                 'regions' => $regions,

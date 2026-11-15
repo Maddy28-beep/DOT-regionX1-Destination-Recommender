@@ -1,0 +1,15 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Island view">
+    <rect width="800" height="600" fill="#FFF7E9"/>
+    <rect x="24" y="24" width="752" height="552" fill="none" stroke="#0B5E52" stroke-width="4" stroke-dasharray="14 10" opacity=".4"/>
+    <circle cx="400" cy="300" r="196" fill="#e6f4ef"/>
+    <circle cx="520" cy="200" r="36" fill="#C8501F"/>
+    <path d="M230 360 Q330 270 430 360 Z" fill="#0B5E52" opacity=".75"/>
+    <path d="M330 360 Q420 300 510 360 Z" fill="#12836F"/>
+    <path d="M410 360 L418 300" stroke="#0B5E52" stroke-width="8" stroke-linecap="round"/>
+    <path d="M418 300 q-30-10-48 12 M418 300 q30-14 52 6 M418 300 q-6-34-34-40 M418 300 q10-34 40-34" stroke="#12836F" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <g fill="none" stroke="#12836F" stroke-width="9" stroke-linecap="round">
+        <path d="M190 400 q30-18 60 0 t60 0 t60 0 t60 0 t60 0 t60 0"/>
+        <path d="M220 440 q30-18 60 0 t60 0 t60 0 t60 0 t60 0"/>
+        <path d="M250 480 q30-18 60 0 t60 0 t60 0 t60 0"/>
+    </g>
+</svg>

@@ -25,7 +25,10 @@ class RestaurantController extends Controller
         }
 
         if ($request->filled('cuisine_type')) {
-            $query->where('cuisine_type', $request->string('cuisine_type'));
+            // A chip such as "Filipino" stands for every stored cuisine that carries the word (Filipino Seafood, Cafe & Filipino...).
+            $cuisine = $request->string('cuisine_type')->toString();
+            $members = \App\Support\CategoryChips::cuisineMembers($cuisine);
+            $members === null ? $query->where('cuisine_type', $cuisine) : $query->whereIn('cuisine_type', $members);
         }
 
         if ($request->filled('price_tier')) {
@@ -50,6 +53,9 @@ class RestaurantController extends Controller
             $query->whereIn('restaurants.id', $ids);
         }
 
+        // The filters this page's panel offers beyond search, province and budget: rating, amenities, and its own extras.
+        \App\Support\ListingFilters::apply($query, $request, 'restaurant');
+
         match ($request->string('sort')->toString()) {
             'rating' => $query->orderByDesc('rating'),
             'name' => $query->orderBy('name'),
@@ -59,11 +65,11 @@ class RestaurantController extends Controller
         // Last, so rows that tie on the chosen sort keep one fixed order: without it a page can repeat or skip a place.
         $query->orderBy('id');
 
-        $restaurants = $query->paginate(9)->withQueryString();
+        $restaurants = $query->paginate(12)->withQueryString();
         \App\Support\SearchLog::record($request, 'restaurants', $restaurants->total());
 
         $regions = Region::orderBy('name')->get();
-        $cuisineTypes = Restaurant::query()->whereNotNull('cuisine_type')->distinct()->orderBy('cuisine_type')->pluck('cuisine_type');
+        $cuisineTypes = \App\Support\CategoryChips::cuisines($request->input('cuisine_type'));
 
         return view('restaurants.index', compact('restaurants', 'regions', 'cuisineTypes'));
     }
@@ -78,8 +84,9 @@ class RestaurantController extends Controller
             ->where('region_id', $restaurant->region_id)
             ->where('id', '!=', $restaurant->id)
             ->orderByDesc('rating')
-            ->take(3)
-            ->get();
+            ->take(12)
+            ->get()
+            ->pipe(fn ($found) => \App\Support\RelatedListings::pick($found));
 
         return view('restaurants.show', compact('restaurant', 'nearby'));
     }

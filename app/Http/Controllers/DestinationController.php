@@ -56,6 +56,9 @@ class DestinationController extends Controller
             }
         }
 
+        // The filters this page's panel offers beyond search, province and budget: rating, amenities, and its own extras.
+        \App\Support\ListingFilters::apply($query, $request, 'destination');
+
         match ($request->string('sort')->toString()) {
             // Weighted, so "no reviews yet" sorts as average rather than as
             // nought stars -- see RanksByRating. Raw rating buried all 17
@@ -80,11 +83,11 @@ class DestinationController extends Controller
             'longitude' => $destination->longitude,
             'url' => route('destinations.show', $destination),
         ]);
-        $destinations = $query->paginate(9)->withQueryString();
+        $destinations = $query->paginate(12)->withQueryString();
         \App\Support\SearchLog::record($request, 'destinations', $destinations->total());
 
         $regions = Region::orderBy('name')->get();
-        $types = Destination::query()->whereNotNull('type')->distinct()->orderBy('type')->pluck('type');
+        $types = \App\Support\CategoryChips::visible(Destination::publiclyVisible(), 'type', $request->input('type'));
 
         return view('destinations.index', compact('destinations', 'regions', 'types', 'mapDestinations'));
     }
@@ -99,8 +102,9 @@ class DestinationController extends Controller
             ->where('region_id', $destination->region_id)
             ->where('id', '!=', $destination->id)
             ->orderByDesc('rating')
-            ->take(3)
-            ->get();
+            ->take(12)
+            ->get()
+            ->pipe(fn ($found) => \App\Support\RelatedListings::pick($found));
         $nearbyIsSameRegion = $nearby->isNotEmpty();
 
         // Some regions (e.g. Samal, which is the only destination seeded in
@@ -111,8 +115,9 @@ class DestinationController extends Controller
             $nearby = Destination::publiclyVisible()->with('region', 'tags', 'photos')
                 ->where('id', '!=', $destination->id)
                 ->orderByDesc('rating')
-                ->take(3)
-                ->get();
+                ->take(12)
+                ->get()
+                ->pipe(fn ($found) => \App\Support\RelatedListings::pick($found));
         }
 
         return view('destinations.show', compact('destination', 'nearby', 'nearbyIsSameRegion'));

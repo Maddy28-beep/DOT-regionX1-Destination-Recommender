@@ -71,6 +71,14 @@ class AccommodationController extends Controller
             });
         }
 
+        // Stays with a live promo (the "Deals" chip).
+        if ($request->boolean('deals')) {
+            $query->whereIn('id', \App\Models\Promotion::listingIdsWithDeal('accommodation'));
+        }
+
+        // The filters this page's panel offers beyond search, province and budget: rating, amenities, and its own extras.
+        \App\Support\ListingFilters::apply($query, $request, 'accommodation');
+
         match ($request->string('sort')->toString()) {
             'rating' => $query->orderByDesc('rating'),
             'price_low' => $query->orderBy('price_per_night'),
@@ -82,24 +90,25 @@ class AccommodationController extends Controller
         // Last, so rows that tie on the chosen sort keep one fixed order: without it a page can repeat or skip a place.
         $query->orderBy('id');
 
-        $accommodations = $query->paginate(9)->withQueryString();
+        $accommodations = $query->paginate(12)->withQueryString();
         \App\Support\SearchLog::record($request, 'accommodations', $accommodations->total());
 
         $regions = Region::orderBy('name')->get();
-        $baseTypes = Accommodation::query()->whereNotNull('type')->distinct()->orderBy('type')->pluck('type');
-        $filedSettings = Accommodation::query()
-            ->where('is_accredited', true)->whereNull('archived_at')
-            ->whereNotNull('resort_settings')
-            ->pluck('resort_settings')
-            ->flatMap(fn ($encoded) => array_filter(explode('|', (string) $encoded)))
-            ->unique()
-            ->all();
+        $selectedType = $request->input('type');
+        $baseTypes = \App\Support\CategoryChips::visible(Accommodation::publiclyVisible(), 'type', $selectedType);
+        // The resort kinds ("Beach Resort", "Lake Resort"...) come from each resort's setting; one with too few resorts is left out.
         $resortCategoryTypes = collect(Accommodation::RESORT_SETTINGS)
-            ->filter(fn ($s) => in_array($s, $filedSettings, true))
-            ->map(fn ($s) => ($s === 'All-Inclusive' ? 'All Inclusive' : $s).' Resort');
+            ->map(fn ($s) => ($s === 'All-Inclusive' ? 'All Inclusive' : $s).' Resort' === $selectedType
+                ? [$s, PHP_INT_MAX]
+                : [$s, Accommodation::publiclyVisible()->whereIn('type', ['Resort', 'Beach Resort'])->withResortSetting($s)->count()])
+            ->filter(fn ($pair) => $pair[1] >= \App\Support\CategoryChips::MIN)
+            ->map(fn ($pair) => ($pair[0] === 'All-Inclusive' ? 'All Inclusive' : $pair[0]).' Resort');
         $types = $baseTypes->merge($resortCategoryTypes)->unique()->values();
 
-        return view('accommodations.index', compact('accommodations', 'regions', 'types'));
+        // The Deals chip is only offered while some visible stay has a live promo (or while it is the chosen filter).
+        $dealsCount = Accommodation::publiclyVisible()->whereIn('id', \App\Models\Promotion::listingIdsWithDeal('accommodation'))->count();
+
+        return view('accommodations.index', compact('accommodations', 'regions', 'types', 'dealsCount'));
     }
 
     public function show(Accommodation $accommodation): View
@@ -112,8 +121,9 @@ class AccommodationController extends Controller
             ->where('region_id', $accommodation->region_id)
             ->where('id', '!=', $accommodation->id)
             ->orderByDesc('rating')
-            ->take(3)
-            ->get();
+            ->take(12)
+            ->get()
+            ->pipe(fn ($found) => \App\Support\RelatedListings::pick($found));
 
         return view('accommodations.show', compact('accommodation', 'nearby'));
     }

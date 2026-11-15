@@ -2,7 +2,8 @@
 
 @section('title', 'Partner Account Request — ExploreDVO')
 @push('styles')
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
     <link rel="stylesheet" href="{{ asset('css/portal-login.css') }}?v={{ filemtime(public_path('css/portal-login.css')) }}">
 @endpush
 
@@ -28,7 +29,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('portal.establishment.register') }}">
+            <form method="POST" action="{{ route('portal.establishment.register') }}" data-busy-submit data-busy-label="Sending your request…">
                 @csrf
 
                 <div class="form-section">
@@ -149,7 +150,7 @@
                     </span>
                 </label>
 
-                <button type="submit" class="portal-signin__submit">Submit for Review &rarr;</button>
+                <button type="submit" class="portal-signin__submit" data-busy-label="Submitting…">Submit for Review &rarr;</button>
             </form>
 
             <p class="portal-signin__help">Already approved? <a href="{{ route('portal.login') }}">Sign in</a></p>

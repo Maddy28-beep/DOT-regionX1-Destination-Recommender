@@ -1,0 +1,346 @@
+/* Brand accents: carries the Department of Tourism look (Barabara headings, the three tourism marks, the regional line)
+   past the landing hero. Only type, a strip of logos and one line of text; no layout of existing pages changes. */
+
+/* 1. Titles that were still in Poppins: the itinerary banner and a destination's name. (The listing and plan pages already use
+   Barabara.) Uppercase only face, so the case is set here. */
+.itin-banner__title,
+.dest-detail-hero__content h1 {
+    font-family: 'Barabara', 'Alfa Slab One', serif;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+    font-weight: 400;
+}
+.itin-banner__title { line-height: 1.1; }
+
+/* 3. The tourism marks on a light strip. */
+.tourism-strip {
+    display: inline-flex; align-items: center; justify-content: center; gap: 14px;
+    background: #fff; border-radius: 12px; padding: 8px 14px;
+}
+.tourism-strip img { display: block; height: auto; object-fit: contain; }
+.tourism-strip__davao { width: 84px; }
+.tourism-strip__dot { width: 40px; }
+.tourism-strip__love { width: 92px; }
+.site-footer .tourism-strip { margin: 18px 0 0; }
+.portal-poster .tourism-strip { margin-top: 14px; }
+
+/* 4. The regional line. */
+.poster-hero .region-tagline {
+    margin: 10px 0 0; font-family: 'Barabara', 'Alfa Slab One', serif; text-transform: uppercase;
+    letter-spacing: .06em; font-size: clamp(.85rem, 1.4vw, 1.05rem); color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.45);
+}
+/* One line under the title, not two: the regional line stays and the long sentence is hidden (it remains in the page for
+   search engines and screen readers). A soft dark glow behind the words keeps them readable on any picture. */
+.poster-hero .poster-hero__subhead:not(.is-visible) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; }
+.poster-hero .region-tagline { margin-top: 14px; font-size: clamp(1rem, 1.9vw, 1.35rem); text-shadow: 0 2px 4px rgba(6, 26, 19, .6), 0 4px 22px rgba(6, 26, 19, .5); }
+.poster-hero__content { position: relative; isolation: isolate; }
+.poster-hero__content::before {
+    content: ""; position: absolute; z-index: -1; inset: -34px -8% -20px; pointer-events: none;
+    background: radial-gradient(ellipse at center, rgba(6, 26, 19, .42) 0%, rgba(6, 26, 19, .22) 48%, rgba(6, 26, 19, 0) 72%);
+}
+.footer-tagline {
+    margin: 14px 0 0; font-family: 'Barabara', 'Alfa Slab One', serif; text-transform: uppercase; letter-spacing: .06em;
+    font-size: .95rem; color: #fff;
+}
+
+/* Listing pages: the regional line above, and the chosen province's niche below, the heading's own text. */
+.catalog-banner .brand-line {
+    margin: 0 0 4px; font-family: 'Barabara', 'Alfa Slab One', serif; text-transform: uppercase;
+    letter-spacing: .08em; font-size: .78rem; opacity: .92;
+}
+.catalog-banner .province-niche {
+    display: inline-block; margin-top: 10px; padding: 4px 12px; border-radius: 999px; max-width: none;
+    background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.4); font-size: .85rem;
+}
+.province-niche--hero {
+    display: inline-block; margin-top: 8px; padding: 3px 12px; border-radius: 999px; font-size: .82rem; font-weight: 600;
+    background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.45); color: #fff;
+}
+
+/* ===== The top bar's menu: roomier links that light up on hover, and a clear mark for the page you are on ===== */
+.site-topbar .main-nav { gap: 2px; }
+.site-topbar .main-nav > a,
+.site-topbar .main-nav .nav-more__toggle {
+    position: relative;
+    min-height: 40px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+    font-size: .92rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color .15s ease, background-color .15s ease;
+}
+.site-topbar .main-nav > a:hover,
+.site-topbar .main-nav .nav-more__toggle:hover,
+.site-topbar .main-nav .nav-more__toggle[aria-expanded="true"] { background: var(--primary-light); color: var(--primary-dark); }
+.site-topbar .main-nav > a:focus-visible,
+.site-topbar .main-nav .nav-more__toggle:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+/* The current page: bold, in the green, with a short stamp-orange bar under it (no underline). */
+.site-topbar .main-nav > a[aria-current="page"],
+.site-topbar .main-nav .nav-more__toggle.is-active {
+    color: var(--primary-dark);
+    font-weight: 800;
+    text-decoration: none;
+}
+.site-topbar .main-nav > a[aria-current="page"]::after,
+.site-topbar .main-nav .nav-more__toggle.is-active::after {
+    content: "";
+    position: absolute;
+    left: 14px; right: 14px; bottom: 2px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--accent-strong, #c8501f);
+}
+.site-topbar .main-nav .main-nav__advisories[aria-current="page"] .main-nav__label { text-decoration: none; }
+
+/* On the landing picture, before the bar turns white: the same shapes in light tints. */
+body.hero-page .site-header:not(.scrolled) .main-nav > a:hover,
+body.hero-page .site-header:not(.scrolled) .main-nav .nav-more__toggle:hover,
+body.hero-page .site-header:not(.scrolled) .main-nav .nav-more__toggle[aria-expanded="true"] { background: rgba(255, 255, 255, .18); color: #fff; }
+body.hero-page .site-header:not(.scrolled) .main-nav > a[aria-current="page"],
+body.hero-page .site-header:not(.scrolled) .main-nav .nav-more__toggle.is-active { color: #fff; }
+
+/* ===== Detail pages (a destination, a stay, a restaurant, a package...) use the width of the screen too ===== */
+.container.listing-detail-refresh { max-width: 1840px; padding-inline: clamp(16px, 2.4vw, 48px); }
+@media (min-width: 1500px) {
+    .listing-detail-refresh .detail-layout { grid-template-columns: minmax(0, 1fr) 440px; gap: 40px; }
+}
+
+/* ===== The menu links in Barabara, like the page titles (an uppercase-only face, so the case is set here) ===== */
+.site-topbar .main-nav > a,
+.site-topbar .main-nav .nav-more__toggle {
+    font-family: 'Barabara', 'Alfa Slab One', serif;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 400;
+    font-size: .95rem;
+    padding: 0 12px;
+}
+.site-topbar .main-nav > a[aria-current="page"],
+.site-topbar .main-nav .nav-more__toggle.is-active { font-weight: 400; }
+.site-topbar .main-nav > a[aria-current="page"]::after,
+.site-topbar .main-nav .nav-more__toggle.is-active::after { left: 12px; right: 12px; }
+
+/* The "More" dropdown's links match the menu. */
+.site-topbar .nav-more__links a {
+    font-family: 'Barabara', 'Alfa Slab One', serif;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 400;
+    font-size: .95rem;
+}
+.site-topbar .nav-more__links a[aria-current="page"] { box-shadow: inset 3px 0 0 var(--accent-strong, #c8501f); background: var(--primary-light); text-decoration: none; }
+
+/* Closer together: the menu sits next to the logo instead of floating in the middle, and its links are tighter. */
+@media (min-width: 1100px) {
+    .site-topbar .main-nav { margin-right: auto; margin-left: clamp(8px, 1.6vw, 32px); gap: 0; }
+    .site-topbar .main-nav > a,
+    .site-topbar .main-nav .nav-more__toggle { padding: 0 10px; }
+    .site-topbar .main-nav > a[aria-current="page"]::after,
+    .site-topbar .main-nav .nav-more__toggle.is-active::after { left: 10px; right: 10px; }
+}
+
+/* The same, stated through the bar itself so nothing can pull the menu back to the centre: the logo and menu from the left,
+   the account buttons pushed to the right. */
+@media (min-width: 1100px) {
+    .site-header .container.bar { justify-content: flex-start; }
+    .site-header .container.bar > .header-actions { margin-left: auto; }
+    .site-header .container.bar > .main-nav { margin-left: clamp(8px, 1.6vw, 32px); margin-right: 0; }
+}
+
+/* ===== The weather and the language, inside the top bar ===== */
+.site-header .container.bar { max-width: 1380px; }
+.header-weather {
+    display: none; align-items: center; gap: 5px; height: 34px; padding: 0 11px; margin-right: 2px; border-radius: 999px;
+    background: var(--primary-light); color: var(--primary-dark); font-size: .84rem; font-weight: 700; white-space: nowrap;
+}
+.header-weather svg { width: 16px; height: 16px; flex: none; color: var(--accent-strong, #c8501f); }
+@media (min-width: 1500px) { .header-weather { display: inline-flex; } }
+body.hero-page .site-header:not(.scrolled) .header-weather { background: rgba(255, 255, 255, .2); color: #fff; }
+body.hero-page .site-header:not(.scrolled) .header-weather svg { color: #fff; }
+
+.mobile-menu__utility { padding: 4px 2px 14px; }
+
+/* ===== An icon in front of each category chip on the listing pages ===== */
+.catalog-categories > a.chip { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.catalog-categories .chip__icon { width: 18px; height: 18px; flex: none; }
+.catalog-categories__menu a { display: flex; align-items: center; gap: 10px; }
+.catalog-categories__menu .chip__icon { color: var(--primary); }
+
+/* ===== Promos and deals: the card on a stay's page, the badge on a stay's card, the Deals chip, the homepage row ===== */
+.promo-card {
+    background: #fff; border: 1px solid var(--border, #dde3dd); border-left: 5px solid var(--accent-strong, #c8501f); border-radius: 16px;
+    padding: 18px 20px; margin: 20px 0; box-shadow: 0 1px 3px rgba(17, 104, 78, .08), 0 4px 14px rgba(17, 104, 78, .05);
+}
+.promo-card__top { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.promo-card__eyebrow {
+    display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px; border-radius: 999px; background: var(--accent-strong, #c8501f); color: #fff;
+    font-size: .72rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+}
+.promo-card__eyebrow svg { width: 14px; height: 14px; }
+.promo-card__status {
+    display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px; border: 1px solid #cfe0d6; border-radius: 999px; background: #fff;
+    color: var(--primary-dark, #0b6b4f); font-size: .8rem; font-weight: 500;
+}
+.promo-card__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--primary, #0b6b4f); }
+.promo-card__title {
+    margin: 0 0 8px; font-family: 'Barabara', 'Alfa Slab One', serif; font-weight: 400; text-transform: uppercase; letter-spacing: .02em;
+    font-size: clamp(1.15rem, 2.2vw, 1.5rem); line-height: 1.25; color: var(--primary-dark, #0b6b4f);
+}
+.promo-card__text { margin: 0 0 14px; white-space: pre-line; line-height: 1.65; }
+.promo-card__meta { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; margin-bottom: 14px; }
+.promo-card__valid { display: inline-flex; align-items: center; gap: 7px; font-size: .88rem; color: var(--ink-soft, #4d5f56); }
+.promo-card__valid svg { width: 16px; height: 16px; color: var(--accent-strong, #c8501f); flex: none; }
+.promo-copy {
+    display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px dashed var(--accent-strong, #c8501f); border-radius: 8px;
+    background: #fbf2df; color: #8a3512; font: inherit; cursor: pointer;
+}
+.promo-copy__code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .95rem; letter-spacing: .06em; }
+.promo-copy__icon { width: 16px; height: 16px; }
+.promo-copy__msg { font-size: .74rem; min-width: 3.2em; }
+.promo-copy:focus-visible, .promo-card__cta:focus-visible { outline: 3px solid var(--primary, #0b6b4f); outline-offset: 2px; }
+.promo-card__cta {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 20px; border-radius: 999px; background: var(--primary, #0b6b4f);
+    color: #fff; font-size: .9rem; font-weight: 600; text-decoration: none;
+}
+.promo-card__cta:hover { background: var(--primary-dark, #08543e); }
+.promo-card__cta svg { width: 16px; height: 16px; }
+
+/* The Deals chip: orange when chosen. */
+.catalog-categories > a.chip--deal { color: #8a3512; border-color: #e8b99f; }
+.catalog-categories > a.chip--deal .chip__icon { color: var(--accent-strong, #c8501f); }
+.catalog-categories > a.chip--deal.active { background: var(--accent-strong, #c8501f); border-color: var(--accent-strong, #c8501f); color: #fff; }
+.catalog-categories > a.chip--deal.active .chip__icon { color: #fff; }
+
+/* A stay's promo title on its card's picture, along the bottom left (the medal sits bottom right). */
+.dcard__promo {
+    position: absolute; left: 10px; bottom: 10px; z-index: 3; display: inline-flex; align-items: center; gap: 5px; max-width: calc(100% - 62px);
+    padding: 3px 10px; border-radius: 999px; background: var(--accent-strong, #c8501f); color: #fff; font-size: .72rem; font-weight: 600; line-height: 1.5;
+}
+.dcard__promo svg { width: 13px; height: 13px; flex: none; }
+.dcard__promo span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dpost-card__art.has-promo .photo-illustration-tag--card { bottom: 42px; }
+
+/* Homepage row. */
+.deals-home { background: #faf8f0; }
+.deals-home__head { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; margin-bottom: 20px; }
+.deals-home__eyebrow { margin: 0 0 4px; color: var(--accent-strong, #c8501f); font-size: .78rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+.deals-home__title { margin: 0; font-family: 'Barabara', 'Alfa Slab One', serif; font-weight: 400; text-transform: uppercase; letter-spacing: .02em; color: var(--primary-dark, #0b6b4f); font-size: clamp(1.5rem, 3vw, 2.1rem); line-height: 1.15; }
+.deals-home__sub { margin: 6px 0 0; color: var(--ink-soft, #4d5f56); }
+.deals-home__all { display: inline-flex; align-items: center; gap: 6px; color: var(--primary-dark, #0b6b4f); font-weight: 600; text-decoration: none; border-bottom: 2px solid currentColor; padding-bottom: 2px; }
+.deals-home__all svg, .deal-card svg { width: 16px; height: 16px; flex: none; }
+.deals-home__row { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.deal-card {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 16px; background: #fff; border-radius: 16px;
+    border-top: 4px solid var(--accent-strong, #c8501f); color: inherit; text-decoration: none;
+    box-shadow: 0 1px 3px rgba(17, 104, 78, .08), 0 4px 14px rgba(17, 104, 78, .05); transition: transform .15s ease, box-shadow .15s ease;
+}
+.deal-card:hover { transform: translateY(-2px); box-shadow: 0 2px 6px rgba(17, 104, 78, .12), 0 10px 24px rgba(17, 104, 78, .1); }
+.deal-card:focus-visible { outline: 3px solid var(--primary, #0b6b4f); outline-offset: 3px; }
+.deal-card__tag {
+    display: inline-flex; align-items: center; gap: 5px; margin-bottom: 6px; padding: 3px 10px; border-radius: 999px; background: var(--accent-strong, #c8501f);
+    color: #fff; font-size: .7rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+}
+.deal-card__tag svg { width: 13px; height: 13px; }
+.deal-card__title { font-size: 1.02rem; line-height: 1.35; }
+.deal-card__stay { font-size: .92rem; }
+.deal-card__loc { display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; color: var(--ink-soft, #4d5f56); font-size: .85rem; }
+.deal-card__code { padding: 3px 9px; border: 1px dashed var(--accent-strong, #c8501f); border-radius: 7px; background: #fbf2df; color: #8a3512; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .85rem; letter-spacing: .06em; }
+.deal-card__go { display: inline-flex; align-items: center; gap: 6px; color: var(--primary-dark, #0b6b4f); font-size: .88rem; font-weight: 600; }
+
+/* ===== Tourism partners beside the logo in the top bar (wide screens; the hero shows them below that width) ===== */
+.header-partners { display: none; }
+@media (min-width: 1500px) {
+    body .site-topbar .site-header .container.bar { grid-template-columns: auto auto minmax(0, 1fr) auto; }
+    .header-partners {
+        display: inline-flex; align-items: center; gap: 14px; flex: none; margin: 0; padding: 0;
+        border-radius: 0; background: transparent; box-shadow: none;
+    }
+    .header-partners img { display: block; height: auto; object-fit: contain; }
+    .header-partners__davao { width: 72px; }
+    .header-partners__dot { width: 28px; }
+    body.hero-page .poster-hero .hero-tourism-brands { display: none; }
+}
+
+/* ===== The three colours of the flag, in the regional line itself ===== */
+/* Lightened a step from the flag's blue, red and yellow so each reads on the picture and on the dark green behind it. */
+.poster-hero .region-tagline {
+    background: linear-gradient(90deg, #7aa2ff 0%, #ff6b79 50%, #ffd94a 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+    text-shadow: none; filter: drop-shadow(0 1px 2px rgba(6, 26, 19, .7)) drop-shadow(0 3px 14px rgba(6, 26, 19, .45));
+    width: fit-content; margin-inline: auto;
+}
+.poster-hero p.region-tagline { font-size: clamp(1.05rem, 1.6vw, 1.4rem); letter-spacing: .07em; }
+
+/* Phones: every place's photo is the same size. The photo column used to stretch to whatever the text beside it needed, so the
+   pictures in one list were 112 by 112, 124, 144... Now each card has one height, and so has each picture. A promo shows as a
+   small tag with its ticket (its words are on the stay's page), since the words cannot fit in a narrow photo. */
+@media (max-width: 560px) {
+    .catalog-refresh .dpost-card { min-height: 148px; }
+    .catalog-refresh .dpost-card .dcard__art { min-height: 148px; }
+    .catalog-refresh .dpost-card .dcard__art.has-promo .dcard__promo { right: auto; width: 30px; height: 26px; padding: 0; justify-content: center; }
+    .catalog-refresh .dpost-card .dcard__art.has-promo .dcard__promo span { display: none; }
+}
+
+/* The photo at the top of a place's page has one shape on every kind of page: the large 16:8 gallery stays and destinations
+   already had (a big main photo with two beside it). Restaurants, packages, souvenir centers and tour operators were a flat
+   320px strip. */
+@media (min-width: 901px) {
+    .container.listing-detail-refresh .gallery-hero,
+    .container.listing-detail-refresh .gallery-categorized { aspect-ratio: 16 / 8; width: 100%; height: auto; max-height: min(680px, 78vh); }
+}
+/* On a picture that is only an illustration, its "not a photo of this place" label sits along the bottom edge; the title block
+   (and the province line under it) leaves room for it instead of running over it. */
+.container.listing-detail-refresh .gallery-hero:has(.photo-illustration-tag) .gallery-hero__title,
+.container.listing-detail-refresh .gallery-categorized:has(.photo-illustration-tag) .gallery-hero__title { padding-bottom: 58px; }
+.container.listing-detail-refresh .gallery-hero .photo-illustration-tag { background: rgba(8, 24, 18, .74); color: #fff; padding: 4px 11px; border-radius: 999px; font-weight: 600; z-index: 4; }
+
+/* ===== A place's "Plan your visit" card: the trip planner first, directions second, and the card stays in view ===== */
+.visit-card__actions--plan { flex-wrap: wrap; }
+.visit-card__actions--plan .visit-card__plan { flex: 1 1 100%; justify-content: center; }
+.visit-card__actions--plan .visit-card__go--ghost { flex: 1 1 0; justify-content: center; background: #fff; color: var(--primary-dark); box-shadow: inset 0 0 0 1.5px var(--primary); }
+.visit-card__actions--plan .visit-card__go--ghost:hover { background: var(--primary-light); }
+@media (min-width: 901px) {
+    /* The column beside the story holds the card; it follows the page down while the story is read (it is a column's own height, so it never covers the footer). */
+    .container.listing-detail-refresh .detail-layout > div:has(> .visit-card) { position: sticky; top: calc(var(--site-topbar-height, 77px) + 16px); align-self: flex-start; max-height: calc(100vh - var(--site-topbar-height, 77px) - 32px); overflow-y: auto; scrollbar-width: thin; }
+}
+
+/* ===== The heart's answer to a tap from someone not signed in, before the sign-in card opens (see login-modal.js) ===== */
+.save-form--teasing button { color: #e0334c !important; border-color: #e0334c !important; animation: heart-ring .6s ease-out; }
+@keyframes heart-ring { from { box-shadow: 0 0 0 0 rgba(224, 51, 76, .5); } to { box-shadow: 0 0 0 16px rgba(224, 51, 76, 0); } }
+@media (prefers-reduced-motion: reduce) { .save-form--teasing button { animation: none; } }
+
+/* ===== Gradient on the filled buttons ===== */
+/* Green for the main actions, orange for the search and the strongest call, red for the one that removes. Every stop keeps the
+   white words at the contrast the flat colours had (4.5:1 or better, bar the first half-inch of the orange). Outline, ghost and
+   chip controls stay flat. !important on the image alone, because the many older rules that set a flat `background` also reset it. */
+:root {
+    --grad-primary: linear-gradient(135deg, #12805f 0%, #0b6b4f 50%, #084d39 100%);
+    --grad-primary-hover: linear-gradient(135deg, #0e6b4f 0%, #084d39 55%, #06382a 100%);
+    --grad-accent: linear-gradient(135deg, #cc531f 0%, #c8501f 45%, #a63d15 100%);
+    --grad-accent-hover: linear-gradient(135deg, #b4461a 0%, #a63d15 55%, #8f3512 100%);
+    --grad-danger: linear-gradient(135deg, #cf4624 0%, #c13a20 50%, #9b2e15 100%);
+    --grad-danger-hover: linear-gradient(135deg, #b53a1c 0%, #9b2e15 60%, #7f2511 100%);
+}
+:is(.btn-primary, .btn-poster-primary, .portal-signin__submit, .visit-card__go:not(.visit-card__go--ghost), .pkg-book-btn, .hero-guests__done, .auth-card button[type="submit"].btn) {
+    background-color: #0b6b4f;
+    background-image: var(--grad-primary) !important;
+}
+:is(.btn-primary, .btn-poster-primary, .portal-signin__submit, .visit-card__go:not(.visit-card__go--ghost), .pkg-book-btn, .hero-guests__done, .auth-card button[type="submit"].btn):is(:hover, :focus-visible):not(:disabled) {
+    background-image: var(--grad-primary-hover) !important;
+}
+.btn-accent { background-color: #c8501f; background-image: var(--grad-accent) !important; }
+.btn-accent:is(:hover, :focus-visible):not(:disabled) { background-image: var(--grad-accent-hover) !important; }
+.btn-danger { background-color: #c13a20; background-image: var(--grad-danger) !important; }
+.btn-danger:is(:hover, :focus-visible):not(:disabled) { background-image: var(--grad-danger-hover) !important; }
+
+/* A card's text sits right under its picture: the empty rating row is gone (see listing-card.blade.php), so the body no longer
+   needs the tall minimum that kept it from looking short with that band in it. */
+@media (min-width: 901px) {
+    .catalog-refresh .dpost-card .dcard__body { min-height: 150px; }
+    .catalog-refresh.souvenirs-catalog .dpost-card .dcard__body { min-height: 128px; }
+}

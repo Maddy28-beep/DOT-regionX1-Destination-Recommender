@@ -2,7 +2,8 @@
 
 @section('title', 'Sign In — ExploreDVO')
 @push('styles')
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
     <link rel="stylesheet" href="{{ asset('css/portal-login.css') }}?v={{ filemtime(public_path('css/portal-login.css')) }}">
 @endpush
 
@@ -45,7 +46,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('account.login') }}">
+            <form method="POST" action="{{ route('account.login') }}" data-busy-submit data-busy-label="Signing you in…">
                 @csrf
 
                 <div class="field">
@@ -66,10 +67,10 @@
                     </div>
                 </div>
 
-                <button type="submit" class="portal-signin__submit">Sign In</button>
+                <button type="submit" class="portal-signin__submit" data-busy-label="Signing in…">Sign In</button>
             </form>
 
-            <p class="portal-signin__help">Don&rsquo;t have an account yet? <a href="{{ route('account.register') }}">Create one for free</a></p>
+            <p class="portal-signin__help">Don&rsquo;t have an account yet? <a href="{{ route('account.register') }}">Sign Up</a></p>
             <p class="portal-signin__partner">Business partner or DOT staff? <a href="{{ route('portal.login') }}">Partner portal sign-in</a></p>
         </section>
     </div>

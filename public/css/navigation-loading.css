@@ -1,0 +1,32 @@
+/* The progress bar along the top of the screen: starts at once when a link is followed and slows as it nears the end, so it
+   never claims to be done before the new page arrives. */
+.navigation-progress[hidden] { display: none; }
+.navigation-progress { position: fixed; top: 0; left: 0; right: 0; z-index: 1300; height: 3px; pointer-events: none; overflow: hidden; }
+.navigation-progress > i { display: block; width: 100%; height: 100%; transform: scaleX(0); transform-origin: left center; background: linear-gradient(90deg, #0e6b4a 0%, #3da56b 55%, #e8742f 100%); box-shadow: 0 0 10px rgba(14, 107, 74, .45); border-radius: 0 3px 3px 0; }
+.navigation-progress.is-running > i { animation: navigation-progress-run 12s cubic-bezier(.08, .55, .2, 1) forwards; }
+@keyframes navigation-progress-run { from { transform: scaleX(.04); } to { transform: scaleX(.92); } }
+
+/* The pill: only shown when the page is slow, along the bottom of the screen where it covers nothing. */
+.navigation-loading[hidden] { display: none; }
+.navigation-loading { width: max-content; }
+.navigation-loading { position: fixed; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); z-index: 1100; display: flex; align-items: center; gap: 12px; max-width: calc(100vw - 32px); padding: 12px 22px 12px 18px; border: 1px solid #d5e8dc; border-radius: 999px; background: #fff; color: #084d39; box-shadow: 0 8px 28px #123b2933; font: 600 .9rem/1.4 'Poppins', sans-serif; pointer-events: none; animation: navigation-loading-in .22s ease-out both; }
+.navigation-loading__text { display: grid; gap: 1px; }
+.navigation-loading__text small { font-weight: 500; font-size: .74rem; color: #52665d; }
+.navigation-loading__text small[hidden] { display: none; }
+/* A green ring with an orange head, the colours of the logo. */
+.navigation-loading__spinner { flex: none; width: 22px; height: 22px; border: 3px solid #d7eadd; border-top-color: #0e6b4a; border-right-color: #e8742f; border-radius: 50%; animation: navigation-loading-spin .8s linear infinite; }
+@keyframes navigation-loading-spin { to { transform: rotate(360deg); } }
+@keyframes navigation-loading-in { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@media (prefers-reduced-motion: reduce) {
+    .navigation-loading { animation: none; }
+    .navigation-loading__spinner { animation: none; border-color: #0e6b4a; }
+    .navigation-progress.is-running > i { animation: none; transform: scaleX(.6); }
+}
+/* On a phone the bar of buttons at the foot of some pages (Directions, the heart) must stay clear. */
+@media (max-width: 900px) { .navigation-loading { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); } }
+@media (max-width: 480px) { .navigation-loading { padding: 10px 18px 10px 14px; font-size: .85rem; } }
+
+/* A button of a form that is working: a small ring in front of its words, and no second press. */
+button.is-busy { position: relative; opacity: .85; cursor: progress; }
+button.is-busy::before { content: ""; display: inline-block; width: 14px; height: 14px; margin-right: 9px; vertical-align: -2px; border: 2px solid rgba(255, 255, 255, .45); border-top-color: #fff; border-radius: 50%; animation: navigation-loading-spin .7s linear infinite; }
+@media (prefers-reduced-motion: reduce) { button.is-busy::before { animation: none; } }

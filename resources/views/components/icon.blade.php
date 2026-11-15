@@ -6,6 +6,21 @@
 --}}
 
 @switch($name)
+    @case('coffee')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h12v8a4 4 0 01-4 4H8a4 4 0 01-4-4V8zM16 9h2a3 3 0 010 6h-2M3 22h15M7 2v2M12 2v2"/></svg>
+        @break
+    @case('fish')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12S12 5 17 8l4 4-4 4c-5 3-9-4-9-4zM8 12L3 7v10l5-5M12 7l2-3 3 4M12 17l2 3 3-4"/><circle cx="17" cy="11" r=".7" fill="currentColor"/></svg>
+        @break
+    @case('bowl')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18a9 9 0 01-18 0zM8 21h8M9 8l9-6M12 10l9-6"/></svg>
+        @break
+    @case('heritage-building')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-6 9 6H3zM5 10v8M10 10v8M14 10v8M19 10v8M3 19h18M2 22h20"/></svg>
+        @break
+    @case('ship')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15V7h14v8M9 7V3h6v4M3 15l9-3 9 3-3 5H6l-3-5zM12 12v8M2 22c2-2 4 2 6 0s4 2 6 0 4 2 8 0"/></svg>
+        @break
     @case('eye')
         <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
         @break
@@ -204,6 +219,10 @@
 
     @case('log-out')
         <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        @break
+
+    @case('copy')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 012-2h9"/></svg>
         @break
 
     @case('check')

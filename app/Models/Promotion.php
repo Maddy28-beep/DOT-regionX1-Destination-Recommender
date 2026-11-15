@@ -46,4 +46,58 @@ class Promotion extends Model
     {
         return $query->where('listing_kind', $listingKind)->where('listing_id', $listingId);
     }
+
+    /** Where it stands today, from its dates: only "showing" is ever public. */
+    public function status(): string
+    {
+        $today = now('Asia/Manila')->startOfDay();
+
+        if ($this->starts_at && $this->starts_at->copy()->startOfDay()->gt($today)) {
+            return 'scheduled';
+        }
+        if ($this->ends_at && $this->ends_at->copy()->startOfDay()->lt($today)) {
+            return 'ended';
+        }
+
+        return 'showing';
+    }
+
+    /** The dates in plain words, whichever of Starts and Ends the partner filled in. */
+    public function validityLine(): string
+    {
+        $from = $this->starts_at;
+        $to = $this->ends_at;
+
+        return match (true) {
+            $from && $to => $from->format('j M Y').' – '.$to->format('j M Y'),
+            (bool) $to => 'Until '.$to->format('j M Y'),
+            (bool) $from => 'From '.$from->format('j M Y'),
+            default => 'No end date — shown until removed',
+        };
+    }
+
+    /**
+     * The title of the live promo of each listing of a kind (the newest when there are several), keyed by listing id. Read once
+     * per request, so a grid of cards costs one query however many it shows.
+     *
+     * @return array<int, string>
+     */
+    public static function activeTitles(string $kind): array
+    {
+        $bag = request()->attributes;
+        $key = 'active_promo_titles.'.$kind;
+
+        if (! $bag->has($key)) {
+            $bag->set($key, static::active()->where('listing_kind', $kind)->latest('id')->get(['listing_id', 'title'])
+                ->unique('listing_id')->pluck('title', 'listing_id')->all());
+        }
+
+        return $bag->get($key);
+    }
+
+    /** Listings of a kind that have a live promo, as a query on their ids. */
+    public static function listingIdsWithDeal(string $kind): Builder
+    {
+        return static::active()->where('listing_kind', $kind)->select('listing_id');
+    }
 }

@@ -183,6 +183,7 @@ class AppServiceProvider extends ServiceProvider
             // then the general ones, most urgent first. The nav dot carries the count of everything live.
             $view->with('ribbonAdvisories', collect([$listingAdvisory])->filter()->merge($general)->unique('id')->take(5)->values());
             $view->with('activeAdvisoryCount', Advisory::active()->count());
+            $view->with('davaoWeather', app(\App\Services\DavaoWeather::class)->now());
 
             // The number on the header's heart: the signed-in traveller's own list, otherwise this
             // browser's. Nothing is counted for a first-time visitor who has no token yet.

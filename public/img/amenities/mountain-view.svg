@@ -1,0 +1,10 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mountain view">
+    <rect width="800" height="600" fill="#FFF7E9"/>
+    <rect x="24" y="24" width="752" height="552" fill="none" stroke="#0B5E52" stroke-width="4" stroke-dasharray="14 10" opacity=".4"/>
+    <circle cx="400" cy="300" r="196" fill="#e6f4ef"/>
+    <circle cx="560" cy="190" r="34" fill="#C8501F"/>
+    <path d="M170 470 L330 230 L420 370 L480 290 L640 470 Z" fill="#12836F"/>
+    <path d="M330 230 L292 288 L318 280 L336 300 L356 280 L372 292 Z" fill="#FFF7E9"/>
+    <path d="M170 470 L270 330 L360 470 Z" fill="#0B5E52" opacity=".7"/>
+    <rect x="150" y="470" width="500" height="12" rx="6" fill="#0B5E52" opacity=".5"/>
+</svg>

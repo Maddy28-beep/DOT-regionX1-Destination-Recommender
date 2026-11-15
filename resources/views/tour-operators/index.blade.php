@@ -13,6 +13,7 @@
     <div class="container">
         <h1 class="poster-title">Davao, Locally Guided</h1>
         <p>Find local tour operators for your next adventure.</p>
+        @include('partials.catalog-brand-line')
     </div>
 </header>
 
@@ -27,6 +28,7 @@
             $moreTypeSelected = $moreTypes->contains(request('specialization'));
         @endphp
         @include('partials.catalog-categories', [
+            'fallbackIcon' => 'compass',
             'categoryLabel' => 'Tour operator specializations',
             'categoryParam' => 'specialization',
             'allCategoriesLabel' => 'All Specializations',
@@ -37,6 +39,7 @@
             @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, 'specialization'); @endphp
 
             @include('partials.catalog-filters', [
+                'groups' => \App\Support\ListingFilters::groups('tour_operator', request()),
                 'route' => 'tour-operators.index',
                 'placeholder' => 'e.g. Apo Summit Guides',
                 'regions' => $regions,

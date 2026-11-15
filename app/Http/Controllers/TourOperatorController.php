@@ -29,6 +29,9 @@ class TourOperatorController extends Controller
             $query->where('price_tier', $request->string('price_tier'));
         }
 
+        // The filters this page's panel offers beyond search, province and budget: rating, amenities, and its own extras.
+        \App\Support\ListingFilters::apply($query, $request, 'tour_operator');
+
         match ($request->string('sort')->toString()) {
             'rating' => $query->orderByDesc('rating'),
             'name' => $query->orderBy('name'),
@@ -38,11 +41,12 @@ class TourOperatorController extends Controller
         // Last, so rows that tie on the chosen sort keep one fixed order: without it a page can repeat or skip a place.
         $query->orderBy('id');
 
-        $tourOperators = $query->paginate(9)->withQueryString();
+        $tourOperators = $query->paginate(12)->withQueryString();
         \App\Support\SearchLog::record($request, 'tour-operators', $tourOperators->total());
 
         $regions = Region::orderBy('name')->get();
-        $specializations = TourOperator::query()->whereNotNull('specialization')->distinct()->orderBy('specialization')->pluck('specialization');
+        // "Tour Operator" is what every one of them is, not a kind; the catch-all "General Travel & Tours" goes after the specific kinds.
+        $specializations = \App\Support\CategoryChips::visible(TourOperator::publiclyVisible(), 'specialization', $request->input('specialization'), ['Tour Operator'], ['General Travel & Tours']);
 
         return view('tour-operators.index', compact('tourOperators', 'regions', 'specializations'));
     }
@@ -57,8 +61,9 @@ class TourOperatorController extends Controller
             ->where('region_id', $tourOperator->region_id)
             ->where('id', '!=', $tourOperator->id)
             ->orderByDesc('rating')
-            ->take(3)
-            ->get();
+            ->take(12)
+            ->get()
+            ->pipe(fn ($found) => \App\Support\RelatedListings::pick($found));
 
         return view('tour-operators.show', compact('tourOperator', 'nearby'));
     }

@@ -22,23 +22,57 @@
 <link rel="stylesheet" href="{{ asset('css/plan-compact.css') }}?v={{ filemtime(public_path('css/plan-compact.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/plan-trip-layout.css') }}?v={{ filemtime(public_path('css/plan-trip-layout.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/plan-headings.css') }}?v={{ filemtime(public_path('css/plan-headings.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/plan-sidebar.css') }}?v={{ filemtime(public_path('css/plan-sidebar.css')) }}">
 <div class="plan-shell plan-wizard" id="planWizard" data-draft-owner="{{ auth()->id() ?? 'guest' }}">
-    <div class="page-head page-head--with-action">
-        <div class="container plan-introduction">
-            <img class="plan-davo" src="{{ asset('images/davo-wave-green.webp') }}" alt="Davo, your eagle travel buddy, waving hello" width="374" height="504">
-            <div class="plan-introduction-copy">
-                <span class="poster-kicker">Your Davao adventure starts here</span>
-                <h1 class="page-title">Let’s plan your Davao adventure.</h1>
-                <p>A few preferences. A trip that feels like you. No sign-up needed.</p>
-            </div>
-            <a href="{{ route('saved.index') }}" class="btn btn-outline plan-saved-link">
-                <x-icon name="heart" /> Saved Places
-            </a>
-        </div>
-    </div>
-
     <div class="section-tight">
-        <div class="container">
+        <div class="container plan-frame">
+            {{-- The intro sits in a column beside the form (not a banner above it), so the form starts near the top of the screen. --}}
+            <aside class="plan-side" aria-label="Trip planning guidance from Davo">
+                <span class="plan-side__kicker">Your travel buddy</span>
+                <img class="plan-side__davo" src="{{ asset('images/davo-wave-green.webp') }}" alt="Davo, your eagle travel buddy, waving hello" width="374" height="504">
+                <div class="plan-side__bubble">
+                    <h1 class="plan-side__title">
+                        <span class="plan-side__guidance--trip">Hi, I’m Davo!</span>
+                        <span class="plan-side__guidance--interests">What do you love?</span>
+                        <span class="plan-side__guidance--stay">Let’s find your style.</span>
+                        <span class="plan-side__guidance--transport">Ready to explore?</span>
+                    </h1>
+                    <p class="plan-side__text plan-side__guidance--trip">Let’s start with who’s coming, when you’ll visit, and where your adventure begins.</p>
+                    <p class="plan-side__text plan-side__guidance--interests">Choose at least one interest so I know what you enjoy. Amenities are optional—pick the comforts that matter to you.</p>
+                    <p class="plan-side__text plan-side__guidance--stay">Tell me your spending style and where you’d like to stay. If you choose a resort, you can pick its setting too.</p>
+                    <p class="plan-side__text plan-side__guidance--transport">Choose how far you’d like to explore and how you’ll travel. You can also tell me about any access needs before creating your plan.</p>
+                </div>
+                <ol class="plan-side__checklist plan-side__checklist--trip" aria-label="Your trip basics">
+                    <li>Choose your companions</li>
+                    <li>Set your trip dates</li>
+                    <li>Pick a starting point</li>
+                </ol>
+                <ol class="plan-side__checklist plan-side__checklist--interests" aria-label="Choosing your interests">
+                    <li>Choose your travel purpose</li>
+                    <li>Pick your interests</li>
+                    <li>Add preferred amenities, if any</li>
+                </ol>
+                <ol class="plan-side__checklist plan-side__checklist--stay" aria-label="Choosing your stay and budget">
+                    <li>Choose your spending style</li>
+                    <li>Pick a type of stay</li>
+                    <li>For resorts, explore the settings</li>
+                </ol>
+                <ol class="plan-side__checklist plan-side__checklist--transport" aria-label="Choosing how to get around">
+                    <li>Choose your exploration range</li>
+                    <li>Pick how you’ll travel</li>
+                    <li>Review any optional access needs</li>
+                </ol>
+                <a href="{{ route('saved.index') }}" class="plan-side__saved"><x-icon name="heart" /> Saved Places</a>
+            </aside>
+
+            <nav class="plan-wizard-steps" aria-label="Trip planning steps" hidden>
+                <button type="button" data-plan-step="0" aria-controls="plan-step-0"><b class="plan-step-num" aria-hidden="true">1</b> Your trip</button>
+                <button type="button" data-plan-step="1" aria-controls="plan-step-1"><b class="plan-step-num" aria-hidden="true">2</b> Your interests</button>
+                <button type="button" data-plan-step="2" aria-controls="plan-step-2"><b class="plan-step-num" aria-hidden="true">3</b> Stay &amp; budget</button>
+                <button type="button" data-plan-step="3" aria-controls="plan-step-3"><b class="plan-step-num" aria-hidden="true">4</b> Getting around</button>
+            </nav>
+
+            <div class="plan-main">
             @if ($errors->any())
                 <div class="alert alert-error">
                     <ul style="margin:0; padding-left:18px;">
@@ -49,14 +83,20 @@
                 </div>
             @endif
 
+            <header class="plan-resume-intro">
+                <p class="plan-side__kicker">Your Davao adventure</p>
+                <h1>Welcome back, explorer.</h1>
+                <p>Your next adventure is right where you left it.</p>
+            </header>
             <section class="plan-resume" id="planResume" aria-labelledby="planResumeTitle" hidden>
                 <div class="plan-resume-art">
                     <div class="plan-resume-davo" role="img" aria-label="Davo waving hello" style="background-image:url('{{ asset('images/davo-resume-frames.webp') }}')"></div>
                 </div>
                 <div class="plan-resume-copy">
                     <span class="plan-resume-eyebrow"><x-icon name="check" /> Trip draft saved</span>
-                    <h2 id="planResumeTitle">Pick up where you left off</h2>
+                    <h2 id="planResumeTitle">Ready to pick up where you left off?</h2>
                     <p>Your trip basics and interests are saved on this device.</p>
+                    <p class="plan-resume-picks-label">Your saved picks</p>
                     <div class="plan-resume-summary" id="planResumeSummary">
                         <span hidden><x-icon name="calendar" /><span></span></span>
                         <span hidden><x-icon name="mountain" /><span></span></span>
@@ -66,15 +106,9 @@
                         <button type="button" id="planResumeContinue">Continue planning <span aria-hidden="true">&rarr;</span></button>
                         <button type="button" id="planResumeDiscard">Start over</button>
                     </div>
-                    <p class="plan-resume-note"><x-icon name="info" class="plan-resume-note__icon" /><span>You can review your answers before creating your itinerary. <br>Dates, location, and health details aren’t saved in this draft.</span></p>
+                    <p class="plan-resume-note"><x-icon name="shield-check" class="plan-resume-note__icon" /><span>You can review your answers before creating your itinerary. <br>Dates, location, and health details aren’t saved in this draft.</span></p>
                 </div>
             </section>
-            <nav class="plan-wizard-steps" aria-label="Trip planning steps" hidden>
-                <button type="button" data-plan-step="0" aria-controls="plan-step-0"><b class="plan-step-num" aria-hidden="true">1</b> Your trip</button>
-                <button type="button" data-plan-step="1" aria-controls="plan-step-1"><b class="plan-step-num" aria-hidden="true">2</b> Your interests</button>
-                <button type="button" data-plan-step="2" aria-controls="plan-step-2"><b class="plan-step-num" aria-hidden="true">3</b> Stay &amp; budget</button>
-                <button type="button" data-plan-step="3" aria-controls="plan-step-3"><b class="plan-step-num" aria-hidden="true">4</b> Getting around</button>
-            </nav>
             <div class="panel plan-panel">
                 <div class="panel-head">
                     <div>
@@ -130,7 +164,8 @@
                         @endphp
                         <div class="plan-section pc-block pc-trip-start">
                             @if ($pickupV2)
-                                <header class="pc-block__head"><h3>Pick-up location</h3><p>Where your trip physically starts: your hotel, the airport or port you arrive at, or any address in Davao Region. Free text is fine. Your first stop is planned from here, and your last stop has to get you back here before your trip ends.</p></header>
+                                <header class="pc-block__head"><h3>Pick-up location</h3><p>Your hotel, arrival point or address in Davao Region.</p></header>
+                                <p class="plan-davo-tip"><x-icon name="map-pin" /> Choose where you’ll be ready to start — I’ll plan your first stop from there.</p>
                             @else
                                 <header class="pc-block__head"><h3>Where will you start each day?</h3><p>Optional. We order your stops from the nearest to the furthest.</p></header>
                             @endif
@@ -164,46 +199,39 @@
                                                aria-autocomplete="list"
                                                aria-controls="origin-suggestions"
                                                aria-describedby="origin-status">
+                                        <button type="button" class="btn btn-outline btn-sm" id="origin-clear" aria-label="Clear pick-up location"
+                                                @if (! $pickupLat && ! $pickupLabel) hidden @endif>Clear</button>
                                         <ul id="origin-suggestions" class="address-suggestions" role="listbox" aria-label="Address suggestions" hidden></ul>
                                     </div>
                                 </div>
 
-                                <div class="field pc-field pc-col-4">
-                                    <span class="pc-label" aria-hidden="true">&nbsp;</span>
-                                    <button type="button" class="btn btn-outline pc-locate" id="origin-btn" @if (\App\Support\Features::tripLocation()) data-region-xi="{{ \App\Support\Geo\RegionXi::json() }}" @endif><x-icon name="locate" /> Use my current location</button>
-                                </div>
+                                <div class="field pc-field pc-col-4 pc-location-actions">
+                                    <button type="button" class="btn btn-outline pc-locate" id="origin-btn" title="Use my current location" aria-label="Use my current location" @if (\App\Support\Features::tripLocation()) data-region-xi="{{ \App\Support\Geo\RegionXi::json() }}" @endif><x-icon name="locate" aria-hidden="true" /><span class="sr-only">Use my current location</span></button>
 
                                 {{-- Where most visitors arrive. A tap fills the box and the two hidden coordinates, so the plan never depends on
                                      a lookup finding the place by name (the geocoder does not know all of them). The
                                      coordinates are what it returned for each place, rounded to the same 3 places the
                                      server stores (plan-origin.js). --}}
-                                <div class="pc-col-12 pc-arrivals" data-arrival-points hidden>
-                                    <span class="pc-label" id="arrivalPointsLabel">Or start from a common arrival point</span>
+                                <div class="pc-arrivals" data-arrival-points hidden>
+                                    <span class="pc-label" id="arrivalPointsLabel">Quick pick</span>
                                     <div class="pc-quick" role="group" aria-labelledby="arrivalPointsLabel">
-                                        <button type="button" data-start-pick="Davao International Airport" data-lat="7.130" data-lng="125.645">Davao Airport</button>
-                                        <button type="button" data-start-pick="Davao City Overland Transport Terminal, Ecoland" data-lat="7.056" data-lng="125.602">Bus terminal</button>
-                                        <button type="button" data-start-pick="Port of Sasa" data-lat="7.127" data-lng="125.663">Seaport</button>
-                                        <button type="button" data-start-pick="San Pedro Street, Davao City" data-lat="7.066" data-lng="125.607">City centre</button>
+                                        <button type="button" title="Davao Airport" aria-label="Davao Airport" data-start-pick="Davao International Airport" data-lat="7.130" data-lng="125.645"><x-icon name="plane" aria-hidden="true" /><span class="sr-only">Davao Airport</span></button>
+                                        <button type="button" title="Bus terminal" aria-label="Bus terminal" data-start-pick="Davao City Overland Transport Terminal, Ecoland" data-lat="7.056" data-lng="125.602"><x-icon name="bus" aria-hidden="true" /><span class="sr-only">Bus terminal</span></button>
+                                        <button type="button" title="Seaport" aria-label="Seaport" data-start-pick="Port of Sasa" data-lat="7.127" data-lng="125.663"><x-icon name="ship" aria-hidden="true" /><span class="sr-only">Seaport</span></button>
+                                        <button type="button" title="City centre" aria-label="City centre" data-start-pick="San Pedro Street, Davao City" data-lat="7.066" data-lng="125.607"><x-icon name="building" aria-hidden="true" /><span class="sr-only">City centre</span></button>
                                     </div>
+                                </div>
                                 </div>
 
                                 <div class="pc-col-12 pc-start-notes">
-                                    <div class="origin-control">
-                                        <button type="button" class="btn btn-outline btn-sm" id="origin-clear"
-                                                @if (! $pickupLat && ! $pickupLabel) hidden @endif>Clear</button>
-                                        <span class="origin-status" id="origin-status" role="status">
+                                        <span class="sr-only" id="origin-status" role="status">
                                             @if ($pickupLabel)
                                                 Starting from {{ $pickupLabel }}.
                                             @else
                                                 Not set &mdash; we'll plan from Davao City centre.
                                             @endif
                                         </span>
-                                    </div>
                                     @error('origin_label')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
-                                    @if (\App\Support\Features::tripLocation())
-                                        <p class="pc-hint">Your start point has to be inside Davao Region. Leave it blank and we plan from Davao City centre.</p>
-                                    @endif
-                                    <p class="pc-privacy"><x-icon name="shield-check" /> Private: rounded to about 100 metres, never linked to your name, and cleared when you clear the trip.</p>
                                 </div>
                             </div>
                         </div>
@@ -261,19 +289,26 @@
                 </div>
             </div>
             <section id="planLoading" class="plan-loading" role="status" aria-live="polite" aria-labelledby="planLoadingTitle" hidden tabindex="-1">
-                <img class="plan-loading-davo" src="{{ asset('images/davo-planning.webp') }}" alt="" width="420" height="504">
+                <div class="plan-loading-art"><img class="plan-loading-davo" src="{{ asset('images/davo-planning.webp') }}" alt="Davo reading a map" width="420" height="504"></div>
                 <div class="plan-loading-copy">
-                <div class="plan-loading-kicker">Hang tight</div>
-                <h2 id="planLoadingTitle">Davo is planning your trip…</h2>
-                <ul class="plan-loading-workflow" aria-label="Itinerary preparation workflow">
-                    <li><span aria-hidden="true"></span> Picking spots that match your interests</li>
-                    <li><span aria-hidden="true"></span> Ordering your stops</li>
-                    <li><span aria-hidden="true"></span> Checking opening hours</li>
-                    <li><span aria-hidden="true"></span> Adding travel times between stops</li>
+                <div class="plan-loading-kicker">Your Davao adventure</div>
+                <h2 id="planLoadingTitle">I’m putting your trip together.</h2>
+                <p class="plan-loading-intro">Sit tight while I turn your preferences into a day-by-day plan.</p>
+                <h3 class="plan-loading-list-title">Your plan includes</h3>
+                <ul class="plan-loading-workflow" aria-label="Your plan includes">
+                    <li><x-icon name="map-pin" aria-hidden="true" /> Places matched to your interests</li>
+                    <li><x-icon name="route" aria-hidden="true" /> A practical order for your stops</li>
+                    <li><x-icon name="clock" aria-hidden="true" /> Opening hours considered</li>
+                    <li><x-icon name="car" aria-hidden="true" /> Travel-time estimates between stops</li>
                 </ul>
-                <div class="plan-loading-track" aria-hidden="true"><span></span></div>
+                </div>
+                <div class="plan-loading-footer">
+                    <div class="plan-loading-track" aria-hidden="true"><span></span></div>
+                    <p class="plan-loading-status"><span class="plan-loading-spinner" aria-hidden="true"></span><strong id="planLoadingStatus">Building your itinerary…</strong></p>
+                    <p class="plan-loading-note">Please keep this page open while your plan is being created.</p>
                 </div>
             </section>
+            </div>{{-- /.plan-main --}}
         </div>
     </div>
 </div>
@@ -491,6 +526,5 @@
 {{-- After the wizard script: it builds the step panels this one folds parts of. --}}
 <script src="{{ asset('js/plan-collapse.js') }}?v={{ filemtime(public_path('js/plan-collapse.js')) }}" defer></script>
 <script src="{{ asset('js/plan-interest-summary.js') }}?v={{ filemtime(public_path('js/plan-interest-summary.js')) }}" defer></script>
-<script src="{{ asset('js/plan-stay-summary.js') }}?v={{ filemtime(public_path('js/plan-stay-summary.js')) }}" defer></script>
 
 @endsection

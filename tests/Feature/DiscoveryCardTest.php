@@ -343,7 +343,8 @@ class DiscoveryCardTest extends TestCase
             $this->assertStringContainsString($chip, $html);
         }
         $this->assertMatchesRegularExpression('/<input type="hidden" name="adults" value="2"/', $html, 'The filter panel carries the guests along.');
-        $this->assertMatchesRegularExpression('/<input type="hidden" name="price_min" value="1500"/', $html);
+        // The price range is a box in the panel now (Price per night), filled with what was asked for, so it is kept the same way.
+        $this->assertMatchesRegularExpression('/<input type="number" name="price_min"[^>]*value="1500"/', $html);
     }
 
     // ---- Dining ---------------------------------------------------------------------------------------

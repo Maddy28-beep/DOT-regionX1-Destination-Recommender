@@ -1,4 +1,15 @@
 {{-- The public topbar stays fixed; the spacer below reserves its measured height. --}}
+<link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/navigation-loading.css') }}">
+{{-- A thin bar along the top starts at once; the pill below it only appears if the page is slow (public/js/navigation-loading.js). --}}
+<div class="navigation-progress" data-navigation-progress hidden aria-hidden="true"><i></i></div>
+<div class="navigation-loading" data-navigation-loading role="status" aria-live="polite" hidden>
+    <span class="navigation-loading__spinner" aria-hidden="true"></span>
+    <span class="navigation-loading__text">
+        <span data-navigation-loading-label>Loading page…</span>
+        <small data-navigation-loading-slow hidden>Taking a little longer…</small>
+    </span>
+</div>
+<script src="{{ asset('js/navigation-loading.js') }}?v={{ filemtime(public_path('js/navigation-loading.js')) }}" defer></script>
 <div class="site-topbar">
     @if (($ribbonAdvisories ?? collect())->isNotEmpty())
         <x-advisory-ribbon :advisories="$ribbonAdvisories" />
@@ -6,6 +17,10 @@
 
     <header class="site-header">
         <div class="container bar">
+            <span class="header-partners" role="group" aria-label="Tourism partners">
+                <img src="{{ asset('images/tourism-logos/davao.webp') }}" alt="Davao" class="header-partners__davao" width="200" height="67" decoding="async">
+                <img src="{{ asset('images/tourism-logos/dot.webp') }}" alt="Department of Tourism Philippines" class="header-partners__dot" width="100" height="99" decoding="async">
+            </span>
             <a href="{{ route('home') }}" class="brand poster-title">
                 <x-brand-mark class="brand-icon" />
                 <span class="brand__name">Explore<span class="dot">DVO</span></span>
@@ -16,6 +31,10 @@
             </nav>
 
             <div class="header-actions">
+                {{-- Davao's weather today (left out when it cannot be read; shown on wide screens only). --}}
+                @if (! empty($davaoWeather))
+                    <span class="header-weather" title="{{ __('Davao today') }}: {{ $davaoWeather['words'] }}"><x-icon name="sun" aria-hidden="true" /> {{ $davaoWeather['temp'] }}&deg;C<span class="sr-only"> {{ $davaoWeather['words'] }}</span></span>
+                @endif
                 {{--
                     Exactly one extra element added here for the optional tourist
                     account, not a whole button row -- this bar already fought a
@@ -58,7 +77,7 @@
                         </div>
                     </div>
                 @else
-                    <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="header-account-link">Log in</a>
+                    <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="header-account-link" data-login-open>{{ __('Log in') }}</a>
                 @endauth
                 {{-- This used to always point at the anonymous, browser-only
                      list, so a signed-in traveler's own "Saved" button opened
@@ -73,7 +92,7 @@
                     <x-icon name="heart" />
                     <span class="header-saved__count" data-count="{{ $savedCount ?? 0 }}" data-saved-count @if(($savedCount ?? 0) < 1) hidden @endif>{{ ($savedCount ?? 0) > 99 ? '99+' : ($savedCount ?? 0) }}</span>
                 </a>
-                <a href="{{ route('plan.choose') }}" @if(request()->routeIs('plan.*')) aria-current="page" @endif class="btn btn-primary header-plan">Plan My Trip <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="{{ route('plan.choose') }}" @if(request()->routeIs('plan.*')) aria-current="page" @endif class="btn btn-primary header-plan">{{ __('Trip Planner') }}</a>
 
                 <button type="button" class="nav-toggle" id="mobileMenuToggle" aria-label="Open menu" aria-haspopup="dialog" aria-expanded="false" aria-controls="mobileMenu">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -123,7 +142,7 @@
         <form class="mobile-menu__search" action="{{ route('search') }}" method="GET" role="search">
             <x-icon name="search" aria-hidden="true" />
             <label for="mobileMenuSearch" class="sr-only">Search Davao Region</label>
-            <input type="search" id="mobileMenuSearch" name="q" placeholder="Search Davao Region" maxlength="100" autocomplete="off" enterkeyhint="search">
+            <input type="search" id="mobileMenuSearch" name="q" placeholder="{{ __('Search Davao Region') }}" maxlength="100" autocomplete="off" enterkeyhint="search">
         </form>
 
         <nav class="mobile-menu__group" aria-label="Mobile navigation">
@@ -134,7 +153,7 @@
             @if ($isTouristAuthed)
                 <a href="{{ route('account.itineraries') }}" @if(request()->routeIs('account.itineraries')) aria-current="page" @endif class="mobile-menu__pill"><x-icon name="map" /> My Itineraries</a>
             @else
-                <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="mobile-menu__pill"><x-icon name="log-in" /> Log in</a>
+                <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="mobile-menu__pill" data-login-open><x-icon name="log-in" /> Log in</a>
             @endif
             <a href="{{ $isTouristAuthed ? route('account.saved') : route('saved.index') }}" class="mobile-menu__pill" data-saved-link
                aria-label="Saved places{{ ($savedCount ?? 0) > 0 ? ', '.$savedCount.' saved' : '' }}"
@@ -166,6 +185,6 @@
     </div>
 
     <div class="mobile-menu__foot">
-        <a href="{{ route('plan.choose') }}" @if(request()->routeIs('plan.*')) aria-current="page" @endif class="btn btn-primary btn-block"><x-icon name="map" /> Plan My Trip <x-icon name="arrow-right" /></a>
+        <a href="{{ route('plan.choose') }}" @if(request()->routeIs('plan.*')) aria-current="page" @endif class="btn btn-primary btn-block"><x-icon name="map" /> Trip Planner</a>
     </div>
 </div>

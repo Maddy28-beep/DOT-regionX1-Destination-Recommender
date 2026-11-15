@@ -609,6 +609,84 @@
 .itin-day__ai { margin: 4px 0 6px; }
 .itin-day__ai em { color: var(--text-muted, #5f6b66); font-size: .9rem; line-height: 1.45; }
 .pairing-why__sample { margin: 12px 0 0; }
+/* Results share the public pages' mint canvas; all schedule data stays in the existing components. */
+@media screen {
+    .itinerary-page.itin { background: #f4f7f4; }
+    .itin .container { max-width: 1280px; }
+    .itin .dash-body { padding-top: 18px; padding-bottom: 32px; }
+    .itin-banner { background: #fffefa; border-color: #dce6df; border-radius: 22px; padding: 20px 24px; margin: 0 0 18px; box-shadow: 0 5px 22px rgba(15,60,42,.04); }
+    .itin-banner__title { font-size: clamp(1.4rem,2.3vw,1.9rem); }
+    .itin-banner__davo { width: 90px; max-height: 105px; }
+    .itin-trip-details { flex: 0 0 100%; min-width: 0; margin-top: 6px; }
+    .itin-trip-details > summary { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; cursor: pointer; list-style: none; font-size: .8rem; font-weight: 600; color: #0a4f38; }
+    .itin-trip-details > summary::-webkit-details-marker { display: none; }
+    .itin-trip-details > summary > svg { width: 15px; height: 15px; }
+    .itin-trip-details__body { padding: 8px 0; border-top: 1px solid #e3eae5; }
+    .itin-trip-details__body .itin-banner__meta { margin: 5px 0; font-size: .8rem; }
+    .itin-bar { gap: 12px 16px; margin-bottom: 18px; }
+    .itin-tabs { gap: 8px; }
+    .itin-tabs a { min-width: 112px; border: 1px solid #d2e0d6; background: #fffefa; padding: 10px 14px; }
+    .itin-tabs a.is-active { background: #0a4f38; border-color: #0a4f38; color: #fff; }
+    .itin-bar__links { gap: 8px; padding-top: 2px; }
+    .itin-more, .itin-bar__links .itinerary-explainer-trigger { border-radius: 10px; font-size: .82rem; padding: 8px 12px; }
+    .itin-layout { grid-template-columns: minmax(0,1fr) minmax(310px,35%); gap: 26px; }
+    .itin-side { position: sticky; top: calc(var(--header-height,80px) + 18px); z-index: 2; }
+    .itin-side__card, .tl-card { background: #fffefa; border-color: #dce6df; border-radius: 16px; }
+    .itin-daymap__map { height: 290px; }
+    .itin-day__head { margin-bottom: 14px; }
+    .itin-day h3 { font-size: 1.35rem; }
+    .tl-row { grid-template-columns: 78px 20px minmax(0,1fr); column-gap: 10px; }
+    .tl-card, .tl-card--meal, .tl-card--overnight { grid-template-columns: 130px minmax(0,1fr) 40px; gap: 12px; padding: 13px; }
+    .tl-card h4 { font-size: 1rem; line-height: 1.4; }
+    .tl-card__media { overflow: hidden; border-radius: 10px; }
+    .tl-ideas__note { font-size: .82rem; padding: 10px 12px; }
+    .tl-idea { background: #fffefa; padding: 10px 12px; }
+    .itinerary-extras { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 16px; align-items: start; }
+    .itinerary-extras > * { grid-column: 1 / -1; margin: 0; min-width: 0; }
+    .itinerary-page .itinerary-extras > .itinerary-support-panel { grid-column: auto; margin: 0; background: #fffefa; padding: 20px 22px 0; border-radius: 16px; }
+    .itinerary-page .itinerary-support-panel .panel-head h2 { font-size: 1.1rem; }
+    .itinerary-page .itinerary-support-panel .panel-head p { font-size: .83rem; }
+    .itinerary-support-panel .itinerary-score-details > summary { gap: 10px; font-size: .9rem; }
+    .itinerary-refine { padding: 18px 22px; background: #fffefa; }
+    .itinerary-refine-note { font-size: .82rem; }
+    .itinerary-feedback { background: #fcf5e9; padding: 20px 26px; gap: 22px; }
+    .itinerary-feedback img { width: 82px; height: 108px; margin: 0; }
+    .itinerary-feedback h2 { font-size: 1.25rem; }
+    .itinerary-feedback p { margin: 6px 0 12px; font-size: .88rem; }
+    .itin a:focus-visible, .itin button:focus-visible, .itin summary:focus-visible { outline: 3px solid #c98a1a; outline-offset: 3px; }
+}
+@media screen and (max-width: 960px) {
+    .itin-layout { grid-template-columns: minmax(0,1fr); }
+    .itin-side { position: static; }
+    .itin-banner__actions { width: auto; }
+}
+@media screen and (max-width: 760px) {
+    .itin .dash-body { padding-top: 12px; }
+    .itin-banner { padding: 16px; border-radius: 18px; }
+    .itin-banner__davo { width: 64px; }
+    .itin-trip-details { grid-column: 1 / -1; }
+    .itin-banner__buttons .btn { white-space: normal; min-height: 46px; }
+    .itin-bar__links { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .itin-bar__links > :first-child, .itin-bar__links > :last-child { grid-column: auto; }
+    .itin-bar__links > * { font-size: .76rem; gap: 5px; padding-inline: 6px; }
+    .itinerary-extras { grid-template-columns: minmax(0,1fr); }
+    .itin-layout { gap: 18px; }
+    .tl-card, .tl-card--meal, .tl-card--overnight { grid-template-columns: minmax(0,1fr) 40px; }
+    .tl-card__media { grid-column: 1 / -1; }
+    .itinerary-feedback { padding: 18px; gap: 12px; }
+    .itinerary-feedback img { width: 62px; height: 84px; }
+}
+@media screen and (max-width: 640px) {
+    .tl-row { grid-template-columns: 16px minmax(0,1fr); column-gap: 10px; }
+    .itin-tabs { background: #f4f7f4; }
+    .itin-tabs a { flex: 0 0 auto; min-width: 105px; }
+    .itin-daymap__map { height: 240px; }
+}
+@media print {
+    .itin-trip-details > summary { display: none; }
+    .itin-trip-details::details-content { display: block; content-visibility: visible; }
+    .itin-trip-details__body { display: block !important; }
+}
 @media (max-width: 560px) {
     .pairing-why__btn { min-height: 44px; }
     /* On a phone the card sits at the foot of the screen, where a thumb reaches it, instead of hanging off a narrow column. */

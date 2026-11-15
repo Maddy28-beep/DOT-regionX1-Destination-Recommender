@@ -13,6 +13,7 @@
     <div class="container">
         <h1 class="poster-title">Taste Davao</h1>
         <p>Explore local flavors and fresh seafood.</p>
+        @include('partials.catalog-brand-line')
     </div>
 </header>
 
@@ -27,6 +28,7 @@
             $moreTypeSelected = $moreTypes->contains(request('cuisine_type'));
         @endphp
         @include('partials.catalog-categories', [
+            'fallbackIcon' => 'utensils',
             'categoryLabel' => 'Restaurant cuisines',
             'categoryParam' => 'cuisine_type',
             'allCategoriesLabel' => 'All Cuisines',
@@ -37,6 +39,7 @@
             @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, 'cuisine_type'); @endphp
 
             @include('partials.catalog-filters', [
+                'groups' => \App\Support\ListingFilters::groups('restaurant', request()),
                 'hidden' => \App\Support\ActiveFilters::carry(request(), ['meal','date']),
                 'route' => 'restaurants.index',
                 'placeholder' => 'e.g. Marina Tuna',

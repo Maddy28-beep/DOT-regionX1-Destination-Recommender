@@ -2,12 +2,17 @@
 (() => {
     const bar = document.querySelector('.catalog-refresh .catalog-categories');
     // On a phone the chips are a swipe row: start with the selected one in view, not off the right edge.
-    const current = bar?.querySelector('.chip.active');
-    if (current && bar.scrollWidth > bar.clientWidth) {
-        bar.scrollLeft = Math.max(0, current.offsetLeft - 20);
+    function revealCurrent() {
+        const current = bar?.querySelector(':scope > .chip.active');
+        if (current && bar.scrollWidth > bar.clientWidth) {
+            bar.scrollLeft = Math.max(0, bar.scrollLeft + current.getBoundingClientRect().left - bar.getBoundingClientRect().left - 10);
+        }
     }
     const more = bar?.querySelector('.catalog-categories__more');
-    if (!more) return;
+    if (!more) {
+        document.fonts.ready.then(revealCurrent);
+        return;
+    }
 
     const extras = [...bar.querySelectorAll(':scope > .catalog-categories__extra')];
     const featured = [...bar.querySelectorAll(':scope > .chip:not(.catalog-categories__extra)')];
@@ -26,19 +31,24 @@
         extras.forEach(link => { link.style.removeProperty('display'); });
 
         // The existing phone/tablet layout exposes every category in a swipeable row.
-        if (!window.matchMedia('(min-width: 901px)').matches) return;
+        if (!window.matchMedia('(min-width: 901px)').matches) {
+            revealCurrent();
+            return;
+        }
 
         // Measure natural sizes before distributing leftover space across visible buttons.
         [...featured, ...extras, more].forEach(link => { link.style.flex = '0 0 auto'; });
         const style = getComputedStyle(bar);
-        const available = bar.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+        const available = bar.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - 2;
         const gap = parseFloat(style.columnGap) || 0;
         extras.forEach(link => { link.style.display = 'inline-flex'; });
-        const widths = extras.map(link => link.getBoundingClientRect().width);
-        const baseWidth = featured.reduce((sum, link) => sum + link.getBoundingClientRect().width, 0);
+        // Use layout pixels throughout: bounding rectangles can be scaled by
+        // browser/CSS zoom while clientWidth remains in layout pixels.
+        const widths = extras.map(link => link.offsetWidth);
+        const baseWidth = featured.reduce((sum, link) => sum + link.offsetWidth, 0);
         const allWidth = baseWidth + widths.reduce((sum, width) => sum + width, 0)
             + gap * (featured.length + extras.length - 1);
-        let used = baseWidth + gap * featured.length + more.getBoundingClientRect().width;
+        let used = baseWidth + gap * featured.length + more.offsetWidth;
 
         extras.forEach((link, index) => {
             const fits = allWidth <= available || used + gap + widths[index] <= available;

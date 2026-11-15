@@ -1,0 +1,17 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Nature view">
+    <rect width="800" height="600" fill="#FFF7E9"/>
+    <rect x="24" y="24" width="752" height="552" fill="none" stroke="#0B5E52" stroke-width="4" stroke-dasharray="14 10" opacity=".4"/>
+    <circle cx="400" cy="300" r="196" fill="#e6f4ef"/>
+    <circle cx="540" cy="190" r="34" fill="#C8501F"/>
+    <path d="M200 470 Q400 400 600 470 L600 490 L200 490 Z" fill="#0B5E52" opacity=".5"/>
+    <g fill="#12836F">
+        <path d="M300 440 L300 330 M300 250 L240 350 L360 350 Z" stroke="#0B5E52" stroke-width="10"/>
+        <path d="M300 300 L250 390 L350 390 Z"/>
+        <path d="M300 340 L240 430 L360 430 Z"/>
+    </g>
+    <g fill="#0B5E52">
+        <path d="M470 440 L470 400 M470 290 L420 380 L520 380 Z" stroke="#0B5E52" stroke-width="8"/>
+        <path d="M470 330 L424 420 L516 420 Z"/>
+    </g>
+    <path d="M410 470 L410 440 M530 470 L530 440" stroke="#0B5E52" stroke-width="10" stroke-linecap="round"/>
+</svg>

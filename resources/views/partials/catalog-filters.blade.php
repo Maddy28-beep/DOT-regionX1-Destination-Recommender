@@ -25,6 +25,10 @@
         array_unshift($tiers, ['', 'Any budget', $tileHasSub ? 'All' : '']);
     }
     $hidden = $hidden ?? [];
+    $groups = $groups ?? [];
+    // A box the panel draws itself (the price range) is not also carried as a hidden field.
+    $managed = collect($groups)->flatMap(fn ($g) => $g['names'])->all();
+    $hidden = array_values(array_filter($hidden, fn ($f) => ! in_array($f['name'], $managed, true)));
     $formId = $formId ?? 'catalogFilters';
     $clearParams = $clearParams ?? [];
     $filterCount = $activeFilters->count();
@@ -43,6 +47,27 @@
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
         </button>
     </div>
+
+    {{-- Move the existing control, keeping its original map handlers and filter state. --}}
+    <div class="filter-panel__view" data-filter-view-slot hidden></div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var slot = document.querySelector("[data-filter-view-slot]");
+            var toggle = document.querySelector(".destination-view-toggle, .results-toolbar .view-toggle");
+            if (!slot || !toggle) return;
+            slot.appendChild(toggle);
+            slot.hidden = false;
+            toggle.querySelectorAll("button").forEach(function (button) {
+                button.addEventListener("click", function () {
+                    // Reveal the chosen view after selecting it inside the mobile filter sheet.
+                    var panel = slot.closest(".filter-panel");
+                    if (panel && panel.classList.contains("open")) {
+                        panel.querySelector("[data-filter-sheet-close]").click();
+                    }
+                });
+            });
+        });
+    </script>
 
     <form method="GET" action="{{ route($route) }}" id="{{ $formId }}" data-filter-form>
         @foreach ($hidden as $field)
@@ -84,6 +109,8 @@
                 </div>
             </fieldset>
         @endif
+
+        @include('partials.catalog-filter-groups', ['groups' => $groups])
 
         <button type="submit" class="btn btn-poster-primary btn-block" data-filter-submit>
             Show results{{ $filterCount ? ' ('.$filterCount.' '.\Illuminate\Support\Str::plural('filter', $filterCount).')' : '' }}

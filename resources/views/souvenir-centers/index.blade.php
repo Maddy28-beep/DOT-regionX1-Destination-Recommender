@@ -12,6 +12,7 @@
     <div class="container">
         <h1 class="poster-title">Bring Home Davao</h1>
         <p>Find local crafts, keepsakes, and pasalubong.</p>
+        @include('partials.catalog-brand-line')
     </div>
 </header>
 
@@ -22,6 +23,7 @@
             @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, null); @endphp
 
             @include('partials.catalog-filters', [
+                'groups' => \App\Support\ListingFilters::groups('souvenir_center', request()),
                 'route' => 'souvenir-centers.index',
                 'placeholder' => 'e.g. Aldevinco',
                 'regions' => $regions,

@@ -28,7 +28,11 @@ class TouristAuthController extends Controller
         return view('auth.tourist-register');
     }
 
-    public function register(Request $request): RedirectResponse
+    /**
+     * The sign-up page posts here and is sent on; the sign-up side of the sign-in modal posts over fetch and gets JSON
+     * back, staying on the page it was opened from, with the place the visitor tapped saved to the new account.
+     */
+    public function register(Request $request): RedirectResponse|JsonResponse
     {
         $data = $request->validate([
             'alias' => ['required', 'string', 'min:3', 'max:30', 'alpha_dash', 'unique:tourist_accounts,alias', function ($attribute, $value, $fail) {
@@ -38,6 +42,8 @@ class TouristAuthController extends Controller
                 }
             }],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'save_type' => ['nullable', 'string', 'max:40'],
+            'save_id' => ['nullable', 'integer', 'min:1'],
         ]);
 
         $account = TouristAccount::create([
@@ -47,6 +53,10 @@ class TouristAuthController extends Controller
 
         Auth::guard('tourist')->login($account);
         $request->session()->regenerate();
+
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => true, 'saved' => $this->saveFromModal($request, $data['save_type'] ?? null, $data['save_id'] ?? null, 'Account created')]);
+        }
 
         return $this->postAuthRedirect($request, 'Account created', 'Your saved itineraries are now available across sessions.');
     }
@@ -93,13 +103,13 @@ class TouristAuthController extends Controller
      * Saves the place the modal was opened for, once, and flashes the message the page shows after it reloads. A type or
      * id that is not a public listing is ignored: signing in still works, and nothing is saved.
      */
-    private function saveFromModal(Request $request, ?string $type, ?int $id): bool
+    private function saveFromModal(Request $request, ?string $type, ?int $id, string $welcome = 'Welcome back'): bool
     {
         $config = $type !== null ? (TouristSavedDestinationController::TYPES[$type] ?? null) : null;
         $listing = ($config && $id) ? $config['model']::find($id) : null;
 
         if (! $listing || ! $listing->is_accredited || $listing->archived_at) {
-            foreach (Toast::success('Welcome back', null) as $key => $value) {
+            foreach (Toast::success($welcome, null) as $key => $value) {
                 $request->session()->flash($key, $value);
             }
 

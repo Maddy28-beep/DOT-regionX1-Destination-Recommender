@@ -15,8 +15,10 @@
 
     const screen = document.querySelector('.hero-screen');
     if (!screen) return;
+    // Fit the desktop introduction as one screen; phone forms keep their natural size.
+    if (window.innerWidth < 1061 && screen.querySelector('.hero-offers')) return;
 
-    const MIN_SCALE = 0.62;
+    const MIN_SCALE = screen.querySelector('.hero-offers') ? 0.82 : 0.62;
     const coarse = window.matchMedia('(pointer: coarse)').matches;
     let lastWidth = 0;
     let lastHeight = 0;
@@ -32,6 +34,7 @@
     const fit = () => {
         const height = window.innerHeight;
         reset();
+        if (window.innerWidth < 1061 && screen.querySelector('.hero-offers')) return;
 
         // The natural height: the content itself, without the "at least one window tall" rule.
         screen.style.minHeight = '0';
@@ -63,5 +66,8 @@
     window.addEventListener('orientationchange', () => setTimeout(refit, 200));
     window.addEventListener('load', () => { lastWidth = 0; refit(); });
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { lastWidth = 0; refit(); });
+    // Choosing another tab of the search card (Stays, Dining, ...) must not refit: the card grows taller for some tabs, and a
+    // refit then rescaled the whole first screen -- the picture moved and the card changed width. The size is decided from the
+    // window and the card as first drawn; after that only the card's own height changes.
     refit();
 })();

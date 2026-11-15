@@ -13,6 +13,7 @@
     <div class="container">
         <h1 class="poster-title">Explore Davao Together</h1>
         <p>Find your next adventure with local tour packages.</p>
+        @include('partials.catalog-brand-line')
     </div>
 </header>
 
@@ -26,12 +27,15 @@
             $moreTypes = $types->reject(fn ($type) => $featuredTypes->has($type));
             $moreTypeSelected = $moreTypes->contains(request('type'));
         @endphp
-        @include('partials.catalog-categories', ['categoryLabel' => 'Tour package categories'])
+        @if ($showCategories)
+            @include('partials.catalog-categories', ['categoryLabel' => 'Tour package categories'])
+        @endif
 
         <div class="catalog-layout">
             @php $activeFilters = \App\Support\ActiveFilters::from(request(), $regions, 'type'); @endphp
 
             @include('partials.catalog-filters', [
+                'groups' => \App\Support\ListingFilters::groups('package', request()),
                 'hidden' => \App\Support\ActiveFilters::carry(request(), ['price_min','price_max','travelers']),
                 'route' => 'packages.index',
                 'placeholder' => 'e.g. Samal',

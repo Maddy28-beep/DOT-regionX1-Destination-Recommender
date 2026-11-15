@@ -2,7 +2,8 @@
 
 @section('title', 'Create Account — ExploreDVO')
 @push('styles')
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
     <link rel="stylesheet" href="{{ asset('css/portal-login.css') }}?v={{ filemtime(public_path('css/portal-login.css')) }}">
 @endpush
 
@@ -47,7 +48,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('account.register') }}" data-register-form>
+            <form method="POST" action="{{ route('account.register') }}" data-register-form data-busy-submit data-busy-label="Creating your account…">
                 @csrf
 
                 <div class="field">
@@ -98,7 +99,7 @@
                     <p><strong>There is no password recovery.</strong> A lost password means creating a new account, so pick one you will remember.</p>
                 </div>
 
-                <button type="submit" class="portal-signin__submit">Create Account</button>
+                <button type="submit" class="portal-signin__submit" data-busy-label="Creating account…">Create Account</button>
             </form>
 
             <p class="portal-signin__help">Already have an account? <a href="{{ route('account.login') }}">Sign in</a></p>
