@@ -1,0 +1,15 @@
+# Remove repeated trip-profile questions
+
+Published 15 November 2026. The exit survey no longer contains the About your trip section: home origin, visit/residency type, days stayed and purpose are removed from the public form. Spending, actual accommodations, overall feedback, places/activities and optional comments remain.
+
+When the current session has an existing plan, `ExitSurveyTripContext` fills unanswered survey profile fields from that plan: purpose, visitor type and home-origin label. Structured chosen origin establishes residency (Region XI local, other Philippine provinces domestic, other countries international). Unknown Philippine province does not invent a local/domestic classification. Legacy free-text origin is copied only when no structured source exists, without geographic inference. Pick-up/GPS is never used as home origin.
+
+`preference_id` is taken only from the server session. Missing/deleted plans leave the survey unlinked; public surveys without planning still submit. Older open forms retain their explicitly supplied valid answers. Nothing is retroactively backfilled. Planned duration is never copied into actual days stayed; new submissions without an actual-days answer leave it null. The plan already retains its planned dates and duration.
+
+Visitor-origin confirmation and its admin aggregate counts are unchanged. Exit survey submission does not increment these counts again. An origin confirmed without generating a plan remains in Visitor origins; it is not silently linked to a survey by retrieving private origin receipts. Session loss or another browser means no automatic plan context is available.
+
+Admin Exit Survey Insights now explains that profile details can be reused from linked plans and that planned duration is not actual stay duration. Existing profile columns and filters read the snapshotted values without extra questions. No migration or data seeding was necessary.
+
+Verification: 19 context checks plus the updated 18 quick-feedback regression checks passed in the isolated current-live app copy, with all QA records rolled back. Coverage includes no-plan and deleted-plan submissions, session-only linking, home-vs-pick-up origin, local/domestic/international classification, null actual days, old-form compatibility, unchanged origin counts, form removal and admin rendering. Public HTTP confirmed the four fields/section are absent and actual stays/spending/submission remain. Full browser visual QA was not performed.
+
+Backup: `/var/backups/exploredvo/survey-context-20261115-142416/`. Four focused files deployed with original hash checks and final byte comparison, compiled views cleared, PHP-FPM reloaded. Exact diff: `deploy/survey-trip-context-2026-11-15.patch`; one-time script: `deploy/publish-survey-context-2026-11-15.sh`. Only matching local source was updated; older local controller/admin templates were preserved and their production edits are in the patch. Do not deploy the whole dirty checkout. Restore the three original files from backup to roll back the presentation and controller; the new standalone service can remain unused.

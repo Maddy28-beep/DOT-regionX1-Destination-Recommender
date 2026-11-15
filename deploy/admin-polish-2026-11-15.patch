@@ -1,0 +1,291 @@
+--- a/public/css/admin-workspace.css
++++ b/public/css/admin-workspace.css
+@@ -271,3 +271,82 @@
+     body.admin-workspace .admin-main { padding: 0; }
+     body.admin-workspace .adm-card { break-inside: avoid; }
+ }
++
++/* Interaction refinement: quiet row tools, actionable metrics, and separate filter levels. */
++body.admin-workspace .adm-kpi--link {
++    display: grid; grid-template-columns: minmax(0, 1fr) 14px; grid-template-rows: auto auto 1fr;
++    align-items: start; gap: 10px 6px; min-height: 138px; padding: 17px 18px;
++    text-decoration: none; color: var(--ink); transition: border-color .12s ease, background-color .12s ease;
++}
++body.admin-workspace .adm-kpi--link:hover { border-color: #9bb9ad; background: #fcfefd; }
++body.admin-workspace .adm-kpi--link .adm-kpi__lab { margin: 0; color: #56676f; font-size: 12px; font-weight: 500; }
++body.admin-workspace .adm-kpi--link .adm-kpi__val { grid-column: 1 / -1; font-size: 29px; color: #253b33; }
++body.admin-workspace .adm-kpi__go { width: 14px; height: 14px; margin-top: 2px; color: #8b9993; stroke-width: 1.7; }
++body.admin-workspace .adm-kpi__foot { grid-column: 1 / -1; align-self: end; min-height: 28px; font-size: 11px; color: #65717c; line-height: 1.4; }
++body.admin-workspace .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 12px; margin-bottom: 22px; }
++body.admin-workspace .stat-card--link { display: block; text-decoration: none; color: inherit; }
++body.admin-workspace .stat-card--link:hover { border-color: #9bb9ad; background: #fcfefd; }
++body.admin-workspace .stat-card--link:focus-visible { outline: 2px solid #397ea1; outline-offset: 3px; }
++body.admin-workspace .adm-listing-tabs { display: flex; gap: 22px; margin: 0 0 18px; border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: thin; }
++body.admin-workspace .adm-listing-tabs a { flex: none; padding: 0 0 11px; border-bottom: 2px solid transparent; color: #67767f; font-size: 13px; font-weight: 500; text-decoration: none; white-space: nowrap; }
++body.admin-workspace .adm-listing-tabs a:hover { color: var(--primary); }
++body.admin-workspace .adm-listing-tabs a.on { border-bottom-color: var(--primary); color: var(--primary); font-weight: 600; }
++body.admin-workspace .adm-listing-tools { justify-content: space-between; align-items: center; padding-bottom: 16px; }
++body.admin-workspace .adm-listing-tools .adm-listing-search { flex: 0 1 340px; width: auto; margin: 0; }
++body.admin-workspace .adm-listing-search input { padding-right: 40px; }
++body.admin-workspace .adm-listing-search .adm-listing-search__submit { position: absolute; inset: 3px 3px 3px auto; width: 30px; min-width: 30px; height: 30px; border: 0; background: transparent; }
++body.admin-workspace .adm-listing-search__submit svg { position: static; margin: 0; width: 14px; height: 14px; }
++body.admin-workspace .adm-col-select { width: 42px; }
++body.admin-workspace .adm-col-name { width: 35%; }
++body.admin-workspace .adm-col-actions { width: 92px; }
++body.admin-workspace .adm-table .col-check { padding-left: 16px; padding-right: 8px; }
++body.admin-workspace input[type=checkbox] { width: 15px; height: 15px; margin: 0; accent-color: var(--primary); vertical-align: middle; }
++body.admin-workspace .adm-actions { gap: 3px; align-items: center; }
++body.admin-workspace .adm-actions .adm-icon-btn { width: 32px; height: 32px; min-width: 32px; border-color: transparent; background: transparent; color: #66747b; }
++body.admin-workspace .adm-actions .adm-icon-btn:hover { border-color: #e0e6ea; background: #f3f6f7; color: #294b3e; }
++body.admin-workspace .adm-actions [title^="Archive"]:hover { color: #a0463f; background: #fff1ef; border-color: #f0d3ce; }
++body.admin-workspace .adm-actions .adm-icon-btn svg { width: 15px; height: 15px; }
++body.admin-workspace .btn[disabled], body.admin-workspace .adm-icon-btn[disabled] { opacity: .5; cursor: not-allowed; filter: none; }
++body.admin-workspace .chip-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
++body.admin-workspace .chip { border: 1px solid transparent; border-radius: 5px; padding: 6px 10px; font-size: 12px; color: #64717a; background: transparent; }
++body.admin-workspace .chip.active { color: #146b55; background: #eaf4ef; border-color: #d5e7dd; }
++body.admin-workspace .table-scroll { width: 100%; min-width: 0; overflow-x: auto; }
++body.admin-workspace .adm-origin .adm-toolbar { display: grid; grid-template-columns: minmax(220px, 1.8fr) minmax(135px, 1fr) minmax(135px, 1fr) auto auto auto; align-items: end; gap: 12px; }
++body.admin-workspace .adm-origin .adm-toolbar label { display: grid; gap: 6px; font-size: 12px; }
++body.admin-workspace .adm-origin .adm-toolbar input, body.admin-workspace .adm-origin .adm-toolbar select { width: 100%; }
++body.admin-workspace .site-dropdown-trigger { min-width: 0; min-height: 36px; border: 1px solid #dbe1e7; border-radius: 6px; background: #fff; font-size: 13px; box-shadow: none; }
++body.admin-workspace .adm-origin .site-dropdown { min-width: 0; max-width: 100%; }
++body.admin-workspace .adm-origin .adm-toolbar__note { grid-column: 1 / -1; font-size: 11px; }
++body.admin-workspace .adm-origin .adm-toolbar > .btn { min-height: 36px; }
++body.admin-workspace .adm-origin-summary { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 15px 0; border-top: 1px solid var(--border); }
++body.admin-workspace .adm-origin-summary > strong { font-size: 26px; line-height: 1.2; font-weight: 650; color: #253b33; }
++body.admin-workspace .adm-origin-summary > span { font-size: 13px; color: #53656d; }
++body.admin-workspace .adm-origin-summary > small { margin-left: auto; font-size: 11px; color: #65717c; }
++body.admin-workspace .adm-origin-method { font-size: 12px; color: #65717c; margin: -6px 0 2px; }
++body.admin-workspace .adm-origin-method summary { cursor: pointer; width: fit-content; padding: 2px 0; }
++body.admin-workspace .adm-origin-method .adm-origin__note { padding: 12px 0 4px; max-width: 1000px; }
++body.admin-workspace .adm-origin-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
++body.admin-workspace .adm-origin-grid .adm-card { min-height: 178px; }
++body.admin-workspace .adm-origin-grid .adm-card__head { min-height: 76px; }
++body.admin-workspace .adm-origin__empty { display: flex; flex-direction: column; gap: 5px; min-height: 100px; justify-content: center; }
++body.admin-workspace .adm-origin__empty span:first-child { color: #4e626a; font-size: 13px; font-weight: 500; }
++body.admin-workspace .adm-origin__empty span:last-child { color: #6b7780; font-size: 12px; }
++@media (max-width: 1200px) {
++    body.admin-workspace .adm-origin .adm-toolbar { grid-template-columns: minmax(180px, 1.5fr) repeat(2, minmax(120px, 1fr)); }
++    body.admin-workspace .adm-origin .adm-toolbar > .btn, body.admin-workspace .adm-origin .adm-toolbar > .adm-icon-btn { justify-self: start; }
++    body.admin-workspace .adm-kpi--link { padding: 15px 12px; }
++}
++@media (max-width: 700px) {
++    body.admin-workspace .adm-origin-grid { grid-template-columns: minmax(0, 1fr); }
++    body.admin-workspace .adm-origin .adm-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
++    body.admin-workspace .adm-origin .adm-toolbar label:first-child { grid-column: 1 / -1; }
++    body.admin-workspace .adm-origin-summary > small { flex-basis: 100%; margin-left: 0; }
++    body.admin-workspace .adm-listing-tools .adm-listing-search { flex-basis: 100%; }
++    body.admin-workspace .adm-listing-tabs { gap: 18px; }
++    body.admin-workspace .stat-cards { grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); }
++    body.admin-workspace .adm-actions .adm-icon-btn { width: 40px; height: 40px; min-width: 40px; }
++    body.admin-workspace .adm-col-actions { width: 104px; }
++}
++@media (prefers-reduced-motion: reduce) {
++    body.admin-workspace .adm-kpi--link { transition: none; }
++}
+--- a/resources/views/admin/overview.blade.php
++++ b/resources/views/admin/overview.blade.php
+@@ -47,44 +47,29 @@
+ @endif
+ 
+ <div class="adm-kpis">
+-    <div class="adm-kpi">
+-        <span class="adm-kpi__ic"><x-icon name="target" /></span>
+-        <div>
+-            <div class="adm-kpi__val">{{ $stats['checkins_today'] }}</div><div class="adm-kpi__lab">Check-ins today</div>
+-            @php
+-                $diff = $stats['checkins_today'] - $trend['checkins_yesterday'];
+-                $trendText = $diff > 0 ? '&#9650; '.$diff.' more than yesterday' : ($diff < 0 ? '&#9660; '.abs($diff).' fewer than yesterday' : 'Same as yesterday');
+-            @endphp
+-            <div class="adm-kpi__trend {{ $diff > 0 ? 'is-up' : ($diff < 0 ? 'is-down' : '') }}">{!! $trendText !!}</div>
+-        </div>
+-    </div>
+-    <div class="adm-kpi">
+-        <span class="adm-kpi__ic"><x-icon name="map-pin" /></span>
+-        <div><div class="adm-kpi__val">{{ $stats['destinations'] }}</div><div class="adm-kpi__lab">Official destinations</div></div>
+-    </div>
+-    <div class="adm-kpi">
+-        <span class="adm-kpi__ic"><x-icon name="map-pin" /></span>
+-        <div><div class="adm-kpi__val">{{ $stats['sample_destinations'] }}</div><div class="adm-kpi__lab">Sample destinations</div></div>
+-    </div>
+-    <div class="adm-kpi">
+-        <span class="adm-kpi__ic"><x-icon name="building" /></span>
+-        <div>
+-            <div class="adm-kpi__val">{{ $stats['pending_establishments'] }}</div>
+-            <div class="adm-kpi__lab">Pending establishments</div>
+-            @if ($stats['pending_establishments'] > 0)
+-                @php $waiting = (int) ($trend['oldest_pending_days'] ?? 0); @endphp
+-                <div class="adm-kpi__flag">Needs review{{ $waiting > 0 ? ' · oldest waiting '.$waiting.' '.\Illuminate\Support\Str::plural('day', $waiting) : '' }}</div>
+-            @endif
+-        </div>
+-    </div>
+-    <div class="adm-kpi">
+-        <span class="adm-kpi__ic"><x-icon name="clock" /></span>
+-        <div>
+-            <div class="adm-kpi__val">{{ $stats['expiring_accreditations'] }}</div>
+-            <div class="adm-kpi__lab">Accreditation follow-up</div>
+-            @if ($stats['expiring_accreditations'] > 0)<div class="adm-kpi__flag">Follow up needed</div>@endif
+-        </div>
+-    </div>
++    @php $diff = $stats['checkins_today'] - $trend['checkins_yesterday']; @endphp
++    <a class="adm-kpi adm-kpi--link" href="{{ route('admin.reports', ['from' => now('Asia/Manila')->toDateString(), 'to' => now('Asia/Manila')->toDateString()]) }}" title="Open today's reports">
++        <span class="adm-kpi__lab">Check-ins today</span><x-icon name="chevron-right" class="adm-kpi__go" />
++        <strong class="adm-kpi__val">{{ $stats['checkins_today'] }}</strong>
++        <span class="adm-kpi__foot">{{ $diff === 0 ? 'Same as yesterday' : abs($diff).' '.($diff > 0 ? 'more' : 'fewer').' than yesterday' }}</span>
++    </a>
++    <a class="adm-kpi adm-kpi--link" href="{{ route('admin.listings.index', 'destinations') }}" title="Open the destination directory">
++        <span class="adm-kpi__lab">Official destinations</span><x-icon name="chevron-right" class="adm-kpi__go" />
++        <strong class="adm-kpi__val">{{ $stats['destinations'] }}</strong><span class="adm-kpi__foot">Accredited official records</span>
++    </a>
++    <a class="adm-kpi adm-kpi--link" href="{{ route('admin.listings.index', 'destinations') }}" title="Open the destination directory">
++        <span class="adm-kpi__lab">Sample destinations</span><x-icon name="chevron-right" class="adm-kpi__go" />
++        <strong class="adm-kpi__val">{{ $stats['sample_destinations'] }}</strong><span class="adm-kpi__foot">Demonstration records</span>
++    </a>
++    <a class="adm-kpi adm-kpi--link" href="{{ route('admin.establishments') }}">
++        <span class="adm-kpi__lab">Awaiting review</span><x-icon name="chevron-right" class="adm-kpi__go" />
++        <strong class="adm-kpi__val">{{ $stats['pending_establishments'] }}</strong>
++        <span class="adm-kpi__foot">{{ ($trend['oldest_pending_days'] ?? 0) > 0 ? 'Oldest request: '.$trend['oldest_pending_days'].' days' : ($stats['pending_establishments'] > 0 ? 'Establishment requests' : 'No pending requests') }}</span>
++    </a>
++    <a class="adm-kpi adm-kpi--link" href="{{ route('admin.accreditation', ['status' => 'Expiring Soon']) }}">
++        <span class="adm-kpi__lab">Accreditation follow-up</span><x-icon name="chevron-right" class="adm-kpi__go" />
++        <strong class="adm-kpi__val">{{ $stats['expiring_accreditations'] }}</strong><span class="adm-kpi__foot">Records flagged for review</span>
++    </a>
+ </div>
+ <details class="adm-directory-note" id="destination-breakdown">
+     <summary>{{ $stats['total_destinations'] }} destinations in the directory <span>View breakdown</span></summary>
+--- a/resources/views/admin/listings/index.blade.php
++++ b/resources/views/admin/listings/index.blade.php
+@@ -21,17 +21,17 @@
+ 
+ <div class="adm-fit adm-listings">
+ 
+-    <div class="adm-toolbar">
+-        <nav class="adm-seg" aria-label="Listing type">
++        <nav class="adm-listing-tabs" aria-label="Listing type">
+             @foreach ($types as $key => $t)
+                 <a href="{{ route('admin.listings.index', $key) }}" class="{{ $type === $key ? 'on' : '' }}" @if ($type === $key) aria-current="page" @endif>{{ $t['label'] }}</a>
+             @endforeach
+         </nav>
+-
+-        <form method="GET" class="adm-search" role="search">
++    <div class="adm-toolbar adm-listing-tools">
++        <form method="GET" class="adm-search adm-listing-search" role="search">
+             <x-icon name="search" />
+             <label for="q" class="sr-only">Search by name</label>
+             <input type="search" id="q" name="q" value="{{ request('q') }}" placeholder="Search by name">
++            <button class="adm-icon-btn adm-listing-search__submit" type="submit" title="Search listings" aria-label="Search listings"><x-icon name="chevron-right" /></button>
+             @if ($status !== 'active')<input type="hidden" name="status" value="{{ $status }}">@endif
+         </form>
+ 
+@@ -49,18 +49,19 @@
+                   onsubmit="return confirm('Archive the selected listings? They will be hidden from the public site.');">
+                 @csrf
+                 <input type="hidden" name="action" value="archive">
+-                <button type="submit" class="btn btn-outline btn-xs">Archive Selected</button>
++                <button type="submit" class="btn btn-outline btn-xs"><x-icon name="archive" />Archive selected</button>
+             </form>
+             <form method="POST" action="{{ route('admin.listings.bulk', $type) }}">
+                 @csrf
+                 <input type="hidden" name="action" value="unarchive">
+-                <button type="submit" class="btn btn-outline btn-xs">Restore Selected</button>
++                <button type="submit" class="btn btn-outline btn-xs"><x-icon name="rotate" />Restore selected</button>
+             </form>
+         </div>
+ 
+         <div class="adm-card__body">
+             <table class="data-table adm-table">
+                 <caption class="sr-only">{{ $listings->total() }} {{ $config['label'] }}</caption>
++                <colgroup><col class="adm-col-select"><col class="adm-col-name"><col>@if ($showTier)<col>@endif<col>@if ($showRating)<col>@endif<col><col class="adm-col-actions"></colgroup>
+                 <thead>
+                     <tr>
+                         <th class="col-check"><input type="checkbox" data-bulk-all aria-label="Select all rows"></th>
+--- a/resources/views/admin/accreditation.blade.php
++++ b/resources/views/admin/accreditation.blade.php
+@@ -14,18 +14,18 @@
+ @endif
+ 
+ <div class="stat-cards">
+-    <div class="stat-card">
++    <a class="stat-card stat-card--link" href="{{ route('admin.accreditation', ['status' => 'Active']) }}">
+         <div class="stat-card-val">{{ $counts['active'] }}</div>
+         <div class="stat-card-label">Active</div>
+-    </div>
+-    <div class="stat-card">
++    </a>
++    <a class="stat-card stat-card--link" href="{{ route('admin.accreditation', ['status' => 'Expiring Soon']) }}">
+         <div class="stat-card-val">{{ $counts['expiring'] }}</div>
+         <div class="stat-card-label">Expiring Within 30 Days</div>
+-    </div>
+-    <div class="stat-card">
++    </a>
++    <a class="stat-card stat-card--link" href="{{ route('admin.accreditation', ['status' => 'Expired']) }}">
+         <div class="stat-card-val">{{ $counts['expired'] }}</div>
+         <div class="stat-card-label">Expired</div>
+-    </div>
++    </a>
+ </div>
+ 
+ <div class="panel">
+@@ -54,7 +54,7 @@
+                 <input type="date" id="bulk_expiration" name="expiration_date"
+                        min="{{ now()->addDay()->toDateString() }}"
+                        value="{{ now()->addYear()->toDateString() }}" required>
+-                <button type="submit" class="btn btn-danger btn-2xs">Renew Selected</button>
++                <button type="submit" class="btn btn-primary btn-2xs"><x-icon name="rotate" />Renew selected</button>
+             </form>
+         </div>
+ 
+@@ -103,7 +103,7 @@
+                                 <form method="POST" action="{{ route('admin.accreditation.renew', $r) }}" style="display:flex; gap:6px; align-items:center;">
+                                     @csrf
+                                     <input type="date" name="expiration_date" aria-label="New expiry date for {{ $r->listing?->name ?? 'this record' }}" min="{{ now()->addDay()->toDateString() }}" value="{{ now()->addYear()->toDateString() }}" style="width:140px; padding:4px 6px; font-size:.8rem;" required>
+-                                    <button type="submit" class="btn btn-danger btn-2xs">Renew</button>
++                                    <button type="submit" class="adm-icon-btn" title="Renew {{ $r->listing?->name ?? 'this accreditation' }}" aria-label="Renew {{ $r->listing?->name ?? 'this accreditation' }}"><x-icon name="rotate" /></button>
+                                 </form>
+                             @endif
+                         </td>
+--- a/resources/views/admin/visitor-origin.blade.php
++++ b/resources/views/admin/visitor-origin.blade.php
+@@ -13,11 +13,14 @@
+         </select></label>
+         <label>From <input type="date" name="from" value="{{ $from }}"></label>
+         <label>To <input type="date" name="to" value="{{ $to }}"></label>
+-        <button class="btn btn-primary btn-sm" type="submit">Apply</button>
+-        <a class="btn btn-outline btn-sm" data-origin-export href="{{ route('admin.visitor-origin.export', array_filter(['from' => $from, 'to' => $to, 'metric' => $metric])) }}">Download CSV</a>
++        <button class="btn btn-primary btn-sm" type="submit"><x-icon name="filter" />Apply filters</button>
++        @if ($from || $to)<a class="adm-icon-btn" href="{{ route('admin.visitor-origin', ['metric' => $metric]) }}" title="Clear date filters" aria-label="Clear date filters"><x-icon name="x" /></a>@endif
++        <a class="btn btn-outline btn-sm" data-origin-export href="{{ route('admin.visitor-origin.export', array_filter(['from' => $from, 'to' => $to, 'metric' => $metric])) }}"><x-icon name="arrow-up-right" />Export CSV</a>
+         <span class="adm-toolbar__note">Dates are in Philippine time; "To" includes the whole day. New responses use their confirmation day.</span>
+     </form>
+ 
++    <div class="adm-origin-summary"><strong>{{ $tables['By country']['total'] }}</strong><span>{{ $metric === 'generated' ? 'origin responses with a generated itinerary' : 'confirmed origin responses' }} in this period</span><small>Groups need {{ $min }} responses to appear separately.</small></div>
++    <details class="adm-origin-method"><summary>Counting and privacy</summary>
+     <p class="adm-origin__note" data-origin-note>
+         These counts are kept permanently and are anonymous: only the day, the country, the province (Philippines) and the city are stored, with a number.
+         No name, browser identifier, IP address, time of day, trip or pick-up place is kept in the permanent totals.
+@@ -26,14 +29,15 @@
+         Responses with a generated itinerary are tracked separately from this update onward, once per browser per day; earlier completions were not backfilled. Historical origin totals retain the former session counting rule.
+         Groups smaller than {{ $min }} are never shown on their own: they are added together under "Other". The CSV has the same totals, not one row per day.
+     </p>
+-
++    </details>
++    <div class="adm-origin-grid">
+     @foreach ($tables as $title => $t)
+         <section class="adm-card" aria-label="{{ $title }}">
+-            <div class="adm-card__head"><div><h2>{{ $title }}</h2></div></div>
++            <div class="adm-card__head"><div><h2>{{ $title }}</h2><p>{{ match ($title) { 'Domestic or international' => 'Philippine residents and residents of other countries', 'By country' => 'Country of residence selected by the visitor', 'Philippine visitors by province' => 'Province selected by Philippine residents', default => 'Optional city or municipality entered by the visitor' } }}</p></div></div>
+             <div class="adm-card__body">
+                 @if (! $t['enough'])
+                     <p class="adm-origin__empty" data-origin-empty>
+-                        Not enough answers yet: {{ $t['total'] }} {{ \Illuminate\Support\Str::plural('answer', $t['total']) }} so far; at least {{ $min }} are needed.
++                        <span>{{ $t['total'] }} recorded</span><span>Waiting for at least {{ $min }} responses</span>
+                     </p>
+                 @else
+                     <table class="adm-table">
+@@ -48,5 +52,6 @@
+             </div>
+         </section>
+     @endforeach
++    </div>
+ </div>
+ @endsection

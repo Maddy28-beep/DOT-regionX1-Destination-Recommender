@@ -1,0 +1,4 @@
+/* Listing results use the full content width now that the filter sidebar is removed. */
+.catalog-layout,
+.catalog-refresh div.catalog-layout { grid-template-columns:minmax(0,1fr); }
+.catalog-layout > form[hidden] { display:none; }

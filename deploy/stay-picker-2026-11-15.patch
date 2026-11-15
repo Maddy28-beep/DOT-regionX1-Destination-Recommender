@@ -1,0 +1,21 @@
+--- a/resources/views/partials/survey-stay-row.blade.php
++++ b/resources/views/partials/survey-stay-row.blade.php
+@@ -2,7 +2,7 @@
+     <legend>Stay <span data-stay-number>{{ is_numeric($stayIndex) ? (int) $stayIndex + 1 : '' }}</span></legend>
+     <label for="stay-place-{{ $stayIndex }}">Place you stayed</label>
+     <select id="stay-place-{{ $stayIndex }}" name="stays[{{ $stayIndex }}][place]" data-stay-choice>
+-        <option value="">Skip / prefer not to say</option>
++        <option value="" disabled @selected(blank($stayAnswer['place'] ?? null))>Select where you stayed</option>
+         <option value="other" @selected(($stayAnswer['place'] ?? '') === 'other')>Other / not in the list</option>
+         <option value="friends_family" @selected(($stayAnswer['place'] ?? '') === 'friends_family')>Stayed with friends or family</option>
+         <option value="day_trip" @selected(($stayAnswer['place'] ?? '') === 'day_trip')>No overnight stay</option>
+--- a/resources/views/partials/survey-stays.blade.php
++++ b/resources/views/partials/survey-stays.blade.php
+@@ -1,6 +1,6 @@
+ <section class="survey-stays" aria-labelledby="survey-stays-title" data-survey-stays>
+     <h2 id="survey-stays-title">Where did you stay? <span>(optional)</span></h2>
+-    <p class="field-hint">Choose your accommodation, or select “Other” and tell us where you stayed.</p>
++    <p class="field-hint">Scroll through the accommodation names and addresses to find where you stayed. If it’s missing, choose “Other / not in the list”.</p>
+     @php
+         $stayAnswers = old('stays');
+         $stayAnswers = is_array($stayAnswers) ? array_values(array_slice($stayAnswers, 0, 5)) : [];

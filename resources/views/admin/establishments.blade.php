@@ -31,7 +31,7 @@
             <thead>
                 <tr>
                     <th>Business</th><th>Type</th><th>Contact</th><th>Claimed DOT #</th>
-                    <th>Submitted</th><th>Status</th><th>Matched Listing</th><th></th>
+                    <th>Submitted</th><th>Status</th><th>Matched Listing</th><th><span class="sr-only">Actions</span></th>
                 </tr>
             </thead>
             <tbody>
@@ -57,7 +57,7 @@
                                         <option value="{{ $listing->id }}" @selected($e->matched_listing_id === $listing->id)>{{ $listing->name }}{{ app(\App\Support\SampleData::class)->isSample($listing) ? ' (sample data)' : '' }}</option>
                                     @endforeach
                                 </select>
-                                <button type="submit" class="btn btn-outline btn-xs">Save Match</button>
+                                <button type="submit" class="btn btn-outline btn-xs"><x-icon name="link" />Save match</button>
                             </form>
                         </td>
                         <td>
@@ -65,15 +65,15 @@
                                 <div class="util-row approval-actions">
                                     <form method="POST" action="{{ route('admin.establishments.approve', $e) }}">
                                         @csrf
-                                        <button type="submit" class="btn btn-primary btn-xs"
+                                        <button type="submit" class="adm-icon-btn approval-action approval-action--approve" aria-label="Approve {{ $e->business_name }}"
                                                 @disabled(! $e->matched_listing_id)
-                                                @if (! $e->matched_listing_id) title="Link this establishment to an existing listing before approving." @endif>
-                                            Approve
+                                                title="{{ $e->matched_listing_id ? 'Approve '.$e->business_name : 'Link this establishment to an existing listing before approving.' }}">
+                                            <x-icon name="check" />
                                         </button>
                                     </form>
                                     <form method="POST" action="{{ route('admin.establishments.reject', $e) }}">
                                         @csrf
-                                        <button type="submit" class="btn btn-outline-danger btn-xs">Reject</button>
+                                        <button type="submit" class="adm-icon-btn approval-action approval-action--reject" title="Reject {{ $e->business_name }}" aria-label="Reject {{ $e->business_name }}"><x-icon name="x" /></button>
                                     </form>
                                 </div>
                             @else
@@ -129,7 +129,7 @@
                                 <option value="{{ $listing->id }}" @selected($e->matched_listing_id === $listing->id)>{{ $listing->name }}{{ app(\App\Support\SampleData::class)->isSample($listing) ? ' (sample data)' : '' }}</option>
                             @endforeach
                         </select>
-                        <button type="submit" class="btn btn-outline btn-xs btn-block">Save Match</button>
+                        <button type="submit" class="btn btn-outline btn-xs"><x-icon name="link" />Save match</button>
                     </form>
                 </div>
 
@@ -137,15 +137,15 @@
                     <div class="approval-actions approval-actions--card">
                         <form method="POST" action="{{ route('admin.establishments.approve', $e) }}">
                             @csrf
-                            <button type="submit" class="btn btn-primary btn-xs btn-block"
+                            <button type="submit" class="btn btn-outline btn-xs approval-action--approve"
                                     @disabled(! $e->matched_listing_id)
                                     @if (! $e->matched_listing_id) title="Link this establishment to an existing listing before approving." @endif>
-                                Approve
+                                <x-icon name="check" />Approve
                             </button>
                         </form>
                         <form method="POST" action="{{ route('admin.establishments.reject', $e) }}">
                             @csrf
-                            <button type="submit" class="btn btn-outline-danger btn-xs btn-block">Reject</button>
+                            <button type="submit" class="btn btn-outline btn-xs approval-action--reject"><x-icon name="x" />Reject</button>
                         </form>
                     </div>
                     @if (! $e->matched_listing_id)

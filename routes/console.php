@@ -4,6 +4,11 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 
+Schedule::call(function () {
+    \Illuminate\Support\Facades\DB::table('visitor_origin_receipts')
+        ->where('day', '<', now('Asia/Manila')->subDays(30)->toDateString())->delete();
+})->name('privacy:purge-origin-receipts')->dailyAt('03:15')->withoutOverlapping();
+
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');

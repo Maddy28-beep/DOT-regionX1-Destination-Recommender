@@ -14,18 +14,18 @@
 @endif
 
 <div class="stat-cards">
-    <div class="stat-card">
+    <a class="stat-card stat-card--link" href="{{ route('admin.accreditation', ['status' => 'Active']) }}">
         <div class="stat-card-val">{{ $counts['active'] }}</div>
         <div class="stat-card-label">Active</div>
-    </div>
-    <div class="stat-card">
+    </a>
+    <a class="stat-card stat-card--link" href="{{ route('admin.accreditation', ['status' => 'Expiring Soon']) }}">
         <div class="stat-card-val">{{ $counts['expiring'] }}</div>
         <div class="stat-card-label">Expiring Within 30 Days</div>
-    </div>
-    <div class="stat-card">
+    </a>
+    <a class="stat-card stat-card--link" href="{{ route('admin.accreditation', ['status' => 'Expired']) }}">
         <div class="stat-card-val">{{ $counts['expired'] }}</div>
         <div class="stat-card-label">Expired</div>
-    </div>
+    </a>
 </div>
 
 <div class="panel">
@@ -54,7 +54,7 @@
                 <input type="date" id="bulk_expiration" name="expiration_date"
                        min="{{ now()->addDay()->toDateString() }}"
                        value="{{ now()->addYear()->toDateString() }}" required>
-                <button type="submit" class="btn btn-danger btn-2xs">Renew Selected</button>
+                <button type="submit" class="btn btn-primary btn-2xs"><x-icon name="rotate" />Renew selected</button>
             </form>
         </div>
 
@@ -103,7 +103,7 @@
                                 <form method="POST" action="{{ route('admin.accreditation.renew', $r) }}" style="display:flex; gap:6px; align-items:center;">
                                     @csrf
                                     <input type="date" name="expiration_date" aria-label="New expiry date for {{ $r->listing?->name ?? 'this record' }}" min="{{ now()->addDay()->toDateString() }}" value="{{ now()->addYear()->toDateString() }}" style="width:140px; padding:4px 6px; font-size:.8rem;" required>
-                                    <button type="submit" class="btn btn-danger btn-2xs">Renew</button>
+                                    <button type="submit" class="adm-icon-btn" title="Renew {{ $r->listing?->name ?? 'this accreditation' }}" aria-label="Renew {{ $r->listing?->name ?? 'this accreditation' }}"><x-icon name="rotate" /></button>
                                 </form>
                             @endif
                         </td>

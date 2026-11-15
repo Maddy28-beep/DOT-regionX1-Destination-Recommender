@@ -34,10 +34,12 @@
         </p>
     </div>
 @else
+    <link rel="stylesheet" href="{{ asset('css/quick-review.css') }}?v={{ filemtime(public_path('css/quick-review.css')) }}">
     <form method="POST" action="{{ route('reviews.store', ['type' => $type, 'id' => $listing->id]) }}" class="review-form" data-review-form>
         @csrf
 
         <h4 class="review-form__title">Leave a review</h4>
+        <p class="field-hint">A star rating is enough. Add details only if you want to.</p>
 
         @error('rating')
             <div class="alert alert-error">{{ $message }}</div>
@@ -68,6 +70,8 @@
             <span class="star-input__word" data-star-word data-words='@json($ratingWords)'>{{ $ratingWords[$chosen] ?? 'Tap a star to rate' }}</span>
         </fieldset>
 
+        <details class="review-form__details" @if(old('service_rating') !== null || old('amenities_rating') !== null || old('comment') || $errors->hasAny(['service_rating', 'amenities_rating', 'comment'])) open @endif>
+        <summary><strong>Add details</strong> <span class="field-hint">(optional)</span></summary>
         {{-- Optional extra ratings. Same radio-star pattern; a second click on the chosen star clears it (app.js). --}}
         @foreach (['service_rating' => 'Service', 'amenities_rating' => 'Amenities'] as $field => $aspectLabel)
             @php $aspectChosen = (int) old($field, 0); @endphp
@@ -95,6 +99,8 @@
                 <span class="review-form__counter" data-review-counter>{{ mb_strlen((string) old('comment')) }}/500</span>
             </div>
         </div>
+
+        </details>
 
         <div class="review-form__actions">
             <button type="submit" class="btn btn-accent review-form__submit">Post my review &rarr;</button>

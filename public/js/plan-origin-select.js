@@ -23,42 +23,7 @@
     const city = document.querySelector('[data-origin-city]');
     if (!country) return;
 
-    /*
-     * From outside Davao Region (another country, or a Philippine province outside Region XI) only "Use my current location"
-     * is switched off, and the advisory shows. The pick-up box and the arrival buttons stay usable: the visitor types or picks
-     * where they want to be picked up, and the server still refuses a place outside Davao Region. The pre-filled Davao
-     * airport default is cleared (so nothing is chosen for them) and comes back if they are in Region XI again.
-     */
-    const field = country.closest('[data-origin-field]');
-    const regionXi = (() => { try { return JSON.parse(field?.dataset.regionXiProvinces || '[]'); } catch (e) { return []; } })();
-    const pickup = document.querySelector('.pc-trip-start');
-    const note = pickup?.querySelector('[data-pickup-lock-note]');
-    const locate = document.getElementById('origin-btn');
-    let cleared = null;
-    const lockPickup = () => {
-        if (!pickup || !note || !regionXi.length) return;
-        const chosen = country.value;
-        const where = province ? province.value : '';
-        // Not decided yet (no country, or the Philippines without a province): leave it alone, the form cannot be sent yet.
-        if (chosen === '' || (chosen === 'PH' && where === '')) return;
-        const outside = chosen !== 'PH' || !regionXi.includes(where);
-        note.hidden = !outside;
-        if (locate) locate.disabled = outside;
-        const label = document.getElementById('origin_label');
-        const lat = document.getElementById('origin_lat');
-        const lng = document.getElementById('origin_lng');
-        if (outside && cleared === null && label && label.value === 'Davao International Airport') {
-            cleared = { label: label.value, lat: lat?.value || '', lng: lng?.value || '' };
-            label.value = '';
-            if (lat) lat.value = '';
-            if (lng) lng.value = '';
-            const status = document.getElementById('origin-status');
-            if (status) status.textContent = '';
-        } else if (!outside && cleared !== null) {
-            if (label && label.value === '') { label.value = cleared.label; if (lat) lat.value = cleared.lat; if (lng) lng.value = cleared.lng; }
-            cleared = null;
-        }
-    };
+    // Home origin never determines the device's current location or changes a chosen pick-up.
 
     const sync = () => {
         const value = country.value;
@@ -77,7 +42,6 @@
                 province.dispatchEvent(new Event('change', { bubbles: true }));
             }
         }
-        lockPickup();
         if (city) {
             city.hidden = !answered;
             if (!answered) city.value = '';

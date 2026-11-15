@@ -123,11 +123,16 @@
         }
         return true;
     }
-    next.addEventListener('click', () => { if (validate([current])) show(current + 1, true); });
+    async function advance(target) {
+        if (current === 0 && window.confirmVisitorOrigin && !await window.confirmVisitorOrigin()) return;
+        if (validate(Array.from({length: target}, (_, i) => i))) show(target, true);
+    }
+    next.addEventListener('click', () => advance(current + 1));
     back.addEventListener('click', () => show(current - 1, true));
     nav.querySelectorAll('[data-plan-step]').forEach(button => button.addEventListener('click', () => {
         const target = Number(button.dataset.planStep);
-        if (target <= current || validate(Array.from({length: target}, (_, i) => i))) show(target, true);
+        if (target <= current) show(target, true);
+        else advance(target);
     }));
     const errorBox = document.createElement('div');
     errorBox.className = 'alert alert-error';
@@ -149,7 +154,7 @@
     form.addEventListener('submit', async event => {
         event.preventDefault();
         if (busy) return;
-        if (current < last) { if (validate([current])) show(current + 1, true); return; }
+        if (current < last) { await advance(current + 1); return; }
         if (!validate(steps.map((_, i) => i))) return;
         busy = true;
         errorBox.hidden = true;

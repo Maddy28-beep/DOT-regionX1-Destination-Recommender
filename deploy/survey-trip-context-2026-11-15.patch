@@ -1,0 +1,113 @@
+--- a/app/Http/Controllers/ExitSurveyController.php
++++ b/app/Http/Controllers/ExitSurveyController.php
+@@ -244,8 +244,13 @@
+ 
+         $preferenceId = $request->session()->get(TripPlannerController::PREFERENCE_KEY);
+ 
+-        if ($preferenceId && ! TouristPreference::whereKey($preferenceId)->exists()) {
+-            $preferenceId = null;
++        $preference = $preferenceId ? TouristPreference::find($preferenceId) : null;
++        $preferenceId = $preference?->id;
++
++        // The public survey no longer repeats the planner's profile questions. Preserve explicit
++        // answers from an older open form; fill missing profile fields from this session's plan.
++        foreach (\App\Services\ExitSurveyTripContext::from($preference) as $field => $value) {
++            if (blank($data[$field] ?? null)) $data[$field] = $value;
+         }
+ 
+         // Only places that exist, and each place once.
+--- a/resources/views/admin/exit-surveys.blade.php
++++ b/resources/views/admin/exit-surveys.blade.php
+@@ -10,6 +10,7 @@
+ 
+ @section('content')
+ <div class="xs">
++<p class="adm-origin__note">Profile details can be reused from the visitor’s linked trip plan. Planned trip length is not treated as actual days stayed. Surveys without a linked plan may have no profile details.</p>
+ 
+ <div class="xs-head">
+     <a href="{{ route('admin.accommodation-stays') }}" class="btn btn-outline"><x-icon name="building" />Accommodation stays</a>
+--- a/resources/views/exit-survey/create.blade.php
++++ b/resources/views/exit-survey/create.blade.php
+@@ -101,40 +101,6 @@
+                                 </div>
+                             </details>
+ 
+-                            <details class="survey-extra" @if(old('origin') || old('residency_type') || old('travel_purpose') || old('actual_days_stayed') !== null || $errors->hasAny(['origin', 'residency_type', 'travel_purpose', 'actual_days_stayed'])) open @endif>
+-                                <summary>About your trip <span>Optional</span></summary>
+-                                <div class="survey-extra-body">
+-                                    <div class="field">
+-                                        <label for="origin">Where are you visiting from?</label>
+-                                        <input type="text" id="origin" name="origin" maxlength="150" value="{{ old('origin') }}" placeholder="e.g. Cebu City, Philippines">
+-                                    </div>
+-                                    <div class="filter-inline survey-context-grid">
+-                                        <div class="field">
+-                                            <label for="residency_type">Visit type</label>
+-                                            <select id="residency_type" name="residency_type">
+-                                                <option value="">Prefer not to say</option>
+-                                                <option value="Local Resident" @selected(old('residency_type') === 'Local Resident')>Local</option>
+-                                                <option value="Domestic Tourist" @selected(old('residency_type') === 'Domestic Tourist')>Domestic</option>
+-                                                <option value="Foreign Tourist" @selected(old('residency_type') === 'Foreign Tourist')>International</option>
+-                                            </select>
+-                                        </div>
+-                                        <div class="field">
+-                                            <label for="actual_days_stayed">Days stayed</label>
+-                                            <input type="number" id="actual_days_stayed" name="actual_days_stayed" min="1" max="365" value="{{ old('actual_days_stayed') }}" placeholder="e.g. 3">
+-                                        </div>
+-                                        <div class="field">
+-                                            <label for="travel_purpose">Purpose of trip</label>
+-                                            <select id="travel_purpose" name="travel_purpose">
+-                                                <option value="">Prefer not to say</option>
+-                                                @foreach ($travelPurposes as $purpose)
+-                                                    <option value="{{ $purpose }}" @selected(old('travel_purpose') === $purpose)>{{ $purpose }}</option>
+-                                                @endforeach
+-                                            </select>
+-                                        </div>
+-                                    </div>
+-                                </div>
+-                            </details>
+-
+                             <details class="survey-extra" @if(old('destination_relevant') !== null || old('itinerary_useful') !== null || old('comments') || $errors->hasAny(['destination_relevant', 'itinerary_useful', 'comments'])) open @endif>
+                                 <summary>Comments &amp; recommendations <span>Optional</span></summary>
+                                 <div class="survey-extra-body">
+--- /dev/null
++++ b/app/Services/ExitSurveyTripContext.php
+@@ -0,0 +1,39 @@
++<?php
++
++namespace App\Services;
++
++use App\Http\Controllers\ExitSurveyController;
++use App\Models\TouristPreference;
++use App\Support\Geo\Countries;
++use App\Support\Geo\PhProvinces;
++
++final class ExitSurveyTripContext
++{
++    /** Reuse known plan answers, never pick-up coordinates or planned duration as an actual outcome. */
++    public static function from(?TouristPreference $preference): array
++    {
++        if (!$preference) return [];
++        $context = [];
++        if (in_array($preference->travel_purpose, ExitSurveyController::TRAVEL_PURPOSES, true)) {
++            $context['travel_purpose'] = $preference->travel_purpose;
++        }
++        if (in_array($preference->visitor_type, ExitSurveyController::VISITOR_TYPES, true)) {
++            $context['visitor_type'] = $preference->visitor_type;
++        }
++        $country = strtoupper((string) $preference->visitor_origin_country_code);
++        if ($preference->visitor_origin_source === 'chosen' && Countries::has($country)) {
++            $parts = [$preference->visitor_origin_city, $preference->visitor_origin_province, Countries::name($country)];
++            $context['origin'] = mb_substr(implode(', ', array_filter($parts, fn ($part) => filled($part))), 0, 150);
++            $region = $country === 'PH' ? PhProvinces::regionOf($preference->visitor_origin_province) : null;
++            if ($country !== 'PH') {
++                $context['residency_type'] = 'Foreign Tourist';
++            } elseif ($region !== null) {
++                $context['residency_type'] = $region === 'Region XI (Davao Region)' ? 'Local Resident' : 'Domestic Tourist';
++            }
++        } elseif (blank($preference->visitor_origin_source) && filled($preference->place_of_origin)) {
++            // Legacy free text is usable as an origin label, but cannot safely establish residency.
++            $context['origin'] = mb_substr($preference->place_of_origin, 0, 150);
++        }
++        return $context;
++    }
++}

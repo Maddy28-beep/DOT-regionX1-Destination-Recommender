@@ -1,0 +1,9 @@
+# Remove public catalog sidebar
+
+Published 15 November 2026 after the user explicitly selected removal of the entire Filters sidebar. Applies to destinations, accommodations, restaurants, souvenir centers, packages and tour operators through two shared templates.
+
+The filter sidebar, mobile drawer opener, overlay, filter-sheet script and script that moved Grid/Map controls into the sidebar are no longer rendered. Listings occupy one full-width column. The stylesheet explicitly overrides the catalog theme's desktop sidebar column rules. Category tabs, sorting, active query chips, pagination and Grid/Map controls stay available. Existing links with filters still work, with active chips for clearing them. A hidden GET form preserves query state and the destination map's view input so the external sort select still submits correctly. No controller, database or ranking changes.
+
+Verified 18 server-rendered page states in an isolated current-live copy: all six pages, alphabetical sorting and an empty search result for each. Confirmed absence of sidebar/drawer markup and script, retained sort-form connection, old search-query preservation and destination view input. Verification used a rollback transaction. Public HTTP confirmed the sidebar and mobile opener absent on all six live pages and the new stylesheet served successfully. Full visual browser QA was not performed.
+
+Backup: `/var/backups/exploredvo/no-filter-sidebar-20261115-144011/`. Exact three-file diff: `deploy/remove-filter-sidebar-2026-11-15.patch`; publishing script: `deploy/publish-no-filter-sidebar-2026-11-15.sh`. Local templates differing from production were preserved, and their production changes are recorded in the patch. New CSS is present locally. Restore the two original templates and clear compiled views to roll back. The new CSS is loaded only by the updated partial.
