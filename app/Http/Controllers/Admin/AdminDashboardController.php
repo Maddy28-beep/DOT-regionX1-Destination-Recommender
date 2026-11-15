@@ -113,7 +113,10 @@ class AdminDashboardController extends Controller
                 ? (int) Carbon::parse($oldest)->startOfDay()->diffInDays(now('Asia/Manila')->startOfDay(), true) : null,
         ];
 
-        return view('admin.overview', compact('stats', 'recentVisits', 'pendingEstablishments', 'expiring', 'accreditationAlert', 'checkinCharts', 'trend'));
+        $expenditure = \App\Services\Admin\ExpenditureSummary::summarize(
+            ExitSurvey::respondents()->where('data_source', 'real')->get(['estimated_total_spend'])
+        );
+        return view('admin.overview', compact('stats', 'recentVisits', 'pendingEstablishments', 'expiring', 'accreditationAlert', 'checkinCharts', 'trend', 'expenditure'));
     }
 
     /**
@@ -504,6 +507,7 @@ class AdminDashboardController extends Controller
             ->filter(fn ($s) => $s->spend_midpoint !== null);
 
         $spendRespondentCount = $spendRows->count();
+        $expenditure = \App\Services\Admin\ExpenditureSummary::summarize($spendRows, $count);
         $avgTotalSpend = $spendRespondentCount > 0 ? round($spendRows->avg('spend_midpoint'), 2) : null;
 
         $spendByResidency = $spendRows->filter(fn ($s) => filled($s->residency_type))
@@ -552,11 +556,51 @@ class AdminDashboardController extends Controller
             'count', 'realCount', 'realUsableForRules', 'checkedInVisitors', 'avgRatings', 'wouldRecommendPct',
             'residencyBreakdown', 'visitorTypeBreakdown', 'travelPurposeBreakdown', 'avgDaysStayed',
             'originBreakdown', 'originTotal', 'otherOriginsCount',
-            'avgTotalSpend', 'spendByResidency', 'spendRespondentCount',
+            'avgTotalSpend', 'spendByResidency', 'spendRespondentCount', 'expenditure',
             'topPlaces', 'topActivities', 'insights',
             'filters', 'hasActiveFilters', 'includeSimulated', 'simulatedHidden',
             'residencyOptions', 'visitorTypeOptions', 'purposeOptions'
         ));
+    }
+
+    public function expenditure(Request $request): View
+    {
+        $this->validateExpenditureDates($request);
+        return view('admin.expenditure', $this->exitSurveys($request)->getData());
+    }
+
+    public function expenditureCsv(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $this->validateExpenditureDates($request);
+        $data = $this->exitSurveys($request)->getData();
+        return response()->streamDownload(function () use ($data) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF");
+            fputcsv($out, ['Visitor expenditure ranges']);
+            fputcsv($out, ['Source', $data['includeSimulated'] ? 'Real and simulated demo responses - demonstration results' : 'Real tourist responses only']);
+            foreach ($data['filters'] as $key => $value) {
+                $value = (string) ($value ?? 'All');
+                fputcsv($out, [$key, preg_match('/^[=+@\-\t\r]/', $value) ? "'".$value : $value]);
+            }
+            fputcsv($out, ['Survey scope', 'Reported trip expenditure; excludes accommodation paid separately in advance under the current survey wording.']);
+            fputcsv($out, ['Survey responses', $data['expenditure']['total']]);
+            fputcsv($out, ['Answered spending question', $data['expenditure']['answered']]);
+            fputcsv($out, ['No spending range supplied', $data['expenditure']['unanswered']]);
+            fputcsv($out, ['Spending range (PHP)', 'Responses', 'Percent of spending answers']);
+            foreach ($data['expenditure']['ranges'] as $row) {
+                fputcsv($out, [$row['label'], $row['count'], $row['percent'].'%']);
+            }
+            fputcsv($out, ['Note', 'Self-reported ranges, not exact expenditure or measured tourism revenue.']);
+            fclose($out);
+        }, 'visitor-expenditure-'.now('Asia/Manila')->format('Y-m-d').'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    private function validateExpenditureDates(Request $request): void
+    {
+        $request->validate([
+            'from' => ['nullable', 'date_format:Y-m-d'],
+            'to' => array_filter(['nullable', 'date_format:Y-m-d', $request->filled('from') ? 'after_or_equal:from' : null]),
+        ]);
     }
 
     /** Mirrors AprioriService::topRules()'s own defaults, named here so the page can display exactly the thresholds actually used to mine these rules. */

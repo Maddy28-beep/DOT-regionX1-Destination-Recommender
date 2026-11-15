@@ -1,0 +1,414 @@
+--- a/resources/views/exit-survey/create.blade.php
++++ b/resources/views/exit-survey/create.blade.php
+@@ -4,187 +4,156 @@
+ 
+ @section('content')
+ <link rel="stylesheet" href="{{ asset('css/exit-survey.css') }}?v={{ filemtime(public_path('css/exit-survey.css')) }}">
+-<div class="exit-survey-page">
+-<div class="page-head">
+-    <div class="container survey-welcome">
+-        <img class="survey-welcome__davo" src="{{ asset('images/davo-survey-v2.webp') }}" alt="" width="100" height="120">
+-        <div>
+-        <span class="poster-kicker" style="font-size:1.05rem;">how was your trip?</span>
+-        <h1 class="page-title" style="font-size:1.9rem; margin:0;">Visitor Exit Survey</h1>
+-        <p>Finished your trip? Tell us how it went and help improve tourism in Davao.</p>
+-        </div>
+-    </div>
+-</div>
+-
+-<div class="section-tight">
+-    <div class="container survey-container">
+-
+-        @if ($errors->any())
+-            <div class="alert alert-error" role="alert">
+-                <ul style="margin:0; padding-left:18px;">
+-                    @foreach ($errors->all() as $error)
+-                        <li>{{ $error }}</li>
+-                    @endforeach
+-                </ul>
++<div class="exit-survey-page survey-quick">
++    <div class="page-head">
++        <div class="container survey-welcome">
++            <img class="survey-welcome__davo" src="{{ asset('images/davo-survey-v2.webp') }}" alt="" width="100" height="120">
++            <div>
++                <span class="survey-step">Visitor exit survey</span>
++                <h1 class="page-title">How was your trip?</h1>
++                <p>Two quick answers. Share more only if you want to.</p>
+             </div>
+-        @endif
+-
+-        <div class="privacy-note" style="margin-top:0;">
+-            <x-icon name="shield-check" />
+-            <p>
+-                Your responses are <strong>anonymous</strong>. This survey does not collect your name, email, or
+-                account information, and is not linked to your ExploreDVO profile if you have one. Data is handled
+-                per the Philippine Data Privacy Act of 2012 (RA 10173) and used only for tourism analytics and
+-                service improvement.
+-            </p>
+         </div>
+-
+-        <form method="POST" action="{{ route('exit-survey.store') }}">
+-            @csrf
+-            {{-- Honeypot: kept off screen and out of the tab order. People never fill it; scripts that fill every field do. --}}
+-            <div class="hp-field" aria-hidden="true">
+-                <label for="{{ \App\Http\Controllers\ExitSurveyController::HONEYPOT_FIELD }}">Leave this field empty</label>
+-                <input type="text" id="{{ \App\Http\Controllers\ExitSurveyController::HONEYPOT_FIELD }}" name="{{ \App\Http\Controllers\ExitSurveyController::HONEYPOT_FIELD }}" value="" tabindex="-1" autocomplete="off">
+-            </div>
+-            @if ($isTest ?? false)
+-                <input type="hidden" name="test" value="1">
+-                <div class="alert alert-error" role="note" style="margin-bottom:18px;">
+-                    <strong>Test mode.</strong> Responses sent from this page are kept separate and are not counted in any
+-                    results or in the association rules.
++    </div>
++    <div class="section-tight">
++        <div class="container survey-container">
++            @if ($errors->any())
++                <div class="alert alert-error" role="alert">
++                    <strong>Please check your answers.</strong>
++                    <ul>
++                        @foreach ($errors->all() as $error)
++                            <li>{{ $error }}</li>
++                        @endforeach
++                    </ul>
+                 </div>
+             @endif
+ 
+-            <div class="panel">
+-                <div class="panel-head">
+-                    <div>
+-                        <span class="survey-step">01 · Trip details</span>
+-                        <h2>About Your Trip</h2>
+-                        <p>These details are optional. Share what you’re comfortable answering.</p>
+-                    </div>
+-                </div>
+-                <div class="panel-body">
+-                    <div class="field">
+-                        <label for="origin">Where are you visiting from?</label>
+-                        <input type="text" id="origin" name="origin" maxlength="150" value="{{ old('origin') }}" placeholder="e.g. Cebu City, Philippines">
+-                        <p class="field-hint">Helps DOT Region XI understand where visitors are travelling from.</p>
+-                    </div>
++            <form method="POST" action="{{ route('exit-survey.store') }}">
++                @csrf
++                <div class="hp-field" aria-hidden="true">
++                    <label for="{{ \App\Http\Controllers\ExitSurveyController::HONEYPOT_FIELD }}">Leave this field empty</label>
++                    <input type="text" id="{{ \App\Http\Controllers\ExitSurveyController::HONEYPOT_FIELD }}" name="{{ \App\Http\Controllers\ExitSurveyController::HONEYPOT_FIELD }}" value="" tabindex="-1" autocomplete="off">
++                </div>
++                @if ($isTest ?? false)
++                    <input type="hidden" name="test" value="1">
++                    <div class="alert alert-error" role="note">
++                        <strong>Test mode.</strong> These responses are kept separate and are not counted in results or association rules.
++                    </div>
++                @endif
++
++                <div class="panel">
++                    <div class="panel-body survey-quick-body">
++                        @include('partials.survey-rating', ['name' => 'overall_rating', 'label' => 'How was your overall visit?', 'required' => true])
+ 
+-                    <div class="filter-inline" style="align-items:start; margin-top:14px;">
+-                        <div class="field" style="flex:1; min-width:180px;">
+-                            <label for="residency_type">Visit type</label>
+-                            <select id="residency_type" name="residency_type">
+-                                <option value="">Prefer not to say</option>
+-                                <option value="Local Resident" @selected(old('residency_type') === 'Local Resident')>Local</option>
+-                                <option value="Domestic Tourist" @selected(old('residency_type') === 'Domestic Tourist')>Domestic</option>
+-                                <option value="Foreign Tourist" @selected(old('residency_type') === 'Foreign Tourist')>International</option>
+-                            </select>
+-                        </div>
+-                        <div class="field" style="flex:1; min-width:180px;">
+-                            <label for="travel_purpose">Purpose of trip</label>
+-                            <select id="travel_purpose" name="travel_purpose">
+-                                <option value="">Prefer not to say</option>
+-                                @foreach ($travelPurposes as $purpose)
+-                                    <option value="{{ $purpose }}" @selected(old('travel_purpose') === $purpose)>{{ $purpose }}</option>
+-                                @endforeach
+-                            </select>
+-                        </div>
+-                    </div>
++                        <fieldset class="survey-recommend">
++                            <legend>Would you recommend Davao to friends or family? <span>(required)</span></legend>
++                            <div class="survey-recommend-options">
++                                <label class="field-check radio-check">
++                                    <input type="radio" name="would_recommend" value="Yes" @checked(old('would_recommend') === 'Yes') required>
++                                    <span>Yes</span>
++                                </label>
++                                <label class="field-check radio-check">
++                                    <input type="radio" name="would_recommend" value="No" @checked(old('would_recommend') === 'No')>
++                                    <span>No</span>
++                                </label>
++                            </div>
++                            @error('would_recommend')<p class="survey-field-error">{{ $message }}</p>@enderror
++                        </fieldset>
+ 
+-                    <div class="filter-inline" style="align-items:start; margin-top:14px;">
+-                        <div class="field" style="flex:1; min-width:180px;">
+-                            <label for="actual_days_stayed">Days stayed</label>
+-                            <input type="number" id="actual_days_stayed" name="actual_days_stayed" min="1" max="365" value="{{ old('actual_days_stayed') }}" placeholder="e.g. 3">
+-                        </div>
+-                        <div class="field" style="flex:1; min-width:180px;">
+-                            <label for="estimated_total_spend">Total amount spent (&#8369;)</label>
+-                            <select id="estimated_total_spend" name="estimated_total_spend">
+-                                <option value="">Prefer not to say</option>
++                        <fieldset class="survey-spend" aria-describedby="survey-spend-hint">
++                            <legend>About how much did you spend? <span>(optional)</span></legend>
++                            <p id="survey-spend-hint" class="field-hint">Choose a range for your whole trip: food, transport, activities and shopping. Exclude accommodation paid separately in advance. This helps DOT understand visitor spending.</p>
++                            <div class="survey-spend-options">
+                                 @foreach ($spendBrackets as $value => $label)
+-                                    <option value="{{ $value }}" @selected(old('estimated_total_spend') === $value)>{{ $label }}</option>
++                                    <label>
++                                        <input type="radio" name="estimated_total_spend" value="{{ $value }}" @checked(old('estimated_total_spend') === $value)>
++                                        <span>{{ $label }}</span>
++                                    </label>
+                                 @endforeach
+-                            </select>
+-                        </div>
+-                    </div>
+-                    <p class="field-hint">Your total spend for the whole trip &mdash; food, transport, activities, and shopping &mdash; not accommodation, if you paid for that separately in advance.</p>
+-                </div>
+-            </div>
+-
+-            <div class="panel">
+-                <div class="panel-head">
+-                    <div>
+-                        <span class="survey-step">02 · Places & activities</span>
+-                        <h2>Your Visit</h2>
+-                        <p>Optional &mdash; add only places you actually visited, even if your plans changed.</p>
+-                        <p class="field-hint" style="margin-top:6px;"><strong>Tip:</strong> adding two or more places helps us learn which places go well together.</p>
+-                    </div>
+-                </div>
+-                <div class="panel-body">
+-                    <x-tag-search
+-                        name="places_visited[]"
+-                        :items="$placeOptions"
+-                        :selected="$selectedPlaces"
+-                        label="Where did you go during your trip?"
+-                        placeholder="Search places you visited…"
+-                    />
+-
+-                    <div class="field" style="margin-top:22px;">
+-                        <label>Activities you participated in (optional)</label>
+-                        <div class="chip-checkbox-grid">
+-                            @foreach ($activityOptions as $activity)
+-                                <label class="field-check">
+-                                    <input type="checkbox" name="activities[]" value="{{ $activity }}" @checked(in_array($activity, old('activities', [])))>
+-                                    <span>{{ $activity }}</span>
++                                <label>
++                                    <input type="radio" name="estimated_total_spend" value="" @checked(old('estimated_total_spend') === '')>
++                                    <span>Prefer not to say</span>
+                                 </label>
+-                            @endforeach
+-                        </div>
+-                    </div>
+-                </div>
+-            </div>
+-
+-            <div class="panel">
+-                <div class="panel-head">
+-                    <div>
+-                        <span class="survey-step">03 · Your feedback</span>
+-                        <h2>Your Experience</h2>
+-                        <p>Only your overall rating and recommendation answer are required.</p>
+-                    </div>
+-                </div>
+-                <div class="panel-body">
+-                    @include('partials.survey-rating', ['name' => 'overall_rating', 'label' => 'Overall satisfaction with your visit', 'required' => true])
++                            </div>
++                            @error('estimated_total_spend')<p class="survey-field-error">{{ $message }}</p>@enderror
++                        </fieldset>
+ 
+-                    <div class="field" style="margin-top:22px;">
+-                        <fieldset class="survey-recommend">
+-                        <legend>Would you recommend Davao to friends or family? <span>(required)</span></legend>
+-                        <div class="survey-recommend-options">
+-                            <label class="field-check radio-check" style="margin-top:0;">
+-                                <input type="radio" name="would_recommend" value="Yes" @checked(old('would_recommend') === 'Yes') required>
+-                                <span>Yes, definitely</span>
+-                            </label>
+-                            <label class="field-check radio-check" style="margin-top:0;">
+-                                <input type="radio" name="would_recommend" value="No" @checked(old('would_recommend') === 'No')>
+-                                <span>Probably not</span>
+-                            </label>
++                        <p class="survey-extra-intro">You can submit now, or add a little more below.</p>
++                        <div class="survey-extras">
++                            <details class="survey-extra" @if(old('places_visited', []) || old('activities', []) || $errors->hasAny(['places_visited', 'places_visited.*', 'activities', 'activities.*'])) open @endif>
++                                <summary>Places &amp; activities <span>Optional</span></summary>
++                                <div class="survey-extra-body">
++                                    <p class="field-hint">Add only places you actually visited. You can leave this blank.</p>
++                                    <x-tag-search name="places_visited[]" :items="$placeOptions" :selected="$selectedPlaces" label="Where did you go?" placeholder="Search places you visited…" />
++                                    <fieldset class="survey-activities">
++                                        <legend>What did you do?</legend>
++                                        <div class="chip-checkbox-grid">
++                                            @foreach ($activityOptions as $activity)
++                                                <label class="field-check">
++                                                    <input type="checkbox" name="activities[]" value="{{ $activity }}" @checked(in_array($activity, old('activities', [])))>
++                                                    <span>{{ $activity }}</span>
++                                                </label>
++                                            @endforeach
++                                        </div>
++                                    </fieldset>
++                                </div>
++                            </details>
++
++                            <details class="survey-extra" @if(old('origin') || old('residency_type') || old('travel_purpose') || old('actual_days_stayed') !== null || $errors->hasAny(['origin', 'residency_type', 'travel_purpose', 'actual_days_stayed'])) open @endif>
++                                <summary>About your trip <span>Optional</span></summary>
++                                <div class="survey-extra-body">
++                                    <div class="field">
++                                        <label for="origin">Where are you visiting from?</label>
++                                        <input type="text" id="origin" name="origin" maxlength="150" value="{{ old('origin') }}" placeholder="e.g. Cebu City, Philippines">
++                                    </div>
++                                    <div class="filter-inline survey-context-grid">
++                                        <div class="field">
++                                            <label for="residency_type">Visit type</label>
++                                            <select id="residency_type" name="residency_type">
++                                                <option value="">Prefer not to say</option>
++                                                <option value="Local Resident" @selected(old('residency_type') === 'Local Resident')>Local</option>
++                                                <option value="Domestic Tourist" @selected(old('residency_type') === 'Domestic Tourist')>Domestic</option>
++                                                <option value="Foreign Tourist" @selected(old('residency_type') === 'Foreign Tourist')>International</option>
++                                            </select>
++                                        </div>
++                                        <div class="field">
++                                            <label for="actual_days_stayed">Days stayed</label>
++                                            <input type="number" id="actual_days_stayed" name="actual_days_stayed" min="1" max="365" value="{{ old('actual_days_stayed') }}" placeholder="e.g. 3">
++                                        </div>
++                                        <div class="field">
++                                            <label for="travel_purpose">Purpose of trip</label>
++                                            <select id="travel_purpose" name="travel_purpose">
++                                                <option value="">Prefer not to say</option>
++                                                @foreach ($travelPurposes as $purpose)
++                                                    <option value="{{ $purpose }}" @selected(old('travel_purpose') === $purpose)>{{ $purpose }}</option>
++                                                @endforeach
++                                            </select>
++                                        </div>
++                                    </div>
++                                </div>
++                            </details>
++
++                            <details class="survey-extra" @if(old('destination_relevant') !== null || old('itinerary_useful') !== null || old('comments') || $errors->hasAny(['destination_relevant', 'itinerary_useful', 'comments'])) open @endif>
++                                <summary>Comments &amp; recommendations <span>Optional</span></summary>
++                                <div class="survey-extra-body">
++                                    <div class="field">
++                                        <label for="comments">What went well? What could be better?</label>
++                                        <textarea id="comments" name="comments" rows="3" maxlength="500" placeholder="Share anything you’d like DOT to know…">{{ old('comments') }}</textarea>
++                                        <p class="field-hint">Up to 500 characters. Please leave out names and contact details.</p>
++                                    </div>
++                                    <p class="field-hint">Used our trip planner? You can rate it here, or leave these unanswered.</p>
++                                    @include('partials.survey-rating', ['name' => 'destination_relevant', 'label' => 'Relevance of recommended destinations', 'required' => false])
++                                    @include('partials.survey-rating', ['name' => 'itinerary_useful', 'label' => 'Usefulness of the suggested itinerary', 'required' => false])
++                                </div>
++                            </details>
+                         </div>
+-                        </fieldset>
+-                    </div>
+ 
+-                    <details class="survey-more" @if(old('destination_relevant') !== null || old('itinerary_useful') !== null || old('comments') || $errors->hasAny(['destination_relevant', 'itinerary_useful', 'comments'])) open @endif>
+-                        <summary>More about your experience <span>· optional</span></summary>
+-                        <p class="field-hint">If you didn’t use the recommendations or itinerary, choose “Not applicable”.</p>
+-                        @include('partials.survey-rating', ['name' => 'destination_relevant', 'label' => 'Relevance of recommended destinations', 'required' => false])
+-                        @include('partials.survey-rating', ['name' => 'itinerary_useful', 'label' => 'Usefulness of the suggested itinerary', 'required' => false])
+-                    <div class="field" style="margin-top:18px;">
+-                        <label for="comments">Any comments or suggestions? (optional)</label>
+-                        <textarea id="comments" name="comments" rows="3" maxlength="500" placeholder="What did you love? What could DOT improve?">{{ old('comments') }}</textarea>
+-                        <p class="field-hint">Up to 500 characters. Please leave out names and contact details.</p>
++                        <button type="submit" class="btn survey-submit">Send feedback</button>
++                        <p class="survey-privacy"><x-icon name="shield-check" /> No name or email needed. Your feedback helps improve tourism services.</p>
+                     </div>
+-                    </details>
+-
+-                    <button type="submit" class="btn survey-submit">Submit feedback &rarr;</button>
+                 </div>
+-            </div>
+-        </form>
++            </form>
++        </div>
+     </div>
+ </div>
+-</div>
+ @endsection
+--- a/resources/views/partials/review-form.blade.php
++++ b/resources/views/partials/review-form.blade.php
+@@ -34,10 +34,12 @@
+         </p>
+     </div>
+ @else
++    <link rel="stylesheet" href="{{ asset('css/quick-review.css') }}?v={{ filemtime(public_path('css/quick-review.css')) }}">
+     <form method="POST" action="{{ route('reviews.store', ['type' => $type, 'id' => $listing->id]) }}" class="review-form" data-review-form>
+         @csrf
+ 
+         <h4 class="review-form__title">Leave a review</h4>
++        <p class="field-hint">A star rating is enough. Add details only if you want to.</p>
+ 
+         @error('rating')
+             <div class="alert alert-error">{{ $message }}</div>
+@@ -68,6 +70,8 @@
+             <span class="star-input__word" data-star-word data-words='@json($ratingWords)'>{{ $ratingWords[$chosen] ?? 'Tap a star to rate' }}</span>
+         </fieldset>
+ 
++        <details class="review-form__details" @if(old('service_rating') !== null || old('amenities_rating') !== null || old('comment') || $errors->hasAny(['service_rating', 'amenities_rating', 'comment'])) open @endif>
++        <summary><strong>Add details</strong> <span class="field-hint">(optional)</span></summary>
+         {{-- Optional extra ratings. Same radio-star pattern; a second click on the chosen star clears it (app.js). --}}
+         @foreach (['service_rating' => 'Service', 'amenities_rating' => 'Amenities'] as $field => $aspectLabel)
+             @php $aspectChosen = (int) old($field, 0); @endphp
+@@ -96,6 +100,8 @@
+             </div>
+         </div>
+ 
++        </details>
++
+         <div class="review-form__actions">
+             <button type="submit" class="btn btn-accent review-form__submit">Post my review &rarr;</button>
+         </div>
+--- a/public/css/exit-survey.css
++++ b/public/css/exit-survey.css
+@@ -43,3 +43,45 @@
+ .exit-survey-page .survey-submit:hover { background:var(--primary-dark); }
+ .exit-survey-page :is(button,summary,input,select,textarea):focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+ @media(max-width:600px) { .exit-survey-page .panel-head { padding:20px 16px 12px; } .exit-survey-page .panel-body { padding:8px 16px 20px; } .exit-survey-page .filter-inline { grid-template-columns:1fr; gap:14px; } .survey-rating-options { gap:4px; } .survey-rating-options small { font-size:.65rem; } .exit-survey-page :is(select,textarea,input:not([type=radio]):not([type=checkbox])) { font-size:16px; } }
++.survey-quick .survey-container,.survey-quick .survey-welcome { max-width:740px; }
++.survey-quick .page-head { padding:28px 0 16px; }
++.survey-quick .page-title { font:700 clamp(1.4rem,4vw,1.9rem)/1.25 'Poppins',sans-serif; text-transform:none; margin:6px 0 0; }
++.survey-quick .survey-welcome { gap:16px; justify-content:flex-start; }
++.survey-quick .survey-welcome__davo { width:66px; height:80px; }
++.survey-quick .page-head p { margin:8px 0 0; font-size:.9rem; }
++.survey-quick .panel { border-radius:16px; margin-bottom:0; }
++.survey-quick .survey-quick-body { padding:26px; }
++.survey-quick .survey-recommend-options .field-check { margin-top:0; min-width:0; min-height:48px; padding:10px 14px; }
++.survey-spend,.survey-activities { border:0; padding:0; margin:0; min-width:0; }
++.survey-spend { padding-top:22px; border-top:1px solid var(--border); }
++.survey-spend legend,.survey-activities legend { float:left; width:100%; padding:0; font-size:.9rem; font-weight:600; color:var(--primary-dark); margin-bottom:8px; }
++.survey-spend legend span { font-weight:400; color:var(--muted); font-size:.78rem; }
++.survey-spend > .field-hint { clear:both; margin:0 0 14px; font-size:.8rem; }
++.survey-spend-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
++.survey-spend-options label { display:flex; align-items:center; gap:9px; margin:0; min-height:46px; padding:10px 12px; border:1px solid var(--border); border-radius:10px; cursor:pointer; font-size:.82rem; font-weight:500; background:white; }
++.survey-spend-options input { margin:0; width:17px; height:17px; flex:0 0 17px; accent-color:var(--primary); }
++.survey-spend-options label:has(input:checked) { background:var(--primary-light); border-color:var(--primary); }
++.survey-spend-options label:focus-within { outline:3px solid var(--accent); outline-offset:2px; }
++.survey-extra-intro { margin:24px 0 10px; font-size:.82rem; color:var(--muted); }
++.survey-extra { border-top:1px solid var(--border); }
++.survey-extra:last-child { border-bottom:1px solid var(--border); }
++.survey-extra summary { padding:15px 0; cursor:pointer; font-size:.86rem; font-weight:600; color:var(--primary-dark); }
++.survey-extra summary > span { float:right; font-size:.73rem; color:var(--muted); font-weight:400; margin-left:8px; }
++.survey-extra[open] summary { padding-bottom:8px; }
++.survey-extra-body { padding:4px 0 20px; }
++.survey-extra-body > .field-hint:first-child { margin-top:0; }
++.survey-activities { margin-top:22px; }
++.survey-activities .chip-checkbox-grid { clear:both; }
++.survey-quick .survey-context-grid { margin-top:16px; }
++.survey-extra-body .survey-rating { margin:20px 0 0; }
++.survey-quick .survey-submit { margin-top:20px; }
++.survey-privacy { display:flex; justify-content:center; align-items:flex-start; gap:7px; color:var(--muted); font-size:.75rem; line-height:1.6; margin:12px 0 0; }
++.survey-privacy svg { width:16px; height:16px; flex:0 0 16px; margin-top:2px; }
++@media(max-width:600px) {
++    .survey-quick .survey-welcome { flex-direction:row; text-align:left; gap:12px; }
++    .survey-quick .survey-welcome__davo { width:50px; height:62px; }
++    .survey-quick .survey-quick-body { padding:20px 16px; }
++    .survey-quick .survey-rating-options label > span { min-height:64px; padding:10px 2px; }
++    .survey-spend-options label { font-size:.75rem; padding:10px 8px; gap:6px; }
++    .survey-quick .survey-recommend legend { line-height:1.6; }
++}
+--- /dev/null
++++ b/public/css/quick-review.css
+@@ -0,0 +1,5 @@
++.review-form__details { border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
++.review-form__details summary { padding:14px 0; cursor:pointer; color:var(--primary-dark); font-size:.9rem; }
++.review-form__details summary:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
++.review-form__details[open] summary { margin-bottom:8px; }
++.review-form__details .field:last-child { margin-bottom:16px; }

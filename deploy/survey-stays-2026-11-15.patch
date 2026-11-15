@@ -1,0 +1,430 @@
+--- a/app/Http/Controllers/ExitSurveyController.php
++++ b/app/Http/Controllers/ExitSurveyController.php
+@@ -140,6 +140,7 @@
+             'travelPurposes' => self::TRAVEL_PURPOSES,
+             'activityOptions' => self::ACTIVITIES,
+             'spendBrackets' => self::SPEND_BRACKETS,
++            'stayAccommodations' => \App\Services\SurveyStayCapture::directory()->orderBy('name')->get(['id', 'name', 'location']),
+         ]);
+     }
+ 
+@@ -185,6 +186,11 @@
+         $visitableKinds = implode('|', self::VISITABLE_KINDS);
+ 
+         $data = $request->validate([
++            'stays' => ['nullable', 'array', 'max:5'],
++            'stays.*' => ['array:place,name,locality'],
++            'stays.*.place' => ['nullable', 'string', 'regex:/^(accommodation:\d+|other|friends_family|day_trip)$/'],
++            'stays.*.name' => ['nullable', 'string', 'max:180'],
++            'stays.*.locality' => ['nullable', 'string', 'max:180'],
+             'residency_type' => ['nullable', 'in:'.implode(',', self::RESIDENCY_TYPES)],
+             'visitor_type' => ['nullable', 'in:'.implode(',', self::VISITOR_TYPES)],
+             'origin' => ['nullable', 'string', 'max:150'],
+@@ -250,15 +256,21 @@
+             return $model !== null && $model::whereKey((int) $id)->exists();
+         })->values()->all();
+ 
+-        $survey = DB::transaction(function () use ($data, $preferenceId, $isTest, $places) {
++        $stays = \App\Services\SurveyStayCapture::prepare($data['stays'] ?? []);
++
++        $survey = DB::transaction(function () use ($data, $preferenceId, $isTest, $places, $stays) {
+             $survey = ExitSurvey::create(
+-                collect($data)->except(['places_visited', 'activities', 'test'])
++                collect($data)->except(['places_visited', 'activities', 'test', 'stays'])
+                     ->put('preference_id', $preferenceId)
+                     // A trial run from /exit-survey?test=1 is kept apart from real responses.
+                     ->put('data_source', $isTest ? 'test' : 'real')
+                     ->all()
+             );
+ 
++            foreach ($stays as $stay) {
++                DB::table('exit_survey_stays')->insert($stay + ['exit_survey_id' => $survey->id]);
++            }
++
+             foreach ($places as $place) {
+                 [$kind, $id] = explode(':', $place, 2);
+                 ExitSurveyVisit::create(['exit_survey_id' => $survey->id, 'listing_kind' => $kind, 'listing_id' => $id]);
+--- a/resources/views/exit-survey/create.blade.php
++++ b/resources/views/exit-survey/create.blade.php
+@@ -78,6 +78,8 @@
+                             @error('estimated_total_spend')<p class="survey-field-error">{{ $message }}</p>@enderror
+                         </fieldset>
+ 
++                        @include('partials.survey-stays')
++
+                         <p class="survey-extra-intro">You can submit now, or add a little more below.</p>
+                         <div class="survey-extras">
+                             <details class="survey-extra" @if(old('places_visited', []) || old('activities', []) || $errors->hasAny(['places_visited', 'places_visited.*', 'activities', 'activities.*'])) open @endif>
+--- a/public/css/exit-survey.css
++++ b/public/css/exit-survey.css
+@@ -85,3 +85,18 @@
+     .survey-spend-options label { font-size:.75rem; padding:10px 8px; gap:6px; }
+     .survey-quick .survey-recommend legend { line-height:1.6; }
+ }
++.survey-stays { padding-top:22px; margin-top:22px; border-top:1px solid var(--border); }
++.survey-stays h2 { font:600 .9rem 'Poppins',sans-serif; color:var(--primary-dark); margin:0 0 8px; }
++.survey-stays h2 span,.survey-stay-manual label span { font-size:.78rem; font-weight:400; color:var(--muted); }
++.survey-stays > .field-hint { font-size:.8rem; }
++.survey-stay-row { padding:14px; margin:14px 0 0; min-width:0; border:1px solid var(--border); border-radius:10px; }
++.survey-stay-row legend { padding:0 6px; font-size:.75rem; color:var(--muted); }
++.survey-stay-row > label { display:block; font-size:.85rem; font-weight:600; margin-bottom:8px; }
++.survey-stay-row select { width:100%; max-width:100%; }
++.survey-stay-manual { margin-top:14px; display:grid; grid-template-columns:1fr 1fr; gap:14px; }
++.survey-stay-manual[hidden] { display:none; }
++.survey-stay-manual .field { margin:0; min-width:0; }
++.survey-stay-add,.survey-stay-remove { background:transparent; border:0; padding:12px 0; min-height:44px; font:600 .8rem 'Poppins',sans-serif; color:var(--primary-dark); cursor:pointer; text-align:left; }
++.survey-stay-add[hidden],.survey-stay-remove[hidden] { display:none; }
++.survey-stay-remove { color:var(--muted); }
++@media(max-width:600px) { .survey-stay-manual { grid-template-columns:1fr; } }
+--- a/resources/views/layouts/admin.blade.php
++++ b/resources/views/layouts/admin.blade.php
+@@ -32,6 +32,7 @@
+             <a href="{{ route('admin.postcard-slides.index') }}" class="{{ request()->routeIs('admin.postcard-slides.*') ? 'active' : '' }}"><x-icon name="camera" /><span>Homepage carousel</span></a>
+             <div class="group-label">Analytics</div>
+             <a href="{{ route('admin.expenditure') }}" class="{{ request()->routeIs('admin.expenditure*') ? 'active' : '' }}"><x-icon name="chart" /><span>Visitor expenditure</span></a>
++            <a href="{{ route('admin.accommodation-stays') }}" class="{{ request()->routeIs('admin.accommodation-stays*') ? 'active' : '' }}"><x-icon name="building" /><span>Accommodation stays</span></a>
+             <a href="{{ route('admin.reports') }}" class="{{ request()->routeIs('admin.reports') ? 'active' : '' }}"><x-icon name="chart" /><span>Reports &amp; exports</span></a>
+             <a href="{{ route('admin.exit-surveys') }}" class="{{ request()->routeIs('admin.exit-surveys') ? 'active' : '' }}"><x-icon name="chat" /><span>Exit surveys</span></a>
+             @if (\App\Support\Features::tripLocation())
+--- a/routes/web.php
++++ b/routes/web.php
+@@ -226,6 +226,8 @@
+     Route::post('/accreditation/bulk-renew', [AdminDashboardController::class, 'bulkRenewAccreditation'])->name('accreditation.bulk-renew');
+     Route::get('/exit-surveys', [AdminDashboardController::class, 'exitSurveys'])->name('exit-surveys');
+     Route::get('/expenditure', [AdminDashboardController::class, 'expenditure'])->name('expenditure');
++    Route::get('/accommodation-stays', [\App\Http\Controllers\Admin\AdminAccommodationStayController::class, 'index'])->name('accommodation-stays');
++    Route::get('/accommodation-stays/export.csv', [\App\Http\Controllers\Admin\AdminAccommodationStayController::class, 'export'])->middleware('throttle:30,1')->name('accommodation-stays.export');
+     Route::get('/expenditure/export.csv', [AdminDashboardController::class, 'expenditureCsv'])->name('expenditure.export');
+     Route::get('/exit-surveys/qr', [QrCodeController::class, 'exitSurveyPoster'])->name('exit-survey-qr');
+     Route::get('/exit-surveys/qr.svg', [QrCodeController::class, 'exitSurveyImage'])->name('exit-survey-qr.svg');
+--- a/resources/views/admin/exit-surveys.blade.php
++++ b/resources/views/admin/exit-surveys.blade.php
+@@ -12,6 +12,7 @@
+ <div class="xs">
+ 
+ <div class="xs-head">
++    <a href="{{ route('admin.accommodation-stays') }}" class="btn btn-outline"><x-icon name="building" />Accommodation stays</a>
+     <p>Collecting more responses?</p>
+     <a href="{{ route('admin.exit-survey-qr') }}" class="btn btn-outline"><x-icon name="qr" /> Printable survey QR code</a>
+ </div>
+--- /dev/null
++++ b/app/Services/SurveyStayCapture.php
+@@ -0,0 +1,60 @@
++<?php
++
++namespace App\Services;
++
++use App\Models\Accommodation;
++use Illuminate\Validation\ValidationException;
++
++final class SurveyStayCapture
++{
++    public static function directory()
++    {
++        // Samples must never be offered as evidence of an actual stay or accreditation.
++        return Accommodation::publiclyVisible()
++            ->whereDoesntHave('accreditationRecords', fn ($q) => $q->where('is_placeholder', true));
++    }
++
++    public static function normalize(string $value): string
++    {
++        return trim(preg_replace('/\s+/u', ' ', $value));
++    }
++
++    public static function prepare(array $answers): array
++    {
++        $rows = [];
++        foreach ($answers as $index => $answer) {
++            $choice = $answer['place'] ?? '';
++            $name = self::normalize((string) ($answer['name'] ?? ''));
++            $area = self::normalize((string) ($answer['locality'] ?? ''));
++            if ($choice === '') {
++                if ($name !== '' || $area !== '') {
++                    throw ValidationException::withMessages(["stays.$index.place" => 'Choose “Not in the list” to report the accommodation you entered.']);
++                }
++                continue;
++            }
++            $row = ['accommodation_id' => null, 'reported_kind' => $choice, 'place_name' => null, 'locality' => null, 'directory_status' => 'not_applicable'];
++            if (str_starts_with($choice, 'accommodation:')) {
++                $listing = self::directory()->find((int) substr($choice, 14));
++                if (!$listing) {
++                    throw ValidationException::withMessages(["stays.$index.place" => 'This directory entry is no longer available. Choose “Not in the list” and enter its name instead.']);
++                }
++                $row = array_replace($row, ['accommodation_id' => $listing->id, 'reported_kind' => 'directory', 'place_name' => $listing->name, 'locality' => $listing->location, 'directory_status' => 'directory_match']);
++                $key = 'directory:'.$listing->id;
++            } elseif ($choice === 'other') {
++                $errors = [];
++                if ($name === '') $errors["stays.$index.name"] = 'Enter the hotel, rental or accommodation name.';
++                if ($area === '') $errors["stays.$index.locality"] = 'Enter its city, municipality or area so DOT can identify the place.';
++                if ($errors) throw ValidationException::withMessages($errors);
++                $row = array_replace($row, ['place_name' => $name, 'locality' => $area, 'directory_status' => 'unverified']);
++                $key = 'other:'.mb_strtolower($name).'|'.mb_strtolower($area);
++            } else {
++                $key = $choice;
++            }
++            $rows[$key] = $row;
++        }
++        if (isset($rows['day_trip']) && count($rows) > 1) {
++            throw ValidationException::withMessages(['stays' => 'Choose either your overnight stay(s) or “No overnight stay”, not both.']);
++        }
++        return array_values($rows);
++    }
++}
+--- /dev/null
++++ b/app/Http/Controllers/Admin/AdminAccommodationStayController.php
+@@ -0,0 +1,65 @@
++<?php
++
++namespace App\Http\Controllers\Admin;
++
++use App\Http\Controllers\Controller;
++use App\Models\ExitSurvey;
++use Illuminate\Http\Request;
++use Illuminate\Support\Facades\DB;
++
++class AdminAccommodationStayController extends Controller
++{
++    private function report(Request $request): array
++    {
++        $input = $request->validate([
++            'from' => ['nullable', 'date_format:Y-m-d'],
++            'to' => ['nullable', 'date_format:Y-m-d', ...($request->filled('from') ? ['after_or_equal:from'] : [])],
++            'status' => ['nullable', 'in:all,unverified,directory_match'],
++        ]);
++        $filters = ['from' => $input['from'] ?? '', 'to' => $input['to'] ?? '', 'status' => $input['status'] ?? 'unverified'];
++        // Never include test, demo or itinerary-import rows in this follow-up report.
++        $surveys = ExitSurvey::query()->where('data_source', 'real')
++            ->when($filters['from'], fn ($q, $date) => $q->whereDate('submitted_at', '>=', $date))
++            ->when($filters['to'], fn ($q, $date) => $q->whereDate('submitted_at', '<=', $date));
++        $base = DB::table('exit_survey_stays as stays')
++            ->joinSub((clone $surveys)->select('id', 'submitted_at'), 'surveys', 'surveys.id', '=', 'stays.exit_survey_id');
++        $total = (clone $surveys)->count();
++        $answered = (clone $base)->distinct()->count('stays.exit_survey_id');
++        $unverified = (clone $base)->where('directory_status', 'unverified')->distinct()->count('stays.exit_survey_id');
++        $private = (clone $base)->where('reported_kind', 'friends_family')->distinct()->count('stays.exit_survey_id');
++        $dayTrips = (clone $base)->where('reported_kind', 'day_trip')->distinct()->count('stays.exit_survey_id');
++        $groups = (clone $base)->whereIn('reported_kind', ['directory', 'other'])
++            ->when($filters['status'] !== 'all', fn ($q) => $q->where('directory_status', $filters['status']))
++            ->selectRaw('stays.accommodation_id, stays.directory_status, MIN(stays.place_name) as place_name, MIN(stays.locality) as locality, COUNT(DISTINCT stays.exit_survey_id) as responses, MIN(surveys.submitted_at) as first_reported, MAX(surveys.submitted_at) as last_reported')
++            ->groupBy('stays.accommodation_id', 'stays.directory_status')
++            ->groupByRaw('LOWER(stays.place_name), LOWER(stays.locality)')
++            ->orderByDesc('responses')->orderBy('place_name')->orderBy('locality');
++        return compact('filters', 'total', 'answered', 'unverified', 'private', 'dayTrips', 'groups');
++    }
++
++    public function index(Request $request)
++    {
++        $data = $this->report($request);
++        $data['places'] = $data['groups']->paginate(25)->withQueryString();
++        unset($data['groups']);
++        return view('admin.accommodation-stays', $data);
++    }
++
++    public function export(Request $request)
++    {
++        $data = $this->report($request);
++        return response()->streamDownload(function () use ($data) {
++            $out = fopen('php://output', 'w');
++            $safe = fn ($value) => preg_match('/^[\s]*[=+@-]/u', (string) $value) ? "'".$value : $value;
++            $write = fn ($row) => fputcsv($out, array_map($safe, $row), ',', '"', '');
++            $write(['Accommodation stays reported by real exit-survey respondents']);
++            $write(['From', $data['filters']['from'], 'To', $data['filters']['to'], 'Status', $data['filters']['status']]);
++            $write(['Manual entries are unverified leads, not confirmed unaccredited businesses. Counts are survey responses, not unique tourists.']);
++            $write(['Name as reported', 'City / area as reported', 'Directory status at submission', 'Survey responses', 'First reported', 'Last reported']);
++            foreach ($data['groups']->cursor() as $place) {
++                $write([$place->place_name, $place->locality, $place->directory_status === 'unverified' ? 'Unverified — manual entry' : 'Directory match — verify current accreditation', $place->responses, $place->first_reported, $place->last_reported]);
++            }
++            fclose($out);
++        }, 'reported-accommodation-stays.csv', ['Content-Type' => 'text/csv; charset=UTF-8', 'Cache-Control' => 'private, no-store']);
++    }
++}
+--- /dev/null
++++ b/resources/views/admin/accommodation-stays.blade.php
+@@ -0,0 +1,55 @@
++@extends('layouts.admin')
++@section('title', 'Accommodation Stays — DOT Admin')
++@section('page-title', 'Accommodation stays')
++@section('page-sub', 'Places visitors reported staying, including properties outside the directory')
++@section('page-actions')
++    <a class="btn btn-outline" href="{{ route('admin.accommodation-stays.export', $filters) }}"><x-icon name="arrow-up-right" />Export places</a>
++@endsection
++@section('content')
++<div class="adm-origin">
++    @if ($errors->any())<div class="alert alert-error" role="alert">{{ $errors->first() }}</div>@endif
++    <form method="GET" class="adm-toolbar adm-expenditure-filters" aria-label="Filter reported stays">
++        <label>From date<input type="date" name="from" value="{{ $filters['from'] }}"></label>
++        <label>To date<input type="date" name="to" value="{{ $filters['to'] }}"></label>
++        <label>Directory status<select name="status">
++            <option value="unverified" @selected($filters['status'] === 'unverified')>Manual entries to check</option>
++            <option value="directory_match" @selected($filters['status'] === 'directory_match')>Directory matches</option>
++            <option value="all" @selected($filters['status'] === 'all')>All reported properties</option>
++        </select></label>
++        <button class="btn btn-primary" type="submit"><x-icon name="filter" />Apply filters</button>
++        <a class="btn btn-outline" href="{{ route('admin.accommodation-stays') }}">Reset</a>
++    </form>
++    <p class="adm-origin__note">Real survey responses only. Demo, test and imported itinerary transactions are excluded.</p>
++    <section class="adm-card adm-expenditure" aria-labelledby="stays-report-title">
++        <header class="adm-card__head"><div><h2 id="stays-report-title">Reported places to stay</h2><p>Use manual entries as leads for accreditation verification and outreach.</p></div></header>
++        <div class="adm-expenditure__summary">
++            <div><strong>{{ $answered }}</strong><span>Surveys with a stay answer</span></div>
++            <div><strong>{{ $unverified }}</strong><span>Surveys naming an unverified place</span></div>
++            <div><strong>{{ $total - $answered }}</strong><span>No stay answer supplied</span></div>
++        </div>
++        <div class="table-scroll">
++            <table class="adm-table adm-expenditure__table">
++                <caption class="sr-only">Reported accommodation names and areas. Entries are not verified findings of non-accreditation.</caption>
++                <thead><tr><th scope="col">Accommodation / property</th><th scope="col">City / area</th><th scope="col">Directory status at submission</th><th scope="col">Responses</th><th scope="col">Last reported</th></tr></thead>
++                <tbody>
++                    @forelse ($places as $place)
++                        <tr>
++                            <th scope="row">{{ $place->place_name }}</th><td>{{ $place->locality }}</td>
++                            <td>{{ $place->directory_status === 'unverified' ? 'Unverified · manual entry' : 'Directory match' }}</td>
++                            <td>{{ $place->responses }}</td><td>{{ \Illuminate\Support\Carbon::parse($place->last_reported)->format('M j, Y') }}</td>
++                        </tr>
++                    @empty
++                        <tr><td colspan="5">No reported properties in this selection yet. New exit surveys can include where the visitor stayed.</td></tr>
++                    @endforelse
++                </tbody>
++            </table>
++        </div>
++        {{ $places->links() }}
++        <footer class="adm-expenditure__note">
++            Manual entries may include accredited properties under another name, spelling variations or incomplete details. Confirm the property and current accreditation before any follow-up. Directory matches also require a current accreditation check. Entries do not automatically create listings or alter accreditation.
++            Counts represent survey responses, not unique tourists; one response can report several stays. Only capitalization and whitespace are normalized; different spellings remain separate.
++            In this date range: {{ $private }} surveys reported friends/family and {{ $dayTrips }} reported no overnight stay. Names and addresses of private hosts are not requested. Older surveys were not backfilled.
++        </footer>
++    </section>
++</div>
++@endsection
+--- /dev/null
++++ b/resources/views/partials/survey-stays.blade.php
+@@ -0,0 +1,18 @@
++<section class="survey-stays" aria-labelledby="survey-stays-title" data-survey-stays>
++    <h2 id="survey-stays-title">Where did you stay? <span>(optional)</span></h2>
++    <p class="field-hint">Choose your accommodation, or select “Other” and tell us where you stayed.</p>
++    @php
++        $stayAnswers = old('stays');
++        $stayAnswers = is_array($stayAnswers) ? array_values(array_slice($stayAnswers, 0, 5)) : [];
++        $stayAnswers = array_filter($stayAnswers, 'is_array') ?: [['place' => '']];
++    @endphp
++    <div data-stay-rows>
++        @foreach ($stayAnswers as $index => $stay)
++            @include('partials.survey-stay-row', ['stayIndex' => $index, 'stayAnswer' => $stay])
++        @endforeach
++    </div>
++    <button class="survey-stay-add" type="button" data-add-stay hidden>+ Add another place you stayed</button>
++    <p class="field-hint">No private home address, host name or contact details needed. You can leave this question blank.</p>
++    <template data-stay-template>@include('partials.survey-stay-row', ['stayIndex' => '__INDEX__', 'stayAnswer' => []])</template>
++</section>
++<script src="{{ asset('js/survey-stays.js') }}?v={{ filemtime(public_path('js/survey-stays.js')) }}" defer></script>
+--- /dev/null
++++ b/resources/views/partials/survey-stay-row.blade.php
+@@ -0,0 +1,26 @@
++<fieldset class="survey-stay-row" data-stay-row>
++    <legend>Stay <span data-stay-number>{{ is_numeric($stayIndex) ? (int) $stayIndex + 1 : '' }}</span></legend>
++    <label for="stay-place-{{ $stayIndex }}">Place you stayed</label>
++    <select id="stay-place-{{ $stayIndex }}" name="stays[{{ $stayIndex }}][place]" data-stay-choice>
++        <option value="">Skip / prefer not to say</option>
++        <option value="other" @selected(($stayAnswer['place'] ?? '') === 'other')>Other / not in the list</option>
++        <option value="friends_family" @selected(($stayAnswer['place'] ?? '') === 'friends_family')>Stayed with friends or family</option>
++        <option value="day_trip" @selected(($stayAnswer['place'] ?? '') === 'day_trip')>No overnight stay</option>
++        <optgroup label="Accommodations in the directory">
++            @foreach ($stayAccommodations as $stayAccommodation)
++                <option value="accommodation:{{ $stayAccommodation->id }}" @selected(($stayAnswer['place'] ?? '') === 'accommodation:'.$stayAccommodation->id)>{{ $stayAccommodation->name }} — {{ $stayAccommodation->location }}</option>
++            @endforeach
++        </optgroup>
++    </select>
++    <div class="survey-stay-manual" data-stay-manual>
++        <div class="field">
++            <label for="stay-name-{{ $stayIndex }}">Accommodation name <span>(if not in the list)</span></label>
++            <input id="stay-name-{{ $stayIndex }}" name="stays[{{ $stayIndex }}][name]" type="text" maxlength="180" value="{{ $stayAnswer['name'] ?? '' }}" placeholder="Hotel, rental or property name" data-stay-name>
++        </div>
++        <div class="field">
++            <label for="stay-locality-{{ $stayIndex }}">City / municipality or area <span>(if not in the list)</span></label>
++            <input id="stay-locality-{{ $stayIndex }}" name="stays[{{ $stayIndex }}][locality]" type="text" maxlength="180" value="{{ $stayAnswer['locality'] ?? '' }}" placeholder="e.g. Matina, Davao City" data-stay-locality>
++        </div>
++    </div>
++    <button type="button" class="survey-stay-remove" data-remove-stay hidden>Remove stay</button>
++</fieldset>
+--- /dev/null
++++ b/public/js/survey-stays.js
+@@ -0,0 +1,50 @@
++document.addEventListener('DOMContentLoaded', function () {
++    document.querySelectorAll('[data-survey-stays]').forEach(function (section) {
++        var rows = section.querySelector('[data-stay-rows]');
++        var add = section.querySelector('[data-add-stay]');
++        var template = section.querySelector('[data-stay-template]');
++        var next = 0;
++        rows.querySelectorAll('[data-stay-row]').forEach(function (row) {
++            var match = row.querySelector('select').name.match(/stays\[(\d+)\]/);
++            if (match) next = Math.max(next, Number(match[1]) + 1);
++        });
++        function sync() {
++            var all = rows.querySelectorAll('[data-stay-row]');
++            all.forEach(function (row, index) {
++                var manual = row.querySelector('[data-stay-choice]').value === 'other';
++                row.querySelector('[data-stay-number]').textContent = index + 1;
++                row.querySelector('[data-stay-manual]').hidden = !manual;
++                row.querySelectorAll('[data-stay-manual] input').forEach(function (input) {
++                    input.disabled = !manual;
++                    input.required = manual;
++                });
++                row.querySelector('[data-remove-stay]').hidden = all.length === 1;
++            });
++            add.hidden = all.length >= 5;
++        }
++        rows.addEventListener('change', sync);
++        rows.addEventListener('click', function (event) {
++            var remove = event.target.closest('[data-remove-stay]');
++            if (!remove) return;
++            var row = remove.closest('[data-stay-row]');
++            var target = row.previousElementSibling || row.nextElementSibling;
++            row.remove();
++            sync();
++            if (target) target.querySelector('select').focus();
++        });
++        add.addEventListener('click', function () {
++            if (rows.querySelectorAll('[data-stay-row]').length >= 5) return;
++            var fragment = template.content.cloneNode(true);
++            fragment.querySelectorAll('[name], [id], label[for]').forEach(function (element) {
++                ['name', 'id', 'for'].forEach(function (attribute) {
++                    if (element.hasAttribute(attribute)) element.setAttribute(attribute, element.getAttribute(attribute).replaceAll('__INDEX__', String(next)));
++                });
++            });
++            next++;
++            rows.appendChild(fragment);
++            sync();
++            rows.lastElementChild.querySelector('select').focus();
++        });
++        sync();
++    });
++});
+--- /dev/null
++++ b/database/migrations/2026_11_15_150000_create_exit_survey_stays_table.php
+@@ -0,0 +1,26 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration {
++    public function up(): void
++    {
++        Schema::create('exit_survey_stays', function (Blueprint $table) {
++            $table->id();
++            $table->foreignUuid('exit_survey_id')->constrained('exit_surveys')->cascadeOnDelete();
++            $table->foreignId('accommodation_id')->nullable()->constrained('accommodations')->nullOnDelete();
++            $table->string('reported_kind', 30);
++            $table->string('place_name')->nullable();
++            $table->text('locality')->nullable();
++            $table->string('directory_status', 30);
++            $table->index(['reported_kind', 'directory_status']);
++        });
++    }
++
++    public function down(): void
++    {
++        Schema::dropIfExists('exit_survey_stays');
++    }
++};

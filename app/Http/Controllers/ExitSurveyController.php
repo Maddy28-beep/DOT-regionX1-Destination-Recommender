@@ -140,6 +140,7 @@ class ExitSurveyController extends Controller
             'travelPurposes' => self::TRAVEL_PURPOSES,
             'activityOptions' => self::ACTIVITIES,
             'spendBrackets' => self::SPEND_BRACKETS,
+            'stayAccommodations' => \App\Services\SurveyStayCapture::directory()->orderBy('name')->get(['id', 'name', 'location']),
         ]);
     }
 
@@ -185,6 +186,11 @@ class ExitSurveyController extends Controller
         $visitableKinds = implode('|', self::VISITABLE_KINDS);
 
         $data = $request->validate([
+            'stays' => ['nullable', 'array', 'max:5'],
+            'stays.*' => ['array:place,name,locality'],
+            'stays.*.place' => ['nullable', 'string', 'regex:/^(accommodation:\d+|other|friends_family|day_trip)$/'],
+            'stays.*.name' => ['nullable', 'string', 'max:180'],
+            'stays.*.locality' => ['nullable', 'string', 'max:180'],
             'residency_type' => ['nullable', 'in:'.implode(',', self::RESIDENCY_TYPES)],
             'visitor_type' => ['nullable', 'in:'.implode(',', self::VISITOR_TYPES)],
             'origin' => ['nullable', 'string', 'max:150'],
@@ -238,8 +244,13 @@ class ExitSurveyController extends Controller
 
         $preferenceId = $request->session()->get(TripPlannerController::PREFERENCE_KEY);
 
-        if ($preferenceId && ! TouristPreference::whereKey($preferenceId)->exists()) {
-            $preferenceId = null;
+        $preference = $preferenceId ? TouristPreference::find($preferenceId) : null;
+        $preferenceId = $preference?->id;
+
+        // The public survey no longer repeats the planner's profile questions. Preserve explicit
+        // answers from an older open form; fill missing profile fields from this session's plan.
+        foreach (\App\Services\ExitSurveyTripContext::from($preference) as $field => $value) {
+            if (blank($data[$field] ?? null)) $data[$field] = $value;
         }
 
         // Only places that exist, and each place once.
@@ -250,14 +261,20 @@ class ExitSurveyController extends Controller
             return $model !== null && $model::whereKey((int) $id)->exists();
         })->values()->all();
 
-        $survey = DB::transaction(function () use ($data, $preferenceId, $isTest, $places) {
+        $stays = \App\Services\SurveyStayCapture::prepare($data['stays'] ?? []);
+
+        $survey = DB::transaction(function () use ($data, $preferenceId, $isTest, $places, $stays) {
             $survey = ExitSurvey::create(
-                collect($data)->except(['places_visited', 'activities', 'test'])
+                collect($data)->except(['places_visited', 'activities', 'test', 'stays'])
                     ->put('preference_id', $preferenceId)
                     // A trial run from /exit-survey?test=1 is kept apart from real responses.
                     ->put('data_source', $isTest ? 'test' : 'real')
                     ->all()
             );
+
+            foreach ($stays as $stay) {
+                DB::table('exit_survey_stays')->insert($stay + ['exit_survey_id' => $survey->id]);
+            }
 
             foreach ($places as $place) {
                 [$kind, $id] = explode(':', $place, 2);

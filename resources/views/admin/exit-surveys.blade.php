@@ -10,8 +10,10 @@
 
 @section('content')
 <div class="xs">
+<p class="adm-origin__note">Profile details can be reused from the visitor’s linked trip plan. Planned trip length is not treated as actual days stayed. Surveys without a linked plan may have no profile details.</p>
 
 <div class="xs-head">
+    <a href="{{ route('admin.accommodation-stays') }}" class="btn btn-outline"><x-icon name="building" />Accommodation stays</a>
     <p>Collecting more responses?</p>
     <a href="{{ route('admin.exit-survey-qr') }}" class="btn btn-outline"><x-icon name="qr" /> Printable survey QR code</a>
 </div>
@@ -73,6 +75,8 @@
 @elseif ($simulatedHidden > 0)
     <x-banner tone="info">Showing real tourist responses only. {{ $simulatedHidden }} simulated demo survey{{ $simulatedHidden === 1 ? '' : 's' }} {{ $simulatedHidden === 1 ? 'is' : 'are' }} left out; tick &ldquo;Include simulated survey rows&rdquo; to add them.</x-banner>
 @endif
+
+@include('admin.partials.expenditure-distribution')
 
 @if ($count === 0)
     <div class="panel">
@@ -164,7 +168,7 @@
             <span class="xs-ico is-amber"><x-icon name="wallet" /></span>
             <div>
                 <div class="stat-card-val">{{ $avgTotalSpend !== null ? '₱'.number_format($avgTotalSpend, 2) : '—' }}</div>
-                <div class="stat-card-label">Avg. Spend per Trip</div>
+                <div class="stat-card-label">Approx. spend per trip</div>
             </div>
         </div>
     </section>
@@ -384,7 +388,7 @@
                 <li>
                     <span class="xs-ico is-amber"><x-icon name="wallet" /></span>
                     <div class="xs-rows__t">
-                        <h3>Average Spending</h3>
+                        <h3>Approximate average (bracket-based)</h3>
                         @if ($spendRespondentCount === 0)
                             <strong class="is-none">No spending data available yet.</strong>
                         @else
@@ -397,7 +401,7 @@
                     <li>
                         <span class="xs-ico"><x-icon name="building" /></span>
                         <div class="xs-rows__t">
-                            <h3>Average spending by residency</h3>
+                            <h3>Approximate spending by residency</h3>
                             @if ($spendByResidency->count() === 1)
                                 <strong>{{ $spendByResidency->keys()->first() }} &middot; ₱{{ number_format($spendByResidency->first(), 2) }}</strong>
                                 @if ($spendRespondentCount < 3)<em>Only {{ $spendRespondentCount === 1 ? 'one respondent' : $spendRespondentCount.' respondents' }} so far, so treat this as indicative.</em>@endif

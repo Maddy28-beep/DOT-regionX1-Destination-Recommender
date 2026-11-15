@@ -1,0 +1,281 @@
+--- a/app/Http/Controllers/Admin/AdminDashboardController.php
++++ b/app/Http/Controllers/Admin/AdminDashboardController.php
+@@ -113,7 +113,10 @@
+                 ? (int) Carbon::parse($oldest)->startOfDay()->diffInDays(now('Asia/Manila')->startOfDay(), true) : null,
+         ];
+ 
+-        return view('admin.overview', compact('stats', 'recentVisits', 'pendingEstablishments', 'expiring', 'accreditationAlert', 'checkinCharts', 'trend'));
++        $expenditure = \App\Services\Admin\ExpenditureSummary::summarize(
++            ExitSurvey::respondents()->where('data_source', 'real')->get(['estimated_total_spend'])
++        );
++        return view('admin.overview', compact('stats', 'recentVisits', 'pendingEstablishments', 'expiring', 'accreditationAlert', 'checkinCharts', 'trend', 'expenditure'));
+     }
+ 
+     /**
+@@ -504,6 +507,7 @@
+             ->filter(fn ($s) => $s->spend_midpoint !== null);
+ 
+         $spendRespondentCount = $spendRows->count();
++        $expenditure = \App\Services\Admin\ExpenditureSummary::summarize($spendRows, $count);
+         $avgTotalSpend = $spendRespondentCount > 0 ? round($spendRows->avg('spend_midpoint'), 2) : null;
+ 
+         $spendByResidency = $spendRows->filter(fn ($s) => filled($s->residency_type))
+@@ -552,13 +556,53 @@
+             'count', 'realCount', 'realUsableForRules', 'checkedInVisitors', 'avgRatings', 'wouldRecommendPct',
+             'residencyBreakdown', 'visitorTypeBreakdown', 'travelPurposeBreakdown', 'avgDaysStayed',
+             'originBreakdown', 'originTotal', 'otherOriginsCount',
+-            'avgTotalSpend', 'spendByResidency', 'spendRespondentCount',
++            'avgTotalSpend', 'spendByResidency', 'spendRespondentCount', 'expenditure',
+             'topPlaces', 'topActivities', 'insights',
+             'filters', 'hasActiveFilters', 'includeSimulated', 'simulatedHidden',
+             'residencyOptions', 'visitorTypeOptions', 'purposeOptions'
+         ));
+     }
+ 
++    public function expenditure(Request $request): View
++    {
++        $this->validateExpenditureDates($request);
++        return view('admin.expenditure', $this->exitSurveys($request)->getData());
++    }
++
++    public function expenditureCsv(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
++    {
++        $this->validateExpenditureDates($request);
++        $data = $this->exitSurveys($request)->getData();
++        return response()->streamDownload(function () use ($data) {
++            $out = fopen('php://output', 'w');
++            fwrite($out, "\xEF\xBB\xBF");
++            fputcsv($out, ['Visitor expenditure ranges']);
++            fputcsv($out, ['Source', $data['includeSimulated'] ? 'Real and simulated demo responses - demonstration results' : 'Real tourist responses only']);
++            foreach ($data['filters'] as $key => $value) {
++                $value = (string) ($value ?? 'All');
++                fputcsv($out, [$key, preg_match('/^[=+@\-\t\r]/', $value) ? "'".$value : $value]);
++            }
++            fputcsv($out, ['Survey scope', 'Reported trip expenditure; excludes accommodation paid separately in advance under the current survey wording.']);
++            fputcsv($out, ['Survey responses', $data['expenditure']['total']]);
++            fputcsv($out, ['Answered spending question', $data['expenditure']['answered']]);
++            fputcsv($out, ['No spending range supplied', $data['expenditure']['unanswered']]);
++            fputcsv($out, ['Spending range (PHP)', 'Responses', 'Percent of spending answers']);
++            foreach ($data['expenditure']['ranges'] as $row) {
++                fputcsv($out, [$row['label'], $row['count'], $row['percent'].'%']);
++            }
++            fputcsv($out, ['Note', 'Self-reported ranges, not exact expenditure or measured tourism revenue.']);
++            fclose($out);
++        }, 'visitor-expenditure-'.now('Asia/Manila')->format('Y-m-d').'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
++    }
++
++    private function validateExpenditureDates(Request $request): void
++    {
++        $request->validate([
++            'from' => ['nullable', 'date_format:Y-m-d'],
++            'to' => array_filter(['nullable', 'date_format:Y-m-d', $request->filled('from') ? 'after_or_equal:from' : null]),
++        ]);
++    }
++
+     /** Mirrors AprioriService::topRules()'s own defaults, named here so the page can display exactly the thresholds actually used to mine these rules. */
+     private const ASSOCIATION_RULE_LIMIT = 15;
+ 
+--- a/resources/views/admin/exit-surveys.blade.php
++++ b/resources/views/admin/exit-surveys.blade.php
+@@ -74,6 +74,8 @@
+     <x-banner tone="info">Showing real tourist responses only. {{ $simulatedHidden }} simulated demo survey{{ $simulatedHidden === 1 ? '' : 's' }} {{ $simulatedHidden === 1 ? 'is' : 'are' }} left out; tick &ldquo;Include simulated survey rows&rdquo; to add them.</x-banner>
+ @endif
+ 
++@include('admin.partials.expenditure-distribution')
++
+ @if ($count === 0)
+     <div class="panel">
+         <div class="empty-panel">
+@@ -164,7 +166,7 @@
+             <span class="xs-ico is-amber"><x-icon name="wallet" /></span>
+             <div>
+                 <div class="stat-card-val">{{ $avgTotalSpend !== null ? '₱'.number_format($avgTotalSpend, 2) : '—' }}</div>
+-                <div class="stat-card-label">Avg. Spend per Trip</div>
++                <div class="stat-card-label">Approx. spend per trip</div>
+             </div>
+         </div>
+     </section>
+@@ -384,7 +386,7 @@
+                 <li>
+                     <span class="xs-ico is-amber"><x-icon name="wallet" /></span>
+                     <div class="xs-rows__t">
+-                        <h3>Average Spending</h3>
++                        <h3>Approximate average (bracket-based)</h3>
+                         @if ($spendRespondentCount === 0)
+                             <strong class="is-none">No spending data available yet.</strong>
+                         @else
+@@ -397,7 +399,7 @@
+                     <li>
+                         <span class="xs-ico"><x-icon name="building" /></span>
+                         <div class="xs-rows__t">
+-                            <h3>Average spending by residency</h3>
++                            <h3>Approximate spending by residency</h3>
+                             @if ($spendByResidency->count() === 1)
+                                 <strong>{{ $spendByResidency->keys()->first() }} &middot; ₱{{ number_format($spendByResidency->first(), 2) }}</strong>
+                                 @if ($spendRespondentCount < 3)<em>Only {{ $spendRespondentCount === 1 ? 'one respondent' : $spendRespondentCount.' respondents' }} so far, so treat this as indicative.</em>@endif
+--- a/resources/views/admin/overview.blade.php
++++ b/resources/views/admin/overview.blade.php
+@@ -87,6 +87,12 @@
+     <a href="{{ route('admin.data-completeness') }}"><x-icon name="database" />Data quality<x-icon name="chevron-right" /></a>
+ </div>
+ 
++<section class="adm-expenditure-highlight" aria-labelledby="expenditure-highlight-title">
++    <div><h2 id="expenditure-highlight-title">Visitor expenditure</h2><p>Real tourist responses only. {{ $expenditure['answered'] }} of {{ $expenditure['total'] }} supplied a spending range.</p></div>
++    <div><span>Most reported range</span><strong>{{ count($expenditure['leading']) === 1 ? $expenditure['leading'][0] : (count($expenditure['leading']) > 1 ? 'Multiple ranges tied' : 'Awaiting spending answers') }}</strong></div>
++    <a href="{{ route('admin.expenditure') }}" class="btn btn-outline">View expenditure<x-icon name="chevron-right" /></a>
++</section>
++
+ <div class="adm-charts" id="overview-charts">
+     <section class="adm-card adm-chart" aria-labelledby="checkin-chart-title">
+         <div class="adm-card__head">
+--- a/resources/views/layouts/admin.blade.php
++++ b/resources/views/layouts/admin.blade.php
+@@ -31,6 +31,7 @@
+             <a href="{{ route('admin.events.index') }}" class="{{ request()->routeIs('admin.events.*') ? 'active' : '' }}"><x-icon name="calendar" /><span>Events</span></a>
+             <a href="{{ route('admin.postcard-slides.index') }}" class="{{ request()->routeIs('admin.postcard-slides.*') ? 'active' : '' }}"><x-icon name="camera" /><span>Homepage carousel</span></a>
+             <div class="group-label">Analytics</div>
++            <a href="{{ route('admin.expenditure') }}" class="{{ request()->routeIs('admin.expenditure*') ? 'active' : '' }}"><x-icon name="chart" /><span>Visitor expenditure</span></a>
+             <a href="{{ route('admin.reports') }}" class="{{ request()->routeIs('admin.reports') ? 'active' : '' }}"><x-icon name="chart" /><span>Reports &amp; exports</span></a>
+             <a href="{{ route('admin.exit-surveys') }}" class="{{ request()->routeIs('admin.exit-surveys') ? 'active' : '' }}"><x-icon name="chat" /><span>Exit surveys</span></a>
+             @if (\App\Support\Features::tripLocation())
+--- a/routes/web.php
++++ b/routes/web.php
+@@ -225,6 +225,8 @@
+     Route::post('/accreditation/{accreditation}/renew', [AdminDashboardController::class, 'renewAccreditation'])->name('accreditation.renew');
+     Route::post('/accreditation/bulk-renew', [AdminDashboardController::class, 'bulkRenewAccreditation'])->name('accreditation.bulk-renew');
+     Route::get('/exit-surveys', [AdminDashboardController::class, 'exitSurveys'])->name('exit-surveys');
++    Route::get('/expenditure', [AdminDashboardController::class, 'expenditure'])->name('expenditure');
++    Route::get('/expenditure/export.csv', [AdminDashboardController::class, 'expenditureCsv'])->name('expenditure.export');
+     Route::get('/exit-surveys/qr', [QrCodeController::class, 'exitSurveyPoster'])->name('exit-survey-qr');
+     Route::get('/exit-surveys/qr.svg', [QrCodeController::class, 'exitSurveyImage'])->name('exit-survey-qr.svg');
+     Route::get('/association-rules', [AdminDashboardController::class, 'associationRules'])->name('association-rules');
+--- a/public/css/admin-workspace.css
++++ b/public/css/admin-workspace.css
+@@ -265,6 +265,38 @@
+     body.admin-workspace .adm-rv2 { display: block; }
+     body.admin-workspace .adm-origin .adm-table { min-width: 0; }
+ }
++
++/* Expenditure is a reporting priority: use observed ranges as the primary measure. */
++body.admin-workspace .adm-expenditure-highlight { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto; gap: 20px; align-items: center; padding: 18px 0; border-block: 1px solid #dce7e1; }
++body.admin-workspace .adm-expenditure-highlight h2 { margin: 0; font-size: 15px; font-weight: 650; color: #314c40; }
++body.admin-workspace .adm-expenditure-highlight p { margin: 5px 0 0; color: #65717c; font-size: 12px; }
++body.admin-workspace .adm-expenditure-highlight span { display: block; color: #65717c; font-size: 11px; }
++body.admin-workspace .adm-expenditure-highlight strong { display: block; margin-top: 4px; font-size: 15px; font-weight: 600; }
++body.admin-workspace .adm-expenditure { scroll-margin-top: 88px; }
++body.admin-workspace .adm-expenditure__summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 20px; gap: 20px; border-bottom: 1px solid #e8eeea; }
++body.admin-workspace .adm-expenditure__summary strong { display: block; font-size: 26px; font-weight: 650; line-height: 1.3; color: #314c40; font-variant-numeric: tabular-nums; }
++body.admin-workspace .adm-expenditure__summary span { display: block; margin-top: 4px; font-size: 12px; color: #65717c; }
++body.admin-workspace .adm-expenditure__track { display: block; width: 100%; min-width: 130px; height: 8px; background: #edf2ef; border-radius: 3px; overflow: hidden; }
++body.admin-workspace .adm-expenditure__track i { display: block; height: 100%; background: #629d80; border-radius: 3px; }
++body.admin-workspace .adm-expenditure__table tbody th { padding: 15px 18px; background: transparent; color: #3e5550; font-size: 12px; font-weight: 500; }
++body.admin-workspace .adm-expenditure__table td:nth-child(2) { width: 45%; }
++body.admin-workspace .adm-expenditure__table td:nth-child(3), body.admin-workspace .adm-expenditure__table td:nth-child(4) { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
++body.admin-workspace .adm-expenditure__note, body.admin-workspace .adm-expenditure__empty { padding: 15px 18px; font-size: 12px; line-height: 1.7; color: #65717c; margin: 0; }
++body.admin-workspace .adm-expenditure__note { border-top: 1px solid #e8eeea; background: #fafcfb; }
++body.admin-workspace .adm-expenditure-filters label { display: grid; gap: 6px; }
++body.admin-workspace .adm-expenditure-filters .adm-expenditure-demo { display: flex; align-items: center; gap: 7px; align-self: end; min-height: 34px; }
++body.admin-workspace .adm-origin form.adm-expenditure-filters { display: flex; align-items: end; flex-wrap: wrap; }
++@media (max-width: 900px) {
++    body.admin-workspace .adm-expenditure-highlight { grid-template-columns: minmax(0, 1fr) auto; }
++    body.admin-workspace .adm-expenditure-highlight > div:first-child { grid-column: 1 / -1; }
++}
++@media (max-width: 540px) {
++    body.admin-workspace .adm-expenditure-highlight { grid-template-columns: minmax(0, 1fr); gap: 14px; }
++    body.admin-workspace .adm-expenditure-highlight .btn { justify-self: start; }
++    body.admin-workspace .adm-expenditure__summary { gap: 14px; padding: 16px; }
++    body.admin-workspace .adm-expenditure__summary strong { font-size: 22px; }
++    body.admin-workspace .adm-expenditure-filters label { width: 100%; }
++}
+ @media print {
+     body.admin-workspace .adm-top, body.admin-workspace .admin-sidebar, body.admin-workspace .admin-sidebar-scrim { display: none !important; }
+     body.admin-workspace .admin-shell { display: block; }
+--- /dev/null
++++ b/app/Services/Admin/ExpenditureSummary.php
+@@ -0,0 +1,27 @@
++<?php
++
++namespace App\Services\Admin;
++
++use App\Http\Controllers\ExitSurveyController;
++use Illuminate\Support\Collection;
++
++final class ExpenditureSummary
++{
++    public static function summarize(Collection $responses, ?int $total = null): array
++    {
++        $counts = $responses->pluck('estimated_total_spend')->countBy();
++        $answered = array_sum(array_map(fn ($key) => (int) $counts->get($key, 0), array_keys(ExitSurveyController::SPEND_BRACKETS)));
++        $total = max($answered, $total ?? $responses->count());
++        $ranges = [];
++        foreach (ExitSurveyController::SPEND_BRACKETS as $key => $label) {
++            $n = (int) $counts->get($key, 0);
++            $ranges[] = ['key' => $key, 'label' => $label, 'count' => $n, 'percent' => $answered ? round($n / $answered * 100, 1) : 0];
++        }
++        $max = max(array_column($ranges, 'count'));
++        return ['total' => $total, 'answered' => $answered, 'unanswered' => $total - $answered,
++            'coverage' => $total ? round($answered / $total * 100, 1) : 0,
++            'ranges' => $ranges,
++            'leading' => $max ? array_values(array_column(array_filter($ranges, fn ($row) => $row['count'] === $max), 'label')) : [],
++        ];
++    }
++}
+--- /dev/null
++++ b/resources/views/admin/expenditure.blade.php
+@@ -0,0 +1,27 @@
++@extends('layouts.admin')
++@section('title', 'Visitor Expenditure - DOT Admin')
++@section('page-title', 'Visitor expenditure')
++@section('page-sub', 'Spending ranges reported by tourists in the exit survey')
++@section('page-actions')
++    <a class="btn btn-outline" href="{{ route('admin.exit-surveys', request()->query()) }}">Exit survey insights<x-icon name="chevron-right" /></a>
++@endsection
++@section('content')
++<div class="adm-origin">
++    <form method="GET" class="adm-toolbar adm-expenditure-filters" aria-label="Filter expenditure responses">
++        <label>From date<input type="date" name="from" value="{{ $filters['from'] }}"></label>
++        <label>To date<input type="date" name="to" value="{{ $filters['to'] }}"></label>
++        @foreach (['residency' => ['Residency', $residencyOptions], 'visitor_type' => ['Visit type', $visitorTypeOptions], 'purpose' => ['Travel purpose', $purposeOptions]] as $key => [$label, $options])
++            <label>{{ $label }}<select name="{{ $key }}"><option value="">All</option>@foreach ($options as $option)<option value="{{ $option }}" @selected($filters[$key] === $option)>{{ $option }}</option>@endforeach</select></label>
++        @endforeach
++        <label class="adm-expenditure-demo"><input type="checkbox" name="include_simulated" value="1" @checked($includeSimulated)>Include simulated responses</label>
++        <button class="btn btn-primary" type="submit"><x-icon name="filter" />Apply filters</button>
++        @if ($hasActiveFilters || $includeSimulated)<a class="btn btn-outline" href="{{ route('admin.expenditure') }}">Reset</a>@endif
++    </form>
++    @if ($includeSimulated)
++        <x-banner tone="warn">These results include simulated demo responses. They demonstrate the report and must not be presented as observed tourist spending.</x-banner>
++    @else
++        <p class="adm-origin__note">Showing real tourist responses only. Demo and imported itinerary transactions are excluded.</p>
++    @endif
++    @include('admin.partials.expenditure-distribution')
++</div>
++@endsection
+--- /dev/null
++++ b/resources/views/admin/partials/expenditure-distribution.blade.php
+@@ -0,0 +1,26 @@
++<section class="adm-card adm-expenditure" id="expenditure" aria-labelledby="expenditure-title">
++    <header class="adm-card__head">
++        <div><h2 id="expenditure-title">Reported expenditure ranges</h2><p>{{ $includeSimulated ? 'Includes simulated demo responses' : 'Real tourist responses only' }} &middot; Current survey filters apply</p></div>
++        <a class="btn btn-outline" href="{{ route('admin.expenditure.export', array_filter($filters + ['include_simulated' => $includeSimulated ? 1 : null])) }}"><x-icon name="arrow-up-right" />Export ranges</a>
++    </header>
++    <div class="adm-expenditure__summary">
++        <div><strong>{{ $expenditure['answered'] }}</strong><span>Spending answers</span></div>
++        <div><strong>{{ $expenditure['coverage'] }}%</strong><span>Answered this question</span></div>
++        <div><strong>{{ $expenditure['unanswered'] }}</strong><span>No spending range supplied</span></div>
++    </div>
++    @if ($expenditure['answered'] === 0)
++        <p class="adm-expenditure__empty">No spending answers in this selection yet. Tourists can provide a range in the exit survey.</p>
++    @endif
++    <div class="table-scroll">
++        <table class="adm-table adm-expenditure__table">
++            <caption class="sr-only">Self-reported expenditure ranges; percentages are calculated among those who supplied a recognized spending range.</caption>
++            <thead><tr><th scope="col">Spending range</th><th scope="col">Share of spending answers</th><th scope="col">Responses</th><th scope="col">Percent</th></tr></thead>
++            <tbody>
++                @foreach ($expenditure['ranges'] as $range)
++                    <tr><th scope="row">{{ $range['label'] }}</th><td><span class="adm-expenditure__track" aria-hidden="true"><i style="width:{{ $range['percent'] }}%"></i></span></td><td>{{ $range['count'] }}</td><td>{{ $range['percent'] }}%</td></tr>
++                @endforeach
++            </tbody>
++        </table>
++    </div>
++    <footer class="adm-expenditure__note">Self-reported ranges, not exact spending or tourism revenue. The current question covers trip spending but excludes accommodation paid separately in advance. Percentages use the {{ $expenditure['answered'] }} spending answers, not all {{ $expenditure['total'] }} survey responses.</footer>
++</section>

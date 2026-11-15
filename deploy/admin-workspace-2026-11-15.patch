@@ -1,0 +1,522 @@
+--- a/resources/views/layouts/admin.blade.php
++++ b/resources/views/layouts/admin.blade.php
+@@ -8,46 +8,43 @@
+     @include('partials.head-assets')
+     <link rel="stylesheet" href="{{ asset('css/admin-shell.css') }}?v={{ filemtime(public_path('css/admin-shell.css')) }}">
+     @stack('head')
++    <link rel="stylesheet" href="{{ asset('css/admin-workspace.css') }}?v={{ filemtime(public_path('css/admin-workspace.css')) }}">
+ </head>
+-<body class="admin">
++<body class="admin admin-workspace">
+     <a class="skip-link" href="#admin-main">Skip to main content</a>
+     @include('partials.admin-topbar')
+ 
+     <div class="admin-shell">
+-        <aside class="admin-sidebar" id="adminSidebar">
+-            {{-- One entry, not six: the in-page tab row already switches
+-                 between listing types, so duplicating that in the sidebar
+-                 was two controls for one job. --}}
+-            <div class="group-label">Tourism Information</div>
+-            <a href="{{ route('admin.listings.index', 'destinations') }}" class="{{ request()->routeIs('admin.listings.*') ? 'active' : '' }}"><x-icon name="building" /><span>Manage Listings</span></a>
+-
++        <aside class="admin-sidebar" id="adminSidebar" aria-label="Admin navigation">
++            <div class="admin-sidebar__context"><span class="admin-sidebar__dot"></span> DOT Region XI</div>
++            <nav aria-label="Administration">
++            <a href="{{ route('admin.overview') }}" class="{{ request()->routeIs('admin.overview') ? 'active' : '' }}"><x-icon name="target" /><span>Overview</span></a>
++            <div class="group-label">Directory &amp; approvals</div>
++            <a href="{{ route('admin.listings.index', 'destinations') }}" class="{{ request()->routeIs('admin.listings.*') ? 'active' : '' }}"><x-icon name="building" /><span>Listings</span></a>
++            <a href="{{ route('admin.establishments') }}" class="{{ request()->routeIs('admin.establishments') ? 'active' : '' }}"><x-icon name="shield-check" /><span>Establishments</span></a>
++            <a href="{{ route('admin.package-approvals') }}" class="{{ request()->routeIs('admin.package-approvals*') ? 'active' : '' }}"><x-icon name="package" /><span>Tour packages</span>
++                @if ($navPackagesWaiting > 0)<b class="adm-nb" title="{{ $navPackagesWaiting }} waiting for review">{{ $navPackagesWaiting }}<span class="sr-only"> waiting for review</span></b>@endif
++            </a>
++            <a href="{{ route('admin.accreditation') }}" class="{{ request()->routeIs('admin.accreditation') ? 'active' : '' }}"><x-icon name="clock" /><span>Accreditation</span></a>
++            <div class="group-label">Tourism content</div>
+             <a href="{{ route('admin.advisories.index') }}" class="{{ request()->routeIs('admin.advisories.*') ? 'active' : '' }}"><x-icon name="alert-triangle" /><span>Advisories</span></a>
+-
+             <a href="{{ route('admin.events.index') }}" class="{{ request()->routeIs('admin.events.*') ? 'active' : '' }}"><x-icon name="calendar" /><span>Events</span></a>
+-
+             <a href="{{ route('admin.postcard-slides.index') }}" class="{{ request()->routeIs('admin.postcard-slides.*') ? 'active' : '' }}"><x-icon name="camera" /><span>Homepage carousel</span></a>
+-
+-            <div class="group-label">Monitoring</div>
+-            <a href="{{ route('admin.overview') }}" class="{{ request()->routeIs('admin.overview') ? 'active' : '' }}"><x-icon name="target" /><span>Overview</span></a>
+-            <a href="{{ route('admin.exit-surveys') }}" class="{{ request()->routeIs('admin.exit-surveys') ? 'active' : '' }}"><x-icon name="chat" /><span>Exit Survey Insights</span></a>
+-            <a href="{{ route('admin.association-rules') }}" class="{{ request()->routeIs('admin.association-rules') ? 'active' : '' }}"><x-icon name="link" /><span>Association Rules</span></a>
+-            <a href="{{ route('admin.audit-log') }}" class="{{ request()->routeIs('admin.audit-log') ? 'active' : '' }}"><x-icon name="shield-check" /><span>Audit Log</span></a>
++            <div class="group-label">Analytics</div>
++            <a href="{{ route('admin.reports') }}" class="{{ request()->routeIs('admin.reports') ? 'active' : '' }}"><x-icon name="chart" /><span>Reports &amp; exports</span></a>
++            <a href="{{ route('admin.exit-surveys') }}" class="{{ request()->routeIs('admin.exit-surveys') ? 'active' : '' }}"><x-icon name="chat" /><span>Exit surveys</span></a>
+             @if (\App\Support\Features::tripLocation())
+-                <a href="{{ route('admin.visitor-origin') }}" class="{{ request()->routeIs('admin.visitor-origin') ? 'active' : '' }}"><x-icon name="map-pin" /><span>Visitor origin</span></a>
++                <a href="{{ route('admin.visitor-origin') }}" class="{{ request()->routeIs('admin.visitor-origin*') ? 'active' : '' }}"><x-icon name="map-pin" /><span>Visitor origins</span></a>
+             @endif
+-            <a href="{{ route('admin.data-completeness') }}" class="{{ request()->routeIs('admin.data-completeness*') ? 'active' : '' }}"><x-icon name="database" /><span>Data completeness</span></a>
+-
+-            <div class="group-label">Accreditation</div>
+-            <a href="{{ route('admin.establishments') }}" class="{{ request()->routeIs('admin.establishments') ? 'active' : '' }}"><x-icon name="shield-check" /><span>Establishment Approvals</span></a>
+-            <a href="{{ route('admin.package-approvals') }}" class="{{ request()->routeIs('admin.package-approvals*') ? 'active' : '' }}"><x-icon name="package" /><span>Package Approvals</span>
+-                @if ($navPackagesWaiting > 0)<b class="adm-nb" title="{{ $navPackagesWaiting }} waiting for review">{{ $navPackagesWaiting }}<span class="sr-only"> waiting for review</span></b>@endif
+-            </a>
+-            <a href="{{ route('admin.accreditation') }}" class="{{ request()->routeIs('admin.accreditation') ? 'active' : '' }}"><x-icon name="clock" /><span>Accreditation Monitoring</span></a>
+-
+-            <div class="group-label">Insights</div>
+-            <a href="{{ route('admin.reports') }}" class="{{ request()->routeIs('admin.reports') ? 'active' : '' }}"><x-icon name="chart" /><span>Reports &amp; Export</span></a>
+-            <a href="{{ route('admin.feedback-analysis') }}" class="{{ request()->routeIs('admin.feedback-analysis') ? 'active' : '' }}"><x-icon name="star" /><span>Feedback Analysis</span></a>
++            <a href="{{ route('admin.association-rules') }}" class="{{ request()->routeIs('admin.association-rules') ? 'active' : '' }}"><x-icon name="link" /><span>Association rules</span></a>
++            <a href="{{ route('admin.feedback-analysis') }}" class="{{ request()->routeIs('admin.feedback-analysis') ? 'active' : '' }}"><x-icon name="star" /><span>Visitor feedback</span></a>
++            <div class="group-label">Administration</div>
++            <a href="{{ route('admin.data-completeness') }}" class="{{ request()->routeIs('admin.data-completeness*') ? 'active' : '' }}"><x-icon name="database" /><span>Data quality</span></a>
++            <a href="{{ route('admin.audit-log') }}" class="{{ request()->routeIs('admin.audit-log') ? 'active' : '' }}"><x-icon name="shield-check" /><span>Audit log</span></a>
++            </nav>
++            <a class="admin-sidebar__public" href="{{ url('/') }}" target="_blank" rel="noopener"><x-icon name="external-link" /><span>View public website</span></a>
+         </aside>
++        <button class="admin-sidebar-scrim" data-sidebar-close aria-label="Close navigation" tabindex="-1" hidden></button>
+ 
+         <main class="admin-main" id="admin-main" tabindex="-1">
+             {{-- The title sits in the content column, beside the sidebar, instead of in a bar across the whole page:
+@@ -80,6 +77,7 @@
+     </dialog>
+     <script src="{{ asset('js/admin-modal.js') }}?v={{ filemtime(public_path('js/admin-modal.js')) }}" defer></script>
+     <script src="{{ asset('js/admin-topbar.js') }}?v={{ filemtime(public_path('js/admin-topbar.js')) }}" defer></script>
++    <script src="{{ asset('js/admin-workspace.js') }}?v={{ filemtime(public_path('js/admin-workspace.js')) }}" defer></script>
+ 
+     {{-- Shared behaviours (bulk row selection). Everything in app.js is
+          guarded by element lookups, so the public-site code is inert here. --}}
+--- a/resources/views/partials/admin-topbar.blade.php
++++ b/resources/views/partials/admin-topbar.blade.php
+@@ -22,8 +22,8 @@
+ 
+ <header class="adm-top" role="banner">
+     <div class="adm-top__left">
+-        <button type="button" class="admin-menu-toggle" onclick="document.getElementById('adminSidebar').classList.toggle('open')"><x-icon name="menu" /> <span class="menu-toggle-label">Menu</span></button>
+-        <a href="{{ route('admin.overview') }}" class="adm-brand" aria-label="ExploreDVO DOT Admin, overview">Explore<b>DVO</b> <span>DOT ADMIN</span></a>
++        <button type="button" class="admin-menu-toggle" data-sidebar-toggle aria-controls="adminSidebar" aria-expanded="false" aria-label="Open navigation" title="Open navigation"><x-icon name="menu" /></button>
++        <a href="{{ route('admin.overview') }}" class="adm-brand" aria-label="ExploreDVO DOT Admin, overview"><span class="adm-brand__mark"><x-icon name="map-pin" /></span><span class="adm-brand__text">Explore<b>DVO</b><small>Administration</small></span></a>
+         <span class="adm-env {{ $isLive ? 'is-live' : '' }}" title="{{ $isLive ? 'This is the live site. Changes here are seen by travellers.' : 'You are working on the '.strtolower($envLabel).' copy, not the live site.' }}"><i aria-hidden="true"></i>{{ $envLabel }}</span>
+     </div>
+ 
+@@ -31,14 +31,14 @@
+         <label for="admSearchInput" class="sr-only">Search listings, establishments, advisories, events and pages</label>
+         <x-icon name="search" class="adm-search__ic" />
+         <input id="admSearchInput" type="search" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="admSearchList" aria-autocomplete="list"
+-               placeholder="Search listings, establishments, advisories…" maxlength="80">
++               placeholder="Search the workspace" maxlength="80">
+         <kbd class="adm-search__kbd" aria-hidden="true">Ctrl K</kbd>
+         <div class="adm-pop adm-pop--search" id="admSearchList" role="listbox" aria-label="Search results" hidden></div>
+     </div>
+ 
+     <div class="adm-top__right">
+         <div class="adm-menu" data-menu>
+-            <button type="button" class="btn btn-primary adm-new" data-menu-btn aria-haspopup="menu" aria-expanded="false"><x-icon name="plus" /><span class="adm-hide-sm">New</span><x-icon name="chevron-down" class="adm-caret" /></button>
++            <button type="button" class="btn btn-primary adm-new" data-menu-btn aria-haspopup="menu" aria-expanded="false" title="Create a listing or content" aria-label="Create a listing or content"><x-icon name="plus" /><span class="adm-hide-sm">Create</span><x-icon name="chevron-down" class="adm-caret" /></button>
+             <div class="adm-pop adm-pop--new" role="menu" aria-label="Add something new" hidden>
+                 <div class="adm-pop__group" role="presentation">Listings</div>
+                 @foreach ($listingKinds as $type => [$label, $icon])
+--- a/resources/views/admin/overview.blade.php
++++ b/resources/views/admin/overview.blade.php
+@@ -2,7 +2,7 @@
+ 
+ @section('title', 'Overview — DOT Admin')
+ @section('page-title', 'Overview')
+-@section('page-sub', 'Key tourism statistics at a glance')
++@section('page-sub', 'Tourism activity, pending reviews and directory health')
+ 
+ @push('head')
+     <link rel="stylesheet" href="{{ asset('css/admin-overview.css') }}?v={{ filemtime(public_path('css/admin-overview.css')) }}">
+@@ -30,7 +30,9 @@
+     @endphp
+     <div class="adm-alert accreditation-alert" role="alert">
+         <x-icon name="alert-triangle" />
+-        <div>
++        <details class="adm-alert__detail">
++            <summary><strong>Accreditation follow-up</strong><span>{{ $accreditationAlert['expired'] }} hidden &middot; {{ $accreditationAlert['expiring'] }} flagged for review</span></summary>
++            <div>
+             <strong>Accreditation needs attention.</strong>
+             @if ($accreditationAlert['expired'] > 0)
+                 {{ $accreditationAlert['expired'] }} {{ \Illuminate\Support\Str::plural('record', $accreditationAlert['expired']) }} expired, so those places are hidden from tourists until renewed.
+@@ -38,7 +40,8 @@
+             @if ($accreditationAlert['expiring'] > 0)
+                 {{ $accreditationAlert['expiring'] }} {{ \Illuminate\Support\Str::plural('record', $accreditationAlert['expiring']) }} {{ $accreditationAlert['expiring'] === 1 ? 'is' : 'are' }} flagged Expiring Soon{{ $expiringDetail }}.
+             @endif
+-        </div>
++            </div>
++        </details>
+         <a href="{{ route('admin.accreditation', ['status' => $accreditationAlert['expired'] > 0 ? 'Expired' : 'Expiring Soon']) }}" class="btn btn-outline">Review &amp; renew</a>
+     </div>
+ @endif
+@@ -47,7 +50,7 @@
+     <div class="adm-kpi">
+         <span class="adm-kpi__ic"><x-icon name="target" /></span>
+         <div>
+-            <div class="adm-kpi__val">{{ $stats['checkins_today'] }}</div><div class="adm-kpi__lab">QR Check-ins Today</div>
++            <div class="adm-kpi__val">{{ $stats['checkins_today'] }}</div><div class="adm-kpi__lab">Check-ins today</div>
+             @php
+                 $diff = $stats['checkins_today'] - $trend['checkins_yesterday'];
+                 $trendText = $diff > 0 ? '&#9650; '.$diff.' more than yesterday' : ($diff < 0 ? '&#9660; '.abs($diff).' fewer than yesterday' : 'Same as yesterday');
+@@ -57,17 +60,17 @@
+     </div>
+     <div class="adm-kpi">
+         <span class="adm-kpi__ic"><x-icon name="map-pin" /></span>
+-        <div><div class="adm-kpi__val">{{ $stats['destinations'] }}</div><div class="adm-kpi__lab">Accredited Destinations</div></div>
++        <div><div class="adm-kpi__val">{{ $stats['destinations'] }}</div><div class="adm-kpi__lab">Official destinations</div></div>
+     </div>
+     <div class="adm-kpi">
+         <span class="adm-kpi__ic"><x-icon name="map-pin" /></span>
+-        <div><div class="adm-kpi__val">{{ $stats['sample_destinations'] }}</div><div class="adm-kpi__lab">Sample Destinations</div></div>
++        <div><div class="adm-kpi__val">{{ $stats['sample_destinations'] }}</div><div class="adm-kpi__lab">Sample destinations</div></div>
+     </div>
+     <div class="adm-kpi">
+         <span class="adm-kpi__ic"><x-icon name="building" /></span>
+         <div>
+             <div class="adm-kpi__val">{{ $stats['pending_establishments'] }}</div>
+-            <div class="adm-kpi__lab">Pending Establishments</div>
++            <div class="adm-kpi__lab">Pending establishments</div>
+             @if ($stats['pending_establishments'] > 0)
+                 @php $waiting = (int) ($trend['oldest_pending_days'] ?? 0); @endphp
+                 <div class="adm-kpi__flag">Needs review{{ $waiting > 0 ? ' · oldest waiting '.$waiting.' '.\Illuminate\Support\Str::plural('day', $waiting) : '' }}</div>
+@@ -78,16 +81,26 @@
+         <span class="adm-kpi__ic"><x-icon name="clock" /></span>
+         <div>
+             <div class="adm-kpi__val">{{ $stats['expiring_accreditations'] }}</div>
+-            <div class="adm-kpi__lab">Accreditations Expiring Soon</div>
++            <div class="adm-kpi__lab">Accreditation follow-up</div>
+             @if ($stats['expiring_accreditations'] > 0)<div class="adm-kpi__flag">Follow up needed</div>@endif
+         </div>
+     </div>
+ </div>
+-<p class="adm-kpi-note" id="destination-breakdown">
++<details class="adm-directory-note" id="destination-breakdown">
++    <summary>{{ $stats['total_destinations'] }} destinations in the directory <span>View breakdown</span></summary>
++    <p>
+     Destinations: {{ $stats['destinations'] }} DOT-accredited (official record) + {{ $stats['sample_destinations'] }} sample data
+     + {{ $stats['other_destinations'] }} not counted in either (official record not currently accredited, or no accreditation record on file)
+     = {{ $stats['total_destinations'] }} in total.
+-</p>
++    </p>
++</details>
++
++<div class="adm-taskline" aria-label="Review queues">
++    <span>Review queues</span>
++    <a href="{{ route('admin.establishments') }}"><x-icon name="building" />Establishments <b>{{ $stats['pending_establishments'] }}</b><x-icon name="chevron-right" /></a>
++    <a href="{{ route('admin.package-approvals') }}"><x-icon name="package" />Tour packages <b>{{ \App\Models\Package::where('status', \App\Models\Package::STATUS_IN_REVIEW)->count() }}</b><x-icon name="chevron-right" /></a>
++    <a href="{{ route('admin.data-completeness') }}"><x-icon name="database" />Data quality<x-icon name="chevron-right" /></a>
++</div>
+ 
+ <div class="adm-charts" id="overview-charts">
+     <section class="adm-card adm-chart" aria-labelledby="checkin-chart-title">
+--- /dev/null
++++ b/public/css/admin-workspace.css
+@@ -0,0 +1,273 @@
++/* Scoped operational design system; public and establishment pages retain their styles. */
++body.admin-workspace {
++    --primary: #146b55;
++    --primary-dark: #164d40;
++    --primary-light: #eaf4ef;
++    --ink: #202b33;
++    --muted: #65717c;
++    --border: #e1e6eb;
++    --bg: #f5f6f8;
++    --white: #fff;
++    --danger: #b54747;
++    --field-radius: 6px;
++    --field-size: 13px;
++    margin: 0;
++    min-width: 0;
++    width: 100%;
++    height: auto;
++    min-height: 100dvh;
++    overflow: visible;
++    display: block;
++    background: var(--bg);
++    color: var(--ink);
++    font: 14px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
++}
++body.admin-workspace *, body.admin-workspace *::before, body.admin-workspace *::after { box-sizing: border-box; letter-spacing: 0; }
++body.admin-workspace h1, body.admin-workspace h2, body.admin-workspace h3,
++body.admin-workspace input, body.admin-workspace select, body.admin-workspace button, body.admin-workspace textarea { font-family: inherit; }
++body.admin-workspace a { text-underline-offset: 3px; }
++body.admin-workspace a:focus-visible, body.admin-workspace button:focus-visible,
++body.admin-workspace input:focus-visible, body.admin-workspace select:focus-visible,
++body.admin-workspace summary:focus-visible { outline: 2px solid #397ea1; outline-offset: 3px; }
++body.admin-workspace [hidden] { display: none !important; }
++
++/* One page scroll, with navigation that stays in reach. */
++body.admin-workspace .adm-top {
++    position: sticky;
++    top: 0;
++    z-index: 100;
++    display: grid;
++    grid-template-columns: 224px minmax(180px, 440px) minmax(0, 1fr);
++    align-items: center;
++    gap: 24px;
++    min-height: 64px;
++    height: 64px;
++    padding: 0 24px 0 16px;
++    background: #fff;
++    border-bottom: 1px solid var(--border);
++    box-shadow: none;
++}
++body.admin-workspace .adm-top__left { min-width: 0; gap: 10px; }
++body.admin-workspace .adm-brand { display: inline-flex; align-items: center; gap: 9px; font-size: 17px; font-weight: 650; color: #253c35; white-space: nowrap; }
++body.admin-workspace .adm-brand b { color: #b45437; font-weight: 650; }
++body.admin-workspace .adm-brand .adm-brand__mark { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: #eaf4ef; color: var(--primary); }
++body.admin-workspace .adm-brand__mark svg { width: 19px; height: 19px; }
++body.admin-workspace .adm-brand .adm-brand__text { display: block; padding: 0; margin: 0; background: none; font: inherit; color: inherit; }
++body.admin-workspace .adm-brand small { display: block; color: var(--muted); font-size: 10px; font-weight: 500; line-height: 1.3; }
++body.admin-workspace .adm-env { display: inline-flex; gap: 4px; padding: 3px 0; background: none; color: #617369; font-size: 10px; font-weight: 600; }
++body.admin-workspace .adm-env i { width: 5px; height: 5px; background: #238363; }
++body.admin-workspace .adm-search { width: 100%; min-width: 0; max-width: none; }
++body.admin-workspace .adm-search input { height: 36px; padding: 0 60px 0 34px; background: #f6f7f9; border: 1px solid #e7ebee; border-radius: 6px; font-size: 13px; }
++body.admin-workspace .adm-search__kbd { border: 1px solid var(--border); background: #fff; color: #74808a; border-radius: 4px; padding: 1px 5px; font-size: 10px; }
++body.admin-workspace .adm-top__right { min-width: 0; justify-content: flex-end; gap: 12px; }
++body.admin-workspace .adm-icon-btn { width: 34px; height: 34px; min-width: 34px; border: 1px solid var(--border); border-radius: 6px; background: #fff; color: #66737b; }
++body.admin-workspace .adm-icon-btn svg { width: 17px; height: 17px; }
++body.admin-workspace .adm-badge { min-width: 15px; height: 15px; top: -5px; right: -4px; font-size: 9px; background: #b34e42; }
++body.admin-workspace .adm-who { gap: 8px; padding: 0; min-width: 0; }
++body.admin-workspace .adm-avatar { width: 32px; height: 32px; background: #e9eef5; color: #435875; font-size: 11px; }
++body.admin-workspace .adm-who__t { max-width: 160px; min-width: 0; }
++body.admin-workspace .adm-who__t strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 600; }
++body.admin-workspace .adm-who__t small { font-size: 10px; color: var(--muted); }
++body.admin-workspace .adm-pop { border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 12px 36px #192b391a; max-height: min(70dvh, 520px); overflow-y: auto; }
++body.admin-workspace .adm-pop a, body.admin-workspace .adm-pop button { font-size: 13px; }
++
++body.admin-workspace .admin-shell { display: grid; grid-template-columns: 224px minmax(0, 1fr); min-height: calc(100dvh - 64px); align-items: start; }
++body.admin-workspace .admin-sidebar {
++    position: sticky; top: 64px; width: 224px; height: calc(100dvh - 64px); min-height: 0;
++    padding: 14px 12px; margin: 0; border: 0; border-right: 1px solid var(--border);
++    border-radius: 0; background: #fff; box-shadow: none; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin;
++}
++body.admin-workspace .admin-sidebar__context { display: flex; align-items: center; gap: 7px; padding: 0 10px 12px; color: #75808a; font-size: 11px; font-weight: 600; }
++body.admin-workspace .admin-sidebar__dot { width: 6px; height: 6px; border-radius: 50%; background: #3e8b71; }
++body.admin-workspace .admin-sidebar .group-label { margin: 0; padding: 12px 10px 5px; font-size: 10px; font-weight: 600; color: #66737d; text-transform: uppercase; }
++body.admin-workspace .admin-sidebar a {
++    display: flex; align-items: center; gap: 9px; height: auto; min-height: 33px; margin: 2px 0; padding: 6px 10px;
++    border-radius: 5px; color: #596671; font-size: 12px; font-weight: 500; line-height: 1.4; text-decoration: none; box-shadow: none;
++}
++body.admin-workspace .admin-sidebar a > span { min-width: 0; overflow-wrap: anywhere; }
++body.admin-workspace .admin-sidebar a svg { flex: none; width: 16px; height: 16px; stroke-width: 1.7; color: #7e8992; }
++body.admin-workspace .admin-sidebar a:hover { background: #f5f6f8; color: #253b34; }
++body.admin-workspace .admin-sidebar a.active { background: #eaf4ef; color: #146b55; font-weight: 650; box-shadow: none; }
++body.admin-workspace .admin-sidebar a.active svg { color: #146b55; }
++body.admin-workspace .admin-sidebar .adm-nb { height: 17px; min-width: 17px; padding: 0 4px; font-size: 9px; background: #f5e8dd; color: #96652b; }
++body.admin-workspace .admin-sidebar .admin-sidebar__public { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--border); border-radius: 0; font-size: 11px; }
++body.admin-workspace .admin-main { width: auto; min-width: 0; height: auto; overflow: visible; padding: 26px 30px 40px; }
++body.admin-workspace .admin-main > .container { width: 100%; min-width: 0; margin: 0; }
++body.admin-workspace .admin-main:focus { outline: none; }
++body.admin-workspace .admin-main:has(.adm-fit) { display: block; overflow: visible; }
++body.admin-workspace .admin-pagehead { min-height: 44px; align-items: flex-start; margin-bottom: 24px; gap: 14px; }
++body.admin-workspace .admin-pagehead h1 { font: 650 25px/1.25 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #25323a; }
++body.admin-workspace .admin-pagehead .sub { margin-top: 5px; font-size: 12px; color: #66737d; }
++body.admin-workspace .admin-pagehead__actions { flex-shrink: 0; }
++
++/* Shared controls and data surfaces across all modules. */
++body.admin-workspace .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 34px; height: auto; padding: 7px 12px; border-width: 1px; border-radius: 6px; font: 600 12px/1.4 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; box-shadow: none; white-space: normal; text-align: center; }
++body.admin-workspace .btn svg { width: 15px; height: 15px; flex: none; }
++body.admin-workspace .btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
++body.admin-workspace .btn-outline { background: #fff; border-color: #dbe2e7; color: #4d5d67; }
++body.admin-workspace .btn:hover { transform: none; filter: brightness(.97); }
++body.admin-workspace .btn-danger { background: #fff0ef; border-color: #efceca; color: #a8463e; }
++body.admin-workspace .adm-new { min-height: 34px; padding-inline: 11px; }
++body.admin-workspace .adm-caret { width: 12px; height: 12px; }
++body.admin-workspace .adm-toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding: 0 0 16px; margin: 0; border: 0; background: none; box-shadow: none; border-radius: 0; }
++body.admin-workspace .adm-toolbar > * { max-width: 100%; }
++body.admin-workspace .adm-toolbar label { font-size: 11px; color: #68757e; }
++body.admin-workspace .adm-toolbar__note { font-size: 11px; color: #66737d; }
++body.admin-workspace input:not([type=checkbox]):not([type=radio]):not([type=file]), body.admin-workspace select, body.admin-workspace textarea { max-width: 100%; border: 1px solid #dbe1e7; border-radius: 6px; background-color: #fff; color: var(--ink); font-size: 13px; box-shadow: none; }
++body.admin-workspace input:not([type=checkbox]):not([type=radio]):not([type=file]), body.admin-workspace select { min-height: 34px; }
++body.admin-workspace .adm-search input { background: #f6f7f9; }
++body.admin-workspace .adm-seg { border: 1px solid var(--border); padding: 3px; gap: 2px; border-radius: 6px; background: #fff; max-width: 100%; overflow-x: auto; }
++body.admin-workspace .adm-seg a { padding: 5px 10px; border-radius: 4px; font-size: 12px; white-space: nowrap; }
++body.admin-workspace .adm-seg a.on { background: #eaf4ef; color: #146b55; font-weight: 650; }
++body.admin-workspace .adm-fit { height: auto; min-height: 0; max-height: none; gap: 16px; }
++body.admin-workspace .adm-card { min-width: 0; border: 1px solid var(--border); border-radius: 7px; background: #fff; box-shadow: none; overflow: hidden; }
++body.admin-workspace .adm-card__head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; min-height: 62px; padding: 15px 18px; border-bottom: 1px solid #edf0f3; background: #fff; }
++body.admin-workspace .adm-card__head h2 { font-size: 14px; font-weight: 650; color: #2e3b43; margin: 0; line-height: 1.4; }
++body.admin-workspace .adm-card__head p { margin: 3px 0 0; color: #66737d; font-size: 11px; line-height: 1.5; }
++body.admin-workspace .adm-card__body { min-height: 0; max-height: none; overflow-x: auto; overflow-y: visible; }
++body.admin-workspace .adm-card__foot { padding: 11px 18px; border-color: #edf0f3; font-size: 11px; }
++body.admin-workspace .admin-main .panel { min-width: 0; border: 1px solid var(--border); border-radius: 7px; background: #fff; box-shadow: none; }
++body.admin-workspace .admin-main .panel-head { padding: 15px 18px; border-bottom: 1px solid #edf0f3; background: #fff; }
++body.admin-workspace .admin-main .panel-head h2, body.admin-workspace .admin-main .panel-head h3 { margin: 0; font-size: 14px; font-weight: 650; color: #2e3b43; }
++body.admin-workspace .admin-main .panel-body { padding: 18px; min-width: 0; }
++body.admin-workspace .stat-card { min-width: 0; padding: 16px 18px; border: 1px solid var(--border); border-radius: 6px; background: #fff; box-shadow: none; }
++body.admin-workspace .stat-card-val { font-size: 25px; line-height: 1.25; font-weight: 650; color: #263a33; font-variant-numeric: tabular-nums; }
++body.admin-workspace .stat-card-label { margin-top: 5px; font-size: 11px; color: #64736b; }
++body.admin-workspace .field > label, body.admin-workspace .field > legend { font-size: 12px; font-weight: 600; color: #56656e; }
++body.admin-workspace .field-hint, body.admin-workspace .filter-inline { font-size: 12px; color: #66737d; }
++body.admin-workspace .filter-inline { max-width: 100%; flex-wrap: wrap; }
++body.admin-workspace .adm-link { font-size: 11px; font-weight: 600; color: #347b66; white-space: nowrap; }
++body.admin-workspace .adm-table, body.admin-workspace .data-table { width: 100%; min-width: 0; margin: 0; border-collapse: collapse; font-size: 12px; background: #fff; }
++body.admin-workspace .adm-table th, body.admin-workspace .data-table th { height: 38px; padding: 10px 16px; background: #f9fafb; border-bottom: 1px solid #e9edf1; color: #66737d; font-size: 11px; font-weight: 600; text-transform: none; white-space: nowrap; }
++body.admin-workspace .adm-table td, body.admin-workspace .data-table td { height: auto; padding: 13px 16px; border-bottom: 1px solid #eff2f4; vertical-align: middle; overflow-wrap: anywhere; font-size: 12px; }
++body.admin-workspace .adm-table tr:last-child td, body.admin-workspace .data-table tr:last-child td { border-bottom: 0; }
++body.admin-workspace .adm-table tbody tr:hover, body.admin-workspace .data-table tbody tr:hover { background: #fafcfb; }
++body.admin-workspace .cell-muted, body.admin-workspace .cell-sub { color: #66737d; font-size: 11px; }
++body.admin-workspace .cell-date { white-space: nowrap; font-variant-numeric: tabular-nums; }
++body.admin-workspace .status-pill { padding: 3px 7px; min-height: 0; border: 1px solid transparent; border-radius: 4px; font-size: 10px; font-weight: 550; line-height: 1.5; white-space: normal; }
++body.admin-workspace .status-pending, body.admin-workspace .status-expiring { background: #fff5e6; color: #8a6127; }
++body.admin-workspace .status-expired { background: #fceeee; color: #ae5650; }
++body.admin-workspace .status-approved, body.admin-workspace .status-active { background: #eaf4ef; color: #378069; }
++body.admin-workspace .bulk-bar { border-radius: 0; padding: 10px 16px; font-size: 12px; }
++body.admin-workspace .adm-modal { width: min(960px, calc(100vw - 28px)); max-height: calc(100dvh - 32px); border: 1px solid var(--border); border-radius: 8px; padding: 0; box-shadow: 0 20px 70px #14213233; }
++body.admin-workspace .adm-modal::backdrop { background: #15222b66; }
++body.admin-workspace .adm-modal__head { padding: 18px 22px; border-bottom: 1px solid var(--border); }
++body.admin-workspace .adm-modal__head h2 { font-size: 18px; font-weight: 650; }
++body.admin-workspace .adm-modal__body { padding: 20px 22px; }
++body.admin-workspace .adm-modal__body .adm-card { border: 0; border-radius: 0; }
++body.admin-workspace .adm-rv2__choices label, body.admin-workspace .fb-aspect { border-radius: 6px; }
++body.admin-workspace .fb-aspects { grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
++body.admin-workspace .adm-origin__note { font-size: 12px; line-height: 1.7; max-width: 100%; }
++body.admin-workspace .adm-origin__empty { font-size: 12px; color: #66737d; padding: 22px 18px; }
++
++/* Overview: concise signals first, followed by activity and the review queues. */
++body.admin-workspace .adm-flow { gap: 18px; }
++body.admin-workspace .adm-alert { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border: 1px solid #eadcc0; border-left: 3px solid #c89b48; border-radius: 6px; background: #fffdf6; color: #856b3c; font-size: 12px; }
++body.admin-workspace .adm-alert > svg { width: 17px; height: 17px; margin-top: 2px; color: #b48d44; }
++body.admin-workspace .adm-alert__detail { flex: 1; min-width: 0; }
++body.admin-workspace .adm-alert__detail summary { cursor: pointer; }
++body.admin-workspace .adm-alert__detail summary strong { font-weight: 650; margin-right: 12px; }
++body.admin-workspace .adm-alert__detail summary span { font-size: 11px; }
++body.admin-workspace .adm-alert__detail > div { padding-top: 10px; line-height: 1.7; max-width: 860px; }
++body.admin-workspace .adm-alert .btn { min-height: 28px; padding: 5px 9px; font-size: 11px; background: #fffdf6; border-color: #e5d6b8; color: #866932; }
++body.admin-workspace .adm-kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
++body.admin-workspace .adm-kpi { display: flex; flex-direction: row-reverse; justify-content: space-between; align-items: flex-start; gap: 8px; min-width: 0; min-height: 116px; padding: 18px; border-radius: 6px; border-color: var(--border); }
++body.admin-workspace .adm-kpi > div { min-width: 0; }
++body.admin-workspace .adm-kpi__ic { width: 29px; height: 29px; border-radius: 6px; background: #edf5f1; color: #4c8c75; }
++body.admin-workspace .adm-kpi__ic svg { width: 16px; height: 16px; }
++body.admin-workspace .adm-kpi:nth-child(3) .adm-kpi__ic { background: #edf1fa; color: #687eac; }
++body.admin-workspace .adm-kpi:nth-child(4) .adm-kpi__ic { background: #fff4e5; color: #ad8548; }
++body.admin-workspace .adm-kpi:nth-child(5) .adm-kpi__ic { background: #f7eded; color: #b27876; }
++body.admin-workspace .adm-kpi__val { font-size: 27px; font-weight: 650; line-height: 1.15; color: #263a33; font-variant-numeric: tabular-nums; }
++body.admin-workspace .adm-kpi__lab { margin-top: 7px; font-size: 11px; line-height: 1.4; color: #64736b; }
++body.admin-workspace .adm-kpi__trend, body.admin-workspace .adm-kpi__flag { margin-top: 6px; font-size: 10px; font-weight: 500; line-height: 1.5; color: #66737d; }
++body.admin-workspace .adm-kpi__flag { color: #886335; }
++body.admin-workspace .adm-directory-note { margin-top: -8px; padding: 0 2px; font-size: 11px; color: #66737d; }
++body.admin-workspace .adm-directory-note summary { cursor: pointer; }
++body.admin-workspace .adm-directory-note summary span { margin-left: 8px; color: #51816f; }
++body.admin-workspace .adm-directory-note p { margin: 8px 0 0; }
++body.admin-workspace .adm-taskline { display: flex; align-items: center; gap: 0; flex-wrap: wrap; padding: 12px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
++body.admin-workspace .adm-taskline > span { margin-right: auto; color: #69767f; font-size: 11px; font-weight: 600; }
++body.admin-workspace .adm-taskline a { display: inline-flex; align-items: center; gap: 7px; padding: 4px 14px; font-size: 11px; font-weight: 500; color: #57676f; border-left: 1px solid #e4e8ec; text-decoration: none; }
++body.admin-workspace .adm-taskline a:hover { color: var(--primary); }
++body.admin-workspace .adm-taskline svg { width: 14px; height: 14px; }
++body.admin-workspace .adm-taskline b { font-size: 10px; padding: 0 5px; border-radius: 4px; background: #e9eef1; }
++body.admin-workspace .adm-charts { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 18px; }
++body.admin-workspace .adm-chart__body { height: 260px; padding: 18px; }
++body.admin-workspace .adm-bars { gap: 14px; }
++body.admin-workspace .adm-bar__row { font-size: 11px; color: #697780; }
++body.admin-workspace .adm-bar__track { height: 5px; margin-top: 6px; background: #edf1f4; border-radius: 2px; }
++body.admin-workspace .adm-bar__fill { height: 5px; background: #5c927d; border-radius: 2px; }
++body.admin-workspace .adm-range { padding: 2px; gap: 2px; background: #f3f5f7; border-radius: 5px; }
++body.admin-workspace .adm-range button { height: 26px; padding: 0 9px; border: 0; border-radius: 4px !important; background: transparent; color: #66737d; font-size: 10px; }
++body.admin-workspace .adm-range button.is-on { background: #fff; color: #3b6d59; box-shadow: 0 1px 3px #162b3510; }
++body.admin-workspace .adm-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
++body.admin-workspace .adm-stack { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; gap: 18px; }
++body.admin-workspace .adm-flow .adm-card__body { overflow-x: auto; }
++body.admin-workspace .admin-sidebar-scrim { display: none; }
++body.admin-workspace .admin-menu-toggle { display: none; }
++
++@media (min-width: 1600px) {
++    body.admin-workspace .adm-stack { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
++}
++@media (max-width: 1200px) {
++    body.admin-workspace .adm-top { grid-template-columns: 200px minmax(180px, 1fr) auto; gap: 16px; padding-right: 20px; }
++    body.admin-workspace .adm-who__t { display: none; }
++    body.admin-workspace .adm-env { display: none; }
++    body.admin-workspace .admin-main { padding: 22px 22px 36px; }
++    body.admin-workspace .adm-kpi { padding: 14px 12px; }
++    body.admin-workspace .adm-kpi__ic { display: none; }
++    body.admin-workspace .adm-kpi__val { font-size: 25px; }
++}
++@media (max-width: 900px) {
++    body.admin-workspace .adm-top { grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; padding: 0 14px; }
++    body.admin-workspace .admin-menu-toggle { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 34px; padding: 0; border: 1px solid var(--border); border-radius: 5px; background: #fff; color: #65747c; }
++    body.admin-workspace .admin-menu-toggle svg { width: 17px; height: 17px; }
++    body.admin-workspace .adm-top__left .adm-brand { display: none; }
++    body.admin-workspace .admin-shell { display: block; }
++    body.admin-workspace .admin-sidebar { display: none; position: fixed; top: 64px; left: 0; z-index: 120; width: 240px; box-shadow: 12px 0 30px #16252f12; }
++    body.admin-workspace .admin-sidebar.open { display: block; }
++    body.admin-workspace .admin-sidebar-scrim:not([hidden]) { display: block; position: fixed; inset: 64px 0 0; z-index: 110; border: 0; background: #182a3659; }
++    body.admin-workspace .admin-main { padding: 22px 18px 36px; }
++    body.admin-workspace .adm-top__right { gap: 9px; }
++    body.admin-workspace .adm-hide-sm { display: none; }
++    body.admin-workspace .adm-pop--new, body.admin-workspace .adm-pop--bell, body.admin-workspace .adm-pop--who, body.admin-workspace .adm-pop--search { position: fixed; top: 60px; right: 12px; left: 12px; width: auto; max-width: none; }
++    body.admin-workspace .adm-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
++    body.admin-workspace .adm-charts { grid-template-columns: minmax(0, 1fr); }
++    body.admin-workspace .adm-taskline > span { flex-basis: 100%; margin-bottom: 8px; }
++    body.admin-workspace .adm-taskline a { padding-left: 0; padding-right: 18px; border: 0; }
++}
++@media (max-width: 540px) {
++    body.admin-workspace .adm-top { height: 58px; min-height: 58px; gap: 9px; padding-inline: 10px; }
++    body.admin-workspace .adm-top__right { gap: 7px; }
++    body.admin-workspace .adm-top .adm-new { width: 32px; min-width: 32px; padding: 6px; }
++    body.admin-workspace .adm-new .adm-caret, body.admin-workspace .adm-who > .adm-caret { display: none; }
++    body.admin-workspace .adm-top .adm-bell { width: 30px; min-width: 30px; }
++    body.admin-workspace .adm-avatar { width: 29px; height: 29px; }
++    body.admin-workspace .adm-search input { padding-right: 10px; font-size: 12px; }
++    body.admin-workspace .adm-search__kbd { display: none; }
++    body.admin-workspace .admin-sidebar { top: 58px; height: calc(100dvh - 58px); }
++    body.admin-workspace .admin-sidebar-scrim:not([hidden]) { top: 58px; }
++    body.admin-workspace .admin-main { padding: 20px 12px 30px; }
++    body.admin-workspace .admin-pagehead { flex-wrap: wrap; margin-bottom: 18px; }
++    body.admin-workspace .admin-pagehead h1 { font-size: 23px; }
++    body.admin-workspace .admin-pagehead__actions { width: 100%; justify-content: flex-start; }
++    body.admin-workspace .adm-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
++    body.admin-workspace .adm-kpi { min-height: 108px; }
++    body.admin-workspace .adm-alert { flex-wrap: wrap; }
++    body.admin-workspace .adm-alert__detail summary span { display: block; margin-top: 4px; }
++    body.admin-workspace .adm-alert .btn { margin-left: 29px; }
++    body.admin-workspace .adm-taskline { gap: 8px; }
++    body.admin-workspace .adm-taskline a { flex-basis: 100%; padding: 3px 0; }
++    body.admin-workspace .adm-card__head { padding: 14px; }
++    body.admin-workspace .adm-table, body.admin-workspace .data-table { min-width: 520px; }
++    body.admin-workspace .adm-chart__body { height: 240px; padding: 12px; }
++    body.admin-workspace .adm-rv2 { display: block; }
++    body.admin-workspace .adm-origin .adm-table { min-width: 0; }
++}
++@media print {
++    body.admin-workspace .adm-top, body.admin-workspace .admin-sidebar, body.admin-workspace .admin-sidebar-scrim { display: none !important; }
++    body.admin-workspace .admin-shell { display: block; }
++    body.admin-workspace .admin-main { padding: 0; }
++    body.admin-workspace .adm-card { break-inside: avoid; }
++}
+--- /dev/null
++++ b/public/js/admin-workspace.js
+@@ -0,0 +1,38 @@
++(() => {
++    'use strict';
++    const sidebar = document.getElementById('adminSidebar');
++    const toggle = document.querySelector('[data-sidebar-toggle]');
++    const scrim = document.querySelector('[data-sidebar-close]');
++    if (!sidebar || !toggle || !scrim) return;
++    const mobile = window.matchMedia('(max-width: 900px)');
++    const setOpen = (open, returnFocus = false) => {
++        sidebar.classList.toggle('open', open);
++        toggle.setAttribute('aria-expanded', String(open));
++        toggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
++        scrim.hidden = !open;
++        if (mobile.matches) sidebar.inert = !open;
++        else sidebar.inert = false;
++        if (open) (sidebar.querySelector('a.active') || sidebar.querySelector('a'))?.focus();
++        else if (returnFocus) toggle.focus();
++    };
++    sidebar.querySelectorAll('a.active').forEach(link => link.setAttribute('aria-current', 'page'));
++    toggle.addEventListener('click', () => setOpen(!sidebar.classList.contains('open')));
++    scrim.addEventListener('click', () => setOpen(false, true));
++    sidebar.addEventListener('click', event => {
++        if (mobile.matches && event.target.closest('a')) setOpen(false);
++    });
++    document.addEventListener('keydown', event => {
++        if (!mobile.matches || !sidebar.classList.contains('open')) return;
++        if (event.key === 'Escape') { event.preventDefault(); setOpen(false, true); }
++        if (event.key === 'Tab') {
++            const links = [...sidebar.querySelectorAll('a[href]')];
++            const first = links[0];
++            const last = links[links.length - 1];
++            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); toggle.focus(); }
++            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); toggle.focus(); }
++            else if (document.activeElement === toggle) { event.preventDefault(); (event.shiftKey ? last : first)?.focus(); }
++        }
++    });
++    mobile.addEventListener('change', () => setOpen(false));
++    setOpen(false);
++})();

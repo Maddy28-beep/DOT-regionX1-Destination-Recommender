@@ -206,7 +206,7 @@ class TripPlannerController extends Controller
             // rejected rather than quietly sequencing the trip from the sea.
             'origin_lat' => ['nullable', 'numeric', 'between:-90,90', 'required_with:origin_lng'],
             'origin_lng' => ['nullable', 'numeric', 'between:-180,180', 'required_with:origin_lat'],
-            'origin_label' => ['nullable', 'string', 'max:200'],
+            'origin_label' => [$v2 ? 'required' : 'nullable', 'string', 'max:200'],
             'accessibility_notes' => ['nullable', 'string', 'max:1000'],
             'activities' => ['required', 'array', 'min:1'],
             'activities.*' => ['string', 'max:30'],
@@ -220,7 +220,9 @@ class TripPlannerController extends Controller
         $window = null;
         if ($v2) {
             $window = $this->validateTripWindow($data);
-            $this->validateTripLocation($request, $data);
+            $pickup = $this->validateTripLocation($request, $data);
+            $data['origin_lat'] = $pickup[0];
+            $data['origin_lng'] = $pickup[1];
             // The planner is fed from the same columns as before: the days, the arrival date and time and the end time are
             // all derived from the two moments, never entered.
             $data['travel_days'] = TripWindow::calendarDays($window[0], $window[1]);
@@ -238,6 +240,7 @@ class TripPlannerController extends Controller
 
         $preference = $this->currentPreference($request) ?? new TouristPreference();
         $isExisting = $preference->exists;
+        $legacyOriginPreference = $isExisting ? clone $preference : null;
         $listsBefore = $isExisting ? $this->answerLists($preference) : null;
 
         $preference->fill(collect($data)->except([
@@ -275,10 +278,6 @@ class TripPlannerController extends Controller
 
         $preference->save();
 
-        if ($v2) {
-            VisitorOriginStats::move($originBefore, VisitorOriginStats::answerOf($preference), $preference->created_at ?? now());
-        }
-
         $preference->activities()->delete();
         foreach ($data['activities'] ?? [] as $activity) {
             PreferenceActivity::create(['preference_id' => $preference->id, 'activity' => $activity]);
@@ -295,6 +294,14 @@ class TripPlannerController extends Controller
         $preference->load('activities', 'amenities');
         $itinerary = $this->itineraryService->generate($preference);
 
+        if ($v2 && ($answer = VisitorOriginStats::answerOf($preference)) !== null) {
+            try {
+                \App\Services\Privacy\VisitorOriginCapture::record($request, $answer, true, $legacyOriginPreference);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
         $request->session()->put(self::PREFERENCE_KEY, $preference->id);
         $request->session()->put(self::ITINERARY_KEY, $itinerary->id);
 
@@ -304,6 +311,22 @@ class TripPlannerController extends Controller
 
         return redirect()->route('plan.itinerary')
             ->with(Toast::success('Preferences saved', 'Your itinerary is ready below.'));
+    }
+
+    public function confirmOrigin(Request $request): \Illuminate\Http\JsonResponse
+    {
+        abort_unless(Features::tripLocation(), 404);
+        $data = $request->validate([
+            'visitor_origin_country' => ['required', 'string', 'max:10'],
+            'visitor_origin_province' => ['nullable', 'string', 'max:80'],
+            'visitor_origin_city' => ['nullable', 'string', 'max:100'],
+        ]);
+        $preference = new TouristPreference();
+        $this->applyVisitorOrigin($preference, $data);
+        \App\Services\Privacy\VisitorOriginCapture::record(
+            $request, VisitorOriginStats::answerOf($preference), false, $this->currentPreference($request)
+        );
+        return response()->json(['message' => 'Origin confirmed. You can continue planning whenever you are ready.']);
     }
 
     public function itinerary(Request $request): View|RedirectResponse
@@ -466,7 +489,7 @@ class TripPlannerController extends Controller
      *
      * @param  array<string, mixed>  $data  the validated input
      */
-    private function validateTripLocation(Request $request, array $data): void
+    private function validateTripLocation(Request $request, array $data): array
     {
         $errors = [];
 
@@ -477,13 +500,16 @@ class TripPlannerController extends Controller
             $match = $this->addresses->resolve(trim((string) $data['origin_label']));
             $point = $match ? [(float) $match['lat'], (float) $match['lng']] : null;
         }
-        if ($point !== null && ! RegionXi::contains($point[0], $point[1])) {
-            $errors['origin_label'] = RegionXi::MESSAGE;
+        if ($point === null) {
+            $errors['origin_label'] = 'Choose a recognized pick-up location in Davao Region from the suggestions, arrival points, or your current location. Your itinerary needs a confirmed starting point.';
+        } elseif (! RegionXi::contains($point[0], $point[1])) {
+            $errors['origin_label'] = 'Your pick-up location must be in Davao Region (Region XI). Choose the hotel, airport, port or address where you will meet your driver or tour operator.';
         }
 
         if ($errors !== []) {
             throw \Illuminate\Validation\ValidationException::withMessages($errors);
         }
+        return $point;
     }
 
     /**

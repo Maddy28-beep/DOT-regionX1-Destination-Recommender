@@ -2,7 +2,7 @@
 
 @section('title', 'Overview — DOT Admin')
 @section('page-title', 'Overview')
-@section('page-sub', 'Key tourism statistics at a glance')
+@section('page-sub', 'Tourism activity, pending reviews and directory health')
 
 @push('head')
     <link rel="stylesheet" href="{{ asset('css/admin-overview.css') }}?v={{ filemtime(public_path('css/admin-overview.css')) }}">
@@ -30,7 +30,9 @@
     @endphp
     <div class="adm-alert accreditation-alert" role="alert">
         <x-icon name="alert-triangle" />
-        <div>
+        <details class="adm-alert__detail">
+            <summary><strong>Accreditation follow-up</strong><span>{{ $accreditationAlert['expired'] }} hidden &middot; {{ $accreditationAlert['expiring'] }} flagged for review</span></summary>
+            <div>
             <strong>Accreditation needs attention.</strong>
             @if ($accreditationAlert['expired'] > 0)
                 {{ $accreditationAlert['expired'] }} {{ \Illuminate\Support\Str::plural('record', $accreditationAlert['expired']) }} expired, so those places are hidden from tourists until renewed.
@@ -38,56 +40,58 @@
             @if ($accreditationAlert['expiring'] > 0)
                 {{ $accreditationAlert['expiring'] }} {{ \Illuminate\Support\Str::plural('record', $accreditationAlert['expiring']) }} {{ $accreditationAlert['expiring'] === 1 ? 'is' : 'are' }} flagged Expiring Soon{{ $expiringDetail }}.
             @endif
-        </div>
+            </div>
+        </details>
         <a href="{{ route('admin.accreditation', ['status' => $accreditationAlert['expired'] > 0 ? 'Expired' : 'Expiring Soon']) }}" class="btn btn-outline">Review &amp; renew</a>
     </div>
 @endif
 
 <div class="adm-kpis">
-    <div class="adm-kpi">
-        <span class="adm-kpi__ic"><x-icon name="target" /></span>
-        <div>
-            <div class="adm-kpi__val">{{ $stats['checkins_today'] }}</div><div class="adm-kpi__lab">QR Check-ins Today</div>
-            @php
-                $diff = $stats['checkins_today'] - $trend['checkins_yesterday'];
-                $trendText = $diff > 0 ? '&#9650; '.$diff.' more than yesterday' : ($diff < 0 ? '&#9660; '.abs($diff).' fewer than yesterday' : 'Same as yesterday');
-            @endphp
-            <div class="adm-kpi__trend {{ $diff > 0 ? 'is-up' : ($diff < 0 ? 'is-down' : '') }}">{!! $trendText !!}</div>
-        </div>
-    </div>
-    <div class="adm-kpi">
-        <span class="adm-kpi__ic"><x-icon name="map-pin" /></span>
-        <div><div class="adm-kpi__val">{{ $stats['destinations'] }}</div><div class="adm-kpi__lab">Accredited Destinations</div></div>
-    </div>
-    <div class="adm-kpi">
-        <span class="adm-kpi__ic"><x-icon name="map-pin" /></span>
-        <div><div class="adm-kpi__val">{{ $stats['sample_destinations'] }}</div><div class="adm-kpi__lab">Sample Destinations</div></div>
-    </div>
-    <div class="adm-kpi">
-        <span class="adm-kpi__ic"><x-icon name="building" /></span>
-        <div>
-            <div class="adm-kpi__val">{{ $stats['pending_establishments'] }}</div>
-            <div class="adm-kpi__lab">Pending Establishments</div>
-            @if ($stats['pending_establishments'] > 0)
-                @php $waiting = (int) ($trend['oldest_pending_days'] ?? 0); @endphp
-                <div class="adm-kpi__flag">Needs review{{ $waiting > 0 ? ' · oldest waiting '.$waiting.' '.\Illuminate\Support\Str::plural('day', $waiting) : '' }}</div>
-            @endif
-        </div>
-    </div>
-    <div class="adm-kpi">
-        <span class="adm-kpi__ic"><x-icon name="clock" /></span>
-        <div>
-            <div class="adm-kpi__val">{{ $stats['expiring_accreditations'] }}</div>
-            <div class="adm-kpi__lab">Accreditations Expiring Soon</div>
-            @if ($stats['expiring_accreditations'] > 0)<div class="adm-kpi__flag">Follow up needed</div>@endif
-        </div>
-    </div>
+    @php $diff = $stats['checkins_today'] - $trend['checkins_yesterday']; @endphp
+    <a class="adm-kpi adm-kpi--link" href="{{ route('admin.reports', ['from' => now('Asia/Manila')->toDateString(), 'to' => now('Asia/Manila')->toDateString()]) }}" title="Open today's reports">
+        <span class="adm-kpi__lab">Check-ins today</span><x-icon name="chevron-right" class="adm-kpi__go" />
+        <strong class="adm-kpi__val">{{ $stats['checkins_today'] }}</strong>
+        <span class="adm-kpi__foot">{{ $diff === 0 ? 'Same as yesterday' : abs($diff).' '.($diff > 0 ? 'more' : 'fewer').' than yesterday' }}</span>
+    </a>
+    <a class="adm-kpi adm-kpi--link" href="{{ route('admin.listings.index', 'destinations') }}" title="Open the destination directory">
+        <span class="adm-kpi__lab">Official destinations</span><x-icon name="chevron-right" class="adm-kpi__go" />
+        <strong class="adm-kpi__val">{{ $stats['destinations'] }}</strong><span class="adm-kpi__foot">Accredited official records</span>
+    </a>
+    <a class="adm-kpi adm-kpi--link" href="{{ route('admin.listings.index', 'destinations') }}" title="Open the destination directory">
+        <span class="adm-kpi__lab">Sample destinations</span><x-icon name="chevron-right" class="adm-kpi__go" />
+        <strong class="adm-kpi__val">{{ $stats['sample_destinations'] }}</strong><span class="adm-kpi__foot">Demonstration records</span>
+    </a>
+    <a class="adm-kpi adm-kpi--link" href="{{ route('admin.establishments') }}">
+        <span class="adm-kpi__lab">Awaiting review</span><x-icon name="chevron-right" class="adm-kpi__go" />
+        <strong class="adm-kpi__val">{{ $stats['pending_establishments'] }}</strong>
+        <span class="adm-kpi__foot">{{ ($trend['oldest_pending_days'] ?? 0) > 0 ? 'Oldest request: '.$trend['oldest_pending_days'].' days' : ($stats['pending_establishments'] > 0 ? 'Establishment requests' : 'No pending requests') }}</span>
+    </a>
+    <a class="adm-kpi adm-kpi--link" href="{{ route('admin.accreditation', ['status' => 'Expiring Soon']) }}">
+        <span class="adm-kpi__lab">Accreditation follow-up</span><x-icon name="chevron-right" class="adm-kpi__go" />
+        <strong class="adm-kpi__val">{{ $stats['expiring_accreditations'] }}</strong><span class="adm-kpi__foot">Records flagged for review</span>
+    </a>
 </div>
-<p class="adm-kpi-note" id="destination-breakdown">
+<details class="adm-directory-note" id="destination-breakdown">
+    <summary>{{ $stats['total_destinations'] }} destinations in the directory <span>View breakdown</span></summary>
+    <p>
     Destinations: {{ $stats['destinations'] }} DOT-accredited (official record) + {{ $stats['sample_destinations'] }} sample data
     + {{ $stats['other_destinations'] }} not counted in either (official record not currently accredited, or no accreditation record on file)
     = {{ $stats['total_destinations'] }} in total.
-</p>
+    </p>
+</details>
+
+<div class="adm-taskline" aria-label="Review queues">
+    <span>Review queues</span>
+    <a href="{{ route('admin.establishments') }}"><x-icon name="building" />Establishments <b>{{ $stats['pending_establishments'] }}</b><x-icon name="chevron-right" /></a>
+    <a href="{{ route('admin.package-approvals') }}"><x-icon name="package" />Tour packages <b>{{ \App\Models\Package::where('status', \App\Models\Package::STATUS_IN_REVIEW)->count() }}</b><x-icon name="chevron-right" /></a>
+    <a href="{{ route('admin.data-completeness') }}"><x-icon name="database" />Data quality<x-icon name="chevron-right" /></a>
+</div>
+
+<section class="adm-expenditure-highlight" aria-labelledby="expenditure-highlight-title">
+    <div><h2 id="expenditure-highlight-title">Visitor expenditure</h2><p>Real tourist responses only. {{ $expenditure['answered'] }} of {{ $expenditure['total'] }} supplied a spending range.</p></div>
+    <div><span>Most reported range</span><strong>{{ count($expenditure['leading']) === 1 ? $expenditure['leading'][0] : (count($expenditure['leading']) > 1 ? 'Multiple ranges tied' : 'Awaiting spending answers') }}</strong></div>
+    <a href="{{ route('admin.expenditure') }}" class="btn btn-outline">View expenditure<x-icon name="chevron-right" /></a>
+</section>
 
 <div class="adm-charts" id="overview-charts">
     <section class="adm-card adm-chart" aria-labelledby="checkin-chart-title">

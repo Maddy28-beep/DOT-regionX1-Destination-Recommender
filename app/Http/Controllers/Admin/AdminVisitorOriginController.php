@@ -34,7 +34,8 @@ class AdminVisitorOriginController extends Controller
         }
 
         [$from, $to] = $this->range($request);
-        $tables = $this->tables($from, $to);
+        $metric = $request->query('metric') === 'generated' ? 'generated' : 'responses';
+        $tables = $this->tables($from, $to, $metric);
         $min = self::MIN_GROUP;
 
         return view('admin.visitor-origin', [
@@ -42,6 +43,7 @@ class AdminVisitorOriginController extends Controller
             'from' => $from?->format('Y-m-d'),
             'to' => $to?->format('Y-m-d'),
             'tables' => $tables,
+            'metric' => $metric,
         ]);
     }
 
@@ -53,17 +55,19 @@ class AdminVisitorOriginController extends Controller
         }
 
         [$from, $to] = $this->range($request);
-        $tables = $this->tables($from, $to);
+        $metric = $request->query('metric') === 'generated' ? 'generated' : 'responses';
+        $tables = $this->tables($from, $to, $metric);
         $min = self::MIN_GROUP;
 
         $name = 'visitor-origin'.($from ? '-from-'.$from->format('Y-m-d') : '').($to ? '-to-'.$to->format('Y-m-d') : '').'.csv';
 
-        return response()->streamDownload(function () use ($tables, $min, $from, $to) {
+        return response()->streamDownload(function () use ($tables, $min, $from, $to, $metric) {
             $out = fopen('php://output', 'w');
             fputcsv($out, ['Visitor origin (anonymous counts)']);
+            fputcsv($out, ['Measure', $metric === 'generated' ? 'Origin responses with a generated itinerary' : 'Confirmed origin responses']);
             fputcsv($out, ['From', $from?->format('Y-m-d') ?? 'start']);
             fputcsv($out, ['To', $to?->format('Y-m-d') ?? 'today']);
-            fputcsv($out, ['Dates are Philippine time. One count per browser session. Groups smaller than '.$min.' are added together under "Other".']);
+            fputcsv($out, ['Dates are Philippine time. New responses count once per browser per day. Groups smaller than '.$min.' are added together under "Other".']);
             foreach ($tables as $title => $t) {
                 fputcsv($out, []);
                 fputcsv($out, [$title]);
@@ -71,7 +75,7 @@ class AdminVisitorOriginController extends Controller
                     fputcsv($out, ['Not enough answers yet: '.$t['total'].' so far; at least '.$min.' are needed.']);
                     continue;
                 }
-                fputcsv($out, ['Place', 'Visitors']);
+                fputcsv($out, ['Place', 'Responses']);
                 foreach ($t['rows'] as $row) {
                     fputcsv($out, [self::safeCell($row['label']), $row['count']]);
                 }
@@ -99,13 +103,14 @@ class AdminVisitorOriginController extends Controller
     }
 
     /** @return array<string, array{rows: array<int, array{label: string, count: int}>, hidden: int, total: int, enough: bool}> */
-    private function tables(?Carbon $from, ?Carbon $to): array
+    private function tables(?Carbon $from, ?Carbon $to, string $metric = 'responses'): array
     {
+        $column = $metric === 'generated' ? 'generated_visitors' : 'visitors';
         $rows = DB::table(VisitorOriginStats::TABLE)
             ->when($from, fn ($q) => $q->where('day', '>=', $from->toDateString()))
             ->when($to, fn ($q) => $q->where('day', '<=', $to->toDateString()))
-            ->where('visitors', '>', 0)
-            ->selectRaw('answer, country_code, province, city, SUM(visitors) as visitors')
+            ->where($column, '>', 0)
+            ->selectRaw('answer, country_code, province, city, SUM('.$column.') as visitors')
             ->groupBy('answer', 'country_code', 'province', 'city')
             ->get();
 
