@@ -33,7 +33,7 @@
     animation: login-modal-rise .22s ease both;
 }
 .login-modal__dialog:focus { outline: none; }
-.login-modal__dialog .portal-signin__card { box-shadow: none; }
+.login-modal__dialog .portal-signin__card { box-shadow: none; border: 0; }
 
 /* It is a heading inside a dialog, not the page title the Sign In page has: same look, a smaller promise of space. */
 .login-modal__title {
@@ -82,3 +82,9 @@ html.login-modal-open, html.login-modal-open body { overflow: hidden; }
     .login-modal .portal-poster { display: none; }
     .login-modal .portal-signin__card { display: block; }
 }
+
+/* The card's two sides: only one is shown at a time. */
+.login-modal .portal-signin__main[hidden] { display: none; }
+.login-modal [data-signup-error] { margin: 0 0 14px; }
+.login-modal [data-signup-submit][disabled] { opacity: .7; cursor: progress; }
+.login-modal__norecovery { margin: 4px 0 14px; }

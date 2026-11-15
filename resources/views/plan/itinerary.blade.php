@@ -78,6 +78,9 @@
                         </div>
                     @endunless
                     {{-- Where it starts and when it was made: one quiet row, each with its own icon, instead of two loose lines. --}}
+                    <details class="itin-trip-details">
+                    <summary><x-icon name="info" /> Trip details <span class="itinerary-disclosure-chevron" aria-hidden="true"></span></summary>
+                    <div class="itin-trip-details__body">
                     <p class="itin-banner__meta">
                         @unless ($itinerary->package)
                             <span><x-icon name="map-pin" aria-hidden="true" /> Starting from {{ $startingFrom }}@if ($preference?->arrival_time), arriving {{ \Illuminate\Support\Carbon::parse($preference->arrival_time)->format('g:i A') }}@endif</span>
@@ -96,6 +99,8 @@
                             </p>
                         @endif
                     @endif
+                    </div>
+                    </details>
                     @if (data_get($itinerary->day_themes, 'ai_skeleton.applied') === true)
                         <span class="plan-badge plan-badge--ai" title="An outside AI service suggested which of the already-chosen places share a day, and the day names. The planner checked the suggestion and kept it only because it fit, with no fewer stops and no more travelling than its own plan."><x-icon name="sparkles" aria-hidden="true" /> Day themes suggested with AI assistance</span>
                     @endif
@@ -374,6 +379,7 @@
                 @include('partials.itinerary-aside', ['itinerary' => $itinerary, 'preference' => $preference, 'routeStops' => $routeStops, 'dayMeta' => $dayMeta, 'operators' => $operators ?? collect()])
             </div>
 
+            <div class="itinerary-extras">
             @unless ($itinerary->package)
             <section class="itinerary-refine" aria-label="Adjust your itinerary">
                 <div class="itinerary-refine-copy">
@@ -580,6 +586,7 @@
             </div>
             @endif
 
+            </div>
             <section class="itinerary-feedback" aria-labelledby="itinerary-feedback-title">
                 <img src="{{ asset('images/davo-survey-v2.webp') }}" alt="" width="128" height="154" loading="lazy">
                 <div>

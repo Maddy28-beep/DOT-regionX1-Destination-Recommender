@@ -8,7 +8,7 @@ use App\Support\ProvinceBrand;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/** The regional line and each province's DOT Region XI niche show on the listing pages and on a destination. */
+/** Province niches remain available; the regional slogan is kept out of listing banners. */
 class ProvinceBrandTest extends TestCase
 {
     use RefreshDatabase;
@@ -31,12 +31,15 @@ class ProvinceBrandTest extends TestCase
         $this->assertNull(ProvinceBrand::for(null));
     }
 
-    public function test_listing_pages_show_the_regional_line_and_the_niche_only_for_a_chosen_province(): void
+    public function test_listing_banners_omit_the_regional_line_and_keep_the_filtered_province_niche(): void
     {
         $place = $this->place('Davao del Sur');
 
         foreach (['destinations.index', 'accommodations.index', 'restaurants.index', 'packages.index', 'souvenir-centers.index', 'tour-operators.index'] as $route) {
-            $this->get(route($route))->assertOk()->assertSee(ProvinceBrand::REGION_LINE)->assertDontSee('province-niche', false);
+            $html = $this->get(route($route))->assertOk()->assertSee(ProvinceBrand::REGION_LINE)->assertDontSee('province-niche', false)->getContent();
+            preg_match('/<header class="catalog-banner.*?<\/header>/s', $html, $banner);
+            $this->assertNotEmpty($banner, $route);
+            $this->assertStringNotContainsString(ProvinceBrand::REGION_LINE, $banner[0], $route);
         }
 
         $this->get(route('destinations.index', ['region_id' => $place->region_id]))

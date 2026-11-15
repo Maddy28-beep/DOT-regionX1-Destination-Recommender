@@ -128,17 +128,18 @@
         </div>
 
         <div class="dcard__body">
-            <div class="dcard__top">
-                <span></span>
+            {{-- The rating row is there only when there is a rating; an empty one used to leave a blank band above the name. --}}
+            @if ($listing->review_count > 0)
+                <div class="dcard__top">
+                    <span></span>
 
-                @if ($listing->review_count > 0)
                     <span class="dcard__rating">
                         <x-icon name="star" />
                         <strong>{{ number_format($listing->rating, 1) }}</strong>
                         <span>({{ $listing->review_count }})</span>
                     </span>
-                @endif
-            </div>
+                </div>
+            @endif
 
             <h3 class="dcard__name">{{ $listing->displayName() }}</h3>
             @if ($sub !== '')

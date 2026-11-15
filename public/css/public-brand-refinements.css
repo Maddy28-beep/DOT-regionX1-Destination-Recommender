@@ -1,0 +1,166 @@
+/* Keep the public navigation in the site's Barabara travel-poster style. */
+/* Use the listing header's wordmark size on every public page. */
+.site-topbar .site-header .brand,
+.mobile-menu__head .brand {
+    font-family: 'Barabara', 'Alfa Slab One', serif;
+    font-size: 21.6px;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    align-items: center;
+}
+.site-topbar .site-header .brand__name,
+.mobile-menu__head .brand__name {
+    font-size: inherit;
+    /* Barabara's visible capitals sit slightly above its trimmed text box. */
+    position: relative;
+    top: 2px;
+}
+.site-topbar .site-header .brand-icon,
+.mobile-menu__head .brand-icon {
+    width: 36px;
+    height: 36px;
+}
+.site-topbar .site-header .container.bar {
+    align-items: center;
+}
+.site-topbar .site-header :is(.header-partners, .main-nav, .header-actions) {
+    align-items: center;
+    align-self: center;
+}
+/* Cream on the photograph, gold for navigation feedback, green on the solid header. */
+body.hero-page .site-topbar .site-header:not(.scrolled) {
+    background: linear-gradient(180deg, rgba(6, 24, 22, .28) 0%, rgba(6, 24, 22, .12) 48%, rgba(6, 24, 22, 0) 100%) border-box no-repeat;
+    border-bottom-color: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+body.hero-page .site-topbar .site-header:not(.scrolled) .main-nav > a,
+body.hero-page .site-topbar .site-header:not(.scrolled) .main-nav .nav-more__toggle { color: #fff7e9; }
+body.hero-page .site-topbar .site-header:not(.scrolled) .main-nav > a:is(:hover, :focus-visible, [aria-current="page"]),
+body.hero-page .site-topbar .site-header:not(.scrolled) .main-nav .nav-more__toggle:is(:hover, :focus-visible, .is-active, [aria-expanded="true"]) {
+    color: #ffd465;
+    background: #082c2433;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 7px;
+}
+body.hero-page .site-topbar .site-header:not(.scrolled) .main-nav > a[aria-current="page"]::after,
+body.hero-page .site-topbar .site-header:not(.scrolled) .main-nav .nav-more__toggle.is-active::after { background: #ffd465; }
+.site-topbar .site-header.scrolled .main-nav > a,
+.site-topbar .site-header.scrolled .main-nav .nav-more__toggle { color: #0a4f38; }
+/* One primary action palette across the public site; outlines remain secondary. */
+body:not(.admin):not(.portal) :is(.btn-primary, .btn-accent, .plan-next, .pkg-book-btn, .promo-card__cta, .hero-guests__done) {
+    background: linear-gradient(135deg, #167652 0%, #0e6b4a 55%, #0a4f38 100%) !important;
+    color: #fff;
+    border-color: #0e6b4a;
+    box-shadow: 0 4px 12px #0a4f3826, inset 0 1px 0 #ffffff1f;
+}
+body:not(.admin):not(.portal) :is(.btn-primary, .btn-accent, .plan-next, .pkg-book-btn, .promo-card__cta, .hero-guests__done):hover {
+    background: linear-gradient(135deg, #116344 0%, #0a573d 55%, #083f2d 100%) !important;
+    color: #fff;
+}
+body:not(.admin):not(.portal) :is(.btn-primary, .btn-accent, .plan-next, .pkg-book-btn, .promo-card__cta, .hero-guests__done):focus-visible {
+    outline: 3px solid #0e6b4a; outline-offset: 3px;
+}
+body:not(.admin):not(.portal) :is(.btn-primary, .btn-accent, .plan-next, .pkg-book-btn, .promo-card__cta, .hero-guests__done):is(:disabled, [aria-disabled="true"]) {
+    opacity: .55; box-shadow: none; cursor: not-allowed;
+}
+body .tourism-strip { gap: 20px; padding: 6px 0; background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+.site-topbar .site-header .main-nav > a,
+.site-topbar .site-header .main-nav .nav-more__toggle,
+.site-topbar .site-header .nav-more__links a {
+    font-family: 'Barabara', 'Alfa Slab One', serif;
+    font-size: .92rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+.site-topbar .site-header .main-nav > a[aria-current="page"],
+.site-topbar .site-header .main-nav .nav-more__toggle.is-active { font-weight: 400; }
+.mobile-menu .mobile-menu__group a,
+.mobile-menu .mobile-menu__group button { font-family: 'Barabara', 'Alfa Slab One', serif; font-weight: 400; text-transform: uppercase; letter-spacing: .04em; }
+
+/* Three balanced groups: brand, navigation, account/trip actions. */
+@media (min-width: 1101px) {
+    .site-topbar .site-header .container.bar {
+        display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+        max-width: 1480px; padding-inline: 28px;
+        column-gap: clamp(16px, 1.5vw, 28px);
+    }
+    .site-topbar .site-header .container.bar > .brand { margin: 0; gap: 10px; white-space: nowrap; }
+    .site-topbar .site-header .container.bar > .main-nav { margin: 0; min-width: 0; justify-content: center; gap: 2px; }
+    .site-topbar .site-header .main-nav > a,
+    .site-topbar .site-header .main-nav .nav-more__toggle { padding-inline: 9px; }
+    .site-topbar .site-header .container.bar > .header-actions { margin: 0; gap: 12px; justify-content: flex-end; }
+    .site-topbar .site-header .header-weather { margin-right: 0; }
+}
+@media (min-width: 1101px) and (max-width: 1366px) {
+    .site-topbar .site-header .container.bar { padding-inline: 20px; column-gap: 14px; }
+    .site-topbar .site-header .main-nav > a,
+    .site-topbar .site-header .main-nav .nav-more__toggle { padding-inline: 6px; font-size: .85rem; }
+    .site-topbar .site-header .container.bar > .header-actions { gap: 8px; }
+}
+@media (max-width: 1100px) {
+    .site-topbar .site-header .container.bar { padding-inline: 20px; gap: 16px; }
+    .site-topbar .site-header .header-actions { gap: 8px; }
+}
+@media (max-width: 480px) {
+    .site-topbar .site-header .container.bar { padding-inline: 16px; gap: 10px; }
+}
+/* Public footer: existing content, original tourism marks, and Barabara wordmark. */
+.site-footer { background: #0c251c; color: #fff7e9; padding: 56px 0 32px; }
+.site-footer > .container { max-width: 1504px; padding-inline: 32px; }
+.site-footer .footer-grid { grid-template-columns: 1.5fr 1.7fr 1fr 1.1fr; gap: 32px; }
+.site-footer .footer-brand { font-family: 'Barabara', 'Alfa Slab One', serif; font-size: 30px; font-weight: 700; text-transform: uppercase; line-height: 1.2; color: #fff7e9; }
+.site-footer .footer-brand__dvo { color: #ff8255; }
+.site-footer .footer-brand-icon { width: 46px; height: 46px; }
+.site-footer .footer-brand-row { gap: 12px; margin-bottom: 18px; }
+.site-footer .footer-intro > p { color: #c3d4c9; font-size: .84rem; line-height: 1.75; margin: 0; }
+.site-footer .footer-intro > .footer-tagline { color: #fff7e9; font-size: .85rem; line-height: 1.6; margin-top: 20px; }
+.site-footer .footer-grid h3 { color: #fff7e9; font-size: .95rem; letter-spacing: 0; text-transform: none; margin-bottom: 16px; }
+.site-footer .footer-grid > .footer-acc { padding-left: 24px; border-left: 1px solid #ffffff24; }
+.site-footer .footer-grid a { color: #d6e2d9; font-size: .84rem; line-height: 1.6; margin-bottom: 12px; }
+.site-footer .footer-grid .footer-acc__panel p { color: #c3d4c9; font-size: .84rem; line-height: 1.7; }
+.site-footer .footer-traveler-links { gap: 0 20px; }
+.site-footer .footer-support { display: grid; grid-template-columns: 1.3fr 1fr 1fr; align-items: center; gap: 32px; margin-top: 32px; padding-block: 26px; border-top: 1px solid #ffffff24; }
+.site-footer .footer-contact { border: 0; margin: 0; padding: 0; }
+.site-footer .footer-contact p { color: #c3d4c9; font-size: .84rem; line-height: 1.6; margin: 0 0 10px; }
+.site-footer .footer-contact p:last-child { margin-bottom: 0; }
+.site-footer .footer-contact svg { width: 18px; height: 18px; color: #c3d4c9; opacity: 1; }
+.site-footer .footer-contact a { color: #fff7e9; overflow-wrap: anywhere; }
+.site-footer .footer-social { margin: 0; }
+.site-footer .footer-social p { margin: 0 0 12px; font-size: .8rem; color: #c3d4c9; text-transform: none; letter-spacing: 0; }
+.site-footer .footer-social nav a { width: 44px; height: 44px; color: #fff7e9; border-color: #9eb6a77a; border-radius: 12px; }
+.site-footer .footer-social nav a:hover { background: #234d3a; }
+.site-footer .footer-partner-marks { justify-self: end; }
+.site-footer .footer-support .tourism-strip { margin: 0; gap: 24px; }
+.site-footer .footer-support .tourism-strip__davao { width: 110px; }
+.site-footer .footer-support .tourism-strip__dot { width: 56px; }
+.site-footer .footer-bottom { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; margin-top: 0; padding-top: 20px; padding-right: 72px; border-color: #ffffff24; text-align: left; }
+.site-footer .footer-copyright { order: -1; color: #c3d4c9; font-size: .78rem; }
+.site-footer .footer-legal { flex-direction: row; gap: 8px 18px; margin: 0; padding: 0; justify-content: flex-start; }
+.site-footer .footer-legal a { color: #d6e2d9; font-size: .78rem; }
+.site-footer a:hover { color: #fff7e9; }
+.site-footer :is(a, button):focus-visible { outline: 2px solid #fff7e9; outline-offset: 4px; }
+@media (min-width: 801px) and (max-width: 1150px) {
+    .site-footer .footer-grid { grid-template-columns: 1fr 1fr; }
+    .site-footer .footer-support { grid-template-columns: 1.2fr 1fr; }
+    .site-footer .footer-partner-marks { justify-self: start; }
+}
+@media (max-width: 800px) {
+    .site-footer { padding: 36px 0 112px; }
+    .site-footer > .container { padding-inline: 20px; }
+    .site-footer .footer-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .site-footer .footer-intro { padding-bottom: 24px; }
+    .site-footer .footer-grid > .footer-acc { padding-left: 0; border-left: 0; }
+    .site-footer .footer-grid .footer-acc__title { margin: 0; }
+    .site-footer .footer-acc__btn { color: #fff7e9; text-transform: none; letter-spacing: 0; font-size: .95rem; }
+    .site-footer .footer-grid .footer-acc__panel a { margin: 0; font-size: .9rem; }
+    .site-footer .footer-support { grid-template-columns: minmax(0, 1fr); gap: 24px; margin-top: 8px; padding-block: 24px; }
+    .site-footer .footer-partner-marks { justify-self: start; }
+    .site-footer .footer-bottom { flex-direction: column; align-items: flex-start; padding-right: 0; gap: 18px; }
+    .site-footer .footer-copyright { order: 0; margin: 0; max-width: calc(100% - 72px); line-height: 1.7; }
+    .site-footer .footer-legal { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; }
+    .site-footer .footer-legal a { min-height: 44px; line-height: 1.6; padding: 8px 0; }
+}

@@ -17,8 +17,9 @@ class CategoryIconsTest extends TestCase
     {
         foreach ([
             'All Types' => 'grid', 'All Cuisines' => 'grid',
-            'Nature & Adventure' => 'mountain', 'Beach & Leisure' => 'umbrella', 'Culture & Heritage' => 'landmark',
-            'Cultural Heritage' => 'landmark', 'Wellness & Spa' => 'heart', 'Adventure & Hiking' => 'boot', 'Beach & Surfing' => 'wind',
+            'Nature & Adventure' => 'mountain', 'Beach & Leisure' => 'umbrella', 'Culture & Heritage' => 'heritage-building',
+            'Cultural Heritage' => 'heritage-building', 'Wellness & Spa' => 'heart', 'Adventure & Hiking' => 'boot', 'Beach & Surfing' => 'wind',
+            'Cafe' => 'coffee', 'Café' => 'coffee', 'Seafood' => 'fish', 'Japanese' => 'bowl', 'Filipino' => 'utensils',
             'Events & Conventions' => 'calendar', 'Farm Tourism' => 'leaf',
             'Hotel' => 'building', 'Resort' => 'pool', 'Beach Resort' => 'umbrella', 'Homestay' => 'home', 'Condominium Unit' => 'key',
             'Mountain Resort' => 'mountain', 'Island Resort' => 'umbrella', 'Apartment Hotel' => 'building',
@@ -42,7 +43,7 @@ class CategoryIconsTest extends TestCase
     {
         $this->assertSame('tag', CategoryIcons::for('Zzz'));
         $this->assertSame('utensils', CategoryIcons::for('Zzz', 'utensils'));
-        $this->assertSame('utensils', CategoryIcons::for('Japanese', 'utensils'));
+        $this->assertSame('bowl', CategoryIcons::for('Japanese', 'utensils'));
     }
 
     public function test_every_icon_named_exists_in_the_icon_set(): void

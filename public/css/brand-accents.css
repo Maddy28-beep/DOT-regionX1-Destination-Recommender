@@ -29,6 +29,15 @@
     margin: 10px 0 0; font-family: 'Barabara', 'Alfa Slab One', serif; text-transform: uppercase;
     letter-spacing: .06em; font-size: clamp(.85rem, 1.4vw, 1.05rem); color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.45);
 }
+/* One line under the title, not two: the regional line stays and the long sentence is hidden (it remains in the page for
+   search engines and screen readers). A soft dark glow behind the words keeps them readable on any picture. */
+.poster-hero .poster-hero__subhead:not(.is-visible) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; }
+.poster-hero .region-tagline { margin-top: 14px; font-size: clamp(1rem, 1.9vw, 1.35rem); text-shadow: 0 2px 4px rgba(6, 26, 19, .6), 0 4px 22px rgba(6, 26, 19, .5); }
+.poster-hero__content { position: relative; isolation: isolate; }
+.poster-hero__content::before {
+    content: ""; position: absolute; z-index: -1; inset: -34px -8% -20px; pointer-events: none;
+    background: radial-gradient(ellipse at center, rgba(6, 26, 19, .42) 0%, rgba(6, 26, 19, .22) 48%, rgba(6, 26, 19, 0) 72%);
+}
 .footer-tagline {
     margin: 14px 0 0; font-family: 'Barabara', 'Alfa Slab One', serif; text-transform: uppercase; letter-spacing: .06em;
     font-size: .95rem; color: #fff;
@@ -154,19 +163,6 @@ body.hero-page .site-header:not(.scrolled) .main-nav .nav-more__toggle.is-active
 body.hero-page .site-header:not(.scrolled) .header-weather { background: rgba(255, 255, 255, .2); color: #fff; }
 body.hero-page .site-header:not(.scrolled) .header-weather svg { color: #fff; }
 
-.lang-switch { display: inline-flex; align-items: stretch; height: 34px; margin-right: 4px; border: 1px solid var(--border, #dde3dd); border-radius: 999px; overflow: hidden; }
-.lang-switch a { display: inline-grid; place-items: center; padding: 0 10px; font-size: .78rem; font-weight: 800; letter-spacing: .03em; color: var(--primary-dark); text-decoration: none; }
-.lang-switch a + a { border-left: 1px solid var(--border, #dde3dd); }
-.lang-switch a:hover { background: var(--primary-light); }
-.lang-switch a[aria-current="true"] { background: var(--primary); color: #fff; }
-.lang-switch a:focus-visible { outline: 3px solid var(--primary); outline-offset: -3px; }
-body.hero-page .site-header:not(.scrolled) .lang-switch { border-color: rgba(255, 255, 255, .6); }
-body.hero-page .site-header:not(.scrolled) .lang-switch a { color: #fff; }
-body.hero-page .site-header:not(.scrolled) .lang-switch a + a { border-left-color: rgba(255, 255, 255, .6); }
-body.hero-page .site-header:not(.scrolled) .lang-switch a[aria-current="true"] { background: #fff; color: var(--primary-dark); }
-/* Below the full bar the language lives in the phone menu. */
-.site-header .header-actions .lang-switch { display: none; }
-@media (min-width: 1366px) { .site-header .header-actions .lang-switch { display: inline-flex; } }
 .mobile-menu__utility { padding: 4px 2px 14px; }
 
 /* ===== An icon in front of each category chip on the listing pages ===== */
@@ -255,3 +251,96 @@ body.hero-page .site-header:not(.scrolled) .lang-switch a[aria-current="true"] {
 .deal-card__loc { display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; color: var(--ink-soft, #4d5f56); font-size: .85rem; }
 .deal-card__code { padding: 3px 9px; border: 1px dashed var(--accent-strong, #c8501f); border-radius: 7px; background: #fbf2df; color: #8a3512; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .85rem; letter-spacing: .06em; }
 .deal-card__go { display: inline-flex; align-items: center; gap: 6px; color: var(--primary-dark, #0b6b4f); font-size: .88rem; font-weight: 600; }
+
+/* ===== Tourism partners beside the logo in the top bar (wide screens; the hero shows them below that width) ===== */
+.header-partners { display: none; }
+@media (min-width: 1500px) {
+    body .site-topbar .site-header .container.bar { grid-template-columns: auto auto minmax(0, 1fr) auto; }
+    .header-partners {
+        display: inline-flex; align-items: center; gap: 14px; flex: none; margin: 0; padding: 0;
+        border-radius: 0; background: transparent; box-shadow: none;
+    }
+    .header-partners img { display: block; height: auto; object-fit: contain; }
+    .header-partners__davao { width: 72px; }
+    .header-partners__dot { width: 28px; }
+    body.hero-page .poster-hero .hero-tourism-brands { display: none; }
+}
+
+/* ===== The three colours of the flag, in the regional line itself ===== */
+/* Lightened a step from the flag's blue, red and yellow so each reads on the picture and on the dark green behind it. */
+.poster-hero .region-tagline {
+    background: linear-gradient(90deg, #7aa2ff 0%, #ff6b79 50%, #ffd94a 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+    text-shadow: none; filter: drop-shadow(0 1px 2px rgba(6, 26, 19, .7)) drop-shadow(0 3px 14px rgba(6, 26, 19, .45));
+    width: fit-content; margin-inline: auto;
+}
+.poster-hero p.region-tagline { font-size: clamp(1.05rem, 1.6vw, 1.4rem); letter-spacing: .07em; }
+
+/* Phones: every place's photo is the same size. The photo column used to stretch to whatever the text beside it needed, so the
+   pictures in one list were 112 by 112, 124, 144... Now each card has one height, and so has each picture. A promo shows as a
+   small tag with its ticket (its words are on the stay's page), since the words cannot fit in a narrow photo. */
+@media (max-width: 560px) {
+    .catalog-refresh .dpost-card { min-height: 148px; }
+    .catalog-refresh .dpost-card .dcard__art { min-height: 148px; }
+    .catalog-refresh .dpost-card .dcard__art.has-promo .dcard__promo { right: auto; width: 30px; height: 26px; padding: 0; justify-content: center; }
+    .catalog-refresh .dpost-card .dcard__art.has-promo .dcard__promo span { display: none; }
+}
+
+/* The photo at the top of a place's page has one shape on every kind of page: the large 16:8 gallery stays and destinations
+   already had (a big main photo with two beside it). Restaurants, packages, souvenir centers and tour operators were a flat
+   320px strip. */
+@media (min-width: 901px) {
+    .container.listing-detail-refresh .gallery-hero,
+    .container.listing-detail-refresh .gallery-categorized { aspect-ratio: 16 / 8; width: 100%; height: auto; max-height: min(680px, 78vh); }
+}
+/* On a picture that is only an illustration, its "not a photo of this place" label sits along the bottom edge; the title block
+   (and the province line under it) leaves room for it instead of running over it. */
+.container.listing-detail-refresh .gallery-hero:has(.photo-illustration-tag) .gallery-hero__title,
+.container.listing-detail-refresh .gallery-categorized:has(.photo-illustration-tag) .gallery-hero__title { padding-bottom: 58px; }
+.container.listing-detail-refresh .gallery-hero .photo-illustration-tag { background: rgba(8, 24, 18, .74); color: #fff; padding: 4px 11px; border-radius: 999px; font-weight: 600; z-index: 4; }
+
+/* ===== A place's "Plan your visit" card: the trip planner first, directions second, and the card stays in view ===== */
+.visit-card__actions--plan { flex-wrap: wrap; }
+.visit-card__actions--plan .visit-card__plan { flex: 1 1 100%; justify-content: center; }
+.visit-card__actions--plan .visit-card__go--ghost { flex: 1 1 0; justify-content: center; background: #fff; color: var(--primary-dark); box-shadow: inset 0 0 0 1.5px var(--primary); }
+.visit-card__actions--plan .visit-card__go--ghost:hover { background: var(--primary-light); }
+@media (min-width: 901px) {
+    /* The column beside the story holds the card; it follows the page down while the story is read (it is a column's own height, so it never covers the footer). */
+    .container.listing-detail-refresh .detail-layout > div:has(> .visit-card) { position: sticky; top: calc(var(--site-topbar-height, 77px) + 16px); align-self: flex-start; max-height: calc(100vh - var(--site-topbar-height, 77px) - 32px); overflow-y: auto; scrollbar-width: thin; }
+}
+
+/* ===== The heart's answer to a tap from someone not signed in, before the sign-in card opens (see login-modal.js) ===== */
+.save-form--teasing button { color: #e0334c !important; border-color: #e0334c !important; animation: heart-ring .6s ease-out; }
+@keyframes heart-ring { from { box-shadow: 0 0 0 0 rgba(224, 51, 76, .5); } to { box-shadow: 0 0 0 16px rgba(224, 51, 76, 0); } }
+@media (prefers-reduced-motion: reduce) { .save-form--teasing button { animation: none; } }
+
+/* ===== Gradient on the filled buttons ===== */
+/* Green for the main actions, orange for the search and the strongest call, red for the one that removes. Every stop keeps the
+   white words at the contrast the flat colours had (4.5:1 or better, bar the first half-inch of the orange). Outline, ghost and
+   chip controls stay flat. !important on the image alone, because the many older rules that set a flat `background` also reset it. */
+:root {
+    --grad-primary: linear-gradient(135deg, #12805f 0%, #0b6b4f 50%, #084d39 100%);
+    --grad-primary-hover: linear-gradient(135deg, #0e6b4f 0%, #084d39 55%, #06382a 100%);
+    --grad-accent: linear-gradient(135deg, #cc531f 0%, #c8501f 45%, #a63d15 100%);
+    --grad-accent-hover: linear-gradient(135deg, #b4461a 0%, #a63d15 55%, #8f3512 100%);
+    --grad-danger: linear-gradient(135deg, #cf4624 0%, #c13a20 50%, #9b2e15 100%);
+    --grad-danger-hover: linear-gradient(135deg, #b53a1c 0%, #9b2e15 60%, #7f2511 100%);
+}
+:is(.btn-primary, .btn-poster-primary, .portal-signin__submit, .visit-card__go:not(.visit-card__go--ghost), .pkg-book-btn, .hero-guests__done, .auth-card button[type="submit"].btn) {
+    background-color: #0b6b4f;
+    background-image: var(--grad-primary) !important;
+}
+:is(.btn-primary, .btn-poster-primary, .portal-signin__submit, .visit-card__go:not(.visit-card__go--ghost), .pkg-book-btn, .hero-guests__done, .auth-card button[type="submit"].btn):is(:hover, :focus-visible):not(:disabled) {
+    background-image: var(--grad-primary-hover) !important;
+}
+.btn-accent { background-color: #c8501f; background-image: var(--grad-accent) !important; }
+.btn-accent:is(:hover, :focus-visible):not(:disabled) { background-image: var(--grad-accent-hover) !important; }
+.btn-danger { background-color: #c13a20; background-image: var(--grad-danger) !important; }
+.btn-danger:is(:hover, :focus-visible):not(:disabled) { background-image: var(--grad-danger-hover) !important; }
+
+/* A card's text sits right under its picture: the empty rating row is gone (see listing-card.blade.php), so the body no longer
+   needs the tall minimum that kept it from looking short with that band in it. */
+@media (min-width: 901px) {
+    .catalog-refresh .dpost-card .dcard__body { min-height: 150px; }
+    .catalog-refresh.souvenirs-catalog .dpost-card .dcard__body { min-height: 128px; }
+}

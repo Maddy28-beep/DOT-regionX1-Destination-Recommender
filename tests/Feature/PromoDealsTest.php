@@ -77,7 +77,7 @@ class PromoDealsTest extends TestCase
 
         $this->get(route('accommodations.show', $stay))->assertOk()->assertDontSee('Old deal')->assertDontSee('Coming deal')->assertDontSee('Your Promo');
         $this->get(route('accommodations.index'))->assertOk()->assertDontSee('Old deal')->assertDontSee('Coming deal')->assertDontSee('chip--deal', false);
-        $this->get('/')->assertOk()->assertDontSee('Deals in Davao Region');
+        $this->get('/')->assertOk()->assertDontSee('Special offers in Davao');
     }
 
     public function test_the_listing_marks_stays_with_a_promo_and_the_deals_chip_narrows_to_them(): void
@@ -101,10 +101,38 @@ class PromoDealsTest extends TestCase
         $this->stay('Quiet Inn');
 
         $this->get('/')->assertOk()
-            ->assertSee('Limited-Time Offers')->assertSee('Deals in Davao Region')->assertSee('Breakfast for two')
+            ->assertSee('Limited-Time Offers')->assertSee('Special offers in Davao')->assertSee('Breakfast for two')
             ->assertSee('Acacia Hotel Davao')->assertSee('STAYDVO')->assertSee('See all deals')
             ->assertSee(route('accommodations.show', $stay), false)->assertSee(route('accommodations.index', ['deals' => 1]), false)
             ->assertDontSee('Quiet Inn');
+    }
+
+    public function test_home_offers_appear_once_between_search_and_counts(): void
+    {
+        $this->promo($this->stay(), ['title' => 'Current stay offer']);
+        $html = $this->get('/')->assertOk()->getContent();
+        $this->assertSame(1, substr_count($html, 'id="deals"'));
+        $this->assertLessThan(strpos($html, 'id="deals"'), strpos($html, 'data-hero-search'));
+        $this->assertLessThan(strpos($html, 'class="stats"'), strpos($html, 'id="deals"'));
+    }
+
+    public function test_home_counts_exclude_hidden_and_sample_listings_and_unused_regions(): void
+    {
+        $this->stay('Real Stay');
+        $this->stay('Archived Stay', ['archived_at' => now()]);
+        $this->stay('Hidden Stay', ['is_accredited' => false]);
+        $sampleRegion = Region::create(['name' => 'Sample-only area']);
+        $this->stay('Sample Demo Stay [SAMPLE]', ['region_id' => $sampleRegion->id]);
+        $placeholder = $this->stay('Placeholder Stay', ['region_id' => $sampleRegion->id]);
+        \App\Models\AccreditationRecord::create([
+            'listing_kind' => 'accommodation', 'listing_id' => $placeholder->id,
+            'accreditation_number' => 'SAMPLE-001', 'is_placeholder' => true, 'status' => 'Active',
+        ]);
+        Region::create(['name' => 'Unused area']);
+        $stats = $this->get('/')->assertOk()->original->getData()['stats'];
+        $this->assertSame(1, $stats['accommodations']);
+        $this->assertSame(0, $stats['destinations']);
+        $this->assertSame(1, $stats['regions']);
     }
 
     public function test_an_archived_or_unaccredited_stay_does_not_show_its_deal(): void

@@ -31,7 +31,7 @@
     var resetBtn = form.querySelector('[data-search-reset]');
 
     var HINTS = {
-        destinations: 'Everything is optional. Leave a box on Any to see every destination.',
+        destinations: 'All filters are optional.',
         accommodations: 'Dates and guests are optional. They are kept with your search but are not checked against availability, which is not recorded.',
         restaurants: 'A meal shows restaurants open at that hour. Dietary needs and plated or buffet service are not recorded for restaurants yet.',
         packages: 'The budget is the total: the per-person price times the number of travelers.',
@@ -64,6 +64,8 @@
     function sync() {
         var radio = chosen();
         if (!radio) return;
+
+        form.dataset.searchPurpose = radio.value;
 
         var allowed = (radio.getAttribute('data-tab-fields') || '').split(/\s+/).filter(Boolean);
 

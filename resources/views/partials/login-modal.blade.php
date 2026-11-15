@@ -30,7 +30,7 @@
                         </div>
                     </aside>
 
-                    <section class="portal-signin__main">
+                    <section class="portal-signin__main" data-signin-pane>
                         <span class="portal-signin__welcome">welcome back</span>
                         <h2 id="loginModalTitle" class="login-modal__title">Sign In</h2>
                         <p class="portal-signin__subtitle" data-login-context>Sign in to save places to your favorites.</p>
@@ -63,7 +63,56 @@
                             <button type="submit" class="portal-signin__submit" data-login-submit>Sign In</button>
                         </form>
 
-                        <p class="portal-signin__help">Don&rsquo;t have an account yet? <a href="{{ route('account.register') }}">Create one for free</a></p>
+                        <p class="portal-signin__help">Don&rsquo;t have an account yet? <a href="{{ route('account.register') }}" data-login-switch="signup">Sign Up</a></p>
+                    </section>
+
+                    {{-- The same card, turned to the sign-up side (no page change): an alias and a password, nothing else. --}}
+                    <section class="portal-signin__main" data-signup-pane hidden>
+                        <span class="portal-signin__welcome">free &middot; no email needed</span>
+                        <h2 id="signupModalTitle" class="login-modal__title">Sign Up</h2>
+                        <p class="portal-signin__subtitle" data-signup-context>Create a free account to save places to your favorites.</p>
+
+                        <div class="alert alert-error" role="alert" data-signup-error hidden></div>
+
+                        <form method="POST" action="{{ route('account.register') }}" data-signup-form novalidate>
+                            @csrf
+                            <input type="hidden" name="save_type" value="">
+                            <input type="hidden" name="save_id" value="">
+
+                            <div class="field">
+                                <label for="lm-su-alias">Alias</label>
+                                <div class="portal-signin__input">
+                                    <x-icon name="user" aria-hidden="true" />
+                                    <input type="text" id="lm-su-alias" name="alias" autocomplete="username" minlength="3" maxlength="30" pattern="[A-Za-z0-9_\-]+" aria-describedby="lm-su-alias-hint" required>
+                                </div>
+                                <small class="portal-signin__hint" id="lm-su-alias-hint">3&ndash;30 characters: letters, numbers, dashes. No real name needed.</small>
+                            </div>
+
+                            <div class="field">
+                                <label for="lm-su-password">Password</label>
+                                <div class="portal-signin__input password-field">
+                                    <x-icon name="lock" aria-hidden="true" />
+                                    <input type="password" id="lm-su-password" name="password" autocomplete="new-password" minlength="8" aria-describedby="lm-su-password-hint" required>
+                                    @include('partials.password-toggle', ['target' => 'lm-su-password'])
+                                </div>
+                                <small class="portal-signin__hint" id="lm-su-password-hint">At least 8 characters.</small>
+                            </div>
+
+                            <div class="field">
+                                <label for="lm-su-confirm">Confirm password</label>
+                                <div class="portal-signin__input password-field">
+                                    <x-icon name="lock" aria-hidden="true" />
+                                    <input type="password" id="lm-su-confirm" name="password_confirmation" autocomplete="new-password" minlength="8" required>
+                                    @include('partials.password-toggle', ['target' => 'lm-su-confirm'])
+                                </div>
+                            </div>
+
+                            <p class="portal-signin__hint login-modal__norecovery"><strong>There is no password recovery.</strong> A lost password means a new account, so pick one you will remember.</p>
+
+                            <button type="submit" class="portal-signin__submit" data-signup-submit>Sign Up</button>
+                        </form>
+
+                        <p class="portal-signin__help">Already have an account? <a href="{{ route('account.login') }}" data-login-switch="signin">Sign In</a></p>
                     </section>
                 </div>
             </div>

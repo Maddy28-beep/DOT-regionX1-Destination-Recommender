@@ -48,22 +48,6 @@
 .pcx-card:hover { transform: translateY(-3px); }
 .pcx-card--rec { border-color: var(--primary); }
 
-/* The "Recommended" tag straddles the top edge of the first card. Green, so coral stays rare on this page. */
-.pcx-badge {
-    position: absolute;
-    top: -12px;
-    left: 22px;
-    padding: 3px 12px;
-    border: 1.5px solid var(--primary-dark);
-    border-radius: 999px;
-    background: var(--primary);
-    color: #fff;
-    font-size: .68rem;
-    font-weight: 700;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-}
-
 .pcx-card h3 { margin: 4px 0 6px; font-size: 1.3rem; color: var(--ocean-teal-dark); }
 .pcx-lead { margin: 0 0 14px; color: var(--muted); font-size: .92rem; line-height: 1.55; }
 
@@ -77,6 +61,62 @@
     font-size: .78rem;
     font-weight: 600;
 }
+
+/* Neutral, equally weighted paths using the same flat background as the listings. */
+.plan-choice { background: #f4f7f4; }
+.plan-choice > .dash-header { background: transparent; border: 0; padding: 20px 0 0; text-align: center; }
+.plan-choice > .dash-body { padding: 28px 0 36px; }
+.plan-choice > :is(.dash-header, .dash-body) > .container { max-width: 1248px; padding-inline: 24px; }
+.plan-choice > .dash-header > .container { justify-content: center; }
+.plan-choice > .dash-header > .container > div { width: 100%; min-width: 0; text-align: center; }
+.plan-choice .page-title { margin: 8px 0 10px; color: #0a4f38; font-family: 'Barabara', 'Alfa Slab One', serif; font-size: clamp(1.8rem, 3vw, 2.5rem); line-height: 1.25; text-wrap: balance; }
+.plan-choice .dash-header .sub { margin: 0; font-size: 1rem; color: #52665b; line-height: 1.6; }
+.plan-choice .pc-stepper { justify-content: center; margin: 20px auto 0; }
+.plan-choice .pcx-grid { gap: 24px; margin: 0; }
+.plan-choice .pcx-card { padding: 28px; border: 1px solid #afc7b8; border-radius: 22px; background: #fffefa; box-shadow: 0 6px 18px rgb(10 79 56 / 5%); }
+.plan-choice .pcx-card:hover { transform: none; border-color: #648e77; }
+.plan-choice .pcx-card__head { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 18px; align-items: start; margin-bottom: 20px; }
+.plan-choice .pcx-icon { display: grid; place-items: center; width: 64px; height: 64px; background: #e8f3ec; border-radius: 17px; color: #0a4f38; }
+.plan-choice .pcx-icon svg { width: 34px; height: 34px; }
+.plan-choice .pcx-card h3 { font-family: 'Poppins', sans-serif; font-size: clamp(1.15rem, 1.7vw, 1.45rem); line-height: 1.35; margin: 0 0 8px; color: #0a4f38; }
+.plan-choice .pcx-lead { margin: 0; font-size: .9rem; line-height: 1.65; }
+.plan-choice .pcx-meta { margin-bottom: 18px; gap: 8px; }
+.plan-choice .pcx-meta li { padding: 4px 12px; border: 1px solid #c9dcd0; background: #fffefa; color: #0a4f38; }
+.plan-choice .pcx-get { margin-bottom: 14px; line-height: 1.6; }
+.plan-choice .pcx-get li { margin-bottom: 8px; }
+.plan-choice .pcx-best { font-size: .86rem; line-height: 1.6; margin-bottom: 20px; }
+.plan-choice .pcx-card .btn { min-height: 48px; border-radius: 12px; font-size: .95rem; }
+.plan-choice .pcx-help { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 12px 22px; align-items: center; margin-top: 24px; padding: 18px 22px; background: #fffefa; border-color: #e1e8e2; border-radius: 18px; }
+.plan-choice .pcx-help h2 { margin: 0; font-size: .95rem; color: #0a4f38; }
+.plan-choice .pcx-help__options { display: flex; gap: 10px; }
+.plan-choice .pcx-help__options button { flex: 1 1 auto; border: 1px solid #b7cdbf; background: #fffefa; color: #0a4f38; padding: 9px 12px; font-size: .8rem; }
+.plan-choice .pcx-help__answer { grid-column: 1 / -1; margin: 0; }
+.plan-choice .pcx-trust { margin: 22px 0 0; font-size: .76rem; gap: 12px 24px; }
+@media (max-width: 900px) {
+    .plan-choice .pcx-help { grid-template-columns: minmax(0, 1fr); }
+    .plan-choice .pcx-card { padding: 22px; }
+    .plan-choice .pcx-card__head { grid-template-columns: 52px minmax(0, 1fr); gap: 12px; }
+    .plan-choice .pcx-icon { width: 52px; height: 52px; border-radius: 14px; }
+    .plan-choice .pcx-icon svg { width: 28px; height: 28px; }
+}
+@media (max-width: 700px) {
+    .plan-choice .pcx-grid { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+    .plan-choice .pcx-card__head { margin-bottom: 16px; }
+}
+@media (max-width: 640px) {
+    .plan-choice > .dash-header { padding-top: 16px; }
+    .plan-choice > .dash-body { padding: 22px 0 32px; }
+    .plan-choice > :is(.dash-header, .dash-body) > .container { padding-inline: 16px; }
+    .plan-choice .pc-stepper { max-width: 380px; }
+    .plan-choice .pcx-card { padding: 20px; border-radius: 18px; }
+    .plan-choice .pcx-card__head { grid-template-columns: minmax(0, 1fr); }
+    .plan-choice .pcx-icon { width: 48px; height: 48px; }
+    .plan-choice .pcx-help { padding: 18px; gap: 14px; }
+    .plan-choice .pcx-help__options { display: grid; }
+    .plan-choice .pcx-help__options button { min-height: 44px; text-align: left; font-size: .86rem; }
+    .plan-choice .pcx-trust { font-size: .8rem; }
+}
+@media (prefers-reduced-motion: reduce) { .plan-choice .pcx-card { transition: none; } }
 
 .pcx-get { margin: 0 0 14px; padding: 0; list-style: none; font-size: .9rem; line-height: 1.5; }
 .pcx-get li { display: flex; gap: 9px; margin-bottom: 6px; }

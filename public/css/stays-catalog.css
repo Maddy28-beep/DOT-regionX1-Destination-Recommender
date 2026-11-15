@@ -6,36 +6,69 @@ html:has(.catalog-refresh) { scrollbar-gutter: stable; }
 }
 
 .catalog-refresh .container { max-width: 1320px; }
-/* Inherit the original shared banner height, typography and image crop. */
+/* A slightly shorter scenic header; the full text group remains vertically centered. */
+.catalog-refresh .catalog-banner { min-height: 144px; padding-block: 18px; align-items: center; }
+@media (max-width: 640px) {
+    .catalog-refresh .catalog-banner { min-height: 0; padding-block: 12px 14px; }
+}
 .catalog-refresh .section-tight:has(.catalog-layout) { padding-top: 0; padding-bottom: 40px; }
 /* Souvenirs has no category filter; leave breathing room below its banner. */
 .catalog-refresh.souvenirs-catalog .section-tight:has(.catalog-layout) { padding-top: 28px; }
 .catalog-refresh .catalog-categories {
     position: relative;
     z-index: 5;
-    margin: -24px 0 28px;
-    padding: 12px 16px;
-    min-height: 72px;
-    gap: 10px;
+    margin: -30px 0 18px;
+    padding: 8px 12px;
+    min-height: 62px;
+    gap: 8px;
     justify-content: center;
     background: #fffefa;
     border: 1px solid #e5ebe6;
     border-radius: 18px;
-    box-shadow: 0 8px 26px rgb(17 61 44 / 7%);
+    box-shadow: 0 6px 18px rgb(17 61 44 / 6%);
 }
 .catalog-refresh .catalog-categories .chip {
-    padding: 10px 22px;
+    padding: 8px 14px;
     font-size: .84rem;
     border-width: 1px;
     min-height: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 6px;
+    border-radius: 999px;
+    border-color: #a5bfb0;
+    background: #fffefa;
+    color: #0a4f38;
+    font-weight: 600;
+    line-height: 1.35;
+    white-space: nowrap;
+    transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.catalog-refresh .catalog-categories .chip.active {
+    background: #0a4f38;
+    border-color: #0a4f38;
+    color: #fffefa;
+    box-shadow: 0 2px 6px rgb(10 79 56 / 12%);
+}
+.catalog-refresh .catalog-categories .chip:hover:not(.active) { background: #e8f3ec; border-color: #0e6b4a; }
+.catalog-refresh .catalog-categories .chip__icon { width: 19px; height: 19px; flex: none; }
+.catalog-refresh .catalog-categories :is(a, summary):focus-visible { outline: 3px solid #0e6b4a; outline-offset: 3px; }
+.catalog-refresh .catalog-categories__menu { padding: 8px; border-color: #d5e2d9; border-radius: 16px; background: #fffefa; }
+.catalog-refresh .catalog-categories__menu a { min-height: 44px; border-radius: 9px; color: #0a4f38; }
+.catalog-refresh .catalog-categories__menu a[aria-current] { background: #e8f3ec; font-weight: 600; }
+@media (prefers-reduced-motion: reduce) {
+    .catalog-refresh .catalog-categories .chip { transition: none; }
 }
 .catalog-refresh .catalog-categories .catalog-categories__extra { display: none; }
 .catalog-refresh .catalog-categories > .chip { flex: 1 1 auto; }
-.catalog-refresh .catalog-categories__more { flex: 1 1 auto; }
-.catalog-refresh .catalog-categories__more summary { width: 100%; }
+.catalog-refresh .catalog-categories__more { flex: 0 0 auto; width: max-content; max-width: 100%; }
+.catalog-refresh .catalog-categories__more summary { width: auto; white-space: nowrap; }
+@media (min-width: 901px) and (max-width: 1100px) {
+    .catalog-refresh .catalog-categories { gap: 6px; }
+    .catalog-refresh .catalog-categories .chip { min-width: 0; padding-inline: 8px; font-size: .74rem; }
+    .catalog-refresh .catalog-categories .chip svg { width: 16px; height: 16px; }
+}
 .catalog-refresh .catalog-categories__more[hidden],
 .catalog-refresh .catalog-categories__menu a[hidden] { display: none; }
 .catalog-refresh .catalog-layout { grid-template-columns: 244px minmax(0, 1fr); gap: 24px; }
@@ -45,6 +78,42 @@ html:has(.catalog-refresh) { scrollbar-gutter: stable; }
     border-radius: 18px;
     box-shadow: 0 4px 18px rgb(17 61 44 / 3%);
 }
+/* The original Grid / Map control now occupies the former area-preview slot. */
+.catalog-refresh .filter-panel__view { margin: 0 0 24px; }
+.catalog-refresh .filter-panel__view[hidden] { display: none; }
+.catalog-refresh .filter-panel__view :is(.view-toggle, .destination-view-toggle) {
+    display: flex;
+    width: 100%;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid #b9cec0;
+    border-radius: 999px;
+    background: #fffefa;
+    box-shadow: 0 2px 6px rgb(10 79 56 / 5%);
+}
+.catalog-refresh .filter-panel__view .destination-view-toggle[hidden] { display: none; }
+.catalog-refresh .filter-panel__view button {
+    display: inline-flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    box-shadow: none;
+    color: #0a4f38;
+    font: inherit;
+    font-size: .88rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.catalog-refresh .filter-panel__view button:is(.active, [aria-pressed="true"]) { background: #0a4f38; color: #fffefa; }
+.catalog-refresh .filter-panel__view button:hover:not(.active):not([aria-pressed="true"]) { background: #e8f3ec; }
+.catalog-refresh .filter-panel__view button svg { width: 18px; height: 18px; }
+.catalog-refresh .filter-panel__view button:focus-visible { outline: 3px solid #0e6b4a; outline-offset: 3px; }
 .catalog-refresh .filter-panel__head {
     align-items: center;
     margin-bottom: 20px;
@@ -216,8 +285,8 @@ html:has(.catalog-refresh) { scrollbar-gutter: stable; }
        box it simply runs off the edge of the screen, which reads as "swipe for more", and a soft fade on the right
        says the same. The chips keep their size and are never squeezed. */
     .catalog-refresh .catalog-categories {
-        margin: -10px -20px 14px;
-        padding: 6px 20px 8px;
+        margin: -20px 0 18px;
+        padding: 10px;
         min-height: 0;
         gap: 8px;
         justify-content: flex-start;
@@ -225,18 +294,18 @@ html:has(.catalog-refresh) { scrollbar-gutter: stable; }
         overflow-x: auto;
         overscroll-behavior-x: contain;
         scroll-snap-type: x proximity;
-        scroll-padding-inline: 20px;
+        scroll-padding-inline: 10px;
         scrollbar-width: none;
-        background: transparent;
-        border: 0;
-        border-radius: 0;
-        box-shadow: none;
+        background: #fffefa;
+        border: 1px solid #e5ebe6;
+        border-radius: 18px;
+        box-shadow: 0 5px 16px rgb(17 61 44 / 6%);
         -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
         mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
     }
     .catalog-refresh .catalog-categories::-webkit-scrollbar { display: none; }
     .catalog-refresh .catalog-categories > .chip { flex: 0 0 auto; scroll-snap-align: start; white-space: nowrap; background: #fffefa; }
-    .catalog-refresh .catalog-categories > .chip.active { background: var(--primary); }
+    .catalog-refresh .catalog-categories > .chip.active { background: #0a4f38; }
     .catalog-refresh .catalog-categories .chip { padding: 8px 16px; min-height: 44px; }
 
     /* ---- Phones: a compact list, not a tall card per place ----

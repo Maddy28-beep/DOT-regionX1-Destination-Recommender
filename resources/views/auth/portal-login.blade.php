@@ -3,7 +3,8 @@
 @section('title', 'Partner Portal Sign In — ExploreDVO')
 
 @push('styles')
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
     <link rel="stylesheet" href="{{ asset('css/portal-login.css') }}?v={{ filemtime(public_path('css/portal-login.css')) }}">
 @endpush
 
@@ -58,7 +59,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('portal.login') }}">
+                <form method="POST" action="{{ route('portal.login') }}" data-busy-submit data-busy-label="Signing you in…">
                     @csrf
                     <input type="hidden" name="portal" value="{{ $portal }}">
 
@@ -82,7 +83,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="portal-signin__submit" data-portal-submit>
+                    <button type="submit" class="portal-signin__submit" data-portal-submit data-busy-label="Signing in…">
                         Log In as {{ $portal === 'admin' ? 'DOT Admin' : 'Partner / Operator' }}
                     </button>
                 </form>

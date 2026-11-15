@@ -1,0 +1,257 @@
+/* Location-first search. All fields remain the existing GET search controls. */
+.poster-hero.has-photo { background-color: #153d32; background-size: cover; background-position: center 48%; background-repeat: no-repeat; }
+@media (max-width: 640px) { .poster-hero.has-photo { background-position: 52% center; } }
+body.hero-page .poster-hero .region-tagline {
+    background: none;
+    color: #fff7e9;
+    -webkit-text-fill-color: #fff7e9;
+    font-size: clamp(.78rem, 1vw, .9rem);
+    line-height: 1.5;
+    margin-top: 10px;
+    letter-spacing: .045em;
+}
+/* Color-only headline treatment: preserve Barabara and the existing text/layout. */
+.poster-hero .poster-hero__title {
+    color: #fff7e9;
+}
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+    body.hero-page .poster-hero .poster-hero__title {
+        background-image: linear-gradient(90deg, #174a9b 0%, #174a9b 30%, #a82032 48%, #a82032 65%, #c59116 82%, #c59116 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+        text-shadow: none;
+        /* A fine cream keyline separates the original dark brand colors from the mountain. */
+        -webkit-text-stroke: .7px rgb(255 247 233 / 85%);
+        paint-order: stroke fill;
+        filter: drop-shadow(0 2px 3px #082c24b3);
+    }
+}
+@media (forced-colors: active) {
+    .poster-hero .poster-hero__title { background-image: none; color: CanvasText; -webkit-text-fill-color: CanvasText; filter: none; }
+}
+/* Preserve original logo artwork and proportions on the hero background.
+   This is a presentation refinement, not a claim of official brand approval. */
+.poster-hero .hero-tourism-brands {
+    display: flex; width: max-content; max-width: calc(100% - 32px);
+    gap: 24px; align-items: center; padding: 6px 0;
+    margin: 0 auto 10px; border-radius: 0;
+    background: transparent; border: 0; box-shadow: none;
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.poster-hero .hero-tourism-brands img { flex: none; height: auto; object-fit: contain; filter: none; }
+.poster-hero .hero-tourism-brands__davao { width: 96px; }
+.poster-hero .hero-tourism-brands__dot { width: 42px; }
+@media (max-width: 640px) {
+    .poster-hero .hero-tourism-brands { gap: 20px; padding: 6px 0; }
+    .poster-hero .hero-tourism-brands__davao { width: 72px; }
+    .poster-hero .hero-tourism-brands__dot { width: 32px; }
+}
+.search-loading { position: fixed; inset: 0; margin: auto; width: min(440px, calc(100% - 32px)); max-height: calc(100dvh - 32px); padding: 32px; border: 1px solid #dfe7e2; border-radius: 20px; background: #fff; color: #084d39; box-shadow: 0 20px 64px #10281e30; text-align: center; }
+.search-loading::backdrop { background: #14251f66; }
+.search-loading__content { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.search-loading h2 { margin: 0; font: 700 1.45rem/1.3 'Poppins', sans-serif; letter-spacing: -.02em; }
+.search-loading p { margin: 0; max-width: 340px; color: #52665d; font-size: .95rem; line-height: 1.6; }
+.search-loading__spinner { width: 44px; height: 44px; border: 5px solid #d4e9dd; border-top-color: #0e6b4a; border-radius: 50%; animation: search-loading-spin .9s linear infinite; }
+.search-loading__dots { display: flex; gap: 10px; padding-top: 2px; }
+.search-loading__dots i { width: 7px; height: 7px; border-radius: 50%; background: #0e6b4a; }
+@keyframes search-loading-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .search-loading__spinner { animation: none; } }
+@media (max-width: 480px) { .search-loading { padding: 28px 22px; } .search-loading h2 { font-size: 1.25rem; } }
+.hero-lower { background: #fcfaf5; padding-bottom: 32px; }
+.hero-search { width: min(1440px, calc(100% - 64px)); max-width: 1440px; margin-bottom: 36px; }
+.hero-search__tab-body { font-size: 1.05rem; padding-inline: 22px; }
+.hero-search__box > label { font-size: .8rem; }
+.hero-search__box .site-dropdown-trigger { font-size: 1.05rem; }
+.hero-search__body { padding: 40px 24px 48px; background: #fcfcfa; box-shadow: 0 10px 28px #17382c24; }
+.hero-search__bar { box-shadow: 0 3px 12px #17382c0d; }
+.hero-search__grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+.hero-search__grid > .hero-search__box { grid-column: span 3; }
+.hero-search__grid > [data-for="where"],
+.hero-search__grid > [data-custom-budget] { grid-column: 1 / -1; }
+.hero-search__box { border-radius: 12px; }
+.hero-search__box[data-for="where"] { min-height: 72px; }
+.hero-search__box[data-for="where"] > label { top: 10px; }
+.hero-search__box[data-for="where"] .site-dropdown-trigger { min-height: 70px; padding-top: 26px; font-size: 1.1rem; font-weight: 650; }
+.hero-search[data-search-purpose="accommodations"] [data-for="from"],
+.hero-search[data-search-purpose="accommodations"] [data-for="to"],
+.hero-search[data-search-purpose="accommodations"] [data-for="guests"] { grid-column: span 2; }
+.hero-search[data-search-purpose="souvenir_centers"] [data-for="where"] { grid-column: 1 / -1; }
+.hero-search__go { box-shadow: 0 6px 16px #0a4f3830, inset 0 1px 0 #ffffff1f !important; }
+.hero-search__foot { gap: 16px; align-items: center; }
+.hero-search__hint { line-height: 1.5; }
+
+/* Native details keeps guest counters accessible without replacing their inputs. */
+.hero-search__box--guest-picker { position: relative; min-height: 60px; }
+.hero-guests > summary { display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 10px 14px; cursor: pointer; list-style: none; }
+.hero-guests > summary::-webkit-details-marker { display: none; }
+.hero-guests > summary > svg { width: 22px; height: 22px; flex: none; color: var(--primary); }
+.hero-guests > summary > svg:last-child { width: 16px; margin-left: auto; }
+.hero-guests > summary > span { display: grid; gap: 3px; min-width: 0; font-size: .95rem; font-weight: 600; }
+.hero-guests__label { font-size: .75rem; color: var(--muted); }
+.hero-guests > summary:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; border-radius: 12px; }
+.hero-guests[open] > summary { background: #eaf4ee; border-radius: 12px; }
+.hero-guests__panel { position: absolute; right: 0; top: calc(100% + 8px); z-index: 15; width: 320px; max-width: calc(100vw - 32px); padding: 16px; margin: 0; border: 1px solid #d8e2db; border-radius: 16px; background: #fff; box-shadow: 0 12px 32px #17382c30; }
+.hero-guests__panel > .hero-guests__title { padding: 4px 6px; font-size: 1rem; line-height: 1.4; font-weight: 700; color: var(--primary-dark); background: #fff; border-radius: 6px; }
+.hero-lower:has([data-guest-picker][open]) { z-index: 210; }
+.hero-guests__panel .hero-search__guest { flex-direction: row; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #edf1ed; }
+.hero-guests__panel .hero-search__stepper button { min-width: 36px; min-height: 36px; }
+.hero-guests__done { margin-top: 12px; width: 100%; min-height: 44px; border: 0; border-radius: 10px; background: var(--primary-dark); color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+.hero-guests__done:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+
+/* Live offers belong to the search area; no separate full-screen promotion section. */
+.hero-lower .hero-offers { width: min(1440px, calc(100% - 64px)); max-width: 1440px; margin: 36px auto 0; background: transparent; padding: 0; }
+.hero-offers > .container { max-width: none; padding: 0; }
+.hero-offers .deals-home__head { margin-bottom: 14px; gap: 10px 20px; align-items: center; }
+.hero-offers .deals-home__eyebrow { display: none; }
+.hero-offers .deals-home__title { font: 750 1.5rem/1.3 'Poppins', sans-serif; text-transform: none; letter-spacing: -.02em; }
+.hero-offers .deals-home__sub { font-size: .95rem; margin-top: 6px; }
+.hero-offers .deals-home__all { font-size: .95rem; }
+.hero-offers .deals-home__row { display: grid; grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); overflow: visible; gap: 20px; padding: 0; }
+.hero-offers .deal-card { display: grid; grid-template-columns: 132px minmax(0, 1fr); min-width: 0; min-height: 0; align-items: stretch; padding: 0; gap: 0; overflow: hidden; border: 1px solid #cbded1; border-radius: 16px; background: #f0f8f3; box-shadow: none; text-decoration: none; }
+.hero-offers .deal-card { background: #fffcf6; border-color: #d5e3d9; }
+.hero-offers .deal-card__media { display: flex; flex-direction: column; background: #f3f1e9; }
+.hero-offers .deal-card__photo { position: relative; display: grid; place-items: center; flex: 1; width: 100%; min-height: 150px; overflow: hidden; }
+.hero-offers .deal-card__photo > img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; }
+.hero-offers .deal-card__photo > small { position: absolute; bottom: 5px; left: 5px; background: #163e2f; color: #fff; font-size: .6rem; padding: 2px 4px; border-radius: 4px; }
+.hero-offers .deal-card__photo > svg { width: 30px; height: 30px; }
+.hero-offers .deal-card__photo-credit { position: static; display: block; width: 100%; padding: 6px 8px; background: transparent; font-size: .65rem; line-height: 1.4; color: #526258; overflow-wrap: anywhere; }
+.deal-card__media { position: relative; display: grid; place-items: center; background: #e0eee5; color: var(--primary); }
+.hero-offers .deal-card__media > img { width: 100%; height: 100%; max-width: none; object-fit: cover; position: absolute; inset: 0; }
+.hero-offers .deal-card__media { min-height: 120px; }
+.deal-card__media > svg { width: 32px; height: 32px; }
+.deal-card__media > small { position: absolute; bottom: 5px; left: 5px; background: #163e2f; color: #fff; font-size: .6rem; padding: 2px 4px; border-radius: 4px; }
+.deal-card__content { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 4px; padding: 14px 16px; min-width: 0; }
+.deal-card__foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 38px; margin-top: auto; padding-top: 10px; border-top: 1px solid #e3e9e1; }
+.deal-card__foot .deal-card__code { margin: 0; }
+.deal-card__foot .deal-card__go { margin-left: auto; }
+.hero-offers .deal-card__tag { padding: 3px 7px; margin-bottom: 0; font-size: .72rem; }
+.hero-offers .deal-card__title { font-size: 1.1rem; line-height: 1.35; min-height: 2.7em; color: #084d39; overflow-wrap: anywhere; }
+.hero-offers .deal-card__stay { font-size: .82rem; color: #526258; }
+.hero-offers .deal-card__loc { align-items: flex-start; font-size: .8rem; line-height: 1.5; margin: 0; color: #526258; }
+.hero-offers .deal-card__loc svg { margin-top: 2px; }
+.deal-card__validity, .deal-card__credit { font-size: .8rem; color: #435e50; line-height: 1.5; }
+.hero-offers .deal-card__code { font-size: .85rem; }
+.hero-offers .deal-card__go { font-size: .9rem; }
+.hero-lower .stats { margin-top: 40px; }
+.hero-lower .stats-strip { gap: 0; }
+.hero-lower .stat-num { font-size: 2rem; }
+.hero-lower .stat-label { font-size: .7rem; }
+.hero-lower .hero-scroll-cue { position: relative; left: auto; bottom: auto; transform: none; display: flex; width: fit-content; margin: 32px auto 0; }
+
+@media (min-width: 1061px) {
+    html.home-slides main#main-content > .hero-screen { zoom: 1; }
+    .poster-hero__title { font-size: clamp(4rem, 5.6vw, 6.2rem); }
+    .poster-hero__content { max-width: 1100px; }
+    .poster-hero .poster-hero__subhead { display: block; font-size: 1.2rem; }
+    .poster-hero .poster-hero__subhead:not(.is-visible) { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; max-width: 640px; margin: 0 auto; }
+    .hero-search { width: min(1200px, calc(100% - 64px)); max-width: 1200px; }
+    .hero-search__grid > .hero-search__box,
+    .hero-search__grid > [data-for="where"] { grid-column: span 2; }
+    .hero-search__box,
+    .hero-search__box[data-for="where"] { min-height: 72px; }
+    .hero-search__box .site-dropdown-trigger { min-height: 70px; font-size: 1.1rem; }
+    .hero-search__tab-body { padding: 18px 24px 15px; font-size: 1.1rem; }
+    .hero-search__body { padding: 40px 28px 48px; }
+}
+@media (max-width: 1060px) {
+    .hero-search { width: calc(100% - 48px); }
+    .hero-lower .hero-offers { width: calc(100% - 48px); }
+}
+@media (max-width: 640px) {
+    .hero-search__tab-body { font-size: .95rem; padding-inline: 16px; }
+    .hero-search__body { padding: 38px 14px 20px; }
+    .hero-search__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .hero-search__grid > .hero-search__box { grid-column: 1 / -1; }
+    .hero-search[data-search-purpose="accommodations"] [data-for="from"],
+    .hero-search[data-search-purpose="accommodations"] [data-for="to"] { grid-column: span 1; }
+    .hero-search[data-search-purpose="accommodations"] [data-for="guests"] { grid-column: 1 / -1; }
+    .hero-search__box[data-for="where"] .site-dropdown-trigger { font-size: 1rem; }
+    .hero-search__box input[type="date"] { font-size: 16px; padding-left: 10px; }
+    .hero-search__box[data-for="from"] > svg,
+    .hero-search__box[data-for="to"] > svg { display: none; }
+    .hero-search__box[data-for="from"] > label,
+    .hero-search__box[data-for="to"] > label { left: 10px; font-size: .68rem; }
+    .hero-search .hero-search__go { position: relative; left: auto; bottom: auto; transform: none; margin: 14px; width: calc(100% - 28px); height: 48px; }
+    .hero-search .hero-search__go:hover, .hero-search .hero-search__go:active { transform: none; }
+    .hero-search { width: calc(100% - 32px); border-radius: 18px; background: #fcfcfa; box-shadow: 0 8px 24px #17382c24; padding-bottom: 1px; }
+    .hero-search__body { box-shadow: none; padding-bottom: 0; }
+    .hero-guests__panel { position: fixed; bottom: 12px; top: auto; left: 12px; right: 12px; width: auto; max-width: none; max-height: 70dvh; overflow-y: auto; z-index: 100; }
+    .hero-guests__panel .hero-search__stepper button { min-width: 44px; min-height: 44px; }
+    .hero-guests__panel .hero-search__guest-name { font-size: .875rem; }
+    .hero-lower .hero-offers { margin-top: 28px; width: calc(100% - 32px); }
+    .hero-offers .deals-home__title { font-size: 1.16rem; }
+    .hero-offers .deals-home__row { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+    .hero-offers .deal-card { grid-template-columns: 90px minmax(0, 1fr); }
+    .hero-offers .deal-card__content { padding: 12px; }
+    .hero-lower .stats { margin-top: 24px; }
+    .hero-lower .stat-num { font-size: 1.7rem; }
+    .hero-lower .stat-label { font-size: .6rem; }
+    .hero-lower .hero-scroll-cue { display: none; }
+}
+
+/* The picture: its curved foot now takes the ground's own cream (it was white against the cream, which showed as a white
+   wedge in the corners), and the picture is taller so the headline has room above the search card. */
+.hero-edge path { fill: #fcfaf5; }
+.poster-hero { padding-bottom: calc(var(--hs-overlap) + clamp(48px, 9vh, 110px)); }
+@media (max-width: 640px) { .poster-hero { padding-bottom: calc(var(--hs-overlap) + 14px); } }
+
+/* Desktop: hero, search, offers and counts share the opening screen. */
+@media (min-width: 1061px) {
+    .poster-hero { padding-top: clamp(80px, 8vh, 96px); padding-bottom: calc(var(--hs-overlap) + 12px); }
+    .poster-hero__title { font-size: clamp(3.4rem, 4.5vw, 5rem); }
+    .poster-hero .poster-hero__subhead { font-size: 1.05rem; line-height: 1.4; }
+    .poster-hero .region-tagline { margin-top: 8px; font-size: 1.1rem; }
+    .hero-search { margin-bottom: 28px; }
+    .hero-search__body { padding: 32px 24px 36px; }
+    .hero-search__tab-body { padding-block: 13px 11px; }
+    .hero-search__grid { gap: 10px; }
+    .hero-search__box, .hero-search__box[data-for="where"] { min-height: 62px; }
+    .hero-search__box .site-dropdown-trigger,
+    .hero-search__box[data-for="where"] .site-dropdown-trigger { min-height: 60px; }
+    .hero-lower .hero-offers { margin-top: 28px; }
+    .hero-offers .deals-home__head { margin-bottom: 10px; }
+    .hero-offers .deals-home__title { font-size: 1.25rem; }
+    .hero-offers .deals-home__sub { font-size: .85rem; margin-top: 2px; }
+    .hero-offers .deal-card__content { gap: 3px; padding: 10px 14px; }
+    .hero-offers .deal-card__title { font-size: 1rem; }
+    .hero-lower .stats { margin-top: 16px; }
+    .hero-lower .hero-scroll-cue { margin-top: 12px; }
+    .hero-lower { padding-bottom: 16px; }
+}
+
+/* Keep the opening copy readable and secondary to the Barabara title. */
+body.hero-page .poster-hero .poster-hero__subhead {
+    display: block;
+    font-weight: 400;
+    line-height: 1.5;
+    max-width: 660px;
+    margin: 0 auto;
+    color: #fff7e9;
+    text-shadow: 0 1px 4px rgb(6 26 19 / 75%);
+}
+@media (min-width: 1061px) {
+    body.hero-page .poster-hero { padding-top: clamp(96px, 10vh, 116px); }
+}
+@media (max-width: 640px) {
+    body.hero-page .poster-hero .poster-hero__subhead { font-size: .9rem; max-width: 340px; padding-inline: 8px; }
+    body.hero-page .hero-search__tabs {
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-inline: 6px;
+        scroll-padding-inline: 6px;
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+    }
+    body.hero-page .hero-search__tab { flex: 0 0 auto; }
+    body.hero-page .hero-search__tab-body {
+        flex-direction: row;
+        gap: 7px;
+        min-height: 48px;
+        padding: 12px 14px;
+        font-size: .85rem;
+        white-space: nowrap;
+    }
+}

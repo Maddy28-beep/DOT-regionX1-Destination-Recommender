@@ -76,14 +76,6 @@ Route::get('/search', \App\Http\Controllers\SearchController::class)->name('sear
 Route::get('/advisories', [AdvisoryController::class, 'index'])->name('advisories.index');
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
 
-// The top bar's EN / FIL switch: remembers the choice in the session and returns to the page the visitor was on.
-Route::get('/lang/{locale}', function (string $locale) {
-    abort_unless(in_array($locale, \App\Http\Middleware\SetLocale::LOCALES, true), 404);
-    session(['locale' => $locale]);
-
-    return redirect()->back(fallback: route('home'));
-})->name('locale.switch');
-
 Route::get('/destinations', [DestinationController::class, 'index'])->name('destinations.index');
 Route::get('/destinations/{destination:slug}', [DestinationController::class, 'show'])->name('destinations.show');
 

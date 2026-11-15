@@ -84,8 +84,4 @@
             </div>
         @endif
     </fieldset>
-    <div class="pc-stay-summary" data-stay-summary hidden>
-        <span class="pc-stay-summary__icon" aria-hidden="true"><x-icon name="check" /></span>
-        <p><strong>Your preferences:</strong> <span data-stay-summary-text></span></p>
-    </div>
 </div>

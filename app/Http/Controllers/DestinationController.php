@@ -102,8 +102,9 @@ class DestinationController extends Controller
             ->where('region_id', $destination->region_id)
             ->where('id', '!=', $destination->id)
             ->orderByDesc('rating')
-            ->take(3)
-            ->get();
+            ->take(12)
+            ->get()
+            ->pipe(fn ($found) => \App\Support\RelatedListings::pick($found));
         $nearbyIsSameRegion = $nearby->isNotEmpty();
 
         // Some regions (e.g. Samal, which is the only destination seeded in
@@ -114,8 +115,9 @@ class DestinationController extends Controller
             $nearby = Destination::publiclyVisible()->with('region', 'tags', 'photos')
                 ->where('id', '!=', $destination->id)
                 ->orderByDesc('rating')
-                ->take(3)
-                ->get();
+                ->take(12)
+                ->get()
+                ->pipe(fn ($found) => \App\Support\RelatedListings::pick($found));
         }
 
         return view('destinations.show', compact('destination', 'nearby', 'nearbyIsSameRegion'));

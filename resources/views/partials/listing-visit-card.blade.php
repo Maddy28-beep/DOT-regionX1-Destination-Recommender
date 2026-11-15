@@ -70,8 +70,12 @@
             <p class="visit-card__hint">{{ $primary['hint'] }}</p>
         @endif
     @else
-        <div class="visit-card__actions">
-            <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="visit-card__go"><x-icon name="send" /> Get Directions</a>
+        <div class="visit-card__actions @if (! empty($type)) visit-card__actions--plan @endif">
+            {{-- A place you can save is a place you can plan a trip around: the trip planner is the main next step, directions the second. --}}
+            @if (! empty($type))
+                <a href="{{ route('plan.edit') }}" class="visit-card__go visit-card__plan"><x-icon name="compass" /> Plan My Trip</a>
+            @endif
+            <a href="{{ $mapUrl }}" target="_blank" rel="noopener" class="visit-card__go @if (! empty($type)) visit-card__go--ghost @endif"><x-icon name="send" /> Get Directions</a>
             @if (! empty($type))
                 <x-save-heart :type="$type" :listing="$listing" variant="square" />
             @endif

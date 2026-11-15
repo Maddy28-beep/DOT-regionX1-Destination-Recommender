@@ -1,3 +1,7 @@
+@php
+    // The selected DOT Mount Apo photograph takes precedence over optional footage.
+    $heroPhoto = is_file(public_path('images/mt-apo-kapatagan-hero.jpg')) ? asset('images/mt-apo-kapatagan-hero.jpg') : null;
+@endphp
 <!DOCTYPE html>
 <html lang="en" class="home-slides">
 <head>
@@ -12,7 +16,10 @@
     <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/hero-search.css') }}">
     <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/home-slides.css') }}">
     <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/brand-accents.css') }}">
-    @if ($heroVideo && $heroVideo['poster'])
+    <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/hero-search-refresh.css') }}">
+    @if ($heroPhoto)
+        <link rel="preload" as="image" href="{{ $heroPhoto }}" fetchpriority="high">
+    @elseif ($heroVideo && $heroVideo['poster'])
         {{-- Fetched in parallel with the stylesheet so the hero's ground is
              ready at first paint, rather than arriving after it. --}}
         <link rel="preload" as="image" href="{{ $heroVideo['poster'] }}" fetchpriority="high">
@@ -34,8 +41,10 @@
 {{-- The picture and the card beneath it are one screen: on a tall display the next section must not peek in under the cue. --}}
 <main id="main-content" tabindex="-1">
 <div class="hero-screen">
-<section class="poster-hero{{ $heroVideo ? ' has-footage' : '' }}"
-    @if ($heroVideo && $heroVideo['poster'])
+<section class="poster-hero{{ $heroPhoto ? ' has-photo' : ($heroVideo ? ' has-footage' : '') }}"
+    @if ($heroPhoto)
+        style="background-image: linear-gradient(180deg, rgba(8, 32, 25, .28), rgba(8, 32, 25, .40)), url('{{ $heroPhoto }}');"
+    @elseif ($heroVideo && $heroVideo['poster'])
         {{-- The clip's own first frame, as the ground the video paints onto.
              Inline because the URL is dynamic. Preloaded in the head so it is
              already decoded when the section paints. --}}
@@ -43,7 +52,7 @@
     @endif
 >
 
-    @if ($heroVideo)
+    @if ($heroVideo && ! $heroPhoto)
         {{--
             Hero footage, carrying no src so the browser cannot start
             downloading before the script below has decided this visit can
@@ -240,13 +249,11 @@
     <div class="hero-tourism-brands" aria-label="Tourism logos">
         <img src="{{ asset('images/tourism-logos/davao.webp') }}" alt="Davao" class="hero-tourism-brands__davao" width="200" height="67">
         <img src="{{ asset('images/tourism-logos/dot.webp') }}" alt="Department of Tourism Philippines" class="hero-tourism-brands__dot" width="100" height="99">
-        <img src="{{ asset('images/tourism-logos/love-philippines.webp') }}" alt="Love the Philippines" class="hero-tourism-brands__love" width="220" height="94">
     </div>
 
     <div class="poster-hero__content">
-        <span class="poster-kicker poster-hero__kicker">welcome to</span>
         <h1 class="poster-title poster-hero__title">DAVAO REGION</h1>
-        <p class="poster-hero__subhead">Sun-warmed islands, misty highlands, and the Philippine Eagle's home &mdash; discover stays, tours, and eats across Region XI.</p>
+        <p class="poster-hero__subhead is-visible">Discover Davao’s islands, highlands, and local experiences.</p>
         <p class="region-tagline">Davao: Diversity is our Beauty</p>
     </div>
 
@@ -438,8 +445,11 @@
                     </div>
                 </div>
 
-                <fieldset class="hero-search__box hero-search__box--guests hero-search__box--wide" data-for="guests" hidden>
-                    <legend class="hero-search__box-title">Guests &middot; optional</legend>
+                <div class="hero-search__box hero-search__box--guest-picker" data-for="guests" hidden>
+                    <details class="hero-guests" data-guest-picker>
+                        <summary><x-icon name="users" /><span><span class="hero-guests__label">Guests &middot; optional</span><span data-guest-total aria-live="polite">Any group size</span></span><x-icon name="chevron-down" /></summary>
+                        <fieldset class="hero-guests__panel">
+                            <legend class="hero-guests__title">Guests &middot; optional</legend>
                     @foreach ($stayGuests as $key => $label)
                         <div class="hero-search__guest" data-counter>
                             <span class="hero-search__guest-name" id="guest-{{ $key }}">{{ $label }}</span>
@@ -450,8 +460,10 @@
                             </div>
                         </div>
                     @endforeach
-                    <p class="hero-search__guest-total" aria-live="polite" data-guest-total>Any group size</p>
-                </fieldset>
+                            <button type="button" class="hero-guests__done" data-guests-done>Done</button>
+                        </fieldset>
+                    </details>
+                </div>
             </div>
             <div class="hero-search__foot">
                 <p class="hero-search__hint" data-search-hint aria-live="polite"></p>
@@ -459,24 +471,34 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-accent hero-search__go">Explore <x-icon name="arrow-right" /></button>
+        <button type="submit" class="btn btn-accent hero-search__go"><x-icon name="search" /><span data-search-submit-label>Search destinations</span></button>
     </form>
+    <dialog class="search-loading" data-search-loading aria-labelledby="searchLoadingTitle" aria-describedby="searchLoadingCopy">
+        <div class="search-loading__content" role="status" aria-live="polite">
+            <span class="search-loading__spinner" aria-hidden="true"></span>
+            <h2 id="searchLoadingTitle">Finding your Davao favorites</h2>
+            <p id="searchLoadingCopy">Looking for destinations that match your preferences.</p>
+            <span class="search-loading__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        </div>
+    </dialog>
     <script src="{{ asset('js/hero-search.js') }}?v={{ filemtime(public_path('js/hero-search.js')) }}" defer></script>
+    <script src="{{ asset('js/hero-search-layout.js') }}?v={{ filemtime(public_path('js/hero-search-layout.js')) }}" defer></script>
 
 
+    @include('partials.home-deals', ['deals' => $deals])
 
     <div class="stats">
         <div class="stats-strip">
             <div class="stat-item">
-                <div class="stat-num" data-count-up>{{ $stats['destinations'] }}+</div>
+                <div class="stat-num" data-count-up>{{ $stats['destinations'] }}</div>
                 <div class="stat-label">Destinations</div>
             </div>
             <div class="stat-item">
                 <div class="stat-num" data-count-up>{{ $stats['regions'] }}</div>
-                <div class="stat-label">Cities &amp; Provinces</div>
+                <div class="stat-label">Cities &amp; provinces covered</div>
             </div>
             <div class="stat-item">
-                <div class="stat-num" data-count-up>{{ $stats['accommodations'] }}+</div>
+                <div class="stat-num" data-count-up>{{ $stats['accommodations'] }}</div>
                 <div class="stat-label">Accommodations</div>
             </div>
             {{-- No fabricated placeholder here: this stood at a hard-coded
@@ -506,7 +528,6 @@
 </div>{{-- /.hero-screen --}}
 
 @include('partials.mood-cards')
-@include('partials.home-deals', ['deals' => $deals])
 @include('partials.culinary-highlights')
 
 @php

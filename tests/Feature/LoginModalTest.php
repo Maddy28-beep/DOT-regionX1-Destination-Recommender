@@ -154,6 +154,80 @@ class LoginModalTest extends TestCase
         $this->assertGuest('tourist');
     }
 
+    public function test_the_log_in_links_in_the_top_bar_and_the_phone_menu_open_the_modal(): void
+    {
+        $html = $this->get('/')->assertOk()->getContent();
+
+        // Still ordinary links to the Sign In page (they work without script); the script turns them into the modal.
+        $this->assertSame(2, substr_count($html, 'data-login-open'));
+        $this->assertMatchesRegularExpression('#<a href="'.preg_quote(route('account.login'), '#').'"[^>]*class="header-account-link" data-login-open#', $html);
+        $this->assertStringContainsString('[data-login-open]', file_get_contents(public_path('js/login-modal.js')));
+    }
+
+    public function test_a_signed_in_visitor_has_no_log_in_link_to_open_it_from(): void
+    {
+        $this->actingAs($this->account(), 'tourist')->get('/')->assertOk()->assertDontSee('data-login-open', false);
+    }
+
+    // ---- the sign-up side
+
+    private function modalSignUp(array $extra = [])
+    {
+        return $this->postJson(route('account.register'), $extra + ['alias' => 'newexplorer', 'password' => 'a-long-test-password', 'password_confirmation' => 'a-long-test-password']);
+    }
+
+    public function test_the_modal_has_a_sign_up_side_and_the_link_says_sign_up(): void
+    {
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertStringContainsString('data-signup-pane', $html);
+        $this->assertStringContainsString('data-login-switch="signup"', $html);
+        $this->assertStringContainsString('data-login-switch="signin"', $html);
+        $this->assertStringNotContainsString('Create one for free', $html);
+        $this->get(route('account.login'))->assertOk()->assertDontSee('Create one for free');
+    }
+
+    public function test_signing_up_from_the_modal_makes_the_account_signs_in_and_saves_the_place(): void
+    {
+        $place = $this->place();
+
+        $this->modalSignUp(['save_type' => 'destinations', 'save_id' => $place->id])->assertOk()->assertJson(['ok' => true, 'saved' => true]);
+
+        $this->assertAuthenticated('tourist');
+        $account = TouristAccount::where('alias', 'newexplorer')->firstOrFail();
+        $this->assertTrue(Hash::check('a-long-test-password', $account->password_hash));
+        $this->assertSame(1, TouristSavedDestination::where(['tourist_account_id' => $account->id, 'listing_kind' => 'destination', 'listing_id' => $place->id])->count());
+        $this->assertSame('Added to Saved Places', session('status'));
+    }
+
+    public function test_signing_up_without_a_place_just_makes_the_account(): void
+    {
+        $this->modalSignUp()->assertOk()->assertJson(['ok' => true, 'saved' => false]);
+
+        $this->assertAuthenticated('tourist');
+        $this->assertSame(0, TouristSavedDestination::count());
+        $this->assertSame('Account created', session('status'));
+    }
+
+    public function test_a_taken_alias_a_short_password_or_a_mismatch_come_back_as_json_errors(): void
+    {
+        $this->account();
+
+        $this->modalSignUp(['alias' => 'Explorer1'])->assertStatus(422)->assertJsonValidationErrors('alias');
+        $this->modalSignUp(['password' => 'short', 'password_confirmation' => 'short'])->assertStatus(422)->assertJsonValidationErrors('password');
+        $this->modalSignUp(['password_confirmation' => 'something-else-entirely'])->assertStatus(422)->assertJsonValidationErrors('password');
+
+        $this->assertGuest('tourist');
+        $this->assertSame(1, TouristAccount::count());
+    }
+
+    public function test_the_sign_up_page_still_works_with_a_normal_post(): void
+    {
+        $this->post(route('account.register'), ['alias' => 'plainpost', 'password' => 'a-long-test-password', 'password_confirmation' => 'a-long-test-password'])->assertRedirect();
+
+        $this->assertAuthenticated('tourist');
+    }
+
     // ---- the script
 
     public function test_the_script_covers_open_close_focus_escape_and_the_fetch_sign_in(): void

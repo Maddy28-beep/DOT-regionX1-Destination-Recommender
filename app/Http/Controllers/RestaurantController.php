@@ -84,8 +84,9 @@ class RestaurantController extends Controller
             ->where('region_id', $restaurant->region_id)
             ->where('id', '!=', $restaurant->id)
             ->orderByDesc('rating')
-            ->take(3)
-            ->get();
+            ->take(12)
+            ->get()
+            ->pipe(fn ($found) => \App\Support\RelatedListings::pick($found));
 
         return view('restaurants.show', compact('restaurant', 'nearby'));
     }

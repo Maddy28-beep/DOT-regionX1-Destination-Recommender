@@ -162,15 +162,23 @@ class HomeController extends Controller
             ->get();
 
         $sample = app(\App\Support\SampleData::class);
-        $destinationCount = $sample->split(Destination::publiclyVisible());
-        $accommodationCount = $sample->split(Accommodation::publiclyVisible());
+        // Marketing counts describe the live catalogue, excluding demonstration records.
+        $countable = fn ($model) => $model::publiclyVisible()->get(['id', 'name', 'region_id'])
+            ->reject(fn ($listing) => $sample->isSample($listing)
+                || preg_match('/\[sample\]|^sample\b/i', $listing->name));
+        $countedDestinations = $countable(Destination::class);
+        $countedAccommodations = $countable(Accommodation::class);
+        $coveredRegionIds = $countedDestinations->pluck('region_id')->merge($countedAccommodations->pluck('region_id'));
+        foreach ([Restaurant::class, Package::class, SouvenirCenter::class, TourOperator::class] as $model) {
+            $coveredRegionIds = $coveredRegionIds->merge($countable($model)->pluck('region_id'));
+        }
 
         $stats = [
-            'destinations' => $destinationCount['total'],
-            'destinations_sample' => $destinationCount['sample'],
-            'regions' => Region::count(),
-            'accommodations' => $accommodationCount['total'],
-            'accommodations_sample' => $accommodationCount['sample'],
+            'destinations' => $countedDestinations->count(),
+            'destinations_sample' => 0,
+            'regions' => Region::whereIn('id', $coveredRegionIds->filter()->unique())->count(),
+            'accommodations' => $countedAccommodations->count(),
+            'accommodations_sample' => 0,
             /*
              * Averaged over destinations that actually carry reviews. Most of
              * the accreditation import landed with rating 0 and no reviews, so
@@ -215,6 +223,7 @@ class HomeController extends Controller
 
         // "Deals in Davao Region": the live promo of each visible stay, newest first. Left out of the page when there are none.
         $dealStays = \App\Models\Accommodation::publiclyVisible()
+            ->with('photos')
             ->whereIn('id', \App\Models\Promotion::listingIdsWithDeal('accommodation'))
             ->get(['id', 'slug', 'name', 'location'])->keyBy('id');
         $deals = \App\Models\Promotion::active()->where('listing_kind', 'accommodation')->whereIn('listing_id', $dealStays->keys())

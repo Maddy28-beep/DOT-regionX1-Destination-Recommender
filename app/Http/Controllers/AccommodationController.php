@@ -121,8 +121,9 @@ class AccommodationController extends Controller
             ->where('region_id', $accommodation->region_id)
             ->where('id', '!=', $accommodation->id)
             ->orderByDesc('rating')
-            ->take(3)
-            ->get();
+            ->take(12)
+            ->get()
+            ->pipe(fn ($found) => \App\Support\RelatedListings::pick($found));
 
         return view('accommodations.show', compact('accommodation', 'nearby'));
     }

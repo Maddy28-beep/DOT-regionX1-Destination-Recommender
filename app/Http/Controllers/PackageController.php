@@ -125,8 +125,9 @@ class PackageController extends Controller
             ->where('region_id', $package->region_id)
             ->where('id', '!=', $package->id)
             ->orderByDesc('rating')
-            ->take(3)
-            ->get();
+            ->take(12)
+            ->get()
+            ->pipe(fn ($found) => \App\Support\RelatedListings::pick($found));
 
         return view('packages.show', compact('package', 'nearby'));
     }

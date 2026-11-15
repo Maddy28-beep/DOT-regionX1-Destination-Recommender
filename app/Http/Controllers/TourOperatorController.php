@@ -61,8 +61,9 @@ class TourOperatorController extends Controller
             ->where('region_id', $tourOperator->region_id)
             ->where('id', '!=', $tourOperator->id)
             ->orderByDesc('rating')
-            ->take(3)
-            ->get();
+            ->take(12)
+            ->get()
+            ->pipe(fn ($found) => \App\Support\RelatedListings::pick($found));
 
         return view('tour-operators.show', compact('tourOperator', 'nearby'));
     }

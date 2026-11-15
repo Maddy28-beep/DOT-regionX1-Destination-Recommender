@@ -19,7 +19,7 @@ final class CategoryIcons
         // destinations and packages
         'hiking' => 'boot', 'trek' => 'boot', 'surf' => 'wind', 'beach' => 'umbrella', 'island' => 'umbrella', 'cruise' => 'umbrella',
         'adventure' => 'mountain', 'nature' => 'mountain', 'mountain' => 'mountain', 'highland' => 'mountain',
-        'culture' => 'landmark', 'cultural' => 'landmark', 'heritage' => 'landmark', 'museum' => 'landmark', 'history' => 'landmark',
+        'culture' => 'heritage-building', 'cultural' => 'heritage-building', 'heritage' => 'heritage-building', 'museum' => 'heritage-building', 'history' => 'heritage-building',
         'religio' => 'church', 'church' => 'church', 'wellness' => 'heart', 'spa' => 'heart', 'health' => 'heart',
         'farm' => 'leaf', 'eco' => 'leaf', 'conservation' => 'leaf', 'garden' => 'leaf', 'park' => 'leaf', 'wildlife' => 'feather',
         'event' => 'calendar', 'convention' => 'calendar', 'festival' => 'calendar', 'mice' => 'briefcase',
@@ -27,7 +27,7 @@ final class CategoryIcons
         // transport and tours
         'transport' => 'van', 'bus' => 'bus', 'van' => 'van', 'general' => 'compass', 'tour' => 'compass', 'travel' => 'compass',
         // dining
-        'grill' => 'utensils', 'bar' => 'moon', 'nightlife' => 'moon', 'cafe' => 'utensils', 'coffee' => 'utensils', 'seafood' => 'utensils', 'filipino' => 'utensils',
+        'grill' => 'utensils', 'bar' => 'moon', 'nightlife' => 'moon', 'cafe' => 'coffee', 'café' => 'coffee', 'coffee' => 'coffee', 'seafood' => 'fish', 'japanese' => 'bowl', 'filipino' => 'utensils',
     ];
 
     public static function for(string $label, string $fallback = 'tag'): string
