@@ -168,6 +168,15 @@ class VisitorOriginAdminTest extends TestCase
         $this->assertStringNotContainsString('adm-fit', $html);
     }
 
+    public function test_apply_and_download_csv_are_styled_buttons_side_by_side(): void
+    {
+        config(['features.trip_location_v2' => true]);
+
+        $html = $this->actingAs($this->admin(), 'admin')->get(route('admin.visitor-origin'))->assertOk()->getContent();
+
+        $this->assertMatchesRegularExpression('#<button class="btn btn-primary btn-sm" type="submit">Apply</button>\s*<a class="btn btn-outline btn-sm" data-origin-export#', $html);
+    }
+
     public function test_the_page_states_the_counting_rule_and_that_the_counts_are_kept(): void
     {
         config(['features.trip_location_v2' => true]);

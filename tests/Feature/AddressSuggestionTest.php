@@ -319,4 +319,41 @@ class AddressSuggestionTest extends TestCase
 
         Cache::flush();
     }
+
+    public function test_with_the_trip_location_switch_on_only_davao_region_places_are_suggested(): void
+    {
+        config(['features.trip_location_v2' => true]);
+        $this->geocoderReturns([
+            $this->place('Manila Hotel, Manila', 14.5826, 120.9718),
+            $this->place('Pearl Farm Beach Resort, Samal', 7.0, 125.78),
+            $this->place('Cebu Business Hotel, Cebu City', 10.3157, 123.8854),
+            $this->place('Mati City Hall, Davao Oriental', 6.9551, 126.2167),
+        ]);
+
+        $labels = collect($this->getJson('/plan/address-suggest?q=hotel')->assertOk()->json('results'))->pluck('label')->all();
+
+        $this->assertSame(['Pearl Farm Beach Resort, Samal', 'Mati City Hall, Davao Oriental'], $labels);
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'rect%3A125.0%2C5.6%2C126.7%2C7.9') || str_contains($request->url(), 'rect:125.0,5.6,126.7,7.9'));
+    }
+
+    public function test_with_the_switch_off_suggestions_still_cover_the_philippines(): void
+    {
+        config(['features.trip_location_v2' => false]);
+        $this->geocoderReturns([
+            $this->place('Manila Hotel, Manila', 14.5826, 120.9718),
+            $this->place('Pearl Farm Beach Resort, Samal', 7.0, 125.78),
+        ]);
+
+        $this->getJson('/plan/address-suggest?q=hotel')->assertOk()->assertJsonCount(2, 'results');
+    }
+
+    public function test_a_typed_place_outside_the_region_is_still_found_so_it_can_be_refused(): void
+    {
+        config(['features.trip_location_v2' => true]);
+        $this->geocoderReturns([$this->place('Manila Hotel, Manila', 14.5826, 120.9718)]);
+
+        $match = app(\App\Services\Geocoding\AddressSuggestionService::class)->resolve('Manila Hotel');
+
+        $this->assertNotNull($match, 'resolve() looks across the Philippines, so the form can refuse it with the Region XI message');
+    }
 }

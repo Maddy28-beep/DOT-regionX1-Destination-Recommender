@@ -9,8 +9,8 @@
     <form method="get" class="adm-toolbar" aria-label="Date range">
         <label>From <input type="date" name="from" value="{{ $from }}"></label>
         <label>To <input type="date" name="to" value="{{ $to }}"></label>
-        <button class="adm-btn" type="submit">Apply</button>
-        <a class="adm-btn" data-origin-export href="{{ route('admin.visitor-origin.export', array_filter(['from' => $from, 'to' => $to])) }}">Download CSV</a>
+        <button class="btn btn-primary btn-sm" type="submit">Apply</button>
+        <a class="btn btn-outline btn-sm" data-origin-export href="{{ route('admin.visitor-origin.export', array_filter(['from' => $from, 'to' => $to])) }}">Download CSV</a>
         <span class="adm-toolbar__note">Dates are in Philippine time; "To" includes the whole day. The day is the day the visitor first planned a trip.</span>
     </form>
 

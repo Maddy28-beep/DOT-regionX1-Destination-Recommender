@@ -2,6 +2,7 @@
 
 namespace App\Services\Geocoding;
 
+use App\Support\Geo\RegionXi;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -62,9 +63,12 @@ class AddressSuggestionService
     private const DAVAO_VIEWBOX = '125.0,7.9,126.7,5.6';
 
     /**
+     * With $regionOnly (the trip form's pick-up box, trip_location_v2) only places inside Davao Region are offered. A typed
+     * place is still looked up across the Philippines (resolve), so one outside the region is refused, not silently ignored.
+     *
      * @return Collection<int, array{label: string, lat: float, lng: float}>
      */
-    public function suggest(string $query): Collection
+    public function suggest(string $query, bool $regionOnly = false): Collection
     {
         $query = trim($query);
 
@@ -74,14 +78,14 @@ class AddressSuggestionService
 
         // The provider is part of the key: switching providers should not serve
         // yesterday's results from the other one.
-        $key = 'geocode:'.($this->hasKey() ? 'geoapify' : 'osm').':'.md5(mb_strtolower($query));
+        $key = 'geocode:'.($this->hasKey() ? 'geoapify' : 'osm').':'.md5(mb_strtolower($query)).($regionOnly ? ':xi' : '');
 
         $cached = Cache::get($key);
         if ($cached !== null) {
             return collect($cached);
         }
 
-        $result = $this->hasKey() ? $this->fromGeoapify($query) : $this->fromNominatim($query);
+        $result = $this->hasKey() ? $this->fromGeoapify($query, $regionOnly) : $this->fromNominatim($query, $regionOnly);
 
         /*
          * Only a genuine answer from the provider is cached -- including a
@@ -125,14 +129,15 @@ class AddressSuggestionService
      *   null means the request itself failed and nothing should be cached;
      *   an empty Collection means the provider genuinely found no matches.
      */
-    private function fromGeoapify(string $query): ?Collection
+    private function fromGeoapify(string $query, bool $regionOnly): ?Collection
     {
-        return $this->attempt(function () use ($query) {
+        return $this->attempt(function () use ($query, $regionOnly) {
             $response = Http::timeout(6)->get(self::GEOAPIFY_ENDPOINT, [
                 'text' => $query,
                 'format' => 'json',
                 'limit' => self::MAX_RESULTS,
-                'filter' => 'countrycode:ph',
+                // west, south, east, north of the Davao Region box; the outline check below trims what the box lets through.
+                'filter' => $regionOnly ? 'rect:125.0,5.6,126.7,7.9' : 'countrycode:ph',
                 // Bias, not a filter: a visitor flying in from Manila still
                 // needs to be able to name where they are starting.
                 'bias' => 'proximity:'.self::BIAS_LNG.','.self::BIAS_LAT,
@@ -147,16 +152,16 @@ class AddressSuggestionService
                 return null;
             }
 
-            return $this->normalise($response->json('results') ?? [], 'formatted', 'lat', 'lon');
+            return $this->normalise($response->json('results') ?? [], 'formatted', 'lat', 'lon', $regionOnly);
         });
     }
 
     /**
      * @return Collection<int, array{label: string, lat: float, lng: float}>|null
      */
-    private function fromNominatim(string $query): ?Collection
+    private function fromNominatim(string $query, bool $regionOnly): ?Collection
     {
-        return $this->attempt(function () use ($query) {
+        return $this->attempt(function () use ($query, $regionOnly) {
             $response = Http::withHeaders(['User-Agent' => self::USER_AGENT])
                 ->timeout(6)
                 ->get(self::NOMINATIM_ENDPOINT, [
@@ -166,14 +171,14 @@ class AddressSuggestionService
                     'limit' => self::MAX_RESULTS,
                     'countrycodes' => 'ph',
                     'viewbox' => self::DAVAO_VIEWBOX,
-                    'bounded' => 0,
+                    'bounded' => $regionOnly ? 1 : 0,
                 ]);
 
             if ($response->failed()) {
                 return null;
             }
 
-            return $this->normalise($response->json() ?? [], 'display_name', 'lat', 'lon');
+            return $this->normalise($response->json() ?? [], 'display_name', 'lat', 'lon', $regionOnly);
         });
     }
 
@@ -184,7 +189,7 @@ class AddressSuggestionService
      * @param  array<int, array<string, mixed>>  $places
      * @return Collection<int, array{label: string, lat: float, lng: float}>
      */
-    private function normalise(array $places, string $labelKey, string $latKey, string $lngKey): Collection
+    private function normalise(array $places, string $labelKey, string $latKey, string $lngKey, bool $regionOnly = false): Collection
     {
         return collect($places)
             ->map(fn (array $place) => [
@@ -193,6 +198,7 @@ class AddressSuggestionService
                 'lng' => (float) ($place[$lngKey] ?? 0),
             ])
             ->filter(fn (array $place) => $place['label'] !== '' && $place['lat'] !== 0.0)
+            ->filter(fn (array $place) => ! $regionOnly || RegionXi::contains($place['lat'], $place['lng']))
             ->values();
     }
 

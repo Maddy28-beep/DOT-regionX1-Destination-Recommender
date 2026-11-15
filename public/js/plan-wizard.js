@@ -31,7 +31,7 @@
     const headings = ['Tell us about your trip.', 'What would you love to do?', 'Where will you rest, and what’s your budget?', 'How will you get around?'];
     const descriptions = [
         tripWindow
-            ? 'Choose your companions, trip dates and starting point.'
+            ? 'The basics — where you’re coming from, when your trip starts and ends, where we pick you up, and who’s coming.'
             : 'The basics — when you’re coming and who’s coming with you.',
         'Choose the interests you’d like your trip to include.',
         'Two quick choices. A budget and a place to stay are already picked, so you can go straight on.',
@@ -54,10 +54,10 @@
         return step;
     });
     // Who is coming, when, where from, where they start: the order the blocks read in.
-    // With the start and end: who is coming, where from (in "About you"), the pick-up location, then when it starts and ends.
+    // With the start and end: where from (first, in "About you"), when it starts and ends, the pick-up location, then who is coming.
     if (tripWindow) {
         steps[0].classList.add('has-trip-window');
-        steps[0].append(style, basics, origin, visit);
+        steps[0].append(visit, basics, origin, style);
     }
     else steps[0].append(style, basics, visit, origin);
     steps[1].append(interests);
