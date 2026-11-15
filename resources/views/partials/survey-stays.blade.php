@@ -1,6 +1,6 @@
 <section class="survey-stays" aria-labelledby="survey-stays-title" data-survey-stays>
     <h2 id="survey-stays-title">Where did you stay? <span>(optional)</span></h2>
-    <p class="field-hint">Scroll through the accommodation names and addresses to find where you stayed. If it’s missing, choose “Other / not in the list”.</p>
+    <p class="field-hint">Find your accommodation by name, city or area. If it’s missing, choose “Other / not in the list”.</p>
     @php
         $stayAnswers = old('stays');
         $stayAnswers = is_array($stayAnswers) ? array_values(array_slice($stayAnswers, 0, 5)) : [];

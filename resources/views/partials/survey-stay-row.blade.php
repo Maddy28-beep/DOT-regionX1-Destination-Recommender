@@ -1,7 +1,7 @@
 <fieldset class="survey-stay-row" data-stay-row>
     <legend>Stay <span data-stay-number>{{ is_numeric($stayIndex) ? (int) $stayIndex + 1 : '' }}</span></legend>
     <label for="stay-place-{{ $stayIndex }}">Place you stayed</label>
-    <select id="stay-place-{{ $stayIndex }}" name="stays[{{ $stayIndex }}][place]" data-stay-choice>
+    <select id="stay-place-{{ $stayIndex }}" name="stays[{{ $stayIndex }}][place]" data-stay-choice data-enhanced="stay-search">
         <option value="" disabled @selected(blank($stayAnswer['place'] ?? null))>Select where you stayed</option>
         <option value="other" @selected(($stayAnswer['place'] ?? '') === 'other')>Other / not in the list</option>
         <option value="friends_family" @selected(($stayAnswer['place'] ?? '') === 'friends_family')>Stayed with friends or family</option>

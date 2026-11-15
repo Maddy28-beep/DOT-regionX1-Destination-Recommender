@@ -93,6 +93,15 @@
 .survey-stay-row legend { padding:0 6px; font-size:.75rem; color:var(--muted); }
 .survey-stay-row > label { display:block; font-size:.85rem; font-weight:600; margin-bottom:8px; }
 .survey-stay-row select { width:100%; max-width:100%; }
+.survey-stay-row select[hidden] { display:none; }
+.survey-stay-picker > input { width:100%; min-height:48px; }
+.survey-stay-matches { max-height:250px; overflow-y:auto; overscroll-behavior:contain; border:1px solid var(--border); border-radius:10px; background:white; }
+.survey-stay-matches[hidden] { display:none; }
+.survey-stay-match { padding:12px 14px; min-height:44px; color:var(--primary-dark); font-size:.85rem; cursor:pointer; overflow-wrap:anywhere; }
+.survey-stay-match + .survey-stay-match { border-top:1px solid var(--border); }
+.survey-stay-match:hover,.survey-stay-match.is-active,.survey-stay-match[aria-selected="true"] { background:var(--primary-light); }
+.survey-stay-search-status { font-size:.75rem; margin:8px 0; }
+.survey-stay-search-status:empty { display:none; }
 .survey-stay-manual { margin-top:14px; display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 .survey-stay-manual[hidden] { display:none; }
 .survey-stay-manual .field { margin:0; min-width:0; }
