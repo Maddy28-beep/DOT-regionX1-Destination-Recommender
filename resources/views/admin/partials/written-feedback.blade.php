@@ -15,6 +15,8 @@
                 <strong>{{ $isSurveyFeedback ? 'Visitor feedback' : ($writtenFeedback->listing ? app(\App\Support\SampleData::class)->labelledName($writtenFeedback->listing) : 'Removed listing') }}</strong>
                 <span>{{ ($isSurveyFeedback ? $writtenFeedback->submitted_at : $writtenFeedback->created_at)->copy()->timezone('Asia/Manila')->format('M j, Y · g:i A') }}</span>
                 <span>Rating: {{ $isSurveyFeedback ? $writtenFeedback->overall_rating : $writtenFeedback->rating }}/5</span>
+                @if (!$isSurveyFeedback && $writtenFeedback->service_rating !== null)<span>Service: {{ $writtenFeedback->service_rating }}/5</span>@endif
+                @if (!$isSurveyFeedback && $writtenFeedback->amenities_rating !== null)<span>Amenities: {{ $writtenFeedback->amenities_rating }}/5</span>@endif
                 @if ($isSurveyFeedback && $writtenFeedback->data_source === 'demo')<span class="status-pill status-pending">Simulated response</span>@endif
             </div>
             <p class="adm-written-feedback__text">{{ $isSurveyFeedback ? $writtenFeedback->comments : $writtenFeedback->comment }}</p>
