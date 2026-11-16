@@ -1,0 +1,9 @@
+.adm-written-feedback { margin-bottom:20px; }
+.adm-written-feedback__entry { padding:18px 22px; border-top:1px solid var(--border); }
+.adm-written-feedback__meta { display:flex; align-items:center; flex-wrap:wrap; gap:8px 16px; font-size:.75rem; color:var(--muted); }
+.adm-written-feedback__meta strong { font-size:.85rem; color:var(--ink); }
+.adm-written-feedback__text { margin:10px 0 0; font-size:.88rem; line-height:1.7; white-space:pre-wrap; overflow-wrap:anywhere; }
+.adm-written-feedback__reply { margin-top:14px; padding:12px 16px; background:var(--primary-light); border-radius:8px; font-size:.8rem; }
+.adm-written-feedback__reply .adm-written-feedback__text { margin-top:5px; }
+.adm-written-feedback__empty,.adm-written-feedback__pages { padding:18px 22px; margin:0; color:var(--muted); font-size:.85rem; }
+@media(max-width:600px) { .adm-written-feedback__entry { padding:16px; } }

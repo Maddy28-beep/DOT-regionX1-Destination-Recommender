@@ -76,6 +76,7 @@
     <x-banner tone="info">Showing real tourist responses only. {{ $simulatedHidden }} simulated demo survey{{ $simulatedHidden === 1 ? '' : 's' }} {{ $simulatedHidden === 1 ? 'is' : 'are' }} left out; tick &ldquo;Include simulated survey rows&rdquo; to add them.</x-banner>
 @endif
 
+@include('admin.partials.written-feedback', ['feedbackComments' => $surveyComments, 'feedbackHeading' => 'Comments & suggestions', 'feedbackId' => 'survey-comments', 'isSurveyFeedback' => true])
 @include('admin.partials.expenditure-distribution')
 
 @if ($count === 0)
