@@ -9,7 +9,7 @@
             <span class="file-field__btn"><x-icon name="camera" /> Choose photos</span>
             <span class="file-field__status" data-file-status>No files chosen</span>
         </label>
-        <p class="field-hint">Up to 10 at a time.</p>
+        <p class="field-hint">Up to 10 at a time. Amenity and accessibility photos appear with those features, not as your cover.</p>
     </div>
 
     <div class="ptr-two">

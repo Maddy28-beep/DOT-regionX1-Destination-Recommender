@@ -27,6 +27,7 @@
                     Every photo is credited.
                 @endif
             </p>
+            <p class="field-hint">Amenity and accessibility photos appear with their matching features. They are not used as cover photos.</p>
         </div>
     </div>
     <div class="adm-card__body">
@@ -46,7 +47,7 @@
                     <div class="ptr-photo" draggable="true" data-id="{{ $photo->id }}">
                         <div class="ptr-photo__img">
                             <img src="{{ $photo->url() }}" alt="{{ $listing->name }}, {{ $photo->category }}" loading="lazy">
-                            @if ($photo->is_primary)<span class="ptr-photo__cover"><x-icon name="star" /> Cover</span>@endif
+                            @if ($photo->is_primary && !$photo->isAmenityPhoto())<span class="ptr-photo__cover"><x-icon name="star" /> Cover</span>@endif
                         </div>
                         <div class="ptr-photo__meta">
                             <span class="ptr-photo__grip" title="Drag to reorder" aria-hidden="true">&#8942;&#8942;</span>
@@ -56,9 +57,9 @@
                                aria-label="{{ $credited ? 'Credit: '.($photo->credit_text ?: $photo->source_name).'. Change it' : 'Add a credit for this '.$photo->category.' photo' }}">{{ $credited ? 'Credited' : 'Add credit' }}</a>
                         </div>
                         <div class="ptr-photo__acts">
-                            @unless ($photo->is_primary)
+                            @if (!$photo->is_primary && !$photo->isAmenityPhoto())
                                 <form method="POST" action="{{ route('establishment.photos.primary', $photo) }}">@csrf<button type="submit" class="adm-icon-btn" title="Make cover photo" aria-label="Make this {{ $photo->category }} photo the cover"><x-icon name="star" /></button></form>
-                            @endunless
+                            @endif
                             <form method="POST" action="{{ route('establishment.photos.up', $photo) }}">@csrf<button type="submit" class="adm-icon-btn" title="Move earlier" aria-label="Move this {{ $photo->category }} photo earlier"><x-icon name="chevron-left" /></button></form>
                             <form method="POST" action="{{ route('establishment.photos.down', $photo) }}">@csrf<button type="submit" class="adm-icon-btn" title="Move later" aria-label="Move this {{ $photo->category }} photo later"><x-icon name="chevron-right" /></button></form>
                             <form method="POST" action="{{ route('establishment.photos.destroy', $photo) }}" onsubmit="return confirm('Remove this photo?');" style="margin-left:auto;">@csrf @method('DELETE')<button type="submit" class="adm-icon-btn is-danger" title="Remove" aria-label="Remove this {{ $photo->category }} photo"><x-icon name="x" /></button></form>

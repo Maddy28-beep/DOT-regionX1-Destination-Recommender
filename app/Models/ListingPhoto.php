@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Support\PhotoCardCopy;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Storage;
 
@@ -34,6 +35,18 @@ class ListingPhoto extends Model
     public function isIllustration(): bool
     {
         return str_ends_with(strtolower((string) $this->path), '.svg') || $this->category === self::SAMPLE_CATEGORY;
+    }
+
+    /** Facility/accessibility evidence belongs with that feature, never as a listing cover. */
+    public function isAmenityPhoto(): bool
+    {
+        return filled($this->amenity) || in_array(strtolower(trim((string) $this->category)), ['amenities', 'accessibility'], true);
+    }
+
+    public function scopeCoverEligible(Builder $query): Builder
+    {
+        return $query->where(fn ($q) => $q->whereNull('amenity')->orWhereRaw("TRIM(amenity) = ''"))
+            ->where(fn ($q) => $q->whereNull('category')->orWhereRaw("LOWER(TRIM(category)) NOT IN ('amenities', 'accessibility')"));
     }
 
     /**

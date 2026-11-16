@@ -172,7 +172,7 @@ class EstablishmentPhotoController extends Controller
         $credit = $request->boolean('own') ? $establishment->business_name : trim((string) ($data['credit_text'] ?? ''));
 
         $nextSort = (int) $listing->photos()->max('sort_order') + 1;
-        $hasPhotos = $listing->photos()->exists();
+        $hasPhotos = $listing->photos()->coverEligible()->exists();
 
         foreach ($data['photos'] as $i => $file) {
             $path = $file->store("listings/{$establishment->listing_kind}/{$listing->id}", 'public');
@@ -184,7 +184,7 @@ class EstablishmentPhotoController extends Controller
                 'category' => $data['category'],
                 'amenity' => $amenity,
                 'sort_order' => $nextSort + $i,
-                'is_primary' => ! $hasPhotos && $i === 0,
+                'is_primary' => ! $hasPhotos && $i === 0 && !$amenity && !in_array($data['category'], ['Amenities', 'Accessibility'], true),
                 'credit_text' => $credit,
                 'source_name' => $credit,
             ]);
@@ -203,6 +203,10 @@ class EstablishmentPhotoController extends Controller
     public function setPrimary(Request $request, ListingPhoto $photo): RedirectResponse
     {
         $this->authorizePhoto($request->user('establishment'), $photo);
+
+        if ($photo->isAmenityPhoto()) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['photo' => 'Amenity and accessibility photos appear with their features. Choose a general, exterior or other listing photo for the cover.']);
+        }
 
         ListingPhoto::where('listing_kind', $photo->listing_kind)
             ->where('listing_id', $photo->listing_id)
@@ -228,6 +232,7 @@ class EstablishmentPhotoController extends Controller
         if ($wasPrimary) {
             ListingPhoto::where('listing_kind', $listingKind)
                 ->where('listing_id', $listingId)
+                ->coverEligible()
                 ->orderBy('sort_order')
                 ->first()?->update(['is_primary' => true]);
         }

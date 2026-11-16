@@ -265,12 +265,12 @@ class EstablishmentPackageController extends Controller
 
         $credit = $request->boolean('own') ? $request->user('establishment')->business_name : trim((string) ($data['credit_text'] ?? ''));
         $next = (int) $package->photos()->max('sort_order') + 1;
-        $first = ! $package->photos()->exists();
+        $first = ! $package->photos()->coverEligible()->exists();
 
         foreach ($data['photos'] as $i => $file) {
             ListingPhoto::create([
                 'listing_kind' => 'package', 'listing_id' => $package->id, 'path' => $file->store("listings/package/{$package->id}", 'public'),
-                'category' => $data['category'], 'amenity' => $feature, 'sort_order' => $next + $i, 'is_primary' => $first && $i === 0,
+                'category' => $data['category'], 'amenity' => $feature, 'sort_order' => $next + $i, 'is_primary' => $first && $i === 0 && !$feature && !in_array($data['category'], ['Amenities', 'Accessibility'], true),
                 'credit_text' => $credit, 'source_name' => $credit,
             ]);
         }
@@ -294,7 +294,7 @@ class EstablishmentPackageController extends Controller
         $photo->delete();
 
         if ($wasPrimary) {
-            ListingPhoto::where('listing_kind', 'package')->where('listing_id', $package->id)->orderBy('sort_order')->first()?->update(['is_primary' => true]);
+            ListingPhoto::where('listing_kind', 'package')->where('listing_id', $package->id)->coverEligible()->orderBy('sort_order')->first()?->update(['is_primary' => true]);
         }
 
         return back()->with(Toast::success('Photo removed'));
