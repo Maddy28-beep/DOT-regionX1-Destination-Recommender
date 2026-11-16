@@ -31,6 +31,8 @@
     </div>
 </div>
 
+@include('admin.partials.written-feedback', ['feedbackComments' => $writtenReviews, 'feedbackHeading' => 'Written reviews', 'feedbackId' => 'written-reviews', 'isSurveyFeedback' => false])
+
 <div class="adm-card">
     <div class="adm-card__head">
         <div>

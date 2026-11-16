@@ -390,6 +390,10 @@ class AdminDashboardController extends Controller
         };
 
         $count = $filtered()->count();
+        $surveyComments = $filtered()->whereNotNull('comments')->whereRaw("TRIM(comments) <> ''")
+            ->latest('submitted_at')->orderByDesc('id')
+            ->paginate(15, ['id', 'submitted_at', 'overall_rating', 'comments', 'data_source'], 'comments_page')
+            ->withQueryString()->fragment('survey-comments');
 
         /*
          * What Apriori can actually use. A rule "A -> B" needs both places in
@@ -553,7 +557,7 @@ class AdminDashboardController extends Controller
         $purposeOptions = ExitSurveyController::TRAVEL_PURPOSES;
 
         return view('admin.exit-surveys', compact(
-            'count', 'realCount', 'realUsableForRules', 'checkedInVisitors', 'avgRatings', 'wouldRecommendPct',
+            'count', 'surveyComments', 'realCount', 'realUsableForRules', 'checkedInVisitors', 'avgRatings', 'wouldRecommendPct',
             'residencyBreakdown', 'visitorTypeBreakdown', 'travelPurposeBreakdown', 'avgDaysStayed',
             'originBreakdown', 'originTotal', 'otherOriginsCount',
             'avgTotalSpend', 'spendByResidency', 'spendRespondentCount', 'expenditure',
