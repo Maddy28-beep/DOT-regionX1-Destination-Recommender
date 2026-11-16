@@ -18,7 +18,7 @@ trait HasListingPhotos
     public function coverPhoto(): ?ListingPhoto
     {
         return $this->relationLoaded('photos')
-            ? $this->photos->first()
-            : $this->photos()->first();
+            ? $this->photos->first(fn ($photo) => !$photo->isAmenityPhoto())
+            : $this->photos()->coverEligible()->first();
     }
 }
