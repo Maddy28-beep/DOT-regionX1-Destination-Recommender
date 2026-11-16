@@ -92,7 +92,10 @@
     let current = 0;
     let busy = false;
     function show(index, focus = false) {
+        if (root.hasAttribute('data-origin-pending')) index = 0;
         current = index;
+        steps[0].querySelector('h2').textContent = root.hasAttribute('data-origin-pending') ? 'Start with your place of origin.' : headings[0];
+        steps[0].querySelector('.plan-step-intro').textContent = root.hasAttribute('data-origin-pending') ? 'Confirm where you are travelling from to continue planning.' : descriptions[0];
         steps.forEach((step, i) => { step.hidden = i !== index; });
         nav.querySelectorAll('[data-plan-step]').forEach((button, i) => {
             button.classList.toggle('is-complete', i < index);
@@ -124,7 +127,7 @@
         return true;
     }
     async function advance(target) {
-        if (current === 0 && window.confirmVisitorOrigin && !await window.confirmVisitorOrigin()) return;
+        if (window.confirmVisitorOrigin && !await window.confirmVisitorOrigin()) { show(0); return; }
         if (validate(Array.from({length: target}, (_, i) => i))) show(target, true);
     }
     next.addEventListener('click', () => advance(current + 1));
@@ -155,6 +158,8 @@
         event.preventDefault();
         if (busy) return;
         if (current < last) { await advance(current + 1); return; }
+        if (window.confirmVisitorOrigin && !await window.confirmVisitorOrigin()) { show(0, true); return; }
+        if (busy) return;
         if (!validate(steps.map((_, i) => i))) return;
         busy = true;
         errorBox.hidden = true;
@@ -245,6 +250,7 @@
         leaveResume();
         draftDirty = true;
         show(Number.isInteger(draft.step) ? Math.max(0, Math.min(last, draft.step)) : 0, true);
+        draft = null;
     });
     document.getElementById('planResumeDiscard').addEventListener('click', () => {
         clearDraft();
@@ -266,7 +272,8 @@
         show(Math.max(0, index));
         badField.setAttribute('aria-invalid', 'true');
     } else show(0);
-    if (draft && !errors.length) {
+    function offerResume() {
+        if (!draft || errors.length || root.hasAttribute('data-origin-pending')) return;
         resumePending = true;
         resume.hidden = false;
         root.classList.add('has-resume');
@@ -297,4 +304,10 @@
         motion.addEventListener('change', stopWave);
         document.addEventListener('visibilitychange', () => { if (document.hidden) stopWave(); });
     }
+    offerResume();
+    document.addEventListener('visitor-origin-confirmed', () => { show(0); offerResume(); });
+    document.addEventListener('visitor-origin-invalidated', () => {
+        if (resumePending) leaveResume();
+        show(0, true);
+    });
 })();
