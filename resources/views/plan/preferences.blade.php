@@ -23,7 +23,10 @@
 <link rel="stylesheet" href="{{ asset('css/plan-trip-layout.css') }}?v={{ filemtime(public_path('css/plan-trip-layout.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/plan-headings.css') }}?v={{ filemtime(public_path('css/plan-headings.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/plan-sidebar.css') }}?v={{ filemtime(public_path('css/plan-sidebar.css')) }}">
-<div class="plan-shell plan-wizard" id="planWizard" data-draft-owner="{{ auth()->id() ?? 'guest' }}">
+@if (\App\Support\Features::tripLocation())
+<script>document.documentElement.classList.add('plan-origin-gating');</script>
+@endif
+<div class="plan-shell plan-wizard" id="planWizard" data-draft-owner="{{ auth()->id() ?? 'guest' }}" @if (\App\Support\Features::tripLocation()) data-origin-pending @endif>
     <div class="section-tight">
         <div class="container plan-frame">
             {{-- The intro sits in a column beside the form (not a banner above it), so the form starts near the top of the screen. --}}
