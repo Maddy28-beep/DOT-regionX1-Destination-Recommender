@@ -64,6 +64,10 @@ Route::get('/check-in/{type}/{id}', [CheckInController::class, 'checkIn'])
 Route::post('/reviews/{type}/{id}', [\App\Http\Controllers\ReviewController::class, 'store'])
     ->middleware('throttle:10,1')
     ->name('reviews.store');
+Route::post('/reviews/{type}/{id}/feedback', [\App\Http\Controllers\ReviewController::class, 'complete'])
+    ->whereNumber('id')
+    ->middleware('throttle:10,1')
+    ->name('reviews.complete');
 
 // Homepage hero search: routes the visitor to the catalogue that answers
 // "I want to...", carrying the rest of the bar across as filters.

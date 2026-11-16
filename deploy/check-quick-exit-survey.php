@@ -83,12 +83,12 @@ try {
     $html = view('partials.review-form', $reviewData)->render();
     @$dom->loadHTML($html);
     $path = new DOMXPath($dom);
-    $check($path->query('//details[contains(@class,"review-form__details") and not(@open)]')->length === 1 && $path->query('//details//input[@required]')->length === 0 && $path->query('//details//textarea[@name="comment"]')->length === 1, 'Optional establishment ratings and comment start collapsed');
+    $check($path->query('//textarea[@name="comment" and not(ancestor::details)]')->length === 1 && $path->query('//fieldset[contains(@class,"review-form__rating--aspect") and not(ancestor::details)]')->length === 2, 'Comments and optional service/amenities ratings are directly visible');
     $session->put('_old_input', ['service_rating' => 4, 'comment' => 'Preserved review']);
     $html = view('partials.review-form', $reviewData)->render();
     @$dom->loadHTML($html);
     $path = new DOMXPath($dom);
-    $check($path->query('//details[@open]')->length === 1 && str_contains($html, 'Preserved review'), 'Establishment review details reopen with preserved answers');
+    $check($path->query('//input[@name="service_rating" and @value="4" and @checked]')->length === 1 && str_contains($html, 'Preserved review'), 'Establishment review keeps previously entered ratings and comment');
 } finally {
     Illuminate\Support\Facades\DB::rollBack();
 }

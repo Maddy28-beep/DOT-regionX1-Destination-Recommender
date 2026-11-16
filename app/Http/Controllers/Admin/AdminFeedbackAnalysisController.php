@@ -62,7 +62,7 @@ class AdminFeedbackAnalysisController extends Controller
 
         $writtenReviews = (clone $query)->with('listing')->whereNotNull('comment')->whereRaw("TRIM(comment) <> ''")
             ->latest('created_at')->orderByDesc('id')
-            ->paginate(15, ['id', 'listing_kind', 'listing_id', 'rating', 'comment', 'owner_reply', 'created_at'], 'reviews_page')
+            ->paginate(15, ['id', 'listing_kind', 'listing_id', 'rating', 'service_rating', 'amenities_rating', 'comment', 'owner_reply', 'created_at'], 'reviews_page')
             ->withQueryString()->fragment('written-reviews');
         $reviews = $query->get(['listing_kind', 'listing_id', 'rating', 'service_rating', 'amenities_rating', 'created_at']);
 

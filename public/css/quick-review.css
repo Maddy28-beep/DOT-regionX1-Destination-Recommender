@@ -3,3 +3,4 @@
 .review-form__details summary:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
 .review-form__details[open] summary { margin-bottom:8px; }
 .review-form__details .field:last-child { margin-bottom:16px; }
+.review-form--followup { margin-top:16px; padding-top:16px; border-top:1px solid var(--border); }
