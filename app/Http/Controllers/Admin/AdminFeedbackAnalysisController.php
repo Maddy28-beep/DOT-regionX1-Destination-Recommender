@@ -60,6 +60,10 @@ class AdminFeedbackAnalysisController extends Controller
             $query->where('listing_kind', $selected[0])->where('listing_id', $selected[1]);
         }
 
+        $writtenReviews = (clone $query)->with('listing')->whereNotNull('comment')->whereRaw("TRIM(comment) <> ''")
+            ->latest('created_at')->orderByDesc('id')
+            ->paginate(15, ['id', 'listing_kind', 'listing_id', 'rating', 'service_rating', 'amenities_rating', 'comment', 'owner_reply', 'created_at'], 'reviews_page')
+            ->withQueryString()->fragment('written-reviews');
         $reviews = $query->get(['listing_kind', 'listing_id', 'rating', 'service_rating', 'amenities_rating', 'created_at']);
 
         // Trend windows end at the end of the chosen range, never in the future.
@@ -84,6 +88,7 @@ class AdminFeedbackAnalysisController extends Controller
             'from' => $from,
             'to' => $to,
             'stats' => $overall,
+            'writtenReviews' => $writtenReviews,
             'perEstablishment' => $perEstablishment,
             'establishmentOptions' => $this->options(),
             'selectedKey' => $selected ? $selected[0].':'.$selected[1] : '',

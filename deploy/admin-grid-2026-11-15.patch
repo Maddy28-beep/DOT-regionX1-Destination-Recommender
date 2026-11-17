@@ -1,0 +1,129 @@
+--- a/public/css/admin-workspace.css
++++ b/public/css/admin-workspace.css
+@@ -350,3 +350,58 @@
+ @media (prefers-reduced-motion: reduce) {
+     body.admin-workspace .adm-kpi--link { transition: none; }
+ }
++
++/* One surface language for grids, without large decorative elements. */
++body.admin-workspace .adm-card,
++body.admin-workspace .admin-main .panel,
++body.admin-workspace .stat-card,
++body.admin-workspace .adm-kpi,
++body.admin-workspace .xs-kpi,
++body.admin-workspace .fb-aspect,
++body.admin-workspace .establishment-card {
++    border: 1px solid #dfe6e3;
++    border-top: 2px solid #c4d8ce;
++    border-radius: 8px;
++    background: #fff;
++    box-shadow: 0 1px 2px #193d2d06;
++}
++body.admin-workspace .adm-card__head,
++body.admin-workspace .admin-main .panel-head {
++    background: #f8fbf9;
++    border-bottom: 1px solid #e6ede9;
++}
++body.admin-workspace .adm-card__head h2,
++body.admin-workspace .admin-main .panel-head h2 { color: #314c40; }
++body.admin-workspace .adm-kpi--link:hover,
++body.admin-workspace .stat-card--link:hover { border-top-color: #4e8e72; box-shadow: 0 2px 5px #193d2d0b; }
++body.admin-workspace .adm-table tbody tr:nth-child(even),
++body.admin-workspace .data-table tbody tr:nth-child(even) { background: #fbfcfd; }
++body.admin-workspace .adm-table tbody tr:hover,
++body.admin-workspace .data-table tbody tr:hover { background: #f2f7f4; }
++body.admin-workspace .adm-modal__body .adm-card { border: 0; box-shadow: none; }
++
++/* Approval actions must remain fixed-size, regardless of table compression. */
++body.admin-workspace .establishments-table { min-width: 1080px; }
++body.admin-workspace .establishments-table th:last-child,
++body.admin-workspace .establishments-table td:last-child { width: 110px; min-width: 110px; }
++body.admin-workspace .approval-actions { display: flex; align-items: center; justify-content: flex-start; gap: 7px; flex-wrap: nowrap; margin: 0; }
++body.admin-workspace .approval-actions form { flex: 0 0 auto; width: auto; min-width: max-content; margin: 0; }
++body.admin-workspace .approval-actions .approval-action { display: inline-flex; align-items: center; justify-content: center; width: 32px; min-width: 32px; height: 32px; padding: 0; border-radius: 5px; }
++body.admin-workspace .approval-action svg { width: 16px; height: 16px; flex: none; }
++body.admin-workspace .approval-action--approve { color: #286b4e; border-color: #c9ded2; background: #fff; }
++body.admin-workspace .approval-action--approve:hover:not(:disabled) { background: #edf6f0; border-color: #6b9b7f; }
++body.admin-workspace .approval-action--reject { color: #9a4d47; border-color: #e7d3d0; background: #fff; }
++body.admin-workspace .approval-action--reject:hover { background: #fff1ef; border-color: #c48e86; }
++body.admin-workspace .approval-actions .btn,
++body.admin-workspace .matched-listing-form .btn { width: auto; min-width: max-content; white-space: nowrap; overflow-wrap: normal; word-break: normal; }
++body.admin-workspace .matched-listing-form .btn { align-self: flex-start; }
++body.admin-workspace .establishment-card { padding: 18px; }
++body.admin-workspace .establishment-card__head { padding-bottom: 12px; border-bottom: 1px solid #e6ede9; }
++body.admin-workspace .establishment-card__head strong { font-size: 14px; font-weight: 600; }
++body.admin-workspace .establishment-card__field { font-size: 13px; min-width: 0; overflow-wrap: anywhere; }
++body.admin-workspace .approval-actions--card { margin-top: 16px; padding-top: 14px; border-top: 1px solid #e6ede9; gap: 10px; }
++body.admin-workspace .approval-actions--card .btn { min-height: 36px; padding-inline: 12px; }
++@media (max-width: 540px) {
++    body.admin-workspace .establishment-card__grid { grid-template-columns: minmax(0, 1fr); }
++    body.admin-workspace .approval-actions--card .btn { min-height: 40px; }
++}
+--- a/resources/views/admin/establishments.blade.php
++++ b/resources/views/admin/establishments.blade.php
+@@ -31,7 +31,7 @@
+             <thead>
+                 <tr>
+                     <th>Business</th><th>Type</th><th>Contact</th><th>Claimed DOT #</th>
+-                    <th>Submitted</th><th>Status</th><th>Matched Listing</th><th></th>
++                    <th>Submitted</th><th>Status</th><th>Matched Listing</th><th><span class="sr-only">Actions</span></th>
+                 </tr>
+             </thead>
+             <tbody>
+@@ -57,7 +57,7 @@
+                                         <option value="{{ $listing->id }}" @selected($e->matched_listing_id === $listing->id)>{{ $listing->name }}{{ app(\App\Support\SampleData::class)->isSample($listing) ? ' (sample data)' : '' }}</option>
+                                     @endforeach
+                                 </select>
+-                                <button type="submit" class="btn btn-outline btn-xs">Save Match</button>
++                                <button type="submit" class="btn btn-outline btn-xs"><x-icon name="link" />Save match</button>
+                             </form>
+                         </td>
+                         <td>
+@@ -65,15 +65,15 @@
+                                 <div class="util-row approval-actions">
+                                     <form method="POST" action="{{ route('admin.establishments.approve', $e) }}">
+                                         @csrf
+-                                        <button type="submit" class="btn btn-primary btn-xs"
++                                        <button type="submit" class="adm-icon-btn approval-action approval-action--approve" aria-label="Approve {{ $e->business_name }}"
+                                                 @disabled(! $e->matched_listing_id)
+-                                                @if (! $e->matched_listing_id) title="Link this establishment to an existing listing before approving." @endif>
+-                                            Approve
++                                                title="{{ $e->matched_listing_id ? 'Approve '.$e->business_name : 'Link this establishment to an existing listing before approving.' }}">
++                                            <x-icon name="check" />
+                                         </button>
+                                     </form>
+                                     <form method="POST" action="{{ route('admin.establishments.reject', $e) }}">
+                                         @csrf
+-                                        <button type="submit" class="btn btn-outline-danger btn-xs">Reject</button>
++                                        <button type="submit" class="adm-icon-btn approval-action approval-action--reject" title="Reject {{ $e->business_name }}" aria-label="Reject {{ $e->business_name }}"><x-icon name="x" /></button>
+                                     </form>
+                                 </div>
+                             @else
+@@ -129,7 +129,7 @@
+                                 <option value="{{ $listing->id }}" @selected($e->matched_listing_id === $listing->id)>{{ $listing->name }}{{ app(\App\Support\SampleData::class)->isSample($listing) ? ' (sample data)' : '' }}</option>
+                             @endforeach
+                         </select>
+-                        <button type="submit" class="btn btn-outline btn-xs btn-block">Save Match</button>
++                        <button type="submit" class="btn btn-outline btn-xs"><x-icon name="link" />Save match</button>
+                     </form>
+                 </div>
+ 
+@@ -137,15 +137,15 @@
+                     <div class="approval-actions approval-actions--card">
+                         <form method="POST" action="{{ route('admin.establishments.approve', $e) }}">
+                             @csrf
+-                            <button type="submit" class="btn btn-primary btn-xs btn-block"
++                            <button type="submit" class="btn btn-outline btn-xs approval-action--approve"
+                                     @disabled(! $e->matched_listing_id)
+                                     @if (! $e->matched_listing_id) title="Link this establishment to an existing listing before approving." @endif>
+-                                Approve
++                                <x-icon name="check" />Approve
+                             </button>
+                         </form>
+                         <form method="POST" action="{{ route('admin.establishments.reject', $e) }}">
+                             @csrf
+-                            <button type="submit" class="btn btn-outline-danger btn-xs btn-block">Reject</button>
++                            <button type="submit" class="btn btn-outline btn-xs approval-action--reject"><x-icon name="x" />Reject</button>
+                         </form>
+                     </div>
+                     @if (! $e->matched_listing_id)

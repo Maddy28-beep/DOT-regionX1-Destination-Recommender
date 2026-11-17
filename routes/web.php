@@ -1,5 +1,8 @@
 <?php
 
+\Illuminate\Support\Facades\Route::post('/plan/origin-confirmation', [\App\Http\Controllers\TripPlannerController::class, 'confirmOrigin'])
+    ->middleware('throttle:30,1')->name('plan.origin-confirmation');
+
 use App\Http\Controllers\AccommodationController;
 use App\Http\Controllers\AddressSuggestionController;
 use App\Http\Controllers\Admin\AdminAdvisoryController;
@@ -61,6 +64,10 @@ Route::get('/check-in/{type}/{id}', [CheckInController::class, 'checkIn'])
 Route::post('/reviews/{type}/{id}', [\App\Http\Controllers\ReviewController::class, 'store'])
     ->middleware('throttle:10,1')
     ->name('reviews.store');
+Route::post('/reviews/{type}/{id}/feedback', [\App\Http\Controllers\ReviewController::class, 'complete'])
+    ->whereNumber('id')
+    ->middleware('throttle:10,1')
+    ->name('reviews.complete');
 
 // Homepage hero search: routes the visitor to the catalogue that answers
 // "I want to...", carrying the rest of the bar across as filters.
@@ -222,6 +229,10 @@ Route::prefix('portal/admin')->name('admin.')->middleware(['auth:admin', \App\Ht
     Route::post('/accreditation/{accreditation}/renew', [AdminDashboardController::class, 'renewAccreditation'])->name('accreditation.renew');
     Route::post('/accreditation/bulk-renew', [AdminDashboardController::class, 'bulkRenewAccreditation'])->name('accreditation.bulk-renew');
     Route::get('/exit-surveys', [AdminDashboardController::class, 'exitSurveys'])->name('exit-surveys');
+    Route::get('/expenditure', [AdminDashboardController::class, 'expenditure'])->name('expenditure');
+    Route::get('/accommodation-stays', [\App\Http\Controllers\Admin\AdminAccommodationStayController::class, 'index'])->name('accommodation-stays');
+    Route::get('/accommodation-stays/export.csv', [\App\Http\Controllers\Admin\AdminAccommodationStayController::class, 'export'])->middleware('throttle:30,1')->name('accommodation-stays.export');
+    Route::get('/expenditure/export.csv', [AdminDashboardController::class, 'expenditureCsv'])->name('expenditure.export');
     Route::get('/exit-surveys/qr', [QrCodeController::class, 'exitSurveyPoster'])->name('exit-survey-qr');
     Route::get('/exit-surveys/qr.svg', [QrCodeController::class, 'exitSurveyImage'])->name('exit-survey-qr.svg');
     Route::get('/association-rules', [AdminDashboardController::class, 'associationRules'])->name('association-rules');

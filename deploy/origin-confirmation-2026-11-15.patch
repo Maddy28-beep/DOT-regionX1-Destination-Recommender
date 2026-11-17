@@ -1,0 +1,370 @@
+--- a/app/Http/Controllers/TripPlannerController.php
++++ b/app/Http/Controllers/TripPlannerController.php
+@@ -240,6 +240,7 @@
+ 
+         $preference = $this->currentPreference($request) ?? new TouristPreference();
+         $isExisting = $preference->exists;
++        $legacyOriginPreference = $isExisting ? clone $preference : null;
+         $listsBefore = $isExisting ? $this->answerLists($preference) : null;
+ 
+         $preference->fill(collect($data)->except([
+@@ -277,10 +278,6 @@
+ 
+         $preference->save();
+ 
+-        if ($v2) {
+-            VisitorOriginStats::move($originBefore, VisitorOriginStats::answerOf($preference), $preference->created_at ?? now());
+-        }
+-
+         $preference->activities()->delete();
+         foreach ($data['activities'] ?? [] as $activity) {
+             PreferenceActivity::create(['preference_id' => $preference->id, 'activity' => $activity]);
+@@ -297,6 +294,14 @@
+         $preference->load('activities', 'amenities');
+         $itinerary = $this->itineraryService->generate($preference);
+ 
++        if ($v2 && ($answer = VisitorOriginStats::answerOf($preference)) !== null) {
++            try {
++                \App\Services\Privacy\VisitorOriginCapture::record($request, $answer, true, $legacyOriginPreference);
++            } catch (\Throwable $e) {
++                report($e);
++            }
++        }
++
+         $request->session()->put(self::PREFERENCE_KEY, $preference->id);
+         $request->session()->put(self::ITINERARY_KEY, $itinerary->id);
+ 
+@@ -308,6 +313,22 @@
+             ->with(Toast::success('Preferences saved', 'Your itinerary is ready below.'));
+     }
+ 
++    public function confirmOrigin(Request $request): \Illuminate\Http\JsonResponse
++    {
++        abort_unless(Features::tripLocation(), 404);
++        $data = $request->validate([
++            'visitor_origin_country' => ['required', 'string', 'max:10'],
++            'visitor_origin_province' => ['nullable', 'string', 'max:80'],
++            'visitor_origin_city' => ['nullable', 'string', 'max:100'],
++        ]);
++        $preference = new TouristPreference();
++        $this->applyVisitorOrigin($preference, $data);
++        \App\Services\Privacy\VisitorOriginCapture::record(
++            $request, VisitorOriginStats::answerOf($preference), false, $this->currentPreference($request)
++        );
++        return response()->json(['message' => 'Origin confirmed. You can continue planning whenever you are ready.']);
++    }
++
+     public function itinerary(Request $request): View|RedirectResponse
+     {
+         $preference = $this->currentPreference($request);
+--- a/app/Http/Controllers/Admin/AdminVisitorOriginController.php
++++ b/app/Http/Controllers/Admin/AdminVisitorOriginController.php
+@@ -34,7 +34,8 @@
+         }
+ 
+         [$from, $to] = $this->range($request);
+-        $tables = $this->tables($from, $to);
++        $metric = $request->query('metric') === 'generated' ? 'generated' : 'responses';
++        $tables = $this->tables($from, $to, $metric);
+         $min = self::MIN_GROUP;
+ 
+         return view('admin.visitor-origin', [
+@@ -42,6 +43,7 @@
+             'from' => $from?->format('Y-m-d'),
+             'to' => $to?->format('Y-m-d'),
+             'tables' => $tables,
++            'metric' => $metric,
+         ]);
+     }
+ 
+@@ -53,17 +55,19 @@
+         }
+ 
+         [$from, $to] = $this->range($request);
+-        $tables = $this->tables($from, $to);
++        $metric = $request->query('metric') === 'generated' ? 'generated' : 'responses';
++        $tables = $this->tables($from, $to, $metric);
+         $min = self::MIN_GROUP;
+ 
+         $name = 'visitor-origin'.($from ? '-from-'.$from->format('Y-m-d') : '').($to ? '-to-'.$to->format('Y-m-d') : '').'.csv';
+ 
+-        return response()->streamDownload(function () use ($tables, $min, $from, $to) {
++        return response()->streamDownload(function () use ($tables, $min, $from, $to, $metric) {
+             $out = fopen('php://output', 'w');
+             fputcsv($out, ['Visitor origin (anonymous counts)']);
++            fputcsv($out, ['Measure', $metric === 'generated' ? 'Origin responses with a generated itinerary' : 'Confirmed origin responses']);
+             fputcsv($out, ['From', $from?->format('Y-m-d') ?? 'start']);
+             fputcsv($out, ['To', $to?->format('Y-m-d') ?? 'today']);
+-            fputcsv($out, ['Dates are Philippine time. One count per browser session. Groups smaller than '.$min.' are added together under "Other".']);
++            fputcsv($out, ['Dates are Philippine time. New responses count once per browser per day. Groups smaller than '.$min.' are added together under "Other".']);
+             foreach ($tables as $title => $t) {
+                 fputcsv($out, []);
+                 fputcsv($out, [$title]);
+@@ -71,7 +75,7 @@
+                     fputcsv($out, ['Not enough answers yet: '.$t['total'].' so far; at least '.$min.' are needed.']);
+                     continue;
+                 }
+-                fputcsv($out, ['Place', 'Visitors']);
++                fputcsv($out, ['Place', 'Responses']);
+                 foreach ($t['rows'] as $row) {
+                     fputcsv($out, [self::safeCell($row['label']), $row['count']]);
+                 }
+@@ -99,13 +103,14 @@
+     }
+ 
+     /** @return array<string, array{rows: array<int, array{label: string, count: int}>, hidden: int, total: int, enough: bool}> */
+-    private function tables(?Carbon $from, ?Carbon $to): array
++    private function tables(?Carbon $from, ?Carbon $to, string $metric = 'responses'): array
+     {
++        $column = $metric === 'generated' ? 'generated_visitors' : 'visitors';
+         $rows = DB::table(VisitorOriginStats::TABLE)
+             ->when($from, fn ($q) => $q->where('day', '>=', $from->toDateString()))
+             ->when($to, fn ($q) => $q->where('day', '<=', $to->toDateString()))
+-            ->where('visitors', '>', 0)
+-            ->selectRaw('answer, country_code, province, city, SUM(visitors) as visitors')
++            ->where($column, '>', 0)
++            ->selectRaw('answer, country_code, province, city, SUM('.$column.') as visitors')
+             ->groupBy('answer', 'country_code', 'province', 'city')
+             ->get();
+ 
+--- a/routes/web.php
++++ b/routes/web.php
+@@ -1,5 +1,8 @@
+ <?php
+ 
++\Illuminate\Support\Facades\Route::post('/plan/origin-confirmation', [\App\Http\Controllers\TripPlannerController::class, 'confirmOrigin'])
++    ->middleware('throttle:30,1')->name('plan.origin-confirmation');
++
+ use App\Http\Controllers\AccommodationController;
+ use App\Http\Controllers\AddressSuggestionController;
+ use App\Http\Controllers\Admin\AdminAdvisoryController;
+--- a/routes/console.php
++++ b/routes/console.php
+@@ -4,6 +4,11 @@
+ use Illuminate\Support\Facades\Artisan;
+ use Illuminate\Support\Facades\Schedule;
+ 
++Schedule::call(function () {
++    \Illuminate\Support\Facades\DB::table('visitor_origin_receipts')
++        ->where('day', '<', now('Asia/Manila')->subDays(30)->toDateString())->delete();
++})->name('privacy:purge-origin-receipts')->dailyAt('03:15')->withoutOverlapping();
++
+ Artisan::command('inspire', function () {
+     $this->comment(Inspiring::quote());
+ })->purpose('Display an inspiring quote');
+--- a/public/js/plan-wizard.js
++++ b/public/js/plan-wizard.js
+@@ -123,11 +123,16 @@
+         }
+         return true;
+     }
+-    next.addEventListener('click', () => { if (validate([current])) show(current + 1, true); });
++    async function advance(target) {
++        if (current === 0 && window.confirmVisitorOrigin && !await window.confirmVisitorOrigin()) return;
++        if (validate(Array.from({length: target}, (_, i) => i))) show(target, true);
++    }
++    next.addEventListener('click', () => advance(current + 1));
+     back.addEventListener('click', () => show(current - 1, true));
+     nav.querySelectorAll('[data-plan-step]').forEach(button => button.addEventListener('click', () => {
+         const target = Number(button.dataset.planStep);
+-        if (target <= current || validate(Array.from({length: target}, (_, i) => i))) show(target, true);
++        if (target <= current) show(target, true);
++        else advance(target);
+     }));
+     const errorBox = document.createElement('div');
+     errorBox.className = 'alert alert-error';
+@@ -149,7 +154,7 @@
+     form.addEventListener('submit', async event => {
+         event.preventDefault();
+         if (busy) return;
+-        if (current < last) { if (validate([current])) show(current + 1, true); return; }
++        if (current < last) { await advance(current + 1); return; }
+         if (!validate(steps.map((_, i) => i))) return;
+         busy = true;
+         errorBox.hidden = true;
+--- a/resources/views/partials/plan-trip-basics.blade.php
++++ b/resources/views/partials/plan-trip-basics.blade.php
+@@ -254,7 +254,10 @@
+                    aria-label="City or municipality" placeholder="City or municipality (type it)" data-origin-city
+                    @if ($countryChosen === '' || $countryChosen === null) hidden @endif>
+             <p class="pc-hint" data-origin-hint>Choose a country; for the Philippines, choose your province too. A city or municipality is optional. We never ask for your home address.</p>
+-            <p class="pc-hint" data-origin-privacy>Your country, province and city are kept as an anonymous statistic for tourism planning, not linked to you. The rest of your trip details are deleted after 30 days.</p>
++            <p class="pc-hint" data-origin-privacy>Confirming your origin records your country, province and city for tourism statistics, even if you do not finish planning. We use a protected browser identifier for up to 30 days to prevent repeat counts within a day. Anonymous totals are kept; trip details are deleted after 30 days.</p>
++            <button type="button" class="btn btn-outline btn-sm" data-confirm-origin data-confirm-url="{{ route('plan.origin-confirmation') }}">Confirm origin and continue</button>
++            <p class="pc-hint" role="status" data-confirm-origin-status></p>
++            <script src="{{ asset('js/plan-origin-capture.js') }}?v={{ filemtime(public_path('js/plan-origin-capture.js')) }}" defer></script>
+         </div>
+         @endif
+ 
+--- a/resources/views/admin/visitor-origin.blade.php
++++ b/resources/views/admin/visitor-origin.blade.php
+@@ -7,18 +7,23 @@
+ @section('content')
+ <div class="adm-origin" data-visitor-origin>
+     <form method="get" class="adm-toolbar" aria-label="Date range">
++        <label>Measure <select name="metric">
++            <option value="responses" @selected($metric === 'responses')>Confirmed origins</option>
++            <option value="generated" @selected($metric === 'generated')>Origins with a generated itinerary</option>
++        </select></label>
+         <label>From <input type="date" name="from" value="{{ $from }}"></label>
+         <label>To <input type="date" name="to" value="{{ $to }}"></label>
+         <button class="btn btn-primary btn-sm" type="submit">Apply</button>
+-        <a class="btn btn-outline btn-sm" data-origin-export href="{{ route('admin.visitor-origin.export', array_filter(['from' => $from, 'to' => $to])) }}">Download CSV</a>
+-        <span class="adm-toolbar__note">Dates are in Philippine time; "To" includes the whole day. The day is the day the visitor first planned a trip.</span>
++        <a class="btn btn-outline btn-sm" data-origin-export href="{{ route('admin.visitor-origin.export', array_filter(['from' => $from, 'to' => $to, 'metric' => $metric])) }}">Download CSV</a>
++        <span class="adm-toolbar__note">Dates are in Philippine time; "To" includes the whole day. New responses use their confirmation day.</span>
+     </form>
+ 
+     <p class="adm-origin__note" data-origin-note>
+         These counts are kept permanently and are anonymous: only the day, the country, the province (Philippines) and the city are stored, with a number.
+-        No name, browser, IP address, time of day, trip or pick-up place is kept with them, and they cannot be traced back to a person or a trip.
+-        <strong>Counting rule:</strong> one count per browser session; a changed answer replaces the earlier one. The same person using two browsers or devices counts twice,
+-        and someone who comes back after the trip details were deleted (30 days) counts as a new visit.
++        No name, browser identifier, IP address, time of day, trip or pick-up place is kept in the permanent totals.
++        <strong>Counting rule:</strong> new responses count once per browser per Philippine day, even without a generated trip. A changed answer replaces that day's earlier answer.
++        A protected daily browser identifier is retained separately for up to 30 days to prevent repeats. Different browsers, devices or cleared cookies may still count separately.
++        Responses with a generated itinerary are tracked separately from this update onward, once per browser per day; earlier completions were not backfilled. Historical origin totals retain the former session counting rule.
+         Groups smaller than {{ $min }} are never shown on their own: they are added together under "Other". The CSV has the same totals, not one row per day.
+     </p>
+ 
+@@ -32,7 +37,7 @@
+                     </p>
+                 @else
+                     <table class="adm-table">
+-                        <thead><tr><th scope="col">Place</th><th scope="col">Visitors</th></tr></thead>
++                        <thead><tr><th scope="col">Place</th><th scope="col">Responses</th></tr></thead>
+                         <tbody>
+                             @foreach ($t['rows'] as $row)
+                                 <tr><td>{{ $row['label'] }}</td><td>{{ $row['count'] }}</td></tr>
+--- /dev/null
++++ b/app/Services/Privacy/VisitorOriginCapture.php
+@@ -0,0 +1,55 @@
++<?php
++
++namespace App\Services\Privacy;
++
++use App\Http\Middleware\EnsureVisitorToken;
++use App\Models\Itinerary;
++use App\Models\TouristPreference;
++use Illuminate\Http\Request;
++use Illuminate\Support\Facades\DB;
++
++final class VisitorOriginCapture
++{
++    public static function record(Request $request, array $answer, bool $generated = false, ?TouristPreference $legacy = null): void
++    {
++        $day = now(VisitorOriginStats::ZONE)->toDateString();
++        $hash = hash_hmac('sha256', 'origin-confirmation|'.$day.'|'.EnsureVisitorToken::get($request), (string) config('app.key'));
++        DB::transaction(function () use ($day, $hash, $answer, $generated, $legacy) {
++            $identity = ['day' => $day, 'browser_hash' => $hash];
++            $created = DB::table('visitor_origin_receipts')->insertOrIgnore($identity + ['answer' => null, 'generated' => false]);
++            $receipt = DB::table('visitor_origin_receipts')->where($identity)->lockForUpdate()->first();
++            $before = $receipt->answer === null ? null : json_decode($receipt->answer, true, 512, JSON_THROW_ON_ERROR);
++            $alreadyGenerated = (bool) $receipt->generated;
++
++            // Adopt an already-counted legacy trip from this session instead of adding its origin again.
++            if ($created && $legacy?->created_at?->copy()->timezone(VisitorOriginStats::ZONE)->toDateString() === $day
++                && Itinerary::where('preference_id', $legacy->id)->exists()) {
++                $before = VisitorOriginStats::answerOf($legacy);
++            }
++            $nowGenerated = $alreadyGenerated || $generated;
++            if ($before !== $answer) {
++                if ($before !== null) {
++                    self::adjust($day, $before, -1, $alreadyGenerated ? -1 : 0);
++                }
++                self::adjust($day, $answer, 1, $nowGenerated ? 1 : 0);
++            } elseif (! $alreadyGenerated && $nowGenerated) {
++                self::adjust($day, $answer, 0, 1);
++            }
++            DB::table('visitor_origin_receipts')->where($identity)->update([
++                'answer' => json_encode($answer, JSON_THROW_ON_ERROR), 'generated' => $nowGenerated,
++            ]);
++        }, 3);
++    }
++
++    private static function adjust(string $day, array $answer, int $responses, int $generated): void
++    {
++        $key = ['day' => $day, 'answer' => $answer['answer'], 'country_code' => $answer['country'],
++            'province' => $answer['province'], 'city' => $answer['city']];
++        DB::table(VisitorOriginStats::TABLE)->insertOrIgnore($key + ['visitors' => 0, 'generated_visitors' => 0]);
++        foreach (['visitors' => $responses, 'generated_visitors' => $generated] as $column => $amount) {
++            $query = DB::table(VisitorOriginStats::TABLE)->where($key);
++            if ($amount > 0) { $query->increment($column, $amount); }
++            elseif ($amount < 0) { $query->where($column, '>', 0)->decrement($column, -$amount); }
++        }
++    }
++}
+--- /dev/null
++++ b/public/js/plan-origin-capture.js
+@@ -0,0 +1,41 @@
++(() => {
++    'use strict';
++    const button = document.querySelector('[data-confirm-origin]');
++    const status = document.querySelector('[data-confirm-origin-status]');
++    if (!button || !status) return;
++    let pending;
++    window.confirmVisitorOrigin = () => {
++        if (pending) return pending;
++        const form = button.closest('form');
++        const fields = ['visitor_origin_country', 'visitor_origin_province', 'visitor_origin_city']
++            .map(name => form.elements.namedItem(name));
++        const bad = fields.find(field => field && !field.checkValidity());
++        if (bad) { bad.reportValidity(); return Promise.resolve(false); }
++        const body = new FormData();
++        body.set('_token', form.elements.namedItem('_token').value);
++        fields.forEach(field => { if (field) body.set(field.name, field.value); });
++        button.disabled = true;
++        status.textContent = 'Confirming your origin...';
++        pending = fetch(button.dataset.confirmUrl, {
++            method: 'POST', credentials: 'same-origin', headers: {Accept: 'application/json'}, body
++        }).then(async response => {
++            const data = await response.json().catch(() => ({}));
++            if (!response.ok) {
++                status.textContent = Object.values(data.errors || {}).flat().join(' ') ||
++                    (response.status === 419 ? 'Your session expired. Refresh the page and try again.' : 'Origin was not recorded. Please try again.');
++                return false;
++            }
++            status.textContent = data.message;
++            return true;
++        }).catch(() => {
++            status.textContent = 'Origin was not recorded. Check your connection and try again.';
++            return false;
++        }).finally(() => { pending = null; button.disabled = false; });
++        return pending;
++    };
++    button.addEventListener('click', async () => {
++        if (await window.confirmVisitorOrigin()) {
++            document.getElementById('start_at')?.focus();
++        }
++    });
++})();
+--- /dev/null
++++ b/database/migrations/2026_11_15_120000_add_origin_confirmation_receipts.php
+@@ -0,0 +1,27 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration {
++    public function up(): void
++    {
++        Schema::table('visitor_origin_daily', function (Blueprint $table) {
++            $table->unsignedInteger('generated_visitors')->default(0);
++        });
++        Schema::create('visitor_origin_receipts', function (Blueprint $table) {
++            $table->date('day');
++            $table->string('browser_hash', 64);
++            $table->text('answer')->nullable();
++            $table->boolean('generated')->default(false);
++            $table->primary(['day', 'browser_hash']);
++        });
++    }
++
++    public function down(): void
++    {
++        Schema::dropIfExists('visitor_origin_receipts');
++        Schema::table('visitor_origin_daily', fn (Blueprint $table) => $table->dropColumn('generated_visitors'));
++    }
++};

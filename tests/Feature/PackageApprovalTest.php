@@ -347,6 +347,32 @@ class PackageApprovalTest extends TestCase
         $this->assertSame('live', $package->fresh()->status);
     }
 
+    public function test_dot_cannot_resume_a_package_while_the_operator_accreditation_is_expired(): void
+    {
+        $operator = $this->operator();
+        $account = $this->account($operator);
+        $package = $this->makeAndSend($account);
+        $admin = $this->admin();
+        $url = "/portal/admin/package-approvals/{$package->id}";
+        $this->actingAs($admin, 'admin')->postJson($url.'/decide', ['decision' => 'approve'])->assertOk();
+        $this->actingAs($admin, 'admin')->postJson($url.'/pause')->assertOk();
+        $events = $package->events()->count();
+        $notifications = Notification::where('user_type', 'establishment')->where('user_id', $account->id)->count();
+
+        $operator->accreditationRecords()->update(['status' => 'Expired', 'expiration_date' => now()->subDay()]);
+        $this->actingAs($admin, 'admin')->postJson($url.'/resume')->assertStatus(422)->assertJsonValidationErrors(['decision']);
+
+        $this->assertSame(Package::STATUS_PAUSED, $package->fresh()->status);
+        $this->assertFalse($package->fresh()->is_accredited);
+        $this->assertSame($events, $package->events()->count());
+        $this->assertSame($notifications, Notification::where('user_type', 'establishment')->where('user_id', $account->id)->count());
+
+        $operator->accreditationRecords()->update(['status' => 'Active', 'expiration_date' => now()->addYear()]);
+        $this->actingAs($admin, 'admin')->postJson($url.'/resume')->assertOk();
+        $this->assertSame(Package::STATUS_LIVE, $package->fresh()->status);
+        $this->assertTrue($package->fresh()->is_accredited);
+    }
+
     public function test_packages_that_already_exist_keep_their_behaviour(): void
     {
         $accredited = Package::create(['slug' => 'old-live', 'name' => 'Old Live', 'is_accredited' => true]);

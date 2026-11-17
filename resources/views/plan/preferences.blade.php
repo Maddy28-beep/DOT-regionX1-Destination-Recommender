@@ -23,7 +23,10 @@
 <link rel="stylesheet" href="{{ asset('css/plan-trip-layout.css') }}?v={{ filemtime(public_path('css/plan-trip-layout.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/plan-headings.css') }}?v={{ filemtime(public_path('css/plan-headings.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/plan-sidebar.css') }}?v={{ filemtime(public_path('css/plan-sidebar.css')) }}">
-<div class="plan-shell plan-wizard" id="planWizard" data-draft-owner="{{ auth()->id() ?? 'guest' }}">
+@if (\App\Support\Features::tripLocation())
+<script>document.documentElement.classList.add('plan-origin-gating');</script>
+@endif
+<div class="plan-shell plan-wizard" id="planWizard" data-draft-owner="{{ auth()->id() ?? 'guest' }}" @if (\App\Support\Features::tripLocation()) data-origin-pending @endif>
     <div class="section-tight">
         <div class="container plan-frame">
             {{-- The intro sits in a column beside the form (not a banner above it), so the form starts near the top of the screen. --}}
@@ -161,11 +164,9 @@
                             TripPlannerController::applyOrigin).
                         --}}
                         @php
-                            // trip_location_v2: this is the PICK-UP location, where the itinerary physically starts. A trip with no
-                            // pick-up yet starts from Davao International Airport (the arrival point for the region), which the
-                            // traveller can change to a hotel, a port or any address, or clear to plan from Davao City centre.
+                            // The visitor explicitly chooses where to meet; home origin never supplies a pick-up point.
                             $pickupV2 = \App\Support\Features::tripLocation();
-                            $pickupDefault = $pickupV2 && ! session()->hasOldInput() && blank($preference->origin_label) && $preference->origin_lat === null;
+                            $pickupDefault = false;
                             $pickupLabel = $pickupDefault ? 'Davao International Airport' : old('origin_label', $preference->origin_label);
                             $pickupLat = $pickupDefault ? '7.13' : old('origin_lat', $preference->origin_lat);
                             $pickupLng = $pickupDefault ? '125.645' : old('origin_lng', $preference->origin_lng);
@@ -173,15 +174,13 @@
                         <div class="plan-section pc-block pc-trip-start">
                             @if ($pickupV2)
                                 <header class="pc-block__head"><h3>Pick-up location</h3><p>Your hotel, arrival point or address in Davao Region.</p></header>
-                                <p class="plan-davo-tip"><x-icon name="map-pin" /> Choose where you’ll be ready to start — I’ll plan your first stop from there.</p>
+                                <p class="plan-davo-tip"><x-icon name="map-pin" /> Choose where you will meet your rental provider or tour operator. Confirm collection and availability directly with them; this itinerary does not book transport.</p>
                             @else
                                 <header class="pc-block__head"><h3>Where will you start each day?</h3><p>Optional. We order your stops from the nearest to the furthest.</p></header>
                             @endif
 
                             @if ($pickupV2)
-                                {{-- Shown (by plan-origin-select.js) while "Where are you travelling from?" is outside Davao Region. Only "Use my
-                                     current location" is then switched off; a typed or picked pick-up is checked by the server as always. --}}
-                                <p class="pc-hint is-warning" role="status" data-pickup-lock-note hidden>Your current location is outside Davao Region. Pick-up location selection is not available for your location. If you wish to continue, please indicate your preferred pick-up location.</p>
+                                <p class="pc-hint is-warning" role="status" data-pickup-lock-note hidden>Your device is outside Davao Region. Choose your preferred pick-up location inside the region, such as your hotel, airport or port.</p>
                             @endif
 
                             <input type="hidden" name="origin_lat" id="origin_lat" value="{{ $pickupLat }}">
@@ -199,6 +198,7 @@
                                         <input type="text"
                                                id="origin_label"
                                                name="origin_label"
+                                               @required($pickupV2)
                                                value="{{ $pickupLabel }}"
                                                placeholder="Hotel, airport or address"
                                                autocomplete="off"
@@ -236,7 +236,7 @@
                                             @if ($pickupLabel)
                                                 Starting from {{ $pickupLabel }}.
                                             @else
-                                                Not set &mdash; we'll plan from Davao City centre.
+                                                @if ($pickupV2)Choose a pick-up location to continue.@else Not set &mdash; we'll plan from Davao City centre.@endif
                                             @endif
                                         </span>
                                     @error('origin_label')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
@@ -352,7 +352,7 @@
 
         if (!input || !list) return;
 
-        var NOT_SET = "Not set — we'll plan from Davao City centre.";
+        var NOT_SET = @json(\App\Support\Features::tripLocation() ? 'Choose a pick-up location to continue.' : "Not set — we'll plan from Davao City centre.");
         var SUGGEST_URL = @json(route('plan.address-suggest'));
         var results = [];
         var active = -1;
@@ -496,6 +496,7 @@
 
             navigator.geolocation.getCurrentPosition(
                 function (pos) {
+                    var outsideNote = document.querySelector('[data-pickup-lock-note]');
                     // trip_location_v2: a position outside Davao Region is not used as the start point (the server checks too).
                     if (btn.dataset.regionXi) {
                         var poly = JSON.parse(btn.dataset.regionXi), inside = false, x = pos.coords.longitude, y = pos.coords.latitude;
@@ -503,11 +504,13 @@
                             if (((poly[i][1] > y) !== (poly[j][1] > y)) && (x < (poly[j][0] - poly[i][0]) * (y - poly[i][1]) / (poly[j][1] - poly[i][1]) + poly[i][0])) inside = !inside;
                         }
                         if (!inside) {
+                            if (outsideNote) outsideNote.hidden = false;
                             btn.disabled = false;
                             say('Your location looks to be outside Davao Region, so we cannot start the trip from there. Choose where you will stay or arrive in the region instead.');
                             return;
                         }
                     }
+                    if (outsideNote) outsideNote.hidden = true;
                     lat.value = pos.coords.latitude.toFixed(3);
                     lng.value = pos.coords.longitude.toFixed(3);
                     input.value = 'My current location';
@@ -519,7 +522,7 @@
                 function (err) {
                     btn.disabled = false;
                     say(err && err.code === 1
-                        ? 'No problem — type an address instead, or leave it blank.'
+                        ? 'Location permission was declined. Choose your pick-up address from the suggestions or arrival points.'
                         : "Couldn't get your location — type an address instead.");
                 },
                 { timeout: 8000, maximumAge: 300000 }

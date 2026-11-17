@@ -6,6 +6,9 @@
 *.md diff=markdown
 *.php diff=php
 
+# Archived unified diffs intentionally retain their context-line whitespace.
+deploy/*.patch -whitespace
+
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore

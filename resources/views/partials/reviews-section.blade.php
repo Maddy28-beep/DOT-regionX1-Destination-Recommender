@@ -10,7 +10,7 @@
     $emptyHint = $emptyHint ?? 'Be the first to visit and share your experience.';
 @endphp
 
-<div class="side-card reviews-card">
+<div class="side-card reviews-card" id="traveler-reviews">
     <div class="reviews-card__head">
         <h3>Traveler Reviews</h3>
         <span class="reviews-card__count">{{ $reviewCount }} {{ \Illuminate\Support\Str::plural('review', $reviewCount) }}</span>

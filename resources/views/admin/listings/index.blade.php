@@ -21,17 +21,17 @@
 
 <div class="adm-fit adm-listings">
 
-    <div class="adm-toolbar">
-        <nav class="adm-seg" aria-label="Listing type">
+        <nav class="adm-listing-tabs" aria-label="Listing type">
             @foreach ($types as $key => $t)
                 <a href="{{ route('admin.listings.index', $key) }}" class="{{ $type === $key ? 'on' : '' }}" @if ($type === $key) aria-current="page" @endif>{{ $t['label'] }}</a>
             @endforeach
         </nav>
-
-        <form method="GET" class="adm-search" role="search">
+    <div class="adm-toolbar adm-listing-tools">
+        <form method="GET" class="adm-search adm-listing-search" role="search">
             <x-icon name="search" />
             <label for="q" class="sr-only">Search by name</label>
             <input type="search" id="q" name="q" value="{{ request('q') }}" placeholder="Search by name">
+            <button class="adm-icon-btn adm-listing-search__submit" type="submit" title="Search listings" aria-label="Search listings"><x-icon name="chevron-right" /></button>
             @if ($status !== 'active')<input type="hidden" name="status" value="{{ $status }}">@endif
         </form>
 
@@ -49,18 +49,19 @@
                   onsubmit="return confirm('Archive the selected listings? They will be hidden from the public site.');">
                 @csrf
                 <input type="hidden" name="action" value="archive">
-                <button type="submit" class="btn btn-outline btn-xs">Archive Selected</button>
+                <button type="submit" class="btn btn-outline btn-xs"><x-icon name="archive" />Archive selected</button>
             </form>
             <form method="POST" action="{{ route('admin.listings.bulk', $type) }}">
                 @csrf
                 <input type="hidden" name="action" value="unarchive">
-                <button type="submit" class="btn btn-outline btn-xs">Restore Selected</button>
+                <button type="submit" class="btn btn-outline btn-xs"><x-icon name="rotate" />Restore selected</button>
             </form>
         </div>
 
         <div class="adm-card__body">
             <table class="data-table adm-table">
                 <caption class="sr-only">{{ $listings->total() }} {{ $config['label'] }}</caption>
+                <colgroup><col class="adm-col-select"><col class="adm-col-name"><col>@if ($showTier)<col>@endif<col>@if ($showRating)<col>@endif<col><col class="adm-col-actions"></colgroup>
                 <thead>
                     <tr>
                         <th class="col-check"><input type="checkbox" data-bulk-all aria-label="Select all rows"></th>

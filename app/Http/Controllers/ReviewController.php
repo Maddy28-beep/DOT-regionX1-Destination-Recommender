@@ -14,6 +14,7 @@ use App\Models\TouristVisit;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Support\Toast;
 
 /**
@@ -92,6 +93,36 @@ class ReviewController extends Controller
         self::refreshRating($listing, $config['kind']);
 
         return $back->with(Toast::success('Review posted', 'Thank you — it is now live on '.$listing->name.'.'));
+    }
+
+    /** Add previously unanswered feedback to this browser's existing rating, without another review row. */
+    public function complete(Request $request, string $type, int $id): RedirectResponse
+    {
+        abort_unless(isset(self::TYPES[$type]), 404);
+        $config = self::TYPES[$type];
+        $listing = $config['model']::findOrFail($id);
+        abort_unless($listing->is_accredited && !$listing->archived_at, 404);
+        $token = EnsureVisitorToken::get($request);
+        abort_unless(self::hasCheckedIn($token, $config['kind'], $listing->id), 403);
+        $data = $request->validate([
+            'comment' => ['nullable', 'string', 'max:500', 'required_without_all:service_rating,amenities_rating'],
+            'service_rating' => ['nullable', 'integer', 'min:1', 'max:5'],
+            'amenities_rating' => ['nullable', 'integer', 'min:1', 'max:5'],
+        ], ['comment.required_without_all' => 'Add a comment or select a service or amenities rating before saving.']);
+        $changed = DB::transaction(function () use ($token, $config, $listing, $data) {
+            $review = Review::where('visitor_token', $token)->where('listing_kind', $config['kind'])->where('listing_id', $listing->id)->lockForUpdate()->first();
+            abort_unless($review, 403);
+            $changes = [];
+            foreach (['comment', 'service_rating', 'amenities_rating'] as $field) {
+                if (blank($review->{$field}) && filled($data[$field] ?? null)) $changes[$field] = $data[$field];
+            }
+            if ($changes) $review->fill($changes)->save();
+            return (bool) $changes;
+        });
+        return redirect()->to(route($config['route'], $listing).'#traveler-reviews')->with(Toast::success(
+            $changed ? 'Feedback saved' : 'Feedback already saved',
+            $changed ? 'Your additional feedback is now part of your original review.' : 'Your existing feedback has been kept.'
+        ));
     }
 
     /** Has this browser scanned the QR code at this listing? */

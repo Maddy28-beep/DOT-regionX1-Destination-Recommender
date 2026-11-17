@@ -127,6 +127,12 @@ class AdminPackageApprovalController extends Controller
         abort_unless($package->status === Package::STATUS_PAUSED, 422);
         $admin = $request->user('admin');
 
+        $package->load('tourOperator.accreditationRecords');
+        [$accredited, $why] = app(PackageChecks::class)->operator($package->tourOperator);
+        if (! $accredited) {
+            throw ValidationException::withMessages(['decision' => "Cannot resume yet: {$why}. Ask the operator to renew first."]);
+        }
+
         $package->transitionTo(Package::STATUS_LIVE, 'resumed', 'admin', $admin->full_name ?: $admin->email);
         $this->tell($package, 'A package is live again', "{$package->name} is visible to travellers again.");
 

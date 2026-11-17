@@ -22,8 +22,8 @@
 
 <header class="adm-top" role="banner">
     <div class="adm-top__left">
-        <button type="button" class="admin-menu-toggle" onclick="document.getElementById('adminSidebar').classList.toggle('open')"><x-icon name="menu" /> <span class="menu-toggle-label">Menu</span></button>
-        <a href="{{ route('admin.overview') }}" class="adm-brand" aria-label="ExploreDVO DOT Admin, overview">Explore<b>DVO</b> <span>DOT ADMIN</span></a>
+        <button type="button" class="admin-menu-toggle" data-sidebar-toggle aria-controls="adminSidebar" aria-expanded="false" aria-label="Open navigation" title="Open navigation"><x-icon name="menu" /></button>
+        <a href="{{ route('admin.overview') }}" class="adm-brand" aria-label="ExploreDVO DOT Admin, overview"><span class="adm-brand__mark"><x-icon name="map-pin" /></span><span class="adm-brand__text">Explore<b>DVO</b><small>Administration</small></span></a>
         <span class="adm-env {{ $isLive ? 'is-live' : '' }}" title="{{ $isLive ? 'This is the live site. Changes here are seen by travellers.' : 'You are working on the '.strtolower($envLabel).' copy, not the live site.' }}"><i aria-hidden="true"></i>{{ $envLabel }}</span>
     </div>
 
@@ -31,14 +31,14 @@
         <label for="admSearchInput" class="sr-only">Search listings, establishments, advisories, events and pages</label>
         <x-icon name="search" class="adm-search__ic" />
         <input id="admSearchInput" type="search" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="admSearchList" aria-autocomplete="list"
-               placeholder="Search listings, establishments, advisories…" maxlength="80">
+               placeholder="Search the workspace" maxlength="80">
         <kbd class="adm-search__kbd" aria-hidden="true">Ctrl K</kbd>
         <div class="adm-pop adm-pop--search" id="admSearchList" role="listbox" aria-label="Search results" hidden></div>
     </div>
 
     <div class="adm-top__right">
         <div class="adm-menu" data-menu>
-            <button type="button" class="btn btn-primary adm-new" data-menu-btn aria-haspopup="menu" aria-expanded="false"><x-icon name="plus" /><span class="adm-hide-sm">New</span><x-icon name="chevron-down" class="adm-caret" /></button>
+            <button type="button" class="btn btn-primary adm-new" data-menu-btn aria-haspopup="menu" aria-expanded="false" title="Create a listing or content" aria-label="Create a listing or content"><x-icon name="plus" /><span class="adm-hide-sm">Create</span><x-icon name="chevron-down" class="adm-caret" /></button>
             <div class="adm-pop adm-pop--new" role="menu" aria-label="Add something new" hidden>
                 <div class="adm-pop__group" role="presentation">Listings</div>
                 @foreach ($listingKinds as $type => [$label, $icon])

@@ -1,0 +1,48 @@
+// node deploy/check-review-star-ui.cjs <path-to-jsdom> <initial-html> <followup-html>
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const {JSDOM} = require(process.argv[2]);
+const app = fs.readFileSync('public/js/app.js', 'utf8').replaceAll('\r\n', '\n');
+const start = app.indexOf('/*\n * Review box:');
+const end = app.indexOf('/*\n * Destinations filter panel:', start);
+assert.ok(start >= 0 && end > start, 'Locate actual review interaction code');
+let checks = 0;
+const check = (ok, message) => { assert.ok(ok, message); checks++; };
+function setup(file, followup) {
+    const dom = new JSDOM(fs.readFileSync(file, 'utf8'), {url: 'https://www.exploredavao.com/', runScripts: 'outside-only'});
+    dom.window.eval(app.slice(start, end));
+    if (followup) dom.window.eval(fs.readFileSync('public/js/review-followup.js', 'utf8'));
+    dom.window.document.dispatchEvent(new dom.window.Event('DOMContentLoaded'));
+    return dom;
+}
+const initial = setup(process.argv[3], false);
+const w = initial.window, d = w.document, form = d.querySelector('[data-review-form]');
+let submitted = 0;
+form.addEventListener('submit', event => { event.preventDefault(); submitted++; });
+const comment = form.querySelector('textarea[name="comment"]');
+const button = form.querySelector('[type="submit"]');
+check(comment && !comment.closest('details,[hidden]'), 'Comment is directly visible before choosing stars');
+check(form.querySelectorAll('input[name="service_rating"]').length === 5 && form.querySelectorAll('input[name="amenities_rating"]').length === 5, 'Service and amenities star controls are available');
+check(!form.querySelector('input[name="service_rating"]').required && !comment.required, 'Optional feedback stays optional');
+check(button.disabled, 'Overall rating is required before posting');
+form.querySelector('label[for="' + form.querySelector('input[name="rating"][value="4"]').id + '"]').click();
+check(!button.disabled && submitted === 0, 'Tapping an overall star enables Post without auto-submitting');
+check(!comment.closest('details,[hidden]'), 'Written suggestion remains accessible after star selection');
+form.querySelector('label[for="' + form.querySelector('input[name="service_rating"][value="5"]').id + '"]').click();
+form.querySelector('label[for="' + form.querySelector('input[name="amenities_rating"][value="3"]').id + '"]').click();
+comment.value = 'Please add clear signs.'; comment.dispatchEvent(new w.Event('input', {bubbles: true}));
+const payload = new w.FormData(form);
+check(payload.get('rating') === '4' && payload.get('service_rating') === '5' && payload.get('amenities_rating') === '3' && payload.get('comment') === comment.value, 'All three ratings and written feedback are part of the submitted form');
+check(form.querySelector('[data-review-counter]').textContent === comment.value.length + '/500', 'Visible comment counter follows typed text');
+check(submitted === 0, 'Selecting optional stars and typing never posts prematurely');
+button.click();
+check(submitted === 1, 'Only explicit Post my review submits');
+const later = setup(process.argv[4], true);
+const lw = later.window, lf = lw.document.querySelector('[data-review-followup]');
+check(lf && !lf.querySelector('input[name="rating"]'), 'Existing star-only visitor gets a completion form without another overall rating');
+check(!lf.querySelector('[type="submit"]').disabled, 'Save feedback works without an overall-rating input');
+check(lf.querySelector('textarea[name="comment"]') && lf.querySelectorAll('[data-star-optional]').length === 2, 'Completion form exposes missing comment, service and amenities fields');
+const lc = lf.querySelector('textarea'); lc.value = 'Additional suggestion'; lc.dispatchEvent(new lw.Event('input', {bubbles: true}));
+check(lf.querySelector('[data-review-counter]').textContent === lc.value.length + '/500', 'Completion form counts typed suggestions');
+initial.window.close(); later.window.close();
+console.log(`${checks} QR-review star/comment UI assertions passed.`);

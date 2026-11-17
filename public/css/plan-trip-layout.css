@@ -499,3 +499,8 @@
 }
 /* Pick-up location while the visitor travels from outside Davao Region: only the location button is switched off. */
 .pc-trip-start .pc-hint.is-warning { color: var(--warning-dark, #92400e); font-weight: 600; }
+.plan-origin-gating #planWizard[data-origin-pending] .plan-section:not(.pc-trip-visitor),
+.plan-origin-gating #planWizard[data-origin-pending] .pc-trip-visitor > .pc-grid > :not([data-origin-v2]),
+.plan-origin-gating #planWizard[data-origin-pending] .plan-wizard-actions,
+.plan-origin-gating #planWizard[data-origin-pending] .plan-wizard-steps,
+.plan-origin-gating #planWizard[data-origin-pending] #planStepStatus { display:none !important; }

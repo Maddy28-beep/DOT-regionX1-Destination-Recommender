@@ -1,0 +1,110 @@
+// node deploy/check-origin-gate.cjs <path-to-jsdom> <privately-rendered-plan.html>
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const {JSDOM} = require(process.argv[2]);
+const html = fs.readFileSync(process.argv[3], 'utf8');
+const capture = fs.readFileSync('public/js/plan-origin-capture.js', 'utf8');
+const wizard = fs.readFileSync('public/js/plan-wizard.js', 'utf8');
+const countrySync = fs.readFileSync('public/js/plan-origin-select.js', 'utf8');
+const css = fs.readFileSync('public/css/plan-trip-layout.css', 'utf8');
+const gateCSS = css.match(/\.plan-origin-gating[\s\S]*?\{ display:none !important; \}/)[0];
+let checks = 0;
+const check = (condition, message) => { assert.ok(condition, message); checks++; };
+const flush = () => new Promise(resolve => setTimeout(resolve, 0));
+async function setup(withDraft = false) {
+    const dom = new JSDOM(html, {url: 'https://www.exploredavao.com/plan', runScripts: 'outside-only', pretendToBeVisual: true});
+    const w = dom.window, d = w.document;
+    w.HTMLElement.prototype.scrollIntoView = function () {};
+    w.matchMedia = () => ({matches: true, addEventListener() {}});
+    d.documentElement.classList.add('plan-origin-gating');
+    const style = d.createElement('style'); style.textContent = gateCSS; d.head.appendChild(style);
+    const root = d.getElementById('planWizard');
+    const form = d.getElementById('planPreferencesForm');
+    form.elements.namedItem('visitor_origin_country').value = 'JP';
+    form.elements.namedItem('visitor_origin_city').value = 'Tokyo';
+    if (withDraft) {
+        const names = JSON.parse(wizard.match(/const draftNames = (\[[^\n]+\]);/)[1].replaceAll("'", '"'));
+        const values = Object.fromEntries(names.map(name => [name, []]));
+        values.budget = ['Mid-range']; values.travel_days = ['3'];
+        w.localStorage.setItem(`dvo-plan-draft-v2:${root.dataset.draftOwner}`, JSON.stringify({savedAt: Date.now(), step: 3, values}));
+    }
+    const requests = [];
+    let responder = async () => ({ok: true, json: async () => ({message: 'Origin confirmed.'})});
+    w.fetch = async (...args) => { requests.push(args); return responder(...args); };
+    w.eval(capture); w.eval(countrySync); w.eval(wizard);
+    await flush();
+    return {dom, w, d, root, form, requests, respond: fn => { responder = fn; }, display: element => w.getComputedStyle(element).display};
+}
+(async () => {
+    const c = await setup();
+    const {w, d, root, form} = c;
+    const dates = d.getElementById('start_at').closest('.plan-section');
+    const origin = d.querySelector('[data-origin-v2]');
+    check(root.hasAttribute('data-origin-pending') && c.display(dates) === 'none', 'Dates and remaining form start hidden');
+    check(c.display(origin) !== 'none' && c.display(form.elements.namedItem('visitor_type')[0].closest('fieldset')) === 'none', 'Origin is visible while other profile questions are hidden');
+    check(c.display(d.querySelector('.plan-wizard-steps')) === 'none' && c.display(d.querySelector('.plan-wizard-actions')) === 'none', 'Step shortcuts and Next/Submit actions cannot skip confirmation');
+    check(root.classList.contains('is-wizard'), 'Actual planner wizard initialized with the gate');
+    const country = form.elements.namedItem('visitor_origin_country');
+    country.value = ''; country.dispatchEvent(new w.Event('change', {bubbles: true}));
+    check(await w.confirmVisitorOrigin() === false && c.requests.length === 0, 'Invalid origin is blocked before a network request');
+    country.value = 'JP'; country.dispatchEvent(new w.Event('change', {bubbles: true}));
+    form.elements.namedItem('visitor_origin_city').value = 'Tokyo';
+    let release;
+    c.respond(() => new Promise(resolve => { release = resolve; }));
+    const pending = w.confirmVisitorOrigin();
+    check(pending === w.confirmVisitorOrigin() && c.requests.length === 1, 'Concurrent confirmations share a single request');
+    check(root.hasAttribute('data-origin-pending') && d.querySelector('[data-confirm-origin]').disabled, 'Rest of form stays hidden during saving');
+    const bodyKeys = [...c.requests[0][1].body.keys()].sort();
+    check(JSON.stringify(bodyKeys) === JSON.stringify(['_token', 'visitor_origin_city', 'visitor_origin_country', 'visitor_origin_province']), 'Confirmation sends origin only, without trip dates or pick-up');
+    release({ok: true, json: async () => ({message: 'Origin recorded.'})});
+    check(await pending === true && !root.hasAttribute('data-origin-pending') && c.display(dates) !== 'none', 'Server success reveals the rest of the trip form');
+    check(w.isVisitorOriginConfirmed() && !d.querySelector('[data-confirm-origin]').disabled, 'Confirmation state and Continue button recover after saving');
+    await w.confirmVisitorOrigin();
+    check(c.requests.length === 1, 'Unchanged confirmed origin is not posted again by wizard navigation');
+    d.getElementById('start_at').value = '2026-12-01T09:00';
+    const city = form.elements.namedItem('visitor_origin_city');
+    city.value = 'Osaka'; city.dispatchEvent(new w.Event('input', {bubbles: true}));
+    check(root.hasAttribute('data-origin-pending') && c.display(dates) === 'none' && !w.isVisitorOriginConfirmed(), 'Editing origin locks the form again');
+    check(d.getElementById('start_at').value === '2026-12-01T09:00', 'Relocking preserves previously entered trip details');
+    for (const code of [422, 419, 500]) {
+        c.respond(async () => ({ok: false, status: code, json: async () => code === 422 ? {errors: {visitor_origin_country: ['Choose a country.']}} : {}}));
+        check(await w.confirmVisitorOrigin() === false && root.hasAttribute('data-origin-pending'), `HTTP ${code} does not unlock the form`);
+    }
+    c.respond(async () => { throw new Error('Offline'); });
+    check(await w.confirmVisitorOrigin() === false && d.querySelector('[data-confirm-origin-status]').textContent.includes('connection'), 'Network failure stays locked with retry guidance');
+    c.respond(async () => ({ok: true, json: async () => ({})}));
+    check(await w.confirmVisitorOrigin() === false && root.hasAttribute('data-origin-pending'), 'Unexpected successful response does not count as an acknowledgement');
+    c.respond(() => new Promise(resolve => { release = resolve; }));
+    const changed = w.confirmVisitorOrigin();
+    city.value = 'Kyoto'; city.dispatchEvent(new w.Event('input', {bubbles: true}));
+    release({ok: true, json: async () => ({message: 'Recorded previous answer.'})});
+    check(await changed === false && root.hasAttribute('data-origin-pending'), 'In-flight edits cannot unlock using an old origin acknowledgement');
+    c.respond(async () => ({ok: true, json: async () => ({message: 'Updated origin recorded.'})}));
+    check(await w.confirmVisitorOrigin() === true && !root.hasAttribute('data-origin-pending'), 'Retry can record the changed origin and unlock again');
+    const draft = await setup(true);
+    check(draft.root.hasAttribute('data-origin-pending') && draft.d.getElementById('planResume').hidden && !draft.d.querySelector('.plan-panel').hidden, 'Saved draft does not hide the initial origin question or bypass its gate');
+    await draft.w.confirmVisitorOrigin();
+    check(!draft.d.getElementById('planResume').hidden && draft.d.querySelector('.plan-panel').hidden, 'Resume-draft offer appears only after origin confirmation');
+    draft.d.getElementById('planResumeContinue').click();
+    check(!draft.d.querySelector('.plan-panel').hidden && !draft.root.hasAttribute('data-origin-pending'), 'Confirmed visitor can resume their saved trip');
+    const draftCity = draft.form.elements.namedItem('visitor_origin_city');
+    draftCity.value = 'Sapporo'; draftCity.dispatchEvent(new draft.w.Event('input', {bubbles: true}));
+    check(draft.root.hasAttribute('data-origin-pending') && !draft.d.getElementById('plan-step-0').hidden, 'Changing origin after draft resume returns to the locked first step');
+    const saved = JSON.parse(draft.w.localStorage.getItem(`dvo-plan-draft-v2:${draft.root.dataset.draftOwner}`));
+    check(!Object.keys(saved.values).some(name => name.startsWith('visitor_origin')), 'Home origin and confirmation receipt are not added to localStorage drafts');
+    // The planner's own required-answer validation is covered separately; simulate valid answers here
+    // to exercise the asynchronous final-submit lock introduced by the confirmation gate.
+    Array.from(form.elements).forEach(field => { field.checkValidity = () => true; });
+    d.querySelector('[data-plan-step="3"]').click();
+    await flush();
+    let finishBuild;
+    c.respond(() => new Promise(resolve => { finishBuild = resolve; }));
+    form.dispatchEvent(new w.Event('submit', {bubbles: true, cancelable: true}));
+    form.dispatchEvent(new w.Event('submit', {bubbles: true, cancelable: true}));
+    await flush();
+    check(c.requests.filter(([url]) => String(url).endsWith('/plan')).length === 1, 'Concurrent final submits cannot build two itineraries after confirmation');
+    finishBuild({ok: false, status: 422, json: async () => ({errors: {budget: ['QA response only']}})});
+    await flush();
+    c.dom.window.close(); draft.dom.window.close();
+    console.log(`${checks} origin gate assertions passed against the rendered planner.`);
+})().catch(error => { console.error(error); process.exitCode = 1; });

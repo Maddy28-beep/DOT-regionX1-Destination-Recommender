@@ -1,6 +1,8 @@
 @php
     $categoryLayout = $categoryLayout ?? false;
     $keepOtherPhotos = $keepOtherPhotos ?? false;
+    // Exclude feature evidence before choosing photographs or suppressing fallback images.
+    $photos = $photos->reject(fn ($photo) => $photo->isAmenityPhoto())->values();
     $galleryCategories = ['General', 'Exterior', 'Interior'];
     $categoryFor = fn ($photo) => $photo->isIllustration() ? 'General' : (trim((string) $photo->category) ?: 'General');
     // official, sample or unverified (see SampleData). A caller that only knows "sample or not" still works.
