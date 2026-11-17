@@ -254,8 +254,14 @@
                    aria-label="City or municipality" placeholder="City or municipality (type it)" data-origin-city
                    @if ($countryChosen === '' || $countryChosen === null) hidden @endif>
             <p class="pc-hint" data-origin-hint>Choose a country; for the Philippines, choose your province too. A city or municipality is optional. We never ask for your home address.</p>
-            <p class="pc-hint" data-origin-privacy>Confirming your origin records your country, province and city for tourism statistics, even if you do not finish planning. We use a protected browser identifier for up to 30 days to prevent repeat counts within a day. Anonymous totals are kept; trip details are deleted after 30 days.</p>
-            <button type="button" class="btn btn-outline btn-sm" data-confirm-origin data-confirm-url="{{ route('plan.origin-confirmation') }}">Confirm origin and continue</button>
+            <div class="pc-hint pc-origin-privacy" data-origin-privacy>
+                <p>Used only for anonymous tourism statistics, never your name or address.</p>
+                <details>
+                    <summary>More about this</summary>
+                    <p>Confirming your origin records your country, province and city for tourism statistics, even if you do not finish planning. We use a protected browser identifier for up to 30 days to prevent repeat counts within a day. Anonymous totals are kept; trip details are deleted after 30 days.</p>
+                </details>
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" data-confirm-origin data-confirm-url="{{ route('plan.origin-confirmation') }}">Continue</button>
             <p class="pc-hint" role="status" data-confirm-origin-status></p>
             <script src="{{ asset('js/plan-origin-capture.js') }}?v={{ filemtime(public_path('js/plan-origin-capture.js')) }}" defer></script>
         </div>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Travel Preferences — ExploreDVO')
+@section('title', 'Trip Planner — ExploreDVO')
 
 @section('content')
 @php
@@ -45,15 +45,16 @@
                         <span class="plan-side__guidance--stay">Let’s find your style.</span>
                         <span class="plan-side__guidance--transport">Ready to explore?</span>
                     </h1>
-                    <p class="plan-side__text plan-side__guidance--trip">Let’s start with who’s coming, when you’ll visit, and where your adventure begins.</p>
+                    <p class="plan-side__text plan-side__guidance--trip">Let’s start with where you’re travelling from, when your trip starts and ends, where we pick you up, and who’s coming.</p>
                     <p class="plan-side__text plan-side__guidance--interests">Choose at least one interest so I know what you enjoy. Amenities are optional—pick the comforts that matter to you.</p>
                     <p class="plan-side__text plan-side__guidance--stay">Tell me your spending style and where you’d like to stay. If you choose a resort, you can pick its setting too.</p>
                     <p class="plan-side__text plan-side__guidance--transport">Choose how far you’d like to explore and how you’ll travel. You can also tell me about any access needs before creating your plan.</p>
                 </div>
                 <ol class="plan-side__checklist plan-side__checklist--trip" aria-label="Your trip basics">
-                    <li>Choose your companions</li>
+                    <li>Say where you’re travelling from</li>
                     <li>Set your trip dates</li>
-                    <li>Pick a starting point</li>
+                    <li>Pick your pick-up point</li>
+                    <li>Choose your companions</li>
                 </ol>
                 <ol class="plan-side__checklist plan-side__checklist--interests" aria-label="Choosing your interests">
                     <li>Choose your travel purpose</li>

@@ -40,7 +40,7 @@
             const data = await response.json().catch(() => ({}));
             if (!response.ok || typeof data.message !== 'string' || !data.message.trim()) {
                 status.textContent = Object.values(data.errors || {}).flat().join(' ') ||
-                    (response.status === 419 ? 'Your session expired. Refresh the page and try again.' : 'Origin was not recorded. Please try again.');
+                    (response.status === 419 ? 'Your session expired. Refresh the page and try again.' : 'We could not save that. Choose a country (and a province if it is the Philippines), then try again.');
                 return false;
             }
             if (signature() !== requested) {
@@ -53,7 +53,7 @@
             document.dispatchEvent(new CustomEvent('visitor-origin-confirmed'));
             return true;
         }).catch(() => {
-            status.textContent = 'Origin was not recorded. Check your connection and try again.';
+            status.textContent = 'We could not save that. Check your connection and try again.';
             return false;
         }).finally(() => { pending = null; button.disabled = false; });
         return pending;

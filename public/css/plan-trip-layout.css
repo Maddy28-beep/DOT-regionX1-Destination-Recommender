@@ -504,3 +504,9 @@
 .plan-origin-gating #planWizard[data-origin-pending] .plan-wizard-actions,
 .plan-origin-gating #planWizard[data-origin-pending] .plan-wizard-steps,
 .plan-origin-gating #planWizard[data-origin-pending] #planStepStatus { display:none !important; }
+
+/* The origin question's privacy note: one short line, the rest behind "More about this". */
+.pc-origin-privacy p { margin: 0 0 4px; }
+.pc-origin-privacy summary { width: fit-content; padding: 6px 0; color: var(--primary-dark); cursor: pointer; font-weight: 600; }
+.pc-origin-privacy summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: 4px; }
+.pc-origin-privacy details p { margin: 4px 0 0; line-height: 1.55; }

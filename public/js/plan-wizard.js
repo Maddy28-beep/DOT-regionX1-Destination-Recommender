@@ -95,8 +95,8 @@
         if (root.hasAttribute('data-origin-pending')) index = 0;
         const stepChanged = current !== index;
         current = index;
-        steps[0].querySelector('h2').textContent = root.hasAttribute('data-origin-pending') ? 'Start with your place of origin.' : headings[0];
-        steps[0].querySelector('.plan-step-intro').textContent = root.hasAttribute('data-origin-pending') ? 'Confirm where you are travelling from to continue planning.' : descriptions[0];
+        steps[0].querySelector('h2').textContent = root.hasAttribute('data-origin-pending') ? 'Let’s begin your trip plan.' : headings[0];
+        steps[0].querySelector('.plan-step-intro').textContent = root.hasAttribute('data-origin-pending') ? 'First, where are you travelling from? It takes a few seconds and helps DOT understand its visitors.' : descriptions[0];
         steps.forEach((step, i) => { step.hidden = i !== index; });
         nav.querySelectorAll('[data-plan-step]').forEach((button, i) => {
             button.classList.toggle('is-complete', i < index);
