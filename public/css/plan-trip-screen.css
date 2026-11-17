@@ -1,0 +1,124 @@
+/* Compact trip basics. All controls, values and wizard validation stay in the existing form. */
+.plan-side__trip-title { display: none; }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-frame { max-width: 1150px; grid-template-columns: 235px minmax(0, 1fr); gap: 12px 22px; align-items: start; }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-side { position: sticky; gap: 16px; }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-side__bubble { order: 0; padding: 16px; }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-side__bubble::before { top: auto; bottom: -10px; left: 50%; transform: rotate(225deg); }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-side__davo { order: 1; width: 170px; margin: 4px auto 0; }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-side__checklist { order: 2; }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-side__saved { order: 3; }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) :is(.plan-side__origin-title, .plan-side__kicker) { display: none; }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-side__trip-title { display: inline; }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-side__title { font-size: 20px; }
+.plan-wizard:not([data-origin-pending]) .panel-body:has(#plan-step-0.has-trip-window:not([hidden])) { padding: 20px 22px 0; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window > h2 { font-size: 23px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window > .plan-step-intro { font-size: 13px; margin-bottom: 14px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-block { padding-bottom: 12px; margin-bottom: 12px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-block__head h3 { font-size: 15px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-visitor > .pc-block__head { display: none; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-origin-summary { padding: 10px 12px; margin: 0 0 8px; min-height: 42px; font-size: 13px; background: #edf6f0; border-color: #dce9df; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-visitor .pc-cards--rows { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-card--row { padding: 10px; gap: 7px; min-height: 48px; font-size: 12px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window :is(.pc-group > legend, .pc-field > label, .pc-label) { font-size: 12px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-field :is(input[type="datetime-local"], input[type="text"]) { width: 100%; min-width: 0; height: 44px; min-height: 44px; font-size: 13px; padding: 9px 12px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-hint { font-size: 11px; line-height: 1.45; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-window > .pc-block__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px 12px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-window > .pc-block__head p { margin: 0; font-size: 11px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-duration { padding: 7px 10px; margin-top: 0; font-size: 12px; }
+/* Give the starting-point search the full width; place its actions underneath. */
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-start > .pc-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+#planWizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-start > .pc-grid > :is(.pc-field, .pc-start-notes) { grid-column: 1 / -1; min-width: 0; }
+#planWizard:not([data-origin-pending]) #plan-step-0.has-trip-window .address-field #origin_label { padding-left: 40px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-start .pc-location-actions { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-start .plan-davo-tip { font-size: 11px; line-height: 1.45; margin: 0 0 9px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-start .pc-block__head { display: block; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-start .pc-block__head p { font-size: 11px; margin: 4px 0; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-location-actions .pc-locate { width: 100%; min-height: 38px; height: auto; padding: 8px 12px; gap: 8px; font-size: 12px; border-radius: 8px; background: #fff; }
+.plan-wizard #origin-btn[hidden] { display: none !important; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-collapse:has(+ .pc-trip-start) { display: none; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-start.is-collapsed { display: block; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-location-actions .pc-arrivals { width: 100%; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-arrivals > .pc-label { display: none; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-arrivals .pc-quick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-quick [data-start-pick] { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; height: auto; min-height: 38px; padding: 7px 5px; border-radius: 8px; font-size: 11px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window [data-start-pick] svg { width: 17px; height: 17px; flex: none; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-suggest-airport { margin: 0; padding: 9px 11px; border-radius: 8px; background: #fff5dd; font-size: 11px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-cards--5 { gap: 8px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-companions .pc-card { padding: 8px 5px; min-height: 55px; font-size: 12px; }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-wizard-actions { padding: 12px 0; margin-top: 0; }
+@media (max-width: 899px) {
+    .plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-frame { grid-template-columns: minmax(0, 1fr); grid-template-areas: "steps" "side" "main"; gap: 0; }
+    .plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-side { position: static; grid-template-columns: 76px minmax(0, 1fr); align-items: start; margin-bottom: 14px; gap: 12px; }
+    .plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-side__bubble { grid-column: 2; grid-row: 1; padding: 12px; }
+    .plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-side__bubble::before { top: 26px; bottom: auto; left: -7px; transform: rotate(-45deg); }
+    .plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-side__davo { grid-column: 1; grid-row: 1; width: 76px; margin-top: 12px; }
+    .plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-side__saved { display: none; }
+}
+@media (max-width: 640px) {
+    .plan-wizard:not([data-origin-pending]) .panel-body:has(#plan-step-0.has-trip-window:not([hidden])) { padding: 18px 14px 0; }
+    .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-window .pc-grid > .pc-field { grid-column: 1 / -1; }
+    .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-start > .pc-block__head h3 { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; }
+    .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-card--row { flex-direction: column; text-align: center; padding: 8px 5px; }
+    .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-field :is(input[type="datetime-local"], input[type="text"]) { min-height: 44px; height: 44px; }
+    .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-arrivals .pc-quick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window :is(.pc-location-actions .pc-locate, .pc-quick [data-start-pick]) { min-height: 44px; }
+    .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-companions .pc-cards--5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* Compact pick-up shortcuts: the location button and the four arrival points are one row of icons under the search box
+   (their names stay for screen readers and in the tooltip), instead of a full-width button and four labelled buttons. */
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-start .pc-location-actions { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-location-actions .pc-locate { flex: none; width: 44px; min-height: 44px; height: 44px; padding: 0; border-radius: 10px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-location-actions .pc-arrivals { width: auto; flex: none; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-arrivals .pc-quick { display: flex; flex-wrap: nowrap; gap: 8px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-quick [data-start-pick] { flex: none; width: 44px; min-height: 44px; height: 44px; padding: 0; border-radius: 10px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-location-actions .pc-locate svg,
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window [data-start-pick] svg { width: 19px; height: 19px; }
+@media (max-width: 640px) {
+    .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-arrivals .pc-quick { display: flex; }
+    .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window :is(.pc-location-actions .pc-locate, .pc-quick [data-start-pick]) { min-height: 44px; }
+}
+
+/* One row on a wider screen: the search box with the location button and the arrival points beside it. */
+@media (min-width: 641px) {
+    .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-start > .pc-grid { grid-template-columns: minmax(0, 1fr) auto; column-gap: 8px; align-items: end; }
+    #planWizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-start > .pc-grid > .pc-field:first-child { grid-column: 1; }
+    #planWizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-start > .pc-grid > .pc-location-actions { grid-column: 2; align-self: end; flex-wrap: nowrap; }
+}
+
+/* "Quick pick" above the row of icons (the location button and the four arrival points), in the same type as the search box's label. */
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-start .pc-location-actions { display: grid; grid-template-columns: repeat(5, 44px); grid-auto-rows: auto; gap: 4px 8px; align-items: end; justify-content: start; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-location-actions .pc-arrivals:not([hidden]),
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-location-actions .pc-arrivals:not([hidden]) .pc-quick { display: contents; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-location-actions .pc-arrivals > .pc-label { display: block; grid-column: 1 / -1; grid-row: 1; margin: 0; color: #394841; font-size: 12px; font-weight: 600; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-location-actions #origin-btn,
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-location-actions .pc-quick [data-start-pick] { grid-row: 2; }
+
+/* "Is this your first visit to Davao?" reads as a heading like the other questions of this step (15px, bold). */
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-visitor .pc-group > legend { font-size: 15px; font-weight: 800; line-height: 1.3; margin-bottom: 8px; }
+
+/* The location button is its own control; "Quick pick" heads only the four arrival points. */
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-start .pc-location-actions { grid-template-columns: auto repeat(4, 44px); }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-location-actions .pc-arrivals > .pc-label { grid-column: 2 / -1; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-location-actions #origin-btn { grid-column: 1; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-location-actions .pc-quick [data-start-pick]:nth-child(1) { grid-column: 2; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-location-actions .pc-quick [data-start-pick]:nth-child(2) { grid-column: 3; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-location-actions .pc-quick [data-start-pick]:nth-child(3) { grid-column: 4; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-location-actions .pc-quick [data-start-pick]:nth-child(4) { grid-column: 5; }
+
+/* Steps 2 to 4 start the same way as step 1: Davo's speech bubble first, then Davo, then the checklist. */
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window[hidden]) .plan-side { position: sticky; gap: 16px; }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window[hidden]) .plan-side__bubble { order: 0; padding: 16px; }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window[hidden]) .plan-side__bubble::before { top: auto; bottom: -10px; left: 50%; transform: rotate(225deg); }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window[hidden]) .plan-side__davo { order: 1; width: 170px; margin: 4px auto 0; }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window[hidden]) .plan-side__checklist { order: 2; }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window[hidden]) .plan-side__saved { order: 3; }
+.plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window[hidden]) :is(.plan-side__origin-title, .plan-side__kicker) { display: none; }
+@media (max-width: 899px) {
+    .plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window[hidden]) .plan-frame { grid-template-columns: minmax(0, 1fr); grid-template-areas: "steps" "side" "main"; gap: 0; }
+    .plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window[hidden]) .plan-side { position: static; grid-template-columns: 76px minmax(0, 1fr); align-items: start; margin-bottom: 14px; gap: 12px; }
+    .plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window[hidden]) .plan-side__bubble { grid-column: 2; grid-row: 1; padding: 12px; }
+    .plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window[hidden]) .plan-side__bubble::before { top: 26px; bottom: auto; left: -7px; transform: rotate(-45deg); }
+    .plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window[hidden]) .plan-side__davo { grid-column: 1; grid-row: 1; width: 76px; margin-top: 12px; }
+    .plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window[hidden]) .plan-side__saved { display: none; }
+}

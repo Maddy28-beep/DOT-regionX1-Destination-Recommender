@@ -241,8 +241,9 @@ class TripLocationV2Test extends TestCase
 
     public function test_the_wizard_puts_the_origin_first_then_start_end_pick_up_and_the_rest(): void
     {
+        // Who is coming now follows the first-visit question, before the start and end and the pick-up.
         $js = file_get_contents(public_path('js/plan-wizard.js'));
-        $this->assertStringContainsString('steps[0].append(visit, basics, origin, style);', $js);
+        $this->assertStringContainsString('steps[0].append(visit, style, basics, origin);', $js);
     }
 
     // ---- 3. start and end date and time ---------------------------------------------------------------------

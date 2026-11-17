@@ -474,7 +474,7 @@ class BetaDeterministicItineraryTest extends TestCase
         $html = $this->get('/plan/itinerary')->assertOk()->getContent();
         $text = trim(preg_replace('/\s+/', ' ', html_entity_decode(strip_tags($html), ENT_QUOTES)));
 
-        $this->assertStringContainsString('Regenerate creates a new itinerary variation using the same preferences. Your existing preferences remain unchanged.', $text);
+        $this->assertStringContainsString('Get a new mix of places with the same preferences.', $text);
         $this->assertStringContainsString('aria-describedby="regenerate-note"', $html);
         $this->assertStringContainsString('id="regenerate-note"', $html);
     }

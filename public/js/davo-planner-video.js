@@ -35,6 +35,20 @@
         buildingActive = false;
         sync();
     });
+    // Pointing at Davo (or tapping him on a touch screen) makes him move again, unless he is already moving. The loading clip
+    // is left alone: it belongs to the wait for the itinerary.
+    if (!building) {
+        var again = function (event) {
+            if (reducedMotion.matches || document.hidden) return;
+            if (event && event.type === 'pointerenter' && event.pointerType && event.pointerType !== 'mouse') return;
+            if (!video.paused && !video.ended) return;
+            video.currentTime = 0;
+            replayPending = false;
+            play();
+        };
+        video.addEventListener('pointerenter', again);
+        video.addEventListener('click', again);
+    }
     document.addEventListener('visibilitychange', sync);
     if (reducedMotion.addEventListener) reducedMotion.addEventListener('change', sync);
     else reducedMotion.addListener(sync);

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Travel Preferences — ExploreDVO')
+@section('title', 'Trip Planner — ExploreDVO')
 
 @section('content')
 @php
@@ -23,10 +23,26 @@
 <link rel="stylesheet" href="{{ asset('css/plan-trip-layout.css') }}?v={{ filemtime(public_path('css/plan-trip-layout.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/plan-headings.css') }}?v={{ filemtime(public_path('css/plan-headings.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/plan-sidebar.css') }}?v={{ filemtime(public_path('css/plan-sidebar.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/plan-origin-screen.css') }}?v={{ filemtime(public_path('css/plan-origin-screen.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/plan-trip-screen.css') }}?v={{ filemtime(public_path('css/plan-trip-screen.css')) }}">
 @if (\App\Support\Features::tripLocation())
 <script>document.documentElement.classList.add('plan-origin-gating');</script>
 @endif
 <div class="plan-shell plan-wizard" id="planWizard" data-draft-owner="{{ auth()->id() ?? 'guest' }}" @if (\App\Support\Features::tripLocation()) data-origin-pending @endif>
+@if (\App\Support\Features::tripLocation())
+<script>
+    /* An origin confirmed in the last day is remembered (public/js/plan-origin-capture.js): do not flash the question again. */
+    (function () {
+        try {
+            var saved = JSON.parse(localStorage.getItem('dvo-plan-origin-v1:{{ auth()->id() ?? 'guest' }}'));
+            if (saved && saved.at && Date.now() - saved.at < 86400000 && saved.values && saved.values[0]) {
+                document.getElementById('planWizard').removeAttribute('data-origin-pending');
+                document.documentElement.classList.remove('plan-origin-gating');
+            }
+        } catch (e) { /* the question is simply shown */ }
+    })();
+</script>
+@endif
     <div class="section-tight">
         <div class="container plan-frame">
             {{-- The intro sits in a column beside the form (not a banner above it), so the form starts near the top of the screen. --}}
@@ -40,20 +56,22 @@
                 </div>
                 <div class="plan-side__bubble">
                     <h1 class="plan-side__title">
-                        <span class="plan-side__guidance--trip">Hi, I’m Davo!</span>
+                        <span class="plan-side__guidance--trip"><span class="plan-side__origin-title">Hi, I’m Davo!</span><span class="plan-side__trip-title">Let’s set your trip!</span></span>
                         <span class="plan-side__guidance--interests">What do you love?</span>
                         <span class="plan-side__guidance--stay">Let’s find your style.</span>
                         <span class="plan-side__guidance--transport">Ready to explore?</span>
                     </h1>
-                    <p class="plan-side__text plan-side__guidance--trip">Let’s start with who’s coming, when you’ll visit, and where your adventure begins.</p>
+                    <p class="plan-side__text plan-side__origin-copy">Let’s plan your Davao adventure. I’ll guide you along the way.</p>
+                    <p class="plan-side__text plan-side__guidance--trip">Tell me who’s coming, your dates and where we’ll start in Davao.</p>
                     <p class="plan-side__text plan-side__guidance--interests">Choose at least one interest so I know what you enjoy. Amenities are optional—pick the comforts that matter to you.</p>
                     <p class="plan-side__text plan-side__guidance--stay">Tell me your spending style and where you’d like to stay. If you choose a resort, you can pick its setting too.</p>
                     <p class="plan-side__text plan-side__guidance--transport">Choose how far you’d like to explore and how you’ll travel. You can also tell me about any access needs before creating your plan.</p>
                 </div>
                 <ol class="plan-side__checklist plan-side__checklist--trip" aria-label="Your trip basics">
+                    <li>Say where you’re travelling from</li>
                     <li>Choose your companions</li>
                     <li>Set your trip dates</li>
-                    <li>Pick a starting point</li>
+                    <li>Pick your pick-up point</li>
                 </ol>
                 <ol class="plan-side__checklist plan-side__checklist--interests" aria-label="Choosing your interests">
                     <li>Choose your travel purpose</li>
@@ -70,7 +88,6 @@
                     <li>Pick how you’ll travel</li>
                     <li>Review any optional access needs</li>
                 </ol>
-                <a href="{{ route('saved.index') }}" class="plan-side__saved"><x-icon name="heart" /> Saved Places</a>
             </aside>
 
             <nav class="plan-wizard-steps" aria-label="Trip planning steps" hidden>
@@ -173,8 +190,7 @@
                         @endphp
                         <div class="plan-section pc-block pc-trip-start">
                             @if ($pickupV2)
-                                <header class="pc-block__head"><h3>Pick-up location</h3><p>Your hotel, arrival point or address in Davao Region.</p></header>
-                                <p class="plan-davo-tip"><x-icon name="map-pin" /> Choose where you will meet your rental provider or tour operator. Confirm collection and availability directly with them; this itinerary does not book transport.</p>
+                                <header class="pc-block__head"><h3>Where will your trip start in Davao Region?</h3><p>Choose your hotel, arrival point, or address in Davao Region.</p></header>
                             @else
                                 <header class="pc-block__head"><h3>Where will you start each day?</h3><p>Optional. We order your stops from the nearest to the furthest.</p></header>
                             @endif
@@ -214,7 +230,7 @@
                                 </div>
 
                                 <div class="field pc-field pc-col-4 pc-location-actions">
-                                    <button type="button" class="btn btn-outline pc-locate" id="origin-btn" title="Use my current location" aria-label="Use my current location" @if (\App\Support\Features::tripLocation()) data-region-xi="{{ \App\Support\Geo\RegionXi::json() }}" @endif><x-icon name="locate" aria-hidden="true" /><span class="sr-only">Use my current location</span></button>
+                                    <button type="button" class="btn btn-outline pc-locate" id="origin-btn" title="Use my current location" aria-label="Use my current location" @if (\App\Support\Features::tripLocation()) data-region-xi="{{ \App\Support\Geo\RegionXi::json() }}" @endif><x-icon name="pin-ring" aria-hidden="true" /><span class="sr-only">Use my current location</span></button>
 
                                 {{-- Where most visitors arrive. A tap fills the box and the two hidden coordinates, so the plan never depends on
                                      a lookup finding the place by name (the geocoder does not know all of them). The
@@ -232,6 +248,10 @@
                                 </div>
 
                                 <div class="pc-col-12 pc-start-notes">
+                                @if ($pickupV2)
+                                    {{-- Shown by plan-origin-select.js to visitors travelling from outside Davao Region while no pick-up is chosen. It only offers the airport; the visitor still taps it. --}}
+                                    <p class="pc-hint pc-suggest-airport" data-suggest-airport hidden>Arriving from outside Davao Region? <button type="button" class="pc-suggest-airport__use" data-suggest-airport-use>Start from the airport</button></p>
+                                @endif
                                         <span class="sr-only" id="origin-status" role="status">
                                             @if ($pickupLabel)
                                                 Starting from {{ $pickupLabel }}.
@@ -242,6 +262,9 @@
                                     @error('origin_label')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
                                 </div>
                             </div>
+                            @if ($pickupV2)
+                                <p class="plan-davo-tip"><x-icon name="info" /> Confirm pick-up with your provider. This itinerary does not book transport.</p>
+                            @endif
                         </div>
 
                         {{--

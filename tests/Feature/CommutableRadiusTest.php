@@ -42,7 +42,7 @@ class CommutableRadiusTest extends TestCase
     public function test_the_wording_shown_on_the_form(): void
     {
         $this->assertSame('about 5 km', Recommender::rangeLabel('near'));
-        $this->assertSame('15–50 km, by how you travel', Recommender::rangeLabel('moderate'));
+        $this->assertSame('15–50 km', Recommender::rangeLabel('moderate'));
         $this->assertSame('no limit', Recommender::rangeLabel('far'));
     }
 
@@ -51,7 +51,7 @@ class CommutableRadiusTest extends TestCase
         $html = $this->get('/plan')->assertOk()->getContent();
 
         $this->assertStringContainsString('about 5 km', $html);
-        $this->assertStringContainsString('15–50 km, by how you travel', $html);
+        $this->assertStringContainsString('15–50 km', $html);
         $this->assertStringNotContainsString('about 25 km', $html);
         $this->assertStringNotContainsString('about 75 km', $html);
     }

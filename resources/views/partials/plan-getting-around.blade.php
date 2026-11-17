@@ -47,9 +47,8 @@
                     <input type="radio" name="distance_pref" value="{{ $value }}" @checked($distanceNow === $value) required>
                     <span class="pc-card__icon" aria-hidden="true"><x-icon :name="$icon" /></span>
                     <span class="pc-card__text">
-                        <strong>{{ $name }}</strong>
+                        <span class="pc-card__head"><strong>{{ $name }}</strong><em>{{ $distanceLabels[$value] }}</em></span>
                         <small>{{ $note }}</small>
-                        <em>{{ $distanceLabels[$value] }}</em>
                     </span>
                     <span class="pc-card__tick" aria-hidden="true"><x-icon name="check" /></span>
                 </label>

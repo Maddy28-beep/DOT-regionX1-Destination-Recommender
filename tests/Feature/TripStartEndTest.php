@@ -242,7 +242,7 @@ class TripStartEndTest extends TestCase
         $this->assertStringNotContainsString('Arrival date', $html);
         $this->assertStringNotContainsString('Finish by', $html);
         $this->assertStringContainsString('data-trip-duration', $html);
-        $this->assertStringContainsString('Pick-up location', $html);
+        $this->assertStringContainsString('Where will your trip start in Davao Region?', $html);
         $this->assertStringContainsString('Philippine time', $html);
     }
 

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Plan Your Trip — ExploreDVO')
+@section('title', 'Trip Planner — ExploreDVO')
 
 @section('content')
 

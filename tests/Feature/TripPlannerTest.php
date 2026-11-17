@@ -916,14 +916,10 @@ class TripPlannerTest extends TestCase
         $html = $this->get('/plan/itinerary')->assertOk()->getContent();
 
         $this->assertStringContainsString('How your plan was built', $html);
-        $this->assertStringContainsString('View technical details', $html);
+        // The technical details panel was taken off the page; the methods are still named in "How was your itinerary created?".
+        $this->assertStringNotContainsString('Technical details', $html);
         $this->assertStringContainsString('Content-Based Recommendation', $html);
-        $this->assertStringContainsString('Nearest-neighbour sequencing', $html);
-        $this->assertStringContainsString('Apriori association rule mining', $html);
-
-        // With no exit surveys seeded, the panel must say so rather than imply
-        // rules were used.
-        $this->assertStringContainsString('no rule cleared the support threshold', $html);
+        $this->assertStringContainsString('Apriori Association Rules', $html);
     }
 
     /**

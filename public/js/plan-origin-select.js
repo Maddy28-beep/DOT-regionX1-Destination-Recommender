@@ -25,7 +25,25 @@
 
     // Home origin never determines the device's current location or changes a chosen pick-up.
 
+    // Visitors travelling from outside Davao Region are offered the airport as a one-tap pick-up. It is never filled in for them.
+    const originField = country.closest('[data-origin-field]');
+    const regionProvinces = (() => { try { return JSON.parse(originField?.dataset.regionXiProvinces || '[]'); } catch (e) { return []; } })();
+    const suggestion = document.querySelector('[data-suggest-airport]');
+    const pickup = document.getElementById('origin_label');
+    const airport = document.querySelector('[data-start-pick="Davao International Airport"]');
+    const locate = document.getElementById('origin-btn');
+    const suggest = () => {
+        const value = country.value;
+        const outside = value !== '' && value !== 'NONE' && (value !== 'PH' || (province && province.value !== '' && !regionProvinces.includes(province.value)));
+        // This controls visibility only; origin never sets or clears the chosen starting point.
+        if (locate) locate.hidden = outside;
+        if (suggestion) suggestion.hidden = !(outside && airport && pickup && pickup.value.trim() === '');
+    };
+    suggestion?.querySelector('[data-suggest-airport-use]')?.addEventListener('click', () => { airport?.click(); suggest(); });
+    pickup?.addEventListener('input', suggest);
+
     const sync = () => {
+        suggest();
         const value = country.value;
         const isPh = value === 'PH';
         const answered = value !== '';
@@ -58,5 +76,49 @@
     if (province && province.parentElement && 'MutationObserver' in window) {
         new MutationObserver(sync).observe(province.closest('.site-dropdown')?.parentElement || province.parentElement, { childList: true });
     }
+    // ---- two plain choices: Philippines, or another country (then the country list)
+    // The select stays the one real field; the choices only set it or show it. Without this script the select is the whole question.
+    const choice = document.querySelector('[data-origin-choice]');
+    if (choice) {
+        const picks = [...choice.querySelectorAll('[data-origin-pick]')];
+        let other = country.value !== '' && country.value !== 'PH';
+        const paint = () => {
+            const state = country.value === 'PH' ? 'PH' : (other ? 'OTHER' : '');
+            picks.forEach(button => button.setAttribute('aria-checked', String(button.dataset.originPick === state)));
+            // The country list is only needed for "Another country"; for Philippines the province is what is asked next.
+            // The select and the shared dropdown built around it are hidden and shown together (a hidden select hides its dropdown).
+            country.hidden = state !== 'OTHER';
+            const built = country.closest('.site-dropdown');
+            if (built) built.hidden = state !== 'OTHER';
+        };
+        const choose = kind => {
+            if (kind === 'PH') {
+                other = false;
+                country.value = 'PH';
+            } else {
+                other = true;
+                if (country.value === 'PH') country.value = '';
+            }
+            country.dispatchEvent(new Event('change', { bubbles: true }));
+            paint();
+            if (kind === 'OTHER') { const control = (country.closest('.site-dropdown') || country).querySelector('button, select') || country; control.focus?.({ preventScroll: true }); }
+        };
+        picks.forEach(button => button.addEventListener('click', () => choose(button.dataset.originPick)));
+        country.addEventListener('change', paint);
+        choice.hidden = false;
+        paint();
+        // The app builds the shared dropdown around the select after this file has run: paint again once it is there.
+        window.addEventListener('load', paint);
+        // Continue with neither choice made: say so, instead of the browser pointing at a field that is hidden.
+        const go = document.querySelector('[data-confirm-origin]');
+        go?.addEventListener('click', event => {
+            if (country.value !== '') return;
+            event.stopImmediatePropagation();
+            const note = document.querySelector('[data-confirm-origin-status]');
+            if (note) note.textContent = 'Choose Philippines or another country first.';
+            choice.querySelector('[data-origin-pick]')?.focus();
+        }, true);
+    }
+
     sync();
 })();

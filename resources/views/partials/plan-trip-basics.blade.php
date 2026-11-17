@@ -226,6 +226,12 @@
             <label for="visitor_origin_country"><span data-origin-label>Where are you travelling from?</span>
                 <span class="field-help" tabindex="0" title="Helps DOT understand where visitors are travelling from. We keep only the place names, never your position or an address." aria-label="Helps DOT understand where visitors are travelling from. We keep only the place names, never your position or an address."><x-icon name="info" /></span>
             </label>
+            {{-- Two plain choices come first (public/js/plan-origin-select.js shows them). Without the script the country list below is the whole question. --}}
+            <div class="pc-origin-choice" role="radiogroup" aria-label="Where are you travelling from?" data-origin-choice hidden>
+                <button type="button" role="radio" aria-checked="false" data-origin-pick="PH"><x-icon name="map-pin" aria-hidden="true" /><span><strong>Philippines</strong><small class="pc-origin-choice__caption">Choose your province</small></span></button>
+                <button type="button" role="radio" aria-checked="false" data-origin-pick="OTHER"><x-icon name="plane" aria-hidden="true" /><span><strong>Another country</strong><small class="pc-origin-choice__caption">Choose your country</small></span></button>
+            </div>
+            <label class="pc-origin-control-label pc-origin-country-label" for="visitor_origin_country">Country</label>
             <select id="visitor_origin_country" name="visitor_origin_country" data-origin-required required>
                 <option value="">Choose a country</option>
                 <option value="PH" @selected($countryChosen === 'PH')>Philippines</option>
@@ -238,9 +244,16 @@
             </select>
             @error('visitor_origin_country')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
 
+            <label class="pc-origin-control-label pc-origin-province-label" for="visitor_origin_province">Province</label>
             <select id="visitor_origin_province" name="visitor_origin_province" aria-label="Province" data-origin-province @if ($countryChosen === 'PH') required @endif @if ($countryChosen !== 'PH') hidden @endif>
                 <option value="">Choose your province</option>
-                @foreach (\App\Support\Geo\PhProvinces::BY_REGION as $regionName => $provinceList)
+                {{-- Davao Region first: most visitors from the Philippines are travelling from or near it. --}}
+                @php
+                    $phRegions = \App\Support\Geo\PhProvinces::BY_REGION;
+                    $phHome = 'Region XI (Davao Region)';
+                    if (isset($phRegions[$phHome])) { $phRegions = [$phHome => $phRegions[$phHome]] + $phRegions; }
+                @endphp
+                @foreach ($phRegions as $regionName => $provinceList)
                     <optgroup label="{{ $regionName }}">
                         @foreach ($provinceList as $provinceName)
                             <option value="{{ $provinceName }}" @selected($provinceChosen === $provinceName)>{{ $provinceName }}</option>
@@ -250,12 +263,15 @@
             </select>
             @error('visitor_origin_province')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
 
+            <label class="pc-origin-control-label pc-origin-city-label" for="visitor_origin_city">City or municipality <span>· optional</span></label>
             <input type="text" id="visitor_origin_city" name="visitor_origin_city" value="{{ $cityTyped }}" maxlength="100" autocomplete="off"
                    aria-label="City or municipality" placeholder="City or municipality (type it)" data-origin-city
                    @if ($countryChosen === '' || $countryChosen === null) hidden @endif>
-            <p class="pc-hint" data-origin-hint>Choose a country; for the Philippines, choose your province too. A city or municipality is optional. We never ask for your home address.</p>
-            <p class="pc-hint" data-origin-privacy>Confirming your origin records your country, province and city for tourism statistics, even if you do not finish planning. We use a protected browser identifier for up to 30 days to prevent repeat counts within a day. Anonymous totals are kept; trip details are deleted after 30 days.</p>
-            <button type="button" class="btn btn-outline btn-sm" data-confirm-origin data-confirm-url="{{ route('plan.origin-confirmation') }}">Confirm origin and continue</button>
+            <p class="pc-hint" data-origin-hint>Pick Philippines and then your province, or choose another country. A city or municipality is optional. We never ask for your home address.</p>
+            <div class="pc-hint pc-origin-privacy" data-origin-privacy>
+                <p><x-icon name="shield-check" aria-hidden="true" /> For anonymous tourism statistics. No name or home address.</p>
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" data-confirm-origin data-confirm-url="{{ route('plan.origin-confirmation') }}">Continue</button>
             <p class="pc-hint" role="status" data-confirm-origin-status></p>
             <script src="{{ asset('js/plan-origin-capture.js') }}?v={{ filemtime(public_path('js/plan-origin-capture.js')) }}" defer></script>
         </div>

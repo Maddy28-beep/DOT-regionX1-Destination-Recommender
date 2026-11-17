@@ -335,6 +335,10 @@
         <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20M4.9 4.9l14.2 14.2M19.1 4.9L4.9 19.1"/></svg>
         @break
 
+    @case('pin-ring')
+        {{-- A solid map pin standing on a ring: "use my current location". --}}
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="currentColor"><path fill-rule="evenodd" d="M12 1.4a6.6 6.6 0 0 0-6.6 6.6c0 4.5 4.7 8.6 6.6 10.5 1.9-1.9 6.6-6 6.6-10.5A6.6 6.6 0 0 0 12 1.4zm0 9.3a2.7 2.7 0 1 1 0-5.4 2.7 2.7 0 0 1 0 5.4z"/><ellipse cx="12" cy="20.7" rx="7.8" ry="2.1" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+        @break
     @case('locate')
         <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
         @break
