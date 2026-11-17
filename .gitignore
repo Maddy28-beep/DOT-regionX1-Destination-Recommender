@@ -38,6 +38,8 @@ Thumbs.db
 !/public/video/README.md
 !/public/video/hero.mp4
 !/public/video/hero.webm
+# Davo's short guide clips (about 500 KB each) are part of the pages, so they ship too.
+!/public/video/davo-*.mp4
 !/public/video/hero-poster.jpg
 
 # Local audit/comparison scratch outputs and DB snapshots

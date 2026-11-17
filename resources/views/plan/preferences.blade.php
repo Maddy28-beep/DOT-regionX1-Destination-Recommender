@@ -99,7 +99,7 @@
             <section class="plan-resume" id="planResume" aria-labelledby="planResumeTitle" hidden>
                 <div class="plan-resume-art">
                     <video class="plan-resume-davo" data-davo-resume-video muted playsinline preload="auto" poster="{{ asset('images/davo-resume-video-poster.webp') }}" width="568" height="746" aria-label="Davo welcoming you back">
-                        <source src="{{ asset('video/davo-resume-guide.mp4') }}?v={{ filemtime(public_path('video/davo-resume-guide.mp4')) }}" type="video/mp4">
+                        <source src="{{ asset('video/davo-resume-guide.mp4') }}?v={{ (is_file(public_path('video/davo-resume-guide.mp4')) ? filemtime(public_path('video/davo-resume-guide.mp4')) : 0) }}" type="video/mp4">
                         <img src="{{ asset('images/davo-resume-video-poster.webp') }}" alt="Davo welcoming you back" width="230" height="300">
                     </video>
                 </div>
@@ -299,7 +299,7 @@
             <section id="planLoading" class="plan-loading" role="status" aria-live="polite" aria-labelledby="planLoadingTitle" hidden tabindex="-1">
                 <div class="plan-loading-art">
                     <video class="plan-loading-davo" data-davo-building-video muted playsinline preload="auto" poster="{{ asset('images/davo-planning.webp') }}" width="568" height="628" aria-label="Davo preparing your itinerary">
-                        <source src="{{ asset('video/davo-itinerary-building.mp4') }}?v={{ filemtime(public_path('video/davo-itinerary-building.mp4')) }}" type="video/mp4">
+                        <source src="{{ asset('video/davo-itinerary-building.mp4') }}?v={{ (is_file(public_path('video/davo-itinerary-building.mp4')) ? filemtime(public_path('video/davo-itinerary-building.mp4')) : 0) }}" type="video/mp4">
                         <img src="{{ asset('images/davo-planning.webp') }}" alt="Davo preparing your itinerary" width="420" height="504">
                     </video>
                 </div>
