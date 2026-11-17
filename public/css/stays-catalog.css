@@ -316,6 +316,10 @@ html:has(.catalog-refresh) { scrollbar-gutter: stable; }
     .catalog-refresh .dpost-card-wrap { height: auto; }
     .catalog-refresh .dcard__art { aspect-ratio: auto; height: 100%; min-height: 112px; }
     .catalog-refresh .dcard__art .photo-illustration-tag { display: none; }
+    .dining-catalog .dcard__art .photo-illustration-tag {
+        display: inline-block; left: 5px; bottom: 6px; max-width: calc(100% - 36px);
+        padding: 2px 4px; font-size: .6rem; white-space: nowrap;
+    }
     .catalog-refresh .dcard__new { top: 6px; left: 6px; padding: 2px 6px; font-size: .6rem; }
     .catalog-refresh .dcard__body { min-width: 0; min-height: 0; padding: 10px 12px; }
     /* The save heart sits at the top right of the text area; give the first two lines room so they never run under it. */
