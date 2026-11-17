@@ -533,3 +533,8 @@
 .pc-origin-choice button[aria-checked="true"] { background: var(--primary); border-color: var(--primary); color: #fff; }
 .pc-origin-choice button:focus-visible { outline: 3px solid #e98543; outline-offset: 2px; }
 @media (max-width: 480px) { .pc-origin-choice button { flex: 1 1 100%; justify-content: center; } }
+
+/* While the origin question is open the page is just that form, centred. Davo's guide and the step list appear when Continue opens the planner. */
+.plan-origin-gating #planWizard[data-origin-pending] .plan-side { display: none; }
+.plan-origin-gating #planWizard[data-origin-pending] .plan-frame { display: block; max-width: 760px; margin-inline: auto; }
+.plan-origin-gating #planWizard[data-origin-pending] .section-tight { padding-top: 36px; padding-bottom: 48px; }
