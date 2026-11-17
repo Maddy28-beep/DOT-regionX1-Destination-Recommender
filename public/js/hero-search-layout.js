@@ -22,8 +22,23 @@
         if (submitLabel && selected) submitLabel.textContent = labels[selected.value];
     };
     form.addEventListener('change', updateLabel);
+    form.addEventListener('hero-search:layout', updateLabel);
     window.addEventListener('pageshow', updateLabel);
     updateLabel();
+
+    // Move one original statistics row: desktop places it after discovery; mobile retains the hero placement.
+    const desktopLayout = window.matchMedia('(min-width: 1061px)');
+    const statistics = document.querySelector('.home-discovery-stats');
+    const heroLower = form.closest('.hero-lower');
+    const discovery = document.querySelector('#known-for > .container');
+    const placeStatistics = () => {
+        if (!statistics || !heroLower) return;
+        if (desktopLayout.matches && discovery) discovery.append(statistics);
+        else heroLower.insertBefore(statistics, heroLower.querySelector('.hero-plan-cta'));
+    };
+    desktopLayout.addEventListener('change', placeStatistics);
+    window.addEventListener('pageshow', placeStatistics);
+    placeStatistics();
 
     const picker = form.querySelector('[data-guest-picker]');
     const summary = picker?.querySelector('summary');

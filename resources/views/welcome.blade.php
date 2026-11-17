@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/home-slides.css') }}">
     <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/brand-accents.css') }}">
     <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/hero-search-refresh.css') }}">
+    <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/home-compact.css') }}">
     @if ($heroPhoto)
         <link rel="preload" as="image" href="{{ $heroPhoto }}" fetchpriority="high">
     @elseif ($heroVideo && $heroVideo['poster'])
@@ -303,7 +304,7 @@
         $stayGuests = ['adults' => 'Adults', 'children' => 'Children', 'seniors' => 'Senior citizens', 'pwd' => 'PWD'];
         $today = now('Asia/Manila')->toDateString();
     @endphp
-    <form class="hero-search hero-search--compact" id="search" action="{{ route('search') }}" method="GET" data-hero-search>
+    <form class="hero-search hero-search--compact" id="search" action="{{ route('search') }}" method="GET" data-hero-search data-search-steady>
         <div class="hero-search__bar">
             <fieldset class="hero-search__tabs">
                 <legend class="sr-only">I want to&hellip;</legend>
@@ -483,32 +484,7 @@
 
     @include('partials.home-deals', ['deals' => $deals])
 
-    <div class="stats">
-        <div class="stats-strip">
-            <div class="stat-item">
-                <div class="stat-num" data-count-up>{{ $stats['destinations'] }}</div>
-                <div class="stat-label">Destinations</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num" data-count-up>{{ $stats['regions'] }}</div>
-                <div class="stat-label">Cities &amp; provinces covered</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num" data-count-up>{{ $stats['accommodations'] }}</div>
-                <div class="stat-label">Accommodations</div>
-            </div>
-            {{-- No fabricated placeholder here: this stood at a hard-coded
-                 "4.8" whenever nothing was rated yet, which is a review score
-                 no traveller ever gave. If there is nothing real to show, the
-                 stat simply stands down. --}}
-            @if ($stats['avg_rating'])
-                <div class="stat-item stat-item--rating">
-                    <div class="stat-num" data-count-up>{{ number_format($stats['avg_rating'], 1) }}</div>
-                    <div class="stat-label">Traveler Rating</div>
-                </div>
-            @endif
-        </div>
-    </div>
+    @include('partials.home-stats')
 
     {{-- Phones only (see hero-search.css): the planner is the heart of the site, and the first screen is otherwise a search box. --}}
     <div class="hero-plan-cta">
