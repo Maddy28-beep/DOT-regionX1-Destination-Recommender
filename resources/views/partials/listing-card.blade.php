@@ -106,6 +106,7 @@
             @if ($coverPhoto)
                 {{-- alt is empty on purpose: the name below already names the place and the card is one link. --}}
                 <img src="{{ $coverPhoto->cardUrl() }}" alt="" class="dpost-card__photo" loading="lazy" decoding="async">
+                @include('partials.photo-scope-label', ['photo' => $coverPhoto])
                 @if ($coverPhoto->isIllustration())
                     <span class="photo-illustration-tag photo-illustration-tag--card">Illustration</span>
                 @endif

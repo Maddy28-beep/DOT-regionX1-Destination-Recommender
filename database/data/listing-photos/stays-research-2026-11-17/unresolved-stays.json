@@ -1,0 +1,330 @@
+[
+    {
+        "id": 67,
+        "name": "Adecor Garden Resort",
+        "slug": "adecor-garden-resort",
+        "location": "Purok 5,Adecor, Kaputian District , Island Garden City of Samal Davao Del Norte",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 73,
+        "name": "Amaya Waterfront Villa",
+        "slug": "amaya-waterfront-villa",
+        "location": "Purok 2, Brgy. Lanca, Mati City, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 74,
+        "name": "Anrana Beach Resort",
+        "slug": "anrana-beach-resort",
+        "location": "Purok Talisay 1, Brgy. San Antonio, Cateel, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 78,
+        "name": "Baculin Beach Resort",
+        "slug": "baculin-beach-resort",
+        "location": "Purok Molave, Brgy. Baculin, Baganga, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 81,
+        "name": "Bungalow Vacation Rentals",
+        "slug": "bungalow-vacation-rentals",
+        "location": "Prk. Maribujoc I, Brgy. Dahican, Mati City, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 86,
+        "name": "Casa-Tanaw Inland Resort",
+        "slug": "casa-tanaw-inland-resort",
+        "location": "Purok 1 Brgy Cawag, Island Garden City Of Samal, Davao del Norte",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 89,
+        "name": "Citistar Hotel",
+        "slug": "citistar-hotel",
+        "location": "Purok 2-A FDR 1, Brgy. Tibal-og (Pob.), Santo Tomas, Davao del Norte",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 100,
+        "name": "Debonaires Beach Resort",
+        "slug": "debonaires-beach-resort",
+        "location": "Block 8, Brgy. Lambajon, Baganga. Davao Oriental",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 101,
+        "name": "DGLM Inland Leisure Center",
+        "slug": "dglm-inland-leisure-center",
+        "location": "Purok Maharlika, Brgy. Cuambogan, Tagum City, Davao del Norte",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 106,
+        "name": "Edar's Place",
+        "slug": "edar-s-place",
+        "location": "Dacuycuy St., Purok Talisay, Brgy. Poblacion, Cateel, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 107,
+        "name": "Emma Victoria's Inn",
+        "slug": "emma-victoria-s-inn",
+        "location": "New Times Beach, Brgy. Matina Aplaya, Davao City",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 109,
+        "name": "Estella Beach'n Star Resort",
+        "slug": "estella-beach-n-star-resort",
+        "location": "Purok Molave, Brgy. Baculin, Baganga, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 115,
+        "name": "Gov Gen Beach Resort",
+        "slug": "gov-gen-beach-resort",
+        "location": "Barangay Tamban, Governor Generoso, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 116,
+        "name": "Grand Amber Country Inn",
+        "slug": "grand-amber-country-inn",
+        "location": "San Jose St., Km 7 Lanang, Brgy. Alfonso Angliongto Sr., Davao City",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 119,
+        "name": "Heavenly Beach Resort",
+        "slug": "heavenly-beach-resort",
+        "location": "Prk. 6 Ilihan, Brgy. Ilihan, Brgy. Camudmud, Island Garden City of Samal, Davao del Norte",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 122,
+        "name": "Honey's Hotel and Restaurant",
+        "slug": "honey-s-hotel-and-restaurant",
+        "location": "Purok Mapayapa, Brgy. Matiao, Mati City, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 125,
+        "name": "Hotel Cabaguio",
+        "slug": "hotel-cabaguio",
+        "location": "JP Cabaguio Ave., Brgy. Agdao, Davao City",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 128,
+        "name": "Hotel San Marco",
+        "slug": "hotel-san-marco",
+        "location": "McArthur Highway, Brgy. Matina Crossing, Davao City",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 132,
+        "name": "Inside Room Inn",
+        "slug": "inside-room-inn",
+        "location": "Pioneer Avenue, Brgy. Magugpo Poblacion, Tagum City, Davao del Norte",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 134,
+        "name": "Jack's In The Sky Mountain Resort",
+        "slug": "jack-s-in-the-sky-mountain-resort",
+        "location": "Purok 34 Sitio Pamuhatan, Marilog, Davao City",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 138,
+        "name": "Jillux Lodging Beach Resort",
+        "slug": "jillux-lodging-beach-resort",
+        "location": "Block 4, Brgy. Lambajon, Baganga, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 151,
+        "name": "Magooz Homestay",
+        "slug": "magooz-homestay",
+        "location": "Purok 2, Brgy. Caliclic (Dangca-an), Babak, Island Garden City of Samal, Davao del Norte",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 153,
+        "name": "Maxze B & B Inn",
+        "slug": "maxze-b-b-inn",
+        "location": "Masai Bldg., B14 L1, Mamay Road",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 155,
+        "name": "MGL Resthouse and Foodhouse",
+        "slug": "mgl-resthouse-and-foodhouse",
+        "location": "Lote Riverside, Zone 2, Sta Cruz, Davao del Sur",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 158,
+        "name": "Moonlit Baganga Beach Resort",
+        "slug": "moonlit-baganga-beach-resort",
+        "location": "Sitio Mabua, National Highway, Brgy. Saoquegue, Baganga, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 159,
+        "name": "Muland Leisure Park",
+        "slug": "muland-leisure-park",
+        "location": "Purok Dumoy Proper Beachline, Brgy. Dumoy, Talomo Dist., Davao City",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 160,
+        "name": "Nacyl-V Transient House",
+        "slug": "nacyl-v-transient-house",
+        "location": "Purok-1, Babak District, Brgy. Mambago-B, Island Garden City of Samal, Davao del Norte",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 164,
+        "name": "Odyson's Mountain Resort",
+        "slug": "odyson-s-mountain-resort",
+        "location": "Purok Lemonsito, Brgy. Magcagong, Maragusan, Davao De Oro",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 165,
+        "name": "Oh George Inn",
+        "slug": "oh-george-inn",
+        "location": "Brgy 10-A San Rafael Village, Maa, Davao City",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 166,
+        "name": "Oh George Inn",
+        "slug": "oh-george-inn-2",
+        "location": "Near Airport Runway, Mamay Bypass Road, Buhangin, Alfonso Angliongto Sr., Davao City",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 167,
+        "name": "Oh George Inn",
+        "slug": "oh-george-inn-3",
+        "location": "OG Bldg., Ecoland Drive, Brgy Bucana, Talomo, Davao City",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 173,
+        "name": "Praia Vista",
+        "slug": "praia-vista",
+        "location": "Purok Bangonay, Brgy. Bobon, Mati City, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 174,
+        "name": "Praia Vista inc",
+        "slug": "praia-vista-inc",
+        "location": "Sitio Dita, Brgy. Bobon, Mati City, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 175,
+        "name": "Primo Whitesand Beach Resort",
+        "slug": "primo-whitesand-beach-resort",
+        "location": "Block 9, Brgy. Lambajon, Baganga, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 176,
+        "name": "Princess Inn",
+        "slug": "princess-inn",
+        "location": "Block 6 Lot 29 & 30 Dacudao Avenue, Brgy. Agdao, Davao City",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 179,
+        "name": "Qanaq Hotel",
+        "slug": "qanaq-hotel",
+        "location": "B. E. Squared Bldg. Km3 MacArthur Highway, Matina, Davao City",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 190,
+        "name": "South Point Beach House",
+        "slug": "south-point-beach-house",
+        "location": "Purok 1 Biao, Brgy. Langka, Mati City, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 205,
+        "name": "Vafi Hills Homestay",
+        "slug": "vafi-hills-homestay",
+        "location": "PUROK 3 SITIO PUTING BATO, BRGY.TAMBO, Island Garden City of Samal, Davao del Norte",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 213,
+        "name": "Nomad Escapes & Sanctuaries OPC",
+        "slug": "nomad-escapes-sanctuaries-opc",
+        "location": "01 Bambulaklak, BLK24 LOT18, Fuji St., Bambu Estate, Brgy. Santo Nio, Davao City",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 224,
+        "name": "Amigotel Inn and Bloom (Boracay)",
+        "slug": "amigotel-inn-and-bloom-boracay",
+        "location": "Mt. Mayon St., Brgy 7-A, Davao City",
+        "website_url": null,
+        "facebook_url": null
+    },
+    {
+        "id": 228,
+        "name": "Matanao Travellers Inn",
+        "slug": "matanao-travellers-inn",
+        "location": "Brgy. Poblacion, Matanao, Davao del Sur",
+        "website_url": null,
+        "facebook_url": null
+    }
+]
