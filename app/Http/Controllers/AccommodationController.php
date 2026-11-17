@@ -49,22 +49,25 @@ class AccommodationController extends Controller
             $query->where('price_tier', $request->string('price_tier'));
         }
 
-        // A peso range from the hero search's Budget dropdown: the price per night.
+        // Daily budgets must never fall back to the nightly rate. Unknown daily rates
+        // remain visible without a budget, but cannot match a specific daily amount.
+        $dayUse = $request->input('stay_mode') === 'day_use';
         [$priceMin, $priceMax] = \App\Support\BudgetRanges::bounds($request);
         if ($priceMin !== null || $priceMax !== null) {
-            $query->whereNotNull('price_per_night');
-            if ($priceMin !== null) {
-                $query->where('price_per_night', '>=', $priceMin);
-            }
-            if ($priceMax !== null) {
-                $query->where('price_per_night', '<=', $priceMax);
+            if ($dayUse) {
+                $query->whereNotNull('price_per_day');
+                if ($priceMin !== null) $query->where('price_per_day', '>=', $priceMin);
+                if ($priceMax !== null) $query->where('price_per_day', '<=', $priceMax);
+            } else {
+                \App\Support\StayPricing::applyNightlyBudget($query, $priceMin, $priceMax);
             }
         }
 
         // Kind of stay. Every accredited lodging type is somewhere to sleep, so "overnight" adds no limit.
-        // No listing carries a day-use flag, so day use can only be read from the listing's own description.
+        // A recorded daily rate explicitly offers day use; older records may say so only in their description.
         if ($request->string('stay_mode')->toString() === 'day_use') {
             $query->where(function ($q) {
+                $q->whereNotNull('price_per_day');
                 foreach (self::DAY_USE_PHRASES as $phrase) {
                     $q->orWhereRaw('LOWER(description) LIKE ?', ['%'.$phrase.'%']);
                 }

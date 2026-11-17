@@ -41,7 +41,6 @@
                 'placeholder' => 'e.g. Samal Island',
                 'regions' => $regions,
                 'activeFilters' => $activeFilters,
-                'tiers' => [['Free', 'Free', ''], ['Budget-Friendly', 'Budget-friendly', ''], ['Mid-range', 'Mid-range', ''], ['Premium', 'Premium', '']],
                 'categoryParam' => 'type',
                 'formId' => 'destinationFilters',
                 'hidden' => array_merge([['name' => 'view', 'value' => request('view') === 'map' ? 'map' : 'grid', 'id' => 'destinationViewInput']], \App\Support\ActiveFilters::carry(request(), ['price_min','price_max'])),
@@ -69,7 +68,7 @@
 
                     @include('partials.pagination', ['paginator' => $destinations])
                 @else
-                    <x-davo-empty-state title="No destinations match your filters" message="Try another category or clear your filters to explore more options." :action-url="route('destinations.index')" action-label="Clear filters" />
+                    <x-davo-empty-state :adjust-filters="true" title="No destinations match your filters" message="Try another category or clear your filters to explore more options." :action-url="route('destinations.index')" action-label="Clear filters" />
                 @endif
                 </div>
             </div>

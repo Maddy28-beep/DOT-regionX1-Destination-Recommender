@@ -55,7 +55,7 @@ class ExitSurveyRecapTest extends TestCase
         // one NOT reported visited) legitimately appears later, in "You
         // Might Have Missed", so a whole-page substring check would be
         // testing the wrong thing.
-        $visitedSection = $this->sectionBetween($html, 'Places You Visited', 'You Might Have Missed');
+        $visitedSection = $this->sectionBetween($html, 'Places You Visited', 'Explore next time');
 
         $this->assertStringContainsString('Destination 1', $visitedSection);
         $this->assertStringContainsString('Destination 2', $visitedSection);
@@ -102,7 +102,7 @@ class ExitSurveyRecapTest extends TestCase
 
         $this->get(route('exit-survey.recap'))
             ->assertOk()
-            ->assertSee('Thanks for your feedback');
+            ->assertSee('Feedback received')->assertDontSee('id="shareTripCardBtn"', false);
     }
 
     public function test_missed_destinations_exclude_what_was_already_visited(): void
@@ -115,7 +115,7 @@ class ExitSurveyRecapTest extends TestCase
 
         $html = $this->get(route('exit-survey.recap'))->assertOk()->getContent();
 
-        $this->assertStringContainsString('You Might Have Missed', $html);
+        $this->assertStringContainsString('Explore next time', $html);
         $this->assertStringContainsString('Destination 2', $html);
         $this->assertStringContainsString('Destination 3', $html);
     }
@@ -130,7 +130,7 @@ class ExitSurveyRecapTest extends TestCase
 
         $this->get(route('exit-survey.recap'))
             ->assertOk()
-            ->assertDontSee('You Might Have Missed');
+            ->assertDontSee('Explore next time');
     }
 
     public function test_the_missed_list_is_personalized_when_a_preference_is_linked(): void

@@ -87,6 +87,9 @@ class ItineraryPageRedesignTest extends TestCase
             ->assertSee('Generated')
             ->assertSee('Edit preferences')
             ->assertSee('Save Itinerary')
+            ->assertSee('data-invite-key="dvo-save-itinerary-'.$trip->id.'"', false)
+            ->assertSee('form="itinerarySaveForm"', false)
+            ->assertSee('Save your plan for later.')
             // Unsaved: a calm notice with an icon, not alarm-red text.
             ->assertSee('Not saved yet')
             ->assertSee('itin-banner__unsaved', false);
@@ -98,6 +101,23 @@ class ItineraryPageRedesignTest extends TestCase
         $trip->update(['title' => 'My Davao Trip']);
 
         $this->page($trip, $pref)->assertSee('My Davao Trip')->assertDontSee('Your Davao itinerary');
+    }
+
+    public function test_a_saved_itinerary_does_not_show_a_save_reminder(): void
+    {
+        [$trip, $pref] = $this->plan();
+        $account = \App\Models\TouristAccount::create(['alias' => 'savedtraveller', 'password_hash' => 'unused-in-view-test']);
+        $trip->update(['tourist_account_id' => $account->id]);
+        $this->page($trip, $pref)->assertOk()->assertDontSee('data-invite-key="dvo-save-itinerary-', false);
+    }
+
+    public function test_adjust_filters_preserves_the_existing_no_results_card_and_clear_action(): void
+    {
+        $this->get('/destinations?q=NoMatchingDestinationPreview')->assertOk()
+            ->assertSee('No destinations match your filters')
+            ->assertSee('data-adjust-filters', false)
+            ->assertSee('Clear filters')
+            ->assertSee('value="NoMatchingDestinationPreview"', false);
     }
 
     // ---- day tabs

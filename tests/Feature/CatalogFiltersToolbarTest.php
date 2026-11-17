@@ -38,18 +38,16 @@ class CatalogFiltersToolbarTest extends TestCase
             $this->assertStringContainsString('Province or city', $html, $name);
             $this->assertStringContainsString('All of Davao Region', $html, $name);
             $this->assertStringContainsString('results-toolbar', $html, $name);
-            $this->assertStringContainsString('form="catalogFilters"', $html, $name);
+            $this->assertStringContainsString('id="catalogFilters"', $html, $name);
             $this->assertMatchesRegularExpression('/data-filter-submit>\s*Show results\s*<\/button>/', $html, $name);
             $this->assertStringNotContainsString('Apply Filters', $html, $name);
             $this->assertStringNotContainsString('Filter results', $html, $name);
 
-            $this->assertSame($tiers ? 4 : 0, substr_count($html, 'name="price_tier"'), "$name budget tiles: Any budget + three tiers");
-            if ($tiers) {
-                foreach (['Any budget', 'Budget-Friendly', 'Mid-range', 'Premium'] as $label) {
-                    $this->assertStringContainsString($label, $html, "$name tile $label");
-                }
-                $this->assertMatchesRegularExpression('/value="" checked/', $html, "$name starts on Any budget");
-            }
+            $this->assertStringNotContainsString('name="price_tier"', $html, $name);
+            $this->assertStringNotContainsString('name="price_min"', $html, $name);
+            $this->assertStringNotContainsString('name="price_max"', $html, $name);
+            $this->assertStringNotContainsString('name="sort"', $html, $name);
+            $this->assertStringContainsString('filter-panel__actions', $html, $name);
             $this->assertStringNotContainsString('value="Free"', $html, "$name has no Free tile (that is a destinations thing)");
             if ($category) {
                 $this->assertStringContainsString('name="'.$category.'"', $html, $name);
@@ -76,27 +74,26 @@ class CatalogFiltersToolbarTest extends TestCase
         $this->assertStringContainsString('Clear all', $html);
     }
 
-    public function test_the_dining_filter_names_its_budget_in_words_with_no_peso_sign(): void
+    public function test_dining_keeps_existing_search_context_without_budget_controls(): void
     {
         $html = $this->get('/restaurants?price_tier=Mid-range')->assertOk()->getContent();
 
         $panel = substr($html, (int) strpos($html, 'id="filterPanel"'), 6000);
-        foreach (['Any budget', 'Budget-friendly', 'Mid-range', 'Premium'] as $name) {
-            $this->assertStringContainsString('budget-tile__name">'.$name.'<', $panel, $name);
-        }
+        $this->assertStringNotContainsString('budget-tile__name', $panel);
+        $this->assertStringContainsString('type="hidden" name="price_tier" value="Mid-range"', $panel);
         $this->assertStringNotContainsString('budget-tile__sub', $panel, 'No peso line under the tile names.');
         $this->assertStringNotContainsString('&#8369;', $panel);
         $this->assertStringNotContainsString('₱', $panel);
         $this->assertStringContainsString('Remove filter: Mid-range"', $html, 'The chip for the chosen band has no peso signs either.');
     }
 
-    public function test_no_catalogue_shows_peso_signs_in_its_budget_filter(): void
+    public function test_no_catalogue_offers_budget_controls_for_existing_budget_context(): void
     {
         foreach (['/destinations', '/accommodations', '/packages', '/tour-operators', '/restaurants'] as $url) {
             $html = $this->get($url.'?price_tier=Premium')->assertOk()->getContent();
 
             $panel = substr($html, (int) strpos($html, 'id="filterPanel"'), 6000);
-            $this->assertStringContainsString('budget-tile__name', $panel, $url);
+            $this->assertStringNotContainsString('budget-tile__name', $panel, $url);
             $this->assertStringNotContainsString('₱', $panel, $url);
             $this->assertStringNotContainsString('budget-tile__sub', $panel, $url);
             $this->assertStringContainsString('Remove filter: Premium"', $html, $url.': the chip names the band in words.');

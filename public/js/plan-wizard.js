@@ -93,6 +93,7 @@
     let busy = false;
     function show(index, focus = false) {
         if (root.hasAttribute('data-origin-pending')) index = 0;
+        const stepChanged = current !== index;
         current = index;
         steps[0].querySelector('h2').textContent = root.hasAttribute('data-origin-pending') ? 'Start with your place of origin.' : headings[0];
         steps[0].querySelector('.plan-step-intro').textContent = root.hasAttribute('data-origin-pending') ? 'Confirm where you are travelling from to continue planning.' : descriptions[0];
@@ -107,6 +108,7 @@
         submit.hidden = index !== last;
         next.textContent = ['Next: your interests →', 'Next: stay & budget →', 'Next: getting around →'][index] || 'Next →';
         status.textContent = `Step ${index + 1} of ${steps.length}`;
+        if (stepChanged) document.dispatchEvent(new CustomEvent('davo:planner-step-change'));
         saveDraft();
         if (focus) {
             steps[index].querySelector('h2').focus({preventScroll: true});
@@ -149,6 +151,7 @@
         panel.hidden = resumePending;
         nav.hidden = resumePending;
         loading.hidden = true;
+        document.dispatchEvent(new CustomEvent('davo:itinerary-building-stop'));
         loading.classList.remove('is-ready', 'is-finishing');
         loading.style.removeProperty('--plan-progress');
         document.getElementById('planLoadingTitle').textContent = 'I’m putting your trip together.';
@@ -167,6 +170,7 @@
         panel.hidden = true;
         nav.hidden = true;
         loading.hidden = false;
+        document.dispatchEvent(new CustomEvent('davo:itinerary-building'));
         document.getElementById('planLoadingTitle').textContent = 'I’m putting your trip together.';
         loading.focus();
         loading.scrollIntoView({block: 'start'});
@@ -287,22 +291,6 @@
             item.lastElementChild.textContent = text;
             item.hidden = !text;
         });
-        const sprite = resume.querySelector('.plan-resume-davo');
-        const motion = matchMedia('(prefers-reduced-motion: reduce)');
-        let waveTimer;
-        function stopWave() { clearTimeout(waveTimer); sprite.style.backgroundPosition = '0% 0%'; }
-        const frames = [0, 1, 2, 3, 4, 5, 6, 7, 8, 0];
-        function wave(index = 0) {
-            if (motion.matches || resume.hidden || document.hidden) { stopWave(); return; }
-            const frame = frames[index];
-            sprite.style.backgroundPosition = `${frame % 3 * 50}% ${Math.floor(frame / 3) * 50}%`;
-            if (index < frames.length - 1) waveTimer = setTimeout(() => wave(index + 1), index === 4 ? 110 : 180);
-        }
-        const image = new Image();
-        image.onload = () => wave();
-        image.src = sprite.style.backgroundImage.slice(5, -2);
-        motion.addEventListener('change', stopWave);
-        document.addEventListener('visibilitychange', () => { if (document.hidden) stopWave(); });
     }
     offerResume();
     document.addEventListener('visitor-origin-confirmed', () => { show(0); offerResume(); });

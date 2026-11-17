@@ -43,6 +43,7 @@
         <p class="field-hint">{{ $hint }}</p>
     @endif
 
+    <div class="tag-search__picker">
     <div class="tag-search__box" data-tag-search-box>
         <input
             type="text"
@@ -56,6 +57,7 @@
         >
     </div>
     <ul class="tag-search__dropdown" data-tag-search-dropdown hidden role="listbox"></ul>
+    </div>
     {{-- Below the input, not inside it: grouped into one block per category
          (see the `group` note above) so "which of these did I already add"
          stays readable once a respondent has picked places across several

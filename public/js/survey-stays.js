@@ -136,6 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     input.required = manual;
                 });
                 row.querySelector('[data-remove-stay]').hidden = all.length === 1;
+                row.querySelector('[data-remove-stay]').setAttribute('aria-label', 'Remove stay ' + (index + 1));
             });
             add.hidden = all.length >= 5;
         }

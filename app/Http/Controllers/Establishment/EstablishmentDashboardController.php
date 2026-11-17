@@ -197,6 +197,7 @@ class EstablishmentDashboardController extends Controller
             'description' => ['nullable', 'string', 'max:1000'],
             'price_tier' => ['nullable', 'string', 'max:20'],
             'price_amount' => ['nullable', 'numeric', 'min:0'],
+            ...($establishment->listing_kind === 'accommodation' ? ['price_per_day' => ['nullable', 'numeric', 'min:0', 'max:1000000']] : []),
             ] : []),
             ...($tracksStatus && $part('status') ? [
                 'operating_status' => ['nullable', Rule::in(array_keys(Destination::OPERATING_STATUSES))],
@@ -251,6 +252,9 @@ class EstablishmentDashboardController extends Controller
                 'package' => $listing->price_per_pax = $data['price_amount'] ?? null,
                 default => null,
             };
+            if ($establishment->listing_kind === 'accommodation' && array_key_exists('price_per_day', $data)) {
+                $listing->price_per_day = $data['price_per_day'];
+            }
         }
 
         if ($part('position')) {

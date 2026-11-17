@@ -25,6 +25,8 @@
     gap: 14px;
 }
 .plan-side__davo { width: 172px; height: auto; display: block; align-self: center; margin: 0 0 4px; }
+.plan-side__davo-media { position:relative; isolation:isolate; background:#f6f4ee; }
+.plan-side__davo-media video { display:block; width:100%; height:auto; aspect-ratio:568 / 760; object-fit:contain; mix-blend-mode:darken; }
 .plan-side__kicker { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #0b6b4f; }
 .plan-side__bubble {
     position: relative; width: 100%; padding: 18px; background: #fffefa;
@@ -329,12 +331,13 @@
 .plan-wizard.is-building .plan-frame { display: block; max-width: 940px; }
 .plan-wizard.is-building .plan-side { display: none; }
 .plan-wizard.is-building .plan-loading {
-    max-width: 860px; width: 100%; grid-template-columns: 250px minmax(0, 1fr);
-    gap: 28px; padding: 30px; background: #fffefa; border: 1px solid #e3e6db;
+    max-width: 860px; width: 100%; grid-template-columns: 280px minmax(0, 1fr);
+    gap: 24px; padding: 26px; background: #fffefa; border: 1px solid #e3e6db;
     border-radius: 24px; box-shadow: 0 8px 28px rgb(25 50 36 / 7%);
 }
-.plan-loading-art { display: grid; place-items: center; align-self: stretch; background: #e8f3e7; border-radius: 20px; padding: 16px; }
-.plan-wizard.is-building .plan-loading .plan-loading-davo { width: 210px; height: 280px; margin: 0; object-fit: contain; }
+.plan-loading-art { display: grid; place-items: center; align-self: center; background: #fffefa; padding: 8px; isolation: isolate; }
+.plan-loading-art video { mix-blend-mode: multiply; filter: contrast(1.12) brightness(1.03); }
+.plan-wizard.is-building .plan-loading .plan-loading-davo { width: 100%; max-width: 264px; height: auto; aspect-ratio: 568 / 628; margin: 0; object-fit: contain; }
 .plan-wizard.is-building .plan-loading-kicker { color: #0a4f38; font-size: 11px; letter-spacing: .12em; }
 .plan-wizard.is-building .plan-loading h2 { font-size: 25px; line-height: 1.3; margin: 0 0 12px; text-wrap: balance; }
 .plan-loading-intro { color: #496256; font-size: 14px; line-height: 1.6; margin: 0 0 20px; }
@@ -347,12 +350,18 @@
 .plan-loading-spinner { flex: none; width: 22px; height: 22px; border: 3px solid #dceee1; border-top-color: #0b6b4f; border-radius: 50%; animation: plan-spin 1s linear infinite; }
 .plan-loading-note { margin: 0; font-size: 12px; line-height: 1.6; color: #496256; }
 .plan-loading.is-ready .plan-loading-track > span { width: 100%; animation: none; }
-.plan-loading.is-ready .plan-loading-spinner { animation: none; }
+.plan-loading-check { display: none; flex: none; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #0b6b4f; color: #fff; }
+.plan-loading-check svg { width: 18px; height: 18px; }
+.plan-loading-ready { display: none; }
+.plan-loading.is-ready .plan-loading-spinner,
+.plan-loading.is-ready .plan-loading-pending { display: none; }
+.plan-loading.is-ready .plan-loading-check { display: inline-grid; }
+.plan-loading.is-ready .plan-loading-ready { display: inline; }
 @media (max-width: 700px) {
     .plan-wizard.is-building { padding: 24px 0; }
-    .plan-wizard.is-building .plan-loading { grid-template-columns: minmax(0, 1fr); padding: 22px; gap: 20px; border-radius: 20px; }
-    .plan-loading-art { padding: 12px; }
-    .plan-wizard.is-building .plan-loading .plan-loading-davo { width: 130px; height: 156px; }
+    .plan-wizard.is-building .plan-loading { grid-template-columns: minmax(0, 1fr); padding: 20px; gap: 16px; border-radius: 20px; }
+    .plan-loading-art { justify-self: center; width: min(100%, 216px); padding: 6px; }
+    .plan-wizard.is-building .plan-loading .plan-loading-davo { width: 100%; max-width: 204px; height: auto; }
     .plan-wizard.is-building .plan-loading h2 { font-size: 22px; }
     .plan-loading-intro { font-size: 13px; }
     .plan-wizard.is-building .plan-loading-workflow { font-size: 12px; gap: 12px; }
@@ -369,7 +378,8 @@
 .plan-resume-intro h1 { margin: 10px 0; color: #084d39; font: 700 clamp(26px, 3vw, 36px)/1.25 'Poppins', sans-serif; }
 .plan-resume-intro > p:last-child { margin: 0; font-size: 15px; color: #496256; }
 .plan-wizard.has-resume .plan-resume { max-width: 980px; border-radius: 24px; border-color: #cbdccf; background: #fffefa; box-shadow: 0 10px 30px rgb(25 50 36 / 8%); }
-.plan-wizard.has-resume .plan-resume-art { background-color: #e8f3ec; }
+.plan-wizard.has-resume .plan-resume-art { background: #fffefa; isolation: isolate; }
+.plan-wizard.has-resume video.plan-resume-davo { display: block; width: 230px; height: 300px; object-fit: contain; mix-blend-mode: multiply; filter: contrast(1.12) brightness(1.03); }
 .plan-wizard.has-resume .plan-resume-copy { padding: 30px; }
 .plan-wizard.has-resume .plan-resume h2 { margin: 12px 0; font-size: clamp(22px, 2.3vw, 29px); text-wrap: balance; }
 .plan-wizard.has-resume .plan-resume-copy > p { line-height: 1.6; }
@@ -389,6 +399,7 @@
     .plan-wizard.has-resume .plan-resume { grid-template-columns: minmax(0, 1fr); border-radius: 20px; }
     .plan-wizard.has-resume .plan-resume-art { padding-block: 10px; }
     .plan-wizard.has-resume .plan-resume-davo { width: 144px; height: 144px; }
+    .plan-wizard.has-resume video.plan-resume-davo { width: 144px; height: 170px; }
     .plan-wizard.has-resume .plan-resume-copy { padding: 22px; }
     .plan-wizard.has-resume .plan-resume h2 { font-size: 22px; }
 }

@@ -24,22 +24,21 @@ class DestinationFiltersToolbarTest extends TestCase
         ]);
     }
 
-    public function test_the_panel_has_the_four_budget_tiles_and_a_plain_show_results_button_when_nothing_is_set(): void
+    public function test_the_panel_omits_budget_price_and_sort_controls_and_keeps_show_results(): void
     {
         $this->place('Eden Park', 'Mid-range');
 
         $html = $this->get('/destinations')->assertOk()->getContent();
 
-        $this->assertSame(4, substr_count($html, 'name="price_tier"'));
-        foreach (['Free', 'Budget', 'Mid-range', 'Premium'] as $label) {
-            $this->assertStringContainsString($label, $html);
+        foreach (['name="price_tier"', 'name="price_min"', 'name="price_max"', 'name="sort"'] as $control) {
+            $this->assertStringNotContainsString($control, $html);
         }
         $panel = substr($html, (int) strpos($html, 'id="filterPanel"'), 6000);
         $this->assertStringNotContainsString('₱', $panel, 'The budget tiles are words, with no peso signs.');
         $this->assertStringContainsString('All of Davao Region', $html);
         $this->assertStringContainsString('Province or city', $html);
         $this->assertMatchesRegularExpression('/data-filter-submit>\s*Show results\s*<\/button>/', $html);
-        $this->assertStringNotContainsString('Clear all', $html);
+        $this->assertStringContainsString('Clear all', $html);
         $this->assertStringNotContainsString('Showing:', $html);
     }
 
@@ -57,7 +56,7 @@ class DestinationFiltersToolbarTest extends TestCase
         $this->assertStringContainsString('Clear all', $html);
         $this->assertStringContainsString('Cheap Beach', $html);
         $this->assertStringNotContainsString('Fancy Resort', $html);
-        $this->assertMatchesRegularExpression('/value="Budget-Friendly" checked/', $html);
+        $this->assertStringContainsString('type="hidden" name="price_tier" value="Budget-Friendly"', $html);
     }
 
     public function test_several_filters_are_counted_and_each_chip_removes_only_its_own_filter(): void
@@ -78,15 +77,15 @@ class DestinationFiltersToolbarTest extends TestCase
         $this->assertStringNotContainsString('price_tier', html_entity_decode($budget[1]));
     }
 
-    public function test_sorting_lives_in_the_toolbar_but_still_submits_with_the_filters(): void
+    public function test_sorting_is_removed_and_the_existing_map_controls_remain(): void
     {
         $this->place('Eden Park', 'Mid-range');
 
         $html = $this->get('/destinations')->assertOk()->getContent();
 
-        $this->assertStringContainsString('form="destinationFilters"', $html);
         $this->assertStringContainsString('id="destinationFilters"', $html);
-        $this->assertStringContainsString('Sort by', $html);
+        $this->assertStringNotContainsString('Sort by', $html);
+        $this->assertStringNotContainsString('name="sort"', $html);
         $this->assertStringContainsString('data-destination-view="map"', $html);
     }
 

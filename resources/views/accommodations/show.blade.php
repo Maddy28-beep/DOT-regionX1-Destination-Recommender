@@ -19,11 +19,10 @@
     $gradient = $gradients[$accommodation->id % count($gradients)];
     $mapUrl = \App\Support\MapLinks::directionsTo($accommodation->latitude, $accommodation->longitude, $accommodation->name, $accommodation->location);
 
-    $tierLabel = match ($accommodation->price_tier) {
-        'Budget-Friendly' => 'Budget',
-        null, '' => null,
-        default => $accommodation->price_tier,
-    };
+    $priceTier = \App\Support\StayPricing::tier($accommodation);
+    $nightly = $accommodation->nightlyPricing();
+    $cityDistance = $accommodation->distanceFromCityCentreKm();
+    $estimatedDistance = $accommodation->distance_km === null && $cityDistance !== null;
 @endphp
 
 <div class="container accommodation-detail-refresh listing-detail-refresh">
@@ -49,10 +48,19 @@
     <div class="detail-layout">
         <div>
             @include('partials.stat-strip', ['items' => [
-                ['icon' => 'tag', 'label' => 'Price tier', 'text' => $tierLabel ?? '—', 'meter' => $accommodation->posterTier()],
-                ['icon' => 'ticket', 'label' => 'Per night', 'text' => $accommodation->price_per_night ? number_format($accommodation->price_per_night) : '—', 'peso' => (bool) $accommodation->price_per_night],
-                ['icon' => 'map-pin', 'label' => 'From city center', 'text' => $accommodation->distance_km ? rtrim(rtrim(number_format((float) $accommodation->distance_km, 1), '0'), '.').' km' : '—'],
+                ['icon' => 'tag', 'label' => $priceTier['estimated'] ? 'Estimated price tier' : 'Price tier', 'text' => $priceTier['label'], 'wrap' => true, 'meter' => $accommodation->posterTier()],
+                ['icon' => 'ticket', 'label' => ($nightly['kind'] === 'estimated' ? 'Estimated' : ($nightly['kind'] === 'published' ? 'Published' : 'Recorded')).' / night', 'text' => $nightly['amount'], 'peso' => true, 'wrap' => true],
+                ['icon' => 'map-pin', 'label' => 'From Davao city center', 'text' => $cityDistance !== null ? rtrim(rtrim(number_format($cityDistance, 1), '0'), '.').' km' : '—', 'wrap' => true],
             ]])
+
+            <p class="stay-rate-note"><strong>{{ $nightly['label'] }}.</strong> {{ $nightly['note'] }}
+                @if ($estimatedDistance)
+                    Distance is a straight-line estimate from Davao City centre, not driving distance.
+                @endif
+                @if (isset($nightly['source']))
+                    <a href="{{ $nightly['source'] }}" target="_blank" rel="noopener">Property rate source</a> · Checked {{ $nightly['checked'] }}.
+                @endif
+            </p>
 
             @php
                 $aboutGroups = ['Property type' => [$accommodation->type]];

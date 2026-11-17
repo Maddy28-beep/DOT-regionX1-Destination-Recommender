@@ -132,6 +132,7 @@
     .listing-detail-refresh .detail-layout > div { display: contents; }
     .listing-detail-refresh .detail-layout > div > * { margin-block: 0; }
     .listing-detail-refresh .detail-layout .about-card { order: 1; }
+    .listing-detail-refresh .detail-layout .stay-rate-note { order: 1; }
     .listing-detail-refresh .detail-layout .visit-card { order: 2; }
     .listing-detail-refresh .detail-layout .reviews-card { order: 3; }
     .listing-detail-refresh .visit-card__map { height: 220px; }

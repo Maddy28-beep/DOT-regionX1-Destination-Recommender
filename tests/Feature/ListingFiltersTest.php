@@ -119,7 +119,7 @@ class ListingFiltersTest extends TestCase
         $this->amenity('accommodation', $a->id, 'pool');
 
         $html = $this->get(route('accommodations.index', ['amenity' => ['pool'], 'rating_min' => '4']))->assertOk()->getContent();
-        $this->assertStringContainsString('Price per night', $html);
+        $this->assertStringNotContainsString('Price per night', $html);
         $this->assertStringContainsString('Guest rating', $html);
         $this->assertStringContainsString('name="amenity[]" value="pool" checked', preg_replace('/\s+/', ' ', $html));
         $this->assertStringContainsString('Rated 4+', $html);

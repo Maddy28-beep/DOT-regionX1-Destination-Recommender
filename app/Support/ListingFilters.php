@@ -146,6 +146,8 @@ final class ListingFilters
             });
         }
 
+        NearbyPlaces::apply($query, $request);
+
         return $query;
     }
 

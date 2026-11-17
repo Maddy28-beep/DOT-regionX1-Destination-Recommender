@@ -101,6 +101,16 @@ body.hero-page .poster-hero .region-tagline {
 .hero-guests__done:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
 
 /* Live offers belong to the search area; no separate full-screen promotion section. */
+/* Without offers, let the counts and next section follow search naturally. */
+html.home-slides main#main-content > .hero-screen--no-offers { min-height: 0; }
+.hero-screen--no-offers > .hero-lower { flex: none; padding-bottom: 20px; }
+.hero-screen--no-offers .stats { margin: 24px auto 0; width: min(960px, calc(100% - 48px)); }
+.hero-screen--no-offers .stats-strip { padding: 16px 20px; border: 1px solid #dce6dd; border-radius: 16px; background: #f0f6ee; }
+.hero-screen--no-offers .hero-scroll-cue { margin-top: 16px; }
+@media (max-width: 640px) {
+    .hero-screen--no-offers .stats { width: calc(100% - 32px); margin-top: 24px; }
+    .hero-screen--no-offers .stats-strip { padding: 14px 6px; border-radius: 12px; }
+}
 .hero-lower .hero-offers { width: min(1440px, calc(100% - 64px)); max-width: 1440px; margin: 36px auto 0; background: transparent; padding: 0; }
 .hero-offers > .container { max-width: none; padding: 0; }
 .hero-offers .deals-home__head { margin-bottom: 14px; gap: 10px 20px; align-items: center; }
@@ -221,6 +231,40 @@ body.hero-page .poster-hero .region-tagline {
     .hero-lower { padding-bottom: 16px; }
 }
 
+/* The mockup search card, isolated from the header and other homepage sections. */
+body.hero-page .hero-search--compact { width: min(1200px,calc(100% - 64px)); margin-bottom: 20px; border: 1px solid #dce5dc; border-radius: 22px; background: #fffefa; box-shadow: 0 10px 24px #153c2921; }
+body.hero-page .hero-search--compact .hero-search__bar { background: transparent; box-shadow: none; padding: 10px 18px 0; }
+body.hero-page .hero-search--compact .hero-search__tabs { justify-content: space-between; padding: 0 0 10px; border-bottom: 1px solid #dce5dc; gap: 8px; }
+body.hero-page .hero-search--compact .hero-search__tab { flex: 1 1 0; }
+body.hero-page .hero-search--compact .hero-search__tab-body { justify-content: center; padding: 12px 10px; border: 0; border-radius: 12px; font-size: 1rem; min-height: 48px; }
+body.hero-page .hero-search--compact .hero-search__tab input:checked + .hero-search__tab-body { background: #dcefdc; color: #0a4f38; box-shadow: 0 2px 5px #244e2610; }
+body.hero-page .hero-search--compact .hero-search__body { margin-top: 0; padding: 18px 22px 20px; border-radius: 0 0 22px 22px; background: transparent; box-shadow: none; }
+body.hero-page .hero-search--compact .hero-search__box { border-color: #d3dcd4; background: #fffefa; border-radius: 12px; }
+body.hero-page .hero-search--compact .hero-search__box > svg { color: #91620d; }
+body.hero-page .hero-search--compact .hero-search__grid { gap: 12px; }
+body.hero-page .hero-search--compact .hero-search__foot { align-items: center; margin-top: 18px; gap: 20px; }
+body.hero-page .hero-search--compact .hero-search__hint { margin-right: auto; font-style: italic; font-size: .85rem; }
+body.hero-page .hero-search--compact .hero-search__go { position: static; transform: none; margin: 0; flex: 0 0 auto; width: auto; min-width: 250px; height: auto; min-height: 48px; padding: 12px 24px; border-radius: 11px; font-size: 1rem; }
+body.hero-page .hero-search--compact .hero-search__go:is(:hover,:active) { transform: none; }
+@media (max-width: 1060px) {
+    body.hero-page .hero-search--compact { width: calc(100% - 40px); }
+}
+@media (max-width: 640px) {
+    body.hero-page .hero-search--compact { width: calc(100% - 24px); border-radius: 16px; }
+    body.hero-page .hero-search--compact .hero-search__bar { padding: 6px 6px 0; }
+    body.hero-page .hero-search--compact .hero-search__tabs { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 0; padding: 0 0 6px; overflow: visible; }
+    body.hero-page .hero-search--compact .hero-search__tab-body { flex-direction: column; gap: 4px; padding: 8px 1px; font-size: clamp(.55rem,2.1vw,.72rem); min-height: 52px; white-space: normal; line-height: 1.2; }
+    body.hero-page .hero-search--compact .hero-search__tab-body svg { width: 17px; height: 17px; }
+    body.hero-page .hero-search--compact .hero-search__body { padding: 12px; }
+    body.hero-page .hero-search--compact .hero-search__grid { gap: 10px; }
+    body.hero-page .hero-search--compact .hero-search__box:is([data-for=from],[data-for=to],[data-for=date]) { grid-column: 1 / -1; }
+    body.hero-page .hero-search--compact .hero-search__box { min-height: 60px; }
+    body.hero-page .hero-search--compact .hero-search__box .site-dropdown-trigger { min-height: 58px; font-size: .93rem; }
+    body.hero-page .hero-search--compact .hero-search__foot { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px; margin-top: 12px; }
+    body.hero-page .hero-search--compact .hero-search__hint { font-size: .72rem; margin: 0; }
+    body.hero-page .hero-search--compact .hero-search__go { grid-column: 1 / -1; width: 100%; min-width: 0; padding: 10px 12px; font-size: .9rem; min-height: 46px; }
+}
+
 /* Keep the opening copy readable and secondary to the Barabara title. */
 body.hero-page .poster-hero .poster-hero__subhead {
     display: block;
@@ -254,4 +298,33 @@ body.hero-page .poster-hero .poster-hero__subhead {
         font-size: .85rem;
         white-space: nowrap;
     }
+}
+/* Stays: mode pills, three primary fields, and a separate date row. */
+body.hero-page .hero-stay-modes { display:flex; flex-wrap:wrap; gap:10px; border:0; padding:0; margin:0 0 14px; min-width:0; }
+body.hero-page .hero-stay-modes[hidden], .hero-stay-note[hidden], .hero-stay-same-day[hidden] { display:none; }
+.hero-stay-modes label { position:relative; margin:0; cursor:pointer; }
+.hero-stay-modes input { position:absolute; opacity:0; width:1px; height:1px; }
+.hero-stay-modes label > span { display:flex; align-items:center; gap:9px; padding:9px 16px; min-height:42px; border:1px solid #cdd8ce; border-radius:24px; background:#fffefa; font-size:.9rem; line-height:1.3; font-weight:600; color:#344e40; }
+.hero-stay-modes label > span::before { content:''; width:15px; height:15px; flex:none; border:2px solid currentColor; border-radius:50%; box-sizing:border-box; }
+.hero-stay-modes input:checked + span { background:#e3f0df; border-color:#0a5b3f; color:#0a4f38; }
+.hero-stay-modes input:checked + span::before { box-shadow:inset 0 0 0 3px #e3f0df; background:#0a4f38; }
+.hero-stay-modes input:focus-visible + span { outline:3px solid #c79829; outline-offset:3px; }
+.hero-stay-note { margin:-3px 0 13px; color:#52665d; font-size:.84rem; line-height:1.5; }
+.hero-stay-same-day { position:absolute; right:18px; top:50%; transform:translateY(-50%); color:#607368; font-size:.8rem; pointer-events:none; }
+@media(min-width:641px) {
+    body.hero-page .hero-search--compact[data-search-purpose="accommodations"] .hero-search__grid > [data-for="from"],
+    body.hero-page .hero-search--compact[data-search-purpose="accommodations"] .hero-search__grid > [data-for="to"] { grid-column:span 3; }
+    body.hero-page .hero-search--compact[data-search-purpose="accommodations"][data-stay-mode="day_use"] .hero-search__grid > [data-for="from"] { grid-column:1 / -1; }
+    body.hero-page .hero-search[data-stay-mode="day_use"] [data-date-from] { padding-right:180px; }
+}
+@media(max-width:640px) {
+    body.hero-page .hero-stay-modes { gap:8px; margin-bottom:12px; }
+    .hero-stay-modes label { flex:1; }
+    .hero-stay-modes label > span { justify-content:center; padding:10px 8px; font-size:.76rem; gap:6px; min-height:44px; }
+    body.hero-page .hero-search--compact[data-search-purpose="accommodations"] .hero-search__grid > [data-for="from"],
+    body.hero-page .hero-search--compact[data-search-purpose="accommodations"] .hero-search__grid > [data-for="to"] { grid-column:span 1; }
+    body.hero-page .hero-search--compact[data-search-purpose="accommodations"][data-stay-mode="day_use"] .hero-search__grid > [data-for="from"] { grid-column:1 / -1; }
+    .hero-stay-note { font-size:.75rem; }
+    body.hero-page .hero-search--compact[data-search-purpose="accommodations"] .hero-search__box:is([data-for="from"],[data-for="to"]) > label { max-width:calc(100% - 20px); font-size:.65rem; }
+    .hero-stay-same-day { position:static; display:block; transform:none; padding:0 10px 8px; font-size:.72rem; }
 }

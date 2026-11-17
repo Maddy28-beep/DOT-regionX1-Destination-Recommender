@@ -4,16 +4,21 @@
     const form = document.querySelector('[data-hero-search]');
     if (!form) return;
     const grid = form.querySelector('[data-search-filters]');
-    const order = ['where', 'from', 'to', 'guests', 'meal', 'date', 'cuisine', 'interest', 'duration', 'travelers', 'budget', 'stay_mode'];
-    // Move original controls, keeping keyboard order aligned with the new visual order.
-    order.forEach(kind => grid.querySelectorAll(`[data-for="${kind}"]`).forEach(box => grid.append(box)));
     const custom = grid.querySelector('[data-custom-budget]');
-    if (custom) grid.append(custom);
+    function arrange(purpose) {
+        const order = purpose === 'accommodations'
+            ? ['where', 'guests', 'budget', 'from', 'to', 'meal', 'date', 'cuisine', 'interest', 'duration', 'travelers']
+            : ['where', 'from', 'to', 'guests', 'meal', 'date', 'cuisine', 'interest', 'duration', 'travelers', 'budget'];
+        // Move original controls so visual and keyboard order agree in every tab.
+        order.forEach(kind => grid.querySelectorAll(`[data-for="${kind}"]`).forEach(box => grid.append(box)));
+        if (custom) grid.append(custom);
+    }
 
     const submitLabel = form.querySelector('[data-search-submit-label]');
     const labels = { destinations: 'Search destinations', accommodations: 'Search stays', restaurants: 'Search dining', packages: 'Search packages', souvenir_centers: 'Search souvenirs' };
     const updateLabel = () => {
         const selected = form.querySelector('[name="purpose"]:checked');
+        if (selected) arrange(selected.value);
         if (submitLabel && selected) submitLabel.textContent = labels[selected.value];
     };
     form.addEventListener('change', updateLabel);

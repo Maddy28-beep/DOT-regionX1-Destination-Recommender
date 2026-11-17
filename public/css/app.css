@@ -5392,6 +5392,9 @@ button.visit-card__go { width: 100%; border: 0; font-family: inherit; cursor: po
 }
 /* The amount is ink, not brand green: green already means selected/accredited/go, so only "Free entry" takes it. */
 .dcard__price strong { font-size: 1.05rem; font-weight: 800; color: var(--ink); }
+.dcard__price.dcard__price--stay { white-space: normal; overflow: visible; }
+.dcard__price .stay-rate-label { display: block; color: var(--primary-dark); font-weight: 600; margin-bottom: 3px; }
+.stay-rate-note { font-size: .875rem; line-height: 1.6; color: var(--muted); margin: 12px 0 24px; }
 .dcard__price strong.dcard__free { color: var(--primary-dark); }
 .dcard__price small { font-size: .8rem; color: var(--muted); }
 .dcard__band { font-size: .95rem; letter-spacing: .04em; }

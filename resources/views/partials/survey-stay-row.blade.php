@@ -22,5 +22,5 @@
             <input id="stay-locality-{{ $stayIndex }}" name="stays[{{ $stayIndex }}][locality]" type="text" maxlength="180" value="{{ $stayAnswer['locality'] ?? '' }}" placeholder="e.g. Matina, Davao City" data-stay-locality>
         </div>
     </div>
-    <button type="button" class="survey-stay-remove" data-remove-stay hidden>Remove stay</button>
+    <button type="button" class="survey-stay-remove" data-remove-stay hidden><x-icon name="x-circle" /><span class="sr-only">Remove stay</span></button>
 </fieldset>

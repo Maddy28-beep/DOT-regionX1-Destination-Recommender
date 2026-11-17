@@ -23,10 +23,10 @@ class PlanResumeDraftTest extends TestCase
             ->assertSeeInOrder(['id="planResume"', 'hidden>'], false);
     }
 
-    public function test_the_card_uses_the_compressed_sprite(): void
+    public function test_the_card_uses_the_resume_video_and_matching_poster(): void
     {
-        $this->get(route('plan.edit'))->assertSee('images/davo-resume-frames.webp', false)->assertDontSee('davo-resume-frames.png', false);
-        $this->assertFileExists(public_path('images/davo-resume-frames.webp'));
+        $this->get(route('plan.edit'))->assertSee('data-davo-resume-video', false)->assertSee('video/davo-resume-guide.mp4', false)->assertSee('images/davo-resume-video-poster.webp', false)->assertDontSee('davo-resume-frames.webp', false);
+        $this->assertFileExists(public_path('video/davo-resume-guide.mp4'));
     }
 
     public function test_the_draft_only_ever_stores_low_sensitivity_trip_choices(): void

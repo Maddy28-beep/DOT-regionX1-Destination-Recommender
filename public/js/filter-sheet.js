@@ -1,8 +1,7 @@
-/* Listing pages: the filter panel as a bottom sheet on a phone.
+/* Listing pages: expand the refined filters in the mobile page; retain the older sheet fallback.
 
-   Wide screens keep the panel beside the grid and this script does nothing there. On a phone the panel is a
-   sheet over the page, so opening it never pushes the listing down. It closes with the x, the dim layer, Esc,
-   or by growing the window past the phone breakpoint. */
+   Wide screens keep the panel beside the grid. The refined panel uses document scrolling and normal tab
+   navigation. It closes with the x, Escape, or by growing the window past the phone breakpoint. */
 (function () {
     'use strict';
 
@@ -13,6 +12,8 @@
     var overlay = document.querySelector('[data-filter-sheet-overlay]');
     var phone = window.matchMedia('(max-width: 900px)');
     var returnTo = null;
+    var pageScroll = panel.classList.contains('filter-panel--page-scroll');
+    if (pageScroll) opener.removeAttribute('aria-haspopup');
 
     function isOpen() { return panel.classList.contains('open'); }
 
@@ -25,14 +26,19 @@
         if (!phone.matches || isOpen()) return;
         returnTo = document.activeElement;
         panel.classList.add('open');
-        panel.setAttribute('role', 'dialog');
-        panel.setAttribute('aria-modal', 'true');
+        panel.setAttribute('role', pageScroll ? 'region' : 'dialog');
+        if (!pageScroll) panel.setAttribute('aria-modal', 'true');
         panel.setAttribute('aria-labelledby', 'filterPanelTitle');
-        document.body.classList.add('filter-sheet-open');
+        document.body.classList.add(pageScroll ? 'filter-inline-open' : 'filter-sheet-open');
         opener.setAttribute('aria-expanded', 'true');
         panel.scrollTop = 0;
+        var fields = panel.querySelector('.filter-panel__fields');
+        if (fields) fields.scrollTop = 0;
         // Wait a frame so the focus move does not fight the slide-in.
-        window.requestAnimationFrame(function () { panel.focus({ preventScroll: true }); });
+        window.requestAnimationFrame(function () {
+            if (pageScroll) panel.scrollIntoView({block:'start', behavior:'auto'});
+            panel.focus({ preventScroll: true });
+        });
     }
 
     function close(restoreFocus) {
@@ -46,12 +52,26 @@
         panel.removeAttribute('aria-modal');
         panel.removeAttribute('aria-labelledby');
         document.body.classList.remove('filter-sheet-open');
+        document.body.classList.remove('filter-inline-open');
         opener.setAttribute('aria-expanded', 'false');
         if (restoreFocus !== false && returnTo && returnTo.focus) returnTo.focus({ preventScroll: true });
         returnTo = null;
     }
 
-    opener.addEventListener('click', open);
+    opener.addEventListener('click', function () {
+        if (pageScroll && isOpen()) close();
+        else open();
+    });
+    document.querySelectorAll('[data-adjust-filters]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            if (phone.matches) {
+                open();
+            } else {
+                panel.scrollIntoView({ block: 'nearest' });
+                panel.focus({ preventScroll: true });
+            }
+        });
+    });
     [].slice.call(panel.querySelectorAll('[data-filter-sheet-close]')).forEach(function (b) {
         b.addEventListener('click', function () { close(); });
     });
@@ -60,7 +80,7 @@
     document.addEventListener('keydown', function (e) {
         if (!isOpen()) return;
         if (e.key === 'Escape') { e.preventDefault(); close(); return; }
-        if (e.key !== 'Tab') return;
+        if (e.key !== 'Tab' || pageScroll) return;
         var items = focusable();
         if (!items.length) return;
         var first = items[0], last = items[items.length - 1];

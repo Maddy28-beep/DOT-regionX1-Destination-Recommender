@@ -6,6 +6,12 @@
 --}}
 
 @switch($name)
+    @case('sliders')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24', 'aria-hidden' => 'true']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h4m4 0h10M3 18h10m4 0h4"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="18" r="2"/></svg>
+        @break
+    @case('bed')
+        <svg {{ $attributes->merge(['viewBox' => '0 0 24 24', 'aria-hidden' => 'true']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v3M21 18v3M3 18h18v-7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v7ZM5 9V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4M3 14h18M8 9V6h8v3"/></svg>
+        @break
     @case('coffee')
         <svg {{ $attributes->merge(['viewBox' => '0 0 24 24']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h12v8a4 4 0 01-4 4H8a4 4 0 01-4-4V8zM16 9h2a3 3 0 010 6h-2M3 22h15M7 2v2M12 2v2"/></svg>
         @break
