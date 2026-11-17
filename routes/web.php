@@ -84,7 +84,20 @@ Route::get('/advisories', [AdvisoryController::class, 'index'])->name('advisorie
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
 
 Route::get('/destinations', [DestinationController::class, 'index'])->name('destinations.index');
-Route::get('/destinations/{destination:slug}', [DestinationController::class, 'show'])->name('destinations.show');
+// An address that was changed (the "-sample" ending was dropped) still works: it is sent on to the new one.
+Route::get('/destinations/{destination:slug}', [DestinationController::class, 'show'])->name('destinations.show')
+    ->missing(function (\Illuminate\Http\Request $request) {
+        try {
+            $new = \Illuminate\Support\Facades\DB::table('destination_slug_redirects as r')->join('destinations as d', 'd.id', '=', 'r.destination_id')
+                ->where('r.old_slug', (string) $request->route('destination'))->value('d.slug');
+        } catch (\Throwable) {
+            $new = null;
+        }
+
+        abort_unless($new, 404);
+
+        return redirect()->route('destinations.show', $new, 301);
+    });
 
 // Public accommodations catalog
 Route::get('/accommodations', [AccommodationController::class, 'index'])->name('accommodations.index');
