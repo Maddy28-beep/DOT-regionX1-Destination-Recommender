@@ -52,7 +52,7 @@
 
                     @include('partials.pagination', ['paginator' => $souvenirCenters, 'panel' => 'grid'])
                 @else
-                    <x-davo-empty-state title="No souvenir centers match your filters" message="Try another category or clear your filters to explore more options." :action-url="route('souvenir-centers.index')" action-label="Clear filters" />
+                    <x-davo-empty-state :adjust-filters="true" title="No souvenir centers match your filters" message="Try another category or clear your filters to explore more options." :action-url="route('souvenir-centers.index')" action-label="Clear filters" />
                 @endif
             </div>
         </div>

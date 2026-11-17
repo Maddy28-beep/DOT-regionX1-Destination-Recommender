@@ -41,8 +41,6 @@
                 'placeholder' => 'e.g. Samal',
                 'regions' => $regions,
                 'activeFilters' => $activeFilters,
-                'tiers' => [['Budget-Friendly', 'Budget-Friendly', ''], ['Mid-range', 'Mid-range', ''], ['Premium', 'Premium', '']],
-                'anyBudget' => true,
                 'categoryParam' => 'type',
             ])
 
@@ -63,7 +61,7 @@
 
                     @include('partials.pagination', ['paginator' => $packages])
                 @else
-                    <x-davo-empty-state title="No packages match your filters" message="Try another category or clear your filters to explore more options." :action-url="route('packages.index')" action-label="Clear filters" />
+                    <x-davo-empty-state :adjust-filters="true" title="No packages match your filters" message="Try another category or clear your filters to explore more options." :action-url="route('packages.index')" action-label="Clear filters" />
                 @endif
             </div>
         </div>

@@ -17,6 +17,40 @@ use Tests\TestCase;
  */
 class HeroSearchTest extends TestCase
 {
+    public function test_stays_offer_overnight_and_day_use_pills_instead_of_a_kind_dropdown(): void
+    {
+        $html = $this->get('/')->assertOk()->getContent();
+        $this->assertStringContainsString('class="hero-stay-modes"', $html);
+        $this->assertStringContainsString('name="stay_mode" value="overnight" checked', $html);
+        $this->assertStringContainsString('name="stay_mode" value="day_use"', $html);
+        $this->assertStringContainsString('Same-day checkout', $html);
+        $this->assertStringNotContainsString('id="search-stay-mode"', $html);
+    }
+
+    public function test_day_use_normalizes_checkout_to_the_visit_date_on_the_server(): void
+    {
+        foreach (['2026-11-25', 'not-a-date', ''] as $checkout) {
+            $response = $this->get('/search?'.http_build_query([
+                'purpose' => 'accommodations', 'stay_mode' => 'day_use', 'from' => '2026-11-18', 'to' => $checkout,
+                'adults' => 2, 'budget' => 'custom', 'budget_min' => 1000,
+            ]));
+            $response->assertRedirect();
+            parse_str(parse_url($response->headers->get('Location'), PHP_URL_QUERY), $query);
+            $this->assertSame('2026-11-18', $query['from']);
+            $this->assertSame('2026-11-18', $query['to']);
+            $this->assertSame('day_use', $query['stay_mode']);
+            $this->assertSame('2', $query['adults']);
+            $this->assertSame('1000', $query['price_min']);
+        }
+        $this->get('/search?purpose=accommodations&stay_mode=day_use')->assertRedirect(route('accommodations.index', ['stay_mode' => 'day_use']));
+    }
+
+    public function test_overnight_keeps_distinct_dates_and_invalid_ranges_are_still_rejected(): void
+    {
+        $this->get('/search?purpose=accommodations&stay_mode=overnight&from=2026-11-18&to=2026-11-20')
+            ->assertRedirect(route('accommodations.index', ['stay_mode' => 'overnight', 'from' => '2026-11-18', 'to' => '2026-11-20']));
+        $this->get('/search?purpose=accommodations&stay_mode=overnight&from=2026-11-20&to=2026-11-18')->assertRedirect(route('home').'#search');
+    }
     use RefreshDatabase;
 
     private function destination(string $slug, string $type, string $priceTier = 'Mid-range'): Destination
@@ -59,7 +93,7 @@ class HeroSearchTest extends TestCase
     {
         $html = $this->get('/')->assertOk()->getContent();
 
-        $this->assertStringContainsString('class="hero-screen"', $html);
+        $this->assertStringContainsString('class="hero-screen hero-screen--no-offers"', $html);
         $this->assertStringContainsString('js/hero-fit.js', $html,
             'The first screen is scaled to the window by this script, so the stats and the scroll cue are never below the fold.');
     }
@@ -207,7 +241,7 @@ class HeroSearchTest extends TestCase
 
         // Every dropdown opens on Any budget, first in its list.
         $this->assertSame(4, preg_match_all('/<select id="search-budget-[a-z]+" name="budget"[^>]*>\s*<option value="">Any budget<\/option>/', $html));
-        $this->assertSame(3, substr_count($html, 'Custom budget'), 'Custom budget only where an amount can be filtered on.');
+        $this->assertSame(3, substr_count($html, '>Custom budget</option>'), 'Custom budget only where an amount can be filtered on.');
         $this->assertStringContainsString('name="budget_min"', $html);
         $this->assertStringContainsString('name="budget_max"', $html);
     }

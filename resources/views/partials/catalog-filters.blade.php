@@ -1,6 +1,6 @@
 {{--
     The filter card beside a listing grid: a "Filters" title with Clear all, a search box, "Province or
-    city", budget as toggle tiles, and a button that counts the filters that are switched on.
+    city", page-specific refinements, and a button that counts the filters that are switched on.
 
     Shared by every listing page; each passes only what it has.
 
@@ -8,26 +8,26 @@
     $placeholder      example for the search box
     $regions          collection of Region
     $activeFilters    from App\Support\ActiveFilters::from()
-    $tiers            optional list of [value, name, sub]; leave out for listings with no budget filter (sub may be '')
-    $anyBudget        optional; put an "Any budget" tile first (selected while no budget is chosen)
     $categoryParam    optional name of the page's category filter ("type", "cuisine_type"); it is carried as a
                       hidden field because the category chips above the grid set it
     $hidden           optional extra hidden fields: list of ['name', 'value', 'id' => optional]
-    $formId           the form's id (the sort select in the toolbar is attached to it)
+    $formId           the form's id
     $clearParams      optional query to keep when clearing (e.g. ['view' => 'map'])
 --}}
 @php
-    $tiers = $tiers ?? [];
-    // A tile's third value is a small line under its name (the peso signs). A page whose tiles have none (dining
-    // names its bands in words only) gets plain tiles, "Any budget" included.
-    $tileHasSub = collect($tiers)->contains(fn ($tier) => ($tier[2] ?? '') !== '');
-    if (! empty($anyBudget) && $tiers) {
-        array_unshift($tiers, ['', 'Any budget', $tileHasSub ? 'All' : '']);
-    }
-    $hidden = $hidden ?? [];
-    $groups = $groups ?? [];
-    // A box the panel draws itself (the price range) is not also carried as a hidden field.
-    $managed = collect($groups)->flatMap(fn ($g) => $g['names'])->all();
+    // The listing panel no longer offers budget tiers or price ranges. Existing search
+    // context remains removable via its active-filter chips and survives form submission.
+    $hidden = array_merge($hidden ?? [], \App\Support\ActiveFilters::carry(request(), ['price_tier', 'price_min', 'price_max']));
+    $hidden = collect($hidden)->keyBy('name')->values()->all();
+    $optionGroups = array_values(array_filter($groups ?? [], fn ($group) => $group['type'] === 'toggle'));
+    $groups = array_values(array_filter($groups ?? [], fn ($group) => ! in_array($group['type'], ['range', 'toggle'], true)));
+    $groups = array_map(fn ($group) => ($group['fold'] ?? 0) > 4 ? array_replace($group, ['fold' => 4]) : $group, $groups);
+    // Put useful page-specific choices first and the optional rating refinement last.
+    $groups = array_merge(array_values(array_filter($groups, fn ($group) => $group['type'] !== 'rating' && $group['type'] !== 'toggle')),
+        array_values(array_filter($groups, fn ($group) => $group['type'] === 'rating')),
+        array_values(array_filter($groups, fn ($group) => $group['type'] === 'toggle')));
+    // Fields drawn by a refinement group are not also carried as hidden fields.
+    $managed = collect(array_merge($groups, $optionGroups))->flatMap(fn ($g) => $g['names'])->all();
     $hidden = array_values(array_filter($hidden, fn ($f) => ! in_array($f['name'], $managed, true)));
     $formId = $formId ?? 'catalogFilters';
     $clearParams = $clearParams ?? [];
@@ -37,11 +37,11 @@
 {{-- On a phone the panel is a bottom sheet over this dim layer; on a wide screen neither is shown. --}}
 <div class="filter-sheet-overlay" id="filterOverlay" data-filter-sheet-overlay></div>
 
-<aside class="filter-panel filter-panel--v2" id="filterPanel" tabindex="-1">
+<aside class="filter-panel filter-panel--v2 filter-panel--refined filter-panel--page-scroll" id="filterPanel" tabindex="-1">
     <div class="filter-panel__head">
         <h2 id="filterPanelTitle"><x-icon name="filter" /> Filters</h2>
         @if ($filterCount)
-            <a href="{{ route($route, $clearParams) }}" class="filter-panel__clear">Clear all</a>
+            <a href="{{ route($route, $clearParams) }}" class="filter-panel__clear">Reset</a>
         @endif
         <button type="button" class="filter-panel__close" data-filter-sheet-close aria-label="Close filters">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
@@ -70,8 +70,9 @@
     </script>
 
     <form method="GET" action="{{ route($route) }}" id="{{ $formId }}" data-filter-form>
+        <div class="filter-panel__fields">
         @foreach ($hidden as $field)
-            <input type="hidden" name="{{ $field['name'] }}" value="{{ $field['value'] }}" @if (! empty($field['id'])) id="{{ $field['id'] }}" @endif>
+            <input type="hidden" name="{{ $field['name'] }}" value="{{ $field['value'] }}" @if (! empty($field['id'])) id="{{ $field['id'] }}" @endif @if($field['name'] !== 'view') data-filter-count @endif>
         @endforeach
         @if (! empty($categoryParam))
             <input type="hidden" name="{{ $categoryParam }}" value="{{ request($categoryParam) }}" data-filter-count>
@@ -95,26 +96,33 @@
             </select>
         </div>
 
-        @if ($tiers)
-            <fieldset class="field budget-field">
-                <legend>Budget</legend>
-                <div class="budget-tiles">
-                    @foreach ($tiers as [$value, $name, $sub])
-                        <label class="budget-tile">
-                            <input type="radio" name="price_tier" value="{{ $value }}" @checked($value === '' ? ! request()->filled('price_tier') : request('price_tier') === $value) data-filter-count @if ($value === '') data-any @endif>
-                            <span class="budget-tile__name">{{ $name }}</span>
-                            @if ($sub !== '')<span class="budget-tile__sub">{{ $sub }}</span>@endif
-                        </label>
-                    @endforeach
-                </div>
-            </fieldset>
+        @include('partials.catalog-nearby')
+
+        @if ($optionGroups)
+            <section class="catalog-filter-options" aria-labelledby="catalogOptionsTitle">
+                <h3 id="catalogOptionsTitle"><x-icon name="sliders" /> Options</h3>
+                <label class="catalog-option-toggle">
+                    <span>Exclude closed places<small>Based on listed operating status</small></span>
+                    <input type="checkbox" role="switch" name="open_now" value="1" @checked(request()->boolean('open_now')) data-filter-count>
+                    <span class="catalog-option-toggle__track" aria-hidden="true"></span>
+                </label>
+            </section>
         @endif
 
         @include('partials.catalog-filter-groups', ['groups' => $groups])
 
+        </div>
+        <div class="filter-panel__actions">
+        <a href="{{ route($route, $clearParams) }}" class="filter-panel__reset">Clear all</a>
         <button type="submit" class="btn btn-poster-primary btn-block" data-filter-submit>
             Show results{{ $filterCount ? ' ('.$filterCount.' '.\Illuminate\Support\Str::plural('filter', $filterCount).')' : '' }}
         </button>
+        </div>
     </form>
 </aside>
 <script src="{{ asset('js/filter-sheet.js') }}?v={{ filemtime(public_path('js/filter-sheet.js')) }}" defer></script>
+<script src="{{ asset('js/catalog-nearby.js') }}?v={{ filemtime(public_path('js/catalog-nearby.js')) }}" defer></script>
+
+@push('styles')
+    <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/catalog-filters-refined.css') }}">
+@endpush

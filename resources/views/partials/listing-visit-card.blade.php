@@ -55,6 +55,13 @@
         <p class="visit-card__address"><x-icon name="map-pin" /> <span>{{ $address }}</span></p>
     @endif
 
+    @if ($listing instanceof \App\Models\Accommodation && $pin = $listing->coordinate_provenance)
+        <p class="stay-rate-note"><strong>{{ $pin['precision'] === 'complex' ? 'Complex-centre pin.' : 'Mapped property pin.' }}</strong>
+            {{ $pin['precision'] === 'complex' ? 'The rental unit and entrance may be elsewhere within the complex.' : 'Confirm the entrance with the property before travel.' }}
+            <a href="{{ $pin['source'] }}" target="_blank" rel="noopener">Map source</a>
+        </p>
+    @endif
+
     @if (! empty($primary))
         <div class="visit-card__actions">
             @if (! empty($primary['post']))

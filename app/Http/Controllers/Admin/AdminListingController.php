@@ -412,6 +412,7 @@ class AdminListingController extends Controller
                 'resort_settings.*' => [Rule::in(Accommodation::RESORT_SETTINGS)],
                 'price_tier' => ['nullable', 'string', 'max:20'],
                 'price_per_night' => ['nullable', 'numeric', 'min:0'],
+                'price_per_day' => ['nullable', 'numeric', 'min:0', 'max:1000000'],
                 'check_in' => ['nullable', 'date_format:H:i'],
                 'check_out' => ['nullable', 'date_format:H:i'],
                 'distance_km' => ['nullable', 'numeric', 'min:0'],

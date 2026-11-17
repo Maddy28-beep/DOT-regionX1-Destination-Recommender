@@ -3,88 +3,67 @@
 @section('title', 'Trip Recap — ExploreDVO')
 
 @section('content')
-<div class="page-head">
-    <div class="container">
-        <span class="poster-kicker">🎉 thank you for exploring davao!</span>
-        <h1 class="poster-title">Your anonymous feedback has been submitted successfully.</h1>
-        <p>Here's a recap of your ExploreDVO experience.</p>
-    </div>
-</div>
+<link rel="stylesheet" href="{{ asset('css/survey-recap.css') }}?v={{ filemtime(public_path('css/survey-recap.css')) }}">
+<div class="survey-recap">
+    <div class="container recap-container">
+        <section class="recap-thanks" aria-labelledby="recapTitle">
+            <img class="recap-thanks__davo" src="{{ asset('images/davo-wave-green.webp') }}" alt="Davo waving thank you" width="140" height="170">
+            <div class="recap-thanks__copy">
+                <span class="recap-success"><x-icon name="check" /> Feedback received</span>
+                <h1 class="poster-title" id="recapTitle">Thank you for sharing!</h1>
+                <p>Your anonymous response helps improve tourism in Davao.</p>
+                <p class="recap-privacy"><x-icon name="shield-check" /> No name or account details linked.</p>
+            </div>
+            @if ($visited->isEmpty())
+                <p class="recap-empty-note">No places added this time — your feedback still makes a difference.</p>
+            @endif
+        </section>
 
-<div class="section-tight">
-    <div class="container" style="max-width:820px;">
-
-        {{--
-            The trip card: the shareable summary. Kept to place names, the
-            count and the day figure only -- never the survey's own answers,
-            the visitor token, or anything from a tourist account, even for a
-            logged-in tourist.
-        --}}
-        <div class="panel" id="tripCard">
-            <div class="panel-body" style="text-align:center;">
-                <p class="poster-kicker" style="margin-bottom:4px;">ExploreDVO</p>
-                <h2 style="margin:0 0 14px;">My Davao Trip</h2>
-                <div style="display:flex; justify-content:center; gap:28px; flex-wrap:wrap; margin-bottom:18px;">
-                    <div>
-                        <div class="stat-card-val" style="font-size:1.6rem;">📍 {{ $visited->count() }}</div>
-                        <div class="stat-card-label">Place{{ $visited->count() === 1 ? '' : 's' }}</div>
-                    </div>
+        {{-- Share only reported place names, their count and optional days; never private survey answers. --}}
+        @if ($visited->isNotEmpty())
+            <section class="recap-trip" id="tripCard" aria-labelledby="tripCardTitle">
+                <div class="recap-trip__head">
+                    <h2 id="tripCardTitle">My Davao Trip</h2>
+                    <button type="button" class="btn btn-outline" id="shareTripCardBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/></svg> Share Trip Card</button>
+                </div>
+                <div class="recap-trip__stats">
+                    <span><x-icon name="map-pin" /><strong>{{ $visited->count() }}</strong> {{ Str::plural('Place', $visited->count()) }}</span>
                     @if ($daysStayed)
-                        <div>
-                            <div class="stat-card-val" style="font-size:1.6rem;">🗓️ {{ $daysStayed }}</div>
-                            <div class="stat-card-label">Day{{ $daysStayed === 1 ? '' : 's' }}</div>
-                        </div>
+                        <span><x-icon name="calendar" /><strong>{{ $daysStayed }}</strong> {{ Str::plural('Day', $daysStayed) }}</span>
                     @endif
                 </div>
-
-                @if ($visited->isNotEmpty())
-                    <p class="sub" style="margin-bottom:16px;">
-                        I explored: {{ $visited->pluck('name')->join(', ', ' and ') }}
-                    </p>
-                @endif
-
-                <button type="button" class="btn btn-outline" id="shareTripCardBtn">Share Trip Card</button>
-            </div>
-        </div>
-
-        @if ($visited->isNotEmpty())
-            <div class="section-head" style="margin-top:34px;">
-                <div><h2 class="poster-title" style="color:var(--ocean-teal-dark);">Places You Visited</h2></div>
-            </div>
-            <div class="dpost-grid" style="margin-bottom:34px;">
-                @foreach ($visited as $listing)
-                    @include('partials.listing-poster-card', ['listing' => $listing])
-                @endforeach
-            </div>
-        @else
-            <div class="empty-state" style="margin-top:34px;">
-                <p>Thanks for your feedback! Explore more of what Davao Region has to offer any time.</p>
-            </div>
+                <p class="recap-trip__names">I explored: {{ $visited->pluck('name')->join(', ', ' and ') }}</p>
+            </section>
+            <section class="recap-section" aria-labelledby="visitedTitle">
+                <div class="recap-section__head"><h2 class="poster-title" id="visitedTitle">Places You Visited</h2></div>
+                <div class="recap-grid">
+                    @foreach ($visited as $listing)
+                        @include('partials.recap-listing-card', ['listing' => $listing])
+                    @endforeach
+                </div>
+            </section>
+        @elseif ($daysStayed)
+            <p class="recap-days"><x-icon name="calendar" /> {{ $daysStayed }} {{ Str::plural('day', $daysStayed) }} stayed</p>
         @endif
 
         @if ($missed->isNotEmpty())
-            <div class="section-head">
-                <div>
-                    <h2 class="poster-title" style="color:var(--ocean-teal-dark);">You Might Have Missed</h2>
-                    <p>
-                        @if ($personalized)
-                            Based on your trip, here are a few more places you might enjoy on your next visit.
-                        @else
-                            A few popular places you might enjoy exploring next time.
-                        @endif
-                    </p>
+            <section class="recap-section" aria-labelledby="nextTimeTitle">
+                <div class="recap-section__head">
+                    <h2 class="poster-title" id="nextTimeTitle">Explore next time</h2>
+                    <p>@if ($personalized) Based on your trip, here are a few more places you might enjoy on your next visit.
+                    @else A few popular places you might enjoy exploring next time. @endif</p>
                 </div>
-            </div>
-            <div class="dpost-grid" style="margin-bottom:34px;">
-                @foreach ($missed as $destination)
-                    @include('partials.listing-poster-card', ['listing' => $destination])
-                @endforeach
-            </div>
+                <div class="recap-grid">
+                    @foreach ($missed as $destination)
+                        @include('partials.recap-listing-card', ['listing' => $destination])
+                    @endforeach
+                </div>
+            </section>
         @endif
 
-        <div class="empty-state__actions" style="justify-content:center;">
-            <a href="{{ route('destinations.index') }}" class="btn btn-poster-primary">Explore More Destinations</a>
-            <a href="{{ route('home') }}" class="btn btn-poster-ghost">Back to Home</a>
+        <div class="recap-actions">
+            <a href="{{ route('destinations.index') }}" class="btn btn-primary">Explore more destinations <x-icon name="arrow-right" /></a>
+            <a href="{{ route('home') }}" class="btn btn-outline">Back to home</a>
         </div>
     </div>
 </div>

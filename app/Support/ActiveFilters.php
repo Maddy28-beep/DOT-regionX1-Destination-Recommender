@@ -44,6 +44,9 @@ class ActiveFilters
         }
 
         $filters->put('interest', $request->filled('interest') ? 'Interest: '.$request->input('interest') : null);
+        if ($nearby = NearbyPlaces::selection($request)) {
+            $filters->put('nearby_origin', 'Within '.$nearby['km'].' km of '.$nearby['label']);
+        }
 
         // What the hero search's per-catalogue boxes can add (see SearchController).
         [$min, $max] = BudgetRanges::bounds($request);

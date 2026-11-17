@@ -45,6 +45,29 @@ class ExitSurveyTest extends TestCase
         ], $overrides);
     }
 
+    public function test_guided_survey_keeps_all_questions_in_one_original_post_form(): void
+    {
+        $html = $this->get(route('exit-survey.create'))->assertOk()->getContent();
+        $this->assertStringContainsString('method="POST" action="'.route('exit-survey.store').'" data-survey-form', $html);
+        foreach (['residency_type', 'travel_purpose', 'actual_days_stayed', 'estimated_total_spend', 'activities[]', 'overall_rating', 'would_recommend', 'destination_relevant', 'itinerary_useful', 'comments'] as $field) {
+            $this->assertStringContainsString('name="'.$field.'"', $html);
+        }
+        $this->assertStringContainsString('places_visited[]', $html);
+        $this->assertSame(3, substr_count($html, 'data-survey-step="'));
+        $this->assertStringContainsString('data-survey-submit', $html);
+    }
+
+    public function test_validation_returns_to_the_step_containing_the_error(): void
+    {
+        foreach (['actual_days_stayed' => 0, 'places_visited.0' => 1, 'overall_rating' => 2] as $field => $step) {
+            $errors = (new \Illuminate\Support\ViewErrorBag)->put('default', new \Illuminate\Support\MessageBag([$field => ['Please check this answer.']]));
+            $this->withSession(['errors' => $errors, '_old_input' => ['actual_days_stayed' => 3]])
+                ->get(route('exit-survey.create'))->assertOk()
+                ->assertSee('data-initial-step="'.$step.'"', false)
+                ->assertSee('value="3"', false);
+        }
+    }
+
     public function test_not_applicable_ratings_are_saved_as_unanswered(): void
     {
         $this->post(route('exit-survey.store'), $this->validPayload([

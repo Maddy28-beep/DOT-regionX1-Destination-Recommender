@@ -120,7 +120,7 @@
                         @if ($itinerary->tourist_account_id)
                             <a href="{{ route('account.itineraries.show', $itinerary) }}" class="btn btn-primary">Saved to My Itineraries &check;</a>
                         @else
-                            <form method="POST" action="{{ route('plan.itinerary.save') }}">
+                            <form id="itinerarySaveForm" method="POST" action="{{ route('plan.itinerary.save') }}">
                                 @csrf
                                 <button type="submit" class="btn btn-primary"><x-icon name="heart" /> Save Itinerary</button>
                             </form>

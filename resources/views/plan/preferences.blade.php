@@ -29,7 +29,12 @@
             {{-- The intro sits in a column beside the form (not a banner above it), so the form starts near the top of the screen. --}}
             <aside class="plan-side" aria-label="Trip planning guidance from Davo">
                 <span class="plan-side__kicker">Your travel buddy</span>
-                <img class="plan-side__davo" src="{{ asset('images/davo-wave-green.webp') }}" alt="Davo, your eagle travel buddy, waving hello" width="374" height="504">
+                <div class="plan-side__davo plan-side__davo-media">
+                    <video data-davo-guide-video muted playsinline preload="none" poster="{{ asset('images/davo-wave-green.webp') }}" width="568" height="760" aria-label="Davo, your animated eagle travel buddy">
+                        <source src="{{ asset('video/davo-planner-guide.mp4') }}" type="video/mp4">
+                        <img src="{{ asset('images/davo-wave-green.webp') }}" alt="Davo waving hello" width="374" height="504">
+                    </video>
+                </div>
                 <div class="plan-side__bubble">
                     <h1 class="plan-side__title">
                         <span class="plan-side__guidance--trip">Hi, I’m Davo!</span>
@@ -90,7 +95,10 @@
             </header>
             <section class="plan-resume" id="planResume" aria-labelledby="planResumeTitle" hidden>
                 <div class="plan-resume-art">
-                    <div class="plan-resume-davo" role="img" aria-label="Davo waving hello" style="background-image:url('{{ asset('images/davo-resume-frames.webp') }}')"></div>
+                    <video class="plan-resume-davo" data-davo-resume-video muted playsinline preload="auto" poster="{{ asset('images/davo-resume-video-poster.webp') }}" width="568" height="746" aria-label="Davo welcoming you back">
+                        <source src="{{ asset('video/davo-resume-guide.mp4') }}?v={{ filemtime(public_path('video/davo-resume-guide.mp4')) }}" type="video/mp4">
+                        <img src="{{ asset('images/davo-resume-video-poster.webp') }}" alt="Davo welcoming you back" width="230" height="300">
+                    </video>
                 </div>
                 <div class="plan-resume-copy">
                     <span class="plan-resume-eyebrow"><x-icon name="check" /> Trip draft saved</span>
@@ -289,11 +297,16 @@
                 </div>
             </div>
             <section id="planLoading" class="plan-loading" role="status" aria-live="polite" aria-labelledby="planLoadingTitle" hidden tabindex="-1">
-                <div class="plan-loading-art"><img class="plan-loading-davo" src="{{ asset('images/davo-planning.webp') }}" alt="Davo reading a map" width="420" height="504"></div>
+                <div class="plan-loading-art">
+                    <video class="plan-loading-davo" data-davo-building-video muted playsinline preload="auto" poster="{{ asset('images/davo-planning.webp') }}" width="568" height="628" aria-label="Davo preparing your itinerary">
+                        <source src="{{ asset('video/davo-itinerary-building.mp4') }}?v={{ filemtime(public_path('video/davo-itinerary-building.mp4')) }}" type="video/mp4">
+                        <img src="{{ asset('images/davo-planning.webp') }}" alt="Davo preparing your itinerary" width="420" height="504">
+                    </video>
+                </div>
                 <div class="plan-loading-copy">
                 <div class="plan-loading-kicker">Your Davao adventure</div>
                 <h2 id="planLoadingTitle">I’m putting your trip together.</h2>
-                <p class="plan-loading-intro">Sit tight while I turn your preferences into a day-by-day plan.</p>
+                <p class="plan-loading-intro"><span class="plan-loading-pending">Sit tight while I turn your preferences into a day-by-day plan.</span><span class="plan-loading-ready">Your day-by-day adventure is ready to explore.</span></p>
                 <h3 class="plan-loading-list-title">Your plan includes</h3>
                 <ul class="plan-loading-workflow" aria-label="Your plan includes">
                     <li><x-icon name="map-pin" aria-hidden="true" /> Places matched to your interests</li>
@@ -304,8 +317,8 @@
                 </div>
                 <div class="plan-loading-footer">
                     <div class="plan-loading-track" aria-hidden="true"><span></span></div>
-                    <p class="plan-loading-status"><span class="plan-loading-spinner" aria-hidden="true"></span><strong id="planLoadingStatus">Building your itinerary…</strong></p>
-                    <p class="plan-loading-note">Please keep this page open while your plan is being created.</p>
+                    <p class="plan-loading-status"><span class="plan-loading-spinner" aria-hidden="true"></span><span class="plan-loading-check" aria-hidden="true"><x-icon name="check" /></span><strong id="planLoadingStatus">Building your itinerary…</strong></p>
+                    <p class="plan-loading-note"><span class="plan-loading-pending">Please keep this page open while your plan is being created.</span><span class="plan-loading-ready">Taking you to your itinerary now.</span></p>
                 </div>
             </section>
             </div>{{-- /.plan-main --}}
@@ -526,5 +539,6 @@
 {{-- After the wizard script: it builds the step panels this one folds parts of. --}}
 <script src="{{ asset('js/plan-collapse.js') }}?v={{ filemtime(public_path('js/plan-collapse.js')) }}" defer></script>
 <script src="{{ asset('js/plan-interest-summary.js') }}?v={{ filemtime(public_path('js/plan-interest-summary.js')) }}" defer></script>
+<script src="{{ asset('js/davo-planner-video.js') }}?v={{ filemtime(public_path('js/davo-planner-video.js')) }}" defer></script>
 
 @endsection

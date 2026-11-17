@@ -57,7 +57,8 @@ class SearchController extends Controller
         }
 
         // Budget: what the dropdown offers differs by catalogue (BudgetRanges).
-        $budget = BudgetRanges::resolve($purpose, $request->input('budget'), $request->input('budget_min'), $request->input('budget_max'));
+        $budgetPurpose = $purpose === 'accommodations' && $request->input('stay_mode') === 'day_use' ? 'accommodations_day_use' : $purpose;
+        $budget = BudgetRanges::resolve($budgetPurpose, $request->input('budget'), $request->input('budget_min'), $request->input('budget_max'));
         if ($budget['error']) {
             return redirect()->to(route('home').'#search')->withInput()->with(Toast::error('Check the budget', $budget['error']));
         }
@@ -106,8 +107,9 @@ class SearchController extends Controller
                     $filters['stay_mode'] = $mode;
                 }
                 $from = $this->date($request->input('from'));
-                $to = $this->date($request->input('to'));
-                if (($request->filled('from') && ! $from) || ($request->filled('to') && ! $to)) {
+                // Day visits have one date. Normalize on the server too, including no-JS requests.
+                $to = $mode === 'day_use' ? $from : $this->date($request->input('to'));
+                if (($request->filled('from') && ! $from) || ($mode !== 'day_use' && $request->filled('to') && ! $to)) {
                     return $this->bad('Check the dates', 'Pick the dates from the calendar.');
                 }
                 if ($from && $to && $to->lt($from)) {

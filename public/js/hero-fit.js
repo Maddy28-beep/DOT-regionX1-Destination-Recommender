@@ -16,7 +16,7 @@
     const screen = document.querySelector('.hero-screen');
     if (!screen) return;
     // Fit the desktop introduction as one screen; phone forms keep their natural size.
-    if (window.innerWidth < 1061 && screen.querySelector('.hero-offers')) return;
+    if (window.innerWidth < 1061) return;
 
     const MIN_SCALE = screen.querySelector('.hero-offers') ? 0.82 : 0.62;
     const coarse = window.matchMedia('(pointer: coarse)').matches;
@@ -34,7 +34,7 @@
     const fit = () => {
         const height = window.innerHeight;
         reset();
-        if (window.innerWidth < 1061 && screen.querySelector('.hero-offers')) return;
+        if (window.innerWidth < 1061) return;
 
         // The natural height: the content itself, without the "at least one window tall" rule.
         screen.style.minHeight = '0';

@@ -27,7 +27,7 @@ class Accommodation extends Model
     protected $fillable = [
         'slug', 'name', 'location', 'region_id', 'type', 'resort_settings', 'dot_classification',
         'description', 'image_path', 'is_accredited', 'rating', 'review_count',
-        'price_tier', 'price_per_night', 'check_in', 'check_out', 'distance_km',
+        'price_tier', 'price_per_night', 'price_per_day', 'check_in', 'check_out', 'distance_km',
         'featured', 'latitude', 'longitude',
         'website_url', 'facebook_url', 'instagram_url', 'tiktok_url',
     ];
@@ -39,10 +39,22 @@ class Accommodation extends Model
             'featured' => 'boolean',
             'rating' => 'decimal:1',
             'price_per_night' => 'decimal:2',
+            'price_per_day' => 'decimal:2',
             'distance_km' => 'decimal:1',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
+            'coordinate_provenance' => 'array',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::updating(function (self $stay) {
+            // A later owner/admin pin edit must not retain attribution for an older researched point.
+            if ($stay->isDirty(['latitude', 'longitude']) && ! $stay->isDirty('coordinate_provenance')) {
+                $stay->coordinate_provenance = null;
+            }
+        });
     }
 
     /**
@@ -112,6 +124,30 @@ class Accommodation extends Model
         return $this->price_per_night
             ? number_format($this->price_per_night).' / night'
             : null;
+    }
+
+    public function nightlyPricing(): array
+    {
+        return \App\Support\StayPricing::nightly($this);
+    }
+
+    /** Preserve recorded distances; otherwise estimate a straight line from the planner's Davao origin. */
+    public function distanceFromCityCentreKm(): ?float
+    {
+        if ($this->distance_km !== null) {
+            return (float) $this->distance_km;
+        }
+        if ($this->latitude === null || $this->longitude === null
+            || ! is_finite((float) $this->latitude) || ! is_finite((float) $this->longitude)
+            || abs((float) $this->latitude) > 90 || abs((float) $this->longitude) > 180) {
+            return null;
+        }
+        $lat1 = deg2rad(\App\Services\Recommendation\ContentBasedRecommendationService::DEFAULT_ORIGIN_LAT);
+        $lat2 = deg2rad((float) $this->latitude);
+        $dLng = deg2rad((float) $this->longitude - \App\Services\Recommendation\ContentBasedRecommendationService::DEFAULT_ORIGIN_LNG);
+        $a = sin(($lat2 - $lat1) / 2) ** 2 + cos($lat1) * cos($lat2) * sin($dLng / 2) ** 2;
+
+        return round(6371 * 2 * asin(sqrt(max(0, min(1, $a)))), 1);
     }
 
     public function region(): BelongsTo

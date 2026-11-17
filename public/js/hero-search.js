@@ -29,10 +29,59 @@
     var fromBox = form.querySelector('[data-date-from]');
     var toBox = form.querySelector('[data-date-to]');
     var resetBtn = form.querySelector('[data-search-reset]');
+    var overnightTo = '';
+    var previousStayMode = 'overnight';
+    var stayBudget = form.querySelector('[data-budget-box="accommodations"] select');
+    var nightlyOptions = stayBudget ? Array.from(stayBudget.options).map(function (o) { return [o.value, o.textContent]; }) : [];
+    var dailyOptions = stayBudget ? Object.entries(JSON.parse(stayBudget.getAttribute('data-day-use-options') || '{}')) : [];
+    var activeStayBudgetMode = 'overnight';
+    var stayBudgetValues = {};
+
+    function syncStayBudget(mode) {
+        if (!stayBudget || mode === activeStayBudgetMode) return;
+        if (activeStayBudgetMode) {
+            stayBudgetValues[activeStayBudgetMode] = { value: stayBudget.value, min: minBox && minBox.value, max: maxBox && maxBox.value };
+        }
+        var saved = stayBudgetValues[mode] || { value: '', min: '', max: '' };
+        var options = mode === 'day_use' ? dailyOptions : nightlyOptions;
+        stayBudget.replaceChildren.apply(stayBudget, options.map(function (row) {
+            var option = document.createElement('option');
+            option.value = row[0]; option.textContent = row[1];
+            return option;
+        }));
+        stayBudget.value = options.some(function (row) { return row[0] === saved.value; }) ? saved.value : '';
+        activeStayBudgetMode = mode;
+        stayBudget.dispatchEvent(new Event('change', { bubbles: true }));
+        if (stayBudget.value === 'custom') {
+            if (minBox) minBox.value = saved.min || '';
+            if (maxBox) maxBox.value = saved.max || '';
+        }
+    }
+
+    function syncStayMode() {
+        var isStays = chosen() && chosen().value === 'accommodations';
+        var mode = form.querySelector('input[name="stay_mode"]:checked');
+        var dayUse = isStays && mode && mode.value === 'day_use';
+        form.dataset.stayMode = isStays ? (dayUse ? 'day_use' : 'overnight') : '';
+        var stayBudgetLabel = form.querySelector('[data-budget-box="accommodations"] > label');
+        if (stayBudgetLabel) stayBudgetLabel.textContent = dayUse ? 'Budget · per day' : 'Budget · per night';
+        form.querySelector('[data-stay-day-note]').hidden = !dayUse;
+        form.querySelector('[data-stay-same-day]').hidden = !dayUse;
+        form.querySelector('[data-stay-from-label]').textContent = dayUse ? 'Visit date' : 'From · check-in';
+        if (!isStays || !fromBox || !toBox) return;
+        syncStayBudget(dayUse ? 'day_use' : 'overnight');
+        if (dayUse && previousStayMode !== 'day_use') overnightTo = toBox.value;
+        if (!dayUse && previousStayMode === 'day_use') {
+            toBox.value = overnightTo && (!fromBox.value || overnightTo >= fromBox.value) ? overnightTo : '';
+        }
+        if (dayUse) toBox.value = fromBox.value;
+        toBox.closest('[data-for="to"]').hidden = dayUse;
+        previousStayMode = dayUse ? 'day_use' : 'overnight';
+    }
 
     var HINTS = {
         destinations: 'All filters are optional.',
-        accommodations: 'Dates and guests are optional. They are kept with your search but are not checked against availability, which is not recorded.',
+        accommodations: 'Dates and group size are optional. Availability is not checked.',
         restaurants: 'A meal shows restaurants open at that hour. Dietary needs and plated or buffet service are not recorded for restaurants yet.',
         packages: 'The budget is the total: the per-person price times the number of travelers.',
         souvenir_centers: 'Souvenir shops are searched by place. Their prices and categories are not recorded.'
@@ -83,6 +132,7 @@
 
         syncCustom();
         syncGuests();
+        syncStayMode();
         if (hint) hint.textContent = HINTS[radio.value] || '';
     }
 
@@ -159,9 +209,11 @@
             toBox.min = fromBox.value || toBox.getAttribute('min');
             if (toBox.value && fromBox.value && toBox.value < fromBox.value) toBox.value = '';
         }
+        if (e.target === fromBox || e.target.name === 'stay_mode') syncStayMode();
     });
 
     form.addEventListener('submit', function (e) {
+        syncStayMode();
         if (!checkBudget()) {
             e.preventDefault();
             (amount(minBox) !== null && isNaN(amount(minBox)) ? minBox : maxBox).focus();
@@ -172,6 +224,10 @@
         resetBtn.addEventListener('click', function () {
             var keep = chosen();
             form.reset();
+            overnightTo = '';
+            previousStayMode = 'overnight';
+            stayBudgetValues = {};
+            activeStayBudgetMode = null;
             if (keep) keep.checked = true;
             // The shared dropdown script shows the native value; tell it the selects changed.
             [].slice.call(form.querySelectorAll('select')).forEach(function (s) {

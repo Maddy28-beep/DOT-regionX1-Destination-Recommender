@@ -10,14 +10,15 @@ use Illuminate\Http\Request;
  * What a budget means differs by catalogue, because the data does:
  *   - Destinations: the entry fee on file (entry_fee_min to entry_fee_max). A place fits when its fee range
  *     overlaps the budget. A place with no fee on file never fits a budget; "Any budget" keeps it.
- *   - Stays: price_per_night.
+ *   - Overnight stays: overlap with the displayed recorded, published or estimated nightly range.
+ *     Day-use stays: the separate, optional price_per_day, never nightly estimates.
  *   - Packages: price_per_pax times the travellers asked for (one, when none is given).
  *   - Dining: restaurants carry a price level (Budget-Friendly / Mid-range / Premium) but no peso amount, so the
  *     dropdown offers those three levels and no custom amount. Nothing is converted to pesos.
  *   - Souvenirs: no price is on file at all, so the card shows no budget there.
  *
- * The peso brackets were cut from the spread of the prices on file on 8 Nov 2026 so that every bracket holds
- * at least one listing; a bracket is offered only while it still does (see offered()).
+ * The original catalogue brackets follow the spread of recorded prices. Day-use brackets are separate
+ * daily spending choices; a stay only matches them when its own daily rate is recorded.
  */
 final class BudgetRanges
 {
@@ -49,6 +50,17 @@ final class BudgetRanges
                 ['1500-2500', '₱1,500 – ₱2,500', 1500.0, 2499.99],
                 ['2500-4000', '₱2,500 – ₱4,000', 2500.0, 3999.99],
                 ['4000-up', '₱4,000 and above', 4000.0, null],
+            ],
+        ],
+        'accommodations_day_use' => [
+            'basis' => 'Day-use price',
+            'unit' => 'per day',
+            'custom' => true,
+            'brackets' => [
+                ['day-under-500', 'Under ₱500', null, 499.99],
+                ['day-500-1000', '₱500 – ₱999', 500.0, 999.99],
+                ['day-1000-2000', '₱1,000 – ₱1,999', 1000.0, 1999.99],
+                ['day-2000-up', '₱2,000 and above', 2000.0, null],
             ],
         ],
         'packages' => [

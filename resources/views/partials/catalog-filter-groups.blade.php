@@ -20,7 +20,7 @@
                     default => (bool) array_filter((array) request($g['names'][0], [])),
                 };
             @endphp
-            <details class="fgroup" @if ($isSet || $g['type'] !== 'toggle') open @endif>
+            <details class="fgroup" @if ($isSet || $g['type'] === 'toggle') open @endif>
                 <summary class="fgroup__title">{{ $g['label'] }}@if ($isSet)<span class="fgroup__dot" role="img" aria-label="in use"></span>@endif</summary>
 
                 @if ($g['type'] === 'range')
@@ -49,9 +49,9 @@
                     </div>
                 @elseif ($g['type'] === 'toggle')
                     <label class="fcheck fcheck--toggle">
-                        <input type="checkbox" name="open_now" value="1" @checked(request()->boolean('open_now'))>
+                        <input type="checkbox" role="switch" name="open_now" value="1" @checked(request()->boolean('open_now'))>
                         <span class="fcheck__box" aria-hidden="true"></span>
-                        <span class="fcheck__text">{{ $g['text'] }}</span>
+                        <span class="fcheck__text">Exclude closed places<small>Based on listed operating status</small></span>
                     </label>
                 @else
                     @php
@@ -66,6 +66,9 @@
                             <label class="fcheck" @if ($folded) data-fold hidden @endif>
                                 <input type="checkbox" name="{{ $name }}[]" value="{{ $value }}" @checked(in_array((string) $value, $chosen, true))>
                                 <span class="fcheck__box" aria-hidden="true"></span>
+                                @if ($key === 'amenity')
+                                    <x-icon :name="match($value) { 'parking' => 'parking', 'restroom' => 'restroom', 'restaurant' => 'utensils', 'wifi' => 'wifi', 'pool' => 'pool', 'airport' => 'plane', 'ramp', 'stepfree', 'accroom', 'accwc', 'wheel' => 'accessibility', 'kids', 'children', 'seniors' => 'users', 'gcash' => 'wallet', 'ac' => 'snowflake', 'outdoor', 'picnic', 'campsites' => 'leaf', default => 'info' }" class="fcheck__icon" aria-hidden="true" />
+                                @endif
                                 <span class="fcheck__text">{{ $text }}</span>
                                 @if (isset($g['counts'][$value]))<span class="fcheck__n">{{ $g['counts'][$value] }}</span>@endif
                             </label>

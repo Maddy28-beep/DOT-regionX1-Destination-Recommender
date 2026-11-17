@@ -77,7 +77,13 @@ class PromoDealsTest extends TestCase
 
         $this->get(route('accommodations.show', $stay))->assertOk()->assertDontSee('Old deal')->assertDontSee('Coming deal')->assertDontSee('Your Promo');
         $this->get(route('accommodations.index'))->assertOk()->assertDontSee('Old deal')->assertDontSee('Coming deal')->assertDontSee('chip--deal', false);
-        $this->get('/')->assertOk()->assertDontSee('Special offers in Davao');
+        $this->get('/')->assertOk()
+            ->assertDontSee('Special offers in Davao')
+            ->assertDontSee('See all deals')
+            ->assertDontSee('id="deals"', false)
+            ->assertSee('hero-screen--no-offers', false)
+            ->assertSee('class="stats"', false)
+            ->assertSee('data-hero-search', false);
     }
 
     public function test_the_listing_marks_stays_with_a_promo_and_the_deals_chip_narrows_to_them(): void
@@ -101,6 +107,7 @@ class PromoDealsTest extends TestCase
         $this->stay('Quiet Inn');
 
         $this->get('/')->assertOk()
+            ->assertDontSee('hero-screen--no-offers', false)
             ->assertSee('Limited-Time Offers')->assertSee('Special offers in Davao')->assertSee('Breakfast for two')
             ->assertSee('Acacia Hotel Davao')->assertSee('STAYDVO')->assertSee('See all deals')
             ->assertSee(route('accommodations.show', $stay), false)->assertSee(route('accommodations.index', ['deals' => 1]), false)

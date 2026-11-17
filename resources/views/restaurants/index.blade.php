@@ -45,8 +45,6 @@
                 'placeholder' => 'e.g. Marina Tuna',
                 'regions' => $regions,
                 'activeFilters' => $activeFilters,
-                'tiers' => [['Budget-Friendly', 'Budget-friendly', ''], ['Mid-range', 'Mid-range', ''], ['Premium', 'Premium', '']],
-                'anyBudget' => true,
                 'categoryParam' => 'cuisine_type',
             ])
 
@@ -72,7 +70,7 @@
 
                     @include('partials.pagination', ['paginator' => $restaurants, 'panel' => 'grid'])
                 @else
-                    <x-davo-empty-state title="No restaurants match your filters" message="Try another category or clear your filters to explore more options." :action-url="route('restaurants.index')" action-label="Clear filters" />
+                    <x-davo-empty-state :adjust-filters="true" title="No restaurants match your filters" message="Try another category or clear your filters to explore more options." :action-url="route('restaurants.index')" action-label="Clear filters" />
                 @endif
             </div>
         </div>

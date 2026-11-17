@@ -7,6 +7,11 @@
         <span class="chatbot-toggle-badge" aria-hidden="true"><x-icon name="chat" /></span>
     </button>
     <span id="chatbot-hint" class="chatbot-hint" aria-hidden="true">Need help? <strong>Ask Davo</strong> 👋</span>
+    @if (request()->routeIs('home'))
+        @include('partials.davo-planner-invite')
+    @elseif (request()->routeIs('plan.itinerary') && isset($itinerary) && ! $itinerary->tourist_account_id && ! session('pending_save_itinerary'))
+        @include('partials.davo-save-invite')
+    @endif
 
     <div id="chatbot-panel" class="chatbot-panel" hidden role="region" aria-labelledby="chatbot-title">
         <div class="chatbot-panel-head">

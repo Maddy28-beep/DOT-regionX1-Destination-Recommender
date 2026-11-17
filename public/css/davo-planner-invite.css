@@ -1,0 +1,32 @@
+.davo-invite {
+    position: absolute; right: 0; bottom: 90px; width: 320px; max-width: calc(100vw - 32px);
+    box-sizing: border-box; padding: 12px; border: 1px solid #a9bd8c; border-radius: 16px;
+    background: #fffefa; color: #0a4f38; box-shadow: 0 8px 28px #143c2929;
+}
+.davo-invite[hidden] { display: none; }
+.davo-invite::after { content: ''; position: absolute; right: 23px; bottom: -9px; width: 16px; height: 16px; background: #fffefa; border-right: 1px solid #a9bd8c; border-bottom: 1px solid #a9bd8c; transform: rotate(45deg); }
+.davo-invite__top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.davo-invite__eyebrow { padding: 5px 11px; border-radius: 30px; background: #e4edcf; color: #0a4f38; font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.davo-invite__close { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; background: transparent; border: 0; border-radius: 50%; color: #0a4f38; font-size: 1.6rem; cursor: pointer; }
+.davo-invite__close:hover { background: #e8f3ec; }
+.davo-invite__intro { display: flex; gap: 10px; align-items: center; }
+.davo-invite__avatar { width: 44px; height: 44px; object-fit: cover; border-radius: 50%; flex: none; }
+.davo-invite h2 { margin: 0 0 4px; font-family: inherit; font-size: .96rem; font-weight: 700; line-height: 1.3; color: #0a4f38; }
+.davo-invite p { margin: 0; font-size: .82rem; line-height: 1.4; color: #365f50; }
+.davo-invite .davo-invite__action { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; min-height: 44px; box-sizing: border-box; margin-top: 10px; padding: 10px 12px; border-radius: 9px; font-size: .86rem; text-decoration: none; }
+.davo-invite__action svg { width: 18px; height: 18px; }
+.davo-invite p.davo-invite__note { margin-top: 5px; text-align: center; font-size: .73rem; color: #64756c; }
+/* Keep the old hover hint from competing with the invitation on the homepage. */
+.chatbot-widget:has([data-davo-invite]) .chatbot-hint { display: none; }
+@media (max-width: 640px) {
+    .davo-invite { bottom: 66px; width: 288px; max-height: calc(100dvh - 160px); overflow-y: auto; padding: 12px; border-radius: 14px; }
+    .davo-invite::after { display: none; }
+    .davo-invite__top { position: absolute; right: 2px; top: 2px; margin: 0; }
+    .davo-invite__close { width: 44px; height: 44px; }
+    .davo-invite__eyebrow, .davo-invite p.davo-invite__note { display: none; }
+    .davo-invite__avatar { display: block; width: 34px; height: 34px; }
+    .davo-invite__intro { display: grid; grid-template-columns: 34px minmax(0,1fr); gap: 4px 8px; }
+    .davo-invite__intro > div { display: contents; }
+    .davo-invite h2 { padding-right: 24px; margin: 0; align-self: center; font-size: .94rem; }
+    .davo-invite__intro p { grid-column: 1 / -1; }
+}

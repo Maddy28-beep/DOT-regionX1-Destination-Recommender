@@ -22,6 +22,7 @@
 
     $isDestination = $listing instanceof \App\Models\Destination;
     $isStay = $listing instanceof \App\Models\Accommodation;
+    $dayUseStay = $isStay && ($stayMode ?? null) === 'day_use';
     $isPackage = $listing instanceof \App\Models\Package;
     $isOperator = $listing instanceof \App\Models\TourOperator;
     $isRestaurant = $listing instanceof \App\Models\Restaurant;
@@ -50,12 +51,17 @@
 
     // Price: bold amount, with a muted unit after it (and "from" before it for a stay).
     $priceLead = null;
+    $stayPricing = $isStay && ! $dayUseStay ? $listing->nightlyPricing() : null;
     [$priceMain, $priceUnit] = [null, null];
     if ($isDestination) {
         $amount = $listing->posterPriceAmount();   // "150 / person", "150–450 / person", "50 max / person"
         [$priceMain, $priceUnit] = $amount ? array_pad(explode(' / ', $amount, 2), 2, null) : [null, null];
-    } elseif ($isStay && $listing->price_per_night) {
-        [$priceLead, $priceMain, $priceUnit] = ['from', number_format($listing->price_per_night), 'night'];
+    } elseif ($dayUseStay) {
+        if ($listing->price_per_day !== null) {
+            [$priceLead, $priceMain, $priceUnit] = ['from', number_format($listing->price_per_day), 'day'];
+        }
+    } elseif ($isStay) {
+        [$priceLead, $priceMain, $priceUnit] = [null, $stayPricing['amount'], 'night'];
     } elseif ($isPackage && $listing->price_per_pax) {
         [$priceMain, $priceUnit] = [number_format($listing->price_per_pax), 'person'];
     }
@@ -88,7 +94,7 @@
             ->take(2)->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('')
         : null;
 
-    $hasFooter = $priceMain || ($isDestination && $tier === 0) || $packageCount || $tierWord || $meta;
+    $hasFooter = $dayUseStay || $priceMain || ($isDestination && $tier === 0) || $packageCount || $tierWord || $meta;
 @endphp
 
 <div class="dpost-card-wrap">
@@ -156,9 +162,14 @@
 
             @if ($hasFooter)
                 <div class="dcard__foot">
-                    <span class="dcard__price">
-                        @if ($priceMain)
+                    <span class="dcard__price{{ $stayPricing ? ' dcard__price--stay' : '' }}">
+                        @if ($stayPricing)
+                            <small class="stay-rate-label" title="{{ $stayPricing['note'] }}">{{ $stayPricing['label'] }}</small>
+                        @endif
+                        @if ($priceMain !== null && $priceMain !== '')
                             @if ($priceLead)<small class="dcard__from">{{ $priceLead }}</small> @endif<strong><span class="currency">&#8369;</span>{{ $priceMain }}</strong>@if ($priceUnit) <small>/ {{ $priceUnit }}</small>@endif
+                        @elseif ($dayUseStay)
+                            <span class="dcard__tier">Day-use rate not listed</span>
                         @elseif ($isDestination && $tier === 0)
                             <strong class="dcard__free">Free entry</strong>
                         @elseif ($packageCount)

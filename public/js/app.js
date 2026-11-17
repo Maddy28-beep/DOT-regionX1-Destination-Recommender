@@ -1148,14 +1148,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function count() {
         var set = 0;
-        var seenRadio = {};
-        form.querySelectorAll('[data-filter-count]').forEach(function (field) {
-            if (field.type === 'radio') {
-                // The "Any budget" tile means no budget filter, so it is not counted.
-                if (field.checked && field.value !== '' && !seenRadio[field.name]) { seenRadio[field.name] = true; set++; }
-                return;
-            }
-            if (field.value.trim() !== '') { set++; }
+        var seen = {};
+        form.querySelectorAll('[data-filter-count], .fgroups input').forEach(function (field) {
+            if (field.disabled || ((field.type === 'radio' || field.type === 'checkbox') && !field.checked)) return;
+            var name = field.name.replace(/\[\]$/, '');
+            if (field.value.trim() !== '' && !seen[name]) { seen[name] = true; set++; }
         });
         return set;
     }

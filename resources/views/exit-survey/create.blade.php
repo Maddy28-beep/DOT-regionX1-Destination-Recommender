@@ -4,14 +4,15 @@
 
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/exit-survey.css') }}?v={{ filemtime(public_path('css/exit-survey.css')) }}">
-<div class="exit-survey-page">
+<link rel="stylesheet" href="{{ asset('css/survey-stays.css') }}?v={{ filemtime(public_path('css/survey-stays.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/exit-survey-guided.css') }}?v={{ filemtime(public_path('css/exit-survey-guided.css')) }}">
+<div class="exit-survey-page survey-guided" data-survey-wizard>
 <div class="page-head">
     <div class="container survey-welcome">
-        <img class="survey-welcome__davo" src="{{ asset('images/davo-survey-v2.webp') }}" alt="" width="100" height="120">
         <div>
         <span class="poster-kicker" style="font-size:1.05rem;">how was your trip?</span>
-        <h1 class="page-title" style="font-size:1.9rem; margin:0;">Visitor Exit Survey</h1>
-        <p>Finished your trip? Tell us how it went and help improve tourism in Davao.</p>
+        <h1 class="page-title" style="font-size:1.9rem; margin:0;">How was your Davao trip?</h1>
+        <p>Visitor Exit Survey · Your feedback helps improve tourism in Davao.</p>
         </div>
     </div>
 </div>
@@ -29,17 +30,34 @@
             </div>
         @endif
 
-        <div class="privacy-note" style="margin-top:0;">
-            <x-icon name="shield-check" />
-            <p>
-                Your responses are <strong>anonymous</strong>. This survey does not collect your name, email, or
-                account information, and is not linked to your ExploreDVO profile if you have one. Data is handled
-                per the Philippine Data Privacy Act of 2012 (RA 10173) and used only for tourism analytics and
-                service improvement.
-            </p>
-        </div>
+        <nav class="survey-progress" aria-label="Survey steps" data-survey-progress hidden>
+            @foreach (['Your trip', 'Your visit', 'Your experience'] as $stepLabel)
+                <button type="button" data-survey-go="{{ $loop->index }}"><span>{{ $loop->iteration }}</span>{{ $stepLabel }}</button>
+            @endforeach
+        </nav>
+        <div class="survey-layout">
+        <aside class="survey-guide" aria-label="Davo’s survey guide">
+            <video class="survey-guide__davo" data-davo-survey-video muted playsinline preload="auto" poster="{{ asset('images/davo-survey-video-poster.webp') }}?v={{ filemtime(public_path('images/davo-survey-video-poster.webp')) }}" width="568" height="746" aria-label="Davo, your animated survey guide">
+                <source src="{{ asset('video/davo-survey-guide.mp4') }}?v={{ filemtime(public_path('video/davo-survey-guide.mp4')) }}" type="video/mp4">
+                <img src="{{ asset('images/davo-survey-video-poster.webp') }}" alt="Davo, your survey guide" width="160" height="190">
+            </video>
+            <div class="survey-guide__bubble" aria-live="polite" aria-atomic="true">
+                <h2 data-survey-guide-title>How was your Davao trip?</h2>
+                <p data-survey-guide-copy>Let’s start with a few trip details. You can skip anything on this step.</p>
+            </div>
+            <div class="survey-guide__privacy"><x-icon name="shield-check" /><div><p><strong>Anonymous</strong> · No name or email needed</p>
+            <details><summary>Privacy details</summary><p>
+                No name, email, or account details are collected. Responses aren’t linked to your profile and are
+                used only for tourism analytics and service improvement under the Data Privacy Act (RA 10173).
+            </p></details></div></div>
+        </aside>
 
-        <form method="POST" action="{{ route('exit-survey.store') }}">
+        @php
+            $surveyErrorStep = $errors->hasAny(['origin', 'residency_type', 'travel_purpose', 'actual_days_stayed', 'estimated_total_spend']) ? 0
+                : ($errors->hasAny(['places_visited', 'places_visited.*', 'activities', 'activities.*', 'stays', 'stays.*']) ? 1 : ($errors->any() ? 2 : 0));
+        @endphp
+        <div class="survey-form-stage" data-survey-stage>
+        <form method="POST" action="{{ route('exit-survey.store') }}" data-survey-form data-initial-step="{{ $surveyErrorStep }}">
             @csrf
             {{-- Honeypot: kept off screen and out of the tab order. People never fill it; scripts that fill every field do. --}}
             <div class="hp-field" aria-hidden="true">
@@ -54,21 +72,16 @@
                 </div>
             @endif
 
-            <div class="panel">
+            <div class="survey-panels" role="region" aria-label="Survey questions">
+            <div class="panel" data-survey-step="0">
                 <div class="panel-head">
                     <div>
                         <span class="survey-step">01 · Trip details</span>
-                        <h2>About Your Trip</h2>
+                        <h2 tabindex="-1">Tell me about your visit <span class="survey-optional-badge">Optional</span></h2>
                         <p>These details are optional. Share what you’re comfortable answering.</p>
                     </div>
                 </div>
                 <div class="panel-body">
-                    <div class="field">
-                        <label for="origin">Where are you visiting from?</label>
-                        <input type="text" id="origin" name="origin" maxlength="150" value="{{ old('origin') }}" placeholder="e.g. Cebu City, Philippines">
-                        <p class="field-hint">Helps DOT Region XI understand where visitors are travelling from.</p>
-                    </div>
-
                     <div class="filter-inline" style="align-items:start; margin-top:14px;">
                         <div class="field" style="flex:1; min-width:180px;">
                             <label for="residency_type">Visit type</label>
@@ -105,17 +118,16 @@
                             </select>
                         </div>
                     </div>
-                    <p class="field-hint">Your total spend for the whole trip &mdash; food, transport, activities, and shopping &mdash; not accommodation, if you paid for that separately in advance.</p>
+                    <p class="field-hint">Include food, transport, activities, and shopping. Exclude accommodation paid separately in advance.</p>
                 </div>
             </div>
 
-            <div class="panel">
+            <div class="panel" data-survey-step="1">
                 <div class="panel-head">
                     <div>
-                        <span class="survey-step">02 · Places & activities</span>
-                        <h2>Your Visit</h2>
+                        <span class="survey-step">02 · Your visit</span>
+                        <h2 tabindex="-1">Your visit <span class="survey-optional-badge">Optional</span></h2>
                         <p>Optional &mdash; add only places you actually visited, even if your plans changed.</p>
-                        <p class="field-hint" style="margin-top:6px;"><strong>Tip:</strong> adding two or more places helps us learn which places go well together.</p>
                     </div>
                 </div>
                 <div class="panel-body">
@@ -123,11 +135,12 @@
                         name="places_visited[]"
                         :items="$placeOptions"
                         :selected="$selectedPlaces"
-                        label="Where did you go during your trip?"
+                        label="Places you visited"
                         placeholder="Search places you visited…"
                     />
 
-                    <div class="field" style="margin-top:22px;">
+                    <p class="field-hint">Attractions and places you explored during your trip.</p>
+                    <div class="field survey-visit-activities">
                         <label>Activities you participated in (optional)</label>
                         <div class="chip-checkbox-grid">
                             @foreach ($activityOptions as $activity)
@@ -138,14 +151,15 @@
                             @endforeach
                         </div>
                     </div>
+                    @include('partials.survey-stays')
                 </div>
             </div>
 
-            <div class="panel">
+            <div class="panel" data-survey-step="2">
                 <div class="panel-head">
                     <div>
                         <span class="survey-step">03 · Your feedback</span>
-                        <h2>Your Experience</h2>
+                        <h2 tabindex="-1">How was your experience?</h2>
                         <p>Only your overall rating and recommendation answer are required.</p>
                     </div>
                 </div>
@@ -180,11 +194,22 @@
                     </div>
                     </details>
 
-                    <button type="submit" class="btn survey-submit">Submit feedback &rarr;</button>
+                    <button type="submit" class="btn survey-submit" data-survey-submit>Submit feedback &rarr;</button>
                 </div>
             </div>
+            </div>
+            <div class="survey-navigation" data-survey-navigation hidden>
+                <button type="button" class="btn btn-outline" data-survey-back>← Back</button>
+                <button type="button" class="survey-skip" data-survey-next data-survey-skip>Skip this step</button>
+                <span data-survey-step-label>Step 1 of 3</span>
+                <button type="button" class="btn btn-primary" data-survey-next data-survey-next-primary>Next: your visit →</button>
+            </div>
         </form>
+        </div>
+        </div>
     </div>
 </div>
 </div>
+<script src="{{ asset('js/exit-survey-wizard.js') }}?v={{ filemtime(public_path('js/exit-survey-wizard.js')) }}" defer></script>
+<script src="{{ asset('js/davo-planner-video.js') }}?v={{ filemtime(public_path('js/davo-planner-video.js')) }}" defer></script>
 @endsection

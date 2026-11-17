@@ -149,6 +149,11 @@
                     <label for="price_per_night">Price / Night (&#8369;)</label>
                     <input type="number" step="0.01" id="price_per_night" name="price_per_night" value="{{ old('price_per_night', $listing->price_per_night) }}">
                 </div>
+                <div class="field" style="flex:1; min-width:140px;">
+                    <label for="price_per_day">Day-use price / Day (&#8369;)</label>
+                    <input type="number" step="0.01" min="0" max="1000000" id="price_per_day" name="price_per_day" value="{{ old('price_per_day', $listing->price_per_day) }}">
+                    <p class="field-hint">Optional. Leave blank if day use is not offered or the rate is unknown.</p>
+                </div>
                 <div class="field" style="flex:1; min-width:120px;">
                     <label for="check_in">Check-in</label>
                     <input type="time" id="check_in" name="check_in" value="{{ old('check_in', $listing->check_in) }}">

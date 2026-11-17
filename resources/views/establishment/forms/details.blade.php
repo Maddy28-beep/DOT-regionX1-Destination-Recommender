@@ -47,6 +47,13 @@
                     <input type="number" id="price_amount" name="price_amount" step="0.01" min="0" value="{{ old('price_amount', $priceValue) }}">
                 </div>
             @endif
+            @if ($establishment->listing_kind === 'accommodation')
+                <div class="field">
+                    <label for="price_per_day">Day-use price per day (₱)</label>
+                    <input type="number" id="price_per_day" name="price_per_day" step="0.01" min="0" max="1000000" value="{{ old('price_per_day', $listing->price_per_day) }}">
+                    <p class="field-hint">Optional. Leave blank if day use is not offered or the rate is unknown.</p>
+                </div>
+            @endif
         </section>
 
         <section class="ptr-col">

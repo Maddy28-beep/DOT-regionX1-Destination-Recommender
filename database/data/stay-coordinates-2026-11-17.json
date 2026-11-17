@@ -1,0 +1,249 @@
+{
+    "checked_on": "2026-11-17",
+    "note": "Property/complex map references, not surveyed entrances. Coordinates from OpenStreetMap contributors (ODbL), GeoNames via Mapcarta, public hotel location references, and previously reviewed venue data. No locality centroids are applied.",
+    "updates": [
+        {
+            "slug": "maxze-b-b-inn",
+            "name": "Maxze B & B Inn",
+            "latitude": 7.1057059,
+            "longitude": 125.6327075,
+            "precision": "property",
+            "source": "https://www.openstreetmap.org/node/2295639607",
+            "note": "Mapped named property point; confirm the entrance with the property."
+        },
+        {
+            "slug": "greenwindows-dormitel",
+            "name": "Greenwindows Dormitel",
+            "latitude": 7.0725638,
+            "longitude": 125.6054949,
+            "precision": "property",
+            "source": "https://www.openstreetmap.org/node/3339875262",
+            "note": "Mapped named property point; confirm the entrance with the property."
+        },
+        {
+            "slug": "inside-room-inn",
+            "name": "Inside Room Inn",
+            "latitude": 7.4493548,
+            "longitude": 125.8057763,
+            "precision": "property",
+            "source": "https://www.openstreetmap.org/node/4253273689",
+            "note": "Mapped named property point; confirm the entrance with the property."
+        },
+        {
+            "slug": "gov-gen-beach-resort",
+            "name": "Gov Gen Beach Resort",
+            "latitude": 6.5866487,
+            "longitude": 126.09048,
+            "precision": "property",
+            "source": "https://www.openstreetmap.org/node/11219408534",
+            "note": "Mapped named property point; confirm the entrance with the property."
+        },
+        {
+            "slug": "cris-inn-tagum",
+            "name": "Cris Inn Tagum",
+            "latitude": 7.4456066,
+            "longitude": 125.8136288,
+            "precision": "property",
+            "source": "https://www.openstreetmap.org/node/11408751965",
+            "note": "Mapped named property point; confirm the entrance with the property."
+        },
+        {
+            "slug": "paradise-island-park-beach-resort",
+            "name": "Paradise Island Park & Beach Resort",
+            "latitude": 7.10236,
+            "longitude": 125.66361,
+            "precision": "property",
+            "source": "https://mapcarta.com/32571862",
+            "note": "Mapped named property point; confirm the entrance with the property."
+        },
+        {
+            "slug": "the-ritz-hotel-at-garden-oases",
+            "name": "The Ritz Hotel at Garden Oases",
+            "latitude": 7.08126,
+            "longitude": 125.61729,
+            "precision": "property",
+            "source": "https://mapcarta.com/32560652",
+            "note": "Mapped named property point; confirm the entrance with the property."
+        },
+        {
+            "slug": "davao-bamboo-sanctuary-and-ecological-park",
+            "name": "Davao Bamboo Sanctuary and Ecological Park",
+            "latitude": 7.16833,
+            "longitude": 125.41505,
+            "precision": "property",
+            "source": "https://mapcarta.com/W539317911",
+            "note": "Mapped named property point; confirm the entrance with the property."
+        },
+        {
+            "slug": "honey-s-hotel-and-restaurant",
+            "name": "Honey's Hotel and Restaurant",
+            "latitude": 6.94472,
+            "longitude": 126.23565,
+            "precision": "property",
+            "source": "https://mapcarta.com/W208169813",
+            "note": "Mapped named property point; confirm the entrance with the property."
+        },
+        {
+            "slug": "napsule-suites",
+            "name": "Napsule Suites",
+            "latitude": 7.0946,
+            "longitude": 125.61461999999999,
+            "precision": "property",
+            "source": "https://www.komandirovka.ru/hotels/davao-city/napsule-suites/",
+            "note": "Mapped named property point; confirm the entrance with the property."
+        },
+        {
+            "slug": "oceano-con-vista-highland-events-place-rental",
+            "name": "Oceano Con Vista Highland Events Place Rental",
+            "latitude": 7.0285,
+            "longitude": 125.76929,
+            "precision": "property",
+            "source": "https://mapcarta.com/W1386127569",
+            "note": "Mapped named property point; confirm the entrance with the property."
+        },
+        {
+            "slug": "the-strand-suites-and-dormitel",
+            "name": "The Strand Suites And Dormitel",
+            "latitude": 7.08355,
+            "longitude": 125.60848,
+            "precision": "property",
+            "source": "https://www.komandirovka.ru/hotels/davao-city/the-strand-suites-and-dormitel/",
+            "note": "Mapped named property point; confirm the entrance with the property."
+        },
+        {
+            "slug": "davao-hub-dormitelle",
+            "name": "Davao HUB DORMITELLE",
+            "latitude": 7.0714458,
+            "longitude": 125.6054723,
+            "precision": "property",
+            "source": "https://www.openstreetmap.org/way/477315497",
+            "note": "Mapped named property point; confirm the entrance with the property."
+        },
+        {
+            "slug": "travelers-inn",
+            "name": "Traveler's Inn",
+            "latitude": 7.0959487,
+            "longitude": 125.6169518,
+            "precision": "property",
+            "source": "https://www.waze.com/live-map/directions/ph/davao-region/davao-city/travelers-inn-bajada%2C-davao-city?to=place.ChIJpZrHsN5t-TIR6yRijTE2AWM",
+            "note": "Mapped named property point; confirm the entrance with the property."
+        },
+        {
+            "slug": "cosy-nook-condotel",
+            "name": "Cosy Nook Condotel",
+            "latitude": 7.06193,
+            "longitude": 125.6086,
+            "precision": "complex",
+            "source": "https://mapcarta.com/W1063550155",
+            "note": "Centro Spatial complex centre; individual unit/building entrances are not verified."
+        },
+        {
+            "slug": "jhs-condo-unit-rental",
+            "name": "JHS Condo Unit Rental",
+            "latitude": 7.06193,
+            "longitude": 125.6086,
+            "precision": "complex",
+            "source": "https://mapcarta.com/W1063550155",
+            "note": "Centro Spatial complex centre; individual unit/building entrances are not verified."
+        },
+        {
+            "slug": "sha-condo-unit-rental",
+            "name": "Sha Condo Unit Rental",
+            "latitude": 7.06193,
+            "longitude": 125.6086,
+            "precision": "complex",
+            "source": "https://mapcarta.com/W1063550155",
+            "note": "Centro Spatial complex centre; individual unit/building entrances are not verified."
+        },
+        {
+            "slug": "wgk-condotel",
+            "name": "WGK Condotel",
+            "latitude": 7.06193,
+            "longitude": 125.6086,
+            "precision": "complex",
+            "source": "https://mapcarta.com/W1063550155",
+            "note": "Centro Spatial complex centre; individual unit/building entrances are not verified."
+        },
+        {
+            "slug": "jazzhy-condo-unit-rental",
+            "name": "Jazzhy Condo Unit Rental",
+            "latitude": 7.06908,
+            "longitude": 125.59276,
+            "precision": "complex",
+            "source": "https://mapcarta.com/W302412928",
+            "note": "8 Spatial complex centre; individual unit/building entrances are not verified."
+        },
+        {
+            "slug": "rk-condo-unit-rental",
+            "name": "RK Condo Unit Rental",
+            "latitude": 7.06908,
+            "longitude": 125.59276,
+            "precision": "complex",
+            "source": "https://mapcarta.com/W302412928",
+            "note": "8 Spatial complex centre; individual unit/building entrances are not verified."
+        },
+        {
+            "slug": "rl-condo-unit-rental",
+            "name": "RL Condo Unit Rental",
+            "latitude": 7.06908,
+            "longitude": 125.59276,
+            "precision": "complex",
+            "source": "https://mapcarta.com/W302412928",
+            "note": "8 Spatial complex centre; individual unit/building entrances are not verified."
+        },
+        {
+            "slug": "russ-condo-unit-rental",
+            "name": "Russ Condo Unit Rental",
+            "latitude": 7.06908,
+            "longitude": 125.59276,
+            "precision": "complex",
+            "source": "https://mapcarta.com/W302412928",
+            "note": "8 Spatial complex centre; individual unit/building entrances are not verified."
+        },
+        {
+            "slug": "lanante-condo-unit-rental",
+            "name": "Lanante Condo Unit Rental",
+            "latitude": 7.06908,
+            "longitude": 125.59276,
+            "precision": "complex",
+            "source": "https://mapcarta.com/W302412928",
+            "note": "8 Spatial complex centre; individual unit/building entrances are not verified."
+        },
+        {
+            "slug": "notre-maison-property-leasing",
+            "name": "Notre Maison Property Leasing",
+            "latitude": 7.04689,
+            "longitude": 125.58929,
+            "precision": "complex",
+            "source": "https://mapcarta.com/W28996082",
+            "note": "One Oasis Davao complex centre; individual unit/building entrances are not verified."
+        },
+        {
+            "slug": "reeka-hometel",
+            "name": "Reeka-Hometel",
+            "latitude": 7.04689,
+            "longitude": 125.58929,
+            "precision": "complex",
+            "source": "https://mapcarta.com/W28996082",
+            "note": "One Oasis Davao complex centre; individual unit/building entrances are not verified."
+        },
+        {
+            "slug": "reeka-hometel-2",
+            "name": "Reeka-Hometel",
+            "latitude": 7.04689,
+            "longitude": 125.58929,
+            "precision": "complex",
+            "source": "https://mapcarta.com/W28996082",
+            "note": "One Oasis Davao complex centre; individual unit/building entrances are not verified."
+        },
+        {
+            "slug": "wl-condominium-unit-rental",
+            "name": "WL Condominium Unit Rental",
+            "latitude": 7.05081,
+            "longitude": 125.59779,
+            "precision": "complex",
+            "source": "https://mapcarta.com/W290097713",
+            "note": "Verdon Parc complex centre; individual unit/building entrances are not verified."
+        }
+    ]
+}

@@ -40,7 +40,7 @@
      all. --}}
 {{-- The picture and the card beneath it are one screen: on a tall display the next section must not peek in under the cue. --}}
 <main id="main-content" tabindex="-1">
-<div class="hero-screen">
+<div class="hero-screen{{ $deals->isEmpty() ? ' hero-screen--no-offers' : '' }}">
 <section class="poster-hero{{ $heroPhoto ? ' has-photo' : ($heroVideo ? ' has-footage' : '') }}"
     @if ($heroPhoto)
         style="background-image: linear-gradient(180deg, rgba(8, 32, 25, .28), rgba(8, 32, 25, .40)), url('{{ $heroPhoto }}');"
@@ -303,7 +303,7 @@
         $stayGuests = ['adults' => 'Adults', 'children' => 'Children', 'seniors' => 'Senior citizens', 'pwd' => 'PWD'];
         $today = now('Asia/Manila')->toDateString();
     @endphp
-    <form class="hero-search" id="search" action="{{ route('search') }}" method="GET" data-hero-search>
+    <form class="hero-search hero-search--compact" id="search" action="{{ route('search') }}" method="GET" data-hero-search>
         <div class="hero-search__bar">
             <fieldset class="hero-search__tabs">
                 <legend class="sr-only">I want to&hellip;</legend>
@@ -323,13 +323,19 @@
         </div>
 
         <div class="hero-search__body">
+            <fieldset class="hero-stay-modes" data-for="stay_mode" hidden>
+                <legend class="sr-only">Kind of stay</legend>
+                <label><input type="radio" name="stay_mode" value="overnight" checked disabled><span>Overnight Stays</span></label>
+                <label><input type="radio" name="stay_mode" value="day_use" disabled><span>Day Use Stays</span></label>
+            </fieldset>
+            <p class="hero-stay-note" data-stay-day-note hidden>Visit for the day, with arrival and departure on the same date.</p>
             <div class="hero-search__grid" data-search-filters>
                 {{-- Budget: one dropdown per tab, because what a budget means (and offers) differs by catalogue. --}}
                 @foreach ($budgetOptions as $purpose => $options)
                     <div class="hero-search__box" data-for="budget" data-budget-box="{{ $purpose }}" @if ($purpose !== 'destinations') hidden @endif>
                         <x-icon name="tag" />
                         <label for="search-budget-{{ $purpose }}">Budget &middot; {{ $budgetBasis[$purpose] }}</label>
-                        <select id="search-budget-{{ $purpose }}" name="budget" data-budget-select data-empty-select @if ($purpose !== 'destinations') disabled @endif>
+                        <select id="search-budget-{{ $purpose }}" name="budget" data-budget-select data-empty-select @if ($purpose === 'accommodations') data-day-use-options="{{ json_encode(\App\Support\BudgetRanges::options('accommodations_day_use')) }}" @endif @if ($purpose !== 'destinations') disabled @endif>
                             @foreach ($options as $key => $label)
                                 <option value="{{ $key }}">{{ $label }}</option>
                             @endforeach
@@ -402,24 +408,15 @@
                     </select>
                 </div>
 
-                <div class="hero-search__box" data-for="stay_mode" hidden>
-                    <x-icon name="building" />
-                    <label for="search-stay-mode">Kind of stay</label>
-                    <select id="search-stay-mode" name="stay_mode" data-empty-select disabled>
-                        <option value="">Any</option>
-                        @foreach ($stayModes as $key => $label)
-                            <option value="{{ $key }}">{{ $label }}</option>
-                        @endforeach
-                    </select>
-                </div>
                 <div class="hero-search__box" data-for="from" hidden>
                     <x-icon name="calendar" />
-                    <label for="search-from">From (check-in)</label>
+                    <label for="search-from" data-stay-from-label>From · check-in</label>
                     <input type="date" id="search-from" name="from" min="{{ $today }}" disabled data-date-from>
+                    <span class="hero-stay-same-day" data-stay-same-day hidden>Same-day checkout</span>
                 </div>
                 <div class="hero-search__box" data-for="to" hidden>
                     <x-icon name="calendar" />
-                    <label for="search-to">To (check-out)</label>
+                    <label for="search-to">To · check-out</label>
                     <input type="date" id="search-to" name="to" min="{{ $today }}" disabled data-date-to>
                 </div>
 
@@ -447,7 +444,7 @@
 
                 <div class="hero-search__box hero-search__box--guest-picker" data-for="guests" hidden>
                     <details class="hero-guests" data-guest-picker>
-                        <summary><x-icon name="users" /><span><span class="hero-guests__label">Guests &middot; optional</span><span data-guest-total aria-live="polite">Any group size</span></span><x-icon name="chevron-down" /></summary>
+                        <summary><x-icon name="users" /><span><span class="hero-guests__label">Group size</span><span data-guest-total aria-live="polite">Any group size</span></span><x-icon name="chevron-down" /></summary>
                         <fieldset class="hero-guests__panel">
                             <legend class="hero-guests__title">Guests &middot; optional</legend>
                     @foreach ($stayGuests as $key => $label)
@@ -468,10 +465,9 @@
             <div class="hero-search__foot">
                 <p class="hero-search__hint" data-search-hint aria-live="polite"></p>
                 <button type="button" class="hero-search__reset" data-search-reset>Reset</button>
+                <button type="submit" class="btn btn-accent hero-search__go"><x-icon name="search" /><span data-search-submit-label>Search destinations</span></button>
             </div>
         </div>
-
-        <button type="submit" class="btn btn-accent hero-search__go"><x-icon name="search" /><span data-search-submit-label>Search destinations</span></button>
     </form>
     <dialog class="search-loading" data-search-loading aria-labelledby="searchLoadingTitle" aria-describedby="searchLoadingCopy">
         <div class="search-loading__content" role="status" aria-live="polite">

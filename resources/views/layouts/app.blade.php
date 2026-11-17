@@ -24,6 +24,8 @@
     @include('partials.login-modal')
 
     <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
-    @include('partials.flash-toast')
+    @unless (request()->routeIs('exit-survey.recap'))
+        @include('partials.flash-toast')
+    @endunless
 </body>
 </html>
