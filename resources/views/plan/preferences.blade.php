@@ -174,7 +174,7 @@
                         @endphp
                         <div class="plan-section pc-block pc-trip-start">
                             @if ($pickupV2)
-                                <header class="pc-block__head"><h3>Pick-up location</h3><p>Your hotel, arrival point or address in Davao Region.</p></header>
+                                <header class="pc-block__head"><h3>Where will your trip start in Davao Region?</h3><p>Pick-up location: your hotel, arrival point or address in Davao Region.</p></header>
                                 <p class="plan-davo-tip"><x-icon name="map-pin" /> Choose where you will meet your rental provider or tour operator. Confirm collection and availability directly with them; this itinerary does not book transport.</p>
                             @else
                                 <header class="pc-block__head"><h3>Where will you start each day?</h3><p>Optional. We order your stops from the nearest to the furthest.</p></header>
@@ -221,6 +221,10 @@
                                      a lookup finding the place by name (the geocoder does not know all of them). The
                                      coordinates are what it returned for each place, rounded to the same 3 places the
                                      server stores (plan-origin.js). --}}
+                                @if ($pickupV2)
+                                    {{-- Shown by plan-origin-select.js to visitors travelling from outside Davao Region while no pick-up is chosen. It only offers the airport; the visitor still taps it. --}}
+                                    <p class="pc-hint pc-suggest-airport" data-suggest-airport hidden>Travelling from outside Davao Region? Most visitors arrive at Davao International Airport. <button type="button" class="pc-suggest-airport__use" data-suggest-airport-use>Start from the airport</button></p>
+                                @endif
                                 <div class="pc-arrivals" data-arrival-points hidden>
                                     <span class="pc-label" id="arrivalPointsLabel">Quick pick</span>
                                     <div class="pc-quick" role="group" aria-labelledby="arrivalPointsLabel">

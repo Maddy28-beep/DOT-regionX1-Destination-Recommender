@@ -25,7 +25,23 @@
 
     // Home origin never determines the device's current location or changes a chosen pick-up.
 
+    // Visitors travelling from outside Davao Region are offered the airport as a one-tap pick-up. It is never filled in for them.
+    const originField = country.closest('[data-origin-field]');
+    const regionProvinces = (() => { try { return JSON.parse(originField?.dataset.regionXiProvinces || '[]'); } catch (e) { return []; } })();
+    const suggestion = document.querySelector('[data-suggest-airport]');
+    const pickup = document.getElementById('origin_label');
+    const airport = document.querySelector('[data-start-pick="Davao International Airport"]');
+    const suggest = () => {
+        if (!suggestion) return;
+        const value = country.value;
+        const outside = value !== '' && value !== 'NONE' && (value !== 'PH' || (province && province.value !== '' && !regionProvinces.includes(province.value)));
+        suggestion.hidden = !(outside && airport && pickup && pickup.value.trim() === '');
+    };
+    suggestion?.querySelector('[data-suggest-airport-use]')?.addEventListener('click', () => { airport?.click(); suggest(); });
+    pickup?.addEventListener('input', suggest);
+
     const sync = () => {
+        suggest();
         const value = country.value;
         const isPh = value === 'PH';
         const answered = value !== '';

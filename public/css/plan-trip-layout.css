@@ -510,3 +510,8 @@
 .pc-origin-privacy summary { width: fit-content; padding: 6px 0; color: var(--primary-dark); cursor: pointer; font-weight: 600; }
 .pc-origin-privacy summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: 4px; }
 .pc-origin-privacy details p { margin: 4px 0 0; line-height: 1.55; }
+
+/* One-tap airport offer for visitors travelling from outside Davao Region. */
+.pc-suggest-airport { margin: 6px 0 8px; }
+.pc-suggest-airport__use { margin-left: 4px; padding: 4px 0; border: 0; background: none; color: var(--primary-dark); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.pc-suggest-airport__use:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: 4px; }
