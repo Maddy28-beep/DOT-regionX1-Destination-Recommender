@@ -31,7 +31,7 @@
     const headings = ['Tell us about your trip.', 'What would you love to do?', 'Where will you rest, and what’s your budget?', 'How will you get around?'];
     const descriptions = [
         tripWindow
-            ? 'The basics — where you’re coming from, when your trip starts and ends, where we pick you up, and who’s coming.'
+            ? 'The basics — when your trip starts and ends, where we pick you up, and who’s coming.'
             : 'The basics — when you’re coming and who’s coming with you.',
         'Choose the interests you’d like your trip to include.',
         'Two quick choices. A budget and a place to stay are already picked, so you can go straight on.',

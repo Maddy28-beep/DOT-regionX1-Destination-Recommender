@@ -538,3 +538,11 @@
 .plan-origin-gating #planWizard[data-origin-pending] .plan-side { display: none; }
 .plan-origin-gating #planWizard[data-origin-pending] .plan-frame { display: block; max-width: 760px; margin-inline: auto; }
 .plan-origin-gating #planWizard[data-origin-pending] .section-tight { padding-top: 36px; padding-bottom: 48px; }
+
+/* An answered origin question becomes one line: "Travelling from ...  Change". */
+.plan-wizard #plan-step-0 [data-origin-field].is-origin-confirmed > :not(.pc-origin-summary) { display: none !important; }
+.pc-origin-summary { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 12px; background: #f4f9f5; color: var(--ink); font-size: .92rem; }
+.pc-origin-summary strong { color: var(--primary-dark); }
+.pc-origin-summary[hidden] { display: none; }
+.pc-origin-summary button { padding: 6px 0; border: 0; background: none; color: var(--primary-dark); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.pc-origin-summary button:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: 4px; }

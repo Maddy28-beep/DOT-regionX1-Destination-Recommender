@@ -58,8 +58,38 @@
         }).finally(() => { pending = null; button.disabled = false; });
         return pending;
     };
+    // Once the origin is answered the question steps aside: one line says what was chosen, with a way to change it. The fields
+    // stay in the form (hidden), so the answer is still sent with the trip.
+    const field = button.closest('[data-origin-field]');
+    let summary = null;
+    const choiceText = () => {
+        const country = fields[0];
+        const name = country ? (country.options[country.selectedIndex]?.textContent || '').trim() : '';
+        return [name, fields[1]?.value, fields[2]?.value].map(part => (part || '').trim()).filter(Boolean).join(' · ');
+    };
+    const showSummary = () => {
+        if (!field) return;
+        if (!summary) {
+            summary = document.createElement('p');
+            summary.className = 'pc-origin-summary';
+            summary.innerHTML = '<span>Travelling from <strong data-origin-summary-text></strong></span> <button type="button" data-origin-change>Change</button>';
+            field.prepend(summary);
+            summary.querySelector('[data-origin-change]').addEventListener('click', () => {
+                field.classList.remove('is-origin-confirmed');
+                summary.hidden = true;
+                field.querySelector('[data-origin-pick]')?.focus();
+            });
+        }
+        summary.querySelector('[data-origin-summary-text]').textContent = choiceText();
+        summary.hidden = false;
+        field.classList.add('is-origin-confirmed');
+    };
+    const hideSummary = () => { if (summary) summary.hidden = true; field?.classList.remove('is-origin-confirmed'); };
+    document.addEventListener('visitor-origin-confirmed', showSummary);
+    document.addEventListener('visitor-origin-invalidated', hideSummary);
     button.addEventListener('click', async () => {
         if (await window.confirmVisitorOrigin()) {
+            showSummary();
             const start = document.getElementById('start_at');
             if (start && !start.closest('[hidden]')) start.focus();
         }
