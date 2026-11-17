@@ -55,6 +55,8 @@ class PostcardCarouselTest extends TestCase
         $this->slide(['title' => 'Test Beach', 'kicker' => 'sun and sea', 'cta_label' => 'Explore →', 'cta_url' => '/destinations']);
 
         $html = $this->get('/')->assertOk()
+            ->assertSee('aria-label="Explore Davao by interest"', false)
+            ->assertSee('home-mobile-only', false)
             ->assertSee('What Davao is known for')
             ->assertSee('Pick a mood and we', false)
             ->assertSee('sun and sea')
@@ -93,7 +95,7 @@ class PostcardCarouselTest extends TestCase
         $this->assertNull($away->listingCount(), 'An outside link has no count.');
 
         $html = $this->get('/')->getContent();
-        $this->assertStringContainsString('[<span data-count-up>3</span>] places', $html);
+        $this->assertStringContainsString('<span data-count-up>3</span> places', $html);
         $this->assertSame(1, substr_count($html, 'class="mood__count"'), 'Only the card that leads to a catalogue shows a count.');
         $this->get('/destinations?type=Beach+%26+Leisure')->assertSee('3 destinations found');
     }
@@ -142,7 +144,7 @@ class PostcardCarouselTest extends TestCase
     {
         PostcardSlide::query()->update(['is_active' => false]);
 
-        $this->get('/')->assertOk()->assertDontSee('What Davao is known for');
+        $this->get('/')->assertOk()->assertDontSee('id="known-for"', false);
     }
 
     public function test_admin_pages_render(): void

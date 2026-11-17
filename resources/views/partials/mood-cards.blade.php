@@ -12,17 +12,15 @@
     $postcardSlides  Collection<PostcardSlide>, already active + ordered
 --}}
 @if ($postcardSlides->isNotEmpty())
-    <section class="section landing-section landing-section--tint moods slide-compact" id="known-for" aria-labelledby="moodsTitle">
+    <section class="section landing-section landing-section--tint moods slide-compact" id="known-for" aria-label="Explore Davao by interest">
         <div class="container">
-            {{-- The same heading as every other landing section (Popular Destinations, Featured Tour Packages...). --}}
-            <div class="dpost-head">
+            <div class="dpost-head home-mobile-only">
                 <div>
                     <span class="dpost-kicker poster-kicker">a quick postcard tour</span>
                     <h2 class="poster-title" id="moodsTitle" style="color:var(--ocean-teal-dark);">What Davao is known for</h2>
                     <p>Pick a mood and we'll show you every spot that fits.</p>
                 </div>
             </div>
-
             <ul class="moods__row" role="list">
                 @foreach ($postcardSlides as $slide)
                     @php
@@ -41,7 +39,7 @@
                             </span>
 
                             @if ($count !== null)
-                                <span class="mood__count">[<span data-count-up>{{ $count }}</span>] {{ \Illuminate\Support\Str::plural('place', $count) }}</span>
+                                <span class="mood__count"><span data-count-up>{{ $count }}</span> {{ \Illuminate\Support\Str::plural('place', $count) }}</span>
                             @endif
 
                             <span class="mood__copy">
@@ -50,6 +48,12 @@
                                 <span class="mood__cta">{{ $label }} <x-icon name="arrow-right" /></span>
                             </span>
                         </a>
+                        @if ($slide->image_path === 'images/postcards/philippine-eagle-shankar.jpg')
+                            <details class="mood-photo-credit">
+                                <summary aria-label="Philippine eagle photo credit" title="Photo credit"><x-icon name="info" /></summary>
+                                <p>Photo: <a href="https://commons.wikimedia.org/wiki/File:The_Philippine_Eagle_(9105629766).jpg" target="_blank" rel="noopener">shankar s. / Wikimedia Commons</a><br><a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noopener">CC BY 2.0</a> · Display cropped.</p>
+                            </details>
+                        @endif
                     </li>
                 @endforeach
             </ul>

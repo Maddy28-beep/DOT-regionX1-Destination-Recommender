@@ -257,32 +257,35 @@
      */
     var body = form.querySelector('.hero-search__body');
     var fading = [grid, form.querySelector('.hero-search__foot')].filter(Boolean);
-    var calm = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var motionPreference = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
     var settle;
 
     function clearMotion() {
         clearTimeout(settle);
-        if (body) { body.style.height = ''; body.style.transition = ''; }
+        if (body) { body.style.height = ''; body.style.transition = ''; body.style.overflow = ''; }
         fading.forEach(function (el) { el.style.opacity = ''; el.style.transition = ''; });
     }
 
     function changeTab() {
-        if (!body || calm) { sync(); return; }
+        if (!body || motionPreference?.matches) { clearMotion(); sync(); return; }
         // The height before the swap, in layout pixels (the hero may be scaled to fit a short screen). If an earlier
         // animation is still running this is where it has got to, so a quick second click carries on smoothly.
         var from = body.offsetHeight;
         clearMotion();
         sync();
+        // Arrange the original controls before measuring the new tab's natural height.
+        form.dispatchEvent(new Event('hero-search:layout'));
         var to = body.offsetHeight;
-        if (from === to) return;
 
         body.style.height = from + 'px';
+        body.style.overflow = 'clip';
         fading.forEach(function (el) { el.style.opacity = '0'; });
         body.getBoundingClientRect(); // start the animation from these values
-        body.style.transition = 'height 280ms ease';
+        var desktop = window.matchMedia('(min-width: 1061px)').matches;
+        body.style.transition = desktop ? 'height 450ms cubic-bezier(.22, 1, .36, 1)' : 'height 280ms ease';
         body.style.height = to + 'px';
-        fading.forEach(function (el) { el.style.transition = 'opacity 240ms ease 60ms'; el.style.opacity = '1'; });
-        settle = setTimeout(clearMotion, 340);
+        fading.forEach(function (el) { el.style.transition = desktop ? 'opacity 300ms ease 60ms' : 'opacity 240ms ease 60ms'; el.style.opacity = '1'; });
+        settle = setTimeout(clearMotion, desktop ? 510 : 340);
     }
 
     radios.forEach(function (r) {

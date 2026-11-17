@@ -162,10 +162,8 @@ class HomeController extends Controller
             ->get();
 
         $sample = app(\App\Support\SampleData::class);
-        // Marketing counts describe the live catalogue, excluding demonstration records.
-        $countable = fn ($model) => $model::publiclyVisible()->get(['id', 'name', 'region_id'])
-            ->reject(fn ($listing) => $sample->isSample($listing)
-                || preg_match('/\[sample\]|^sample\b/i', $listing->name));
+        // Match the catalogues visitors can actually browse; their sample badges remain unchanged.
+        $countable = fn ($model) => $model::publiclyVisible()->get(['id', 'name', 'region_id']);
         $countedDestinations = $countable(Destination::class);
         $countedAccommodations = $countable(Accommodation::class);
         $coveredRegionIds = $countedDestinations->pluck('region_id')->merge($countedAccommodations->pluck('region_id'));
@@ -173,12 +171,18 @@ class HomeController extends Controller
             $coveredRegionIds = $coveredRegionIds->merge($countable($model)->pluck('region_id'));
         }
 
+        // Samal remains a separate search option, but belongs to Davao del Norte for coverage.
+        $coverageAreas = ['Davao City', 'Davao del Norte', 'Davao del Sur', 'Davao de Oro', 'Davao Oriental', 'Davao Occidental'];
+        $coveredAreas = Region::whereIn('id', $coveredRegionIds->filter()->unique())->pluck('name')
+            ->map(fn ($name) => $name === 'Island Garden City of Samal' ? 'Davao del Norte' : $name)
+            ->filter(fn ($name) => in_array($name, $coverageAreas, true))->unique();
+        $isSample = fn ($listing) => $sample->isSample($listing) || preg_match('/\[sample\]|^sample\b/i', $listing->name);
         $stats = [
             'destinations' => $countedDestinations->count(),
-            'destinations_sample' => 0,
-            'regions' => Region::whereIn('id', $coveredRegionIds->filter()->unique())->count(),
+            'destinations_sample' => $countedDestinations->filter($isSample)->count(),
+            'regions' => $coveredAreas->count(),
             'accommodations' => $countedAccommodations->count(),
-            'accommodations_sample' => 0,
+            'accommodations_sample' => $countedAccommodations->filter($isSample)->count(),
             /*
              * Averaged over destinations that actually carry reviews. Most of
              * the accreditation import landed with rating 0 and no reviews, so

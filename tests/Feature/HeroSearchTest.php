@@ -400,8 +400,8 @@ class HeroSearchTest extends TestCase
 
         // The card keeps its own height per tab (like before); the change is animated.
         $this->assertStringContainsString('function changeTab()', $js);
-        $this->assertStringContainsString("body.style.transition = 'height 280ms ease'", $js);
-        $this->assertStringContainsString("el.style.transition = 'opacity 240ms ease 60ms'", $js);
+        $this->assertStringContainsString("'height 450ms cubic-bezier(.22, 1, .36, 1)' : 'height 280ms ease'", $js);
+        $this->assertStringContainsString("'opacity 300ms ease 60ms' : 'opacity 240ms ease 60ms'", $js);
         // In layout pixels, because the hero is scaled to fit short screens.
         $this->assertStringContainsString('body.offsetHeight', $js);
         // A visitor who asks for less motion gets the plain swap, and nothing is left behind afterwards.
