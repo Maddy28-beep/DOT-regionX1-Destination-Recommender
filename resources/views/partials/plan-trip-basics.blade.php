@@ -240,7 +240,13 @@
 
             <select id="visitor_origin_province" name="visitor_origin_province" aria-label="Province" data-origin-province @if ($countryChosen === 'PH') required @endif @if ($countryChosen !== 'PH') hidden @endif>
                 <option value="">Choose your province</option>
-                @foreach (\App\Support\Geo\PhProvinces::BY_REGION as $regionName => $provinceList)
+                {{-- Davao Region first: most visitors from the Philippines are travelling from or near it. --}}
+                @php
+                    $phRegions = \App\Support\Geo\PhProvinces::BY_REGION;
+                    $phHome = 'Region XI (Davao Region)';
+                    if (isset($phRegions[$phHome])) { $phRegions = [$phHome => $phRegions[$phHome]] + $phRegions; }
+                @endphp
+                @foreach ($phRegions as $regionName => $provinceList)
                     <optgroup label="{{ $regionName }}">
                         @foreach ($provinceList as $provinceName)
                             <option value="{{ $provinceName }}" @selected($provinceChosen === $provinceName)>{{ $provinceName }}</option>
@@ -253,6 +259,7 @@
             <input type="text" id="visitor_origin_city" name="visitor_origin_city" value="{{ $cityTyped }}" maxlength="100" autocomplete="off"
                    aria-label="City or municipality" placeholder="City or municipality (type it)" data-origin-city
                    @if ($countryChosen === '' || $countryChosen === null) hidden @endif>
+            <p class="pc-hint pc-origin-guess" data-origin-guess hidden role="status"></p>
             <p class="pc-hint" data-origin-hint>Choose a country; for the Philippines, choose your province too. A city or municipality is optional. We never ask for your home address.</p>
             <div class="pc-hint pc-origin-privacy" data-origin-privacy>
                 <p>Used only for anonymous tourism statistics, never your name or address.</p>

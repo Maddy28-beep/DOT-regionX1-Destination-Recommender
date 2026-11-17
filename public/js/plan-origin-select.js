@@ -74,5 +74,45 @@
     if (province && province.parentElement && 'MutationObserver' in window) {
         new MutationObserver(sync).observe(province.closest('.site-dropdown')?.parentElement || province.parentElement, { childList: true });
     }
+    // ---- a first guess, so most visitors only press Continue
+    // Nothing is asked of the browser: the time zone and the language it already sends are read, and only when the box is
+    // still empty. The guess is shown and can be changed; nothing is recorded until the visitor confirms.
+    const ZONES = {
+        'Asia/Manila': 'PH', 'Asia/Tokyo': 'JP', 'Asia/Seoul': 'KR', 'Asia/Singapore': 'SG', 'Asia/Hong_Kong': 'HK', 'Asia/Macau': 'MO',
+        'Asia/Shanghai': 'CN', 'Asia/Taipei': 'TW', 'Asia/Kuala_Lumpur': 'MY', 'Asia/Bangkok': 'TH', 'Asia/Jakarta': 'ID',
+        'Asia/Ho_Chi_Minh': 'VN', 'Asia/Saigon': 'VN', 'Asia/Kolkata': 'IN', 'Asia/Calcutta': 'IN', 'Asia/Dubai': 'AE', 'Asia/Riyadh': 'SA',
+        'Asia/Qatar': 'QA', 'Asia/Kuwait': 'KW', 'Asia/Phnom_Penh': 'KH', 'Asia/Vientiane': 'LA', 'Asia/Yangon': 'MM', 'Asia/Dhaka': 'BD',
+        'Australia/Sydney': 'AU', 'Australia/Melbourne': 'AU', 'Australia/Brisbane': 'AU', 'Australia/Perth': 'AU', 'Australia/Adelaide': 'AU',
+        'Pacific/Auckland': 'NZ', 'Europe/London': 'GB', 'Europe/Dublin': 'IE', 'Europe/Paris': 'FR', 'Europe/Berlin': 'DE', 'Europe/Madrid': 'ES',
+        'Europe/Rome': 'IT', 'Europe/Amsterdam': 'NL', 'Europe/Zurich': 'CH', 'Europe/Stockholm': 'SE', 'Europe/Moscow': 'RU',
+        'America/New_York': 'US', 'America/Chicago': 'US', 'America/Denver': 'US', 'America/Los_Angeles': 'US', 'America/Phoenix': 'US',
+        'America/Toronto': 'CA', 'America/Vancouver': 'CA', 'Pacific/Honolulu': 'US', 'Pacific/Guam': 'GU'
+    };
+    const guessCountry = () => {
+        let zone = '';
+        try { zone = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { /* the box stays empty */ }
+        if (ZONES[zone]) return ZONES[zone];
+        const tags = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']);
+        for (const tag of tags) {
+            const region = (String(tag).split('-')[1] || '').toUpperCase();
+            if (/^[A-Z]{2}$/.test(region)) return region;
+        }
+        return '';
+    };
+    const guessNote = document.querySelector('[data-origin-guess]');
+    if (country.value === '' && !country.disabled) {
+        const code = guessCountry();
+        const option = code ? [...country.options].find(o => o.value === code) : null;
+        if (option) {
+            country.value = code;
+            country.dispatchEvent(new Event('change', { bubbles: true }));
+            if (guessNote) {
+                guessNote.textContent = `We picked ${option.textContent.trim()} from your browser settings. Change it if that is not right.`;
+                guessNote.hidden = false;
+            }
+        }
+    }
+    // Registered after the guess, so only a later choice by the visitor replaces the guess and hides its note.
+    [country, province].forEach(control => control && control.addEventListener('change', () => { if (guessNote) guessNote.hidden = true; }));
     sync();
 })();
