@@ -22,15 +22,6 @@
             @if ($activeFilters->isNotEmpty())<span class="filter-toggle__count" aria-label="{{ $activeFilters->count() }} on">{{ $activeFilters->count() }}</span>@endif
         </button>
 
-        <label class="sort-control">
-            <span>Sort by</span>
-            <select name="sort" form="{{ $formId }}" onchange="this.form.submit()">
-                @foreach ($sortOptions as $value => $label)
-                    <option value="{{ $value }}" @selected(request('sort', 'recommended') === $value)>{{ $label }}</option>
-                @endforeach
-            </select>
-        </label>
-
         @if ($viewToggle === 'destinations')
             <div class="destination-view-toggle" role="group" aria-label="Destination display" hidden>
                 <button type="button" data-destination-view="grid" aria-pressed="true"><x-icon name="grid" /> Grid</button>

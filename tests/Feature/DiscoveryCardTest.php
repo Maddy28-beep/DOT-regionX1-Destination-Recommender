@@ -81,10 +81,9 @@ class DiscoveryCardTest extends TestCase
     {
         $html = $this->get('/')->assertOk()->getContent();
 
-        $this->assertMatchesRegularExpression(
-            '/<select id="search-stay-mode" name="stay_mode"[^>]*>\s*<option value="">Any<\/option>\s*<option value="overnight">Overnight<\/option>\s*<option value="day_use">Day use<\/option>\s*<\/select>/',
-            $html
-        );
+        // The stay type is two radio buttons now, Overnight first and chosen (no "Any" option).
+        $this->assertMatchesRegularExpression('/<input type="radio" name="stay_mode" value="overnight" checked[^>]*>\s*<span>Overnight Stays<\/span>/', $html);
+        $this->assertMatchesRegularExpression('/<input type="radio" name="stay_mode" value="day_use"[^>]*>\s*<span>Day Use Stays<\/span>/', $html);
     }
 
     public function test_four_guest_counters_start_at_zero_and_cannot_go_below_it(): void
@@ -236,7 +235,7 @@ class DiscoveryCardTest extends TestCase
         $mid = $this->get('/accommodations?price_min=1500&price_max=2499.99')->assertOk()->getContent();
         $this->assertStringContainsString('Mid Hotel', $mid);
         $this->assertStringNotContainsString('Grand Hotel', $mid);
-        $this->assertStringNotContainsString('Unpriced Lodge', $mid, 'A stay with no price on file never fits a budget.');
+        // A stay with no recorded price is matched on its estimated range (StayPricing), so it is not asserted here.
 
         $min = $this->get('/accommodations?price_min=4000')->assertOk()->getContent();
         $this->assertStringContainsString('Grand Hotel', $min);
@@ -343,8 +342,8 @@ class DiscoveryCardTest extends TestCase
             $this->assertStringContainsString($chip, $html);
         }
         $this->assertMatchesRegularExpression('/<input type="hidden" name="adults" value="2"/', $html, 'The filter panel carries the guests along.');
-        // The price range is a box in the panel now (Price per night), filled with what was asked for, so it is kept the same way.
-        $this->assertMatchesRegularExpression('/<input type="number" name="price_min"[^>]*value="1500"/', $html);
+        // The panel no longer has a price box; the asked-for budget is carried along as a hidden field.
+        $this->assertMatchesRegularExpression('/<input type="hidden" name="price_min" value="1500"/', $html);
     }
 
     // ---- Dining ---------------------------------------------------------------------------------------
