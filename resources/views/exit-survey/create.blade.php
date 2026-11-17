@@ -38,7 +38,7 @@
         <div class="survey-layout">
         <aside class="survey-guide" aria-label="Davo’s survey guide">
             <video class="survey-guide__davo" data-davo-survey-video muted playsinline preload="auto" poster="{{ asset('images/davo-survey-video-poster.webp') }}?v={{ filemtime(public_path('images/davo-survey-video-poster.webp')) }}" width="568" height="746" aria-label="Davo, your animated survey guide">
-                <source src="{{ asset('video/davo-survey-guide.mp4') }}?v={{ filemtime(public_path('video/davo-survey-guide.mp4')) }}" type="video/mp4">
+                <source src="{{ asset('video/davo-survey-guide.mp4') }}?v={{ (is_file(public_path('video/davo-survey-guide.mp4')) ? filemtime(public_path('video/davo-survey-guide.mp4')) : 0) }}" type="video/mp4">
                 <img src="{{ asset('images/davo-survey-video-poster.webp') }}" alt="Davo, your survey guide" width="160" height="190">
             </video>
             <div class="survey-guide__bubble" aria-live="polite" aria-atomic="true">
