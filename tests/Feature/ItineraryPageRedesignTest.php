@@ -269,12 +269,11 @@ class ItineraryPageRedesignTest extends TestCase
         $this->page($trip, $pref)->assertOk()
             ->assertSee('How was this made?')
             ->assertSee('Open Day 1 in Google Maps')
-            ->assertSee('Recommended Destinations')
+            ->assertSee('Other places that fit you')
             ->assertSee('Your itinerary, your way')
             ->assertSee('Regenerate itinerary')
-            ->assertSee('Explore other matches')
+            ->assertSee('match-list', false)
             ->assertSee('How your plan was built')
-            ->assertSee('View technical details')
             ->assertSee('Not saved yet');
     }
 

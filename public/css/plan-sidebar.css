@@ -403,3 +403,18 @@
     .plan-wizard.has-resume .plan-resume-copy { padding: 22px; }
     .plan-wizard.has-resume .plan-resume h2 { font-size: 22px; }
 }
+
+/* "How far will you go?" (step 4): three compact cards of the same height, the range chip always on the bottom line. */
+.plan-wizard #plan-step-3 .pc-cards:not(.pc-cards--4) { gap: 10px; }
+.plan-wizard #plan-step-3 .pc-cards:not(.pc-cards--4) .pc-card { min-height: 0; padding: 10px; gap: 8px; align-items: flex-start; }
+.plan-wizard #plan-step-3 .pc-cards:not(.pc-cards--4) .pc-card__icon { flex: none; width: 32px; height: 32px; border-radius: 9px; }
+.plan-wizard #plan-step-3 .pc-cards:not(.pc-cards--4) .pc-card__icon svg { width: 17px; height: 17px; }
+.plan-wizard #plan-step-3 .pc-cards:not(.pc-cards--4) .pc-card__text { align-self: stretch; gap: 3px; }
+.plan-wizard #plan-step-3 .pc-cards:not(.pc-cards--4) .pc-card strong { font-size: .86rem; white-space: nowrap; }
+.plan-wizard #plan-step-3 .pc-cards:not(.pc-cards--4) .pc-card small { font-size: .74rem; line-height: 1.4; }
+.plan-wizard #plan-step-3 .pc-cards:not(.pc-cards--4) .pc-card__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.plan-wizard #plan-step-3 .pc-cards:not(.pc-cards--4) .pc-card em { flex: none; margin: 0; padding: 2px 7px; font-size: .68rem; line-height: 1.35; white-space: nowrap; }
+/* The chosen range shows its tick inside its pill (solid green), so there is no separate tick to collide with it. */
+.plan-wizard #plan-step-3 .pc-cards:not(.pc-cards--4) .pc-card__tick { display: none !important; }
+.plan-wizard #plan-step-3 .pc-cards:not(.pc-cards--4) .pc-card:has(input:checked) em { background: var(--primary); border-color: var(--primary); color: #fff; }
+.plan-wizard #plan-step-3 .pc-cards:not(.pc-cards--4) .pc-card:has(input:checked) em::before { content: "✓"; margin-right: 4px; font-size: .68rem; }

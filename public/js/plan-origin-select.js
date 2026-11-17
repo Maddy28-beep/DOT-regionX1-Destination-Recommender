@@ -31,11 +31,13 @@
     const suggestion = document.querySelector('[data-suggest-airport]');
     const pickup = document.getElementById('origin_label');
     const airport = document.querySelector('[data-start-pick="Davao International Airport"]');
+    const locate = document.getElementById('origin-btn');
     const suggest = () => {
-        if (!suggestion) return;
         const value = country.value;
         const outside = value !== '' && value !== 'NONE' && (value !== 'PH' || (province && province.value !== '' && !regionProvinces.includes(province.value)));
-        suggestion.hidden = !(outside && airport && pickup && pickup.value.trim() === '');
+        // This controls visibility only; origin never sets or clears the chosen starting point.
+        if (locate) locate.hidden = outside;
+        if (suggestion) suggestion.hidden = !(outside && airport && pickup && pickup.value.trim() === '');
     };
     suggestion?.querySelector('[data-suggest-airport-use]')?.addEventListener('click', () => { airport?.click(); suggest(); });
     pickup?.addEventListener('input', suggest);
@@ -99,7 +101,7 @@
             }
             country.dispatchEvent(new Event('change', { bubbles: true }));
             paint();
-            if (kind === 'OTHER') { const control = (country.closest('.site-dropdown') || country).querySelector('button, select') || country; control.focus?.(); }
+            if (kind === 'OTHER') { const control = (country.closest('.site-dropdown') || country).querySelector('button, select') || country; control.focus?.({ preventScroll: true }); }
         };
         picks.forEach(button => button.addEventListener('click', () => choose(button.dataset.originPick)));
         country.addEventListener('change', paint);

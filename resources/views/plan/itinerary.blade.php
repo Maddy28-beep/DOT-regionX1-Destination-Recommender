@@ -384,36 +384,36 @@
             <section class="itinerary-refine" aria-label="Adjust your itinerary">
                 <div class="itinerary-refine-copy">
                     <h2>Your itinerary, your way</h2>
-                    <p class="itinerary-refine-note" id="regenerate-note">Regenerate creates a new itinerary variation using the same preferences. Your existing preferences remain unchanged.</p>
+                    <p class="itinerary-refine-note" id="regenerate-note">Get a new mix of places with the same preferences.</p>
                     {{-- Honest about the one thing Regenerate can do beyond that: see the location script at the bottom of this page. --}}
-                    <p class="itinerary-refine-note itinerary-refine-note--location">If your browser asks to share your location and you allow it, the plan is rebuilt from where you are now.</p>
+                    <p class="itinerary-refine-note itinerary-refine-note--location"><x-icon name="locate" aria-hidden="true" /> If you share your location, the new plan starts from where you are.</p>
                 </div>
                 <div class="itinerary-refine-actions">
                     <form method="POST" action="{{ route('plan.regenerate') }}" id="regenerate-form">
                         @csrf
                         <input type="hidden" name="lat" id="regenerate-lat">
                         <input type="hidden" name="lng" id="regenerate-lng">
-                        <button type="submit" class="btn btn-outline" aria-describedby="regenerate-note"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7v5h-5M20 12a8 8 0 1 0-2 5"/></svg> Regenerate itinerary</button>
+                        <button type="submit" class="btn btn-primary" aria-describedby="regenerate-note"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7v5h-5M20 12a8 8 0 1 0-2 5"/></svg> Regenerate itinerary</button>
                     </form>
                 </div>
             </section>
             <div class="panel itinerary-support-panel">
                 <div class="panel-head">
                     <div>
-                        <h2 id="itinerary-recommendations">Recommended Destinations</h2>
-                        <p>Ranked by how well each place fits your picked interests first, then by its recommendation score.</p>
+                        <h2 id="itinerary-recommendations">Other places that fit you</h2>
+                        <p>Ranked by your interests first, then by score.</p>
                     </div>
                 </div>
                 <div class="panel-body">
-                    <details class="itinerary-score-details">
-                    <summary><span class="itinerary-disclosure-icon" aria-hidden="true"><x-icon name="map-pin" /></span><span>Explore other matches <span class="itinerary-disclosure-hint">View destinations and match scores</span></span><span class="itinerary-disclosure-chevron" aria-hidden="true"></span></summary>
+                    {{-- The first three are always shown; "See all" opens the rest (the list stays one list, so it reads in order). --}}
+                    <div class="itinerary-matches">
                     <ul class="match-list">
                         @foreach ($topMatches as $match)
                             @php $tier = $match->match_score >= 3.5 ? 'strong' : 'fair'; @endphp
-                            <li class="match-row">
+                            <li class="match-row{{ $loop->index >= 3 ? ' match-row--more' : '' }}">
                                 <span class="match-rank">{{ $match->rank }}</span>
                                 <div class="match-info">
-                                    <a href="{{ route('destinations.show', $match->destination) }}">{{ $match->destination->name }}</a>
+                                    <a href="{{ route('destinations.show', $match->destination) }}">{{ \App\Support\SampleData::displayName($match->destination->name) }}</a>
                                     @if (app(\App\Support\SampleData::class)->isSample($match->destination))<x-sample-tag label="Sample data" title="Sample data, not DOT-verified: this place's accreditation number is a placeholder, not an official DOT number." />@endif
                                     <div class="match-bar-track">
                                         <div class="match-bar-fill match-bar-fill--{{ $tier }}" style="width: {{ min(100, max(0, $match->match_score / 5 * 100)) }}%;"></div>
@@ -423,7 +423,12 @@
                             </li>
                         @endforeach
                     </ul>
-                    </details>
+                    @if ($topMatches->count() > 3)
+                        <details class="itinerary-more-matches">
+                            <summary><span>See all {{ $topMatches->count() }} matches</span><span class="itinerary-disclosure-chevron" aria-hidden="true"></span></summary>
+                        </details>
+                    @endif
+                    </div>
                 </div>
             </div>
             @endunless
@@ -484,104 +489,14 @@
                 <div class="panel-head">
                     <div>
                         <h2>How your plan was built</h2>
-                        <p>We matched destinations to your preferences and arranged nearby stops together.</p>
-                        <p class="itinerary-method-note"><x-icon name="info" aria-hidden="true" /> Travel times are planning estimates{{ $preference->transport_pref ? ', worked out for '.\App\Services\Recommendation\TransportMode::label($preference->transport_pref) : '' }}. Check opening hours before visiting.</p>
-                        @if ($provenance['range_widened'])
-                            <p class="itinerary-method-note">We widened your preferred travel range to find enough stops for your trip. Some destinations may be farther away than requested.</p>
-                        @endif
+                        <ul class="itinerary-method-list">
+                            <li><x-icon name="heart" aria-hidden="true" /> <span>Matched to your interests, with nearby stops on the same day.</span></li>
+                            <li><x-icon name="clock" aria-hidden="true" /> <span>Travel times are estimates{{ $preference->transport_pref ? ' for '.\App\Services\Recommendation\TransportMode::label($preference->transport_pref) : '' }}. Check opening hours before you go.</span></li>
+                            @if ($provenance['range_widened'])
+                                <li class="is-notice"><x-icon name="info" aria-hidden="true" /> <span>We widened your travel range from {{ $rangeTierLabels[$provenance['range_requested']] ?? $provenance['range_requested'] }} to {{ $rangeTierLabels[$provenance['range_tier_used']] ?? $provenance['range_tier_used'] }} to find enough stops, so some places may be farther than you asked.</span></li>
+                            @endif
+                        </ul>
                     </div>
-                </div>
-                <div class="panel-body">
-                    <details class="itinerary-score-details itinerary-method-details">
-                    <summary><span class="itinerary-disclosure-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6"/></svg></span><span>View technical details <span class="itinerary-disclosure-hint">Recommendation methods, match scores, and data used</span></span><span class="itinerary-disclosure-chevron" aria-hidden="true"></span></summary>
-                    <ol class="provenance">
-                        <li>
-                            <span class="provenance-step">Ranking</span>
-                            <div>
-                                <strong>Content-Based Recommendation</strong> scored
-                                {{ $provenance['destinations_ranked'] }} of
-                                @if (($provenance['catalogue_sample'] ?? 0) > 0 || ($provenance['catalogue_unverified'] ?? 0) > 0)
-                                    {{ $provenance['catalogue_size'] }} destinations ({{ $provenance['catalogue_real'] }} DOT Accredited,
-                                    {{ $provenance['catalogue_sample'] }} Sample Data{{ ($provenance['catalogue_unverified'] ?? 0) > 0 ? ', '.$provenance['catalogue_unverified'].' Not Yet Verified' : '' }}) against your
-                                @else
-                                    {{ $provenance['catalogue_size'] }} accredited destinations against your
-                                @endif
-                                survey answers, combining five weighted factors into the Destination
-                                Recommendation Score shown above (Sec. 2.3.3, Equations 1&ndash;3).
-                                @if ($provenance['range_widened'])
-                                    <br><strong>Note:</strong> you asked for
-                                    &ldquo;{{ $rangeTierLabels[$provenance['range_requested']] ?? $provenance['range_requested'] }}&rdquo;,
-                                    but there weren&rsquo;t enough destinations that close to
-                                    {{ $provenance['origin'] }} to fill a {{ $itinerary->total_days }}-day
-                                    plan, so the search was automatically widened to
-                                    &ldquo;{{ $rangeTierLabels[$provenance['range_tier_used']] ?? $provenance['range_tier_used'] }}&rdquo;
-                                    range. Some stops below may be farther than you expected.
-                                @endif
-                            </div>
-                        </li>
-                        <li>
-                            <span class="provenance-step">Order</span>
-                            <div>
-                                <strong>Nearest-neighbour sequencing</strong> on Haversine distance
-                                arranged the highest-scoring stops into the shortest sensible run,
-                                starting from {{ $provenance['origin'] }}. Journey times are planning
-                                estimates, not routed directions.
-                            </div>
-                        </li>
-                        @if (data_get($itinerary->day_themes, 'ai_skeleton.applied') === true)
-                            <li>
-                                <span class="provenance-step">AI-assisted days</span>
-                                <div>
-                                    An <strong>outside AI service</strong> was asked which of the places already chosen belong together on each day, and
-                                    for a short name for each day. Its answer could only rearrange those places; it was kept because the planner's own
-                                    checks found it fit with no fewer stops and no worse a schedule. Places within a day keep the planner's route order.
-                                </div>
-                            </li>
-                        @endif
-                        @if (data_get($itinerary->day_themes, 'summary'))
-                            <li>
-                                <span class="provenance-step">Themes</span>
-                                <div>
-                                    A <strong>pretrained embedding model</strong> compared what each place is about and
-                                    @if (data_get($itinerary->day_themes, 'summary.regrouped'))
-                                        grouped alike places into the same day (average similarity within a day
-                                        {{ data_get($itinerary->day_themes, 'summary.mean_similarity_before') }}%
-                                        &rarr; {{ data_get($itinerary->day_themes, 'summary.mean_similarity_after') }}%,
-                                        travelling {{ data_get($itinerary->day_themes, 'summary.distance_before_km') }} km
-                                        &rarr; {{ data_get($itinerary->day_themes, 'summary.distance_after_km') }} km, never more than 25% extra).
-                                    @elseif (data_get($itinerary->day_themes, 'summary.guard'))
-                                        tried grouping alike places into the same day, but that would have left a stop out of the plan, so the route order was kept.
-                                    @else
-                                        found that the route order already put alike places together, so the days were left as they were.
-                                    @endif
-                                </div>
-                            </li>
-                        @endif
-                        <li>
-                            <span class="provenance-step">Companions</span>
-                            <div>
-                                <strong>Apriori association rule mining</strong> over
-                                {{ $provenance['transactions'] }} visitation
-                                transaction{{ $provenance['transactions'] === 1 ? '' : 's' }}
-                                @if ($provenance['transactions_demo'] > 0)
-                                    ({{ $provenance['transactions_demo'] }} simulated for demonstration,
-                                    {{ $provenance['transactions'] - $provenance['transactions_demo'] }} from real tourist surveys)
-                                @endif
-                                suggested
-                                where to eat, shop and stay
-                                @if ($provenance['rules_applied'] > 0)
-                                    &mdash; {{ $provenance['rules_applied'] }}
-                                    row{{ $provenance['rules_applied'] === 1 ? '' : 's' }} below carr{{ $provenance['rules_applied'] === 1 ? 'ies' : 'y' }}
-                                    the rule and its confidence (Equations 8&ndash;9).
-                                @else
-                                    &mdash; no rule cleared the support threshold for these stops, so
-                                    the suggestions below fall back to proximity and your stated
-                                    preferences.
-                                @endif
-                            </div>
-                        </li>
-                    </ol>
-                    </details>
                 </div>
             </div>
             @endif

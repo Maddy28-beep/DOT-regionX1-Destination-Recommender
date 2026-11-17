@@ -31,7 +31,7 @@
     const headings = ['Tell us about your trip.', 'What would you love to do?', 'Where will you rest, and what’s your budget?', 'How will you get around?'];
     const descriptions = [
         tripWindow
-            ? 'The basics — when your trip starts and ends, where we pick you up, and who’s coming.'
+            ? 'Who is coming, your dates, and your starting point.'
             : 'The basics — when you’re coming and who’s coming with you.',
         'Choose the interests you’d like your trip to include.',
         'Two quick choices. A budget and a place to stay are already picked, so you can go straight on.',
@@ -54,10 +54,10 @@
         return step;
     });
     // Who is coming, when, where from, where they start: the order the blocks read in.
-    // With the start and end: where from (first, in "About you"), when it starts and ends, the pick-up location, then who is coming.
+    // With the start and end: where from and first visit (in "About you"), who is coming, when it starts and ends, then the pick-up location.
     if (tripWindow) {
         steps[0].classList.add('has-trip-window');
-        steps[0].append(visit, basics, origin, style);
+        steps[0].append(visit, style, basics, origin);
     }
     else steps[0].append(style, basics, visit, origin);
     steps[1].append(interests);
@@ -95,8 +95,8 @@
         if (root.hasAttribute('data-origin-pending')) index = 0;
         const stepChanged = current !== index;
         current = index;
-        steps[0].querySelector('h2').textContent = root.hasAttribute('data-origin-pending') ? 'Let’s begin your trip plan.' : headings[0];
-        steps[0].querySelector('.plan-step-intro').textContent = root.hasAttribute('data-origin-pending') ? 'First, where are you travelling from? It takes a few seconds and helps DOT understand its visitors.' : descriptions[0];
+        steps[0].querySelector('h2').textContent = root.hasAttribute('data-origin-pending') ? 'Where are you travelling from?' : headings[0];
+        steps[0].querySelector('.plan-step-intro').textContent = root.hasAttribute('data-origin-pending') ? 'Choose one to get started.' : descriptions[0];
         steps.forEach((step, i) => { step.hidden = i !== index; });
         nav.querySelectorAll('[data-plan-step]').forEach((button, i) => {
             button.classList.toggle('is-complete', i < index);

@@ -234,7 +234,7 @@ class ContentBasedRecommendationService
     {
         return match ($tier) {
             'near' => 'about '.(int) self::RANGE_RADIUS_KM['near'].' km',
-            'moderate' => (int) min(self::COMMUTABLE_RADIUS_KM).'–'.(int) max(self::COMMUTABLE_RADIUS_KM).' km, by how you travel',
+            'moderate' => (int) min(self::COMMUTABLE_RADIUS_KM).'–'.(int) max(self::COMMUTABLE_RADIUS_KM).' km',
             default => 'no limit',
         };
     }

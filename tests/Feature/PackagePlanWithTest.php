@@ -82,7 +82,7 @@ class PackagePlanWithTest extends TestCase
             ->assertSee('Check in and orientation.')
             ->assertSee('Island Hopping')
             ->assertSee($package->name)
-            ->assertDontSee('Recommended Destinations');
+            ->assertDontSee('Other places that fit you');
     }
 
     public function test_a_package_with_no_published_days_cannot_be_adopted(): void

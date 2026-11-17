@@ -693,3 +693,36 @@
     .pairing-why__panel { position: fixed; top: auto; left: 12px; right: 12px; bottom: 12px; width: auto; max-height: 70vh; overflow-y: auto; box-shadow: 0 -4px 30px rgba(8, 77, 57, .22); }
     .pairing-why__close { width: 44px; height: 44px; margin: -8px -10px -8px 0; }
 }
+
+/* Itinerary extras (refresh): a short regenerate card, the top three matches shown with the rest behind "See all",
+   and "How your plan was built" as short lines with icons. */
+.itinerary-refine .itinerary-refine-note { max-width: 62ch; }
+.itinerary-refine .itinerary-refine-note--location { display: flex; align-items: center; gap: 6px; }
+.itinerary-refine .itinerary-refine-note--location svg { width: 15px; height: 15px; flex: none; color: var(--primary-dark); }
+.itinerary-page .itinerary-support-panel .panel-head h2 { font-size: 1.15rem; }
+.itinerary-page .itinerary-support-panel .panel-head { padding-bottom: 12px; }
+.itinerary-matches .match-list { margin: 0; padding: 4px 0 0; }
+.itinerary-matches .match-row--more { display: none; }
+.itinerary-matches:has(.itinerary-more-matches[open]) .match-row--more { display: flex; }
+.itinerary-more-matches > summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 0 16px; border-top: 1px solid var(--border); color: var(--primary-dark); font-weight: 600; font-size: .88rem; cursor: pointer; list-style: none; }
+.itinerary-more-matches > summary::-webkit-details-marker { display: none; }
+.itinerary-more-matches[open] > summary .itinerary-disclosure-chevron { transform: rotate(135deg); }
+.itinerary-more-matches > summary:focus-visible { outline: 3px solid var(--primary); outline-offset: 4px; border-radius: 4px; }
+.itinerary-support-panel .itinerary-matches .match-list { padding-bottom: 0; }
+.itinerary-method-list { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 6px; }
+.itinerary-method-list li { display: flex; align-items: flex-start; gap: 9px; font-size: .86rem; line-height: 1.45; color: #384a42; }
+.itinerary-method-list li svg { width: 17px; height: 17px; flex: none; margin-top: 1px; color: var(--primary-dark); }
+.itinerary-method-list li.is-notice { padding: 7px 9px; border-radius: 8px; background: #fff5dd; color: #6b4a0b; }
+.itinerary-method-list li.is-notice svg { color: #a06b07; }
+.itinerary-support-panel .itinerary-method-details > summary { padding: 14px 0; }
+@media (min-width: 901px) {
+    .itinerary-page .itinerary-extras > .itinerary-support-panel { display: flex; flex-direction: column; }
+    .itinerary-page .itinerary-extras > .itinerary-support-panel > .panel-body { margin-top: auto; }
+}
+.itinerary-matches .match-score { white-space: nowrap; }
+.itinerary-more-matches > summary .itinerary-disclosure-chevron { transform: rotate(135deg); }
+.itinerary-more-matches[open] > summary .itinerary-disclosure-chevron { transform: rotate(-45deg); }
+
+/* The banner title in Barabara like the planner's "How would you like to plan your trip?" (the Poppins shorthand above
+   loads after brand-accents.css and used to win). Sentence case, as on the planner. */
+.itin-banner__title { font-family: 'Barabara', 'Alfa Slab One', serif; font-weight: 400; text-transform: none; letter-spacing: .01em; color: #0a4f38; }
