@@ -74,45 +74,49 @@
     if (province && province.parentElement && 'MutationObserver' in window) {
         new MutationObserver(sync).observe(province.closest('.site-dropdown')?.parentElement || province.parentElement, { childList: true });
     }
-    // ---- a first guess, so most visitors only press Continue
-    // Nothing is asked of the browser: the time zone and the language it already sends are read, and only when the box is
-    // still empty. The guess is shown and can be changed; nothing is recorded until the visitor confirms.
-    const ZONES = {
-        'Asia/Manila': 'PH', 'Asia/Tokyo': 'JP', 'Asia/Seoul': 'KR', 'Asia/Singapore': 'SG', 'Asia/Hong_Kong': 'HK', 'Asia/Macau': 'MO',
-        'Asia/Shanghai': 'CN', 'Asia/Taipei': 'TW', 'Asia/Kuala_Lumpur': 'MY', 'Asia/Bangkok': 'TH', 'Asia/Jakarta': 'ID',
-        'Asia/Ho_Chi_Minh': 'VN', 'Asia/Saigon': 'VN', 'Asia/Kolkata': 'IN', 'Asia/Calcutta': 'IN', 'Asia/Dubai': 'AE', 'Asia/Riyadh': 'SA',
-        'Asia/Qatar': 'QA', 'Asia/Kuwait': 'KW', 'Asia/Phnom_Penh': 'KH', 'Asia/Vientiane': 'LA', 'Asia/Yangon': 'MM', 'Asia/Dhaka': 'BD',
-        'Australia/Sydney': 'AU', 'Australia/Melbourne': 'AU', 'Australia/Brisbane': 'AU', 'Australia/Perth': 'AU', 'Australia/Adelaide': 'AU',
-        'Pacific/Auckland': 'NZ', 'Europe/London': 'GB', 'Europe/Dublin': 'IE', 'Europe/Paris': 'FR', 'Europe/Berlin': 'DE', 'Europe/Madrid': 'ES',
-        'Europe/Rome': 'IT', 'Europe/Amsterdam': 'NL', 'Europe/Zurich': 'CH', 'Europe/Stockholm': 'SE', 'Europe/Moscow': 'RU',
-        'America/New_York': 'US', 'America/Chicago': 'US', 'America/Denver': 'US', 'America/Los_Angeles': 'US', 'America/Phoenix': 'US',
-        'America/Toronto': 'CA', 'America/Vancouver': 'CA', 'Pacific/Honolulu': 'US', 'Pacific/Guam': 'GU'
-    };
-    const guessCountry = () => {
-        let zone = '';
-        try { zone = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { /* the box stays empty */ }
-        if (ZONES[zone]) return ZONES[zone];
-        const tags = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']);
-        for (const tag of tags) {
-            const region = (String(tag).split('-')[1] || '').toUpperCase();
-            if (/^[A-Z]{2}$/.test(region)) return region;
-        }
-        return '';
-    };
-    const guessNote = document.querySelector('[data-origin-guess]');
-    if (country.value === '' && !country.disabled) {
-        const code = guessCountry();
-        const option = code ? [...country.options].find(o => o.value === code) : null;
-        if (option) {
-            country.value = code;
-            country.dispatchEvent(new Event('change', { bubbles: true }));
-            if (guessNote) {
-                guessNote.textContent = `We picked ${option.textContent.trim()} from your browser settings. Change it if that is not right.`;
-                guessNote.hidden = false;
+    // ---- two plain choices: Philippines, or another country (then the country list)
+    // The select stays the one real field; the choices only set it or show it. Without this script the select is the whole question.
+    const choice = document.querySelector('[data-origin-choice]');
+    if (choice) {
+        const picks = [...choice.querySelectorAll('[data-origin-pick]')];
+        let other = country.value !== '' && country.value !== 'PH';
+        const paint = () => {
+            const state = country.value === 'PH' ? 'PH' : (other ? 'OTHER' : '');
+            picks.forEach(button => button.setAttribute('aria-checked', String(button.dataset.originPick === state)));
+            // The country list is only needed for "Another country"; for Philippines the province is what is asked next.
+            // The select and the shared dropdown built around it are hidden and shown together (a hidden select hides its dropdown).
+            country.hidden = state !== 'OTHER';
+            const built = country.closest('.site-dropdown');
+            if (built) built.hidden = state !== 'OTHER';
+        };
+        const choose = kind => {
+            if (kind === 'PH') {
+                other = false;
+                country.value = 'PH';
+            } else {
+                other = true;
+                if (country.value === 'PH') country.value = '';
             }
-        }
+            country.dispatchEvent(new Event('change', { bubbles: true }));
+            paint();
+            if (kind === 'OTHER') { const control = (country.closest('.site-dropdown') || country).querySelector('button, select') || country; control.focus?.(); }
+        };
+        picks.forEach(button => button.addEventListener('click', () => choose(button.dataset.originPick)));
+        country.addEventListener('change', paint);
+        choice.hidden = false;
+        paint();
+        // The app builds the shared dropdown around the select after this file has run: paint again once it is there.
+        window.addEventListener('load', paint);
+        // Continue with neither choice made: say so, instead of the browser pointing at a field that is hidden.
+        const go = document.querySelector('[data-confirm-origin]');
+        go?.addEventListener('click', event => {
+            if (country.value !== '') return;
+            event.stopImmediatePropagation();
+            const note = document.querySelector('[data-confirm-origin-status]');
+            if (note) note.textContent = 'Choose Philippines or another country first.';
+            choice.querySelector('[data-origin-pick]')?.focus();
+        }, true);
     }
-    // Registered after the guess, so only a later choice by the visitor replaces the guess and hides its note.
-    [country, province].forEach(control => control && control.addEventListener('change', () => { if (guessNote) guessNote.hidden = true; }));
+
     sync();
 })();

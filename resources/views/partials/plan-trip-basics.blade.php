@@ -226,6 +226,11 @@
             <label for="visitor_origin_country"><span data-origin-label>Where are you travelling from?</span>
                 <span class="field-help" tabindex="0" title="Helps DOT understand where visitors are travelling from. We keep only the place names, never your position or an address." aria-label="Helps DOT understand where visitors are travelling from. We keep only the place names, never your position or an address."><x-icon name="info" /></span>
             </label>
+            {{-- Two plain choices come first (public/js/plan-origin-select.js shows them). Without the script the country list below is the whole question. --}}
+            <div class="pc-origin-choice" role="radiogroup" aria-label="Where are you travelling from?" data-origin-choice hidden>
+                <button type="button" role="radio" aria-checked="false" data-origin-pick="PH"><x-icon name="map-pin" aria-hidden="true" /> Philippines</button>
+                <button type="button" role="radio" aria-checked="false" data-origin-pick="OTHER"><x-icon name="plane" aria-hidden="true" /> Another country</button>
+            </div>
             <select id="visitor_origin_country" name="visitor_origin_country" data-origin-required required>
                 <option value="">Choose a country</option>
                 <option value="PH" @selected($countryChosen === 'PH')>Philippines</option>
@@ -259,8 +264,7 @@
             <input type="text" id="visitor_origin_city" name="visitor_origin_city" value="{{ $cityTyped }}" maxlength="100" autocomplete="off"
                    aria-label="City or municipality" placeholder="City or municipality (type it)" data-origin-city
                    @if ($countryChosen === '' || $countryChosen === null) hidden @endif>
-            <p class="pc-hint pc-origin-guess" data-origin-guess hidden role="status"></p>
-            <p class="pc-hint" data-origin-hint>Choose a country; for the Philippines, choose your province too. A city or municipality is optional. We never ask for your home address.</p>
+            <p class="pc-hint" data-origin-hint>Pick Philippines and then your province, or choose another country. A city or municipality is optional. We never ask for your home address.</p>
             <div class="pc-hint pc-origin-privacy" data-origin-privacy>
                 <p>Used only for anonymous tourism statistics, never your name or address.</p>
                 <details>
