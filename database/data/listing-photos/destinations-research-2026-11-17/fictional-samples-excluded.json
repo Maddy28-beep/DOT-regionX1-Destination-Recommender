@@ -1,0 +1,488 @@
+[
+  {
+    "id": 116,
+    "name": "Sample Gulfview Public Beach [SAMPLE]",
+    "slug": "sample-gulfview-public-beach-sample",
+    "location": "Sample site, Davao City, Davao City",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Beach & Leisure"
+  },
+  {
+    "id": 117,
+    "name": "Sample Durian Food Hall & Market [SAMPLE]",
+    "slug": "sample-durian-food-hall-market-sample",
+    "location": "Sample site, Davao City, Davao City",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Cultural Heritage"
+  },
+  {
+    "id": 118,
+    "name": "Sample Artisan Craft & Souvenir Centre [SAMPLE]",
+    "slug": "sample-artisan-craft-souvenir-centre-sample",
+    "location": "Sample site, Davao City, Davao City",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Cultural Heritage"
+  },
+  {
+    "id": 119,
+    "name": "Sample Riverside Heritage Museum [SAMPLE]",
+    "slug": "sample-riverside-heritage-museum-sample",
+    "location": "Sample site, Davao City, Davao City",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Cultural Heritage"
+  },
+  {
+    "id": 120,
+    "name": "Sample Upland Botanical Park [SAMPLE]",
+    "slug": "sample-upland-botanical-park-sample",
+    "location": "Sample site, Davao City, Davao City",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Leisure"
+  },
+  {
+    "id": 121,
+    "name": "Sample Hillcrest Wellness Garden [SAMPLE]",
+    "slug": "sample-hillcrest-wellness-garden-sample",
+    "location": "Sample site, Davao City, Davao City",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Wellness & Spa"
+  },
+  {
+    "id": 122,
+    "name": "Sample South Coast White Beach [SAMPLE]",
+    "slug": "sample-south-coast-white-beach-sample",
+    "location": "Sample site, Samal, Davao del Norte",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Beach & Leisure"
+  },
+  {
+    "id": 123,
+    "name": "Sample Coral Garden Snorkel Park [SAMPLE]",
+    "slug": "sample-coral-garden-snorkel-park-sample",
+    "location": "Sample site, Samal, Davao del Norte",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Beach & Leisure"
+  },
+  {
+    "id": 124,
+    "name": "Sample Island Mangrove Boardwalk [SAMPLE]",
+    "slug": "sample-island-mangrove-boardwalk-sample",
+    "location": "Sample site, Samal, Davao del Norte",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Leisure"
+  },
+  {
+    "id": 125,
+    "name": "Sample Island Pearl Farm Tour [SAMPLE]",
+    "slug": "sample-island-pearl-farm-tour-sample",
+    "location": "Sample site, Samal, Davao del Norte",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Farm Tourism"
+  },
+  {
+    "id": 126,
+    "name": "Sample Island Ridge Viewpoint Trail [SAMPLE]",
+    "slug": "sample-island-ridge-viewpoint-trail-sample",
+    "location": "Sample site, Samal, Davao del Norte",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Adventure & Hiking"
+  },
+  {
+    "id": 127,
+    "name": "Sample North Coast Heritage Park [SAMPLE]",
+    "slug": "sample-north-coast-heritage-park-sample",
+    "location": "Sample site, Samal, Davao del Norte",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Cultural Heritage"
+  },
+  {
+    "id": 128,
+    "name": "Sample East Reef Marine Learning Park [SAMPLE]",
+    "slug": "sample-east-reef-marine-learning-park-sample",
+    "location": "Sample site, Samal, Davao del Norte",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Wildlife"
+  },
+  {
+    "id": 129,
+    "name": "Sample Island Highland Garden [SAMPLE]",
+    "slug": "sample-island-highland-garden-sample",
+    "location": "Sample site, Samal, Davao del Norte",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Leisure"
+  },
+  {
+    "id": 130,
+    "name": "Sample Northern Coastal Beach Park [SAMPLE]",
+    "slug": "sample-northern-coastal-beach-park-sample",
+    "location": "Sample site, Carmen, Davao del Norte",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Beach & Leisure"
+  },
+  {
+    "id": 131,
+    "name": "Sample Banana & Cacao Farm Experience [SAMPLE]",
+    "slug": "sample-banana-cacao-farm-experience-sample",
+    "location": "Sample site, Panabo City, Davao del Norte",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Farm Tourism"
+  },
+  {
+    "id": 132,
+    "name": "Sample Wetland Bird Sanctuary [SAMPLE]",
+    "slug": "sample-wetland-bird-sanctuary-sample",
+    "location": "Sample site, Carmen, Davao del Norte",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Wildlife"
+  },
+  {
+    "id": 133,
+    "name": "Sample City Heritage Plaza & Museum [SAMPLE]",
+    "slug": "sample-city-heritage-plaza-museum-sample",
+    "location": "Sample site, Tagum City, Davao del Norte",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Cultural Heritage"
+  },
+  {
+    "id": 134,
+    "name": "Sample Southern River Nature Trail [SAMPLE]",
+    "slug": "sample-southern-river-nature-trail-sample",
+    "location": "Sample site, Panabo City, Davao del Norte",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Adventure"
+  },
+  {
+    "id": 135,
+    "name": "Sample Upland Nature Park [SAMPLE]",
+    "slug": "sample-upland-nature-park-sample",
+    "location": "Sample site, Kapalong, Davao del Norte",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Adventure"
+  },
+  {
+    "id": 136,
+    "name": "Sample Inland Agri Park [SAMPLE]",
+    "slug": "sample-inland-agri-park-sample",
+    "location": "Sample site, Santo Tomas, Davao del Norte",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Farm Tourism"
+  },
+  {
+    "id": 137,
+    "name": "Sample Highland Hot Spring Garden [SAMPLE]",
+    "slug": "sample-highland-hot-spring-garden-sample",
+    "location": "Sample site, New Corella, Davao del Norte",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Leisure"
+  },
+  {
+    "id": 138,
+    "name": "Sample Valley Hot Spring Pools [SAMPLE]",
+    "slug": "sample-valley-hot-spring-pools-sample",
+    "location": "Sample site, Nabunturan, Davao de Oro",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Leisure"
+  },
+  {
+    "id": 139,
+    "name": "Sample Highland Wellness & Tea Garden [SAMPLE]",
+    "slug": "sample-highland-wellness-tea-garden-sample",
+    "location": "Sample site, Maragusan, Davao de Oro",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Wellness & Spa"
+  },
+  {
+    "id": 140,
+    "name": "Sample Highland Tiered Falls & Trail [SAMPLE]",
+    "slug": "sample-highland-tiered-falls-trail-sample",
+    "location": "Sample site, Maragusan, Davao de Oro",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Adventure"
+  },
+  {
+    "id": 141,
+    "name": "Sample Crater Lake Viewpoint Trek [SAMPLE]",
+    "slug": "sample-crater-lake-viewpoint-trek-sample",
+    "location": "Sample site, Maco, Davao de Oro",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Adventure & Hiking"
+  },
+  {
+    "id": 142,
+    "name": "Sample Valley Craft & Pasalubong Market [SAMPLE]",
+    "slug": "sample-valley-craft-pasalubong-market-sample",
+    "location": "Sample site, Nabunturan, Davao de Oro",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Cultural Heritage"
+  },
+  {
+    "id": 143,
+    "name": "Sample Eastern River Falls Park [SAMPLE]",
+    "slug": "sample-eastern-river-falls-park-sample",
+    "location": "Sample site, New Bataan, Davao de Oro",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Adventure"
+  },
+  {
+    "id": 144,
+    "name": "Sample Highland View Park [SAMPLE]",
+    "slug": "sample-highland-view-park-sample",
+    "location": "Sample site, Compostela, Davao de Oro",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Leisure"
+  },
+  {
+    "id": 145,
+    "name": "Sample Northern Cultural & Craft Village [SAMPLE]",
+    "slug": "sample-northern-cultural-craft-village-sample",
+    "location": "Sample site, Monkayo, Davao de Oro",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Cultural Heritage"
+  },
+  {
+    "id": 146,
+    "name": "Sample Western White Beach [SAMPLE]",
+    "slug": "sample-western-white-beach-sample",
+    "location": "Sample site, Santa Maria, Davao Occidental",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Beach & Leisure"
+  },
+  {
+    "id": 147,
+    "name": "Sample Western Marine Sanctuary [SAMPLE]",
+    "slug": "sample-western-marine-sanctuary-sample",
+    "location": "Sample site, Santa Maria, Davao Occidental",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Wildlife"
+  },
+  {
+    "id": 148,
+    "name": "Sample Coastal Mangrove & River Park [SAMPLE]",
+    "slug": "sample-coastal-mangrove-river-park-sample",
+    "location": "Sample site, Malita, Davao Occidental",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Leisure"
+  },
+  {
+    "id": 149,
+    "name": "Sample Upland Cultural Village Experience [SAMPLE]",
+    "slug": "sample-upland-cultural-village-experience-sample",
+    "location": "Sample site, Malita, Davao Occidental",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Cultural Heritage"
+  },
+  {
+    "id": 150,
+    "name": "Sample Southern Cove Viewpoint Trail [SAMPLE]",
+    "slug": "sample-southern-cove-viewpoint-trail-sample",
+    "location": "Sample site, Jose Abad Santos, Davao Occidental",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Adventure & Hiking"
+  },
+  {
+    "id": 151,
+    "name": "Sample Central Coastal Park [SAMPLE]",
+    "slug": "sample-central-coastal-park-sample",
+    "location": "Sample site, Don Marcelino, Davao Occidental",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Beach & Leisure"
+  },
+  {
+    "id": 152,
+    "name": "Sample Town Heritage & Weaving House [SAMPLE]",
+    "slug": "sample-town-heritage-weaving-house-sample",
+    "location": "Sample site, Malita, Davao Occidental",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Cultural Heritage"
+  },
+  {
+    "id": 153,
+    "name": "Sample Southern Coastal Viewpoint [SAMPLE]",
+    "slug": "sample-southern-coastal-viewpoint-sample",
+    "location": "Sample site, Sarangani, Davao Occidental",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Leisure"
+  },
+  {
+    "id": 154,
+    "name": "Sample Sunrise Surf Beach [SAMPLE]",
+    "slug": "sample-sunrise-surf-beach-sample",
+    "location": "Sample site, Mati City, Davao Oriental",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Beach & Surfing"
+  },
+  {
+    "id": 155,
+    "name": "Sample Bay Island Day Park [SAMPLE]",
+    "slug": "sample-bay-island-day-park-sample",
+    "location": "Sample site, Mati City, Davao Oriental",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Beach & Leisure"
+  },
+  {
+    "id": 156,
+    "name": "Sample Turtle & Mangrove Nursery [SAMPLE]",
+    "slug": "sample-turtle-mangrove-nursery-sample",
+    "location": "Sample site, Mati City, Davao Oriental",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Wildlife"
+  },
+  {
+    "id": 157,
+    "name": "Sample Provincial Museum Annex [SAMPLE]",
+    "slug": "sample-provincial-museum-annex-sample",
+    "location": "Sample site, Mati City, Davao Oriental",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Cultural Heritage"
+  },
+  {
+    "id": 158,
+    "name": "Sample Northern Tiered Falls Park [SAMPLE]",
+    "slug": "sample-northern-tiered-falls-park-sample",
+    "location": "Sample site, Cateel, Davao Oriental",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Adventure"
+  },
+  {
+    "id": 159,
+    "name": "Sample Eastern Ridge Walk [SAMPLE]",
+    "slug": "sample-eastern-ridge-walk-sample",
+    "location": "Sample site, Mati City, Davao Oriental",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Adventure & Hiking"
+  },
+  {
+    "id": 160,
+    "name": "Sample Northern Heritage & River Park [SAMPLE]",
+    "slug": "sample-northern-heritage-river-park-sample",
+    "location": "Sample site, Baganga, Davao Oriental",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Cultural Heritage"
+  },
+  {
+    "id": 161,
+    "name": "Sample Southern Headland Viewpoint [SAMPLE]",
+    "slug": "sample-southern-headland-viewpoint-sample",
+    "location": "Sample site, Governor Generoso, Davao Oriental",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Leisure"
+  },
+  {
+    "id": 162,
+    "name": "Sample Highland Flower Park [SAMPLE]",
+    "slug": "sample-highland-flower-park-sample",
+    "location": "Sample site, Digos City, Davao del Sur",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Leisure"
+  },
+  {
+    "id": 163,
+    "name": "Sample Foothills Forest Trail [SAMPLE]",
+    "slug": "sample-foothills-forest-trail-sample",
+    "location": "Sample site, Digos City, Davao del Sur",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Adventure & Hiking"
+  },
+  {
+    "id": 164,
+    "name": "Sample Weaving & Culture House [SAMPLE]",
+    "slug": "sample-weaving-culture-house-sample",
+    "location": "Sample site, Santa Cruz, Davao del Sur",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Cultural Heritage"
+  },
+  {
+    "id": 165,
+    "name": "Sample Coastal Fish Market & Food Row [SAMPLE]",
+    "slug": "sample-coastal-fish-market-food-row-sample",
+    "location": "Sample site, Digos City, Davao del Sur",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Cultural Heritage"
+  },
+  {
+    "id": 166,
+    "name": "Sample Coastal Mangrove Boardwalk [SAMPLE]",
+    "slug": "sample-coastal-mangrove-boardwalk-sample",
+    "location": "Sample site, Santa Cruz, Davao del Sur",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Leisure"
+  },
+  {
+    "id": 167,
+    "name": "Sample Inland Farm & Food Park [SAMPLE]",
+    "slug": "sample-inland-farm-food-park-sample",
+    "location": "Sample site, Bansalan, Davao del Sur",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Farm Tourism"
+  },
+  {
+    "id": 168,
+    "name": "Sample Cave & River Park [SAMPLE]",
+    "slug": "sample-cave-river-park-sample",
+    "location": "Sample site, Matanao, Davao del Sur",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Nature & Adventure"
+  },
+  {
+    "id": 169,
+    "name": "Sample Southern Coastal Eco Park [SAMPLE]",
+    "slug": "sample-southern-coastal-eco-park-sample",
+    "location": "Sample site, Sulop, Davao del Sur",
+    "website_url": null,
+    "facebook_url": null,
+    "type": "Beach & Leisure"
+  }
+]

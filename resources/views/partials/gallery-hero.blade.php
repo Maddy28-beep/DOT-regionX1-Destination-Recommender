@@ -43,6 +43,7 @@
                 @foreach ($photos as $i => $photo)
                     <a href="#" class="carousel-slide" data-open="{{ $i }}">
                         <img src="{{ $photo->url() }}" alt="{{ $altFor($photo) }}">
+                        @include('partials.photo-scope-label', ['photo' => $photo])
                         @if ($onlyIllustrations && $i === 0)
                             <span class="photo-illustration-tag">Illustration, not a photo of this place</span>
                         @endif
@@ -88,6 +89,7 @@
                     @if ($photoIndex !== false)
                         <a href="#" class="{{ $category === 'General' ? 'g-main' : 'g-thumb' }}" data-category="{{ $category }}" data-open="{{ $photoIndex }}" aria-label="View {{ strtolower($category) }} photos of {{ $title }}">
                             <img src="{{ $photos[$photoIndex]->url() }}" alt="{{ $altFor($photos[$photoIndex]) }}">
+                            @include('partials.photo-scope-label', ['photo' => $photos[$photoIndex]])
                             @if ($photos[$photoIndex]->isIllustration())<span class="photo-illustration-tag">Illustration, not a photo of this place</span>@endif
                         </a>
                     @else
@@ -99,6 +101,7 @@
             @else
             <a href="#" class="g-main" data-open="0">
                 <img src="{{ $photos[0]->url() }}" alt="{{ $altFor($photos[0]) }}">
+                @include('partials.photo-scope-label', ['photo' => $photos[0]])
                 @if ($onlyIllustrations)
                     <span class="photo-illustration-tag">Illustration, not a photo of this place</span>
                 @endif

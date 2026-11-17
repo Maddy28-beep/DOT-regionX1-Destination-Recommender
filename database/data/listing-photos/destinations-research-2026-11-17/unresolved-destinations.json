@@ -1,0 +1,212 @@
+[
+    {
+        "id": 12,
+        "name": "Bukid Amara Tourism Agriventures Corporation",
+        "slug": "bukid-amara-tourism-agriventures-corporation",
+        "location": "Blk 50, Lot 2, Deca Homes Talomo, Davao City",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Farm Tourism",
+        "review_note": "Catalogue address is an office; visitor farm location requires confirmation."
+    },
+    {
+        "id": 17,
+        "name": "JKM Mini Zoo",
+        "slug": "jkm-mini-zoo",
+        "location": "Purok 7, Pag-asa Farms, Brgy Pag-asa, Kapalong, Davao del Norte",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Wildlife",
+        "review_note": "Official image is a promotional flyer, not a destination photo."
+    },
+    {
+        "id": 20,
+        "name": "Rancho Palos Verdes Golf & Sports Club Inc.",
+        "slug": "rancho-palos-verdes-golf-sports-club-inc-2",
+        "location": "Riverfront Corporate City Prk 26 Riverside Brgy. Ma-a Talomo Dist., Davao City",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Sports & Recreation",
+        "review_note": "Name matches a golf club but catalogue address is Riverfront/Ma-a, not the researched Mandug golf site."
+    },
+    {
+        "id": 23,
+        "name": "Elysia Wellness Spa",
+        "slug": "elysia-wellness-spa",
+        "location": "Trumph Bldg., Quimpo Blvd, Corner Mangga St., Brgy. Bucana Talomo District, Davao City",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Wellness & Spa",
+        "review_note": "Exact Ecoland branch photograph not confirmed."
+    },
+    {
+        "id": 24,
+        "name": "Elysia Wellness Spa",
+        "slug": "elysia-wellness-spa-2",
+        "location": "Lacson St. Corner Cervantes St., Bo. Obrero, Brgy. 20-B, Davao City",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Wellness & Spa",
+        "review_note": "Exact Obrero branch photograph not confirmed."
+    },
+    {
+        "id": 25,
+        "name": "Elysia Wellness Spa",
+        "slug": "elysia-wellness-spa-3",
+        "location": "Phoenix Mega Service Station ,Jp Laurel Avenue cor Arroyo st., Brgy. Agdao, Davao City",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Wellness & Spa",
+        "review_note": "Exact JP Laurel/Arroyo branch photograph not confirmed."
+    },
+    {
+        "id": 28,
+        "name": "Museo Dabawenyo",
+        "slug": "museo-dabawenyo",
+        "location": "Davao City",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Cultural Heritage",
+        "review_note": "Historical museum location photo; current venue image could not be retrieved."
+    },
+    {
+        "id": 41,
+        "name": "San Salvador del Mundo Church",
+        "slug": "san-salvador-del-mundo-church",
+        "location": "City of Mati, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Cultural Heritage",
+        "review_note": "Catalogue says Mati; sources identify the named church in Caraga."
+    },
+    {
+        "id": 44,
+        "name": "Wishing Island",
+        "slug": "wishing-island",
+        "location": "Island Garden City of Samal, Davao del Norte",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Beach & Leisure",
+        "review_note": "Available photograph does not clearly show the named island."
+    },
+    {
+        "id": 51,
+        "name": "Diaz Island",
+        "slug": "diaz-island",
+        "location": "Island Garden City of Samal, Davao del Norte",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Beach & Leisure",
+        "review_note": "No retrievable photo confidently assigned to Diaz Island."
+    },
+    {
+        "id": 69,
+        "name": "Linow tu Gabon (Ocean of Fogs) [SAMPLE]",
+        "slug": "linow-tu-gabon-ocean-of-fogs-sample",
+        "location": "Sitio Kawayan, Kapalong",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Nature & Adventure",
+        "review_note": "Search images show other towns rather than the named Kapalong site."
+    },
+    {
+        "id": 74,
+        "name": "Tuka Beach (\"Little Boracay of Santa Maria\") [SAMPLE]",
+        "slug": "tuka-beach-little-boracay-of-santa-maria-sample",
+        "location": "Barangay Sto. Ni├▒o, Santa Maria, Davao Occidental",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Beach & Leisure",
+        "review_note": "Search images show Tuka in Kiamba, not the recorded Santa Maria site."
+    },
+    {
+        "id": 75,
+        "name": "Santa Maria Viewdeck [SAMPLE]",
+        "slug": "santa-maria-viewdeck-sample",
+        "location": "National Highway Overlook, Poblacion, Santa Maria, Davao Occidental",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Nature & Leisure",
+        "review_note": "Search result is Santa Maria, Laguna rather than Davao Occidental."
+    },
+    {
+        "id": 78,
+        "name": "Tuke Makil / Tuke Nunsol Marine Cove [SAMPLE]",
+        "slug": "tuke-makil-tuke-nunsol-marine-cove-sample",
+        "location": "Barangay Sugal, Jose Abad Santos, Davao Occidental",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Nature & Adventure",
+        "review_note": "Named cove could not be confirmed in image sources."
+    },
+    {
+        "id": 83,
+        "name": "Lunod Island Mangrove Forest [SAMPLE]",
+        "slug": "lunod-island-mangrove-forest-sample",
+        "location": "Barangay San Antonio, Mabini, Davao de Oro",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Nature & Leisure",
+        "review_note": "Available mangrove images refer to other places."
+    },
+    {
+        "id": 86,
+        "name": "Malanog-lanog Cave [SAMPLE]",
+        "slug": "malanog-lanog-cave-sample",
+        "location": "Barangay Mainit, Nabunturan, Davao de Oro",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Nature & Adventure",
+        "review_note": "Search images refer to other caves."
+    },
+    {
+        "id": 101,
+        "name": "Centennial Balite Tree (500-Year-Old Balite) [SAMPLE]",
+        "slug": "centennial-balite-tree-500-year-old-balite-sample",
+        "location": "Barangay Magdug, Governor Generoso, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Nature & Leisure",
+        "review_note": "Search images show balete trees in other municipalities."
+    },
+    {
+        "id": 104,
+        "name": "Pintatagan Coastal Overlook [SAMPLE]",
+        "slug": "pintatagan-coastal-overlook-sample",
+        "location": "Barangay Pintatagan, Banaybanay, Davao Oriental",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Nature & Leisure",
+        "review_note": "Search images show Sleeping Dinosaur in Mati rather than Pintatagan."
+    },
+    {
+        "id": 105,
+        "name": "Tagum City Night Market & Rotary Park [SAMPLE]",
+        "slug": "tagum-city-night-market-rotary-park-sample",
+        "location": "Rotary Park, Tagum City, Davao del Norte",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Cultural Heritage",
+        "review_note": "Night street image cannot be confidently assigned to the named park."
+    },
+    {
+        "id": 107,
+        "name": "San Agustin Botanical Park [SAMPLE]",
+        "slug": "san-agustin-botanical-park-sample",
+        "location": "Barangay San Agustin, Tagum City, Davao del Norte",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Nature & Leisure",
+        "review_note": "Matched image source could not be downloaded."
+    },
+    {
+        "id": 110,
+        "name": "Carmen Mangrove Sanctuary & Boardwalk [SAMPLE]",
+        "slug": "carmen-mangrove-sanctuary-boardwalk-sample",
+        "location": "Barangay San Pedro, Carmen, Davao del Norte",
+        "website_url": null,
+        "facebook_url": null,
+        "type": "Nature & Leisure",
+        "review_note": "Available images show Del Carmen/Siargao or other mangrove sites."
+    }
+]
