@@ -59,15 +59,9 @@
         <div class="halftone"></div>
         <div class="dpost-card__scrim"></div>
 
-        @if ($listing->is_accredited)
+        @if ($listing->is_accredited || (($listing instanceof \Illuminate\Database\Eloquent\Model ? app(\App\Support\SampleData::class)->status($listing) : \App\Support\SampleData::UNVERIFIED) !== \App\Support\SampleData::OFFICIAL))
             @php $provenance = $listing instanceof \Illuminate\Database\Eloquent\Model ? app(\App\Support\SampleData::class)->status($listing) : \App\Support\SampleData::UNVERIFIED; @endphp
-            <span class="dpost-badge-accredited is-{{ $provenance }}" title="{{ \App\Support\SampleData::title($provenance) }}">
-                <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
-                    <circle cx="10" cy="10" r="3.4" fill="currentColor"/>
-                </svg>
-                {{ \App\Support\SampleData::label($provenance) }}
-            </span>
+            @include('partials.provenance-mark', ['provenance' => $provenance, 'accredited' => $listing->is_accredited])
         @endif
 
         <span class="dpost-badge-rating">

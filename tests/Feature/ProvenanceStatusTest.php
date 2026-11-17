@@ -118,7 +118,9 @@ class ProvenanceStatusTest extends TestCase
         $this->get(route('destinations.show', $this->official('Official Park')))->assertOk()
             ->assertSee('dpost-badge-accredited is-official', false)->assertSee('DOT Accredited');
         $this->get(route('destinations.show', $this->sample('Demo Park')))->assertOk()
-            ->assertSee('dpost-badge-accredited is-sample', false)->assertSee('Sample Data');
+            ->assertSee('dpost-badge-accredited is-mark is-sample', false)->assertSee('Sample Data');
+        // Not official: a small "i" on the picture, with the words only in its tooltip and accessible name, never as visible text.
+        $this->assertDoesNotMatchRegularExpression('/<span class="dpost-badge-accredited is-mark[^>]*>[^<]*Sample Data/', $this->get(route('destinations.show', $this->sample('Demo Park Two')))->getContent());
     }
 
     public function test_the_stay_page_badge_follows_the_same_rule(): void
@@ -138,7 +140,7 @@ class ProvenanceStatusTest extends TestCase
         $this->get(route('accommodations.show', $make('Official Inn', ['accreditation_number' => 'DOT-R11-HTL-00001-2026', 'is_placeholder' => false])))->assertOk()->assertSee('DOT Accredited');
         $this->get(route('accommodations.show', $make('Demo Inn', ['accreditation_number' => 'DOT-XI-2025-0009', 'is_placeholder' => true])))->assertOk()->assertSee('Sample Data');
         // (The page also lists the other stays as nearby cards, which carry their own labels; the page's own badge is the hero one.)
-        $unrecorded = $this->get(route('accommodations.show', $make('Unrecorded Inn', null)))->assertOk()->assertSee('dpost-badge-accredited is-unverified', false)->assertSee('Not Yet Verified')->getContent();
+        $unrecorded = $this->get(route('accommodations.show', $make('Unrecorded Inn', null)))->assertOk()->assertSee('dpost-badge-accredited is-mark is-unverified', false)->assertSee('Not Yet Verified')->getContent();
         $this->assertStringNotContainsString('dpost-badge-accredited is-official', $unrecorded);
     }
 
