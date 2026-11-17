@@ -344,3 +344,22 @@ body.hero-page .site-header:not(.scrolled) .header-weather svg { color: #fff; }
     .catalog-refresh .dpost-card .dcard__body { min-height: 150px; }
     .catalog-refresh.souvenirs-catalog .dpost-card .dcard__body { min-height: 128px; }
 }
+
+/* Always-visible scope for shared condominium imagery, including compact mobile cards. */
+.photo-scope-tag {
+    position: absolute; left: 10px; bottom: 10px; z-index: 4;
+    max-width: calc(100% - 48px); padding: 5px 9px; border-radius: 8px;
+    background: #073e30ed; color: #fff; font: 600 .7rem/1.35 var(--font-body, sans-serif);
+    white-space: normal; pointer-events: none;
+}
+.gallery-hero .photo-scope-tag { top: 62px; bottom: auto; }
+.carousel-slide .photo-scope-tag { top: 44px; bottom: auto; padding: 3px 6px; font-size: .65rem; }
+.recap-place__photo { position: relative; }
+.tl-card__media .photo-scope-tag { left: 5px; bottom: 5px; max-width: calc(100% - 10px); font-size: .65rem; }
+@media (max-width: 640px) {
+    .dcard__art .photo-scope-tag { left: 5px; bottom: 34px; max-width: calc(100% - 10px); padding: 4px 5px; font-size: .65rem; }
+}
+
+/* Not official (sample or not yet verified): a small gray "i" on the picture instead of a text badge, like the cards. */
+.dpost-badge-accredited.is-mark { width: 28px; height: 28px; padding: 0; gap: 0; justify-content: center; border-radius: 999px; background: rgba(255, 253, 247, .94); color: #7d8582; box-shadow: 0 1px 4px rgba(11, 40, 30, .28); cursor: help; }
+.dpost-badge-accredited.is-mark svg { width: 16px; height: 16px; fill: #7d8582; }

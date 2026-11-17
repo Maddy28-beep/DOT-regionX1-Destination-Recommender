@@ -37,6 +37,13 @@ class ListingPhoto extends Model
         return str_ends_with(strtolower((string) $this->path), '.svg') || $this->category === self::SAMPLE_CATEGORY;
     }
 
+    /** Shared-building imagery must never be presented as a photo of the rental unit. */
+    public function scopeLabel(): ?string
+    {
+        return str_starts_with((string) $this->category, 'Complex exterior')
+            ? 'Complex exterior · Unit not shown' : null;
+    }
+
     /** Facility/accessibility evidence belongs with that feature, never as a listing cover. */
     public function isAmenityPhoto(): bool
     {

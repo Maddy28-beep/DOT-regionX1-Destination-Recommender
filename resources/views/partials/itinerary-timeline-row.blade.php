@@ -118,6 +118,7 @@
                 <div class="tl-card__media">
                     @if ($realPhoto)
                         <img src="{{ $realPhoto->url() }}" alt="" loading="lazy" decoding="async">
+                        @include('partials.photo-scope-label', ['photo' => $realPhoto])
                         @if ($realPhoto->isIllustration())
                             <span class="photo-illustration-tag photo-illustration-tag--card">Illustration</span>
                         @endif

@@ -1,0 +1,401 @@
+[
+  {
+    "id": 1,
+    "name": "Marina Tuna Restaurant",
+    "slug": "marina-tuna-restaurant",
+    "file": "restaurant-1.webp",
+    "sha256": "a9e7068dced19caafc162caa732dd8f592aca0d878fba3a657c8d2582d7202b8"
+  },
+  {
+    "id": 3,
+    "name": "Blue Post Boiling Crabs & Shrimp",
+    "slug": "blue-post-boiling-crabs-shrimp",
+    "file": "restaurant-3.webp",
+    "sha256": "53dc6da11a82dae2dabd4e1c7f1f00d0b630ee532a5f45e6f4d2da4cca7ee5af"
+  },
+  {
+    "id": 4,
+    "name": "Arvie's Cafe",
+    "slug": "arvies-cafe",
+    "file": "restaurant-4.webp",
+    "sha256": "367a46a8a88ff0cb0ebdd17420ea86e81ed4869c3228dc1005239348080bec8c"
+  },
+  {
+    "id": 5,
+    "name": "Axl Dave Bibingka Food Corporation",
+    "slug": "axl-dave-bibingka-food-corporation",
+    "file": "restaurant-5.webp",
+    "sha256": "65ba46c06ba49d838f1207e65b32b09e619ffeb78b7b608979cfc5c03401f0b2"
+  },
+  {
+    "id": 7,
+    "name": "BigFat Tummy's Steak and Seafood Restaurant",
+    "slug": "bigfat-tummys-steak-and-seafood-restaurant",
+    "file": "restaurant-7.webp",
+    "sha256": "2944371e742cfe776a49bca2428d156462d11a2f8e3602b1cfd64e2ac897ccbb"
+  },
+  {
+    "id": 8,
+    "name": "Braytside Cakes Catering Services",
+    "slug": "braytside-cakes-catering-services",
+    "file": "restaurant-8.webp",
+    "sha256": "5d9751b9609ac82a5b8d02e06a3f8da471e169396b67055b98221f2643024b5c"
+  },
+  {
+    "id": 9,
+    "name": "Chow2 Restaurant & Catering Services",
+    "slug": "chow2-restaurant-catering-services",
+    "file": "restaurant-9.webp",
+    "sha256": "929f0a1c8f9db2a12f47600de9b0621738b3929582c065de4ecd94cda35187e1"
+  },
+  {
+    "id": 10,
+    "name": "ClareBites Cafe",
+    "slug": "clarebites-cafe",
+    "file": "restaurant-10.webp",
+    "sha256": "eed90ea3004ab91c22d92b8fe5b4dd420875c05246287be02faf14b75c085230"
+  },
+  {
+    "id": 12,
+    "name": "Diskanso Cafe",
+    "slug": "diskanso-cafe",
+    "file": "restaurant-12.webp",
+    "sha256": "b7b2ca1d507a0c8de52cf09534e638b9d9face1b117ef4bd40df37bd203daf28"
+  },
+  {
+    "id": 13,
+    "name": "Dongturks Catering Services",
+    "slug": "dongturks-catering-services",
+    "file": "restaurant-13.webp",
+    "sha256": "3c2d4ed67f683c4b8cbe5f241af2e04176d69fb0836b112b9998c3e0837f0cf2"
+  },
+  {
+    "id": 16,
+    "name": "George BBQ",
+    "slug": "george-bbq",
+    "file": "restaurant-16.webp",
+    "sha256": "f5f1f36e49aeab8130cf5c39c6b32cf549cbbf3e3413782e93552a40857f3705"
+  },
+  {
+    "id": 18,
+    "name": "Hugo - Montevista Branch",
+    "slug": "hugo-montevista-branch",
+    "file": "restaurant-18.webp",
+    "sha256": "1b2af55d96e4838439ea76c8d3f3ca09b239c76726f79ac1d5a96ebc7a1fd834"
+  },
+  {
+    "id": 19,
+    "name": "Hugo's Pizza",
+    "slug": "hugo-s-pizza",
+    "file": "restaurant-19.webp",
+    "sha256": "87395110d16765835c07a8ecde175c32e0fbfb0ced23419bf661b587da7a066e"
+  },
+  {
+    "id": 22,
+    "name": "Jenniel's Caf",
+    "slug": "jenniel-s-caf",
+    "file": "restaurant-22.webp",
+    "sha256": "b401bc2656b5ce660c70f2fa2a97ce2184ae055921bd5616a5d8022984b16a3e"
+  },
+  {
+    "id": 23,
+    "name": "Kapehan sa Tambacan",
+    "slug": "kapehan-sa-tambacan",
+    "file": "restaurant-23.webp",
+    "sha256": "8a0fc277266b5c5c039520a3ceb9b16ed0769ed6382f07c9c0050d5b1c05604c"
+  },
+  {
+    "id": 24,
+    "name": "Kusina Kabacan",
+    "slug": "kusina-kabacan",
+    "file": "restaurant-24.webp",
+    "sha256": "9d2b7ece9ea09928ae38ae01c5991ea4bed99642e645688853a013a9f2060aec"
+  },
+  {
+    "id": 25,
+    "name": "Kusina Kabacan",
+    "slug": "kusina-kabacan-2",
+    "file": "restaurant-25.webp",
+    "sha256": "7dc071b625574872e8b3ea9cd32b1a309718b7aff866b5baeaeaf7238a297f6d"
+  },
+  {
+    "id": 26,
+    "name": "Leonora's Restaurant",
+    "slug": "leonora-s-restaurant",
+    "file": "restaurant-26.webp",
+    "sha256": "4b4af1f6df5df6488e39627a84ffdddf557e2f92ac9fa8c30e752a2137ef7dda"
+  },
+  {
+    "id": 30,
+    "name": "Parola-Baywalk Restaurant",
+    "slug": "parola-baywalk-restaurant",
+    "file": "restaurant-30.webp",
+    "sha256": "f197eb4b63710fbeaa67041de438d1b1ca622a95d4aabd84ad26744fcbc8e22d"
+  },
+  {
+    "id": 31,
+    "name": "Pizzakaya - Maco",
+    "slug": "pizzakaya-maco",
+    "file": "restaurant-31.webp",
+    "sha256": "ef78e128b5d7e8f42370772d210534b19f12460a40b15aee53dd1f808d65f75c"
+  },
+  {
+    "id": 32,
+    "name": "PortSide Grill House Food Corporation",
+    "slug": "portside-grill-house-food-corporation",
+    "file": "restaurant-32.webp",
+    "sha256": "3d4c8492378eb05ec697a1375b2334420e35b13601bc81d2c2d025fbe03ff49e"
+  },
+  {
+    "id": 33,
+    "name": "Qan's Bibingka and Eatery",
+    "slug": "qan-s-bibingka-and-eatery",
+    "file": "restaurant-33.webp",
+    "sha256": "f0881d439ccc62720266c93de2f3380c0afc1b0cfdbf34c648dff886935c8fcf"
+  },
+  {
+    "id": 35,
+    "name": "Sabor Elas Cafe",
+    "slug": "sabor-elas-cafe",
+    "file": "restaurant-35.webp",
+    "sha256": "821f47dec40508312e91f6502514b66fce81998b4f47abc393b12253b80841d0"
+  },
+  {
+    "id": 36,
+    "name": "Skyway21 Nature Park",
+    "slug": "skyway21-nature-park",
+    "file": "restaurant-36.webp",
+    "sha256": "cfaf7f271986f537333c5619a6dc0920c6aecf70ac486ac5f9b930d32b04816a"
+  },
+  {
+    "id": 38,
+    "name": "Tsuru",
+    "slug": "tsuru",
+    "file": "restaurant-38.webp",
+    "sha256": "7c55f37e96314e54333790832aaf8385336c0ada6c8a8acf52d3377f885929bd"
+  },
+  {
+    "id": 39,
+    "name": "Tsuru Incorporated(Camus)",
+    "slug": "tsuru-incorporated-camus",
+    "file": "restaurant-39.webp",
+    "sha256": "e84c261dba320c6dd7f72a0f7981987f7e4801de8e61b94984040673c5d4587d"
+  },
+  {
+    "id": 41,
+    "name": "Tsuru Japanese Restaurant & Sushi Bar",
+    "slug": "tsuru-japanese-restaurant-sushi-bar-2",
+    "file": "restaurant-41.webp",
+    "sha256": "eeeb3ce6545b03176ee537f0168f948f8dd1035c7afeb30d517bb963ff83149f"
+  },
+  {
+    "id": 42,
+    "name": "Tsuru Japanese Restaurant & Sushi Bar",
+    "slug": "tsuru-japanese-restaurant-sushi-bar-3",
+    "file": "restaurant-42.webp",
+    "sha256": "aa0d04b4d6bad21b5b12699b15e6f0a439e9b85528c6ee366716c53783dc7ed0"
+  },
+  {
+    "id": 43,
+    "name": "Vikings",
+    "slug": "vikings",
+    "file": "restaurant-43.webp",
+    "sha256": "e26303238d112a7a35ba24d73fe1c7dd26d0b5ee4a2a52fd72fb28ff6c090dd3"
+  },
+  {
+    "id": 45,
+    "name": "Matina Swiss Deli and Restaurant",
+    "slug": "matina-swiss-deli-and-restaurant",
+    "file": "restaurant-45.webp",
+    "sha256": "c166b02d840bb9008931cff1eaa434b72c29a43af9037e2f8f0f39d5673722db"
+  },
+  {
+    "id": 55,
+    "name": "Sample Central Grill House [SAMPLE]",
+    "slug": "sample-central-grill-house-sample",
+    "file": "restaurant-55.webp",
+    "sha256": "eb549e593358044dc579903210abb2f1ef22150f68eeabf734f7dbf988bde953"
+  },
+  {
+    "id": 56,
+    "name": "Sample Coastal Seafood Kitchen [SAMPLE]",
+    "slug": "sample-coastal-seafood-kitchen-sample",
+    "file": "restaurant-56.webp",
+    "sha256": "43c0144f43368bc975dccb63fa35c04ad2c1ea36247cdc6b95fb85fba507f43d"
+  },
+  {
+    "id": 57,
+    "name": "Sample Garden Restaurant (split) [SAMPLE]",
+    "slug": "sample-garden-restaurant-split-sample",
+    "file": "restaurant-57.webp",
+    "sha256": "70b6d883d49135c137886b957cf4bd4fd66cf7e26ab67dceff5e0b494cdb1755"
+  },
+  {
+    "id": 58,
+    "name": "Sample North Port Eatery [SAMPLE]",
+    "slug": "sample-north-port-eatery-sample",
+    "file": "restaurant-58.webp",
+    "sha256": "4b969e49488565f2daab9779503a007edd095855917acad131cbd770f8fc1d66"
+  },
+  {
+    "id": 59,
+    "name": "Sample East Beach Cafe [SAMPLE]",
+    "slug": "sample-east-beach-cafe-sample",
+    "file": "restaurant-59.webp",
+    "sha256": "0701c785afb432b4af7c3fad31128a1b9942951d626dfcf23907f8566e82d10e"
+  },
+  {
+    "id": 60,
+    "name": "Sample South Island Grill [SAMPLE]",
+    "slug": "sample-south-island-grill-sample",
+    "file": "restaurant-60.webp",
+    "sha256": "9b07168e9de1f36755c6046dab6148f39d04fb77e0174b40897129d7ede6ad72"
+  },
+  {
+    "id": 61,
+    "name": "Sample West Island Kitchen [SAMPLE]",
+    "slug": "sample-west-island-kitchen-sample",
+    "file": "restaurant-61.webp",
+    "sha256": "0502f8be279ce8ae1927c7adff8b6f580c513f8deb609075e818f4ff0def212f"
+  },
+  {
+    "id": 62,
+    "name": "Sample City Food Plaza [SAMPLE]",
+    "slug": "sample-city-food-plaza-sample",
+    "file": "restaurant-62.webp",
+    "sha256": "b9ff7def4af577c2c6f15d4762d89e0eae5ce00bd25a4de04458d6f9bf1752de"
+  },
+  {
+    "id": 63,
+    "name": "Sample Coastal Seafood House North [SAMPLE]",
+    "slug": "sample-coastal-seafood-house-north-sample",
+    "file": "restaurant-63.webp",
+    "sha256": "77cf7057bf891ec34793520a8ca41e77f650cea2a8157ffda615b00c1dee2021"
+  },
+  {
+    "id": 64,
+    "name": "Sample Farm Kitchen North [SAMPLE]",
+    "slug": "sample-farm-kitchen-north-sample",
+    "file": "restaurant-64.webp",
+    "sha256": "3f15d2a52e09591fe3758bdb8d55fdd82cb257357855c2c6d8a1282bd9263e8c"
+  },
+  {
+    "id": 65,
+    "name": "Sample Upland Town Cafe [SAMPLE]",
+    "slug": "sample-upland-town-cafe-sample",
+    "file": "restaurant-65.webp",
+    "sha256": "21690be0832db1c152519ed48d693eaa842a30ddd86a8f43ca61de03ac20d58f"
+  },
+  {
+    "id": 66,
+    "name": "Sample Valley Home Kitchen (split) [SAMPLE]",
+    "slug": "sample-valley-home-kitchen-split-sample",
+    "file": "restaurant-66.webp",
+    "sha256": "9e9b18545dcc2697213699f151280ca1166c7e7485f231cf864aec46d0f64a7e"
+  },
+  {
+    "id": 67,
+    "name": "Sample Highland Cafe East [SAMPLE]",
+    "slug": "sample-highland-cafe-east-sample",
+    "file": "restaurant-67.webp",
+    "sha256": "b5f85fc04c1d9c430ee43afb1574c3888739a95a0d67125d5030ccd35570415b"
+  },
+  {
+    "id": 68,
+    "name": "Sample Lakeview Restaurant [SAMPLE]",
+    "slug": "sample-lakeview-restaurant-sample",
+    "file": "restaurant-68.webp",
+    "sha256": "77fc83ac4f63bcb69aac48884c6224e9cf0d7b4856684878c51da8d70d9345a4"
+  },
+  {
+    "id": 69,
+    "name": "Sample Eastern River Cafe [SAMPLE]",
+    "slug": "sample-eastern-river-cafe-sample",
+    "file": "restaurant-69.webp",
+    "sha256": "45db743e20337d924085c11bb4d495a656a63ec7b3deb71e10c4fe08268b41e9"
+  },
+  {
+    "id": 70,
+    "name": "Sample Bay Seafood House West [SAMPLE]",
+    "slug": "sample-bay-seafood-house-west-sample",
+    "file": "restaurant-70.webp",
+    "sha256": "d2d61dc05839fa2790e3dc56157ad5ee60cd399c4a2f6c631416bffec922ff6b"
+  },
+  {
+    "id": 71,
+    "name": "Sample Western Beach Grill [SAMPLE]",
+    "slug": "sample-western-beach-grill-sample",
+    "file": "restaurant-71.webp",
+    "sha256": "156a4e5639536d0a14941a31a4558818ed26931628d2936ed6447531099f320f"
+  },
+  {
+    "id": 72,
+    "name": "Sample Upland Kitchen West [SAMPLE]",
+    "slug": "sample-upland-kitchen-west-sample",
+    "file": "restaurant-72.webp",
+    "sha256": "a2d43595e8c8b36ffc38edf1635d3c116126953dd1f27f7220da65de3415f6ba"
+  },
+  {
+    "id": 73,
+    "name": "Sample Southern Town Eatery [SAMPLE]",
+    "slug": "sample-southern-town-eatery-sample",
+    "file": "restaurant-73.webp",
+    "sha256": "d83e21d4512020f8c1953a63979bba6ed5f6514208793638a9c0a64166629755"
+  },
+  {
+    "id": 74,
+    "name": "Sample Bay Grill East [SAMPLE]",
+    "slug": "sample-bay-grill-east-sample",
+    "file": "restaurant-74.webp",
+    "sha256": "22095eb44e0aca05a6d78966b9bf67e0bb0175aef98b6580528e6c2c47f05452"
+  },
+  {
+    "id": 75,
+    "name": "Sample Sunrise Surfer Cafe (split) [SAMPLE]",
+    "slug": "sample-sunrise-surfer-cafe-split-sample",
+    "file": "restaurant-75.webp",
+    "sha256": "69fdc13c382d5fbcd686339cf6a4fa5059b323a794cdceaca80f7f23727a5f99"
+  },
+  {
+    "id": 76,
+    "name": "Sample Northern Coastal Kitchen [SAMPLE]",
+    "slug": "sample-northern-coastal-kitchen-sample",
+    "file": "restaurant-76.webp",
+    "sha256": "6c2b661a4c9a78fb77c0ae1169902f9125e5f73098ffa62c034ee293980629f8"
+  },
+  {
+    "id": 77,
+    "name": "Sample River Town Restaurant [SAMPLE]",
+    "slug": "sample-river-town-restaurant-sample",
+    "file": "restaurant-77.webp",
+    "sha256": "5a969e9e2538a1d1f451bd86f63b5e011c6fe484a62f60f80c18d2f1c684c2dd"
+  },
+  {
+    "id": 78,
+    "name": "Sample Southern Grill Row [SAMPLE]",
+    "slug": "sample-southern-grill-row-sample",
+    "file": "restaurant-78.webp",
+    "sha256": "007db2378ec4be8ef7b017b2d2d18a7287f29d698a925fae33b648a5bb327929"
+  },
+  {
+    "id": 79,
+    "name": "Sample Highland Restaurant South [SAMPLE]",
+    "slug": "sample-highland-restaurant-south-sample",
+    "file": "restaurant-79.webp",
+    "sha256": "bfa883e37a96e60de8bff690d478f22bc5293f456d7e1f86e623d9437007740b"
+  },
+  {
+    "id": 80,
+    "name": "Sample Seaside Eatery South [SAMPLE]",
+    "slug": "sample-seaside-eatery-south-sample",
+    "file": "restaurant-80.webp",
+    "sha256": "d33782431c72661c86a0972c9c2709aee74903a69a4c7fde81c7fa239672bb88"
+  },
+  {
+    "id": 81,
+    "name": "Sample Farm Restaurant South [SAMPLE]",
+    "slug": "sample-farm-restaurant-south-sample",
+    "file": "restaurant-81.webp",
+    "sha256": "0288f5ae414693d01bcac24756515436589921c49b3804dd41cbacf27cc773a5"
+  }
+]

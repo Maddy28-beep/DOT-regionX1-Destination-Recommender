@@ -43,6 +43,7 @@
                 @foreach ($photos as $i => $photo)
                     <a href="#" class="carousel-slide" data-open="{{ $i }}">
                         <img src="{{ $photo->url() }}" alt="{{ $altFor($photo) }}">
+                        @include('partials.photo-scope-label', ['photo' => $photo])
                         @if ($onlyIllustrations && $i === 0)
                             <span class="photo-illustration-tag">Illustration, not a photo of this place</span>
                         @endif
@@ -50,14 +51,8 @@
                 @endforeach
             </div>
             <div class="badges">
-                @if ($isAccredited)
-                    <span class="dpost-badge-accredited is-{{ $provenance }}" title="{{ \App\Support\SampleData::title($provenance) }}">
-                    <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
-                        <circle cx="10" cy="10" r="3.4" fill="currentColor"/>
-                    </svg>
-                    {{ \App\Support\SampleData::label($provenance) }}
-                </span>
+                @if ($isAccredited || $provenance !== \App\Support\SampleData::OFFICIAL)
+                    @include('partials.provenance-mark', ['provenance' => $provenance, 'accredited' => $isAccredited])
                 @else
                     <span></span>
                 @endif
@@ -88,6 +83,7 @@
                     @if ($photoIndex !== false)
                         <a href="#" class="{{ $category === 'General' ? 'g-main' : 'g-thumb' }}" data-category="{{ $category }}" data-open="{{ $photoIndex }}" aria-label="View {{ strtolower($category) }} photos of {{ $title }}">
                             <img src="{{ $photos[$photoIndex]->url() }}" alt="{{ $altFor($photos[$photoIndex]) }}">
+                            @include('partials.photo-scope-label', ['photo' => $photos[$photoIndex]])
                             @if ($photos[$photoIndex]->isIllustration())<span class="photo-illustration-tag">Illustration, not a photo of this place</span>@endif
                         </a>
                     @else
@@ -99,6 +95,7 @@
             @else
             <a href="#" class="g-main" data-open="0">
                 <img src="{{ $photos[0]->url() }}" alt="{{ $altFor($photos[0]) }}">
+                @include('partials.photo-scope-label', ['photo' => $photos[0]])
                 @if ($onlyIllustrations)
                     <span class="photo-illustration-tag">Illustration, not a photo of this place</span>
                 @endif
@@ -115,14 +112,8 @@
             @endif
             @endif
             <div class="badges">
-                @if ($isAccredited)
-                    <span class="dpost-badge-accredited is-{{ $provenance }}" title="{{ \App\Support\SampleData::title($provenance) }}">
-                    <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
-                        <circle cx="10" cy="10" r="3.4" fill="currentColor"/>
-                    </svg>
-                    {{ \App\Support\SampleData::label($provenance) }}
-                </span>
+                @if ($isAccredited || $provenance !== \App\Support\SampleData::OFFICIAL)
+                    @include('partials.provenance-mark', ['provenance' => $provenance, 'accredited' => $isAccredited])
                 @else
                     <span></span>
                 @endif
@@ -161,14 +152,8 @@
 @else
     <div class="detail-hero" style="background:{{ $fallbackGradient }}">
         <div class="badges">
-            @if ($isAccredited)
-                <span class="dpost-badge-accredited is-{{ $provenance }}" title="{{ \App\Support\SampleData::title($provenance) }}">
-                    <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
-                        <circle cx="10" cy="10" r="3.4" fill="currentColor"/>
-                    </svg>
-                    {{ \App\Support\SampleData::label($provenance) }}
-                </span>
+            @if ($isAccredited || $provenance !== \App\Support\SampleData::OFFICIAL)
+                @include('partials.provenance-mark', ['provenance' => $provenance, 'accredited' => $isAccredited])
             @else
                 <span></span>
             @endif

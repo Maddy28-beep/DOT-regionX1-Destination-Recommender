@@ -12,6 +12,7 @@
         <div class="recap-place__photo">
             @if ($photo)
                 <img src="{{ $photo->cardUrl() }}" alt="" loading="lazy" decoding="async">
+                @include('partials.photo-scope-label', ['photo' => $photo])
                 @if ($photo->isIllustration())<span class="recap-place__image-note">Illustration</span>@endif
             @else
                 @include('partials.poster-illustration', ['scene' => $listing->posterScene()])

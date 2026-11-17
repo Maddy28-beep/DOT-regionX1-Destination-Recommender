@@ -23,9 +23,11 @@
 --}}
 
 {{-- The same mark as <x-brand-mark />, so the tab matches the page. Kept under images/ so it also loads on the tunnelled survey. --}}
-<link rel="icon" href="{{ asset('favicon.ico') }}" sizes="48x48">
-<link rel="icon" href="{{ asset('images/logo/favicon-32.png') }}" type="image/png" sizes="32x32">
-<link rel="apple-touch-icon" href="{{ asset('images/logo/apple-touch-icon.png') }}">
+<link rel="icon" href="{{ asset('favicon.ico') }}?v=eagle-durian-20261117" type="image/x-icon" sizes="16x16 32x32 48x48">
+<link rel="icon" href="{{ asset('images/logo/eagle-durian-favicon-16.png') }}" type="image/png" sizes="16x16">
+<link rel="icon" href="{{ asset('images/logo/eagle-durian-favicon-32.png') }}" type="image/png" sizes="32x32">
+<link rel="icon" href="{{ asset('images/logo/eagle-durian-favicon-48.png') }}" type="image/png" sizes="48x48">
+<link rel="apple-touch-icon" href="{{ asset('images/logo/eagle-durian-apple-touch.png') }}" sizes="180x180">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
