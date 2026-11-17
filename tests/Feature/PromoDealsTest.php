@@ -123,7 +123,7 @@ class PromoDealsTest extends TestCase
         $this->assertLessThan(strpos($html, 'class="stats"'), strpos($html, 'id="deals"'));
     }
 
-    public function test_home_counts_exclude_hidden_and_sample_listings_and_unused_regions(): void
+    public function test_home_counts_match_public_catalogues_including_labeled_samples(): void
     {
         $this->stay('Real Stay');
         $this->stay('Archived Stay', ['archived_at' => now()]);
@@ -137,9 +137,21 @@ class PromoDealsTest extends TestCase
         ]);
         Region::create(['name' => 'Unused area']);
         $stats = $this->get('/')->assertOk()->original->getData()['stats'];
-        $this->assertSame(1, $stats['accommodations']);
+        $this->assertSame(3, $stats['accommodations']);
+        $this->assertSame(2, $stats['accommodations_sample']);
         $this->assertSame(0, $stats['destinations']);
         $this->assertSame(1, $stats['regions']);
+    }
+
+    public function test_coverage_groups_samal_with_davao_del_norte_without_changing_search_areas(): void
+    {
+        foreach (['Davao City', 'Davao del Norte', 'Davao del Sur', 'Davao de Oro', 'Davao Oriental', 'Davao Occidental', 'Island Garden City of Samal'] as $index => $area) {
+            $region = Region::firstOrCreate(['name' => $area]);
+            $this->stay('Coverage Stay '.$index, ['region_id' => $region->id]);
+        }
+        $stats = $this->get('/')->assertOk()->original->getData()['stats'];
+        $this->assertSame(6, $stats['regions']);
+        $this->assertSame(7, Region::whereIn('name', ['Davao City', 'Davao del Norte', 'Davao del Sur', 'Davao de Oro', 'Davao Oriental', 'Davao Occidental', 'Island Garden City of Samal'])->count());
     }
 
     public function test_an_archived_or_unaccredited_stay_does_not_show_its_deal(): void
