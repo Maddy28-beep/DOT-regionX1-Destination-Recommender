@@ -47,7 +47,9 @@ class ApplyDestinationPhotos extends Command
         $changes = [];
         DB::transaction(function () use ($entries, $directory, &$changes) {
             foreach ($entries as $entry) {
-                $destination = Destination::where('slug', $entry['slug'])->lockForUpdate()->first();
+                $destination = Destination::where('slug', $entry['slug'])->lockForUpdate()->first()
+                    // A destination whose address was changed (destinations:rename-sample-slugs) is still found by its old one.
+                    ?? Destination::whereIn('id', DB::table('destination_slug_redirects')->where('old_slug', $entry['slug'])->pluck('destination_id'))->lockForUpdate()->first();
                 if (! $destination || $destination->name !== $entry['name'] || $destination->location !== $entry['location']
                     || $destination->archived_at || str_starts_with($destination->name, 'Sample ')
                     || $destination->photos()->get()->contains(fn ($photo) => ! $photo->isIllustration())) continue;
