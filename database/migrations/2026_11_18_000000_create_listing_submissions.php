@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('listing_submissions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('establishment_account_id')->constrained('establishment_accounts')->cascadeOnDelete();
+            $table->foreignUuid('establishment_account_id')->constrained('establishment_accounts')->cascadeOnDelete();
             $table->string('listing_kind', 30);
             $table->unsignedBigInteger('listing_id');
             $table->string('status', 12)->default('draft')->index(); // draft, pending, returned, approved

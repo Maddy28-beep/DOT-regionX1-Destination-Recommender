@@ -48,7 +48,7 @@ class AppServiceProvider extends ServiceProvider
         // Audit trail for the DOT Admin console: who signed in, who tried and failed, who signed out.
         $audit = function (string $adminId, string $action) {
             try {
-                app(AuditLogger::class)->record($adminId, $action, 'admin_users', $adminId, 'from '.request()->ip());
+                app(AuditLogger::class)->record($adminId, $action, 'users', $adminId, 'from '.request()->ip());
             } catch (\Throwable $e) {
                 report($e); // never let the log stop a sign-in
             }
