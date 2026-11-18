@@ -19,28 +19,15 @@
     // page never reaches here. The lookup is memoized per request, so a grid
     // of cards still costs one query.
     //
-    // A logged-in tourist's heart checks/posts against their account-scoped
-    // list instead of the anonymous browser-token one, so the same control
-    // never shows two different "saved" states for the same listing. The
-    // anonymous path below is untouched when no tourist is signed in.
-    $isTourist = auth('tourist')->check();
-
-    if ($isTourist) {
-        $kind = \App\Http\Controllers\Tourist\TouristSavedDestinationController::TYPES[$type]['kind'] ?? null;
-        $savedKeys = \App\Http\Controllers\Tourist\TouristSavedDestinationController::savedKeys(request());
-        $toggleRoute = route('account.saved.toggle', [$type, $listing->id]);
-    } else {
-        $kind = \App\Http\Controllers\SavedListingController::TYPES[$type]['kind'] ?? null;
-        $savedKeys = \App\Http\Controllers\SavedListingController::savedKeys(request());
-        $toggleRoute = route('saved.toggle', [$type, $listing->id]);
-    }
+    $kind = \App\Http\Controllers\SavedListingController::TYPES[$type]['kind'] ?? null;
+    $savedKeys = \App\Http\Controllers\SavedListingController::savedKeys(request());
+    $toggleRoute = route('saved.toggle', [$type, $listing->id]);
 
     $isSaved = in_array($kind.':'.$listing->id, $savedKeys, true);
 @endphp
 
-{{-- A visitor who is not signed in gets the sign-in modal (public/js/login-modal.js); without script the form still posts and saves to the browser token, as before. --}}
 <form method="POST" action="{{ $toggleRoute }}"
-      class="save-form save-form--{{ $variant }} {{ $class }}"@unless ($isTourist) data-login-required data-save-type="{{ $type }}" data-save-id="{{ $listing->id }}" data-save-name="{{ $listing->displayName() }}"@endunless>
+      class="save-form save-form--{{ $variant }} {{ $class }}">
     @csrf
     @if ($variant === 'button')
         <button type="submit" class="btn btn-poster-ghost btn-block {{ $isSaved ? 'is-saved' : '' }}"

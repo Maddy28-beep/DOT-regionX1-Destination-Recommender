@@ -35,60 +35,11 @@
                 @if (! empty($davaoWeather))
                     <span class="header-weather" title="{{ __('Davao today') }}: {{ $davaoWeather['words'] }}"><x-icon name="sun" aria-hidden="true" /> {{ $davaoWeather['temp'] }}&deg;C<span class="sr-only"> {{ $davaoWeather['words'] }}</span></span>
                 @endif
-                {{--
-                    Exactly one extra element added here for the optional tourist
-                    account, not a whole button row -- this bar already fought a
-                    127px overflow from a single extra link (see the nav comment
-                    above), so a second header-actions button would repeat that.
-                --}}
-                @auth('tourist')
-                    {{-- One control instead of a name link plus a log-out icon the thumb could hit by
-                         accident. Log out now sits at the bottom of the menu. The menu is hidden with
-                         the rest of the bar below 1366px, where the drawer carries the same links. --}}
-                    @php $alias = auth('tourist')->user()->alias; @endphp
-                    <div class="account-menu" data-nav-more>
-                        <button type="button" class="account-menu__toggle {{ request()->routeIs('account.itineraries*', 'account.saved') ? 'is-active' : '' }}" aria-expanded="false" aria-controls="accountMenuPanel" aria-label="Account menu for {{ $alias }}">
-                            <span class="account-menu__avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr($alias, 0, 1)) }}</span>
-                            <span class="account-menu__name">{{ $alias }}</span>
-                            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 7.5 5 5 5-5" /></svg>
-                        </button>
-                        <div class="account-menu__panel" id="accountMenuPanel" hidden>
-                            <div class="account-menu__who">
-                                <strong>{{ $alias }}</strong>
-                                <span>Traveler account</span>
-                            </div>
-                            <a href="{{ route('account.itineraries') }}" @if(request()->routeIs('account.itineraries*')) aria-current="page" @endif>
-                                <x-icon name="compass" />
-                                My itineraries
-                                <small>{{ $accountItineraryCount ?? 0 }}</small>
-                            </a>
-                            <a href="{{ route('account.saved') }}" @if(request()->routeIs('account.saved')) aria-current="page" @endif>
-                                <x-icon name="heart" />
-                                Saved places
-                                <small>{{ $savedCount ?? 0 }}</small>
-                            </a>
-                            <form method="POST" action="{{ route('account.logout') }}">
-                                @csrf
-                                <button type="submit" class="account-menu__logout">
-                                    <x-icon name="log-out" />
-                                    Log out
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                @else
-                    <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="header-account-link" data-login-open>{{ __('Log in') }}</a>
-                @endauth
-                {{-- This used to always point at the anonymous, browser-only
-                     list, so a signed-in traveler's own "Saved" button opened
-                     someone else's list -- the session's, not their account's --
-                     even while logged in. The mobile menu below already branched
-                     on auth state; this one had not. --}}
                 {{-- Icon-only so it costs 38px of the bar instead of a labelled button, with the number
                      of saved places on it. The label stays for screen readers and as a tooltip. --}}
-                <a href="{{ auth('tourist')->check() ? route('account.saved') : route('saved.index') }}" class="header-saved" data-saved-link
+                <a href="{{ route('saved.index') }}" class="header-saved" data-saved-link
                    aria-label="Saved places{{ ($savedCount ?? 0) > 0 ? ', '.$savedCount.' saved' : '' }}" title="Saved places"
-                   @if(request()->routeIs('saved.*', 'account.saved')) aria-current="page" @endif>
+                   @if(request()->routeIs('saved.*')) aria-current="page" @endif>
                     <x-icon name="heart" />
                     <span class="header-saved__count" data-count="{{ $savedCount ?? 0 }}" data-saved-count @if(($savedCount ?? 0) < 1) hidden @endif>{{ ($savedCount ?? 0) > 99 ? '99+' : ($savedCount ?? 0) }}</span>
                 </a>
@@ -124,7 +75,6 @@
     list was dropped, it's just no longer presented as one undifferentiated
     column.
 --}}
-@php($isTouristAuthed = auth('tourist')->check())
 <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
 <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Site menu" inert>
     <div class="mobile-menu__head">
@@ -150,31 +100,17 @@
         </nav>
 
         <div class="mobile-menu__pills">
-            @if ($isTouristAuthed)
-                <a href="{{ route('account.itineraries') }}" @if(request()->routeIs('account.itineraries')) aria-current="page" @endif class="mobile-menu__pill"><x-icon name="map" /> My Itineraries</a>
-            @else
-                <a href="{{ route('account.login') }}" @if(request()->routeIs('account.login')) aria-current="page" @endif class="mobile-menu__pill" data-login-open><x-icon name="log-in" /> Log in</a>
-            @endif
-            <a href="{{ $isTouristAuthed ? route('account.saved') : route('saved.index') }}" class="mobile-menu__pill" data-saved-link
+            <a href="{{ route('saved.index') }}" class="mobile-menu__pill" data-saved-link
                aria-label="Saved places{{ ($savedCount ?? 0) > 0 ? ', '.$savedCount.' saved' : '' }}"
-               @if(request()->routeIs('saved.*', 'account.saved')) aria-current="page" @endif>
+               @if(request()->routeIs('saved.*')) aria-current="page" @endif>
                 <x-icon name="heart" />
                 Saved
                 <span class="mobile-menu__count" data-count="{{ $savedCount ?? 0 }}" data-saved-count aria-hidden="true" @if(($savedCount ?? 0) < 1) hidden @endif>{{ ($savedCount ?? 0) > 99 ? '99+' : ($savedCount ?? 0) }}</span>
             </a>
         </div>
 
-        <p class="mobile-menu__label-small" id="mobileMenuAccount">Account</p>
+        <p class="mobile-menu__label-small" id="mobileMenuAccount">Partners</p>
         <div class="mobile-menu__group mobile-menu__group--muted" role="group" aria-labelledby="mobileMenuAccount">
-            @if ($isTouristAuthed)
-                <span class="mobile-menu__account">Signed in as {{ auth('tourist')->user()->alias }}</span>
-                <form method="POST" action="{{ route('account.logout') }}">
-                    @csrf
-                    <button type="submit" class="mobile-menu__utility"><span class="mobile-menu__icon" aria-hidden="true"><x-icon name="log-out" /></span>Log out</button>
-                </form>
-            @else
-                <a href="{{ route('account.register') }}" class="mobile-menu__utility"><span class="mobile-menu__icon" aria-hidden="true"><x-icon name="user" /></span>Create a free account</a>
-            @endif
             <a href="{{ route('portal.establishment.register') }}" class="mobile-menu__utility"><span class="mobile-menu__icon" aria-hidden="true"><x-icon name="building" /></span>List your establishment</a>
         </div>
 

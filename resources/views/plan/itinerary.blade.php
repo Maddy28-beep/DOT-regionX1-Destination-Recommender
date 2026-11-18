@@ -117,36 +117,15 @@
                         @unless ($itinerary->package)
                             <a href="{{ route('plan.edit') }}" class="btn btn-outline"><x-icon name="filter" /> Edit preferences</a>
                         @endunless
-                        @if ($itinerary->tourist_account_id)
-                            <a href="{{ route('account.itineraries.show', $itinerary) }}" class="btn btn-primary">Saved to My Itineraries &check;</a>
-                        @else
-                            <form id="itinerarySaveForm" method="POST" action="{{ route('plan.itinerary.save') }}">
-                                @csrf
-                                <button type="submit" class="btn btn-primary"><x-icon name="heart" /> Save Itinerary</button>
-                            </form>
-                        @endif
+                        <a href="#keep" class="btn btn-primary"><x-icon name="heart" /> {{ $itinerary->edit_token_hash ? 'Your private link' : 'Keep this plan' }}</a>
                     </div>
-                    {{-- Set expectations honestly: no account is needed to plan or view a trip, by design -- this is what
-                         happens if you do not save it. --}}
-                    @unless ($itinerary->tourist_account_id)
-                        <p class="itin-banner__unsaved" role="status"><x-icon name="info" aria-hidden="true" /><span>Not saved yet &mdash; this plan disappears when you close the tab.</span></p>
+                    @unless ($itinerary->edit_token_hash)
+                        <p class="itin-banner__unsaved" role="status"><x-icon name="info" aria-hidden="true" /><span>Not kept yet &mdash; this plan is lost when you close the tab, unless you keep it with a private link.</span></p>
                     @endunless
                 </div>
             </section>
 
-            @if (session('pending_save_itinerary'))
-                <div class="privacy-note" role="status">
-                    <x-icon name="shield-check" />
-                    <p>
-                        <strong>Save your itinerary.</strong> Your current itinerary can now be saved to your
-                        new account.
-                        <form method="POST" action="{{ route('plan.itinerary.save') }}" style="display:inline;">
-                            @csrf
-                            <button type="submit" class="btn btn-primary btn-xs" style="margin-left:6px;">Save Itinerary</button>
-                        </form>
-                    </p>
-                </div>
-            @endif
+            @include('plan.partials.keep-panel', ['itinerary' => $itinerary, 'keep' => $keep ?? null])
 
             @if ($itemsByDay->isNotEmpty())
                 <div class="itin-bar">

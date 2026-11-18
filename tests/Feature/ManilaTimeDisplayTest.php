@@ -17,7 +17,7 @@ class ManilaTimeDisplayTest extends TestCase
 
     public function test_the_views_convert_before_formatting(): void
     {
-        foreach (['plan/itinerary', 'tourist/itineraries/index', 'admin/audit-log', 'establishment/notifications', 'admin/reports-print'] as $view) {
+        foreach (['plan/itinerary', 'admin/audit-log', 'establishment/notifications', 'admin/reports-print'] as $view) {
             $source = file_get_contents(resource_path('views/'.$view.'.blade.php'));
 
             $this->assertStringContainsString("timezone('Asia/Manila')", $source, $view);

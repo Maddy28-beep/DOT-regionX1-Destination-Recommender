@@ -86,12 +86,12 @@ class ItineraryPageRedesignTest extends TestCase
             ->assertSee('Budget-Friendly')
             ->assertSee('Generated')
             ->assertSee('Edit preferences')
-            ->assertSee('Save Itinerary')
+            ->assertSee('Keep this plan')
             ->assertSee('data-invite-key="dvo-save-itinerary-'.$trip->id.'"', false)
-            ->assertSee('form="itinerarySaveForm"', false)
-            ->assertSee('Save your plan for later.')
-            // Unsaved: a calm notice with an icon, not alarm-red text.
-            ->assertSee('Not saved yet')
+            ->assertSee('href="#keep"', false)
+            ->assertSee('Keep your plan with a private link.')
+            // Not kept: a calm notice with an icon, not alarm-red text.
+            ->assertSee('Not kept yet')
             ->assertSee('itin-banner__unsaved', false);
     }
 
@@ -103,11 +103,10 @@ class ItineraryPageRedesignTest extends TestCase
         $this->page($trip, $pref)->assertSee('My Davao Trip')->assertDontSee('Your Davao itinerary');
     }
 
-    public function test_a_saved_itinerary_does_not_show_a_save_reminder(): void
+    public function test_a_kept_itinerary_does_not_show_a_save_reminder(): void
     {
         [$trip, $pref] = $this->plan();
-        $account = \App\Models\TouristAccount::create(['alias' => 'savedtraveller', 'password_hash' => 'unused-in-view-test']);
-        $trip->update(['tourist_account_id' => $account->id]);
+        $trip->update(['edit_token_hash' => str_repeat('a', 64), 'share_token_hash' => str_repeat('b', 64), 'kept_at' => now()]);
         $this->page($trip, $pref)->assertOk()->assertDontSee('data-invite-key="dvo-save-itinerary-', false);
     }
 
@@ -274,7 +273,7 @@ class ItineraryPageRedesignTest extends TestCase
             ->assertSee('Regenerate itinerary')
             ->assertSee('match-list', false)
             ->assertSee('How your plan was built')
-            ->assertSee('Not saved yet');
+            ->assertSee('Not kept yet');
     }
 
     /** The old closing panel is now a Davo card; it must still lead to the exit survey, with a picture that exists. */

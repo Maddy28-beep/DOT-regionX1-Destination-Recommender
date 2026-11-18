@@ -9,7 +9,7 @@
     <span id="chatbot-hint" class="chatbot-hint" aria-hidden="true">Need help? <strong>Ask Davo</strong> 👋</span>
     @if (request()->routeIs('home'))
         @include('partials.davo-planner-invite')
-    @elseif (request()->routeIs('plan.itinerary') && isset($itinerary) && ! $itinerary->tourist_account_id && ! session('pending_save_itinerary'))
+    @elseif (request()->routeIs('plan.itinerary') && isset($itinerary) && ! $itinerary->edit_token_hash)
         @include('partials.davo-save-invite')
     @endif
 

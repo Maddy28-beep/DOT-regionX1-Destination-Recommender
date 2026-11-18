@@ -6,7 +6,6 @@ use App\Http\Controllers\TripPlannerController;
 use App\Http\Middleware\EnsureVisitorToken;
 use App\Models\Destination;
 use App\Models\Region;
-use App\Models\TouristAccount;
 use App\Models\TouristPreference;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -191,20 +190,5 @@ class ExitSurveyRecapTest extends TestCase
         $html = $this->get(route('exit-survey.recap'))->assertOk()->getContent();
 
         $this->assertStringNotContainsString('A very distinctive private comment', $html);
-    }
-
-    /** A logged-in tourist gets the same recap, and the survey stays unlinked from their account. */
-    public function test_a_logged_in_tourist_gets_the_same_recap_without_the_survey_being_linked(): void
-    {
-        [$a] = $this->seedDestinations(1);
-        $tourist = TouristAccount::create(['alias' => 'explorer1', 'password_hash' => Hash::make('password123')]);
-        $this->actingAs($tourist, 'tourist');
-
-        $this->post(route('exit-survey.store'), $this->validPayload(['places_visited' => ["destination:{$a->id}"]]));
-
-        $this->get(route('exit-survey.recap'))->assertOk()->assertSee('Destination 1');
-
-        $survey = \App\Models\ExitSurvey::sole();
-        $this->assertArrayNotHasKey('tourist_account_id', $survey->getAttributes());
     }
 }

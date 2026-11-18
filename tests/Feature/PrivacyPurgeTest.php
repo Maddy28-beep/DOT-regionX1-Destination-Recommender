@@ -6,7 +6,6 @@ use App\Models\ExitSurvey;
 use App\Models\Itinerary;
 use App\Models\ItineraryItem;
 use App\Models\PreferenceActivity;
-use App\Models\TouristAccount;
 use App\Models\TouristHealthCondition;
 use App\Models\TouristHealthProfile;
 use App\Models\TouristPreference;
@@ -49,10 +48,10 @@ class PrivacyPurgeTest extends TestCase
         ]);
     }
 
-    private function itinerary(TouristPreference $preference, int $ageDays, ?string $accountId = null): Itinerary
+    private function itinerary(TouristPreference $preference, int $ageDays, ?int $openedDaysAgo = null): Itinerary
     {
         $itinerary = Itinerary::create([
-            'preference_id' => $preference->id, 'total_days' => 2, 'generated_at' => now()->subDays($ageDays), 'tourist_account_id' => $accountId,
+            'preference_id' => $preference->id, 'total_days' => 2, 'generated_at' => now()->subDays($ageDays), 'edit_token_hash' => $openedDaysAgo === null ? null : hash('sha256', 'x'.$preference->id), 'last_opened_at' => $openedDaysAgo === null ? null : now()->subDays($openedDaysAgo),
         ]);
         ItineraryItem::create(['itinerary_id' => $itinerary->id, 'day_number' => 1, 'sort_order' => 1, 'slot' => 'Morning', 'kind' => 'baseline', 'title' => 'Arrival']);
 
@@ -98,16 +97,25 @@ class PrivacyPurgeTest extends TestCase
         $this->assertDatabaseHas('tourist_preferences', ['id' => $pref->id]);
     }
 
-    public function test_a_trip_saved_to_a_tourist_account_is_never_deleted(): void
+    public function test_a_plan_kept_by_link_survives_while_it_is_still_being_opened(): void
     {
-        $account = TouristAccount::create(['alias' => 'traveller1', 'password_hash' => 'x']);
         $pref = $this->preference();
-        $itinerary = $this->itinerary($pref, 400, $account->id);
+        $itinerary = $this->itinerary($pref, 400, 5);
 
         app(AnonymousDataPurger::class)->purge(now());
 
         $this->assertDatabaseHas('itineraries', ['id' => $itinerary->id]);
         $this->assertDatabaseHas('tourist_preferences', ['id' => $pref->id]);
+    }
+
+    public function test_a_plan_kept_by_link_goes_after_the_kept_period_without_being_opened(): void
+    {
+        $pref = $this->preference();
+        $itinerary = $this->itinerary($pref, 400, 120);
+
+        app(AnonymousDataPurger::class)->purge(now());
+
+        $this->assertDatabaseMissing('itineraries', ['id' => $itinerary->id]);
     }
 
     public function test_preferences_with_no_itinerary_such_as_the_demo_data_survive(): void
