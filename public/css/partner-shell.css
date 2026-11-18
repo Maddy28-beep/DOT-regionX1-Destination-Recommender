@@ -240,3 +240,15 @@
 .ptr-choices label:has(input:checked) { border-color: var(--primary); background: var(--primary-light); }
 .ptr-mini { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: .78rem; } .ptr-mini:last-child { border-bottom: 0; }
 .ptr-mini img { border-radius: 8px; object-fit: cover; } .ptr-mini small { color: var(--muted); }
+
+/* What waits between an establishment and DOT: the unsent draft, what DOT is reviewing, what DOT sent back. */
+.draft-bar { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin: 0 0 14px; padding: 12px 16px; border-radius: 12px; border: 1px solid #e8c777; background: #fffaf0; }
+.draft-bar__text { display: grid; gap: 2px; min-width: 0; flex: 1 1 320px; font-size: .88rem; color: #3b4a42; }
+.draft-bar__text strong { font-size: .95rem; color: #1c2b25; }
+.draft-bar__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.draft-bar__actions form { margin: 0; }
+.draft-bar__pill { display: inline-block; margin-left: 6px; padding: 2px 9px; border-radius: 999px; background: #fff0c7; color: #6b4a0b; font-size: .72rem; font-weight: 600; }
+.draft-bar--waiting { border-color: #dfe6df; background: #fff; }
+.draft-bar--returned { border-color: #e3b0a8; background: #fdf3f1; }
+.draft-bar--returned .draft-bar__pill { background: #fde0da; color: #8a2c1d; }
+.draft-tag { position: absolute; left: 8px; bottom: 8px; padding: 3px 9px; border-radius: 999px; background: #fff0c7; color: #6b4a0b; font-size: .7rem; font-weight: 700; }

@@ -16,10 +16,26 @@ class ListingPhoto extends Model
     public const SAMPLE_CATEGORY = 'Sample image';
 
     protected $fillable = [
-        'listing_kind', 'listing_id', 'path', 'category', 'amenity', 'sort_order', 'is_primary', 'source_url', 'source_name',
+        'review_status', 'listing_kind', 'listing_id', 'path', 'category', 'amenity', 'sort_order', 'is_primary', 'source_url', 'source_name',
         'source_type', 'permission_basis', 'permission_ref', 'permission_date', 'licence', 'credit_text', 'show_credit',
         'verification_status', 'verified_by', 'verified_at',
     ];
+
+    /**
+     * A photo (or offer) an establishment has added waits hidden until DOT approves it (review_status is set); only an
+     * approved one, with no review_status, is ever public. The establishment's own pages and the admin queue read
+     * through withoutGlobalScopes().
+     */
+    protected static function booted(): void
+    {
+        static::addGlobalScope('approved', fn (Builder $query) => $query->whereNull($query->getModel()->getTable().'.review_status'));
+    }
+
+    /** The establishment's routes name a photo that may still be waiting; ownership is checked there. */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->withoutGlobalScopes()->where($field ?? $this->getRouteKeyName(), $value)->first();
+    }
 
     protected function casts(): array
     {

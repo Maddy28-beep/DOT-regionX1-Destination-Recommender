@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // ExploreDVO has no generic `users` table: authentication is split across
+        // Portal sign-in lives in `users` (admins and establishments, see unify_users); travelers keep their own alias table. It was split across
         // three actor-specific tables (tourists, admin_users, establishment_accounts),
         // each behind its own auth guard. See 2.2.1.1 / 2.3.2 in the project spec.
         Schema::create('sessions', function (Blueprint $table) {

@@ -18,6 +18,8 @@ use Tests\TestCase;
  */
 class DestinationPartnerAccountTest extends TestCase
 {
+    use \Tests\Concerns\ApprovesListingDrafts;
+
     use RefreshDatabase;
 
     private function destination(string $name, array $extra = []): Destination
@@ -94,11 +96,13 @@ class DestinationPartnerAccountTest extends TestCase
         $this->actingAs($partner, 'establishment')->put(route('establishment.listing.update'), [
             'section' => 'amenities', 'amenities' => ['parking', 'restroom'],
         ])->assertSessionHasNoErrors();
+        $this->approveDraftOf($partner);
         $this->assertEqualsCanonicalizing(['Parking Area', 'Restroom'], $mine->tags()->where('kind', 'amenity')->pluck('value')->all());
         $this->assertSame(0, $other->tags()->where('kind', 'amenity')->count(), 'another destination is untouched');
 
         $hours = array_fill(0, 7, ['on' => '1', 'from' => '09:00', 'to' => '16:00']);
         $this->actingAs($partner, 'establishment')->put(route('establishment.listing.update'), ['section' => 'hours', 'hours' => $hours])->assertSessionHasNoErrors();
+        $this->approveDraftOf($partner);
         $this->assertNotSame('8:00 AM–5:00 PM', $mine->fresh()->hours);
         $this->assertSame('8:00 AM–5:00 PM', $other->fresh()->hours);
 

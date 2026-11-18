@@ -2,17 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\DB;
 
-class EstablishmentAccount extends Authenticatable
+class EstablishmentAccount extends User
 {
-    use HasUuids;
-
-    public $timestamps = false;
+    /** What only a business has lives in `establishment_profiles`; the model reads and writes it as if it were its own. */
+    public const PROFILE = [
+        'business_name', 'listing_kind', 'claimed_accreditation_number', 'certificate_file_name', 'matched_listing_id', 'portal_key',
+        'contact_number', 'submitted_at', 'reviewed_by', 'reviewed_at', 'review_note',
+    ];
 
     protected $fillable = [
         'business_name', 'listing_kind', 'claimed_accreditation_number',
@@ -21,7 +24,8 @@ class EstablishmentAccount extends Authenticatable
         'submitted_at', 'reviewed_by', 'reviewed_at', 'review_note',
     ];
 
-    protected $hidden = ['password_hash'];
+    /** Profile values waiting to be written beside the user row. */
+    private array $profileToSave = [];
 
     protected function casts(): array
     {
@@ -31,9 +35,64 @@ class EstablishmentAccount extends Authenticatable
         ];
     }
 
-    public function getAuthPasswordName(): string
+    protected static function booted(): void
     {
-        return 'password_hash';
+        // Only establishments, each with its profile alongside.
+        static::addGlobalScope('establishments', function (Builder $q) {
+            $q->join('establishment_profiles', 'establishment_profiles.user_id', '=', 'users.id')
+                ->where('users.role', User::ESTABLISHMENT)
+                ->select(array_merge(['users.*'], array_map(fn ($c) => "establishment_profiles.$c", self::PROFILE)));
+        });
+
+        // The profile columns are not on the users table: set them aside before the user row is written, put them back after.
+        static::saving(function (self $account) {
+            if (! $account->exists) {
+                $account->role = User::ESTABLISHMENT;
+                $account->setAttribute('submitted_at', $account->getAttribute('submitted_at') ?? now());
+            }
+            $account->profileToSave = array_intersect_key($account->getDirty(), array_flip(self::PROFILE));
+            foreach (array_keys($account->profileToSave) as $column) {
+                unset($account->attributes[$column]);
+            }
+        });
+
+        static::saved(function (self $account) {
+            if ($account->profileToSave === []) {
+                return;
+            }
+            $values = array_map(fn ($v) => $v instanceof \DateTimeInterface ? $v->format('Y-m-d H:i:s') : $v, $account->profileToSave);
+            $row = DB::table('establishment_profiles')->where('user_id', $account->getKey());
+            $row->exists() ? $row->update($values) : DB::table('establishment_profiles')->insert(['user_id' => $account->getKey()] + $values);
+            foreach ($account->profileToSave as $column => $value) {
+                $account->attributes[$column] = $value;
+            }
+            $account->profileToSave = [];
+            $account->syncOriginal();
+        });
+    }
+
+    /** fresh() and refresh() skip global scopes, and the scope is what brings the profile in. */
+    public function fresh($with = [])
+    {
+        return $this->exists ? $this->newQuery()->with(is_string($with) ? func_get_args() : $with)->whereKey($this->getKey())->first() : null;
+    }
+
+    public function refresh()
+    {
+        if (! $this->exists) {
+            return $this;
+        }
+        $this->setRawAttributes($this->newQuery()->whereKey($this->getKey())->firstOrFail()->attributes);
+        $this->load(collect($this->relations)->reject(fn ($relation) => $relation instanceof \Illuminate\Database\Eloquent\Relations\Pivot)->keys()->all());
+        $this->syncOriginal();
+
+        return $this;
+    }
+
+    /** The contact person is the account's name. */
+    protected function contactPerson(): Attribute
+    {
+        return Attribute::make(get: fn ($value, array $attributes) => $attributes['name'] ?? null, set: fn ($value) => ['name' => $value]);
     }
 
     public function matchedListing(): MorphTo

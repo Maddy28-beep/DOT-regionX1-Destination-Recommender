@@ -19,6 +19,8 @@ use Tests\TestCase;
  */
 class PackageItineraryTest extends TestCase
 {
+    use \Tests\Concerns\ApprovesListingDrafts;
+
     use RefreshDatabase;
 
     private function partnerWithPackage(): array
@@ -49,6 +51,7 @@ class PackageItineraryTest extends TestCase
                 'itinerary' => "Arrival & Camp 1 | Trek to Camp 1, briefing with your guide.\nSummit Push | Pre-dawn ascent, descend after.\nDescent & Departure",
             ])
             ->assertRedirect(route('establishment.listing.edit'));
+        $this->approveDraftOf($partner);
 
         $days = $package->itineraryDays()->get();
         $this->assertCount(3, $days);
@@ -67,6 +70,7 @@ class PackageItineraryTest extends TestCase
         $this->actingAs($partner, 'establishment')
             ->put('/portal/establishment/listing', ['itinerary' => 'Day one on the water'])
             ->assertRedirect();
+        $this->approveDraftOf($partner);
 
         $this->get(route('packages.show', $package))
             ->assertOk()
@@ -79,10 +83,12 @@ class PackageItineraryTest extends TestCase
 
         $this->actingAs($partner, 'establishment')
             ->put('/portal/establishment/listing', ['itinerary' => "Day A\nDay B\nDay C"]);
+        $this->approveDraftOf($partner);
         $this->assertCount(3, $package->itineraryDays()->get());
 
         $this->actingAs($partner, 'establishment')
             ->put('/portal/establishment/listing', ['itinerary' => 'Day A only']);
+        $this->approveDraftOf($partner);
 
         $days = $package->itineraryDays()->get();
         $this->assertCount(1, $days);
@@ -95,10 +101,12 @@ class PackageItineraryTest extends TestCase
 
         $this->actingAs($partner, 'establishment')
             ->put('/portal/establishment/listing', ['itinerary' => "Day A\nDay B"]);
+        $this->approveDraftOf($partner);
         $this->assertCount(2, $package->itineraryDays()->get());
 
         $this->actingAs($partner, 'establishment')
             ->put('/portal/establishment/listing', ['itinerary' => '']);
+        $this->approveDraftOf($partner);
 
         $this->assertCount(0, $package->itineraryDays()->get());
     }
@@ -124,6 +132,7 @@ class PackageItineraryTest extends TestCase
         $this->actingAs($partner, 'establishment')
             ->put('/portal/establishment/listing', ['itinerary' => 'Day A'])
             ->assertRedirect();
+        $this->approveDraftOf($partner);
 
         $this->assertSame(0, \App\Models\PackageItineraryDay::count());
     }

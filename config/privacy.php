@@ -14,6 +14,9 @@
  */
 return [
     // Days an anonymous itinerary (and the preferences it was built from) is kept.
+    // A plan the traveler chose to keep by private link lives this long after it was last opened with that link.
+    'kept_retention_days' => (int) env('PRIVACY_KEPT_RETENTION_DAYS', 90),
+
     'retention_days' => (int) env('PRIVACY_RETENTION_DAYS', 30),
 
     // Days chatbot questions are kept; people sometimes type personal details into a chat box.

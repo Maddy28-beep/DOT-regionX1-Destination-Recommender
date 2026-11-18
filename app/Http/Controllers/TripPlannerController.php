@@ -386,7 +386,9 @@ class TripPlannerController extends Controller
             )
             : collect();
 
-        return view('plan.itinerary', compact('itinerary', 'preference', 'provenance', 'swap', 'ideas', 'operators'));
+        $keep = app(\App\Services\Itineraries\ItineraryKeep::class)->links($itinerary, $request->session()->get(\App\Services\Itineraries\ItineraryKeep::SESSION_KEY));
+
+        return view('plan.itinerary', compact('itinerary', 'preference', 'provenance', 'swap', 'ideas', 'operators', 'keep'));
     }
 
     /**

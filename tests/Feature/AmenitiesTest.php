@@ -29,6 +29,8 @@ use Tests\TestCase;
  */
 class AmenitiesTest extends TestCase
 {
+    use \Tests\Concerns\ApprovesListingDrafts;
+
     use RefreshDatabase;
 
     private function region(): Region
@@ -143,6 +145,7 @@ class AmenitiesTest extends TestCase
 
         $this->actingAs($account, 'establishment')->putJson('/portal/establishment/listing', ['section' => 'amenities', 'amenities' => ['wifi', 'pool', 'bogus']])
             ->assertOk()->assertJsonStructure(['redirect']);
+        $this->approveDraftOf($account);
 
         $this->assertSame(['wifi', 'pool'], app(AmenityStore::class)->keys('accommodation', $stay));
 
@@ -156,6 +159,7 @@ class AmenitiesTest extends TestCase
 
         // a form that ticks nothing clears them
         $this->actingAs($account, 'establishment')->putJson('/portal/establishment/listing', ['section' => 'amenities'])->assertOk();
+        $this->approveDraftOf($account);
         $this->assertSame([], app(AmenityStore::class)->keys('accommodation', $stay));
     }
 
@@ -169,6 +173,7 @@ class AmenitiesTest extends TestCase
             'amenities' => ['viewing_decks'],
             'amenity_names' => ['viewing_decks' => 'Sunset viewing deck'],
         ])->assertOk();
+        $this->approveDraftOf($account);
 
         $this->assertDatabaseHas('destination_tags', [
             'destination_id' => $destination->id,
@@ -198,6 +203,7 @@ class AmenitiesTest extends TestCase
         $photo(['category' => 'Amenities', 'amenity' => 'lockers'])->assertOk();
         $photo(['category' => 'Accessibility', 'amenity' => 'ramp'])->assertOk();
         $photo(['category' => 'Exterior'])->assertOk();
+        $this->approveDraftOf($account);
 
         $this->assertSame('lockers', ListingPhoto::where('category', 'Amenities')->first()->amenity);
         $this->assertNull(ListingPhoto::where('category', 'Exterior')->first()->amenity);

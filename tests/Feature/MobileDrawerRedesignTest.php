@@ -26,7 +26,7 @@ class MobileDrawerRedesignTest extends TestCase
         $drawer = $this->drawer();
         $last = -1;
 
-        foreach (['Destinations', 'Stays', 'Dining', 'Packages', 'More', 'Souvenir Centers', 'Tour Operators', 'Events', 'Advisories', 'Log in', 'Saved', 'Create a free account', 'List your establishment', 'Plan My Trip'] as $label) {
+        foreach (['Destinations', 'Stays', 'Dining', 'Packages', 'More', 'Souvenir Centers', 'Tour Operators', 'Events', 'Advisories', 'Saved', 'List your establishment', 'Plan My Trip'] as $label) {
             $at = strpos($drawer, $label, $last + 1);
             $this->assertNotFalse($at, "{$label} is in the drawer, after the one before it.");
             $last = $at;
@@ -51,11 +51,11 @@ class MobileDrawerRedesignTest extends TestCase
         $this->assertStringContainsString('id="mobile-more-links" hidden', $drawer);
     }
 
-    public function test_log_in_and_saved_are_pills_and_the_account_links_are_grouped(): void
+    public function test_saved_is_a_pill_and_the_partner_links_are_grouped(): void
     {
         $drawer = $this->drawer();
 
-        $this->assertSame(2, substr_count($drawer, 'class="mobile-menu__pill"'), 'Log in and Saved.');
+        $this->assertSame(1, substr_count($drawer, 'class="mobile-menu__pill"'), 'Saved.');
         $this->assertStringContainsString('id="mobileMenuAccount"', $drawer);
         $this->assertStringContainsString('aria-labelledby="mobileMenuAccount"', $drawer);
     }

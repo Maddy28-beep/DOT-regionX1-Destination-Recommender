@@ -60,7 +60,7 @@ class EstablishmentRegistrationFlowTest extends TestCase
         $this->post('/portal/register', $payload)
             ->assertSessionHasErrors('terms_accepted');
 
-        $this->assertDatabaseCount('establishment_accounts', 0);
+        $this->assertDatabaseCount('establishment_profiles', 0);
     }
 
     /** An explicitly unticked box is refused the same way a missing one is. */
@@ -69,7 +69,7 @@ class EstablishmentRegistrationFlowTest extends TestCase
         $this->post('/portal/register', $this->application(['terms_accepted' => '0']))
             ->assertSessionHasErrors('terms_accepted');
 
-        $this->assertDatabaseCount('establishment_accounts', 0);
+        $this->assertDatabaseCount('establishment_profiles', 0);
     }
 
     private function admin(): AdminUser

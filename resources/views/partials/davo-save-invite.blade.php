@@ -7,10 +7,10 @@
         <img src="{{ asset('images/davo-adventure-ready.webp') }}" width="64" height="64" alt="" class="davo-invite__avatar">
         <div>
             <h2 id="davoSaveInviteTitle">Your adventure is ready.</h2>
-            <p>Save your plan for later.</p>
+            <p>Keep your plan with a private link.</p>
         </div>
     </div>
-    <button type="submit" form="itinerarySaveForm" class="btn btn-primary davo-invite__action" data-davo-invite-link><x-icon name="heart" /> Save itinerary</button>
+    <a href="#keep" class="btn btn-primary davo-invite__action" data-davo-invite-link><x-icon name="heart" /> Keep this plan</a>
 </aside>
 <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/davo-planner-invite.css') }}">
 <script src="{{ asset('js/davo-planner-invite.js') }}?v={{ filemtime(public_path('js/davo-planner-invite.js')) }}" defer></script>

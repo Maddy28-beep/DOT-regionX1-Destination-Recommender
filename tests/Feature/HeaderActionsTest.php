@@ -30,11 +30,11 @@ class HeaderActionsTest extends TestCase
         }
     }
 
-    public function test_the_header_has_the_heart_the_login_link_and_the_plan_button(): void
+    public function test_the_header_has_the_heart_and_the_plan_button_and_no_traveler_login(): void
     {
         $this->get('/destinations')->assertOk()
             ->assertSee('class="header-saved"', false)
-            ->assertSee('Log in')
+            ->assertDontSee('Log in')
             ->assertSee('Plan My Trip');
     }
 

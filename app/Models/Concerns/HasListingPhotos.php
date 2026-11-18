@@ -15,6 +15,15 @@ trait HasListingPhotos
             ->orderBy('sort_order');
     }
 
+    /** Every photo, including those still waiting for DOT: for the establishment's own pages only. */
+    public function photosWithDrafts(): MorphMany
+    {
+        return $this->morphMany(ListingPhoto::class, 'listing', 'listing_kind', 'listing_id')
+            ->withoutGlobalScopes()
+            ->orderByDesc('is_primary')
+            ->orderBy('sort_order');
+    }
+
     public function coverPhoto(): ?ListingPhoto
     {
         return $this->relationLoaded('photos')

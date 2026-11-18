@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class Promotion extends Model
 {
     protected $fillable = [
-        'listing_kind', 'listing_id', 'title', 'code', 'description', 'starts_at', 'ends_at',
+        'review_status', 'listing_kind', 'listing_id', 'title', 'code', 'description', 'starts_at', 'ends_at',
     ];
 
     protected function casts(): array
@@ -23,6 +23,18 @@ class Promotion extends Model
             'starts_at' => 'date',
             'ends_at' => 'date',
         ];
+    }
+
+    /** An offer an establishment has added waits hidden until DOT approves it (see ListingPhoto::booted). */
+    protected static function booted(): void
+    {
+        static::addGlobalScope('approved', fn (Builder $query) => $query->whereNull($query->getModel()->getTable().'.review_status'));
+    }
+
+    /** The establishment's routes name an offer that may still be waiting; ownership is checked there. */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->withoutGlobalScopes()->where($field ?? $this->getRouteKeyName(), $value)->first();
     }
 
     public function listing(): MorphTo

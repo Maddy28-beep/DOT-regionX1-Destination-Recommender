@@ -10,6 +10,8 @@
 
 @section('content')
 
+@include('establishment.partials.draft-bar', ['establishment' => $establishment])
+
 @php
     $kind = $establishment->listing_kind;
     $price = match ($kind) {
