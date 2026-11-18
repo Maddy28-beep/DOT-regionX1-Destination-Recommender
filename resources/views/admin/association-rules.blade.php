@@ -73,6 +73,9 @@
                 @if ($totalRulesFound > $rules->count())
                     Showing the top {{ $rules->count() }} of {{ $totalRulesFound }} rules found, ranked by confidence.
                 @endif
+                @if ($rulesBuiltAt)
+                    Rules are counted once a night; last built {{ \Illuminate\Support\Carbon::parse($rulesBuiltAt, 'UTC')->timezone('Asia/Manila')->format('j M Y, g:i A') }} (Philippine time).
+                @endif
             </p>
         @endif
 

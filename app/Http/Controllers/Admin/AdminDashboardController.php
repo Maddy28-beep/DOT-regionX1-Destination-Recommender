@@ -619,6 +619,7 @@ class AdminDashboardController extends Controller
         // Which transaction sources to mine: everything, or one kind on its own.
         $source = in_array($request->get('source'), ['real', 'itinerary', 'demo'], true) ? $request->get('source') : 'all';
         $apriori = $apriori->onlySources($source === 'all' ? null : [$source]);
+        $rulesBuiltAt = $apriori->rulesBuiltAt();
 
         $sourceCounts = ExitSurvey::query()
             ->selectRaw('data_source, count(*) as total')->groupBy('data_source')->pluck('total', 'data_source');
@@ -656,7 +657,7 @@ class AdminDashboardController extends Controller
 
         return view('admin.association-rules', compact(
             'rules', 'sort', 'dir', 'totalTransactions', 'demoTransactions', 'sourceCounts', 'source', 'totalRulesFound',
-            'minSupportPct'
+            'minSupportPct', 'rulesBuiltAt'
         ))->with('minConfidencePct', round(self::ASSOCIATION_MIN_CONFIDENCE * 100));
     }
 

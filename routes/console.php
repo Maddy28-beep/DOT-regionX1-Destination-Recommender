@@ -21,6 +21,11 @@ Schedule::command('accreditation:sync-status')->daily();
 Schedule::command('privacy:purge-anonymous-data')->dailyAt('03:00')->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/privacy-purge.log'));
 
+// Counts the "people who visit A also visit B" pairs once a night, so suggestions can be read from a table instead of
+// being re-counted from every recorded trip (read only while the association_rules_table switch is on).
+Schedule::command('association-rules:build')->dailyAt('02:30')->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/association-rules.log'));
+
 // Removes surveys submitted from /exit-survey?test=1 (and, by cascade, their places and activities).
 Artisan::command('exit-survey:purge-test', function () {
     $deleted = \App\Models\ExitSurvey::withoutGlobalScopes()->where('data_source', 'test')->delete();
