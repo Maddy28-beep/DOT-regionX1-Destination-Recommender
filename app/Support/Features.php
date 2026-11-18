@@ -14,6 +14,8 @@ final class Features
 {
     public const TRIP_LOCATION_V2 = 'trip_location_v2';
 
+    public const ASSOCIATION_RULES_TABLE = 'association_rules_table';
+
     public static function on(string $name): bool
     {
         try {
