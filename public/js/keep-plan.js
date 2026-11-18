@@ -1,6 +1,32 @@
 // Copy buttons for the private-link panel on the itinerary page.
 (function () {
     'use strict';
+    var managed = document.querySelector('[data-keep-managed]');
+    var manageLinks = document.querySelectorAll('[data-keep-manage]');
+    function showManagedPanel() {
+        if (!managed) return;
+        managed.hidden = false;
+        manageLinks.forEach(function (link) { link.setAttribute('aria-expanded', 'true'); });
+    }
+    manageLinks.forEach(function (link) {
+        link.addEventListener('click', function (event) {
+            if (!managed) return;
+            event.preventDefault();
+            showManagedPanel();
+            managed.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+        });
+    });
+    document.querySelectorAll('[data-keep-panel-close]').forEach(function (button) {
+        button.hidden = false;
+        button.addEventListener('click', function () {
+            managed.hidden = true;
+            var device = managed.querySelector('[data-keep-device]');
+            if (device) device.open = false;
+            manageLinks.forEach(function (link) { link.setAttribute('aria-expanded', 'false'); });
+            if (manageLinks[0]) manageLinks[0].focus({ preventScroll: true });
+        });
+    });
+    if (window.location.hash === '#keep') showManagedPanel();
     // Enhance the existing confirmation section into a native modal. Without JS,
     // the original anchor and POST form still work as an inline fallback.
     var confirmation = document.querySelector('[data-keep-confirm]');

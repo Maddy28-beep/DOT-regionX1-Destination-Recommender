@@ -26,12 +26,13 @@ class ItineraryKeepController extends Controller
 
         // Pressing it again when the link is already here changes nothing; "make a new link" is the way to replace it.
         if ($this->keep->isKept($itinerary) && $this->keep->links($itinerary, $existing)) {
-            return redirect()->to(route('plan.itinerary').'#keep');
+            return redirect()->to(route('plan.itinerary').'#keep')->with('show_keep_panel', true);
         }
 
         $request->session()->put(ItineraryKeep::SESSION_KEY, $this->keep->issue($itinerary));
 
         return redirect()->to(route('plan.itinerary').'#keep')
+            ->with('show_keep_panel', true)
             ->with(Toast::success('Your plan has a private link', 'Copy it or scan the code. Anyone with the link can open this plan.'));
     }
 
@@ -42,6 +43,7 @@ class ItineraryKeepController extends Controller
         $request->session()->put(ItineraryKeep::SESSION_KEY, $this->keep->issue($itinerary));
 
         return redirect()->to(route('plan.itinerary').'#keep')
+            ->with('show_keep_panel', true)
             ->with(Toast::success('New link made', 'The old links no longer open this plan.'));
     }
 
@@ -55,8 +57,9 @@ class ItineraryKeepController extends Controller
         $request->session()->put(TripPlannerController::PREFERENCE_KEY, $itinerary->preference_id);
         $request->session()->put(TripPlannerController::ITINERARY_KEY, $itinerary->id);
         $request->session()->put(ItineraryKeep::SESSION_KEY, $secret);
+        $request->session()->forget('show_keep_panel');
 
-        return $this->private(redirect()->to(route('plan.itinerary').'#keep'));
+        return $this->private(redirect()->to(route('plan.itinerary')));
     }
 
     /** The share link: the plan to read, print or save as a PDF. It cannot be changed from here. */

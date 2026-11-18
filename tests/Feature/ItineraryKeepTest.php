@@ -48,7 +48,7 @@ class ItineraryKeepTest extends TestCase
     {
         [$trip, $pref] = $this->plan();
 
-        $this->holding($trip, $pref)->post(route('plan.keep'))->assertRedirect();
+        $this->holding($trip, $pref)->post(route('plan.keep'))->assertRedirect()->assertSessionHas('show_keep_panel', true);
 
         $trip->refresh();
         $secret = session(ItineraryKeep::SESSION_KEY);
@@ -79,13 +79,18 @@ class ItineraryKeepTest extends TestCase
         $secret = session(ItineraryKeep::SESSION_KEY);
 
         $this->flushSession();
-        $response = $this->get(route('plan.kept.open', $secret))->assertRedirect();
+        $response = $this->get(route('plan.kept.open', $secret))->assertRedirect(route('plan.itinerary'));
 
         $this->assertSame($trip->id, session(TripPlannerController::ITINERARY_KEY));
         $this->assertSame($pref->id, session(TripPlannerController::PREFERENCE_KEY));
         $response->assertHeader('Referrer-Policy', 'no-referrer');
         $this->assertStringContainsString('noindex', $response->headers->get('X-Robots-Tag'));
         $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
+
+        $page = $this->get(route('plan.itinerary'))->assertOk()->assertSee('data-keep-manage', false);
+        preg_match('/<section\b[^>]*id="keep"[^>]*>/', $page->getContent(), $panel);
+        $this->assertNotEmpty($panel, 'The owner can still manage their links.');
+        $this->assertStringContainsString('hidden', $panel[0], 'Opening the private link should show the itinerary, not link management.');
     }
 
     public function test_a_wrong_or_malformed_secret_finds_nothing(): void

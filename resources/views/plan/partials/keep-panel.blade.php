@@ -1,7 +1,7 @@
 {{-- Private-link behavior stays in ItineraryKeep; this partial only presents its existing states. --}}
 @php $days = (int) config('privacy.kept_retention_days', 90); @endphp
 <link rel="stylesheet" href="{{ asset('css/keep-plan.css') }}?v={{ filemtime(public_path('css/keep-plan.css')) }}">
-<section class="keep-plan {{ ! $itinerary->edit_token_hash ? 'keep-plan--confirm' : '' }}" id="keep" aria-labelledby="keepTitle" @unless ($itinerary->edit_token_hash) data-keep-confirm @endunless>
+<section class="keep-plan {{ ! $itinerary->edit_token_hash ? 'keep-plan--confirm' : '' }}" id="keep" aria-labelledby="keepTitle" @if ($itinerary->edit_token_hash) data-keep-managed @unless (session('show_keep_panel')) hidden @endunless @else data-keep-confirm @endif>
     @if ($keep)
         <header class="keep-plan__heading">
             <span class="keep-plan__check" aria-hidden="true"><x-icon name="check" /></span>
@@ -37,5 +37,7 @@
         <p class="keep-plan__retention">Deleted {{ $days }} days after your last visit. Lost links cannot be recovered.</p>
         <form method="POST" action="{{ route('plan.keep') }}" class="keep-plan__confirm-actions">@csrf<button type="button" class="btn btn-outline" data-keep-dismiss hidden>Not now</button><button type="submit" class="btn btn-primary">Create private link</button></form>
     @endif
+    @if ($itinerary->edit_token_hash)<button type="button" class="keep-plan__linkbtn keep-plan__panel-close" data-keep-panel-close hidden>Close link panel</button>@endif
 </section>
+<noscript><style>.keep-plan[hidden]:target { display: block !important; }</style></noscript>
 <script src="{{ asset('js/keep-plan.js') }}?v={{ filemtime(public_path('js/keep-plan.js')) }}" defer></script>
