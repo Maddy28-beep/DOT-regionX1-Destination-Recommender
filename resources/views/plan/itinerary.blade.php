@@ -117,7 +117,7 @@
                         @unless ($itinerary->package)
                             <a href="{{ route('plan.edit') }}" class="btn btn-outline"><x-icon name="filter" /> Edit preferences</a>
                         @endunless
-                        <a href="#keep" class="btn btn-primary" @unless ($itinerary->edit_token_hash) data-keep-open @endunless><x-icon :name="$itinerary->edit_token_hash ? 'check' : 'heart'" /> {{ $itinerary->edit_token_hash ? 'Saved · Manage link' : 'Keep this plan' }}</a>
+                        <a href="#keep" class="btn btn-primary" @if ($itinerary->edit_token_hash) data-keep-manage aria-controls="keep" aria-expanded="{{ session('show_keep_panel') ? 'true' : 'false' }}" @else data-keep-open @endif><x-icon :name="$itinerary->edit_token_hash ? 'check' : 'heart'" /> {{ $itinerary->edit_token_hash ? 'Saved · Manage link' : 'Keep this plan' }}</a>
                     </div>
                     @unless ($itinerary->edit_token_hash)
                         <p class="itin-banner__keep-state">Not saved yet</p>
