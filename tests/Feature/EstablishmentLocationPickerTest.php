@@ -27,6 +27,8 @@ use Tests\TestCase;
  */
 class EstablishmentLocationPickerTest extends TestCase
 {
+    use \Tests\Concerns\ApprovesListingDrafts;
+
     use RefreshDatabase;
 
     private function partner(): EstablishmentAccount
@@ -77,6 +79,7 @@ class EstablishmentLocationPickerTest extends TestCase
             ]))
             ->assertRedirect()
             ->assertSessionHasNoErrors();
+        $this->approveDraftOf($partner);
 
         $listing = $partner->matchedListing()->first();
         $this->assertEqualsWithDelta(7.0644, (float) $listing->latitude, 0.0001);
@@ -98,6 +101,7 @@ class EstablishmentLocationPickerTest extends TestCase
                 'latitude' => 10.2794, 'longitude' => 123.9747,
             ]))
             ->assertSessionHasErrors('longitude');
+        $this->approveDraftOf($partner);
 
         $this->assertNull($partner->matchedListing()->first()->latitude);
     }
@@ -110,6 +114,7 @@ class EstablishmentLocationPickerTest extends TestCase
         $this->actingAs($partner, 'establishment')
             ->put('/portal/establishment/listing', $this->form(['latitude' => 7.0644]))
             ->assertSessionHasErrors('longitude');
+        $this->approveDraftOf($partner);
 
         $this->assertNull($partner->matchedListing()->first()->latitude);
     }
@@ -128,6 +133,7 @@ class EstablishmentLocationPickerTest extends TestCase
         $this->actingAs($partner, 'establishment')
             ->put('/portal/establishment/listing', $this->form())
             ->assertSessionHasNoErrors();
+        $this->approveDraftOf($partner);
 
         $this->assertNull($partner->matchedListing()->first()->latitude);
         $this->assertNull($partner->matchedListing()->first()->longitude);
@@ -145,6 +151,7 @@ class EstablishmentLocationPickerTest extends TestCase
                 'latitude' => 7.1553, 'longitude' => 125.7080,
             ]))
             ->assertSessionHasNoErrors();
+        $this->approveDraftOf($partner);
 
         $listing = $partner->matchedListing()->first();
         $this->assertSame('Beachfront rooms and a dive shop.', $listing->description);

@@ -10,6 +10,8 @@
 
 @section('content')
 
+@include('establishment.partials.draft-bar', ['establishment' => $establishment])
+
 @php
     $readiness = app(\App\Services\Establishment\ListingReadiness::class);
     $missing = $readiness->realPhotos($listing)->reject(fn ($p) => $readiness->credited($p))->count();
@@ -48,6 +50,7 @@
                         <div class="ptr-photo__img">
                             <img src="{{ $photo->url() }}" alt="{{ $listing->name }}, {{ $photo->category }}" loading="lazy">
                             @if ($photo->is_primary && !$photo->isAmenityPhoto())<span class="ptr-photo__cover"><x-icon name="star" /> Cover</span>@endif
+                            @if ($photo->review_status)<span class="draft-tag">{{ ['draft' => 'Not sent yet', 'pending' => 'Waiting for DOT', 'returned' => 'Returned by DOT'][$photo->review_status] ?? 'Waiting' }}</span>@endif
                         </div>
                         <div class="ptr-photo__meta">
                             <span class="ptr-photo__grip" title="Drag to reorder" aria-hidden="true">&#8942;&#8942;</span>

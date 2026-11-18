@@ -116,6 +116,7 @@ class AppServiceProvider extends ServiceProvider
 
         // The count beside "Package Approvals" in the DOT Admin sidebar: packages tour operators sent in that DOT has not decided.
         View::composer('layouts.admin', function ($view) {
+            $view->with('navListingsWaiting', \App\Models\ListingSubmission::where('status', \App\Models\ListingSubmission::PENDING)->count());
             $view->with('navPackagesWaiting', \App\Models\Package::where('status', \App\Models\Package::STATUS_IN_REVIEW)->count());
         });
 

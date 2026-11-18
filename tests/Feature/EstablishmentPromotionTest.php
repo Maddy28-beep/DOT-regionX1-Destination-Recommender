@@ -20,6 +20,8 @@ use Tests\TestCase;
  */
 class EstablishmentPromotionTest extends TestCase
 {
+    use \Tests\Concerns\ApprovesListingDrafts;
+
     use RefreshDatabase;
 
     private function partnerWithListing(): array
@@ -58,6 +60,7 @@ class EstablishmentPromotionTest extends TestCase
                 'description' => 'Show this code at check-in.',
             ])
             ->assertRedirect();
+        $this->approveDraftOf($partner);
 
         $promotion = Promotion::sole();
         $this->assertSame('accommodation', $promotion->listing_kind);

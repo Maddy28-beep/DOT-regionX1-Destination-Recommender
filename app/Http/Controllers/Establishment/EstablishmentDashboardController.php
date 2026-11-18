@@ -9,6 +9,8 @@ use App\Models\Destination;
 use App\Models\Package;
 use App\Models\Review;
 use App\Services\Amenities\AmenityStore;
+use App\Models\ListingSubmission;
+use App\Services\Listings\ListingDraft;
 use App\Support\Amenities;
 use App\Services\Establishment\ListingInsights;
 use App\Services\Establishment\ListingReadiness;
@@ -94,16 +96,23 @@ class EstablishmentDashboardController extends Controller
                 ->with(Toast::success('No listing linked yet', 'A DOT Admin will link one once your accreditation is verified.'));
         }
 
+        // The establishment sees its own draft laid over the approved page.
+        $drafts = app(ListingDraft::class);
+        $draft = $drafts->current($establishment)?->load('changes');
+        $listing = $drafts->overlay($establishment, $listing);
+        $submissions = ListingSubmission::where('establishment_account_id', $establishment->id)
+            ->whereIn('status', [ListingSubmission::PENDING, ListingSubmission::RETURNED])->with('changes')->latest('id')->get();
+
         // Same map the QR encoder uses, so the URL shown beside the code can't
         // drift from the one it actually encodes.
         $qrTargetUrl = QrCodeController::targetUrlFor($establishment->listing_kind, $listing);
         $readiness = app(ListingReadiness::class)->for($establishment->listing_kind, $listing);
         $hoursColumn = ListingReadiness::hoursColumn($establishment->listing_kind);
         $hours = $hoursColumn ? trim((string) $listing->{$hoursColumn}) : null;
-        $amenityKeys = $this->hasAmenityList($establishment->listing_kind) ? app(AmenityStore::class)->keys($establishment->listing_kind, $listing) : null;
+        $amenityKeys = $this->hasAmenityList($establishment->listing_kind) ? ($drafts->payload($draft, 'amenities')['amenities'] ?? app(AmenityStore::class)->keys($establishment->listing_kind, $listing)) : null;
         $amenityPhotos = $amenityKeys === null ? [] : $listing->photos->pluck('amenity')->filter()->unique()->all();
 
-        return view('establishment.edit-listing', compact('establishment', 'listing', 'qrTargetUrl', 'readiness', 'hoursColumn', 'hours', 'amenityKeys', 'amenityPhotos'));
+        return view('establishment.edit-listing', compact('establishment', 'listing', 'qrTargetUrl', 'readiness', 'hoursColumn', 'hours', 'amenityKeys', 'amenityPhotos', 'draft', 'submissions'));
     }
 
     /** The sections of My Listing that are edited in their own form (a modal where JavaScript is on). */
@@ -114,6 +123,40 @@ class EstablishmentDashboardController extends Controller
         'amenities' => ['Amenities', 'What is really there. Travellers and the trip planner use this.'],
         'position' => ['Pin your place on the map', 'Travellers use this to find you and to plan the route between places'],
     ];
+
+    /** Send the draft to DOT. */
+    public function submitDraft(Request $request): RedirectResponse
+    {
+        $establishment = $request->user('establishment');
+        abort_if(! $establishment->matchedListing, 404);
+
+        $sent = app(ListingDraft::class)->submit($establishment);
+
+        return redirect()->route('establishment.listing.edit')->with($sent
+            ? Toast::success('Sent to DOT', 'We will tell you when it is reviewed. Travelers keep seeing your approved page until then.')
+            : Toast::success('Nothing to send', 'Your draft has no changes yet.'));
+    }
+
+    /** Throw the draft away. */
+    public function discardDraft(Request $request): RedirectResponse
+    {
+        app(ListingDraft::class)->discard($request->user('establishment'));
+
+        return redirect()->route('establishment.listing.edit')->with(Toast::success('Draft discarded', 'Your listing is as DOT last approved it.'));
+    }
+
+    /** A returned submission becomes the draft again. */
+    public function reopenSubmission(Request $request, ListingSubmission $submission): RedirectResponse
+    {
+        $establishment = $request->user('establishment');
+        abort_unless($submission->establishment_account_id === $establishment->id, 404);
+
+        $ok = app(ListingDraft::class)->reopen($submission);
+
+        return redirect()->route('establishment.listing.edit')->with($ok
+            ? Toast::success('Back in your draft', 'Fix what DOT asked for, then send it again.')
+            : Toast::success('Send or discard your current draft first', 'Only one draft can be open at a time.'));
+    }
 
     public function form(Request $request, string $section): View|Response|RedirectResponse
     {
@@ -127,6 +170,8 @@ class EstablishmentDashboardController extends Controller
                 ->with(Toast::success('No listing linked yet', 'A DOT Admin will link one once your accreditation is verified.'));
         }
 
+        $drafts = app(ListingDraft::class);
+        $listing = $drafts->overlay($establishment, $listing);
         $hoursColumn = ListingReadiness::hoursColumn($establishment->listing_kind);
         abort_if($section === 'status' && ! method_exists($listing, 'operatingNotice'), 404);
         abort_if($section === 'hours' && ! $hoursColumn, 404);
@@ -141,7 +186,7 @@ class EstablishmentDashboardController extends Controller
         ];
 
         if ($section === 'amenities') {
-            $data['ticked'] = app(AmenityStore::class)->keys($establishment->listing_kind, $listing);
+            $data['ticked'] = $drafts->payload($drafts->current($establishment)?->load('changes'), 'amenities')['amenities'] ?? app(AmenityStore::class)->keys($establishment->listing_kind, $listing);
         }
 
         if ($section === 'hours') {
@@ -178,18 +223,18 @@ class EstablishmentDashboardController extends Controller
                 'amenity_names' => ['nullable', 'array'],
                 'amenity_names.*' => ['nullable', 'string', 'max:80'],
             ]);
-            app(AmenityStore::class)->sync($establishment->listing_kind, $listing, $data['amenities'] ?? [], $data['amenity_names'] ?? []);
+            // Waits for DOT with the rest of the draft (see ListingDraft).
+            app(ListingDraft::class)->stage($establishment, 'amenities', ['amenities' => $data['amenities'] ?? [], 'names' => $data['amenity_names'] ?? []]);
 
-            return $this->savedTo($request, route('establishment.listing.edit'), Toast::success('Amenities saved', 'Travellers see them on your page and the trip planner uses them.'));
+            return $this->savedTo($request, route('establishment.listing.edit'), Toast::success('Amenities saved to your draft', 'Send your draft to DOT when you are ready. Travelers keep seeing your approved page until then.'));
         }
 
         if ($section === 'hours') {
             abort_if(! $hoursColumn, 404);
 
-            $listing->{$hoursColumn} = $this->hoursFromRequest($request);
-            $listing->save();
+            app(ListingDraft::class)->stage($establishment, 'hours', ['attributes' => [$hoursColumn => $this->hoursFromRequest($request)]]);
 
-            return $this->savedTo($request, route('establishment.listing.edit'), Toast::success('Opening hours saved', 'Travellers planning a day now see when you are open.'));
+            return $this->savedTo($request, route('establishment.listing.edit'), Toast::success('Opening hours saved to your draft', 'Send your draft to DOT when you are ready. Travelers keep seeing your approved page until then.'));
         }
 
         $data = $request->validate([
@@ -239,29 +284,36 @@ class EstablishmentDashboardController extends Controller
             'tiktok_url.url' => 'Enter a full web address, starting with http:// or https://.',
         ]);
 
-        if ($part('details')) {
-            $listing->description = $data['description'] ?? null;
-            $listing->price_tier = $data['price_tier'] ?? null;
-            $listing->website_url = $data['website_url'] ?? null;
-            $listing->facebook_url = $data['facebook_url'] ?? null;
-            $listing->instagram_url = $data['instagram_url'] ?? null;
-            $listing->tiktok_url = $data['tiktok_url'] ?? null;
+        // Details and position wait for DOT in the draft; only the operating status below goes live at once.
+        $draft = app(ListingDraft::class);
+        $staged = false;
 
+        if ($part('details')) {
+            $attributes = [
+                'description' => $data['description'] ?? null,
+                'price_tier' => $data['price_tier'] ?? null,
+                'website_url' => $data['website_url'] ?? null,
+                'facebook_url' => $data['facebook_url'] ?? null,
+                'instagram_url' => $data['instagram_url'] ?? null,
+                'tiktok_url' => $data['tiktok_url'] ?? null,
+            ];
             match ($establishment->listing_kind) {
-                'accommodation' => $listing->price_per_night = $data['price_amount'] ?? null,
-                'package' => $listing->price_per_pax = $data['price_amount'] ?? null,
+                'accommodation' => $attributes['price_per_night'] = $data['price_amount'] ?? null,
+                'package' => $attributes['price_per_pax'] = $data['price_amount'] ?? null,
                 default => null,
             };
             if ($establishment->listing_kind === 'accommodation' && array_key_exists('price_per_day', $data)) {
-                $listing->price_per_day = $data['price_per_day'];
+                $attributes['price_per_day'] = $data['price_per_day'];
             }
+            $draft->stage($establishment, 'details', ['attributes' => $attributes] + ($establishment->listing_kind === 'package' ? ['itinerary' => $data['itinerary'] ?? ''] : []));
+            $staged = true;
         }
 
         if ($part('position')) {
             // Blank clears it: "we do not know" is a better answer than a wrong
             // pin, because the recommender trusts a stored coordinate completely.
-            $listing->latitude = $data['latitude'] ?? null;
-            $listing->longitude = $data['longitude'] ?? null;
+            $draft->stage($establishment, 'position', ['attributes' => ['latitude' => $data['latitude'] ?? null, 'longitude' => $data['longitude'] ?? null]]);
+            $staged = true;
         }
 
         if ($tracksStatus && $part('status')) {
@@ -271,18 +323,16 @@ class EstablishmentDashboardController extends Controller
             $listing->reopens_on = $status === Destination::STATUS_TEMPORARILY_CLOSED ? ($data['reopens_on'] ?? null) : null;
         }
 
-        $listing->save();
-
-        // Self-service, same as everything else on this page: no DOT
-        // approval step before a package's day-by-day breakdown goes live.
-        if ($part('details') && $establishment->listing_kind === 'package') {
-            $this->syncItineraryDays($listing, $data['itinerary'] ?? '');
+        if ($tracksStatus && $part('status')) {
+            $listing->save();
         }
 
         $toast = match ($section) {
             'status' => Toast::success('Operating status saved', 'Travellers see the change straight away.'),
-            'position' => Toast::success('Map position saved', 'Travel times to you will use this spot.'),
-            default => Toast::success('Listing updated', 'Your changes are now live on the public catalog.'),
+            'position' => Toast::success('Map position saved to your draft', 'Send your draft to DOT when you are ready. Travelers keep seeing your approved page until then.'),
+            default => $staged
+                ? Toast::success('Saved to your draft', 'Send your draft to DOT when you are ready. Travelers keep seeing your approved page until then.')
+                : Toast::success('Operating status saved', 'Travellers see the change straight away.'),
         };
 
         return $this->savedTo($request, route('establishment.listing.edit'), $toast);
@@ -342,6 +392,14 @@ class EstablishmentDashboardController extends Controller
      * assigned by line order rather than typed by the operator, so removing
      * or reordering a line can't leave a gap or a duplicate day number.
      */
+    /** Used when DOT approves a package's staged itinerary (see ListingDraft). */
+    public function syncItineraryDaysFor($listing, string $itinerary): void
+    {
+        if ($listing instanceof Package) {
+            $this->syncItineraryDays($listing, $itinerary);
+        }
+    }
+
     private function syncItineraryDays(Package $package, string $itinerary): void
     {
         $package->itineraryDays()->delete();

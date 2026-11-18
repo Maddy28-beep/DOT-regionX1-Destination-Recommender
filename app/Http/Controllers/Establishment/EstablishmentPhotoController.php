@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use App\Services\Listings\ListingDraft;
 use App\Support\Toast;
 
 class EstablishmentPhotoController extends Controller
@@ -47,7 +48,8 @@ class EstablishmentPhotoController extends Controller
                 ->with(Toast::success('No listing linked yet', 'A DOT Admin will link one once your accreditation is verified.'));
         }
 
-        $photos = $listing->photos;
+        // Photos still waiting for DOT are shown too, marked as waiting.
+        $photos = $listing->photosWithDrafts;
 
         return view('establishment.photos', [
             'establishment' => $establishment,
@@ -171,13 +173,16 @@ class EstablishmentPhotoController extends Controller
 
         $credit = $request->boolean('own') ? $establishment->business_name : trim((string) ($data['credit_text'] ?? ''));
 
-        $nextSort = (int) $listing->photos()->max('sort_order') + 1;
+        $nextSort = (int) $listing->photosWithDrafts()->max('sort_order') + 1;
         $hasPhotos = $listing->photos()->coverEligible()->exists();
+        $drafts = app(ListingDraft::class);
 
         foreach ($data['photos'] as $i => $file) {
             $path = $file->store("listings/{$establishment->listing_kind}/{$listing->id}", 'public');
 
-            ListingPhoto::create([
+            $photo = ListingPhoto::create([
+                // Hidden from travelers until DOT approves the draft it goes into.
+                'review_status' => 'draft',
                 'listing_kind' => $establishment->listing_kind,
                 'listing_id' => $listing->id,
                 'path' => $path,
@@ -188,16 +193,13 @@ class EstablishmentPhotoController extends Controller
                 'credit_text' => $credit,
                 'source_name' => $credit,
             ]);
-        }
-
-        // The photo says the amenity is there, so it is ticked on the listing too.
-        if ($amenity) {
-            app(AmenityStore::class)->add($establishment->listing_kind, $listing, $amenity);
+            // The photo says the amenity is there; it is ticked on the listing when DOT approves the photo.
+            $drafts->stageItem($establishment, 'photo', ['id' => $photo->id, 'amenity' => $amenity]);
         }
 
         $n = count($data['photos']);
 
-        return $this->savedTo($request, route('establishment.photos'), Toast::success('Photos uploaded', "{$n} photo".($n === 1 ? '' : 's').' added to your listing.'));
+        return $this->savedTo($request, route('establishment.photos'), Toast::success('Photos saved to your draft', "{$n} photo".($n === 1 ? '' : 's').' will show on your listing once DOT approves them. Send your draft to DOT when you are ready.'));
     }
 
     public function setPrimary(Request $request, ListingPhoto $photo): RedirectResponse
@@ -227,6 +229,8 @@ class EstablishmentPhotoController extends Controller
         $listingId = $photo->listing_id;
 
         Storage::disk('public')->delete($photo->path);
+        // A photo still waiting leaves its draft or submission too, so DOT never reviews a picture that is gone.
+        \App\Models\ListingChange::where('kind', 'photo')->where('payload->id', $photo->id)->delete();
         $photo->delete();
 
         if ($wasPrimary) {

@@ -11,6 +11,8 @@ use Tests\TestCase;
 
 class DayUseBudgetTest extends TestCase
 {
+    use \Tests\Concerns\ApprovesListingDrafts;
+
     use RefreshDatabase;
 
     private function stay(string $name, ?float $day = null, float $night = 3000, string $description = 'Day use available'): Accommodation
@@ -95,12 +97,14 @@ class DayUseBudgetTest extends TestCase
         ]);
         $this->actingAs($partner, 'establishment')->get('/portal/establishment/listing/details')->assertOk()->assertSee('name="price_per_day"', false);
         $this->put('/portal/establishment/listing', ['section' => 'details', 'price_amount' => 3000, 'price_per_day' => 700])->assertSessionHasNoErrors();
+        $this->approveDraftOf($partner);
         $this->assertSame('700.00', $stay->fresh()->price_per_day);
         $this->assertSame('3000.00', $stay->fresh()->price_per_night);
         $this->put('/portal/establishment/listing', ['section' => 'details', 'price_amount' => 3000, 'price_per_day' => -5])->assertSessionHasErrors('price_per_day');
         $this->put('/portal/establishment/listing', ['section' => 'details', 'price_amount' => 3000])->assertSessionHasNoErrors();
         $this->assertSame('700.00', $stay->fresh()->price_per_day, 'Omitting the field does not clear it.');
         $this->put('/portal/establishment/listing', ['section' => 'details', 'price_amount' => 3000, 'price_per_day' => ''])->assertSessionHasNoErrors();
+        $this->approveDraftOf($partner);
         $this->assertNull($stay->fresh()->price_per_day);
     }
 }

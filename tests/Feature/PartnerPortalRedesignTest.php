@@ -31,6 +31,8 @@ use Tests\TestCase;
  */
 class PartnerPortalRedesignTest extends TestCase
 {
+    use \Tests\Concerns\ApprovesListingDrafts;
+
     use RefreshDatabase;
 
     private function region(): Region
@@ -100,6 +102,7 @@ class PartnerPortalRedesignTest extends TestCase
         $this->actingAs($partner, 'establishment')
             ->putJson('/portal/establishment/listing', ['section' => 'hours', 'hours' => $hours])
             ->assertOk()->assertJsonStructure(['redirect']);
+        $this->approveDraftOf($partner);
 
         $this->assertSame('Mon–Sat 8:00 AM–5:00 PM', $cafe->fresh()->opening_hours);
     }
@@ -112,9 +115,11 @@ class PartnerPortalRedesignTest extends TestCase
 
         $this->actingAs($partner, 'establishment')->putJson('/portal/establishment/listing', ['section' => 'hours', 'hours' => $closesEarly])
             ->assertStatus(422)->assertJsonValidationErrors(['hours.0.to']);
+        $this->approveDraftOf($partner);
 
         $this->actingAs($partner, 'establishment')->putJson('/portal/establishment/listing', ['section' => 'hours', 'hours' => $allShut])
             ->assertStatus(422)->assertJsonValidationErrors(['hours.0.on']);
+        $this->approveDraftOf($partner);
     }
 
     public function test_a_stay_has_no_hours_form(): void
@@ -158,6 +163,7 @@ class PartnerPortalRedesignTest extends TestCase
         $this->actingAs($partner, 'establishment')
             ->putJson('/portal/establishment/listing', ['section' => 'details', 'description' => 'A quiet place by the sea with a long, honest description of it.', 'price_tier' => 'Premium', 'price_amount' => 4500])
             ->assertOk()->assertJsonStructure(['redirect']);
+        $this->approveDraftOf($partner);
 
         $stay->refresh();
         $this->assertSame('Premium', $stay->price_tier);
@@ -172,6 +178,7 @@ class PartnerPortalRedesignTest extends TestCase
         $this->actingAs($partner, 'establishment')
             ->putJson('/portal/establishment/listing', ['section' => 'status', 'operating_status' => 'temporarily_closed', 'reopens_on' => '2026-12-01', 'closure_reason' => 'Repairs'])
             ->assertOk();
+        $this->approveDraftOf($partner);
 
         $stay->refresh();
         $this->assertSame('temporarily_closed', $stay->operating_status);
@@ -181,6 +188,7 @@ class PartnerPortalRedesignTest extends TestCase
         $this->actingAs($partner, 'establishment')
             ->putJson('/portal/establishment/listing', ['section' => 'position', 'latitude' => 7.2, 'longitude' => 125.7])
             ->assertOk();
+        $this->approveDraftOf($partner);
 
         $stay->refresh();
         $this->assertEqualsWithDelta(7.2, (float) $stay->latitude, 0.0001);
@@ -238,10 +246,12 @@ class PartnerPortalRedesignTest extends TestCase
         $this->actingAs($partner, 'establishment')
             ->postJson('/portal/establishment/photos', ['photos' => [UploadedFile::fake()->image('a.jpg')], 'category' => 'General'])
             ->assertStatus(422)->assertJsonValidationErrors(['credit_text']);
+        $this->approveDraftOf($partner);
 
         $this->actingAs($partner, 'establishment')
             ->postJson('/portal/establishment/photos', ['photos' => [UploadedFile::fake()->image('a.jpg')], 'category' => 'General', 'own' => 1])
             ->assertOk();
+        $this->approveDraftOf($partner);
 
         $photo = ListingPhoto::where('listing_id', $stay->id)->firstOrFail();
         $this->assertSame('My Resort', $photo->credit_text);
@@ -250,6 +260,7 @@ class PartnerPortalRedesignTest extends TestCase
         $this->actingAs($partner, 'establishment')
             ->postJson('/portal/establishment/photos', ['photos' => [UploadedFile::fake()->image('b.jpg')], 'category' => 'Views', 'credit_text' => 'Rey Santos'])
             ->assertOk();
+        $this->approveDraftOf($partner);
 
         $this->assertSame('Rey Santos', ListingPhoto::where('listing_id', $stay->id)->where('category', 'Views')->first()->credit_text);
     }

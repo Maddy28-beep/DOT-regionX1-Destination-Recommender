@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
+use App\Services\Listings\ListingDraft;
 use App\Support\Toast;
 
 class EstablishmentPromotionController extends Controller
@@ -27,7 +28,8 @@ class EstablishmentPromotionController extends Controller
                 ->with(Toast::success('No listing linked yet', 'A DOT Admin will link one once your accreditation is verified.'));
         }
 
-        $promotions = Promotion::forListing($establishment->listing_kind, $listing->id)->latest()->get();
+        // Offers still waiting for DOT are listed too, marked as waiting.
+        $promotions = Promotion::withoutGlobalScopes()->forListing($establishment->listing_kind, $listing->id)->latest()->get();
 
         return view('establishment.promotions', compact('establishment', 'listing', 'promotions'));
     }
@@ -63,18 +65,22 @@ class EstablishmentPromotionController extends Controller
             'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
         ]);
 
-        Promotion::create($data + [
+        // Hidden from travelers until DOT approves the draft it goes into.
+        $promotion = Promotion::create($data + [
+            'review_status' => 'draft',
             'listing_kind' => $establishment->listing_kind,
             'listing_id' => $listing->id,
         ]);
+        app(ListingDraft::class)->stageItem($establishment, 'promotion', ['id' => $promotion->id]);
 
-        return $this->savedTo($request, route('establishment.promotions'), Toast::success('Promo added', 'Travelers will now see it on your listing page.'));
+        return $this->savedTo($request, route('establishment.promotions'), Toast::success('Promo saved to your draft', 'Travelers will see it once DOT approves it. Send your draft to DOT when you are ready.'));
     }
 
     public function destroy(Request $request, Promotion $promotion): RedirectResponse
     {
         $this->authorizePromotion($request->user('establishment'), $promotion);
 
+        \App\Models\ListingChange::where('kind', 'promotion')->where('payload->id', $promotion->id)->delete();
         $promotion->delete();
 
         return back()->with(Toast::success('Promo removed', 'It no longer appears on your listing.'));

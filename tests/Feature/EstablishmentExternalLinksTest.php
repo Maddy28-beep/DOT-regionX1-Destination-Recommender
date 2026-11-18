@@ -17,6 +17,8 @@ use Tests\TestCase;
  */
 class EstablishmentExternalLinksTest extends TestCase
 {
+    use \Tests\Concerns\ApprovesListingDrafts;
+
     use RefreshDatabase;
 
     private function partner(): EstablishmentAccount
@@ -50,6 +52,7 @@ class EstablishmentExternalLinksTest extends TestCase
             ])
             ->assertRedirect()
             ->assertSessionHasNoErrors();
+        $this->approveDraftOf($partner);
 
         $listing = $partner->matchedListing()->first();
         $this->assertSame('https://www.linktestfalls.example.com', $listing->website_url);
@@ -66,6 +69,7 @@ class EstablishmentExternalLinksTest extends TestCase
             ->put('/portal/establishment/listing', [])
             ->assertRedirect()
             ->assertSessionHasNoErrors();
+        $this->approveDraftOf($partner);
 
         $listing = $partner->matchedListing()->first();
         $this->assertNull($listing->website_url);
@@ -82,6 +86,7 @@ class EstablishmentExternalLinksTest extends TestCase
                 'website_url' => 'not a url',
             ])
             ->assertSessionHasErrors('website_url');
+        $this->approveDraftOf($partner);
 
         $this->assertNull($partner->matchedListing()->first()->website_url);
     }
@@ -96,6 +101,7 @@ class EstablishmentExternalLinksTest extends TestCase
                 'facebook_url' => 'javascript:alert(1)',
             ])
             ->assertSessionHasErrors('facebook_url');
+        $this->approveDraftOf($partner);
 
         $this->assertNull($partner->matchedListing()->first()->facebook_url);
     }
@@ -110,6 +116,7 @@ class EstablishmentExternalLinksTest extends TestCase
                 'website_url' => 'https://www.linktestfalls.example.com',
             ])
             ->assertSessionHasNoErrors();
+        $this->approveDraftOf($partner);
 
         $listing = $partner->matchedListing()->first();
         $this->assertSame('A quiet waterfall outside the city.', $listing->description);

@@ -232,6 +232,8 @@ Route::prefix('portal/admin')->name('admin.')->middleware(['auth:admin', \App\Ht
     Route::post('/establishments/{establishment}/match', [AdminDashboardController::class, 'matchEstablishmentListing'])->name('establishments.match');
 
     // Packages tour operators sent in: approved here before travellers can see them
+    Route::get('/listing-approvals', [\App\Http\Controllers\Admin\AdminListingApprovalController::class, 'index'])->name('listing-approvals');
+    Route::post('/listing-approvals/{submission}/decide', [\App\Http\Controllers\Admin\AdminListingApprovalController::class, 'decide'])->whereNumber('submission')->name('listing-approvals.decide');
     Route::get('/package-approvals', [\App\Http\Controllers\Admin\AdminPackageApprovalController::class, 'index'])->name('package-approvals');
     Route::get('/package-approvals/{package}', [\App\Http\Controllers\Admin\AdminPackageApprovalController::class, 'review'])->whereNumber('package')->name('package-approvals.review');
     Route::post('/package-approvals/{package}/decide', [\App\Http\Controllers\Admin\AdminPackageApprovalController::class, 'decide'])->whereNumber('package')->name('package-approvals.decide');
@@ -306,6 +308,9 @@ Route::prefix('portal/establishment')->name('establishment.')->middleware('auth:
     Route::get('/', [EstablishmentDashboardController::class, 'overview'])->name('overview');
     Route::get('/listing', [EstablishmentDashboardController::class, 'editListing'])->name('listing.edit');
     Route::put('/listing', [EstablishmentDashboardController::class, 'updateListing'])->name('listing.update');
+    Route::post('/listing/submit', [EstablishmentDashboardController::class, 'submitDraft'])->middleware('throttle:20,1')->name('listing.submit');
+    Route::post('/listing/discard', [EstablishmentDashboardController::class, 'discardDraft'])->name('listing.discard');
+    Route::post('/listing/reopen/{submission}', [EstablishmentDashboardController::class, 'reopenSubmission'])->whereNumber('submission')->name('listing.reopen');
     Route::get('/listing/{section}', [EstablishmentDashboardController::class, 'form'])->whereIn('section', array_keys(EstablishmentDashboardController::SECTIONS))->name('listing.form');
     Route::get('/listing/qr-code', [QrCodeController::class, 'establishment'])->name('listing.qr-code');
     Route::get('/reviews', [EstablishmentDashboardController::class, 'reviews'])->name('reviews');
