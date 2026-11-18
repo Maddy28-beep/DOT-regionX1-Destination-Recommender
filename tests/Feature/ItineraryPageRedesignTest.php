@@ -87,12 +87,11 @@ class ItineraryPageRedesignTest extends TestCase
             ->assertSee('Generated')
             ->assertSee('Edit preferences')
             ->assertSee('Keep this plan')
-            ->assertSee('data-invite-key="dvo-save-itinerary-'.$trip->id.'"', false)
+            ->assertDontSee('data-invite-key="dvo-save-itinerary-', false)
             ->assertSee('href="#keep"', false)
-            ->assertSee('Keep your plan with a private link.')
-            // Not kept: a calm notice with an icon, not alarm-red text.
-            ->assertSee('Not kept yet')
-            ->assertSee('itin-banner__unsaved', false);
+            ->assertSee('Open this trip again')
+            ->assertSee('Not saved yet')
+            ->assertDontSee('itin-banner__unsaved', false);
     }
 
     public function test_a_saved_plans_own_title_is_kept(): void
@@ -273,7 +272,7 @@ class ItineraryPageRedesignTest extends TestCase
             ->assertSee('Regenerate itinerary')
             ->assertSee('match-list', false)
             ->assertSee('How your plan was built')
-            ->assertSee('Not kept yet');
+            ->assertSee('Not saved yet');
     }
 
     /** The old closing panel is now a Davo card; it must still lead to the exit survey, with a picture that exists. */

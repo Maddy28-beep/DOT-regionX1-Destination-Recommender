@@ -163,8 +163,8 @@ class ItineraryKeepTest extends TestCase
         $this->flushSession();
 
         $this->holding($trip, $pref)->get(route('plan.itinerary'))->assertOk()
-            ->assertSee('not stored where we can show it again')
-            ->assertSee('Make a new link');
+            ->assertSee('cannot be shown again in this browser')
+            ->assertSee('Replace links');
     }
 
     public function test_keeping_needs_a_plan_to_keep(): void
