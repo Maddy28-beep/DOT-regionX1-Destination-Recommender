@@ -64,7 +64,7 @@ class ExitSurveyRedesignTest extends TestCase
         $html = $this->page();
 
         foreach (['Printable survey QR code', 'Apply Filter', 'Include simulated survey rows', 'Key Insights', 'Average Ratings by Category', 'Popular Activities',
-            'Visitor Profile', 'Visitor Origin', 'Visitor Residency', 'Visit Type', 'Purpose of Travel', 'Trip Economics', 'Average Spending', 'Most Visited Places'] as $text) {
+            'Visitor Profile', 'Visitor Origin', 'Visitor Residency', 'Visit Type', 'Purpose of Travel', 'Trip Economics', 'Approx. spend per trip', 'Most Visited Places'] as $text) {
             $this->assertStringContainsString($text, $html, $text);
         }
     }
