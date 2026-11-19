@@ -45,7 +45,8 @@ class QaBatchATest extends TestCase
             ->get(route('plan.itinerary'))->assertOk()->getContent();
         $text = preg_replace('/[\s\x{00A0}]+/u', ' ', html_entity_decode(strip_tags($html)));
 
-        $this->assertStringContainsString('3 visitation transactions (2 simulated for demonstration, 1 from real tourist surveys)', $text);
+        // The 17 November itinerary refresh removed the technical visit counts from the traveler's plan.
+        $this->assertStringNotContainsString('visitation transactions', $text);
     }
 
     public function test_the_watchlist_lists_places_about_to_expire_even_when_many_have_already_expired(): void

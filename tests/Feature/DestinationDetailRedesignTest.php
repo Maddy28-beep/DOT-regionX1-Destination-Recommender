@@ -192,7 +192,7 @@ class DestinationDetailRedesignTest extends TestCase
         $html = $this->get(route('accommodations.show', $stay))->assertOk()->getContent();
 
         $this->assertStringContainsString('stat-strip', $html);
-        $this->assertStringContainsString('Per night', $html);
+        $this->assertStringContainsString('/ night', $html);
         $this->assertStringContainsString('3,500', $html);
         $this->assertStringContainsString('2.5 km', $html);
         $this->assertStringNotContainsString('stat-strip__meter', $html, 'Premium is a word; there is no row of peso symbols.');
@@ -368,13 +368,13 @@ class DestinationDetailRedesignTest extends TestCase
 
     // ---- the same card for the other listing types
 
-    public function test_a_stay_card_shows_from_price_per_night_type_and_rating(): void
+    public function test_a_stay_card_shows_the_price_per_night_type_and_rating(): void
     {
         $this->stay(['price_per_night' => 2800, 'rating' => 4.6, 'review_count' => 112]);
 
         $html = $this->get('/accommodations')->assertOk()->getContent();
 
-        $this->assertStringContainsString('<small class="dcard__from">from</small>', $html);
+        $this->assertStringNotContainsString('dcard__from', $html, 'a stay shows its nightly price outright; only day-use stays say "from"');
         $this->assertStringContainsString('2,800', $html);
         $this->assertStringContainsString('<small>/ night</small>', $html);
         $this->assertStringContainsString('<span class="dpost-tag">Hotel</span>', $html);

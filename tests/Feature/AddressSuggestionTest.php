@@ -280,7 +280,7 @@ class AddressSuggestionTest extends TestCase
         $this->assertNull($preference->origin_lat, 'An unplaceable address must not invent coordinates.');
 
         $this->get('/plan/itinerary')->assertOk()
-            ->assertSee('starting from Davao City centre', false)
+            ->assertSee('Starting from Davao City centre', false)
             ->assertDontSee('somewhere that does not exist');
     }
 

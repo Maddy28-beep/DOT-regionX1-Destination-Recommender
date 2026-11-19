@@ -52,10 +52,10 @@ class ExitSurveyUsableForRulesTest extends TestCase
         $response->assertSee('Real Surveys Usable for Rules');
     }
 
-    public function test_the_survey_form_encourages_adding_two_or_more_places(): void
+    public function test_the_survey_form_asks_only_for_places_actually_visited(): void
     {
         $this->get(route('exit-survey.create'))
             ->assertOk()
-            ->assertSee('adding two or more places');
+            ->assertSee('add only places you actually visited');
     }
 }

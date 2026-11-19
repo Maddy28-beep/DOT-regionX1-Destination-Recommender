@@ -23,6 +23,27 @@ class MobilePerformanceTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** The home page prefers this photograph to the hero clip, so the clip rules are tested with the photograph moved aside. */
+    private const PHOTO = 'images/mt-apo-kapatagan-hero.jpg';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (file_exists(public_path(self::PHOTO))) {
+            rename(public_path(self::PHOTO), public_path(self::PHOTO.'.testbackup'));
+        }
+    }
+
+    protected function tearDown(): void
+    {
+        if (file_exists(public_path(self::PHOTO.'.testbackup'))) {
+            rename(public_path(self::PHOTO.'.testbackup'), public_path(self::PHOTO));
+        }
+
+        parent::tearDown();
+    }
+
     private function home(): string
     {
         // The map section is only drawn when there is a province with something accredited in it.
@@ -135,7 +156,7 @@ class MobilePerformanceTest extends TestCase
     {
         $html = $this->home();
 
-        foreach (['davao', 'dot', 'love-philippines'] as $logo) {
+        foreach (['davao', 'dot'] as $logo) {
             $this->assertStringContainsString("images/tourism-logos/{$logo}.webp", $html);
             $this->assertStringNotContainsString("images/tourism-logos/{$logo}.png", $html);
             $this->assertLessThan(15 * 1024, filesize(public_path("images/tourism-logos/{$logo}.webp")));

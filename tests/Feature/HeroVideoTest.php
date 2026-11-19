@@ -23,6 +23,9 @@ class HeroVideoTest extends TestCase
 
     private const FILES = ['hero.mp4', 'hero.webm', 'hero-poster.jpg'];
 
+    /** The home page now prefers this photograph to any footage, so it is moved aside while the footage rules are tested. */
+    private const PHOTO = 'images/mt-apo-kapatagan-hero.jpg';
+
     private function videoPath(string $file): string
     {
         return public_path('video/'.$file);
@@ -48,6 +51,10 @@ class HeroVideoTest extends TestCase
                 rename($this->videoPath($file), $this->videoPath($file.'.testbackup'));
             }
         }
+
+        if (file_exists(public_path(self::PHOTO))) {
+            rename(public_path(self::PHOTO), public_path(self::PHOTO.'.testbackup'));
+        }
     }
 
     protected function tearDown(): void
@@ -62,12 +69,30 @@ class HeroVideoTest extends TestCase
             }
         }
 
+        if (file_exists(public_path(self::PHOTO.'.testbackup'))) {
+            if (file_exists(public_path(self::PHOTO))) {
+                unlink(public_path(self::PHOTO));
+            }
+            rename(public_path(self::PHOTO.'.testbackup'), public_path(self::PHOTO));
+        }
+
         parent::tearDown();
     }
 
     private function putVideo(string $file = 'hero.mp4'): void
     {
         file_put_contents($this->videoPath($file), 'not-really-a-video');
+    }
+
+    public function test_the_hero_photograph_wins_over_footage(): void
+    {
+        file_put_contents(public_path(self::PHOTO), 'not-really-a-photo');
+        $this->putVideo();
+
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertStringContainsString('has-photo', $html);
+        $this->assertStringNotContainsString('poster-hero__video', $html, 'With a photograph there is no footage to play.');
     }
 
     public function test_the_illustrated_hero_stands_alone_when_no_footage_is_supplied(): void

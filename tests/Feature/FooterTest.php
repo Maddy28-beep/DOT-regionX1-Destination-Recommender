@@ -69,15 +69,13 @@ class FooterTest extends TestCase
         $this->assertStringContainsString('id="ra-10173"', $html);
     }
 
-    /** The optional tourist account is a real reversal of a documented "no
-     *  traveler accounts" decision -- pin down that the policy explains it
-     *  honestly rather than silently going quiet on the change. */
-    public function test_the_privacy_policy_explains_the_optional_tourist_account(): void
+    /** Travelers have no account: a plan is kept by a private link. The policy must say so rather than describe the old optional account. */
+    public function test_the_privacy_policy_explains_that_a_plan_is_kept_by_a_private_link_not_an_account(): void
     {
-        $html = $this->get(route('legal.privacy'))->getContent();
+        $html = preg_replace('/\s+/', ' ', strip_tags($this->get(route('legal.privacy'))->getContent()));
 
-        $this->assertStringContainsString('Optional traveler account', $html);
-        $this->assertStringContainsString('alias', $html);
-        $this->assertStringContainsString('never linked to your exit survey', $html);
+        $this->assertStringContainsString('Keeping a plan with a private link', $html);
+        $this->assertStringContainsString('no traveler accounts', $html);
+        $this->assertStringNotContainsString('Optional traveler account', $html);
     }
 }
