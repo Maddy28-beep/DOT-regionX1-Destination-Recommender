@@ -59,8 +59,8 @@ class OutsideServicesDisclosureTest extends TestCase
         // No retention period or legal-compliance claim was added for the outside providers.
         $this->assertStringNotContainsString('comply with', $text);
 
-        // The approved text dates the change to its publication day.
-        $this->assertStringContainsString('Last updated November 5, 2026', $text);
+        // The policy's date moves with each revision; this one added the private link and removed the traveler account.
+        $this->assertStringContainsString('Last updated November 19, 2026', $text);
         $this->assertStringContainsString('Last updated November 4, 2026', $this->text(route('legal.terms')));
     }
 

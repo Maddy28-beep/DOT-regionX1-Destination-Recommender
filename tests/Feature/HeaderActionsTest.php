@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 /**
  * The header's three actions: a quiet Log in link, an icon-only Saved heart
- * carrying the number of saved places, and the one solid Plan My Trip button.
+ * carrying the number of saved places, and the one solid Trip Planner button.
  */
 class HeaderActionsTest extends TestCase
 {
@@ -30,12 +30,12 @@ class HeaderActionsTest extends TestCase
         }
     }
 
-    public function test_the_header_has_the_heart_and_the_plan_button_and_no_traveler_login(): void
+    public function test_the_header_has_the_heart_and_the_trip_planner_button_and_no_traveler_login(): void
     {
         $this->get('/destinations')->assertOk()
             ->assertSee('class="header-saved"', false)
             ->assertDontSee('Log in')
-            ->assertSee('Plan My Trip');
+            ->assertSee('Trip Planner');
     }
 
     public function test_the_count_badge_is_hidden_until_something_is_saved(): void
