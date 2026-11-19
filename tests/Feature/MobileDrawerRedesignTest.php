@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 /**
  * The phone drawer: search up top, the same links in the same order, Log in / Saved as pill buttons, the account links,
- * and Plan My Trip pinned at the bottom. "N active" appears on Advisories only when something is active.
+ * and Trip Planner pinned at the bottom. "N active" appears on Advisories only when something is active.
  */
 class MobileDrawerRedesignTest extends TestCase
 {
@@ -26,7 +26,7 @@ class MobileDrawerRedesignTest extends TestCase
         $drawer = $this->drawer();
         $last = -1;
 
-        foreach (['Destinations', 'Stays', 'Dining', 'Packages', 'More', 'Souvenir Centers', 'Tour Operators', 'Events', 'Advisories', 'Saved', 'List your establishment', 'Plan My Trip'] as $label) {
+        foreach (['Destinations', 'Stays', 'Dining', 'Packages', 'More', 'Souvenir Centers', 'Tour Operators', 'Events', 'Advisories', 'Saved', 'List your establishment', 'Trip Planner'] as $label) {
             $at = strpos($drawer, $label, $last + 1);
             $this->assertNotFalse($at, "{$label} is in the drawer, after the one before it.");
             $last = $at;

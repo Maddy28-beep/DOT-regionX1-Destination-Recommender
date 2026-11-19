@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -58,10 +59,16 @@ return new class extends Migration
             DB::table('users')->insert(['id' => $a->id, 'role' => $a->role, 'name' => $a->full_name, 'email' => $a->email, 'password_hash' => $a->password_hash, 'status' => null, 'created_at' => $a->created_at]);
         }
         foreach (DB::table('establishment_accounts')->get() as $e) {
-            if (isset($taken[mb_strtolower($e->email)])) {
-                throw new RuntimeException("The email {$e->email} belongs to an admin and an establishment. Change one of them before merging the accounts.");
+            $email = $e->email;
+            if (isset($taken[mb_strtolower($email)])) {
+                // One email cannot be two users. The administrator keeps it; the establishment gets a tagged address that
+                // still reaches the same inbox (name+establishment@host), so the merge never stops half-way on a live server.
+                $email = $this->freeEmail($email, $taken);
+                Log::warning("unify_users: {$e->email} belonged to an admin and an establishment; the establishment now signs in as {$email}.");
+                fwrite(STDERR, "unify_users: {$e->email} is also an admin; the establishment now signs in as {$email}" . PHP_EOL);
             }
-            DB::table('users')->insert(['id' => $e->id, 'role' => 'establishment', 'name' => $e->contact_person, 'email' => $e->email, 'password_hash' => $e->password_hash, 'status' => $e->status, 'created_at' => $e->submitted_at]);
+            $taken[mb_strtolower($email)] = true;
+            DB::table('users')->insert(['id' => $e->id, 'role' => 'establishment', 'name' => $e->contact_person, 'email' => $email, 'password_hash' => $e->password_hash, 'status' => $e->status, 'created_at' => $e->submitted_at]);
         }
         // Profiles after every user exists, so reviewed_by can point at an admin.
         foreach (DB::table('establishment_accounts')->get() as $e) {
@@ -85,6 +92,18 @@ return new class extends Migration
 
         Schema::drop('establishment_accounts');
         Schema::drop('admin_users');
+    }
+
+    /** name@host -> name+establishment@host (then +establishment2, ...) that no other account uses. */
+    private function freeEmail(string $email, array $taken): string
+    {
+        [$local, $host] = array_pad(explode('@', $email, 2), 2, 'invalid.example');
+        $candidate = "{$local}+establishment@{$host}";
+        for ($i = 2; isset($taken[mb_strtolower($candidate)]); $i++) {
+            $candidate = "{$local}+establishment{$i}@{$host}";
+        }
+
+        return $candidate;
     }
 
     public function down(): void

@@ -39,7 +39,7 @@ class MobileMenuIconsTest extends TestCase
     {
         [, $drawer] = $this->parts();
 
-        foreach (['Saved', 'List your establishment', 'Plan My Trip'] as $label) {
+        foreach (['Saved', 'List your establishment', 'Trip Planner'] as $label) {
             // The account rows keep the icon in its tinted tile, so the tile may close between icon and label.
             $this->assertMatchesRegularExpression('/<svg[^>]*>.*?<\/svg>\s*(?:<\/span>\s*)?'.preg_quote($label, '/').'/s', $drawer, "{$label} should carry an icon.");
         }

@@ -8,7 +8,7 @@
         <div class="container">
             <div>
                 <h1>Privacy Policy</h1>
-                <div class="sub">Last updated {{ \Illuminate\Support\Carbon::parse('2026-11-05')->format('F j, Y') }} &middot; what ExploreDVO collects, why, how long it is kept, and how to reach us about it.</div>
+                <div class="sub">Last updated {{ \Illuminate\Support\Carbon::parse('2026-11-19')->format('F j, Y') }} &middot; what ExploreDVO collects, why, how long it is kept, and how to reach us about it.</div>
             </div>
         </div>
     </div>
@@ -45,7 +45,8 @@
                             information is saved so the recommendation engine can favor suitable
                             destinations. It is only ever attached to that one trip plan, never to an
                             identity, and is only collected if you give consent on that screen. It is
-                            deleted together with the trip plan.</li>
+                            deleted together with the trip plan, or at once if you keep the plan with a
+                            private link (see &ldquo;Keeping a plan with a private link&rdquo; below).</li>
                         <li><strong>An anonymous browser token</strong> &mdash; a random identifier stored in
                             a cookie on your device for up to one year, used only to (a) stop the same
                             visitor's QR check-in from being counted twice in one day at the same place,
@@ -53,6 +54,10 @@
                             review you post to your own browser. It is not derived from your device, IP
                             address, or any personal detail, and is never linked to a name. Clearing your
                             browser's cookies discards it.</li>
+                        <li><strong>A private link (only if you choose to keep a plan)</strong> &mdash; a long
+                            random secret that opens that one plan. We store only a one-way hash of it, never the
+                            secret itself, together with the plan and the date it was kept and last opened. It is
+                            not linked to your name, email, browser token or exit survey.</li>
                         <li><strong>Chatbot questions</strong> &mdash; your messages to the assistant are
                             logged to improve its answers, but carry no browser token, cookie, or other link
                             back to you. @if (filled(config('services.groq.key')))
@@ -104,22 +109,28 @@
                         <li>QR check-ins, reviews, saved places and exit survey answers: kept, because DOT
                             Region XI uses them for visit counts and tourism statistics. They are linked
                             only to the random browser token (or to nothing), never to a name.</li>
-                        <li>Itineraries you save to the optional account below: kept until you ask for them
-                            to be deleted.</li>
+                        <li>A plan you keep with a private link: <strong>deleted automatically
+                            {{ (int) config('privacy.kept_retention_days', 90) }}&nbsp;days after it was last
+                            opened</strong>, instead of after 30&nbsp;days. Opening it with its link starts
+                            the count again.</li>
                         <li>Backups: our nightly backups are kept for 14&nbsp;days, so a record we have
                             deleted can still sit in a backup for up to that long before it disappears.</li>
                     </ul>
                     <p>Because anonymous records carry no name, email or other identifier, we cannot tell
                         which record is yours; this is why they are removed on a schedule and not on
                         individual request.</p>
-                    <p><strong>Optional traveler account:</strong> if you want an itinerary or saved places
-                        to survive past your browser session, you may create a free account using an alias
-                        and password &mdash; never your real name or email. It is used solely to keep the
-                        itineraries and places you explicitly save; it is never linked to your exit survey
-                        responses or your anonymous browser token, and health/accessibility answers are
-                        removed rather than kept when an itinerary is saved to it. Your password is stored
-                        only as a secure hash. Creating one is entirely optional and never required to
-                        plan or view a trip.</p>
+                    <p><strong>Keeping a plan with a private link:</strong> ExploreDVO has no traveler
+                        accounts, no passwords and no sign-in. If you want a plan to survive past your browser
+                        session, you can ask for a private link on the itinerary page. The link opens that plan
+                        and lets you change it, on any device; a second, view-only link lets travel companions
+                        see the plan without changing it, and a QR code, a printable page and a calendar file are
+                        offered alongside. The links are only as private as you keep them: anyone who has the
+                        private link can open and change the plan, and a lost link cannot be recovered. You can
+                        make a new link at any time, and the old links then stop working. Pages opened through a
+                        link are marked so that search engines do not index them and browsers do not store
+                        them, and the link is not passed on to other websites. Health and accessibility answers
+                        are deleted when a plan is kept. Creating a link is optional and never required to plan
+                        or view a trip.</p>
                 </div>
             </div>
 
@@ -237,8 +248,10 @@
                 <div class="panel-head"><div><h2>6. How we protect it</h2></div></div>
                 <div class="panel-body legal-content">
                     <ul>
-                        <li>Passwords are stored only as secure hashes, and sign-in, registration and trip
-                            requests are rate-limited to slow down guessing and abuse.</li>
+                        <li>Passwords are stored only as secure hashes, and sign-in, registration, trip and
+                            private-link requests are rate-limited to slow down guessing and abuse.</li>
+                        <li>Private link secrets are never stored, only their one-way hashes, so a copy of
+                            the database cannot be used to open anyone's plan.</li>
                         <li>Administrator and partner pages need a sign-in and are limited by role; every
                             administrator change is logged.</li>
                         <li>The server accepts connections only for the website and for key-based
@@ -259,7 +272,8 @@
                         for it to be blocked or erased, and to claim compensation for damage from its
                         unlawful use. For partner and staff accounts, write to us at the address below and
                         we will act on your request. For anonymous traveler records, which we cannot trace to
-                        a person, the scheduled deletion described in section 1 applies. If you believe your
+                        a person, the scheduled deletion described in section 1 applies, and so does the automatic deletion
+                        of a kept plan {{ (int) config('privacy.kept_retention_days', 90) }}&nbsp;days after it was last opened. If you believe your
                         rights were not respected, you may also complain to the National Privacy Commission
                         (privacy.gov.ph).</p>
                 </div>
@@ -271,11 +285,11 @@
                     <p>This platform is designed around data minimization, a core principle of Republic
                         Act No. 10173 (the Data Privacy Act of 2012): the traveler-facing side of the site
                         was deliberately built to need no account and no traveler-identifying information
-                        at all -- the one optional exception, a free alias-based account with no real
-                        identity, exists purely for a traveler's own convenience -- and any sensitive
-                        information a traveler does choose to share
+                        at all; a traveler who wants to keep a plan uses a private link instead of an
+                        account -- and any sensitive information a traveler does choose to share
                         (health or accessibility details) is collected only with consent, kept only for the
-                        trip plan it was given with, deleted with it, and never linked to an identity.</p>
+                        trip plan it was given with, deleted with it (or when the plan is kept with a private
+                        link), and never linked to an identity.</p>
                     <p>Establishment partners and DOT staff accounts do involve personal and business data,
                         as described in sections 2 and 3 above, and that data is handled under the same Act's
                         requirements for lawful processing, proportionality, and security.</p>
