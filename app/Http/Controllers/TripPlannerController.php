@@ -25,6 +25,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use App\Services\Recommendation\ItineraryScheduleBuilder;
 use App\Support\Features;
+use App\Support\VisitorType;
 use App\Support\TripWindow;
 use App\Support\Geo\Countries;
 use App\Support\Geo\PhProvinces;
@@ -216,6 +217,15 @@ class TripPlannerController extends Controller
             'health_conditions.*' => ['string', Rule::in(array_keys(self::HEALTH_CONDITIONS))],
             'health_other' => ['nullable', 'string', 'max:300'],
         ]);
+
+        if ($v2 && VisitorType::isLocal($data['visitor_type'])) {
+            if (!VisitorType::hasDavaoOrigin($data['visitor_origin_country'] ?? null, $data['visitor_origin_province'] ?? null)) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'visitor_type' => 'Choose first-time or returning visitor. The resident option is for people who live in Davao Region.',
+                ]);
+            }
+            $data['visitor_type'] = VisitorType::RESIDENT;
+        }
 
         $window = null;
         if ($v2) {

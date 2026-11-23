@@ -245,6 +245,11 @@
     }
     document.getElementById('planResumeContinue').addEventListener('click', () => {
         if (!draft) return;
+        // Old drafts combined frequent visitors and residents. Keep their familiar-visitor meaning outside Region XI.
+        const residentChoice = form.querySelector('[data-resident-choice]');
+        if (residentChoice && draft.values.visitor_type.includes('Regular / Local')) {
+            draft.values.visitor_type = [residentChoice.disabled ? 'Returning Visitor' : residentChoice.value];
+        }
         draftFields.forEach(el => {
             const values = draft.values[el.name];
             if (el.type === 'checkbox' || el.type === 'radio') el.checked = values.includes(el.value);

@@ -17,7 +17,7 @@
 .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-block__head h3 { font-size: 15px; }
 .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-visitor > .pc-block__head { display: none; }
 .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-origin-summary { padding: 10px 12px; margin: 0 0 8px; min-height: 42px; font-size: 13px; background: #edf6f0; border-color: #dce9df; }
-.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-visitor .pc-cards--rows { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-visitor .pc-cards--rows { display: grid; grid-template-columns: repeat(var(--visitor-columns, 3), minmax(0, 1fr)); gap: 8px; }
 .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-card--row { padding: 10px; gap: 7px; min-height: 48px; font-size: 12px; }
 .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window :is(.pc-group > legend, .pc-field > label, .pc-label) { font-size: 12px; }
 .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-field :is(input[type="datetime-local"], input[type="text"]) { width: 100%; min-width: 0; height: 44px; min-height: 44px; font-size: 13px; padding: 9px 12px; }
@@ -55,6 +55,7 @@
     .plan-wizard:not([data-origin-pending]):has(#plan-step-0.has-trip-window:not([hidden])) .plan-side__saved { display: none; }
 }
 @media (max-width: 640px) {
+    .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-visitor [data-visitor-type-grid] { grid-template-columns: 1fr; }
     .plan-wizard:not([data-origin-pending]) .panel-body:has(#plan-step-0.has-trip-window:not([hidden])) { padding: 18px 14px 0; }
     .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-window .pc-grid > .pc-field { grid-column: 1 / -1; }
     .plan-wizard:not([data-origin-pending]) #plan-step-0.has-trip-window .pc-trip-start > .pc-block__head h3 { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; }
