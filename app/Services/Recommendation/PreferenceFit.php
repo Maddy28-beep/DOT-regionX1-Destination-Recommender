@@ -91,7 +91,7 @@ class PreferenceFit
         return match ($visitorType) {
             'First-time Visitor' => 0.4 + 0.6 * $share,
             'Returning Visitor' => 1.0 - 0.6 * $share,
-            'Regular / Local' => 1.0 - 0.3 * $share,
+            'Regular / Local', 'Davao Region Resident' => 1.0 - 0.3 * $share,
             default => self::NEUTRAL,
         };
     }

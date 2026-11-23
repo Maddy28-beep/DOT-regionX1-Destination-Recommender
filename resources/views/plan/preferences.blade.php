@@ -14,7 +14,7 @@
     $amenityOptions = \App\Support\Amenities::plannerLabels();
     $travelTypes = ['Solo' => 'Solo', 'Couple' => 'Couple', 'Family' => 'Family', 'Friends' => 'Friends / Group', 'Business' => 'Business'];
     $travelPurposes = ['Leisure', 'Business', 'Visiting Friends/Family', 'Educational', 'Medical', 'Religious/Pilgrimage', 'Other'];
-    $visitorTypes = ['First-time Visitor', 'Returning Visitor', 'Regular / Local'];
+    $visitorTypes = \App\Support\VisitorType::options(\App\Support\Features::tripLocation());
 @endphp
 
 <link rel="stylesheet" href="{{ asset('css/plan-wizard.css') }}?v={{ filemtime(public_path('css/plan-wizard.css')) }}">
@@ -559,6 +559,7 @@
 <script src="{{ asset('js/plan-origin.js') }}?v={{ filemtime(public_path('js/plan-origin.js')) }}" defer></script>
 <script src="{{ asset('js/plan-departure.js') }}?v={{ filemtime(public_path('js/plan-departure.js')) }}" defer></script>
 <script src="{{ asset('js/plan-origin-select.js') }}?v={{ filemtime(public_path('js/plan-origin-select.js')) }}" defer></script>
+<script src="{{ asset('js/plan-visitor-type.js') }}?v={{ filemtime(public_path('js/plan-visitor-type.js')) }}" defer></script>
 <script src="{{ asset('js/plan-trip-window.js') }}?v={{ filemtime(public_path('js/plan-trip-window.js')) }}" defer></script>
 <script src="{{ asset('js/plan-comfort.js') }}?v={{ filemtime(public_path('js/plan-comfort.js')) }}" defer></script>
 <script src="{{ asset('js/plan-wizard.js') }}?v={{ filemtime(public_path('js/plan-wizard.js')) }}" defer></script>

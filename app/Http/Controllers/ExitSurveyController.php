@@ -29,7 +29,7 @@ class ExitSurveyController extends Controller
     /** Also reused by AdminDashboardController for the Exit Survey Insights filter dropdown. */
     public const RESIDENCY_TYPES = ['Local Resident', 'Domestic Tourist', 'Foreign Tourist'];
 
-    public const VISITOR_TYPES = ['First-time Visitor', 'Returning Visitor', 'Regular / Local'];
+    public const VISITOR_TYPES = ['First-time Visitor', 'Returning Visitor', 'Davao Region Resident', 'Regular / Local'];
 
     public const ACTIVITIES = [
         'Beach & Island', 'Nature & Adventure', 'Cultural Heritage', 'Wildlife',
