@@ -66,7 +66,7 @@ class TripLocationV2Test extends TestCase
     private function form(array $over = []): array
     {
         return $over + [
-            'travel_type' => 'Couple', 'travel_purpose' => 'Leisure', 'visitor_type' => 'Regular / Local',
+            'travel_type' => 'Couple', 'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time Visitor',
             'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => 'moderate',
             'start_at' => '2026-11-28T08:00', 'end_at' => '2026-11-28T17:00',
             'origin_lat' => '7.130', 'origin_lng' => '125.645', 'origin_label' => 'Davao International Airport',
@@ -381,14 +381,15 @@ class TripLocationV2Test extends TestCase
 
     public function test_every_visitor_has_to_choose_a_real_place_a_local_included(): void
     {
-        foreach (['Regular / Local', 'Regular / Foreign'] as $type) {
+        foreach (['First-time Visitor', 'Regular / Foreign'] as $type) {
             foreach (['', 'NONE'] as $answer) {
                 $this->post(route('plan.update'), $this->form(['visitor_type' => $type, 'visitor_origin_country' => $answer]))->assertSessionHasErrors('visitor_origin_country');
             }
         }
         $this->assertSame(0, TouristPreference::count(), 'nothing is saved without an origin');
 
-        $this->post(route('plan.update'), $this->form(['visitor_type' => 'Regular / Local']))->assertSessionHasNoErrors();
+        // A resident answers the same question, and the resident option needs a Davao Region origin.
+        $this->post(route('plan.update'), $this->form(['visitor_type' => 'Davao Region Resident', 'visitor_origin_country' => 'PH', 'visitor_origin_province' => 'Davao del Sur']))->assertSessionHasNoErrors();
         $this->assertSame(1, TouristPreference::count());
     }
 
