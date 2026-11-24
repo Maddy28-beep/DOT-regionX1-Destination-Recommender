@@ -376,5 +376,32 @@
   "verified_by": "Claude (AI), for the project owner, 2026-11-09: checked file page and picture",
   "verified_at": "2026-11-09",
   "notes": "Resized to 1600 px wide from the Commons original; otherwise unchanged. The credit and licence must stay shown."
+ },
+ {
+  "lookup": "name",
+  "kind": "Destination",
+  "name": "Wishing Island",
+  "file": "wishing-island-commons.jpg",
+  "sha256": "89569f0cc1afc8ebfa1340ac55e96b30bd22f426d3107e1e7bf33db7baca17cd",
+  "width": 1920,
+  "height": 1079,
+  "source_type": "wikimedia_commons",
+  "source_name": "Wikimedia Commons",
+  "source_url": "https://commons.wikimedia.org/wiki/File:Wishing_Island_001.jpg",
+  "original_image_url": "https://upload.wikimedia.org/wikipedia/commons/0/00/Wishing_Island_001.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+  "original_name": "Wishing Island 001.jpg",
+  "licence": "CC BY-SA 4.0",
+  "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+  "match_confidence": "high",
+  "shows": "A small rocky islet crowned with trees and a slide, seen from the water off Samal.",
+  "verification_status": "approved",
+  "permission_basis": "open_licence",
+  "permission_ref": "Open licence CC BY-SA 4.0; see the Commons file page in source_url",
+  "permission_date": "2026-11-24",
+  "credit_text": "RoyKabanlit / Wikimedia Commons, CC BY-SA 4.0",
+  "show_credit": true,
+  "verified_by": "Claude (AI), for the project owner, 2026-11-24: checked file page and picture",
+  "verified_at": "2026-11-24",
+  "notes": "Resized to 1920 px wide from the Commons original (3836 px); otherwise unchanged. The credit and licence must stay shown."
  }
 ]
