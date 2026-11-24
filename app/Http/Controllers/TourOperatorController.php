@@ -13,8 +13,10 @@ class TourOperatorController extends Controller
     {
         $query = TourOperator::publiclyVisible()->with('region', 'photos')->withCount('reviews')->withCount(['packages' => fn ($q) => $q->whereNull('archived_at')->where('is_accredited', true)]);
 
+        // Keywords, not one exact phrase: budget words fill the budget, the other words are matched in any of these columns.
+        \App\Support\KeywordSearch::prepare($request, 'tour_operators');
         if ($request->filled('q')) {
-            \App\Support\SearchTerm::contains($query, 'name', (string) $request->string('q'));
+            \App\Support\KeywordSearch::apply($query, (string) $request->string('q'), ['tour_operators.name', 'tour_operators.location', 'tour_operators.specialization', 'tour_operators.description'], ! $request->filled('sort'));
         }
 
         if ($request->filled('region_id')) {

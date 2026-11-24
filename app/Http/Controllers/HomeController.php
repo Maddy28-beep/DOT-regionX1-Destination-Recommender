@@ -253,7 +253,7 @@ class HomeController extends Controller
             'packages' => fn () => Package::publiclyVisible()->whereNotNull('price_per_pax'),
         ] as $purpose => $base) {
             $config = BudgetRanges::for($purpose);
-            $options[$purpose] = ['' => 'Any budget'];
+            $options[$purpose] = ['' => 'Flexible'];
 
             foreach ($config['brackets'] as [$key, $label, $min, $max]) {
                 $query = $base();
@@ -274,7 +274,7 @@ class HomeController extends Controller
 
         // Dining records a price level, not an amount: offer the levels some restaurant carries.
         $levels = Restaurant::publiclyVisible()->whereNotNull('price_tier')->distinct()->pluck('price_tier')->all();
-        $options['restaurants'] = ['' => 'Any budget'];
+        $options['restaurants'] = ['' => 'Flexible'];
         foreach (BudgetRanges::DINING_LEVELS as $value => $label) {
             if (in_array($value, $levels, true)) {
                 $options['restaurants']['level:'.$value] = $label;

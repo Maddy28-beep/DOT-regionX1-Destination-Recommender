@@ -203,7 +203,7 @@ class DiscoveryCardTest extends TestCase
 
     public function test_dining_and_souvenirs_offer_no_peso_budget_because_none_is_recorded(): void
     {
-        $this->assertSame(['' => 'Any budget'], BudgetRanges::options('souvenir_centers'));
+        $this->assertSame(['' => 'Flexible'], BudgetRanges::options('souvenir_centers'));
         $this->assertFalse(BudgetRanges::has('souvenir_centers'));
         $this->assertStringNotContainsString('price_', $this->go(['purpose' => 'souvenir_centers', 'budget' => 'custom', 'budget_min' => '5']));
         $this->assertStringNotContainsString('price_min', $this->go(['purpose' => 'restaurants', 'budget' => 'custom', 'budget_min' => '5']));

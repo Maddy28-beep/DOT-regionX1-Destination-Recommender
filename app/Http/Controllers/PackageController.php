@@ -36,8 +36,10 @@ class PackageController extends Controller
     {
         $query = Package::publiclyVisible()->with('region', 'photos', 'tourOperator')->withCount('reviews');
 
+        // Keywords, not one exact phrase: budget words fill the budget, the other words are matched in any of these columns.
+        \App\Support\KeywordSearch::prepare($request, 'packages');
         if ($request->filled('q')) {
-            \App\Support\SearchTerm::contains($query, 'name', (string) $request->string('q'));
+            \App\Support\KeywordSearch::apply($query, (string) $request->string('q'), ['packages.name', 'packages.location', 'packages.type', 'packages.description'], ! $request->filled('sort'));
         }
 
         if ($request->filled('region_id')) {

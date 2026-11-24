@@ -239,8 +239,8 @@ class HeroSearchTest extends TestCase
         $this->assertStringNotContainsString('hero-search__pill', $html);
         $this->assertSame(4, substr_count($html, 'data-budget-select'), 'One dropdown each for destinations, stays, dining and packages; souvenirs have no price.');
 
-        // Every dropdown opens on Any budget, first in its list.
-        $this->assertSame(4, preg_match_all('/<select id="search-budget-[a-z]+" name="budget"[^>]*>\s*<option value="">Any budget<\/option>/', $html));
+        // Every dropdown opens on Flexible (no budget), first in its list.
+        $this->assertSame(4, preg_match_all('/<select id="search-budget-[a-z]+" name="budget"[^>]*>\s*<option value="">Flexible<\/option>/', $html));
         $this->assertSame(3, substr_count($html, '>Custom budget</option>'), 'Custom budget only where an amount can be filtered on.');
         $this->assertStringContainsString('name="budget_min"', $html);
         $this->assertStringContainsString('name="budget_max"', $html);
