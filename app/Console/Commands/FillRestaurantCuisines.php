@@ -49,6 +49,9 @@ class FillRestaurantCuisines extends Command
         'Rhapsody Asian Fusion — Aria Hotel & Residences' => 'Asian fusion',
         'Jollibee Davao Bolton' => 'Fast food',
         'Vista Restaurant — Eden Nature Park' => 'Filipino & International',
+        'Resto-Beach — Paradise Island Park & Beach Resort' => 'Filipino & International',
+        'Chow2 Restaurant & Catering Services' => 'Filipino',
+        "Leonora's Restaurant" => 'Cafe',
     ];
 
     public function handle(): int
