@@ -234,15 +234,18 @@ class ItinerarySampleCueTest extends TestCase
         $this->assertStringContainsString('Sample data, not DOT-verified', $html, 'The accreditation line still says it.');
     }
 
-    public function test_the_accreditation_badge_is_one_pill_in_two_states(): void
+    public function test_only_an_accredited_place_gets_the_pill_and_the_others_get_an_info_mark(): void
     {
         $sample = $this->page($this->destination('Quiet Falls', true));
         $official = $this->page($this->destination('Damosa Land Inc. / Agriya Naturetainment', false));
 
-        $this->assertStringContainsString('tl-badge tl-badge--warn', $sample);
-        $this->assertStringNotContainsString('tl-badge--ok', $sample);
+        $this->assertStringNotContainsString('tl-badge', $sample);
+        $this->assertStringContainsString('class="tl-card__info"', $sample);
+        $this->assertStringContainsString('title="Sample data, not DOT-verified"', $sample);
+
         $this->assertStringContainsString('tl-badge tl-badge--ok', $official);
-        $this->assertStringNotContainsString('tl-badge--warn', $official);
         $this->assertStringContainsString('DOT accreditation listed', $official);
+        $this->assertStringNotContainsString('tl-badge--warn', $official);
+        $this->assertStringNotContainsString('tl-card__info', $official);
     }
 }
