@@ -64,6 +64,12 @@ class ReferencePlaceSeeder extends Seeder
         $regions = Region::pluck('id', 'name');
 
         foreach (self::PLACES as [$name, $location, $region, $type]) {
+            // A place that was promoted to a listing (it is accredited now, or carries a description of its own) is left
+            // alone: re-running this seeder must not hide it again.
+            $existing = Destination::withoutGlobalScopes()->where('slug', Str::slug($name))->first();
+            if ($existing && ($existing->is_accredited || $existing->description !== self::NOTE)) {
+                continue;
+            }
             Destination::updateOrCreate(
                 ['slug' => Str::slug($name)],
                 [
