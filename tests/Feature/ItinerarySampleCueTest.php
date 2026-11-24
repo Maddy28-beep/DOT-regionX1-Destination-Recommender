@@ -175,7 +175,7 @@ class ItinerarySampleCueTest extends TestCase
             ->get(route('plan.itinerary'))->assertOk()->getContent();
 
         // Destination stop, meal card and stay card each carry the official wording; no sample cue anywhere.
-        $this->assertSame(3, substr_count($html, 'DOT accreditation listed'));
+        $this->assertSame(3, substr_count($html, 'tl-card__mark is-official'));
         $this->assertStringNotContainsString(self::CUE, $html);
     }
 
@@ -234,18 +234,20 @@ class ItinerarySampleCueTest extends TestCase
         $this->assertStringContainsString('Sample data, not DOT-verified', $html, 'The accreditation line still says it.');
     }
 
-    public function test_only_an_accredited_place_gets_the_pill_and_the_others_get_an_info_mark(): void
+    public function test_an_accredited_place_gets_the_dot_medal_and_the_others_a_gray_info_mark(): void
     {
         $sample = $this->page($this->destination('Quiet Falls', true));
         $official = $this->page($this->destination('Damosa Land Inc. / Agriya Naturetainment', false));
 
         $this->assertStringNotContainsString('tl-badge', $sample);
-        $this->assertStringContainsString('class="tl-card__info"', $sample);
+        $this->assertStringContainsString('tl-card__mark is-other', $sample);
         $this->assertStringContainsString('title="Sample data, not DOT-verified"', $sample);
+        $this->assertStringNotContainsString('dot-accredited-badge', $sample);
 
-        $this->assertStringContainsString('tl-badge tl-badge--ok', $official);
-        $this->assertStringContainsString('DOT accreditation listed', $official);
-        $this->assertStringNotContainsString('tl-badge--warn', $official);
-        $this->assertStringNotContainsString('tl-card__info', $official);
+        $this->assertStringNotContainsString('tl-badge', $official);
+        $this->assertStringContainsString('tl-card__mark is-official', $official);
+        $this->assertStringContainsString('dot-accredited-badge', $official);
+        $this->assertStringContainsString('title="DOT accreditation listed"', $official);
+        $this->assertStringNotContainsString('tl-card__mark is-other', $official);
     }
 }

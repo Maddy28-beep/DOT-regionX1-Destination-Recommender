@@ -116,9 +116,14 @@
         @elseif ($isCard)
             <article class="tl-card tl-card--{{ $kind }}">
                 <div class="tl-card__media">
-                    @if ($listing && ! $accreditationOk && $accreditationLabel && ($isStay || in_array($kind, ['activity', 'meal'], true)))
-                        {{-- No pill for a place without a DOT record: a small info mark on the photo says why, on hover, focus or tap. --}}
-                        <span class="tl-card__info" tabindex="0" role="img" aria-label="{{ $accreditationLabel }}" title="{{ $accreditationLabel }}"><x-icon name="info" aria-hidden="true" /></span>
+                    {{-- As on the listing cards: the DOT medal on the photo for a place with a genuine DOT record, a small gray "i" for any other.
+                         The words are in the tooltip and the accessible name. --}}
+                    @if ($listing && $accreditationLabel && ($isStay || in_array($kind, ['activity', 'meal'], true)))
+                        @if ($accreditationOk)
+                            <span class="tl-card__mark is-official" tabindex="0" role="img" aria-label="{{ $accreditationLabel }}" title="{{ $accreditationLabel }}"><img src="{{ asset('images/dot-accredited-badge.webp') }}" alt="" width="30" height="30" loading="lazy" decoding="async"></span>
+                        @else
+                            <span class="tl-card__mark is-other" tabindex="0" role="img" aria-label="{{ $accreditationLabel }}" title="{{ $accreditationLabel }}"><x-icon name="info" aria-hidden="true" /></span>
+                        @endif
                     @endif
                     @if ($realPhoto)
                         <img src="{{ $realPhoto->url() }}" alt="" loading="lazy" decoding="async">
