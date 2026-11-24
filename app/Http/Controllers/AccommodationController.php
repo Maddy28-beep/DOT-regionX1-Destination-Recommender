@@ -16,8 +16,10 @@ class AccommodationController extends Controller
     {
         $query = Accommodation::publiclyVisible()->with('region', 'photos')->withCount('reviews');
 
+        // Keywords, not one exact phrase: budget words fill the budget, the other words are matched in any of these columns.
+        \App\Support\KeywordSearch::prepare($request, $request->input('stay_mode') === 'day_use' ? 'accommodations_day_use' : 'accommodations');
         if ($request->filled('q')) {
-            \App\Support\SearchTerm::contains($query, 'name', (string) $request->string('q'));
+            \App\Support\KeywordSearch::apply($query, (string) $request->string('q'), ['accommodations.name', 'accommodations.location', 'accommodations.type', 'accommodations.description'], ! $request->filled('sort'));
         }
 
         if ($request->filled('region_id')) {
