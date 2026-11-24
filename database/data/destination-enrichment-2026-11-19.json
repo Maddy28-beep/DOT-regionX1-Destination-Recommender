@@ -1,0 +1,2174 @@
+{
+  "format": "destination-enrichment-v1",
+  "researched_on": "2026-11-19",
+  "scope": "Existing real-named local destinations only. Unknown values not fabricated; no itinerary eligibility or accreditation edits.",
+  "records": [
+    {
+      "slug": "aguacan-cold-spring",
+      "name": "Aguacan Cold Spring",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.3254488,
+          "source": "https://www.google.com/maps/place/Aguakan/data=!4m2!3m1!1s0x32fbf04dcfd0c7a7:0xb378602af344dca4",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.1282411,
+          "source": "https://www.google.com/maps/place/Aguakan/data=!4m2!3m1!1s0x32fbf04dcfd0c7a7:0xb378602af344dca4",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": [
+        {
+          "key": "pool",
+          "source": "https://wayph.com/aguacan-coldspring-resort-maragusan/",
+          "evidence": "Visitor account and mapped resort photographs show cold spring swimming pools.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Swimming Pool (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "alina-cave",
+      "name": "Alina Cave",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.74272,
+          "source": "https://mapcarta.com/N1778736625",
+          "reason": "mapped_cave_entrance reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.66918,
+          "source": "https://mapcarta.com/N1778736625",
+          "reason": "mapped_cave_entrance reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://kapalong.gov.ph/tourism/attractions/",
+          "evidence": "Municipality asks cave visitors to coordinate with Tourism Section/local guides for approved access routes.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "aliwagwag-falls",
+      "name": "Aliwagwag Falls",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.74045,
+          "source": "https://mapcarta.com/N5799152058",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.3015,
+          "source": "https://mapcarta.com/N5799152058",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "almendras-falls",
+      "name": "Almendras Falls",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.0814553,
+          "source": "https://www.google.com/maps/place/Almendras%20Falls/data=!4m2!3m1!1s0x32f91b1394829619:0x733bebfb44977e16",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.363577,
+          "source": "https://www.google.com/maps/place/Almendras%20Falls/data=!4m2!3m1!1s0x32f91b1394829619:0x733bebfb44977e16",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "angels-cove",
+      "name": "Angels Cove",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.9595375,
+          "source": "https://www.waze.com/live-map/directions/ph/davao-region/samal/angels-cove?to=place.ChIJg3Haw-t2-TIRBWOcUhpY9qU",
+          "reason": "marine_map_pin reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.6796094,
+          "source": "https://www.waze.com/live-map/directions/ph/davao-region/samal/angels-cove?to=place.ChIJg3Haw-t2-TIRBWOcUhpY9qU",
+          "reason": "marine_map_pin reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "baganga-sunrise-boulevard",
+      "name": "Baganga Sunrise Boulevard",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.6511994,
+          "source": "https://www.google.com/maps/place/Baganga%20Sunrise%20Boulevard/data=!4m2!3m1!1s0x32fc6104bb095e3b:0x2f4120688c506d97",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.556293,
+          "source": "https://www.google.com/maps/place/Baganga%20Sunrise%20Boulevard/data=!4m2!3m1!1s0x32fc6104bb095e3b:0x2f4120688c506d97",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "balite-hot-spring",
+      "name": "Balite Hot Spring",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.68245,
+          "source": "https://mapcarta.com/W208192451",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.54718,
+          "source": "https://mapcarta.com/W208192451",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "description": {
+          "expected": "A hot-spring recreation site in Kinablangan, Baganga. Contact the operator for current entry arrangements and rates.",
+          "value": "A natural hot-spring bathing spot in Kinablangan, Baganga, Davao Oriental, with warm water flowing through rocky pools and greenery. Visitor accounts confirm the spring, but published entrance charges vary by date. Ask local management for current access, fees and available facilities rather than relying on older prices.",
+          "source": "https://mywanderstory.com/2017/08/05/balite-hot-spring-davao-oriental/",
+          "reason": "Sourced visitor information; no unverified accessibility, tariffs or facilities added."
+        }
+      },
+      "amenities": [
+        {
+          "key": "hot_springs",
+          "source": "https://mywanderstory.com/2017/08/05/balite-hot-spring-davao-oriental/",
+          "evidence": "First-person visit describes bathing in the natural hot spring.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Hot Spring Soaking Areas (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "bamboo-peak",
+      "name": "Bamboo Peak",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.9217,
+          "source": "https://mapcarta.com/N9673368628",
+          "reason": "summit reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.4067,
+          "source": "https://mapcarta.com/N9673368628",
+          "reason": "summit reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://logsac.blogspot.com/2021/06/hiking-barangay-jose-rizals-bamboo-peak.html",
+          "evidence": "Tourism officer describes the hiking route at Bamboo Peak.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Walking Trails & Boardwalks (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "battle-of-ising-memorial",
+      "name": "Battle of Ising Memorial",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.36163,
+          "source": "https://mapcarta.com/N8653966797",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.70634,
+          "source": "https://mapcarta.com/N8653966797",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "big-ligid-island",
+      "name": "Big Ligid Island",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.1695,
+          "source": "https://mapcarta.com/15796414",
+          "reason": "island_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.7807,
+          "source": "https://mapcarta.com/15796414",
+          "reason": "island_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "bilawa-mainit-hot-waterfall",
+      "name": "Bilawa Mainit Hot Waterfall",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.40122,
+          "source": "https://mapcarta.com/N6035786485",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.02915,
+          "source": "https://mapcarta.com/N6035786485",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        },
+        "website_url": {
+          "expected": null,
+          "value": "https://davaodeoro.gov.ph/bilawa-mainit-hot-waterfalls/",
+          "source": "https://davaodeoro.gov.ph/bilawa-mainit-hot-waterfalls/",
+          "reason": "Provincial visitor information; the body identifies Mainit, Maco despite a conflicting template contact block."
+        }
+      },
+      "amenities": [
+        {
+          "key": "hot_springs",
+          "source": "https://davaodeoro.gov.ph/bilawa-mainit-hot-waterfalls/",
+          "evidence": "Province describes the natural hot pools; no generic site-header hours adopted.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "bluebird-view-deck",
+      "name": "Bluebird View Deck",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.99207,
+          "source": "https://mapcarta.com/N6059404886",
+          "reason": "viewpoint reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.73393,
+          "source": "https://mapcarta.com/N6059404886",
+          "reason": "viewpoint reference; not a verified vehicle entrance"
+        },
+        "description": {
+          "expected": "A viewpoint overlooking the Davao Gulf and nearby islands, including Malipano. Contact the operator for the current entrance and visitor arrangements. The photograph shows the view from the deck.",
+          "value": "An elevated roadside viewing deck in Kaputian, Samal, overlooking the Davao Gulf and nearby islands, including Malipano. Visitor accounts describe a simple platform for photographs and relaxing. Confirm the current entrance charge and opening arrangements with local management. The island seen from the deck is not the decks location.",
+          "source": "https://www.syramay.com/blue-bird-view-deck-samal-island/",
+          "reason": "Sourced visitor information; no unverified accessibility, tariffs or facilities added."
+        }
+      },
+      "amenities": [
+        {
+          "key": "viewing_decks",
+          "source": "https://www.syramay.com/blue-bird-view-deck-samal-island/",
+          "evidence": "First-person visitor describes the viewing deck.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Viewing Decks (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "camp-damada",
+      "name": "Camp Damada",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.6206427,
+          "source": "https://www.google.com/maps/place/Camp%20Damada/data=!4m2!3m1!1s0x32f9134a232bcbf1:0x151241e9cb43b4cd",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.9540222,
+          "source": "https://www.google.com/maps/place/Camp%20Damada/data=!4m2!3m1!1s0x32f9134a232bcbf1:0x151241e9cb43b4cd",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "facebook_url": {
+          "expected": null,
+          "value": "https://www.facebook.com/campdamada",
+          "source": "https://www.google.com/maps/place/Camp%20Damada/data=!4m2!3m1!1s0x32f9134a232bcbf1:0x151241e9cb43b4cd",
+          "reason": "Operator website/social profile or official managing-authority page."
+        }
+      },
+      "amenities": [
+        {
+          "key": "restaurant",
+          "source": "https://www.nabunturan.gov.ph/tourist-destination",
+          "evidence": "Municipal catalogue describes an overlooking cafe and camping venue.",
+          "status": "published_facility"
+        },
+        {
+          "key": "campsites",
+          "source": "https://www.nabunturan.gov.ph/tourist-destination",
+          "evidence": "Municipal catalogue describes an overlooking cafe and camping venue.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "candelaria-park",
+      "name": "Candelaria Park",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.05694,
+          "source": "https://mapcarta.com/W783620055",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.60165,
+          "source": "https://mapcarta.com/W783620055",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "city-of-tagum-cultural-center",
+      "name": "City of Tagum Cultural Center",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.447591,
+          "source": "https://api.openstreetmap.org/api/0.6/way/365973107/full.json",
+          "reason": "mapped_main_entrance reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.8043537,
+          "source": "https://api.openstreetmap.org/api/0.6/way/365973107/full.json",
+          "reason": "mapped_main_entrance reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "coral-garden",
+      "name": "Coral Garden",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.91362,
+          "source": "https://www.padi.com/dive-site/philippines/coral-garden-12/",
+          "reason": "marine_map_pin reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.68203,
+          "source": "https://www.padi.com/dive-site/philippines/coral-garden-12/",
+          "reason": "marine_map_pin reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "crocodile-hill",
+      "name": "Crocodile Hill",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.6435,
+          "source": "https://mapcarta.com/N332021070",
+          "reason": "summit reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.3806,
+          "source": "https://mapcarta.com/N332021070",
+          "reason": "summit reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "d-fortees-nature-park-and-inland-resort",
+      "name": "D'Fortees Nature Park and Inland Resort",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.70996,
+          "source": "https://mapcarta.com/N13302680666",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.98857,
+          "source": "https://mapcarta.com/N13302680666",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "description": {
+          "expected": "A nature park and inland resort in Montevista featured in the provincial tourism directory. Contact the operator for current day-visit arrangements and available facilities.",
+          "value": "A nature park and inland resort in Montevista with gardens and a small lake. Published visitor accounts describe swimming pools, cabin and villa lodging, day-use cottages, a playground and a viewpoint. Confirm which facilities are included in a day visit and which require separate booking. The provincial tourism directory lists the venue in Montevista.",
+          "source": "https://thegeestravel.com/d-fortees-nature-park/",
+          "reason": "Sourced visitor information; no unverified accessibility, tariffs or facilities added."
+        }
+      },
+      "amenities": [
+        {
+          "key": "pool",
+          "source": "https://thegeestravel.com/d-fortees-nature-park/",
+          "evidence": "First-person illustrated facility account: swimming pools, cabin/villa lodging, cottages, playground, viewpoint and garden walks. Room-only Wi-Fi/AC not represented as day-visitor facilities.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Swimming Pool (reported)"
+        },
+        {
+          "key": "overnight_lodging",
+          "source": "https://thegeestravel.com/d-fortees-nature-park/",
+          "evidence": "First-person illustrated facility account: swimming pools, cabin/villa lodging, cottages, playground, viewpoint and garden walks. Room-only Wi-Fi/AC not represented as day-visitor facilities.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Overnight Lodging (reported)"
+        },
+        {
+          "key": "day_use_cottages",
+          "source": "https://thegeestravel.com/d-fortees-nature-park/",
+          "evidence": "First-person illustrated facility account: swimming pools, cabin/villa lodging, cottages, playground, viewpoint and garden walks. Room-only Wi-Fi/AC not represented as day-visitor facilities.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Day-use Cottages & Gazebos (reported)"
+        },
+        {
+          "key": "playgrounds",
+          "source": "https://thegeestravel.com/d-fortees-nature-park/",
+          "evidence": "First-person illustrated facility account: swimming pools, cabin/villa lodging, cottages, playground, viewpoint and garden walks. Room-only Wi-Fi/AC not represented as day-visitor facilities.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Playgrounds (reported)"
+        },
+        {
+          "key": "viewing_decks",
+          "source": "https://thegeestravel.com/d-fortees-nature-park/",
+          "evidence": "First-person illustrated facility account: swimming pools, cabin/villa lodging, cottages, playground, viewpoint and garden walks. Room-only Wi-Fi/AC not represented as day-visitor facilities.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Viewing Decks (reported)"
+        },
+        {
+          "key": "walking_trails",
+          "source": "https://thegeestravel.com/d-fortees-nature-park/",
+          "evidence": "First-person illustrated facility account: swimming pools, cabin/villa lodging, cottages, playground, viewpoint and garden walks. Room-only Wi-Fi/AC not represented as day-visitor facilities.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Walking Trails & Boardwalks (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "davao-bamboo-sanctuary-and-ecological-park",
+      "name": "Davao Bamboo Sanctuary and Ecological Park",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.16833,
+          "source": "https://mapcarta.com/W539317911",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.41505,
+          "source": "https://mapcarta.com/W539317911",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "davao-city-hall",
+      "name": "Davao City Hall",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.06439,
+          "source": "https://en.wikipedia.org/wiki/Davao_City_Hall",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.6077,
+          "source": "https://en.wikipedia.org/wiki/Davao_City_Hall",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "davao-city-library-and-information-center",
+      "name": "Davao City Library and Information Center",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.07278,
+          "source": "https://mapcarta.com/W31756392",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.61095,
+          "source": "https://mapcarta.com/W31756392",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "description": {
+          "expected": "A public library and educational destination that has hosted visitor tours. Contact the library for current opening hours and tour arrangements.",
+          "value": "A public library and information centre at C. Bangoy Street in Davao City. City information describes air-conditioned reading areas, childrens learning spaces, conference rooms and Wi-Fi/computer services subject to registration. Library card charges are separate from a tourism entrance fee. Check the latest visitor and service timetable before going.",
+          "source": "https://davaocity.gov.ph/education/davao-city-library-opens-with-all-inclusive-features/",
+          "reason": "Sourced visitor information; no unverified accessibility, tariffs or facilities added."
+        },
+        "website_url": {
+          "expected": null,
+          "value": "https://davaocity.gov.ph/davao-city-library-information-center/",
+          "source": "https://davaocity.gov.ph/davao-city-library-information-center/",
+          "reason": "Operator website/social profile or official managing-authority page."
+        }
+      },
+      "amenities": [
+        {
+          "key": "wifi",
+          "source": "https://davaocity.gov.ph/education/davao-city-library-opens-with-all-inclusive-features/",
+          "evidence": "City confirms Wi-Fi card service, air-conditioned library and conference rooms. Library card charges are not per-visit entry fees.",
+          "status": "published_facility"
+        },
+        {
+          "key": "ac",
+          "source": "https://davaocity.gov.ph/education/davao-city-library-opens-with-all-inclusive-features/",
+          "evidence": "City confirms Wi-Fi card service, air-conditioned library and conference rooms. Library card charges are not per-visit entry fees.",
+          "status": "published_facility"
+        },
+        {
+          "key": "event_spaces",
+          "source": "https://davaocity.gov.ph/education/davao-city-library-opens-with-all-inclusive-features/",
+          "evidence": "City confirms Wi-Fi card service, air-conditioned library and conference rooms. Library card charges are not per-visit entry fees.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "davao-crocodile-park-inc",
+      "name": "Davao Crocodile Park Inc",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.09721,
+          "source": "https://mapcarta.com/W81347693",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.59898,
+          "source": "https://mapcarta.com/W81347693",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "davao-del-norte-sports-and-tourism-complex",
+      "name": "Davao del Norte Sports and Tourism Complex",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.4551,
+          "source": "https://en.wikipedia.org/wiki/Davao_del_Norte_Sports_Complex",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.78364,
+          "source": "https://en.wikipedia.org/wiki/Davao_del_Norte_Sports_Complex",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "davao-museum-of-history-and-ethnography",
+      "name": "Davao Museum of History and Ethnography",
+      "fields": {
+        "location": {
+          "expected": "Ateneo de Davao University, Jacinto campus, Davao City",
+          "value": "Museum Study Gallery, ground floor, Arrupe Hall, Ateneo de Davao University, Jacinto Campus, Davao City",
+          "source": "https://www.addu.edu.ph/museum-study-gallery-blessing-arrupe-hall/",
+          "reason": "October 2026 collection location supersedes 2025 turnover venue."
+        },
+        "description": {
+          "expected": "A museum collection documenting Mindanao history and ethnography. A study gallery at Ateneo de Davao houses the collection while a permanent facility is planned. Confirm visitor access with the museum before visiting.",
+          "value": "The Davao Museum of History and Ethnography collection is housed in a study gallery on the ground floor of Arrupe Hall at Ateneo de Davao Universitys Jacinto Campus. The gallery was blessed in October 2026 and supports research and study while a new museum is planned. Contact the university for visitor access and appointments. This is separate from Museo Dabawenyo and the former Lanang museum site.",
+          "source": "https://www.addu.edu.ph/museum-study-gallery-blessing-arrupe-hall/",
+          "reason": "University primary update."
+        },
+        "website_url": {
+          "expected": null,
+          "value": "https://www.addu.edu.ph/museum-study-gallery-blessing-arrupe-hall/",
+          "source": "https://www.addu.edu.ph/museum-study-gallery-blessing-arrupe-hall/",
+          "reason": "Operator website/social profile or official managing-authority page."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "daya-farm-adventure",
+      "name": "Daya Farm & Adventure",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.0210114,
+          "source": "https://www.google.com/maps/place/Daya%20Farm%20%26%20Adventure/data=!4m2!3m1!1s0x32fbd122788fd95d:0xba178b90d88c4148",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.00481,
+          "source": "https://www.google.com/maps/place/Daya%20Farm%20%26%20Adventure/data=!4m2!3m1!1s0x32fbd122788fd95d:0xba178b90d88c4148",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "dayang-beach",
+      "name": "Dayang Beach",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.94951,
+          "source": "https://mapcarta.com/N1668416923",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.66932,
+          "source": "https://mapcarta.com/N1668416923",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "entry_fee_min": {
+          "expected": null,
+          "value": 100,
+          "source": "https://www.dayangbeach.com/rates-and-fees",
+          "reason": "Published per-person day tour without room booking; transport separate."
+        },
+        "entry_fee_max": {
+          "expected": null,
+          "value": 100,
+          "source": "https://www.dayangbeach.com/rates-and-fees",
+          "reason": "Same adult admission product, not combined with transport or overnight lodging."
+        },
+        "price_tier": {
+          "expected": null,
+          "value": "Budget-Friendly",
+          "source": "https://www.dayangbeach.com/rates-and-fees",
+          "reason": "Tier based on published PHP100 day admission."
+        },
+        "description": {
+          "expected": "Reference place: not DOT-accredited and not shown to travelers. Recorded so published itineraries that mention it can be matched.",
+          "value": "A beach resort on Talicud Island, Samal. The operator publishes a PHP100 per-person day-tour charge without an overnight room booking; entrance is included when staying overnight. Boat transfers are charged separately and must not be added to the entrance price. Confirm room bookings, transfer schedules and current rates directly with the resort.",
+          "source": "https://www.dayangbeach.com/rates-and-fees",
+          "reason": "Sourced visitor information; no unverified accessibility, tariffs or facilities added."
+        },
+        "website_url": {
+          "expected": null,
+          "value": "https://www.dayangbeach.com/",
+          "source": "https://www.dayangbeach.com/",
+          "reason": "Operator website/social profile or official managing-authority page."
+        }
+      },
+      "amenities": [
+        {
+          "key": "overnight_lodging",
+          "source": "https://www.dayangbeach.com/rates-and-fees",
+          "evidence": "Operator publishes overnight room bookings.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "deca-wakeboard-park-davao",
+      "name": "DECA Wakeboard Park Davao",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.10836,
+          "source": "https://mapcarta.com/W669042983",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.50072,
+          "source": "https://mapcarta.com/W669042983",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "digos-city-ecopark-and-arboretum",
+      "name": "Digos City Ecopark and Arboretum",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.77553,
+          "source": "https://mapcarta.com/W1382022448",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.34392,
+          "source": "https://mapcarta.com/W1382022448",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "website_url": {
+          "expected": null,
+          "value": "https://www.experiencedavao.com/attractions/digos-city-ecopark-and-arboretum",
+          "source": "https://www.experiencedavao.com/attractions/digos-city-ecopark-and-arboretum",
+          "reason": "Official DOT visitor information for the city-managed ecopark."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "divine-mercy-shrine",
+      "name": "Divine Mercy Shrine",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.4276298,
+          "source": "https://www.google.com/maps/place/Divine%20Mercy%20Shrine/data=!4m2!3m1!1s0x32f9e7a130e2fa09:0xd7455dda1a0b39f7",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.5767557,
+          "source": "https://www.google.com/maps/place/Divine%20Mercy%20Shrine/data=!4m2!3m1!1s0x32f9e7a130e2fa09:0xd7455dda1a0b39f7",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "hours": {
+          "expected": null,
+          "value": "Daily 06:00–18:00; map-listed, confirm",
+          "source": "https://www.google.com/maps/place/Divine%20Mercy%20Shrine/data=!4m2!3m1!1s0x32f9e7a130e2fa09:0xd7455dda1a0b39f7",
+          "reason": "Map-published schedule; operator confirmation pending."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "dona-vicenta-park",
+      "name": "Doña Vicenta Park",
+      "fields": {
+        "description": {
+          "expected": "An urban park with landscaped paths and an amphitheatre. Check with the city for current access to individual amenities.",
+          "value": "A public park in Dona Vicenta Village, Barangay 9-A, Davao City. The city lists a skywalk, amphitheatre, stage, koi pond and library among its features. It provides space for walking and leisure. Confirm current park rules and operating hours with CENRO.",
+          "source": "https://davaocity.gov.ph/environment/dona-vicenta-park-now-open/",
+          "reason": "Sourced visitor information; no unverified accessibility, tariffs or facilities added."
+        },
+        "website_url": {
+          "expected": null,
+          "value": "https://davaocity.gov.ph/environment/dona-vicenta-park-now-open/",
+          "source": "https://davaocity.gov.ph/environment/dona-vicenta-park-now-open/",
+          "reason": "Operator website/social profile or official managing-authority page."
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://davaocity.gov.ph/environment/dona-vicenta-park-now-open/",
+          "evidence": "City confirms skywalk, amphitheatre and stage. Proposed/possible hours not adopted.",
+          "status": "published_facility"
+        },
+        {
+          "key": "visitor_bridges",
+          "source": "https://davaocity.gov.ph/environment/dona-vicenta-park-now-open/",
+          "evidence": "City confirms skywalk, amphitheatre and stage. Proposed/possible hours not adopted.",
+          "status": "published_facility"
+        },
+        {
+          "key": "event_spaces",
+          "source": "https://davaocity.gov.ph/environment/dona-vicenta-park-now-open/",
+          "evidence": "City confirms skywalk, amphitheatre and stage. Proposed/possible hours not adopted.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "energy-park",
+      "name": "Energy Park",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.41549,
+          "source": "https://mapcarta.com/32700974",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.82672,
+          "source": "https://mapcarta.com/32700974",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "fabian-s-peak",
+      "name": "Fabian's Peak",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.2671049,
+          "source": "https://www.google.com/maps/place/Fabians%20Peak/data=!4m2!3m1!1s0x32fbefe8fa97b8fd:0xecb31c56c23d3a2e",
+          "reason": "summit reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.147696,
+          "source": "https://www.google.com/maps/place/Fabians%20Peak/data=!4m2!3m1!1s0x32fbefe8fa97b8fd:0xecb31c56c23d3a2e",
+          "reason": "summit reference; not a verified vehicle entrance"
+        },
+        "location": {
+          "expected": "Araibo, Pantukan, Davao de Oro",
+          "value": "Maragusan, Davao de Oro",
+          "source": "https://www.google.com/maps/place/Fabians%20Peak/data=!4m2!3m1!1s0x32fbefe8fa97b8fd:0xecb31c56c23d3a2e",
+          "reason": "Exact profile and dedicated visitor report agree on Maragusan; Araibo/Pantukan text conflicts."
+        },
+        "description": {
+          "expected": "A highland viewpoint in Araibo, Pantukan. Confirm current access and visitor arrangements with the operator or local tourism office.",
+          "value": "A mountain viewpoint in Maragusan, Davao de Oro, known for wide views and cool highland scenery. Arrange the current access route and local guidance before travelling. Earlier catalogue references to Araibo, Pantukan conflict with the mapped place and need no longer be used.",
+          "source": "https://www.google.com/maps/place/Fabians%20Peak/data=!4m2!3m1!1s0x32fbefe8fa97b8fd:0xecb31c56c23d3a2e",
+          "reason": "Identity/location correction only; eligibility unchanged."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "freedom-park-tagum",
+      "name": "Freedom Park, Tagum",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.44707,
+          "source": "https://mapcarta.com/W289142619",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.80408,
+          "source": "https://mapcarta.com/W289142619",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "giant-clam-sanctuary",
+      "name": "Giant Clam Sanctuary",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.013849,
+          "source": "https://www.google.com/maps/place/Giant%20Clam%20(Taklobo)%20Sanctuary%2C%20Adecor/data=!4m2!3m1!1s0x32f970603c7da5e5:0xc1c29a2f2253d14f",
+          "reason": "marine_map_pin reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.7205224,
+          "source": "https://www.google.com/maps/place/Giant%20Clam%20(Taklobo)%20Sanctuary%2C%20Adecor/data=!4m2!3m1!1s0x32f970603c7da5e5:0xc1c29a2f2253d14f",
+          "reason": "marine_map_pin reference; not a verified vehicle entrance"
+        },
+        "website_url": {
+          "expected": null,
+          "value": "https://dnsc.edu.ph/taklobo-tours/",
+          "source": "https://dnsc.edu.ph/taklobo-tours/",
+          "reason": "Managing institution information for Taklobo Tours."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "hagimit-falls",
+      "name": "Hagimit Falls",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.06664,
+          "source": "https://mapcarta.com/N1223930550",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.72301,
+          "source": "https://mapcarta.com/N1223930550",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "isla-reta",
+      "name": "Isla Reta",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.9373,
+          "source": "https://mapcarta.com/N8392026304",
+          "reason": "boat_stop reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.72066,
+          "source": "https://mapcarta.com/N8392026304",
+          "reason": "boat_stop reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "island-buenavista",
+      "name": "Island Buenavista",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.1920073,
+          "source": "https://www.google.com/maps/place/The%20Island%20Buenavista%20Resort/data=!4m2!3m1!1s0x32f97002bdfb58bb:0xbed067b6009ec82",
+          "reason": "island_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.7731512,
+          "source": "https://www.google.com/maps/place/The%20Island%20Buenavista%20Resort/data=!4m2!3m1!1s0x32f97002bdfb58bb:0xbed067b6009ec82",
+          "reason": "island_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "jkm-mini-zoo",
+      "name": "JKM Mini Zoo",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.575845,
+          "source": "https://jkmsons.com.ph/",
+          "reason": "operator_map_marker reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.68261,
+          "source": "https://jkmsons.com.ph/",
+          "reason": "operator_map_marker reference; not a verified vehicle entrance"
+        },
+        "website_url": {
+          "expected": null,
+          "value": "https://jkmsons.com.ph/",
+          "source": "https://jkmsons.com.ph/",
+          "reason": "Operator website/social profile or official managing-authority page."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "jorge-town",
+      "name": "Jorge Town",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.71322,
+          "source": "https://mapcarta.com/N9377737317",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.99034,
+          "source": "https://mapcarta.com/N9377737317",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "description": {
+          "expected": "An amusement and recreation destination in Montevista featured in the provincial tourism directory. Contact the operator for current day-tour arrangements and attractions.",
+          "value": "An amusement and leisure destination along the National Highway in Montevista. Provincial tourism information describes a mini-zoo, swan boat rides and a zip line among its attractions. Contact the venue for current activity availability, age restrictions and admission charges.",
+          "source": "https://davaodeoro.gov.ph/jorge-town/",
+          "reason": "Sourced visitor information; no unverified accessibility, tariffs or facilities added."
+        }
+      },
+      "amenities": [
+        {
+          "key": "adventure_facilities",
+          "source": "https://davaodeoro.gov.ph/jorge-town/",
+          "evidence": "Province explicitly lists zip line and swan boat activities.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "kagan-dinagsaan-peak",
+      "name": "Kagan Dinagsaan Peak",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.04477,
+          "source": "https://www.google.com/maps/place/Kagan%20Dinagsaan%20Peak/data=!4m2!3m1!1s0x32fbd94c517502bd:0xa699c7daa3855b66",
+          "reason": "summit reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.976511,
+          "source": "https://www.google.com/maps/place/Kagan%20Dinagsaan%20Peak/data=!4m2!3m1!1s0x32fbd94c517502bd:0xa699c7daa3855b66",
+          "reason": "summit reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://www.experiencedavao.com/activities/kagan-dinagsaan-peak",
+          "evidence": "DOT XI describes community-based hiking.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "langan-falls",
+      "name": "Langan Falls",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.89659,
+          "source": "https://mapcarta.com/N5166405752",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.41982,
+          "source": "https://mapcarta.com/N5166405752",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "lao-integrated-farms",
+      "name": "Lao Integrated Farms",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.8477521,
+          "source": "https://www.google.com/maps/place/Lao%20Integrated%20Farms%2C%20Inc./data=!4m2!3m1!1s0x32f852bebfb9e51b:0xc80636d9708520da",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.1904277,
+          "source": "https://www.google.com/maps/place/Lao%20Integrated%20Farms%2C%20Inc./data=!4m2!3m1!1s0x32f852bebfb9e51b:0xc80636d9708520da",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "hours": {
+          "expected": null,
+          "value": "Mon–Thu 08:00–16:00; Fri 08:00–15:00; Sat–Sun closed; map-listed, confirm",
+          "source": "https://www.google.com/maps/place/Lao%20Integrated%20Farms%2C%20Inc./data=!4m2!3m1!1s0x32f852bebfb9e51b:0xc80636d9708520da",
+          "reason": "Map-published schedule; operator confirmation pending."
+        },
+        "website_url": {
+          "expected": null,
+          "value": "https://www.laointegratedfarms.com/",
+          "source": "https://www.laointegratedfarms.com/",
+          "reason": "Operator website/social profile or official managing-authority page."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "los-amigos-park",
+      "name": "Los Amigos Park",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.14118,
+          "source": "https://mapcarta.com/W1060515995",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.48023,
+          "source": "https://mapcarta.com/W1060515995",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "hours": {
+          "expected": null,
+          "value": "5:00–8:00 AM; 1:00–7:00 PM (city report; confirm)",
+          "source": "https://davaocity.gov.ph/environment/los-amigos-park-opens-to-public/",
+          "reason": "Dated city publication; maintenance closure between sessions."
+        },
+        "description": {
+          "expected": "A public green space in Los Amigos for walks and outdoor relaxation.",
+          "value": "A pocket park in Los Amigos, Davao City, with a playground, elevated gazebo, parking lot, bike racks and landscaped pathways. The city published separate morning and afternoon walking sessions with a midday maintenance closure. Check the current schedule before visiting.",
+          "source": "https://davaocity.gov.ph/environment/los-amigos-park-opens-to-public/",
+          "reason": "Sourced visitor information; no unverified accessibility, tariffs or facilities added."
+        },
+        "website_url": {
+          "expected": null,
+          "value": "https://davaocity.gov.ph/environment/los-amigos-park-opens-to-public/",
+          "source": "https://davaocity.gov.ph/environment/los-amigos-park-opens-to-public/",
+          "reason": "Operator website/social profile or official managing-authority page."
+        }
+      },
+      "amenities": [
+        {
+          "key": "parking",
+          "source": "https://davaocity.gov.ph/environment/los-amigos-park-opens-to-public/",
+          "evidence": "City confirms parking lot, playground, pathways and elevated gazebo.",
+          "status": "published_facility"
+        },
+        {
+          "key": "playgrounds",
+          "source": "https://davaocity.gov.ph/environment/los-amigos-park-opens-to-public/",
+          "evidence": "City confirms parking lot, playground, pathways and elevated gazebo.",
+          "status": "published_facility"
+        },
+        {
+          "key": "walking_trails",
+          "source": "https://davaocity.gov.ph/environment/los-amigos-park-opens-to-public/",
+          "evidence": "City confirms parking lot, playground, pathways and elevated gazebo.",
+          "status": "published_facility"
+        },
+        {
+          "key": "day_use_cottages",
+          "source": "https://davaocity.gov.ph/environment/los-amigos-park-opens-to-public/",
+          "evidence": "City confirms parking lot, playground, pathways and elevated gazebo.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "mabunao-eco-park",
+      "name": "Mabunao Eco-Park",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.25615,
+          "source": "https://mapcarta.com/N13155150684",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.57523,
+          "source": "https://mapcarta.com/N13155150684",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "magsaysay-park",
+      "name": "Magsaysay Park",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.07446,
+          "source": "https://mapcarta.com/32244086",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.6256,
+          "source": "https://mapcarta.com/32244086",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "malipano-island",
+      "name": "Malipano Island",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.00779,
+          "source": "https://mapcarta.com/W23965515",
+          "reason": "island_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.71915,
+          "source": "https://mapcarta.com/W23965515",
+          "reason": "island_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "malumagpak-falls",
+      "name": "Malumagpak Falls",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.4845625,
+          "source": "https://www.google.com/maps/place/Malumagpak%20Falls/data=!4m2!3m1!1s0x32fc75eb399912b1:0x18085ee52a2ae16a",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.3079844,
+          "source": "https://www.google.com/maps/place/Malumagpak%20Falls/data=!4m2!3m1!1s0x32fc75eb399912b1:0x18085ee52a2ae16a",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        },
+        "hours": {
+          "expected": null,
+          "value": "Daily 07:00–17:00; map-listed, confirm",
+          "source": "https://www.google.com/maps/place/Malumagpak%20Falls/data=!4m2!3m1!1s0x32fc75eb399912b1:0x18085ee52a2ae16a",
+          "reason": "Map-published schedule; operator confirmation pending."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "marawer-hot-spring",
+      "name": "Marawer Hot Spring",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.9377279,
+          "source": "https://www.google.com/maps/place/Marawer%20Hot%20Spring/data=!4m2!3m1!1s0x32f9a9b226542d8d:0x8e00dbe64bf2ecfe",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.3082323,
+          "source": "https://www.google.com/maps/place/Marawer%20Hot%20Spring/data=!4m2!3m1!1s0x32f9a9b226542d8d:0x8e00dbe64bf2ecfe",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": [
+        {
+          "key": "hot_springs",
+          "source": "https://manakaayugbukid.com/marawer-hot-springs-kapatagan-guide/",
+          "evidence": "First-person guide describes the small hot soaking pool.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Hot Spring Soaking Areas (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "matol-falls",
+      "name": "Matol Falls",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.77277,
+          "source": "https://mapcarta.com/N1778736643",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.6322,
+          "source": "https://mapcarta.com/N1778736643",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://www.mindanaotimes.com.ph/dot-xi-officially-kicks-off-davao-adventure-challenge-season-2/",
+          "evidence": "Matol Falls trekking attraction in the adventure challenge.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Walking Trails & Boardwalks (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "mayor-francisco-g-rabat-park-and-baywalk",
+      "name": "Mayor Francisco G. Rabat Park and Baywalk",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.95012,
+          "source": "https://mapcarta.com/W809236769",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.21707,
+          "source": "https://mapcarta.com/W809236769",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "monfort-bat-cave",
+      "name": "Monfort Bat Cave",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.1654,
+          "source": "https://mapcarta.com/W666853611",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.6927,
+          "source": "https://mapcarta.com/W666853611",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "mount-fortune-view",
+      "name": "Mount Fortune View",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.8859361,
+          "source": "https://www.google.com/maps/place/Mt.%20Fortune%20View/data=!4m2!3m1!1s0x32f9a70002c71a39:0x6b2328bfe268546d",
+          "reason": "viewpoint reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.4291139,
+          "source": "https://www.google.com/maps/place/Mt.%20Fortune%20View/data=!4m2!3m1!1s0x32f9a70002c71a39:0x6b2328bfe268546d",
+          "reason": "viewpoint reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "mount-karilongan",
+      "name": "Mount Karilongan",
+      "fields": {
+        "description": {
+          "expected": "A community-managed mountain trail associated with the Obu-Manuvu community of Carmen. Also reported as Mount Kalilongan. Arrange community permission and local guidance before a visit.",
+          "value": "A community-managed mountain trail in Carmen, Baguio District, associated with the Obu-Manuvu community. The foundation describes a stepped climb of around 1,083 steps, mountain views and community-guided visits. Arrange community permission, a guide and any food requests before travelling. Published volunteer-event hours are not the current visitor schedule.",
+          "source": "https://www.ivolunteer.com.ph/time-volunteer/7783",
+          "reason": "Sourced visitor information; no unverified accessibility, tariffs or facilities added."
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://www.ivolunteer.com.ph/time-volunteer/7783",
+          "evidence": "Community foundation describes summit steps and tour guiding. The 2023 volunteer timetable is not a current visitor timetable.",
+          "status": "published_facility"
+        },
+        {
+          "key": "guided_tours",
+          "source": "https://www.ivolunteer.com.ph/time-volunteer/7783",
+          "evidence": "Community foundation describes summit steps and tour guiding. The 2023 volunteer timetable is not a current visitor timetable.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "mount-lamabal",
+      "name": "Mount Lamabal",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.673391,
+          "source": "https://api.openstreetmap.org/api/0.6/node/10134434854.json",
+          "reason": "summit reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.0756925,
+          "source": "https://api.openstreetmap.org/api/0.6/node/10134434854.json",
+          "reason": "summit reference; not a verified vehicle entrance"
+        },
+        "location": {
+          "expected": "Matanao, Davao del Sur",
+          "value": "Sitio Talambato, Asbang, Matanao, Davao del Sur",
+          "source": "https://www.experiencedavao.com/destinations/davao-del-sur/matanao/attractions/mt-lamabal",
+          "reason": "DOT XI visitor address."
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://www.experiencedavao.com/destinations/davao-del-sur/matanao/attractions/mt-lamabal",
+          "evidence": "DOT XI identifies the peak as a hiking attraction.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "mount-loay",
+      "name": "Mount Loay",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.8842,
+          "source": "https://mapcarta.com/N5459336564",
+          "reason": "summit reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.4081,
+          "source": "https://mapcarta.com/N5459336564",
+          "reason": "summit reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://mirror.pia.gov.ph/news/2022/05/31/sta-cruz-tourists-mostly-seek-outdoor-adventure-sites",
+          "evidence": "Municipal tourism officer describes mountain climbing at Mount Loay.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "mount-pandadagsaan",
+      "name": "Mount Pandadagsaan",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.445,
+          "source": "https://www.gunungbagging.com/mount-tagubud-mount-pandadagsaan/",
+          "reason": "summit reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.2267,
+          "source": "https://www.gunungbagging.com/mount-tagubud-mount-pandadagsaan/",
+          "reason": "summit reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "mount-puting-bato",
+      "name": "Mount Puting Bato",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.066,
+          "source": "https://www.gunungbagging.com/puting-bato/",
+          "reason": "summit reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.7681,
+          "source": "https://www.gunungbagging.com/puting-bato/",
+          "reason": "summit reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://rcmb11.ncmb.gov.ph/health-and-wellness-through-hiking-and-self-love/",
+          "evidence": "Government first-person hiking account describes two access trails.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "new-barili-heights-and-sights",
+      "name": "New Barili Heights and Sights",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.35411,
+          "source": "https://mapcarta.com/N9671315617",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.01136,
+          "source": "https://mapcarta.com/N9671315617",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "description": {
+          "expected": "A mountain resort and viewpoint in New Barili, Maco, featured in the provincial tourism directory. Confirm current day-visit arrangements and access with the operator.",
+          "value": "A mountain resort in New Barili, Maco, overlooking Lake Leonard. Provincial tourism information lists overnight accommodation, a restaurant and a coffee shop. Contact the operator for day-visit access, room availability and current rates.",
+          "source": "https://davaodeoro.gov.ph/new-barili-heights-and-sights/",
+          "reason": "Sourced visitor information; no unverified accessibility, tariffs or facilities added."
+        }
+      },
+      "amenities": [
+        {
+          "key": "restaurant",
+          "source": "https://davaodeoro.gov.ph/new-barili-heights-and-sights/",
+          "evidence": "Province explicitly describes accommodation, a restaurant and a coffee shop.",
+          "status": "published_facility"
+        },
+        {
+          "key": "overnight_lodging",
+          "source": "https://davaodeoro.gov.ph/new-barili-heights-and-sights/",
+          "evidence": "Province explicitly describes accommodation, a restaurant and a coffee shop.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "new-city-hall-of-tagum",
+      "name": "New City Hall of Tagum",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.4408,
+          "source": "https://mapcarta.com/W753444490",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.82647,
+          "source": "https://mapcarta.com/W753444490",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "panabo-mangrove-park",
+      "name": "Panabo Mangrove Park",
+      "fields": {
+        "description": {
+          "expected": "A mangrove ecotourism site in Panabo City with a forest boardwalk experience. Check current access and visitor arrangements with the city tourism office.",
+          "value": "A mangrove conservation area in Barangay JP Laurel, Panabo City. The citys completed ecotourism project includes a 430-metre boardwalk and docking cottage. The city announced other facilities as proposals; they are not confirmed amenities. Check with local tourism staff for current boardwalk access and guided activities.",
+          "source": "https://panabocity.gov.ph/panabo-mangrove-park-ecotourism-project-inaugurated/",
+          "reason": "Sourced visitor information; no unverified accessibility, tariffs or facilities added."
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://panabocity.gov.ph/panabo-mangrove-park-ecotourism-project-inaugurated/",
+          "evidence": "City confirms completed 430 m boardwalk and docking cottage; future zip line/canteen/reception facilities not added.",
+          "status": "published_facility"
+        },
+        {
+          "key": "day_use_cottages",
+          "source": "https://panabocity.gov.ph/panabo-mangrove-park-ecotourism-project-inaugurated/",
+          "evidence": "City confirms completed 430 m boardwalk and docking cottage; future zip line/canteen/reception facilities not added.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "poo-sandbar",
+      "name": "Poo Sandbar",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.702554,
+          "source": "https://www.google.com/maps/place/Poo%20Sandbar/data=!4m2!3m1!1s0x32fc5fd922efa0e1:0x7fea9395d500438",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.5628147,
+          "source": "https://www.google.com/maps/place/Poo%20Sandbar/data=!4m2!3m1!1s0x32fc5fd922efa0e1:0x7fea9395d500438",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        },
+        "hours": {
+          "expected": null,
+          "value": "Mon–Fri 07:00–17:00; Sat 07:00–15:00; Sun 07:00–14:00; map-listed, confirm",
+          "source": "https://www.google.com/maps/place/Poo%20Sandbar/data=!4m2!3m1!1s0x32fc5fd922efa0e1:0x7fea9395d500438",
+          "reason": "Map-published schedule; operator confirmation pending."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "pusan-point",
+      "name": "Pusan Point",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.29382,
+          "source": "https://mapcarta.com/N9027393351",
+          "reason": "landmark reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.60221,
+          "source": "https://mapcarta.com/N9027393351",
+          "reason": "landmark reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "pyalitan-falls",
+      "name": "Pyalitan Falls",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.29919,
+          "source": "https://mapcarta.com/N7345718185",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.1707,
+          "source": "https://mapcarta.com/N7345718185",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "rancho-palos-verdes-golf-sports-club-inc",
+      "name": "Rancho Palos Verdes Golf & Sports Club Inc.",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.16987,
+          "source": "https://mapcarta.com/W1013398163",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.58705,
+          "source": "https://mapcarta.com/W1013398163",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "rancho-palos-verdes-golf-sports-club-inc-2",
+      "name": "Rancho Palos Verdes Golf & Sports Club Inc.",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "pool",
+          "source": "https://stalucialand.com.ph/projects/rancho-palos-verdes-2/",
+          "evidence": "Developer describes Riverfront country club pool, courts, function rooms, restaurant and fitness gym. Access/membership conditions require confirmation; no gate location inferred.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Swimming Pool (reported)"
+        },
+        {
+          "key": "sports_courts",
+          "source": "https://stalucialand.com.ph/projects/rancho-palos-verdes-2/",
+          "evidence": "Developer describes Riverfront country club pool, courts, function rooms, restaurant and fitness gym. Access/membership conditions require confirmation; no gate location inferred.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "undefined (reported)"
+        },
+        {
+          "key": "event_spaces",
+          "source": "https://stalucialand.com.ph/projects/rancho-palos-verdes-2/",
+          "evidence": "Developer describes Riverfront country club pool, courts, function rooms, restaurant and fitness gym. Access/membership conditions require confirmation; no gate location inferred.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Event & Meeting Spaces (reported)"
+        },
+        {
+          "key": "restaurant",
+          "source": "https://stalucialand.com.ph/projects/rancho-palos-verdes-2/",
+          "evidence": "Developer describes Riverfront country club pool, courts, function rooms, restaurant and fitness gym. Access/membership conditions require confirmation; no gate location inferred.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Restaurant (reported)"
+        },
+        {
+          "key": "gyms",
+          "source": "https://stalucialand.com.ph/projects/rancho-palos-verdes-2/",
+          "evidence": "Developer describes Riverfront country club pool, courts, function rooms, restaurant and fitness gym. Access/membership conditions require confirmation; no gate location inferred.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "undefined (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "roxas-greenway-park",
+      "name": "Roxas Greenway Park",
+      "fields": {
+        "hours": {
+          "expected": null,
+          "value": "24-hour walking access (city report; confirm)",
+          "source": "https://davaocity.gov.ph/local-government/davao-citys-roxas-greenway-park-opens/",
+          "reason": "City parks division report, December 2025."
+        },
+        "description": {
+          "expected": "A riverside greenway along Roxas Avenue with landscaped paths and outdoor recreation areas. This park is separate from Roxas Night Market.",
+          "value": "A 398-metre public greenway along Roxas Avenue in Davao City, with landscaped walking areas, fitness spaces and Plaza Bridge. It is a separate green-space attraction from the Roxas Night Market. The city reported around-the-clock walking access when it opened; follow current park rules.",
+          "source": "https://davaocity.gov.ph/local-government/davao-citys-roxas-greenway-park-opens/",
+          "reason": "Sourced visitor information; no unverified accessibility, tariffs or facilities added."
+        },
+        "website_url": {
+          "expected": null,
+          "value": "https://davaocity.gov.ph/local-government/davao-citys-roxas-greenway-park-opens/",
+          "source": "https://davaocity.gov.ph/local-government/davao-citys-roxas-greenway-park-opens/",
+          "reason": "Operator website/social profile or official managing-authority page."
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://davaocity.gov.ph/local-government/davao-citys-roxas-greenway-park-opens/",
+          "evidence": "City confirms landscaped walkways and Plaza Bridge.",
+          "status": "published_facility"
+        },
+        {
+          "key": "visitor_bridges",
+          "source": "https://davaocity.gov.ph/local-government/davao-citys-roxas-greenway-park-opens/",
+          "evidence": "City confirms landscaped walkways and Plaza Bridge.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "roxas-night-market",
+      "name": "Roxas Night Market",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.07042,
+          "source": "https://mapcarta.com/W504508082",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.61337,
+          "source": "https://mapcarta.com/W504508082",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "hours": {
+          "expected": null,
+          "value": "6:00 PM–12:00 AM",
+          "source": "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/night-market/roxas-night-market/",
+          "reason": "City tourism published daily trading schedule."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "sabang-cliff",
+      "name": "Sabang Cliff",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.9749,
+          "source": "https://mapcarta.com/N4621625891",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.72465,
+          "source": "https://mapcarta.com/N4621625891",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "san-salvador-del-mundo-church",
+      "name": "San Salvador del Mundo Church",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.3277,
+          "source": "https://mapcarta.com/W322426196",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.56588,
+          "source": "https://mapcarta.com/W322426196",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "location": {
+          "expected": "City of Mati, Davao Oriental",
+          "value": "Caraga, Davao Oriental",
+          "source": "https://philhistoricsites.nhcp.gov.ph/registry_database/simbahan-ng-caraga/",
+          "reason": "NHCP identifies the historic church in Caraga, not Mati."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "sanctuario-de-santo-rosario",
+      "name": "Sanctuario de Santo Rosario",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.4143416,
+          "source": "https://www.google.com/maps/place/Santo%20Rosario%20Shrine%2C%20Malita/data=!4m2!3m1!1s0x32f9e1fe150b6ca9:0xf249d8202c014f6d",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.5937868,
+          "source": "https://www.google.com/maps/place/Santo%20Rosario%20Shrine%2C%20Malita/data=!4m2!3m1!1s0x32f9e1fe150b6ca9:0xf249d8202c014f6d",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "sandunganan-peak",
+      "name": "Sandunganan Peak",
+      "fields": {
+        "hours": {
+          "expected": null,
+          "value": "Weekends/holidays; guided starts 3:30–7:30 AM; confirm",
+          "source": "https://pia.gov.ph/news/retracing-watchers-trail-gazing-at-same-skyline-atop-sandunganan-peak/",
+          "reason": "Reported 2025 guide departure windows, not daily continuous opening."
+        },
+        "visit_duration": {
+          "expected": null,
+          "value": "Approx. 4 hours round trip; guide estimate",
+          "source": "https://pia.gov.ph/news/retracing-watchers-trail-gazing-at-same-skyline-atop-sandunganan-peak/",
+          "reason": "Beginners may take longer; 2025 guide estimate."
+        },
+        "description": {
+          "expected": "A mountain viewpoint also called Gorilla Peak. Arrange current trail access and local guidance before climbing.",
+          "value": "A community-guided hiking destination in Banaybanay with river crossings, forest and open trails, Table Stone and the Gorilla Stone formation. A November 2025 government report gives an approximately four-hour return hike, with longer needed for some beginners, and weekend or holiday departure batches. Confirm guides, permission, weather conditions and the current timetable before booking.",
+          "source": "https://pia.gov.ph/news/retracing-watchers-trail-gazing-at-same-skyline-atop-sandunganan-peak/",
+          "reason": "Sourced visitor information; no unverified accessibility, tariffs or facilities added."
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://pia.gov.ph/news/retracing-watchers-trail-gazing-at-same-skyline-atop-sandunganan-peak/",
+          "evidence": "Government report describes guided hiking trails and local guide coordination.",
+          "status": "published_facility"
+        },
+        {
+          "key": "guided_tours",
+          "source": "https://pia.gov.ph/news/retracing-watchers-trail-gazing-at-same-skyline-atop-sandunganan-peak/",
+          "evidence": "Government report describes guided hiking trails and local guide coordination.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "shrine-of-the-holy-infant-jesus-of-prague",
+      "name": "Shrine of the Holy Infant Jesus of Prague",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.0657,
+          "source": "https://mapcarta.com/W1001989764",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.57838,
+          "source": "https://mapcarta.com/W1001989764",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "sicao-falls",
+      "name": "Sicao Falls",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.0854246,
+          "source": "https://api.openstreetmap.org/api/0.6/node/4874930699.json",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.3132627,
+          "source": "https://api.openstreetmap.org/api/0.6/node/4874930699.json",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "sigaboy-island",
+      "name": "Sigaboy Island",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.62873,
+          "source": "https://mapcarta.com/15718968",
+          "reason": "island_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.06688,
+          "source": "https://mapcarta.com/15718968",
+          "reason": "island_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "south-pacific-davao-country-club-inc",
+      "name": "South Pacific Davao Country Club Inc.",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.06586,
+          "source": "https://mapcarta.com/W1120578954",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.51118,
+          "source": "https://mapcarta.com/W1120578954",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "subangan-museum",
+      "name": "Subangan Museum",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.94423,
+          "source": "https://mapcarta.com/W1328605333",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 126.24834,
+          "source": "https://mapcarta.com/W1328605333",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "tagtugonan-falls",
+      "name": "Tagtugonan Falls",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.7793125,
+          "source": "https://www.google.com/maps/place/Tagtugonan%20Falls/data=!4m2!3m1!1s0x32febd893055eedf:0x64576b320744ecc2",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.6548906,
+          "source": "https://www.google.com/maps/place/Tagtugonan%20Falls/data=!4m2!3m1!1s0x32febd893055eedf:0x64576b320744ecc2",
+          "reason": "natural_feature reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "talikud-island",
+      "name": "Talikud Island",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 6.93218,
+          "source": "https://mapcarta.com/15713562",
+          "reason": "island_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.69872,
+          "source": "https://mapcarta.com/15713562",
+          "reason": "island_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "the-grape-valley",
+      "name": "The Grape Valley",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.5987035,
+          "source": "https://www.google.com/maps/place/The%20Grape%20Valley/data=!4m2!3m1!1s0x32fc035c3f298795:0xbb8582a834bbd38f",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.9820914,
+          "source": "https://www.google.com/maps/place/The%20Grape%20Valley/data=!4m2!3m1!1s0x32fc035c3f298795:0xbb8582a834bbd38f",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "hours": {
+          "expected": null,
+          "value": "Daily 08:00–17:00; map-listed, confirm",
+          "source": "https://www.google.com/maps/place/The%20Grape%20Valley/data=!4m2!3m1!1s0x32fc035c3f298795:0xbb8582a834bbd38f",
+          "reason": "Map-published schedule; operator confirmation pending."
+        },
+        "facebook_url": {
+          "expected": null,
+          "value": "https://www.facebook.com/TheGrapeValley",
+          "source": "https://www.google.com/maps/place/The%20Grape%20Valley/data=!4m2!3m1!1s0x32fc035c3f298795:0xbb8582a834bbd38f",
+          "reason": "Operator website/social profile or official managing-authority page."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "toril-public-park",
+      "name": "Toril Public Park",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.0188,
+          "source": "https://mapcarta.com/W845223168",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.49687,
+          "source": "https://mapcarta.com/W845223168",
+          "reason": "venue_area reference; not a verified vehicle entrance"
+        },
+        "hours": {
+          "expected": null,
+          "value": "8:00 AM–8:00 PM (city report; confirm)",
+          "source": "https://davaocity.gov.ph/infrastructure-development/renovated-toril-public-park-offers-amenities-for-visitors/",
+          "reason": "City publication 1 October 2024."
+        },
+        "description": {
+          "expected": "A landscaped public park near the Toril District Hall, with walking areas and community recreation spaces.",
+          "value": "A renovated public park in Toril with a childrens play area, fitness equipment, comfort rooms, parking, bike racks and a dedicated walking and jogging lane. The citys October 2024 report lists an 8 AM to 8 PM schedule; confirm current hours before travelling.",
+          "source": "https://davaocity.gov.ph/infrastructure-development/renovated-toril-public-park-offers-amenities-for-visitors/",
+          "reason": "Sourced visitor information; no unverified accessibility, tariffs or facilities added."
+        },
+        "website_url": {
+          "expected": null,
+          "value": "https://davaocity.gov.ph/infrastructure-development/renovated-toril-public-park-offers-amenities-for-visitors/",
+          "source": "https://davaocity.gov.ph/infrastructure-development/renovated-toril-public-park-offers-amenities-for-visitors/",
+          "reason": "Operator website/social profile or official managing-authority page."
+        }
+      },
+      "amenities": [
+        {
+          "key": "parking",
+          "source": "https://davaocity.gov.ph/infrastructure-development/renovated-toril-public-park-offers-amenities-for-visitors/",
+          "evidence": "City confirms parking, comfort rooms, childrens play equipment and walking/jogging lane.",
+          "status": "published_facility"
+        },
+        {
+          "key": "restroom",
+          "source": "https://davaocity.gov.ph/infrastructure-development/renovated-toril-public-park-offers-amenities-for-visitors/",
+          "evidence": "City confirms parking, comfort rooms, childrens play equipment and walking/jogging lane.",
+          "status": "published_facility"
+        },
+        {
+          "key": "playgrounds",
+          "source": "https://davaocity.gov.ph/infrastructure-development/renovated-toril-public-park-offers-amenities-for-visitors/",
+          "evidence": "City confirms parking, comfort rooms, childrens play equipment and walking/jogging lane.",
+          "status": "published_facility"
+        },
+        {
+          "key": "walking_trails",
+          "source": "https://davaocity.gov.ph/infrastructure-development/renovated-toril-public-park-offers-amenities-for-visitors/",
+          "evidence": "City confirms parking, comfort rooms, childrens play equipment and walking/jogging lane.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "vanishing-island",
+      "name": "Vanishing Island",
+      "fields": {
+        "latitude": {
+          "expected": null,
+          "value": 7.15782,
+          "source": "https://mapcarta.com/W31754135",
+          "reason": "island_area reference; not a verified vehicle entrance"
+        },
+        "longitude": {
+          "expected": null,
+          "value": 125.68188,
+          "source": "https://mapcarta.com/W31754135",
+          "reason": "island_area reference; not a verified vehicle entrance"
+        }
+      },
+      "amenities": []
+    }
+  ],
+  "held_coordinate_references": [
+    {
+      "id": 32,
+      "reason": "Reference too broad/uncertain for a public destination pin",
+      "reference": {
+        "latitude": 7.0653028,
+        "longitude": 125.569375,
+        "kind": "photo_location",
+        "source": "https://commons.wikimedia.org/wiki/File:Japanese_Tunnel_Davao_Well_Area.jpg",
+        "notes": "Photographer-recorded position at the tunnel well in 2018. This is neither a verified gate nor confirmation of current operation.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 2
+      }
+    },
+    {
+      "id": 173,
+      "reason": "Reference too broad/uncertain for a public destination pin",
+      "reference": {
+        "latitude": 7.2723831,
+        "longitude": 125.6808289,
+        "kind": "study_area",
+        "source": "https://smujo.id/bw/article/download/9115/5161",
+        "notes": "Research study position within mangrove park, not a verified boardwalk entrance.",
+        "verified_vehicle_entrance": false
+      }
+    },
+    {
+      "id": 197,
+      "reason": "Reference too broad/uncertain for a public destination pin",
+      "reference": {
+        "latitude": 7.0879676,
+        "longitude": 125.6782937,
+        "kind": "secondary_pin",
+        "source": "https://evendo.com/locations/philippines/davao-region/landmark/general-moncado-white-house",
+        "notes": "Secondary guide pin agrees with Urbexology; operator/entrance confirmation pending.",
+        "verified_vehicle_entrance": false
+      }
+    },
+    {
+      "id": 218,
+      "reason": "Reference too broad/uncertain for a public destination pin",
+      "reference": {
+        "latitude": 7.0811111,
+        "longitude": 125.6058333,
+        "kind": "approximate_area",
+        "source": "https://journals.umt.edu.pk/index.php/JAABE/article/download/5539/3582?inline=1",
+        "notes": "Research article describes this position as approximate; do not label exact.",
+        "verified_vehicle_entrance": false
+      }
+    },
+    {
+      "id": 227,
+      "reason": "Reference too broad/uncertain for a public destination pin",
+      "reference": {
+        "latitude": 6.9681,
+        "longitude": 125.37412,
+        "kind": "identity_review",
+        "source": "https://mapcarta.com/N5093108556",
+        "notes": "Tumari waterfall candidate. Nearby Tomari entry N13653855901 is tourism information office; municipality/boundary needs checking.",
+        "verified_vehicle_entrance": false
+      }
+    },
+    {
+      "id": 233,
+      "reason": "Reference too broad/uncertain for a public destination pin",
+      "reference": {
+        "latitude": 7.455851,
+        "longitude": 125.236992,
+        "kind": "study_area",
+        "source": "https://www.innspub.net/wp-content/uploads/2022/10/JBES-V8-No5-p36-44.pdf",
+        "notes": "Field-study sampling location along Epol Falls in Marilog. Retained as a study-area reference, with nearby conflicting cascade/entrance coordinates still unresolved.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 3
+      }
+    }
+  ]
+}

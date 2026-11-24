@@ -1,0 +1,365 @@
+{
+  "format": "destination-enrichment-v1",
+  "researched_on": "2026-11-19",
+  "scope": "Second local source-backed detail and amenity pass. All fee, duration, coordinate, accreditation, eligibility and photo values unchanged.",
+  "records": [
+    {
+      "slug": "eden-nature-park",
+      "name": "Eden Nature Park",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://www.edennaturepark.com.ph/",
+          "source": "https://www.edennaturepark.com.ph/attractions/",
+          "reason": "Operator website; office hours are separate from resort hours."
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://www.edennaturepark.com.ph/attractions/",
+          "evidence": "Operator lists hiking trail.",
+          "status": "published_facility"
+        },
+        {
+          "key": "playgrounds",
+          "source": "https://www.edennaturepark.com.ph/attractions/",
+          "evidence": "Operator lists playground.",
+          "status": "published_facility"
+        },
+        {
+          "key": "event_spaces",
+          "source": "https://www.edennaturepark.com.ph/attractions/",
+          "evidence": "Amphitheater hosts ceremonies and small concerts.",
+          "status": "published_facility"
+        },
+        {
+          "key": "adventure_facilities",
+          "source": "https://www.edennaturepark.com.ph/adventure/",
+          "evidence": "Operator lists Skyrider zip-line and rope activities.",
+          "status": "published_facility"
+        },
+        {
+          "key": "campsites",
+          "source": "https://www.edennaturepark.com.ph/adventure/",
+          "evidence": "Operator explicitly offers tent camping areas.",
+          "status": "published_facility"
+        },
+        {
+          "key": "overnight_lodging",
+          "source": "https://www.edennaturepark.com.ph/rooms/",
+          "evidence": "Operator publishes rooms and resort reservations.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "philippine-eagle-center",
+      "name": "Philippine Eagle Center",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://www.philippineeaglefoundation.org/pec",
+          "source": "https://www.philippineeaglefoundation.org/pec",
+          "reason": "Foundation visitor information for the Malagos center."
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://www.philippineeaglefoundation.org/pec",
+          "evidence": "Operator identifies Rainforest Walk and Wild Trail.",
+          "status": "published_facility"
+        },
+        {
+          "key": "guided_tours",
+          "source": "https://www.philippineeaglefoundation.org/pec",
+          "evidence": "Operator identifies Guided Tour and visitor booking.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "malagos-garden-resort",
+      "name": "Malagos Garden Resort",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://www.malagos.com/",
+          "source": "https://www.malagos.com/parks/",
+          "reason": "Current operator site."
+        }
+      },
+      "amenities": [
+        {
+          "key": "pool",
+          "source": "https://www.malagos.com/parks/",
+          "evidence": "Signature attractions explicitly include swimming pool.",
+          "status": "published_facility"
+        },
+        {
+          "key": "spa",
+          "source": "https://www.malagos.com/parks/",
+          "evidence": "Operator lists Malagos Chocolate Spa.",
+          "status": "published_facility"
+        },
+        {
+          "key": "overnight_lodging",
+          "source": "https://images.squarespace-cdn.com/content/v1/5c64dd0a2727be078751d911/1770534218542-5A5RVLKED5ZC801IAQE3/BACK_2026.jpg",
+          "evidence": "Operator 2026 brochure advertises overnight accommodation.",
+          "status": "published_facility"
+        },
+        {
+          "key": "guided_tours",
+          "source": "https://images.squarespace-cdn.com/content/v1/5c64dd0a2727be078751d911/1770534218542-5A5RVLKED5ZC801IAQE3/BACK_2026.jpg",
+          "evidence": "Operator 2026 brochure advertises farm tours; arrange availability.",
+          "status": "published_facility"
+        },
+        {
+          "key": "playgrounds",
+          "source": "https://images.squarespace-cdn.com/content/v1/5c64dd0a2727be078751d911/1770534218542-5A5RVLKED5ZC801IAQE3/BACK_2026.jpg",
+          "evidence": "Operator 2026 brochure shows the playground with climbing equipment and slides.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "belviz-farm",
+      "name": "Belviz Farm",
+      "fields": {
+        "description": {
+          "expected": "Belviz Farm is a DOT Region XI-accredited Farm Tourism in Davao City (accreditation no. DOT-R11-FTC-01243-2024).",
+          "value": "A family-run durian farm on Wangan Road in Calinan, known for the Duyaya variety. Visitors can explore the orchards and taste farm-grown fruit. Contact the farm before visiting to confirm access, fruit availability and any charges.",
+          "source": "https://www.experiencedavao.com/destinations/davao-city/attractions/belviz-durian-farms",
+          "reason": "Replace accreditation-only description with regional tourism visitor information; accreditation fields unchanged."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "bemwa-farm-fresh-inc",
+      "name": "Bemwa Farm Fresh Inc.",
+      "fields": {
+        "description": {
+          "expected": "Bemwa Farm Fresh Inc. is a DOT Region XI-accredited Farm Tourism in Davao City (accreditation no. DOT-R11-AGT-00361-2022).",
+          "value": "A highland farm in Datu Salumay, Marilog District, with vegetable plots and strawberry products. A published visitor report describes an on-site cafe. Confirm current access and cafe availability before travelling; entrance fees and visit length remain unconfirmed.",
+          "source": "https://primer.com.ph/travel/2017/12/27/look-bemwa-farm-in-davao-city/",
+          "reason": "Older visitor report is identified as reported, not a current operating guarantee."
+        }
+      },
+      "amenities": [
+        {
+          "key": "restaurant",
+          "source": "https://primer.com.ph/travel/2017/12/27/look-bemwa-farm-in-davao-city/",
+          "evidence": "Visitor report identifies a cafe at the Marilog farm, not the downtown restaurant branch.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Restaurant (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "damosa-land-inc-agriya-naturetainment",
+      "name": "Damosa Land Inc. / Agriya Naturetainment",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://damosaland.com/agriya/",
+          "source": "https://damosaland.com/agriya/",
+          "reason": "Developer information explicitly identifies the Naturetainment visitor area."
+        },
+        "description": {
+          "expected": "Damosa Land Inc. / Agriya Naturetainment is a DOT Region XI-accredited Farm Tourism in Davao del Norte (accreditation no. DOT-R11-AGT-00288-2021).",
+          "value": "An agricultural visitor attraction within the Agriya township in Panabo City, with farming activities and learning experiences. Contact the operator for current visitor access and arrangements. Residential amenities in Agriya Gardens are separate from the Naturetainment attraction.",
+          "source": "https://damosaland.com/agriya/",
+          "reason": "Do not transfer residential swimming pool, clubhouse or future retail amenities to the visitor attraction."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "museo-dabawenyo",
+      "name": "Museo Dabawenyo",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://davaocity.gov.ph/departments/economic-development/museo-dabawenyo/",
+          "source": "https://davaocity.gov.ph/departments/economic-development/museo-dabawenyo/",
+          "reason": "City government department contact page; confirm current visitor location directly."
+        }
+      },
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://davaocity.gov.ph/departments/economic-development/museo-dabawenyo/",
+          "evidence": "City department lists museum tours among its visitor services.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "cacao-culture-poblacion",
+      "name": "Cacao Culture Chocolate Shop - Poblacion Market Central",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://www.cacaoculture.ph/pages/store-locations",
+          "source": "https://www.cacaoculture.ph/pages/store-locations",
+          "reason": "Branch-specific operator directory."
+        },
+        "location": {
+          "expected": "Davao City",
+          "value": "Ground floor, Poblacion Market Central, C. Bangoy Street, Poblacion, Davao City",
+          "source": "https://www.cacaoculture.ph/pages/store-locations",
+          "reason": "Exact Poblacion shop address; not the Matina head office or Calinan farm."
+        },
+        "hours": {
+          "expected": "9:00 AM-7:00 PM",
+          "value": "Daily 9:00 AM-7:00 PM",
+          "source": "https://www.cacaoculture.ph/pages/store-locations",
+          "reason": "Operator publishes this schedule for the Poblacion branch."
+        }
+      },
+      "amenities": [
+        {
+          "key": "souvenir_shops",
+          "source": "https://www.cacaoculture.ph/pages/store-locations",
+          "evidence": "The listed chocolate shop sells locally produced chocolates and gifts.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "paradise-island-park-beach-resort",
+      "name": "Paradise Island Park & Beach Resort",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://paradiseislandsamal.com/",
+          "source": "https://paradiseislandsamal.com/",
+          "reason": "Verified operator domain."
+        },
+        "facebook_url": {
+          "expected": null,
+          "value": "https://www.facebook.com/paradiseislanddavao",
+          "source": "https://paradiseislandsamal.com/",
+          "reason": "Operator explicitly identifies this page and warns about impersonators."
+        }
+      },
+      "amenities": [
+        {
+          "key": "parking",
+          "source": "https://paradiseislandsamal.com/",
+          "evidence": "Operator explicitly offers parking on Davao and Samal sides.",
+          "status": "published_facility"
+        },
+        {
+          "key": "restaurant",
+          "source": "https://paradiseislandsamal.com/",
+          "evidence": "Operator lists resto-bar dining.",
+          "status": "published_facility"
+        },
+        {
+          "key": "spa",
+          "source": "https://paradiseislandsamal.com/",
+          "evidence": "Operator advertises Alima Spa services.",
+          "status": "published_facility"
+        },
+        {
+          "key": "overnight_lodging",
+          "source": "https://paradiseislandsamal.com/",
+          "evidence": "Operator offers rooms and overnight reservations.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "davao-bamboo-sanctuary-and-ecological-park",
+      "name": "Davao Bamboo Sanctuary and Ecological Park",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://davaobamboosanctuary.com/",
+          "source": "https://davaobamboosanctuary.com/booking/daytour/",
+          "reason": "Operator day-tour booking source."
+        }
+      },
+      "amenities": [
+        {
+          "key": "pool",
+          "source": "https://davaobamboosanctuary.com/booking/daytour/",
+          "evidence": "Day-tour package includes spring pool access.",
+          "status": "published_facility"
+        },
+        {
+          "key": "adventure_facilities",
+          "source": "https://davaobamboosanctuary.com/booking/daytour/",
+          "evidence": "Operator lists kayak, monkey bridge and practice archery.",
+          "status": "published_facility"
+        },
+        {
+          "key": "spa",
+          "source": "https://davaobamboosanctuary.com/booking/daytour/",
+          "evidence": "Operator publishes whole-body and couple massage services separately from fish spa.",
+          "status": "published_facility"
+        },
+        {
+          "key": "day_use_cottages",
+          "source": "https://davaobamboosanctuary.com/booking/daytour/",
+          "evidence": "Group day-use package explicitly includes bamboo hut tables.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "davao-del-norte-sports-and-tourism-complex",
+      "name": "Davao del Norte Sports and Tourism Complex",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://tagumcitytourism.wordpress.com/davao-del-norte-sports-and-tourism-complex/",
+          "source": "https://tagumcitytourism.wordpress.com/davao-del-norte-sports-and-tourism-complex/",
+          "reason": "City tourism information; confirm facility access and schedules directly."
+        },
+        "description": {
+          "expected": "A sports and events complex in Tagum featured in the regional tourism directory. Public access depends on facility rules and event schedules.",
+          "value": "A sports complex in Mankilam, Tagum, with an athletics track, swimming pools, football fields and basketball facilities described by city tourism. Public access, pool use and event bookings depend on facility rules and schedules; confirm with the venue before visiting.",
+          "source": "https://tagumcitytourism.wordpress.com/davao-del-norte-sports-and-tourism-complex/",
+          "reason": "Facility-specific city tourism information; no assumed opening hours or admission fee."
+        }
+      },
+      "amenities": [
+        {
+          "key": "pool",
+          "source": "https://tagumcitytourism.wordpress.com/davao-del-norte-sports-and-tourism-complex/",
+          "evidence": "City tourism identifies an Olympic-size swimming pool and warm-up pool.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Swimming Pool (reported)"
+        },
+        {
+          "key": "sports_courts",
+          "source": "https://tagumcitytourism.wordpress.com/davao-del-norte-sports-and-tourism-complex/",
+          "evidence": "City tourism identifies basketball facilities and football fields.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Sports Courts (reported)"
+        }
+      ]
+    }
+  ],
+  "held": [
+    {
+      "name": "Island Buenavista",
+      "reason": "Operator amenities URL now redirects to a suspended page. Historical cached facilities not imported.",
+      "source": "https://buenavistaislandresort.com/amenities-2/"
+    },
+    {
+      "name": "Davao Bamboo Sanctuary and Ecological Park",
+      "reason": "Published day-tour package prices include activities and snacks and conditional promotions. Not imported as a standalone entrance fee; no visit duration inferred from massage lengths.",
+      "source": "https://davaobamboosanctuary.com/booking/daytour/"
+    },
+    {
+      "name": "Davao Museum of History and Ethnography",
+      "reason": "Existing catalogue already reflects newer October 2026 study-gallery information. Older 2025 relocation plans and Lanang facilities must not overwrite it.",
+      "source": "https://pia.gov.ph/news/davao-museum-gets-new-home-at-ateneo-de-davao/"
+    }
+  ]
+}

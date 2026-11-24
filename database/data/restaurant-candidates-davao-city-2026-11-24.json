@@ -1,0 +1,224 @@
+{
+  "researched_on": "2026-11-24",
+  "area": "Davao City",
+  "existing_catalogue_records_checked": 62,
+  "scope": "Research only. No database import, photo download, accreditation claim or application logic change.",
+  "candidates": [
+    {
+      "name": "Hey Monday! Deli",
+      "aliases": [
+        "Hey Monday Deli",
+        "HeyMondaydeli"
+      ],
+      "location": "Poblacion Market Central, C. Bangoy Street",
+      "cuisine": "Contemporary / deli",
+      "source": "https://www.heymondaydeli.com/",
+      "review_status": "research_shortlist_not_imported",
+      "dot_accreditation": "not_confirmed",
+      "current_opening_hours": null,
+      "prices": null,
+      "coordinates": null,
+      "photo_status": "source_pages_available_exact_photo_not_selected",
+      "existing_name_or_alias_matches": []
+    },
+    {
+      "name": "Tola - Kan-anan sa Balay Oboza",
+      "aliases": [
+        "Tola"
+      ],
+      "location": "Oboza Compound, 143 Rizal Street",
+      "cuisine": "Filipino / regional cuisine",
+      "source": "https://www.tatlerasia.com/dining/tola",
+      "review_status": "research_shortlist_not_imported",
+      "dot_accreditation": "not_confirmed",
+      "current_opening_hours": null,
+      "prices": null,
+      "coordinates": null,
+      "photo_status": "source_pages_available_exact_photo_not_selected",
+      "existing_name_or_alias_matches": []
+    },
+    {
+      "name": "Huckleberry Southern Kitchen & Bar",
+      "aliases": [
+        "Huckleberry Southern Kitchen",
+        "Huckleberry"
+      ],
+      "location": "Oboza House, Rizal Street, Poblacion",
+      "cuisine": "Restaurant and bar",
+      "source": "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/restaurants/huckleberry-southern-kitchen/",
+      "review_status": "research_shortlist_not_imported",
+      "dot_accreditation": "not_confirmed",
+      "current_opening_hours": null,
+      "prices": null,
+      "coordinates": null,
+      "photo_status": "source_pages_available_exact_photo_not_selected",
+      "existing_name_or_alias_matches": []
+    },
+    {
+      "name": "Tiny Kitchen",
+      "aliases": [
+        "Tiny Kitchen Creations"
+      ],
+      "location": "Gutierrez Building, F. Torres Street",
+      "cuisine": null,
+      "source": "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/restaurants/tiny-kitchen/",
+      "review_status": "research_shortlist_not_imported",
+      "dot_accreditation": "not_confirmed",
+      "current_opening_hours": null,
+      "prices": null,
+      "coordinates": null,
+      "photo_status": "source_pages_available_exact_photo_not_selected",
+      "existing_name_or_alias_matches": []
+    },
+    {
+      "name": "Made Simple",
+      "aliases": [
+        "Made Simple Restaurant",
+        "Made Simple Davao"
+      ],
+      "location": "2nd floor, CT Drive, C. Villa-Abrille Drive / Tulip Drive, Matina",
+      "cuisine": "Vegetable-forward; also offers seafood/chicken",
+      "source": "https://www.mydavaocity.com/dining/made-simple/",
+      "review_status": "research_shortlist_not_imported",
+      "dot_accreditation": "not_confirmed",
+      "current_opening_hours": null,
+      "prices": null,
+      "coordinates": null,
+      "photo_status": "source_pages_available_exact_photo_not_selected",
+      "existing_name_or_alias_matches": []
+    },
+    {
+      "name": "The Vegan Dinosaur",
+      "aliases": [
+        "Vegan Dinosaur"
+      ],
+      "location": "Door A, Values School Building, Ruby Street, Marfori Heights",
+      "cuisine": "Plant-based",
+      "source": "https://www.thevegandinosaur.com/",
+      "review_status": "research_shortlist_not_imported",
+      "dot_accreditation": "not_confirmed",
+      "current_opening_hours": null,
+      "prices": null,
+      "coordinates": null,
+      "photo_status": "source_pages_available_exact_photo_not_selected",
+      "existing_name_or_alias_matches": []
+    },
+    {
+      "name": "Luk Foo Palace - Acacia Hotel Davao",
+      "aliases": [
+        "Luk Foo Palace",
+        "Luk-Foo Palace"
+      ],
+      "location": "3rd floor, Acacia Hotel Davao, J.P. Laurel Avenue, Lanang",
+      "cuisine": "Cantonese",
+      "source": "https://acaciahotelsdavao.com/dining/",
+      "review_status": "research_shortlist_not_imported",
+      "dot_accreditation": "not_confirmed",
+      "current_opening_hours": null,
+      "prices": null,
+      "coordinates": null,
+      "photo_status": "source_pages_available_exact_photo_not_selected",
+      "existing_name_or_alias_matches": []
+    },
+    {
+      "name": "Madayaw Cafe - dusitD2 Davao",
+      "aliases": [
+        "Madayaw Cafe",
+        "Madayaw Café"
+      ],
+      "location": "Podium, dusitD2, Stella Hizon Reyes Drive, Pampanga",
+      "cuisine": "International",
+      "source": "https://www.dusit.com/dusitd2-davao/dining/madayaw-cafe/",
+      "review_status": "research_shortlist_not_imported",
+      "dot_accreditation": "not_confirmed",
+      "current_opening_hours": null,
+      "prices": null,
+      "coordinates": null,
+      "photo_status": "source_pages_available_exact_photo_not_selected",
+      "existing_name_or_alias_matches": []
+    },
+    {
+      "name": "Pilgrim Restaurant",
+      "aliases": [
+        "Pilgrim",
+        "Pilgrim Cafe & Restaurant"
+      ],
+      "location": "Purok 2, Baganihan, Marilog District, Davao City",
+      "cuisine": "International / comfort food",
+      "source": "https://www.tatlerasia.com/dining/pilgrim",
+      "review_status": "research_shortlist_not_imported",
+      "dot_accreditation": "not_confirmed",
+      "current_opening_hours": null,
+      "prices": null,
+      "coordinates": null,
+      "photo_status": "source_pages_available_exact_photo_not_selected",
+      "existing_name_or_alias_matches": []
+    },
+    {
+      "name": "Yellow Fin Seafood Restaurant - Ecoland",
+      "aliases": [
+        "Yellow Fin",
+        "Yellow Fin Seafood Restaurant"
+      ],
+      "location": "Sandawa Plaza, Quimpo Boulevard, Ecoland",
+      "cuisine": "Filipino / seafood",
+      "source": "https://www.mydavaocity.com/dining/yellow-fin/",
+      "review_status": "research_shortlist_not_imported",
+      "dot_accreditation": "not_confirmed",
+      "current_opening_hours": null,
+      "prices": null,
+      "coordinates": null,
+      "photo_status": "source_pages_available_exact_photo_not_selected",
+      "existing_name_or_alias_matches": []
+    },
+    {
+      "name": "Davao Dencia's Restaurant",
+      "aliases": [
+        "Dencia's Restaurant",
+        "Davao Dencia’s Restaurant"
+      ],
+      "location": "General Luna Street",
+      "cuisine": "Filipino-Chinese",
+      "source": "https://davaocity.gov.ph/local-government/inside-the-dabawenyo-kitchen-davao-city-food-crawl-showcases-heirloom-and-homegrown-flavors/",
+      "review_status": "research_shortlist_not_imported",
+      "dot_accreditation": "not_confirmed",
+      "current_opening_hours": null,
+      "prices": null,
+      "coordinates": null,
+      "photo_status": "source_pages_available_exact_photo_not_selected",
+      "existing_name_or_alias_matches": []
+    },
+    {
+      "name": "Lachi's - Poblacion Market Central",
+      "aliases": [
+        "Lachi's",
+        "Lachi's Sans Rival Atbp",
+        "Lachi's Dessert Bakery"
+      ],
+      "location": "Poblacion Market Central, Davao City",
+      "cuisine": "Filipino comfort food / cakes",
+      "source": "https://www.spot.ph/eatdrink/the-latest-eat-drink/10-must-try-restaurants-in-davao-city-a7989-20250919-dyn",
+      "review_status": "research_shortlist_not_imported",
+      "dot_accreditation": "not_confirmed",
+      "current_opening_hours": null,
+      "prices": null,
+      "coordinates": null,
+      "photo_status": "source_pages_available_exact_photo_not_selected",
+      "existing_name_or_alias_matches": []
+    }
+  ],
+  "held": [
+    {
+      "name": "Benjarong Bar and Restaurant",
+      "source": "https://www.dusit.com/dusitd2-davao/dining/benjarong-bar-and-restaurant/",
+      "reason": "Dedicated venue page says temporarily closed, while other hotel pages advertise future festive dining. Confirm current service before considering import."
+    }
+  ],
+  "notes": [
+    "Tola and Huckleberry are separately named venues at the Oboza compound; do not collapse them or create a third generic Oboza restaurant.",
+    "Lachi’s shortlist is the Poblacion Market Central branch. Older Ruby Street information describing takeaway-only service is not transferred to this branch.",
+    "Pilgrim is within Davao City’s Marilog District, outside the urban centre.",
+    "Hotel presence or tourism-directory inclusion does not establish restaurant DOT accreditation.",
+    "Photo selection, current branch operation and a fresh duplicate check remain necessary before import."
+  ]
+}

@@ -1,0 +1,293 @@
+{
+  "format": "destination-enrichment-v1",
+  "researched_on": "2026-11-19",
+  "scope": "Third source-backed local detail pass. Fees, price tiers, visit durations, coordinates, identity, accreditation, photos, publication and planner eligibility remain unchanged.",
+  "records": [
+    {
+      "slug": "rancho-palos-verdes-golf-sports-club-inc",
+      "name": "Rancho Palos Verdes Golf & Sports Club Inc.",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/restaurants/rancho-palos-verdes-golf-sports-club-inc/",
+          "source": "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/restaurants/rancho-palos-verdes-golf-sports-club-inc/",
+          "reason": "City visitor directory matches Mandug-Indangan, not the separate Ma-a country club."
+        },
+        "description": {
+          "expected": "Rancho Palos Verdes Golf & Sports Club Inc. is a DOT Region XI-accredited Sports & Recreation in Davao City (accreditation no. DOT-R11-SRC-00239-2021).",
+          "value": "A golf and recreation venue in Mandug-Indangan, Buhangin District. A specialist golf directory reports an 18-hole course, driving range, putting green and restaurant, and advises advance booking. Confirm access and facility availability with the club before visiting; this is separate from the Ma-a country-club listing.",
+          "source": "https://www.1golf.eu/en/club/rancho-palos-verdes-golf-country-club/",
+          "reason": "Replace accreditation-only text with branch-specific visitor information; preserve all accreditation and eligibility fields."
+        }
+      },
+      "amenities": [
+        {
+          "key": "restaurant",
+          "source": "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/restaurants/rancho-palos-verdes-golf-sports-club-inc/",
+          "evidence": "City tourism lists the Mandug-Indangan venue in its restaurant directory.",
+          "status": "published_facility"
+        },
+        {
+          "key": "golf_practice",
+          "source": "https://www.1golf.eu/en/club/rancho-palos-verdes-golf-country-club/",
+          "evidence": "Specialist directory explicitly identifies driving range and putting green at Barangay Mandug.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Golf Practice Areas (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "roxas-night-market",
+      "name": "Roxas Night Market",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/night-market/roxas-night-market/",
+          "source": "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/night-market/roxas-night-market/",
+          "reason": "City visitor information for this exact market."
+        },
+        "location": {
+          "expected": "Davao City",
+          "value": "Roxas Avenue, Poblacion District, Davao City",
+          "source": "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/night-market/roxas-night-market/",
+          "reason": "Replace city-only location with the published street and district."
+        },
+        "hours": {
+          "expected": "6:00 PM–12:00 AM",
+          "value": "Daily 6:00 PM-12:00 AM",
+          "source": "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/night-market/roxas-night-market/",
+          "reason": "City tourism publishes Monday-Sunday schedule; no other market schedule copied."
+        }
+      },
+      "amenities": [
+        {
+          "key": "restaurant",
+          "source": "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/night-market/roxas-night-market/ukay2x-and-street-foods/",
+          "evidence": "City tourism explicitly identifies street-food vendors at Roxas Night Market.",
+          "status": "published_facility",
+          "display_name": "Food stalls"
+        }
+      ]
+    },
+    {
+      "slug": "japanese-tunnel",
+      "name": "Japanese Tunnel",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://tourism.davaocity.gov.ph/explore-the-city/nightlife/resorts/d-japanese-tunnel-family-resort-and-restaurant/",
+          "source": "https://tourism.davaocity.gov.ph/explore-the-city/nightlife/resorts/d-japanese-tunnel-family-resort-and-restaurant/",
+          "reason": "City directory for the resort associated with the historical tunnel. Publication status unchanged."
+        },
+        "location": {
+          "expected": "Davao City",
+          "value": "Hillcrest Subdivision, Balusong Extension, Matina Crossing, Talomo, Davao City",
+          "source": "https://tourism.davaocity.gov.ph/explore-the-city/nightlife/resorts/d-japanese-tunnel-family-resort-and-restaurant/",
+          "reason": "Published site address; not a speculative map coordinate."
+        }
+      },
+      "amenities": [
+        {
+          "key": "restaurant",
+          "source": "https://tourism.davaocity.gov.ph/explore-the-city/nightlife/resorts/d-japanese-tunnel-family-resort-and-restaurant/",
+          "evidence": "City tourism explicitly identifies D Japanese Tunnel Family Resort and Restaurant.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "kapalong-cave-system-okbot-sua-caves-sample",
+      "name": "Kapalong Cave System (Okbot & Sua Caves) [SAMPLE]",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://kapalong.gov.ph/tourism/attractions/",
+          "source": "https://kapalong.gov.ph/tourism/attractions/",
+          "reason": "Municipal guide identifies Okbot and underground cave areas and access coordination."
+        }
+      },
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://kapalong.gov.ph/tourism/attractions/",
+          "evidence": "Municipal guide instructs visitors to coordinate approved cave routes with tourism staff or local guides.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "energy-park",
+      "name": "Energy Park",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "playgrounds",
+          "source": "https://davao.bomboradyo.com/childrens-and-water-park-sa-tagum-city-abli-na-karong-mayo-1/",
+          "evidence": "April 2025 on-site inspection report describes installed slides, swings, seesaw and monkey bars at Energy Park. Opening and current access require confirmation.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Playgrounds (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "digos-city-ecopark-and-arboretum",
+      "name": "Digos City Ecopark and Arboretum",
+      "fields": {
+        "location": {
+          "expected": "Digos City, Davao del Sur",
+          "value": "San Nicolas, Tres de Mayo, Digos City, Davao del Sur",
+          "source": "https://www.experiencedavao.com/attractions/digos-city-ecopark-and-arboretum",
+          "reason": "Exact address published by regional tourism."
+        },
+        "description": {
+          "expected": "An ecopark and arboretum in Digos City listed by the Department of Tourism Region XI. Confirm entrance arrangements and current facilities with the city tourism office.",
+          "value": "A city ecopark and arboretum in San Nicolas, Tres de Mayo, Digos City. A published field study describes gardens, jogging and biking trails, picnic use and barbecue areas. Confirm current access, permitted activities and facility availability with city tourism before visiting.",
+          "source": "https://www.atlantis-press.com/article/126015180.pdf",
+          "reason": "2025 field research is identified as reported facilities, not a current operating guarantee."
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://www.atlantis-press.com/article/126015180.pdf",
+          "evidence": "Study introduction, page 4, describes jogging and biking trails.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Walking trails (reported)"
+        },
+        {
+          "key": "picnic",
+          "source": "https://www.atlantis-press.com/article/126015180.pdf",
+          "evidence": "Study introduction and results describe picnic use of the grounds.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Picnic area (reported)"
+        },
+        {
+          "key": "grilling",
+          "source": "https://www.atlantis-press.com/article/126015180.pdf",
+          "evidence": "Study results, page 7, explicitly describe barbeque areas.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Grilling areas (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "salinta-monon-weaving-center",
+      "name": "Salinta Monon Weaving Center",
+      "fields": {
+        "description": {
+          "expected": "A cultural center preserving traditional Bagobo textile weaving, named after National Living Treasure Salinta Monon. Confirm appointments and opportunities to observe weaving before visiting.",
+          "value": "A Bagobo textile-weaving center in Bansalan named after National Living Treasure Salinta Monon. Tourism Promotions Board visitor information describes observing master weavers, learning about their craft and buying handmade textiles. Confirm appointments and demonstration availability before visiting.",
+          "source": "https://phworldexpo.tpb.gov.ph/category/davao-scrim/01-davao-scrim/",
+          "reason": "Specific visitor activities from the government tourism promotion page; no assumed hours or fees."
+        }
+      },
+      "amenities": [
+        {
+          "key": "souvenir_shops",
+          "source": "https://phworldexpo.tpb.gov.ph/category/davao-scrim/01-davao-scrim/",
+          "evidence": "Tourism Promotions Board explicitly states visitors can purchase handmade textiles. No separate shop building is asserted.",
+          "status": "published_facility",
+          "display_name": "Handmade textiles for sale"
+        }
+      ]
+    },
+    {
+      "slug": "city-of-tagum-cultural-center",
+      "name": "City of Tagum Cultural Center",
+      "fields": {
+        "description": {
+          "expected": "A cultural venue in Tagum with exhibitions and activities relating to local history and culture. Confirm exhibition schedules and visitor access.",
+          "value": "A cultural venue in Tagum hosting exhibitions, performances and arts activities. The Cultural Center of the Philippines held its July 2026 apprenticeship program at the center’s Herminigildo Balayo MD Hall. Confirm current exhibition schedules, event admission and visitor access with the venue.",
+          "source": "https://pia.gov.ph/news/ccp-cultural-exchange-brings-the-2026-kaisa-sa-sining-apprenticeship-program-to-tagum-city/",
+          "reason": "Current-year CCP account confirms use of the named hall."
+        }
+      },
+      "amenities": [
+        {
+          "key": "event_spaces",
+          "source": "https://pia.gov.ph/news/ccp-cultural-exchange-brings-the-2026-kaisa-sa-sining-apprenticeship-program-to-tagum-city/",
+          "evidence": "CCP reports the named hall at the cultural center as its July 2026 program venue.",
+          "status": "published_facility"
+        }
+      ]
+    },
+    {
+      "slug": "mabunao-eco-park",
+      "name": "Mabunao Eco-Park",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://panabocity.gov.ph/mabunao-eco-park/",
+          "source": "https://panabocity.gov.ph/mabunao-eco-park/",
+          "reason": "City visitor information for Mabunao Eco-Park."
+        },
+        "description": {
+          "expected": "A wooded eco-park in Mabunao described by the city government as a day-visit destination. Confirm current public access and entrance arrangements.",
+          "value": "A wooded eco-park in Mabunao, Panabo City. City visitor information describes planted forest trees and a stepped walking route with city views, and identifies the park for day visits. The route includes many stairs; confirm present access, trail conditions and entrance arrangements before travelling.",
+          "source": "https://panabocity.gov.ph/mabunao-eco-park/",
+          "reason": "Older city account is used for durable site features, not current hours or a step-free access claim."
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://panabocity.gov.ph/mabunao-eco-park/",
+          "evidence": "City describes a descending route of 282 steps; current condition needs confirmation.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Stepped walking path (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "tagtugonan-falls",
+      "name": "Tagtugonan Falls",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://kapalong.gov.ph/tourism/attractions/",
+          "source": "https://kapalong.gov.ph/tourism/attractions/",
+          "reason": "Municipal visitor guide identifies the waterfall and access coordination."
+        }
+      },
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://kapalong.gov.ph/post/kapalong-records-149-adventure-participants-in-february-caving-and-canyoneering-activities",
+          "evidence": "Municipality reports February 2026 Tier 3 canyoneering at Tagtugonan Falls with guides and technical teams. Arrange access through municipal tourism; not an accreditation claim about this listing.",
+          "status": "published_facility"
+        }
+      ]
+    }
+  ],
+  "held": [
+    {
+      "name": "Energy Park / New City Hall of Tagum",
+      "source": "https://tagumcity.gov.ph/wp-content/uploads/2025/03/LGU-Tagum-Citizens-Charter-2024-Version-2.pdf",
+      "reason": "Indexed rental schedule found, but full PDF returned 502. No gazebo, atrium or rental price imported from snippets alone."
+    },
+    {
+      "name": "Energy Park",
+      "source": "https://tagumcity.gov.ph/wp-content/uploads/2026/01/2026-FINAL-APP.pdf",
+      "reason": "Procurement plans are not proof of completed or operational facilities. No pool or new facilities inferred."
+    },
+    {
+      "name": "Rancho Palos Verdes Mandug",
+      "source": "https://tourism.davaocity.gov.ph/explore-the-city/attractions/swimming-pools/rancho-palos-verdes-golf-sports-club-inc/",
+      "reason": "Swimming-pool directory entry is for the separate Ma-a site. No pool copied to Mandug."
+    },
+    {
+      "name": "Pusan Point",
+      "source": "https://mindanao.politiko.com.ph/gov-nelson-l-dayanghirang-requests-tieza-inspection-of-aliwagwag-falls-pusan-point-for-restoration/",
+      "reason": "Recent restoration reporting raises operational uncertainty; old pool and campsite reports held for fresh operator confirmation."
+    },
+    {
+      "name": "Carmen Mangrove Sanctuary",
+      "reason": "Search results mostly refer to Del Carmen, Siargao, outside Davao Region. No unrelated facilities copied."
+    },
+    {
+      "name": "Digos City Ecopark",
+      "source": "https://www.atlantis-press.com/article/126015180.pdf",
+      "reason": "Study reports no entrance fee at research time. Not converted into a current published operator rate; fee and duration stay unconfirmed."
+    }
+  ]
+}
