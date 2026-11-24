@@ -1,6 +1,6 @@
 # Wikimedia Commons photo batch (2026-11-09)
 
-14 pictures for listings that had no real photo (13 destinations in Davao City and Davao del Sur, 1 stay), each from
+15 pictures for listings that had no real photo (14 destinations, 1 stay; Wishing Island was added on 2026-11-24), each from
 Wikimedia Commons under an open licence (CC BY or CC BY-SA). Each entry in `manifest.json` records the Commons file page
 (the licence evidence), the photographer, the licence, and what the picture shows.
 

@@ -74,9 +74,9 @@ class CommonsBatchPhotoSeederTest extends TestCase
         $manifest = new ListingPhotoManifest(database_path('data/listing-photos/commons-2026-11'));
         $entries = $manifest->entries();
 
-        $this->assertCount(14, $entries);
+        $this->assertCount(15, $entries);
         $this->assertSame([], $manifest->problems());
-        $this->assertCount(14, $manifest->approved());
+        $this->assertCount(15, $manifest->approved());
 
         foreach ($entries as $e) {
             $this->assertSame('wikimedia_commons', $e['source_type'], $e['name']);
