@@ -48,6 +48,7 @@ class FillRestaurantCuisines extends Command
         'VANDA — Park Inn by Radisson Davao' => 'Filipino & International',
         'Rhapsody Asian Fusion — Aria Hotel & Residences' => 'Asian fusion',
         'Jollibee Davao Bolton' => 'Fast food',
+        'Vista Restaurant — Eden Nature Park' => 'Filipino & International',
     ];
 
     public function handle(): int
