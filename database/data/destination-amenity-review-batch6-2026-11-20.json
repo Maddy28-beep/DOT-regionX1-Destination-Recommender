@@ -1,0 +1,746 @@
+{
+  "audited_on": "2026-11-20",
+  "starting_cohort": 53,
+  "newly_with_amenities": 13,
+  "still_without_confirmed_amenities": 40,
+  "records": [
+    {
+      "id": 14,
+      "name": "Isla- Agri Ventures Inc",
+      "slug": "isla-agri-ventures-inc",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Farm/company identification does not confirm visitor facilities; zoo subpage links remain empty."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 17,
+      "name": "JKM Mini Zoo",
+      "slug": "jkm-mini-zoo",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Farm/company identification does not confirm visitor facilities; zoo subpage links remain empty."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 23,
+      "name": "Elysia Wellness Spa",
+      "slug": "elysia-wellness-spa",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "spa",
+          "source": "https://thetravelintern.com/davao-guide/",
+          "evidence": "Author reports receiving a Filipino Hilot massage at the Ecoland/Quimpo branch.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Massage treatments (reported)"
+        }
+      ],
+      "updated_fields": [
+        "description"
+      ],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 25,
+      "name": "Elysia Wellness Spa",
+      "slug": "elysia-wellness-spa-3",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Quimpo firsthand massage account does not establish services at the distinct Agdao/Phoenix branch."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 29,
+      "name": "San Pedro Cathedral",
+      "slug": "san-pedro-cathedral",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Parish history, mass schedules and nearby museum references do not prove specific visitor amenities. Preserve aliases and existing fields."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 33,
+      "name": "Bankerohan Public Market",
+      "slug": "bankerohan-public-market",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Older public-toilet/food-stall articles and current demolition reporting do not establish the present location or condition of market visitor facilities."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 34,
+      "name": "Shrine of the Holy Infant Jesus of Prague",
+      "slug": "shrine-of-the-holy-infant-jesus-of-prague",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://www.gojavalava.com/davaotours",
+          "evidence": "Operator includes the Matina shrine in its city tour with a driver-guide. Vehicle facilities are not shrine facilities.",
+          "status": "published_facility",
+          "display_name": "Guided visits by arrangement"
+        }
+      ],
+      "updated_fields": [],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 36,
+      "name": "Talikud Island",
+      "slug": "talikud-island",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://www.seantric.com/samal-island-tour",
+          "evidence": "Operator lists Talicud Island among its guided boat-tour stops. Confirm itinerary and sea conditions; no shore facilities inferred.",
+          "status": "published_facility",
+          "display_name": "Guided boat tours by arrangement"
+        }
+      ],
+      "updated_fields": [],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 39,
+      "name": "Aliwagwag Falls",
+      "slug": "aliwagwag-falls",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Recent restoration planning does not confirm current opening or usable facilities; no old infrastructure claim promoted to confirmed."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 41,
+      "name": "San Salvador del Mundo Church",
+      "slug": "san-salvador-del-mundo-church",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Parish history, mass schedules and nearby museum references do not prove specific visitor amenities. Preserve aliases and existing fields."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 42,
+      "name": "Pusan Point",
+      "slug": "pusan-point",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Recent restoration planning does not confirm current opening or usable facilities; no old infrastructure claim promoted to confirmed."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 44,
+      "name": "Wishing Island",
+      "slug": "wishing-island",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://aplreysamalislandhoppingtour23.my.canva.site/",
+          "evidence": "Operator names this stop and includes a tour guide. Boat equipment and prices are not site amenities or entrance fees.",
+          "status": "published_facility",
+          "display_name": "Guided boat visits by arrangement"
+        }
+      ],
+      "updated_fields": [],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 45,
+      "name": "Sabang Cliff",
+      "slug": "sabang-cliff",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://aplreysamalislandhoppingtour23.my.canva.site/",
+          "evidence": "Operator names this stop and includes a tour guide. Boat equipment and prices are not site amenities or entrance fees.",
+          "status": "published_facility",
+          "display_name": "Guided boat visits by arrangement"
+        }
+      ],
+      "updated_fields": [],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 51,
+      "name": "Diaz Island",
+      "slug": "diaz-island",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://aplreysamalislandhoppingtour23.my.canva.site/",
+          "evidence": "Operator explicitly describes Diaz Island as a pass-by on its guided route. This does not grant landing access.",
+          "status": "published_facility",
+          "display_name": "Guided boat viewing (pass-by only)"
+        }
+      ],
+      "updated_fields": [],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 59,
+      "name": "Pujada Bay and Pujada Island [SAMPLE]",
+      "slug": "pujada-bay-and-pujada-island-sample",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "campsites",
+          "source": "https://contentbydorz.wordpress.com/2023/04/11/what-to-do-and-expect-when-in-isla-pujada-campsite-mati/",
+          "evidence": "April 2023 visitors describe pitching tents and hammocks at the island campsite.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Island campsite (reported)"
+        },
+        {
+          "key": "day_use_cottages",
+          "source": "https://contentbydorz.wordpress.com/2023/04/11/what-to-do-and-expect-when-in-isla-pujada-campsite-mati/",
+          "evidence": "Same visit documents rented open and umbrella cottages. Current availability unconfirmed.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Open cottages at island campsite (reported)"
+        }
+      ],
+      "updated_fields": [
+        "description"
+      ],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 60,
+      "name": "Oak Island [SAMPLE]",
+      "slug": "oak-island-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Island/mangrove identification and boat publicity do not establish onshore facilities. Proposed boardwalks, adjacent island camps and foreign namesakes excluded."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 61,
+      "name": "Guang-guang Mangrove Forest [SAMPLE]",
+      "slug": "guang-guang-mangrove-forest-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Island/mangrove identification and boat publicity do not establish onshore facilities. Proposed boardwalks, adjacent island camps and foreign namesakes excluded."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 69,
+      "name": "Linow tu Gabon (Ocean of Fogs) [SAMPLE]",
+      "slug": "linow-tu-gabon-ocean-of-fogs-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Viewpoints and landmarks are not automatically constructed viewing decks or campsites. Planned development is not an operating facility."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 72,
+      "name": "Balut Island & Sabang Hot Spring [SAMPLE]",
+      "slug": "balut-island-sabang-hot-spring-sample",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://www.pinoymountaineer.com/2016/07/hiking-matters-517-balut-volcano-the-only-philippine-mountain-where-you-can-see-indonesia.html",
+          "evidence": "Firsthand 2016 trek describes the Lipol route and variants to Sabang. This is a historical natural route, not a current maintained-trail guarantee.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Lipol trekking route (reported)"
+        }
+      ],
+      "updated_fields": [
+        "description"
+      ],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 73,
+      "name": "Olanivan Island [SAMPLE]",
+      "slug": "olanivan-island-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Island/mangrove identification and boat publicity do not establish onshore facilities. Proposed boardwalks, adjacent island camps and foreign namesakes excluded."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 75,
+      "name": "Santa Maria Viewdeck [SAMPLE]",
+      "slug": "santa-maria-viewdeck-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Viewpoints and landmarks are not automatically constructed viewing decks or campsites. Planned development is not an operating facility."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 78,
+      "name": "Tuke Makil / Tuke Nunsol Marine Cove [SAMPLE]",
+      "slug": "tuke-makil-tuke-nunsol-marine-cove-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Island/mangrove identification and boat publicity do not establish onshore facilities. Proposed boardwalks, adjacent island camps and foreign namesakes excluded."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 83,
+      "name": "Lunod Island Mangrove Forest [SAMPLE]",
+      "slug": "lunod-island-mangrove-forest-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Island/mangrove identification and boat publicity do not establish onshore facilities. Proposed boardwalks, adjacent island camps and foreign namesakes excluded."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 86,
+      "name": "Malanog-lanog Cave [SAMPLE]",
+      "slug": "malanog-lanog-cave-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Municipal cave identity does not prove guide service; exact Carmen mangrove identity/facilities remain insufficiently supported."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 90,
+      "name": "Virgin Falls [SAMPLE]",
+      "slug": "virgin-falls-sample",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://edgedavao.net/indulge-lifestyle/2016/03/why-i-love-the-highlands-of-kapatagan/",
+          "evidence": "Authored 2016 account describes trekking down to Virgin Falls in Kapatagan, Digos. Camp Sabros facilities and Lanao del Norte namesake results are excluded.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Waterfall trekking access (reported)"
+        }
+      ],
+      "updated_fields": [],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 98,
+      "name": "San Salvador del Mundo Church (Caraga Church) [SAMPLE]",
+      "slug": "san-salvador-del-mundo-church-caraga-church-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Parish history, mass schedules and nearby museum references do not prove specific visitor amenities. Preserve aliases and existing fields."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 101,
+      "name": "Centennial Balite Tree (500-Year-Old Balite) [SAMPLE]",
+      "slug": "centennial-balite-tree-500-year-old-balite-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Viewpoints and landmarks are not automatically constructed viewing decks or campsites. Planned development is not an operating facility."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 105,
+      "name": "Tagum City Night Market & Rotary Park [SAMPLE]",
+      "slug": "tagum-city-night-market-rotary-park-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Combined legacy night-market/Rotary Park name spans distinct venues. No market food facilities or separate Freedom Park features assigned to Rotary Park."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 110,
+      "name": "Carmen Mangrove Sanctuary & Boardwalk [SAMPLE]",
+      "slug": "carmen-mangrove-sanctuary-boardwalk-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Municipal cave identity does not prove guide service; exact Carmen mangrove identity/facilities remain insufficiently supported."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 113,
+      "name": "San Pedro Cathedral [SAMPLE]",
+      "slug": "san-pedro-cathedral-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Parish history, mass schedules and nearby museum references do not prove specific visitor amenities. Preserve aliases and existing fields."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 171,
+      "name": "Davao Museum of History and Ethnography",
+      "slug": "davao-museum-of-history-and-ethnography",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Existing Arrupe Hall relocation details are correct. Ceremony guided viewing and climate-control wording do not establish regular bookable tours or a specific public air-conditioning amenity."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 175,
+      "name": "The Grape Valley",
+      "slug": "the-grape-valley",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Grape-picking is a published activity, not proof of a guided farm tour; full summit-climb facilities do not establish facilities at the Rafflesia viewing locality."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 176,
+      "name": "Mount Candalaga Rafflesia viewing area",
+      "slug": "mount-candalaga-rafflesia-viewing-area",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Grape-picking is a published activity, not proof of a guided farm tour; full summit-climb facilities do not establish facilities at the Rafflesia viewing locality."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 181,
+      "name": "Poo Sandbar",
+      "slug": "poo-sandbar",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Island/mangrove identification and boat publicity do not establish onshore facilities. Proposed boardwalks, adjacent island camps and foreign namesakes excluded."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 182,
+      "name": "Christ the Redeemer",
+      "slug": "christ-the-redeemer",
+      "status": "details_updated_amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [
+        "website_url",
+        "location"
+      ],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 183,
+      "name": "Divine Mercy Shrine",
+      "slug": "divine-mercy-shrine",
+      "status": "details_updated_amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [
+        "website_url"
+      ],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 184,
+      "name": "Sanctuario de Santo Rosario",
+      "slug": "sanctuario-de-santo-rosario",
+      "status": "details_updated_amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [
+        "website_url"
+      ],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 188,
+      "name": "Malumagpak Falls",
+      "slug": "malumagpak-falls",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Remote trekking references, community history and name/location conflicts are insufficient for specific current facilities. No unverified campsite, water station or guide network imported."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 189,
+      "name": "Mount Pandadagsaan",
+      "slug": "mount-pandadagsaan",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Remote trekking references, community history and name/location conflicts are insufficient for specific current facilities. No unverified campsite, water station or guide network imported."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 197,
+      "name": "General Moncado White House",
+      "slug": "general-moncado-white-house",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Remote trekking references, community history and name/location conflicts are insufficient for specific current facilities. No unverified campsite, water station or guide network imported."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 207,
+      "name": "Fabian's Peak",
+      "slug": "fabian-s-peak",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Remote trekking references, community history and name/location conflicts are insufficient for specific current facilities. No unverified campsite, water station or guide network imported."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 212,
+      "name": "Crocodile Hill",
+      "slug": "crocodile-hill",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://p600.org/articles/a-viewpoint-without-crocodiles-on-crocodile-hill",
+          "evidence": "April 2023 firsthand visit documents paths at Punta Piape, Padada; some facilities appeared unused. No viewing-deck structure or current facility operation inferred.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Hill walking paths (reported)"
+        }
+      ],
+      "updated_fields": [],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 215,
+      "name": "Sigaboy Island",
+      "slug": "sigaboy-island",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Island/mangrove identification and boat publicity do not establish onshore facilities. Proposed boardwalks, adjacent island camps and foreign namesakes excluded."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 216,
+      "name": "Burias Islet",
+      "slug": "burias-islet",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Island/mangrove identification and boat publicity do not establish onshore facilities. Proposed boardwalks, adjacent island camps and foreign namesakes excluded."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 217,
+      "name": "Kepiya Falls",
+      "slug": "kepiya-falls",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Remote trekking references, community history and name/location conflicts are insufficient for specific current facilities. No unverified campsite, water station or guide network imported."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 222,
+      "name": "Candelaria Park",
+      "slug": "candelaria-park",
+      "status": "details_updated_amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [
+        "website_url"
+      ],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 224,
+      "name": "Big Ligid Island",
+      "slug": "big-ligid-island",
+      "status": "details_updated_amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [
+        "website_url",
+        "description"
+      ],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 227,
+      "name": "Tomari Falls",
+      "slug": "tomari-falls",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://realestateblogph.com/2021/11/mt-apo-town-opens-all-ecotourism-cultural-sites/",
+          "evidence": "Syndicated BusinessWorld report by Maya M. Padilla quotes Santa Cruz tourism officer Julius Paner on local-guide arrangements for the town’s sites, including Tomari. Historical fees and reopening statements not imported.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Local guide arrangements (reported)"
+        }
+      ],
+      "updated_fields": [
+        "website_url"
+      ],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 229,
+      "name": "Tagabuli Sea Rock Garden",
+      "slug": "tagabuli-sea-rock-garden",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Provincial destination identification and memorial history do not by themselves confirm visitor amenities."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 232,
+      "name": "Langan Falls",
+      "slug": "langan-falls",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://meanttogo.com/a-day-hike-guide-to-mt-loay-traverse-langan-falls-11-things-to-know-prior-to-your-adventure/",
+          "evidence": "Firsthand guide updated 2021 describes the steeper Loay-to-Langan route; Loay summit camping and stores are not assigned to the falls.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Langan trekking route (reported)"
+        },
+        {
+          "key": "visitor_bridges",
+          "source": "https://meanttogo.com/a-day-hike-guide-to-mt-loay-traverse-langan-falls-11-things-to-know-prior-to-your-adventure/",
+          "evidence": "Author describes crossing a hanging bridge on the walk out from Langan Falls; access-route facility, not a bridge over the waterfall.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Access-route hanging bridge (reported)"
+        }
+      ],
+      "updated_fields": [],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 237,
+      "name": "Battle of Ising Memorial",
+      "slug": "battle-of-ising-memorial",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "review_notes": [
+        "Provincial destination identification and memorial history do not by themselves confirm visitor amenities."
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 239,
+      "name": "Davao City Hall",
+      "slug": "davao-city-hall",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "info",
+          "source": "https://davaocity.gov.ph/wp-content/uploads/2026/03/CGD_CC2026_VOLUMEIIE.pdf",
+          "evidence": "Rendered PDF page 641 of the 2026 city service guide places a Public Assistance Counter at the main entrance of Main City Hall. This is civic assistance, not a tourist booking desk.",
+          "status": "published_facility",
+          "display_name": "Public assistance counter"
+        }
+      ],
+      "updated_fields": [],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    },
+    {
+      "id": 240,
+      "name": "Almendras Falls",
+      "slug": "almendras-falls",
+      "status": "details_updated_amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [
+        "website_url"
+      ],
+      "review_notes": [],
+      "note": "Unconfirmed does not mean unavailable or absent. Confirm current access and services with the operator or local tourism office."
+    }
+  ]
+}

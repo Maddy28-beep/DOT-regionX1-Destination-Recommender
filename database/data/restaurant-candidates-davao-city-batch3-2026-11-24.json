@@ -1,0 +1,274 @@
+{
+  "researched_on": "2026-11-24",
+  "scope": "Research only. No database import or application changes.",
+  "existing_catalogue_records_checked": 74,
+  "ready_candidates": 5,
+  "held_candidates": 1,
+  "candidates": [
+    {
+      "key": "bairrada",
+      "name": "Bairrada Churrasqueira",
+      "aliases": [
+        "Bairrada"
+      ],
+      "slug": "bairrada-churrasqueira-tulip",
+      "location": "The Compound, Tulip Drive, Juna Subdivision, Matina, Davao City",
+      "cuisine_type": "Portuguese",
+      "latitude": 7.0561327,
+      "longitude": 125.5887746,
+      "coordinate_source": "https://www.tatlerasia.com/dining/bairrada-churrasqueira",
+      "contact_number": "+63 954 175 0252",
+      "website_url": "https://www.tatlerasia.com/dining/bairrada-churrasqueira",
+      "description": "A small Portuguese grill at The Compound serving charcoal-grilled piri-piri chicken, salted-cod dishes and pork with white beans.",
+      "opening_hours": null,
+      "opening_hours_note": "No current operator-confirmed weekly schedule captured.",
+      "photo_date_note": "Dining-room image in Tatler 2026 gallery.",
+      "amenities": [],
+      "region": "Davao City",
+      "dot_accreditation": "not_confirmed",
+      "price_tier": null,
+      "price_range": null,
+      "rating": null,
+      "review_status": "researched_not_imported",
+      "existing_name_or_alias_matches": [],
+      "photo": {
+        "local_file": "storage/app/restaurant-research-batch3/photos/bairrada.jpg",
+        "source_url": "https://www.tatlerasia.com/dining/bairrada-churrasqueira",
+        "original_image_url": "https://cdn.tatlerasia.com/tatlerasia/i/2026/03/16153217-dining-room_cover_1200x1600.jpg",
+        "credit_text": "Tatler Asia / Bairrada Churrasqueira",
+        "sha256": "0c83ca27c9b0daaf1f2d32a74dceb51082465f72ec7da3af59b7eed3000d647e",
+        "reviewed_visually": true,
+        "permission_status": "public_reuse_permission_not_established",
+        "usage": "Research reference only; not installed on a public listing"
+      }
+    },
+    {
+      "key": "taichou",
+      "name": "Taichou Izakaya Japanese Pub",
+      "aliases": [
+        "Taichou Izakaya"
+      ],
+      "slug": "taichou-izakaya-suazo",
+      "location": "1st floor, Lacuesta Building, Suazo corner D. Ponce Street, Barangay 28-C, Davao City",
+      "cuisine_type": "Japanese",
+      "latitude": 7.0710821,
+      "longitude": 125.6187134,
+      "coordinate_source": "https://goo.gl/maps/soZUsT9FxSdST7nv8",
+      "contact_number": "+63 997 076 9623",
+      "website_url": "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/restaurants/taichou-izakaya-japanese-pub/",
+      "facebook_url": "https://www.facebook.com/TaichouIzakaya",
+      "description": "A Japanese pub and restaurant on Suazo and Ponce streets, known for ramen and Japanese dishes. This candidate refers to the Lacuesta Building venue.",
+      "opening_hours": null,
+      "opening_hours_note": "Older directory says 18:00-22:00; recent aggregator says 12:00-20:00. Leave unconfirmed.",
+      "details_sources": [
+        "https://www.davaocitydirectory.com/food-and-beverages/restaurants/taichou-izakaya.html",
+        "https://restaurantguru.com/Taichou-Izakaya-Davao-City"
+      ],
+      "photo_date_note": "City tourism photograph uploaded June 2022; historical storefront view.",
+      "amenities": [],
+      "region": "Davao City",
+      "dot_accreditation": "not_confirmed",
+      "price_tier": null,
+      "price_range": null,
+      "rating": null,
+      "review_status": "researched_not_imported",
+      "existing_name_or_alias_matches": [],
+      "photo": {
+        "local_file": "storage/app/restaurant-research-batch3/photos/taichou.jpg",
+        "source_url": "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/restaurants/taichou-izakaya-japanese-pub/",
+        "original_image_url": "https://tourism.davaocity.gov.ph/wp-content/uploads/2022/06/TAICH.jpg",
+        "credit_text": "Davao City Tourism Operations Office / Taichou Izakaya",
+        "sha256": "d4a20215ee58aee9830dffb28ba6419c9ed29c1fb0648ddf1d7e5faad8e0e5f9",
+        "reviewed_visually": true,
+        "permission_status": "public_reuse_permission_not_established",
+        "usage": "Research reference only; not installed on a public listing"
+      }
+    },
+    {
+      "key": "lara",
+      "name": "Lara Mia Cafe & Bistro",
+      "aliases": [
+        "Lara Mia",
+        "Laramia Cafe Bistro",
+        "Lara Mia Cafe and Bistro"
+      ],
+      "slug": "lara-mia-cafe-bistro-juna",
+      "location": "University Avenue corner Talisay Street, Juna Subdivision, Matina, Davao City",
+      "cuisine_type": "Italian",
+      "latitude": 7.05597496,
+      "longitude": 125.594085693,
+      "coordinate_source": "https://www.waze.com/live-map/directions/lara-mia-talisay-davao-city?to=place.w.82313287.823067330.11072629",
+      "contact_number": "+63 932 828 3636",
+      "website_url": "https://www.facebook.com/LaraMiaFudge",
+      "facebook_url": "https://www.facebook.com/LaraMiaFudge",
+      "instagram_url": "https://www.instagram.com/LaraMiaFudge/",
+      "description": "A neighborhood cafe and bistro in Juna serving pizza, pasta, desserts and house-made gelato.",
+      "opening_hours": "Daily 10:00-21:00",
+      "opening_hours_note": "October 2026 operator posts mirrored by FoodBevg; corroborated by branch-specific Waze. Older 2019 article has an earlier schedule and is used only for the photo.",
+      "hours_source": "https://www.foodbevg.com/PH/Davao-City/318630738201193/Lara-Mia-Caf%C3%A9-%26-Bistro",
+      "details_sources": [
+        "https://autoreserve.com/en/restaurants/T5Vx2kYkfj6R8LqLDL2H"
+      ],
+      "photo_date_note": "Pizza photograph published February 2019 by Ria Jose; watermark retained.",
+      "amenities": [],
+      "region": "Davao City",
+      "dot_accreditation": "not_confirmed",
+      "price_tier": null,
+      "price_range": null,
+      "rating": null,
+      "review_status": "researched_not_imported",
+      "existing_name_or_alias_matches": [],
+      "photo": {
+        "local_file": "storage/app/restaurant-research-batch3/photos/lara.png",
+        "source_url": "https://www.mydavaocity.com/tag/lara-mia/",
+        "original_image_url": "https://i0.wp.com/www.mydavaocity.com/wp-content/uploads/2019/02/Lara-Mia-Cafe-Bistro-500x500.png?resize=500%2C500",
+        "credit_text": "Ria Jose / MyDavaoCity.com",
+        "sha256": "605387e649a67e158fc6df766a7f7d4ba39b9f97affb137f26eedd602914e2d2",
+        "reviewed_visually": true,
+        "permission_status": "public_reuse_permission_not_established",
+        "usage": "Research reference only; not installed on a public listing"
+      }
+    },
+    {
+      "key": "bonte",
+      "name": "De Bonte Koe European Bar and Restaurant - Rizal",
+      "aliases": [
+        "De Bonte Koe",
+        "De Bonte Koe European Restaurant"
+      ],
+      "slug": "de-bonte-koe-rizal",
+      "location": "Habana Compound, 29 J.P. Rizal Street, Barangay 3-A, Poblacion, Davao City",
+      "cuisine_type": "European",
+      "latitude": 7.0670666,
+      "longitude": 125.6084848,
+      "coordinate_source": "https://www.waze.com/live-map/directions/ph/rehiyon-ng-davao/lungsod-ng-dabaw/de-bonte-koe-european-bar-and-restaurant?to=place.ChIJ0QfkFHht-TIRgIPNjVTc9LA",
+      "contact_number": "(082) 317 2217 / +63 968 854 4516",
+      "description": "A European restaurant in the Habana Compound serving steaks, pasta and Dutch-style dishes. This entry is the Rizal branch, separate from its Lanang venue.",
+      "website_url": "https://debontekoe.ph/",
+      "opening_hours": null,
+      "opening_hours_note": "Published Rizal closing times differ (20:00, 21:00 and 22:30); operator reconfirmation needed.",
+      "details_sources": [
+        "https://www.spot.ph/eatdrink/the-latest-eat-drink/10-must-try-restaurants-in-davao-city-a7989-20250919-dyn",
+        "https://www.findglocal.com/PH/Davao-City/101849211431882/De-Bonte-Koe-European-Bar-and-Restaurant"
+      ],
+      "photo_date_note": "Named restaurant exterior from Davao.page; capture date not published.",
+      "amenities": [],
+      "region": "Davao City",
+      "dot_accreditation": "not_confirmed",
+      "price_tier": null,
+      "price_range": null,
+      "rating": null,
+      "review_status": "researched_not_imported",
+      "existing_name_or_alias_matches": [],
+      "photo": {
+        "local_file": "storage/app/restaurant-research-batch3/photos/bonte.webp",
+        "source_url": "https://davao.page/restaurants/de-bonte-koe/",
+        "original_image_url": "https://davao.page/_astro/de-bonte-koe@1024w.8f9ec7c5.webp",
+        "credit_text": "Davao.page / De Bonte Koe restaurant page",
+        "sha256": "aef4c0d7da5c4298346ebf37045de0579da0f6f7b7cbaa6381120b86ca48b611",
+        "reviewed_visually": true,
+        "permission_status": "public_reuse_permission_not_established",
+        "usage": "Research reference only; not installed on a public listing"
+      }
+    },
+    {
+      "key": "omerta",
+      "name": "Omerta Bistro & Lounge",
+      "aliases": [
+        "Omerta Bistro + Lounge",
+        "Omerta Incorporated"
+      ],
+      "slug": "omerta-bistro-lounge-bajada",
+      "location": "7th floor roof deck, Bormaheco Building Phase 2, J.P. Laurel Avenue, Bajada, Davao City",
+      "cuisine_type": "Italian / Spanish",
+      "latitude": 7.0876003,
+      "longitude": 125.6096613,
+      "coordinate_source": "https://www.waze.com/live-map/directions/ph/davao-region/davao-city/omerta-bistro-%2B-lounge?to=place.ChIJx-gvqz1t-TIRYBX-W9cCdCw",
+      "contact_number": "+63 936 941 6476",
+      "website_url": "https://www.facebook.com/Omertabistrolounge",
+      "facebook_url": "https://www.facebook.com/Omertabistrolounge",
+      "instagram_url": "https://www.instagram.com/officialomertadavao/",
+      "description": "A rooftop bistro and lounge in Bajada serving dishes such as pizza, pasta, paella and tapas, with indoor and deck seating.",
+      "opening_hours": "Sun-Thu 11:00-22:00; Fri-Sat 11:00-01:00",
+      "opening_hours_note": "June 2026 operator post and Waze agree. Other old directory schedules differ; confirm holidays directly.",
+      "hours_source": "https://www.findglocal.com/PH/Davao-City/774726179592224/Omert%C3%A0-Bistro-%26-Lounge",
+      "details_sources": [
+        "https://www.tripadvisor.com.ph/Restaurant_Review-g298459-d19923201-Reviews-Omerta_Bistro_Lounge-Davao_City_Davao_del_Sur_Province_Mindanao.html"
+      ],
+      "photo_date_note": "City tourism image uploaded May 2022, only 275 x 183 px; real but low resolution.",
+      "amenities": [
+        "Outdoor seating",
+        "Reservations"
+      ],
+      "amenities_source": "https://www.tripadvisor.com.ph/Restaurant_Review-g298459-d19923201-Reviews-Omerta_Bistro_Lounge-Davao_City_Davao_del_Sur_Province_Mindanao.html",
+      "region": "Davao City",
+      "dot_accreditation": "not_confirmed",
+      "price_tier": null,
+      "price_range": null,
+      "rating": null,
+      "review_status": "researched_not_imported",
+      "existing_name_or_alias_matches": [],
+      "photo": {
+        "local_file": "storage/app/restaurant-research-batch3/photos/omerta.jpg",
+        "source_url": "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/ktv/omerta-incorporated/",
+        "original_image_url": "https://tourism.davaocity.gov.ph/wp-content/uploads/2022/05/OMERTA.jpg",
+        "credit_text": "Davao City Tourism Operations Office / Omerta",
+        "sha256": "a6b5ef4473edf06973fa19565cf9ab1552e46e6f53601f9e283220bba3d20271",
+        "reviewed_visually": true,
+        "permission_status": "public_reuse_permission_not_established",
+        "usage": "Research reference only; not installed on a public listing"
+      }
+    },
+    {
+      "key": "benjarong",
+      "name": "Benjarong Bar and Restaurant - Davao",
+      "aliases": [
+        "Benjarong Davao"
+      ],
+      "slug": "benjarong-davao",
+      "location": "Lower Foyer, dusitD2 Davao, Stella Hizon Reyes Drive, Bo. Pampanga, Davao City",
+      "cuisine_type": "Thai",
+      "latitude": 7.10904,
+      "longitude": 125.650275,
+      "coordinate_source": "https://www.benjarongkitchen.com/benjarong-davao/",
+      "contact_number": "+63 82 272 7500 / +63 905 562 1370",
+      "website_url": "https://www.dusit.com/dusitd2-davao/dining/benjarong-bar-and-restaurant/",
+      "description": "Thai restaurant at dusitD2 Davao. Do not offer as an active dining stop until the conflicting operational status is resolved.",
+      "opening_hours": null,
+      "review_status": "hold_operating_status_conflict",
+      "operating_status": "unconfirmed_possible_temporary_closure",
+      "opening_hours_note": "Hotel dining page explicitly says Temporarily Closed Until Further Notice. Separate brand page lists Mon-Thu and Fri-Sat hours but no Sunday schedule. Do not infer open status.",
+      "status_source": "https://www.dusit.com/dusitd2-davao/dining/benjarong-bar-and-restaurant/",
+      "photo_date_note": "Food photograph on official Davao page, uploaded March 2025.",
+      "amenities": [],
+      "region": "Davao City",
+      "dot_accreditation": "not_confirmed",
+      "price_tier": null,
+      "price_range": null,
+      "rating": null,
+      "existing_name_or_alias_matches": [],
+      "photo": {
+        "local_file": "storage/app/restaurant-research-batch3/photos/benjarong.jpg",
+        "source_url": "https://www.benjarongkitchen.com/benjarong-davao/",
+        "original_image_url": "https://www.benjarongkitchen.com/wp-content/uploads/2025/03/5.jpg",
+        "credit_text": "Benjarong / official Davao restaurant page",
+        "sha256": "616aae32eaa64ca84597b2fe1a644be8bfecf3a3e83fcdddb2fda1be04b3b133",
+        "reviewed_visually": true,
+        "permission_status": "public_reuse_permission_not_established",
+        "usage": "Research reference only; not installed on a public listing"
+      }
+    }
+  ],
+  "deferred": [
+    {
+      "name": "Robata Davao",
+      "reason": "Reports of Azuela branch closure or relocation and a new Tulip branch. Historical Azuela photo must not be assigned to Tulip without matching evidence.",
+      "source": "https://www.reddit.com/r/davao/comments/1w8jbir/hisher_cafe_azuela_cove/"
+    },
+    {
+      "name": "MISA Dining and Listening Room",
+      "reason": "Named venue confirmed, but exact map pin not yet verified; weekly schedules conflict. No guessed coordinates.",
+      "source": "https://www.findglocal.com/PH/Davao-City/100872026100911/MISA-Dining-and-Listening-Room"
+    }
+  ]
+}

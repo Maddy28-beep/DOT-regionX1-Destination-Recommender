@@ -1,0 +1,2432 @@
+{
+    "audited_on": "2026-11-20",
+    "real_named_destinations": 183,
+    "counts": {
+        "hours": 108,
+        "visit_duration": 120,
+        "best_time": 180,
+        "website_url": 131,
+        "entry_fee_min": 116,
+        "entry_fee_max": 116,
+        "price_tier": 115,
+        "amenities_unconfirmed": 40,
+        "coordinates": 25
+    },
+    "records": [
+        {
+            "id": 1,
+            "slug": "samal-island",
+            "name": "Samal Island",
+            "unconfirmed_fields": [
+                "hours",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 2,
+            "slug": "eden-nature-park",
+            "name": "Eden Nature Park",
+            "unconfirmed_fields": [
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 3,
+            "slug": "philippine-eagle-center",
+            "name": "Philippine Eagle Center",
+            "unconfirmed_fields": [
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 4,
+            "slug": "peoples-park",
+            "name": "People's Park",
+            "unconfirmed_fields": [
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 6,
+            "slug": "malagos-garden-resort",
+            "name": "Malagos Garden Resort",
+            "unconfirmed_fields": [
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 7,
+            "slug": "mount-apo-natural-park",
+            "name": "Mount Apo Natural Park",
+            "unconfirmed_fields": [
+                "hours",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 8,
+            "slug": "dahican-beach",
+            "name": "Dahican Beach",
+            "unconfirmed_fields": [
+                "hours",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 9,
+            "slug": "smx-convention-center-davao",
+            "name": "SMX Convention Center Davao",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 10,
+            "slug": "belviz-farm",
+            "name": "Belviz Farm",
+            "unconfirmed_fields": [
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 11,
+            "slug": "bemwa-farm-fresh-inc",
+            "name": "Bemwa Farm Fresh Inc.",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 12,
+            "slug": "bukid-amara-tourism-agriventures-corporation",
+            "name": "Bukid Amara Tourism Agriventures Corporation",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 13,
+            "slug": "damosa-land-inc-agriya-naturetainment",
+            "name": "Damosa Land Inc. / Agriya Naturetainment",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 14,
+            "slug": "isla-agri-ventures-inc",
+            "name": "Isla- Agri Ventures Inc",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 15,
+            "slug": "lao-integrated-farms",
+            "name": "Lao Integrated Farms",
+            "unconfirmed_fields": [
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 16,
+            "slug": "davao-crocodile-park-inc",
+            "name": "Davao Crocodile Park Inc",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 17,
+            "slug": "jkm-mini-zoo",
+            "name": "JKM Mini Zoo",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 18,
+            "slug": "apo-golf-and-country-club",
+            "name": "Apo Golf and Country Club",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 19,
+            "slug": "rancho-palos-verdes-golf-sports-club-inc",
+            "name": "Rancho Palos Verdes Golf & Sports Club Inc.",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 20,
+            "slug": "rancho-palos-verdes-golf-sports-club-inc-2",
+            "name": "Rancho Palos Verdes Golf & Sports Club Inc.",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 21,
+            "slug": "south-pacific-davao-country-club-inc",
+            "name": "South Pacific Davao Country Club Inc.",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 22,
+            "slug": "imin-the-philippine-japan-historical-museum",
+            "name": "IMIN The Philippine-Japan Historical Museum",
+            "unconfirmed_fields": [
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 23,
+            "slug": "elysia-wellness-spa",
+            "name": "Elysia Wellness Spa",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 24,
+            "slug": "elysia-wellness-spa-2",
+            "name": "Elysia Wellness Spa",
+            "unconfirmed_fields": [
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 25,
+            "slug": "elysia-wellness-spa-3",
+            "name": "Elysia Wellness Spa",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 28,
+            "slug": "museo-dabawenyo",
+            "name": "Museo Dabawenyo",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 29,
+            "slug": "san-pedro-cathedral",
+            "name": "San Pedro Cathedral",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 30,
+            "slug": "magsaysay-park",
+            "name": "Magsaysay Park",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 31,
+            "slug": "roxas-night-market",
+            "name": "Roxas Night Market",
+            "unconfirmed_fields": [
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 32,
+            "slug": "japanese-tunnel",
+            "name": "Japanese Tunnel",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 33,
+            "slug": "bankerohan-public-market",
+            "name": "Bankerohan Public Market",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 34,
+            "slug": "shrine-of-the-holy-infant-jesus-of-prague",
+            "name": "Shrine of the Holy Infant Jesus of Prague",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 35,
+            "slug": "hagimit-falls",
+            "name": "Hagimit Falls",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 36,
+            "slug": "talikud-island",
+            "name": "Talikud Island",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 37,
+            "slug": "isla-reta",
+            "name": "Isla Reta",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 38,
+            "slug": "coral-garden",
+            "name": "Coral Garden",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 39,
+            "slug": "aliwagwag-falls",
+            "name": "Aliwagwag Falls",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 40,
+            "slug": "subangan-museum",
+            "name": "Subangan Museum",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 41,
+            "slug": "san-salvador-del-mundo-church",
+            "name": "San Salvador del Mundo Church",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 42,
+            "slug": "pusan-point",
+            "name": "Pusan Point",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 43,
+            "slug": "vanishing-island",
+            "name": "Vanishing Island",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 44,
+            "slug": "wishing-island",
+            "name": "Wishing Island",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 45,
+            "slug": "sabang-cliff",
+            "name": "Sabang Cliff",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 46,
+            "slug": "kaputian-beach",
+            "name": "Kaputian Beach",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 47,
+            "slug": "giant-clam-sanctuary",
+            "name": "Giant Clam Sanctuary",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 48,
+            "slug": "malipano-island",
+            "name": "Malipano Island",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 49,
+            "slug": "monfort-bat-cave",
+            "name": "Monfort Bat Cave",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 50,
+            "slug": "dayang-beach",
+            "name": "Dayang Beach",
+            "unconfirmed_fields": [
+                "hours",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 51,
+            "slug": "diaz-island",
+            "name": "Diaz Island",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 52,
+            "slug": "angels-cove",
+            "name": "Angels Cove",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 53,
+            "slug": "cacao-culture-poblacion",
+            "name": "Cacao Culture Chocolate Shop - Poblacion Market Central",
+            "unconfirmed_fields": [
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 54,
+            "slug": "national-museum-davao",
+            "name": "National Museum of the Philippines - Davao",
+            "unconfirmed_fields": [
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 55,
+            "slug": "osmena-park",
+            "name": "Osmeña Park",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 56,
+            "slug": "paradise-island-park-beach-resort",
+            "name": "Paradise Island Park & Beach Resort",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 57,
+            "slug": "magongawon-falls-forest-trail",
+            "name": "Magongawon Falls — Forest Trail",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 58,
+            "slug": "mount-hamiguitan-range-wildlife-sanctuary-sample",
+            "name": "Mount Hamiguitan Range Wildlife Sanctuary [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 59,
+            "slug": "pujada-bay-and-pujada-island-sample",
+            "name": "Pujada Bay and Pujada Island [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 60,
+            "slug": "oak-island-sample",
+            "name": "Oak Island [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 61,
+            "slug": "guang-guang-mangrove-forest-sample",
+            "name": "Guang-guang Mangrove Forest [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 62,
+            "slug": "sleeping-dinosaur-sample",
+            "name": "Sleeping Dinosaur [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 63,
+            "slug": "campawan-curtain-falls-sample",
+            "name": "Campawan Curtain Falls [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 64,
+            "slug": "lon-wa-buddhist-temple-sample",
+            "name": "Lon Wa Buddhist Temple [SAMPLE]",
+            "unconfirmed_fields": [
+                "hours",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 65,
+            "slug": "davao-chinatown-sample",
+            "name": "Davao Chinatown [SAMPLE]",
+            "unconfirmed_fields": [
+                "hours",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 66,
+            "slug": "national-museum-of-the-philippines-davao-sample",
+            "name": "National Museum of the Philippines Davao [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 67,
+            "slug": "tagbibinta-falls-sample",
+            "name": "Tagbibinta Falls [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 68,
+            "slug": "panas-eco-cultural-park-sample",
+            "name": "Panas Eco-cultural Park [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 69,
+            "slug": "linow-tu-gabon-ocean-of-fogs-sample",
+            "name": "Linow tu Gabon (Ocean of Fogs) [SAMPLE]",
+            "unconfirmed_fields": [
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 70,
+            "slug": "urayas-peak-sample",
+            "name": "Uraya's Peak [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 71,
+            "slug": "tudaya-falls-sample",
+            "name": "Tudaya Falls [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 72,
+            "slug": "balut-island-sabang-hot-spring-sample",
+            "name": "Balut Island & Sabang Hot Spring [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 73,
+            "slug": "olanivan-island-sample",
+            "name": "Olanivan Island [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 74,
+            "slug": "tuka-beach-little-boracay-of-santa-maria-sample",
+            "name": "Tuka Beach (\"Little Boracay of Santa Maria\") [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 75,
+            "slug": "santa-maria-viewdeck-sample",
+            "name": "Santa Maria Viewdeck [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 76,
+            "slug": "malita-dives-marine-sanctuary-sample",
+            "name": "Malita Dives & Marine Sanctuary [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 77,
+            "slug": "davao-occidental-provincial-capitol-complex-sample",
+            "name": "Davao Occidental Provincial Capitol Complex [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 78,
+            "slug": "tuke-makil-tuke-nunsol-marine-cove-sample",
+            "name": "Tuke Makil / Tuke Nunsol Marine Cove [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 79,
+            "slug": "mainit-hot-springs-protected-landscape-toyozu-mountain-resort-sample",
+            "name": "Mainit Hot Springs Protected Landscape & Toyozu Mountain Resort [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 80,
+            "slug": "lake-leonard-sample",
+            "name": "Lake Leonard [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 81,
+            "slug": "awao-falls-sample",
+            "name": "Awao Falls [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 82,
+            "slug": "kopiat-island-sample",
+            "name": "Kopiat Island [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 83,
+            "slug": "lunod-island-mangrove-forest-sample",
+            "name": "Lunod Island Mangrove Forest [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 84,
+            "slug": "marangig-falls-sample",
+            "name": "Marangig Falls [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 85,
+            "slug": "calamba-farm-sea-of-clouds-sample",
+            "name": "Calamba Farm Sea of Clouds [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 86,
+            "slug": "malanog-lanog-cave-sample",
+            "name": "Malanog-lanog Cave [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 87,
+            "slug": "magnaga-waters-beach-resort-sample",
+            "name": "Magnaga Waters Beach Resort [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 88,
+            "slug": "passig-islet-aqua-eco-park-sample",
+            "name": "Passig Islet Aqua Eco Park [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 89,
+            "slug": "camp-sabros-sample",
+            "name": "Camp Sabros [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 90,
+            "slug": "virgin-falls-sample",
+            "name": "Virgin Falls [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 91,
+            "slug": "kublai-art-garden-agong-house-sample",
+            "name": "Kublai Art Garden (Agong House) [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 92,
+            "slug": "tibolo-cultural-village-sample",
+            "name": "Tibolo Cultural Village [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 93,
+            "slug": "subon-cave-underground-stream-sample",
+            "name": "Sub'on Cave & Underground Stream [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 94,
+            "slug": "jardin-de-senorita-mountain-resort-sample",
+            "name": "Jardin de Se├▒orita Mountain Resort [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 95,
+            "slug": "montefrio-garden-resort-sample",
+            "name": "Montefrio Garden Resort [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 96,
+            "slug": "mount-dinor-peak-sample",
+            "name": "Mount Dinor Peak [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 97,
+            "slug": "cape-san-agustin-historic-lighthouses-sample",
+            "name": "Cape San Agustin & Historic Lighthouses [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 98,
+            "slug": "san-salvador-del-mundo-church-caraga-church-sample",
+            "name": "San Salvador del Mundo Church (Caraga Church) [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 99,
+            "slug": "san-victor-island-sample",
+            "name": "San Victor Island [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 100,
+            "slug": "carolina-lake-sample",
+            "name": "Carolina Lake [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 101,
+            "slug": "centennial-balite-tree-500-year-old-balite-sample",
+            "name": "Centennial Balite Tree (500-Year-Old Balite) [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 102,
+            "slug": "mount-hamiguitan-natural-science-museum-sample",
+            "name": "Mount Hamiguitan Natural Science Museum [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 103,
+            "slug": "waniban-island-sample",
+            "name": "Waniban Island [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 104,
+            "slug": "pintatagan-coastal-overlook-sample",
+            "name": "Pintatagan Coastal Overlook [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 105,
+            "slug": "tagum-city-night-market-rotary-park-sample",
+            "name": "Tagum City Night Market & Rotary Park [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 106,
+            "slug": "christ-the-king-cathedral-giant-rosary-sample",
+            "name": "Christ the King Cathedral & Giant Rosary [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 107,
+            "slug": "san-agustin-botanical-park-sample",
+            "name": "San Agustin Botanical Park [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 108,
+            "slug": "canibad-secret-paradise-beach-sample",
+            "name": "Canibad Secret Paradise Beach [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 109,
+            "slug": "kapalong-cave-system-okbot-sua-caves-sample",
+            "name": "Kapalong Cave System (Okbot & Sua Caves) [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 110,
+            "slug": "carmen-mangrove-sanctuary-boardwalk-sample",
+            "name": "Carmen Mangrove Sanctuary & Boardwalk [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 111,
+            "slug": "d-bone-collector-museum-sample",
+            "name": "D' Bone Collector Museum [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 112,
+            "slug": "jacks-ridge-resort-and-shrine-sample",
+            "name": "Jack's Ridge Resort and Shrine [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 113,
+            "slug": "san-pedro-cathedral-sample",
+            "name": "San Pedro Cathedral [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 114,
+            "slug": "roxas-avenue-night-market-sample",
+            "name": "Roxas Avenue Night Market [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 115,
+            "slug": "gap-farming-resort-sample",
+            "name": "GAP Farming Resort [SAMPLE]",
+            "unconfirmed_fields": [
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 170,
+            "slug": "davao-bamboo-sanctuary-and-ecological-park",
+            "name": "Davao Bamboo Sanctuary and Ecological Park",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 171,
+            "slug": "davao-museum-of-history-and-ethnography",
+            "name": "Davao Museum of History and Ethnography",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "coordinates",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 172,
+            "slug": "energy-park",
+            "name": "Energy Park",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 173,
+            "slug": "panabo-mangrove-park",
+            "name": "Panabo Mangrove Park",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 174,
+            "slug": "camp-damada",
+            "name": "Camp Damada",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 175,
+            "slug": "the-grape-valley",
+            "name": "The Grape Valley",
+            "unconfirmed_fields": [
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 176,
+            "slug": "mount-candalaga-rafflesia-viewing-area",
+            "name": "Mount Candalaga Rafflesia viewing area",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "coordinates",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 177,
+            "slug": "digos-city-ecopark-and-arboretum",
+            "name": "Digos City Ecopark and Arboretum",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 178,
+            "slug": "mount-lamabal",
+            "name": "Mount Lamabal",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 179,
+            "slug": "salinta-monon-weaving-center",
+            "name": "Salinta Monon Weaving Center",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 180,
+            "slug": "baganga-sunrise-boulevard",
+            "name": "Baganga Sunrise Boulevard",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 181,
+            "slug": "poo-sandbar",
+            "name": "Poo Sandbar",
+            "unconfirmed_fields": [
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 182,
+            "slug": "christ-the-redeemer",
+            "name": "Christ the Redeemer",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "coordinates",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 183,
+            "slug": "divine-mercy-shrine",
+            "name": "Divine Mercy Shrine",
+            "unconfirmed_fields": [
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 184,
+            "slug": "sanctuario-de-santo-rosario",
+            "name": "Sanctuario de Santo Rosario",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 185,
+            "slug": "bilawa-mainit-hot-waterfall",
+            "name": "Bilawa Mainit Hot Waterfall",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 186,
+            "slug": "pyalitan-falls",
+            "name": "Pyalitan Falls",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 187,
+            "slug": "mipangi-hilltop",
+            "name": "Mipangi Hilltop",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 188,
+            "slug": "malumagpak-falls",
+            "name": "Malumagpak Falls",
+            "unconfirmed_fields": [
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 189,
+            "slug": "mount-pandadagsaan",
+            "name": "Mount Pandadagsaan",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 190,
+            "slug": "aguacan-cold-spring",
+            "name": "Aguacan Cold Spring",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 191,
+            "slug": "city-of-tagum-cultural-center",
+            "name": "City of Tagum Cultural Center",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 192,
+            "slug": "davao-del-norte-sports-and-tourism-complex",
+            "name": "Davao del Norte Sports and Tourism Complex",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 193,
+            "slug": "new-city-hall-of-tagum",
+            "name": "New City Hall of Tagum",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 194,
+            "slug": "island-buenavista",
+            "name": "Island Buenavista",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 195,
+            "slug": "mount-puting-bato",
+            "name": "Mount Puting Bato",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 196,
+            "slug": "mabunao-eco-park",
+            "name": "Mabunao Eco-Park",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 197,
+            "slug": "general-moncado-white-house",
+            "name": "General Moncado White House",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "coordinates",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 198,
+            "slug": "davao-city-coastal-road-public-parks",
+            "name": "Davao City Coastal Road Public Parks",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 199,
+            "slug": "davao-city-library-and-information-center",
+            "name": "Davao City Library and Information Center",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 200,
+            "slug": "sicao-falls",
+            "name": "Sicao Falls",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 201,
+            "slug": "mount-loay",
+            "name": "Mount Loay",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 202,
+            "slug": "balite-hot-spring",
+            "name": "Balite Hot Spring",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 203,
+            "slug": "mount-karilongan",
+            "name": "Mount Karilongan",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 204,
+            "slug": "bluebird-view-deck",
+            "name": "Bluebird View Deck",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 205,
+            "slug": "matol-falls",
+            "name": "Matol Falls",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 206,
+            "slug": "alina-cave",
+            "name": "Alina Cave",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 207,
+            "slug": "fabian-s-peak",
+            "name": "Fabian's Peak",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 208,
+            "slug": "d-fortees-nature-park-and-inland-resort",
+            "name": "D'Fortees Nature Park and Inland Resort",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 209,
+            "slug": "jorge-town",
+            "name": "Jorge Town",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 210,
+            "slug": "new-barili-heights-and-sights",
+            "name": "New Barili Heights and Sights",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 211,
+            "slug": "fyingi-sol-cave",
+            "name": "Fyingi Sol Cave",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 212,
+            "slug": "crocodile-hill",
+            "name": "Crocodile Hill",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 213,
+            "slug": "daya-farm-adventure",
+            "name": "Daya Farm & Adventure",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 214,
+            "slug": "kagan-dinagsaan-peak",
+            "name": "Kagan Dinagsaan Peak",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 215,
+            "slug": "sigaboy-island",
+            "name": "Sigaboy Island",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 216,
+            "slug": "burias-islet",
+            "name": "Burias Islet",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "coordinates",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 217,
+            "slug": "kepiya-falls",
+            "name": "Kepiya Falls",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "coordinates",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 218,
+            "slug": "dona-vicenta-park",
+            "name": "Doña Vicenta Park",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 219,
+            "slug": "los-amigos-park",
+            "name": "Los Amigos Park",
+            "unconfirmed_fields": [
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 220,
+            "slug": "deca-wakeboard-park-davao",
+            "name": "DECA Wakeboard Park Davao",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 221,
+            "slug": "toril-public-park",
+            "name": "Toril Public Park",
+            "unconfirmed_fields": [
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 222,
+            "slug": "candelaria-park",
+            "name": "Candelaria Park",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 223,
+            "slug": "tagtugonan-falls",
+            "name": "Tagtugonan Falls",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 224,
+            "slug": "big-ligid-island",
+            "name": "Big Ligid Island",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 225,
+            "slug": "bamboo-peak",
+            "name": "Bamboo Peak",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 226,
+            "slug": "mount-fortune-view",
+            "name": "Mount Fortune View",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 227,
+            "slug": "tomari-falls",
+            "name": "Tomari Falls",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 228,
+            "slug": "sinoron-ecotourism-park",
+            "name": "Sinoron Ecotourism Park",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 229,
+            "slug": "tagabuli-sea-rock-garden",
+            "name": "Tagabuli Sea Rock Garden",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "coordinates",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 230,
+            "slug": "sandunganan-peak",
+            "name": "Sandunganan Peak",
+            "unconfirmed_fields": [
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "best_time",
+                "website_url",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 231,
+            "slug": "mayor-francisco-g-rabat-park-and-baywalk",
+            "name": "Mayor Francisco G. Rabat Park and Baywalk",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 232,
+            "slug": "langan-falls",
+            "name": "Langan Falls",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 233,
+            "slug": "epol-falls",
+            "name": "Epol Falls",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 234,
+            "slug": "roxas-greenway-park",
+            "name": "Roxas Greenway Park",
+            "unconfirmed_fields": [
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 235,
+            "slug": "marawer-hot-spring",
+            "name": "Marawer Hot Spring",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 236,
+            "slug": "sibulan-river-tubing",
+            "name": "Sibulan River Tubing",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url",
+                "coordinates"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 237,
+            "slug": "battle-of-ising-memorial",
+            "name": "Battle of Ising Memorial",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 238,
+            "slug": "freedom-park-tagum",
+            "name": "Freedom Park, Tagum",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "website_url"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 239,
+            "slug": "davao-city-hall",
+            "name": "Davao City Hall",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        },
+        {
+            "id": 240,
+            "slug": "almendras-falls",
+            "name": "Almendras Falls",
+            "unconfirmed_fields": [
+                "hours",
+                "entry_fee_min",
+                "entry_fee_max",
+                "price_tier",
+                "visit_duration",
+                "best_time",
+                "amenities_unconfirmed"
+            ],
+            "note": "Unknown is not free, closed, unavailable, or absent. Confirm with operator/local tourism."
+        }
+    ]
+}

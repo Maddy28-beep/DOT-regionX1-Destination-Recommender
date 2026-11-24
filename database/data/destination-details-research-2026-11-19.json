@@ -1,0 +1,4429 @@
+{
+  "researched_on": "2026-11-19",
+  "scope": "99 active real-named destinations lacking latitude or longitude in the local audit",
+  "mode": "research_only_not_imported",
+  "summary": {
+    "review_queue": 99,
+    "coordinate_references": 80,
+    "no_coordinate_selected": 19,
+    "verified_vehicle_entrances": 0,
+    "remaining_destination_reviews_completed": 48,
+    "current_admission_fee_imports_approved": 0,
+    "additional_map_profiles_resolved": 18,
+    "map_reported_schedules_pending_confirmation": 5,
+    "latest_source_reviews_completed": 21
+  },
+  "policy": [
+    "No database or application changes.",
+    "Reference coordinates identify features/areas, not automatically entrances.",
+    "Keep all 71 imported destinations excluded from automatic itinerary generation until operational data are verified.",
+    "Keep actual accreditation unconfirmed; map presence is not DOT accreditation.",
+    "Unknown fees/hours/durations remain unknown; never infer free admission or 24-hour access.",
+    "Do not combine student/adult, camping/day-entry, or optional activity charges into one admission range."
+  ],
+  "records": [
+    {
+      "id": 15,
+      "name": "Lao Integrated Farms",
+      "location": "Brgy. Eman, Bansalan, Davao del Sur",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.8477521,
+        "longitude": 125.1904277,
+        "kind": "venue_area",
+        "source": "https://www.google.com/maps/place/Lao%20Integrated%20Farms%2C%20Inc./data=!4m2!3m1!1s0x32f852bebfb9e51b:0xc80636d9708520da",
+        "notes": "Operator website and Eman, Bansalan address match the profile. Map phone differs from the operator contact; do not overwrite contact details.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "official_website_found",
+          "detail": "The operator's own website describes its farm and activities. No exact visitor entrance, current tariff or visit schedule confirmed in this pass.",
+          "sources": [
+            "https://www.laointegratedfarms.com/about-lao-integrated-farms"
+          ],
+          "source_date": null
+        },
+        {
+          "status": "confirmed_primary",
+          "detail": "Operator confirms LIFI Compound, Purok 4, Eman, Bansalan and a demonstration farm. No exact visitor entrance, tour tariff or visiting timetable was established. Do not borrow the PHP30 charge appearing under a different farm in a multi-farm article.",
+          "sources": [
+            "https://www.laointegratedfarms.com/contact-lao-integrated-farms",
+            "https://www.laointegratedfarms.com/welcome"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Operator website and Eman, Bansalan address match the profile. Map phone differs from the operator contact; do not overwrite contact details.",
+          "sources": [
+            "https://www.google.com/maps/place/Lao%20Integrated%20Farms%2C%20Inc./data=!4m2!3m1!1s0x32f852bebfb9e51b:0xc80636d9708520da"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.laointegratedfarms.com/contact-lao-integrated-farms",
+          "https://www.laointegratedfarms.com/welcome"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "Lao Integrated Farms, Inc.",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/Lao%20Integrated%20Farms%2C%20Inc./data=!4m2!3m1!1s0x32f852bebfb9e51b:0xc80636d9708520da"
+        ],
+        "opening_hours": {
+          "value": "Mon–Thu 08:00–16:00; Fri 08:00–15:00; Sat–Sun closed",
+          "status": "map_published_operator_confirmation_pending",
+          "source": "https://www.google.com/maps/place/Lao%20Integrated%20Farms%2C%20Inc./data=!4m2!3m1!1s0x32f852bebfb9e51b:0xc80636d9708520da",
+          "checked_on": "2026-11-19"
+        }
+      }
+    },
+    {
+      "id": 16,
+      "name": "Davao Crocodile Park Inc",
+      "location": "Riverfront Corporate City, Diversion Road, Brgy. Maa, Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.09721,
+        "longitude": 125.59898,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W81347693",
+        "notes": "Zoo area; vehicle entrance still needs checking.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": [
+        {
+          "status": "schedule_conflict",
+          "detail": "The city tourism directory lists daily 08:00–19:00, while a mirror of recent park social posts lists 08:00–17:00. Operator confirmation needed. A newly found similarly named domain was not assumed to be the official operator site. Do not import its indicative rates.",
+          "sources": [
+            "https://tourism.davaocity.gov.ph/explore-the-city/attractions/man-made-nature-parks/davao-crocodile-park-wild-water-rafting-zip-city/",
+            "https://www.findglocal.com/PH/Davao-City/333035537242075/Davao-Crocodile-Park-%26-Zoo"
+          ],
+          "source_date": null
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "name": "JKM Mini Zoo",
+      "location": "Purok 7, Pag-asa Farms, Brgy Pag-asa, Kapalong, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.575845,
+        "longitude": 125.68261,
+        "kind": "operator_map_marker",
+        "source": "https://jkmsons.com.ph/",
+        "notes": "Coordinates embedded by the farm operator's GoogleMapInit call. Names and address match Pag-Asa Farms/JKM Mini Zoo; gate not independently verified.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 3
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_primary",
+          "detail": "Operator explicitly advertises JKM Mini Zoo at Pag-Asa Farms, Kapalong. Its embedded GoogleMapInit call publishes 7.575845,125.682610. This is a farm map marker, not a verified zoo gate. Reject the unrelated barangay directory point 7.59572,125.70412.",
+          "sources": [
+            "https://jkmsons.com.ph/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary",
+        "coordinate_status": "reference_found_not_field_verified",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://jkmsons.com.ph/"
+        ]
+      }
+    },
+    {
+      "id": 19,
+      "name": "Rancho Palos Verdes Golf & Sports Club Inc.",
+      "location": "Brgy. Mandug & Indangan Buhangin District Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.16987,
+        "longitude": 125.58705,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W1013398163",
+        "notes": "Indangan/Mandug golf clubhouse. Apply only to this listing identity, not the same-name Ma-a row (ID20).",
+        "verified_vehicle_entrance": false,
+        "research_pass": 2
+      },
+      "detail_findings": [
+        {
+          "status": "identity_review",
+          "detail": "The clubhouse pin matches the Indangan/Mandug golf venue. The second same-name catalogue row has a Ma-a address; do not copy this coordinate into that row without resolving whether it is an office, another facility or a duplicate.",
+          "sources": [
+            "https://mapcarta.com/W1013398163"
+          ],
+          "source_date": null,
+          "research_pass": 2
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "name": "Rancho Palos Verdes Golf & Sports Club Inc.",
+      "location": "Riverfront Corporate City Prk 26 Riverside Brgy. Ma-a Talomo Dist., Davao City",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "identity_review",
+          "detail": "Another catalogue row shares this exact business name but describes Indangan/Mandug. The observed Ma-a address is materially different. No coordinate selected for this row.",
+          "sources": [
+            "https://www.opmc.ph/sites/default/files/downloads/rancho_palos_verdes_golf_and_residential_estates_project_brief.pdf"
+          ],
+          "source_date": null,
+          "research_pass": 2
+        },
+        {
+          "status": "conflicting_location",
+          "detail": "The city swimming-pool page states Riverfront Corporate City, Ma-a, but its QR map link resolves to the Indangan golf venue at 7.1663969,125.5855597. No coordinate is accepted for this Ma-a row. It must not inherit ID19's clubhouse coordinate.",
+          "sources": [
+            "https://tourism.davaocity.gov.ph/explore-the-city/attractions/swimming-pools/rancho-palos-verdes-golf-sports-club-inc/",
+            "https://goo.gl/maps/D7waXx3dG3VUFzAA8"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "developer_address_map_conflict",
+          "detail": "Sta. Lucia developer page explicitly describes a country club in Riverfront, Ma-a, but its embedded map centres near 7.1657366,125.5826105, in the northern golf-estate area. Official city tourism also lists the Ma-a swimming-pool address. The conflicting developer map does not establish a Ma-a entrance; retain this row for identity review and do not copy the Indangan golf coordinate.",
+          "sources": [
+            "https://stalucialand.com.ph/projects/rancho-palos-verdes-2/",
+            "https://tourism.davaocity.gov.ph/explore-the-city/attractions/swimming-pools/rancho-palos-verdes-golf-sports-club-inc/"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "conflicting_location",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://tourism.davaocity.gov.ph/explore-the-city/attractions/swimming-pools/rancho-palos-verdes-golf-sports-club-inc/",
+          "https://goo.gl/maps/D7waXx3dG3VUFzAA8"
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "developer_address_map_conflict",
+        "sources": [
+          "https://stalucialand.com.ph/projects/rancho-palos-verdes-2/",
+          "https://tourism.davaocity.gov.ph/explore-the-city/attractions/swimming-pools/rancho-palos-verdes-golf-sports-club-inc/"
+        ]
+      }
+    },
+    {
+      "id": 21,
+      "name": "South Pacific Davao Country Club Inc.",
+      "location": "South Pacific Drive, Brgy. Catalunan Pequeo, Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.06586,
+        "longitude": 125.51118,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W1120578954",
+        "notes": "South Pacific golf-course area in Catalunan Pequeno; not a confirmed gate.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 2
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 28,
+      "name": "Museo Dabawenyo",
+      "location": "Davao City",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "relocation_review",
+          "detail": "The current city department page still lists Pichon Street and office hours. A March 2026 report locates Museo Dabawenyo on the fifth floor of the National Museum building at People's Park. Confirm public entrance and museum-specific schedule before setting a pin or hours.",
+          "sources": [
+            "https://davaocity.gov.ph/departments/economic-development/museo-dabawenyo/",
+            "https://www.sunstar.com.ph/davao/davao-museum-bares-operating-hours-extension-for-araw-ng-dabaw"
+          ],
+          "source_date": "2026-03-10"
+        },
+        {
+          "status": "multiple_sites",
+          "detail": "The city confirms a Museo Dabawenyo Event Center behind Davao City National High School on Mabini Street. A March 2026 turnover took place there, while a 2026 exhibition also used the National Museum fifth floor. The generic listing does not identify which visitor venue is intended; Pichon, Mabini and People's Park cannot be treated as one pin.",
+          "sources": [
+            "https://davaocity.gov.ph/local-government/museo-dabawenyo-event-center-opens-exhibit-a-history-of-davao-city-in-50-objects/",
+            "https://www.sunstar.com.ph/davao/history-paintings-turned-over-to-museo-dabawenyo",
+            "https://www.mindanaotimes.com.ph/2026/05/18/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "multiple_museum_venues_still_ambiguous",
+          "detail": "March 2026 reporting places Museo Dabawenyo exhibits on the fifth floor of NMP-Davao at Peoples Park, while later reporting also mentions its Mabini events centre and the city department page retains an older address. No single public entrance selected and no Manila central-museum timetable copied to the Davao city museum.",
+          "sources": [
+            "https://davaocity.gov.ph/departments/economic-development/museo-dabawenyo/",
+            "https://www.sunstar.com.ph/davao/davao-museum-bares-operating-hours-extension-for-araw-ng-dabaw",
+            "https://www.mindanaotimes.com.ph/2026/04/01/"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "multiple_sites",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://davaocity.gov.ph/local-government/museo-dabawenyo-event-center-opens-exhibit-a-history-of-davao-city-in-50-objects/",
+          "https://www.sunstar.com.ph/davao/history-paintings-turned-over-to-museo-dabawenyo",
+          "https://www.mindanaotimes.com.ph/2026/05/18/"
+        ],
+        "unselected_coordinate_alternatives": [
+          {
+            "latitude": 7.07939,
+            "longitude": 125.60449,
+            "kind": "Mabini event centre",
+            "source": "https://mapcarta.com/N13179862776",
+            "reason": "A confirmed Museo venue, but generic listing could refer to the National Museum-floor exhibition. Venue selection is unresolved.",
+            "accepted_for_import": false
+          }
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "multiple_museum_venues_still_ambiguous",
+        "sources": [
+          "https://davaocity.gov.ph/departments/economic-development/museo-dabawenyo/",
+          "https://www.sunstar.com.ph/davao/davao-museum-bares-operating-hours-extension-for-araw-ng-dabaw",
+          "https://www.mindanaotimes.com.ph/2026/04/01/"
+        ]
+      }
+    },
+    {
+      "id": 30,
+      "name": "Magsaysay Park",
+      "location": "Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.07446,
+        "longitude": 125.6256,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/32244086",
+        "notes": "Park area; do not confuse nearby fruit market.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 31,
+      "name": "Roxas Night Market",
+      "location": "Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.07042,
+        "longitude": 125.61337,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W504508082",
+        "notes": "Market footprint along Roxas Avenue; stall layout and road access may change.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 2
+      },
+      "detail_findings": [
+        {
+          "status": "published_schedule",
+          "detail": "The city tourism page lists daily operation from 18:00 to midnight. Food and shopping purchases are separate from admission; no fee value inferred.",
+          "sources": [
+            "https://tourism.davaocity.gov.ph/explore-the-city/restaurants/night-market/roxas-night-market/"
+          ],
+          "source_date": null
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "name": "Japanese Tunnel",
+      "location": "Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.0653028,
+        "longitude": 125.569375,
+        "kind": "photo_location",
+        "source": "https://commons.wikimedia.org/wiki/File:Japanese_Tunnel_Davao_Well_Area.jpg",
+        "notes": "Photographer-recorded position at the tunnel well in 2018. This is neither a verified gate nor confirmation of current operation.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 2
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 34,
+      "name": "Shrine of the Holy Infant Jesus of Prague",
+      "location": "Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.0657,
+        "longitude": 125.57838,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W1001989764",
+        "notes": "Shrine Hills church complex.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 35,
+      "name": "Hagimit Falls",
+      "location": "Island Garden City of Samal, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.06664,
+        "longitude": 125.72301,
+        "kind": "natural_feature",
+        "source": "https://mapcarta.com/N1223930550",
+        "notes": "Falls feature; current access and entrance not confirmed.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 36,
+      "name": "Talikud Island",
+      "location": "Island Garden City of Samal, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.93218,
+        "longitude": 125.69872,
+        "kind": "island_area",
+        "source": "https://mapcarta.com/15713562",
+        "notes": "Talikud island-area reference, not a pier or drivable point.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 2
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 37,
+      "name": "Isla Reta",
+      "location": "Island Garden City of Samal, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.9373,
+        "longitude": 125.72066,
+        "kind": "boat_stop",
+        "source": "https://mapcarta.com/N8392026304",
+        "notes": "Map feature is a transport stop operated by Isla Reta Beach Resort. This is an arrival-point lead, not the resort building coordinate; landing/access must be confirmed.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 2
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 38,
+      "name": "Coral Garden",
+      "location": "Island Garden City of Samal, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.91362,
+        "longitude": 125.68203,
+        "kind": "marine_map_pin",
+        "source": "https://www.padi.com/dive-site/philippines/coral-garden-12/",
+        "notes": "PADI dive-site marker credited to South Shore Divers; Talikud reef, not a vehicle entrance or guaranteed boat landing.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 5,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_industry_source",
+          "detail": "PADI identifies this Coral Garden as the Talikud Island dive site, with a reef-depth range of 5–20m. This is not Palawan's Coral Garden and not automatically Dapia, another named dive site. Dive depths are not visitor-duration data. Boat access, exact reef pin and current tour charges remain unconfirmed.",
+          "sources": [
+            "https://www.padi.com/dive-site/philippines/coral-garden-12/",
+            "https://hofgoreiresortdavao.com/explore/island-hopping/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "operator_contributed_dive_reference",
+          "detail": "PADI names Talikud Island and lists 6.91362,125.68203, with South Shore Divers credited as its contributor. Retain this as a marine dive-site reference, not a road arrival point or confirmed boat landing. Another dive directory places Coral Garden about 600 m farther north; the reef name does not identify one guaranteed mooring. No dive-shop office hours were copied to the reef.",
+          "sources": [
+            "https://www.padi.com/dive-site/philippines/coral-garden-12/",
+            "https://www.padi.com/dive-center/philippines/south-shore-divers/",
+            "https://divemap.be/dive-sites/coral-garden-philippines.html"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_industry_source",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.padi.com/dive-site/philippines/coral-garden-12/",
+          "https://hofgoreiresortdavao.com/explore/island-hopping/"
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "operator_contributed_dive_reference",
+        "sources": [
+          "https://www.padi.com/dive-site/philippines/coral-garden-12/",
+          "https://www.padi.com/dive-center/philippines/south-shore-divers/",
+          "https://divemap.be/dive-sites/coral-garden-philippines.html"
+        ]
+      }
+    },
+    {
+      "id": 39,
+      "name": "Aliwagwag Falls",
+      "location": "Cateel, Davao Oriental",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.74045,
+        "longitude": 126.3015,
+        "kind": "natural_feature",
+        "source": "https://mapcarta.com/N5799152058",
+        "notes": "Waterfall feature beside bridge, not the ticket booth.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 40,
+      "name": "Subangan Museum",
+      "location": "City of Mati, Davao Oriental",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.94423,
+        "longitude": 126.24834,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W1328605333",
+        "notes": "Museum building reference.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 41,
+      "name": "San Salvador del Mundo Church",
+      "location": "City of Mati, Davao Oriental",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.3277,
+        "longitude": 126.56588,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W322426196",
+        "notes": "Caraga church; current catalogue location says Mati and needs correction review.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": [
+        {
+          "status": "location_text_correction",
+          "detail": "Catalogue says City of Mati. NHCP identifies the historic church in Caraga, Davao Oriental; retain the church identity and correct the location text in a future reviewed patch.",
+          "sources": [
+            "https://philhistoricsites.nhcp.gov.ph/registry_database/simbahan-ng-caraga/"
+          ],
+          "source_date": null
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "name": "Pusan Point",
+      "location": "Caraga, Davao Oriental",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.29382,
+        "longitude": 126.60221,
+        "kind": "landmark",
+        "source": "https://mapcarta.com/N9027393351",
+        "notes": "Pusan Point lighthouse feature within the wider attraction. Science discovery centre and visitor gate are not confirmed at this point.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 2
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 43,
+      "name": "Vanishing Island",
+      "location": "Island Garden City of Samal, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.15782,
+        "longitude": 125.68188,
+        "kind": "island_area",
+        "source": "https://mapcarta.com/W31754135",
+        "notes": "Sanipaan/Vanishing Island; tidal islet, not a road arrival point.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 44,
+      "name": "Wishing Island",
+      "location": "Island Garden City of Samal, Davao del Norte",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "ambiguous_same_name",
+          "detail": "Two distinct mapped islets carry the Wishing Island name: 7.01018,125.71501 and 7.01717,125.7139, roughly 790m apart. Both lie near Malipano. A tour-operator or local tourism-office match to the actual advertised islet is needed; neither point was selected.",
+          "sources": [
+            "https://mapcarta.com/W23965523",
+            "https://mapcarta.com/W300504224"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "same_name_islets_still_ambiguous",
+          "detail": "Regional tourism confirms Wishing Island as a Samal coastal attraction. Same-name mapped islets remain unresolved and other travel pages sometimes conflate Wishing with Vanishing Island. No automatic merge or coordinate selection.",
+          "sources": [
+            "https://www.experiencedavao.com/destinations/davao-del-norte/island-garden-city-of-samal/attractions/wishing-island",
+            "https://mapcarta.com/W23965523",
+            "https://mapcarta.com/W300504224"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "ambiguous_same_name",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://mapcarta.com/W23965523",
+          "https://mapcarta.com/W300504224"
+        ],
+        "unselected_coordinate_alternatives": [
+          {
+            "latitude": 7.01018,
+            "longitude": 125.71501,
+            "kind": "islet",
+            "source": "https://mapcarta.com/W23965523",
+            "reason": "Two nearby islets share this name.",
+            "accepted_for_import": false
+          },
+          {
+            "latitude": 7.01717,
+            "longitude": 125.7139,
+            "kind": "islet",
+            "source": "https://mapcarta.com/W300504224",
+            "reason": "Two nearby islets share this name.",
+            "accepted_for_import": false
+          }
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "same_name_islets_still_ambiguous",
+        "sources": [
+          "https://www.experiencedavao.com/destinations/davao-del-norte/island-garden-city-of-samal/attractions/wishing-island",
+          "https://mapcarta.com/W23965523",
+          "https://mapcarta.com/W300504224"
+        ]
+      }
+    },
+    {
+      "id": 45,
+      "name": "Sabang Cliff",
+      "location": "Island Garden City of Samal, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.9749,
+        "longitude": 125.72465,
+        "kind": "natural_feature",
+        "source": "https://mapcarta.com/N4621625891",
+        "notes": "Sabang cliff feature; do not treat as safe cliff-jump or arrival point without local access verification.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 2
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 47,
+      "name": "Giant Clam Sanctuary",
+      "location": "Island Garden City of Samal, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.013849,
+        "longitude": 125.7205224,
+        "kind": "marine_map_pin",
+        "source": "https://www.google.com/maps/place/Giant%20Clam%20(Taklobo)%20Sanctuary%2C%20Adecor/data=!4m2!3m1!1s0x32f970603c7da5e5:0xc1c29a2f2253d14f",
+        "notes": "Specific Adecor/Kaputian visitor-service profile matches DNSC locality. Protected area and clam beds may extend offshore; no road routing implied. Expanded schedule was not fully inspected, so hours remain unknown.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "primary_operator_information",
+          "detail": "DNSC identifies the Giant Clam Sanctuary in Adecor, Kaputian District and describes its joint conservation/tourism management. Its embedded map searches a name rather than exposing a dependable coordinate; no precise pin, fee or schedule selected.",
+          "sources": [
+            "https://dnsc.edu.ph/taklobo-tours/"
+          ],
+          "source_date": null,
+          "research_pass": 2
+        },
+        {
+          "status": "confirmed_primary",
+          "detail": "DNSC confirms the Taklobo Tours sanctuary in Adecor, Kaputian District, with community-based guided marine conservation visits. The embedded name-search map is not a precise sanctuary pin; the college's Panabo campus is not the attraction. A 2021 media report gives PHP100 plus a separate boat charge, but this is historical, not a confirmed current tariff.",
+          "sources": [
+            "https://dnsc.edu.ph/taklobo-tours/",
+            "https://edgedavao.net/environment/2021/10/environment-saving-white-gold-of-the-sea/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Specific Adecor/Kaputian visitor-service profile matches DNSC locality. Protected area and clam beds may extend offshore; no road routing implied. Expanded schedule was not fully inspected, so hours remain unknown.",
+          "sources": [
+            "https://www.google.com/maps/place/Giant%20Clam%20(Taklobo)%20Sanctuary%2C%20Adecor/data=!4m2!3m1!1s0x32f970603c7da5e5:0xc1c29a2f2253d14f"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://dnsc.edu.ph/taklobo-tours/",
+          "https://edgedavao.net/environment/2021/10/environment-saving-white-gold-of-the-sea/"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "Giant Clam (Taklobo) Sanctuary, Adecor",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/Giant%20Clam%20(Taklobo)%20Sanctuary%2C%20Adecor/data=!4m2!3m1!1s0x32f970603c7da5e5:0xc1c29a2f2253d14f"
+        ],
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        }
+      }
+    },
+    {
+      "id": 48,
+      "name": "Malipano Island",
+      "location": "Island Garden City of Samal, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.00779,
+        "longitude": 125.71915,
+        "kind": "island_area",
+        "source": "https://mapcarta.com/W23965515",
+        "notes": "Malipano islet area; landing arrangements unknown.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 49,
+      "name": "Monfort Bat Cave",
+      "location": "Island Garden City of Samal, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.1654,
+        "longitude": 125.6927,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W666853611",
+        "notes": "Sanctuary area; not a verified entrance.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 50,
+      "name": "Dayang Beach",
+      "location": "Island Garden City of Samal, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.94951,
+        "longitude": 125.66932,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/N1668416923",
+        "notes": "Dayang Beach Resort at Dadatan/Talicud. Operator website corroborates island identity. Replaces the earlier unselected directory point, not any database value.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 3
+      },
+      "detail_findings": [
+        {
+          "status": "pin_conflict",
+          "detail": "The directory gives a Dayang Beach point but also lists multiple same-name resort entries over a kilometre away. Exact beach identity/entrance still needs confirmation.",
+          "sources": [
+            "https://philippines.worldplaces.me/places-in-samal-davao-del-norte/60654864-dayang-beach-resort.html"
+          ],
+          "source_date": null
+        },
+        {
+          "status": "confirmed_primary",
+          "detail": "Dayang's own site confirms Talicud Island and publishes PHP100 per person for a day tour without a room booking. Entrance is included with an overnight room booking. The advertised PHP200 per person one-way boat fare is transport, not admission. No daily operating-hour schedule was established.",
+          "sources": [
+            "https://www.dayangbeach.com/about",
+            "https://www.dayangbeach.com/rates-and-fees",
+            "https://www.dayangbeach.com/transportation",
+            "https://mapcarta.com/N1668416923"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary",
+        "coordinate_status": "reference_found_not_field_verified",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": 100,
+          "currency": "PHP",
+          "unit": "per person",
+          "applies_to": "day tour without a room booking",
+          "status": "operator_published_undated_reconfirm_before_import",
+          "source": "https://www.dayangbeach.com/rates-and-fees"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.dayangbeach.com/about",
+          "https://www.dayangbeach.com/rates-and-fees",
+          "https://www.dayangbeach.com/transportation",
+          "https://mapcarta.com/N1668416923"
+        ],
+        "other_charges": [
+          {
+            "value": 200,
+            "currency": "PHP",
+            "unit": "per person one way",
+            "purpose": "boat transport",
+            "status": "operator_published_undated_reconfirm",
+            "source": "https://www.dayangbeach.com/transportation"
+          }
+        ],
+        "package_note": "The operator says no separate entrance fee with an overnight room booking. This is a package condition, not free general admission."
+      }
+    },
+    {
+      "id": 51,
+      "name": "Diaz Island",
+      "location": "Island Garden City of Samal, Davao del Norte",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "confirmed_name_only",
+          "detail": "A Tourism Promotions Board itinerary mentions Diaz Island separately from Talikud, Malipano, Vanishing and Wishing islands. This supports the name in the Samal tour circuit, but not an exact island position, public landing, operating hours or fee. No similarly named island elsewhere was substituted.",
+          "sources": [
+            "https://www.tpb.gov.ph/wp-content/uploads/2025/11/Annex-B_Itinerary-Lots-1-7.pdf"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "tour_itinerary_identity_without_numeric_position",
+          "detail": "Tourism Promotions Board includes Diaz Island among Samal island-hopping stops, and visitor accounts describe it opposite Malipano/Pearl Farm. This does not establish an exact island boundary, landing point or admission. No nearby island coordinate substituted.",
+          "sources": [
+            "https://www.tpb.gov.ph/wp-content/uploads/2025/11/Annex-B_Itinerary-Lots-1-7.pdf",
+            "https://thequeensescape.com/top-places-to-visit-in-samal-island-daval-del-norte-2023/"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_name_only",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.tpb.gov.ph/wp-content/uploads/2025/11/Annex-B_Itinerary-Lots-1-7.pdf"
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "tour_itinerary_identity_without_numeric_position",
+        "sources": [
+          "https://www.tpb.gov.ph/wp-content/uploads/2025/11/Annex-B_Itinerary-Lots-1-7.pdf",
+          "https://thequeensescape.com/top-places-to-visit-in-samal-island-daval-del-norte-2023/"
+        ]
+      }
+    },
+    {
+      "id": 52,
+      "name": "Angels Cove",
+      "location": "Island Garden City of Samal, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.9595375,
+        "longitude": 125.6796094,
+        "kind": "marine_map_pin",
+        "source": "https://www.waze.com/live-map/directions/ph/davao-region/samal/angels-cove?to=place.ChIJg3Haw-t2-TIRBWOcUhpY9qU",
+        "notes": "Decoded centre of published plus code XM5H+RR9, expanded as 6QR7XM5H+RR9 for Talikud. PADI corroborates the Talikud dive-site identity. It is not a road entrance.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 3
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_industry_source",
+          "detail": "PADI places Angel's Cove at Talikud Island and describes a sloping reef 5–20m deep. Waze and Trip.com publish the same XM5H+RR9 plus code in the Samal area. Its decoded centre is a marine location reference, not a road arrival point; boat access and activity cost need confirmation.",
+          "sources": [
+            "https://www.padi.com/dive-site/philippines/angels-cove/",
+            "https://www.waze.com/live-map/directions/ph/davao-region/samal/angels-cove?to=place.ChIJg3Haw-t2-TIRBWOcUhpY9qU",
+            "https://www.trip.com/travel-guide/attraction/davao-del-norte/angels-cove-137087912/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_industry_source",
+        "coordinate_status": "reference_found_not_field_verified",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.padi.com/dive-site/philippines/angels-cove/",
+          "https://www.waze.com/live-map/directions/ph/davao-region/samal/angels-cove?to=place.ChIJg3Haw-t2-TIRBWOcUhpY9qU",
+          "https://www.trip.com/travel-guide/attraction/davao-del-norte/angels-cove-137087912/"
+        ]
+      }
+    },
+    {
+      "id": 170,
+      "name": "Davao Bamboo Sanctuary and Ecological Park",
+      "location": "Purok 5, Barangay Malagos, Baguio District, Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.16833,
+        "longitude": 125.41505,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W539317911",
+        "notes": "Davao Bamboo Sanctuary footprint. Historical website now redirects to unrelated material and was rejected.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 2
+      },
+      "detail_findings": [
+        {
+          "status": "historical_domain_rejected",
+          "detail": "The historical resort domain redirected to unrelated casino content during this research pass. Do not populate the public website field from that domain; this observation does not establish whether the actual resort is operating.",
+          "sources": [
+            "https://davaobamboosanctuary.com/"
+          ],
+          "source_date": null,
+          "research_pass": 2
+        }
+      ]
+    },
+    {
+      "id": 171,
+      "name": "Davao Museum of History and Ethnography",
+      "location": "Ateneo de Davao University, Jacinto campus, Davao City",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "relocation_review",
+          "detail": "The collection was transferred to Ateneo in 2025. The government report identifies the ground floor of Rodriguez Hall/Community Center of the First Companions on the Roxas Avenue side. Old Lanang/Zonta pins, fees and schedules must not be reused. Public entrance and current visitor schedule remain unresolved.",
+          "sources": [
+            "https://pia.gov.ph/news/davao-museum-gets-new-home-at-ateneo-de-davao/"
+          ],
+          "source_date": "2025-09-01"
+        },
+        {
+          "status": "confirmed_relocation",
+          "detail": "Ateneo's own August 2025 account confirms transfer of the collection and unveiling of designs for its new home. This is not evidence that the new museum has opened to walk-in visitors. The old Lanang/Zonta coordinate, fees and hours were rejected; no campus-centre pin was substituted.",
+          "sources": [
+            "https://wwwold.addu.edu.ph/2025/08/ceremonial-turnover-of-the-davao-museum-collection-and-unveiling-of-the-designs-for-the-new-davao-museum-building/",
+            "https://international.addu.edu.ph/?p=12536"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "newer_primary_gallery_location",
+          "detail": "Ateneo reports the Museum Study Gallery blessing on 27 October 2026 on the ground floor of Arrupe Hall, Jacinto Campus. The collection is accessible for study by researchers, students and visitors while a new museum is planned. This supersedes using Rodriguez Hall, the 2025 turnover venue, as the collection location. No exact gallery entrance, regular visitor schedule, admission fee or campus access procedure confirmed. Do not reuse old Lanang or generic campus-centre pins.",
+          "sources": [
+            "https://www.addu.edu.ph/museum-study-gallery-blessing-arrupe-hall/"
+          ],
+          "source_date": "2026-10-30",
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_relocation",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://wwwold.addu.edu.ph/2025/08/ceremonial-turnover-of-the-davao-museum-collection-and-unveiling-of-the-designs-for-the-new-davao-museum-building/",
+          "https://international.addu.edu.ph/?p=12536"
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "newer_primary_gallery_location",
+        "sources": [
+          "https://www.addu.edu.ph/museum-study-gallery-blessing-arrupe-hall/"
+        ],
+        "location_correction": "Museum Study Gallery, ground floor, Arrupe Hall, Ateneo de Davao University, Jacinto Campus, Davao City"
+      }
+    },
+    {
+      "id": 172,
+      "name": "Energy Park",
+      "location": "Apokon, Tagum City, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.41549,
+        "longitude": 125.82672,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/32700974",
+        "notes": "Energy Park in Apokon; not generic Tagum city coordinates.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 173,
+      "name": "Panabo Mangrove Park",
+      "location": "Panabo City, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.2723831,
+        "longitude": 125.6808289,
+        "kind": "study_area",
+        "source": "https://smujo.id/bw/article/download/9115/5161",
+        "notes": "Research study position within mangrove park, not a verified boardwalk entrance.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 174,
+      "name": "Camp Damada",
+      "location": "San Isidro, Nabunturan, Davao de Oro",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.6206427,
+        "longitude": 125.9540222,
+        "kind": "venue_area",
+        "source": "https://www.google.com/maps/place/Camp%20Damada/data=!4m2!3m1!1s0x32f9134a232bcbf1:0x151241e9cb43b4cd",
+        "notes": "Profile phone 0966 366 7617 matches municipal tourism catalogue; no visiting schedule confirmed.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "primary_identity_contact_evidence",
+          "detail": "The municipal tourism catalogue lists Camp Damada in San Isidro and its overlooking cafe setting. Exact venue entrance and current visitor charges remain unresolved.",
+          "sources": [
+            "https://www.nabunturan.gov.ph/tourist-destination"
+          ],
+          "source_date": null,
+          "research_pass": 2
+        },
+        {
+          "status": "confirmed_primary",
+          "detail": "Nabunturan's municipal tourism catalogue identifies Camp Damada as an overlooking cafe/camping destination and publishes a contact number. Its public JavaScript contains barangay map coordinates, not a verified Camp Damada entrance. Restaurant-directory closing-time claims were not promoted to confirmed opening hours.",
+          "sources": [
+            "https://www.nabunturan.gov.ph/tourist-destination"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Profile phone 0966 366 7617 matches municipal tourism catalogue; no visiting schedule confirmed.",
+          "sources": [
+            "https://www.google.com/maps/place/Camp%20Damada/data=!4m2!3m1!1s0x32f9134a232bcbf1:0x151241e9cb43b4cd"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.nabunturan.gov.ph/tourist-destination"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "Camp Damada",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/Camp%20Damada/data=!4m2!3m1!1s0x32f9134a232bcbf1:0x151241e9cb43b4cd"
+        ],
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        }
+      }
+    },
+    {
+      "id": 175,
+      "name": "The Grape Valley",
+      "location": "Barangay Sta. Maria, Nabunturan, Davao de Oro",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.5987035,
+        "longitude": 125.9820914,
+        "kind": "venue_area",
+        "source": "https://www.google.com/maps/place/The%20Grape%20Valley/data=!4m2!3m1!1s0x32fc035c3f298795:0xbb8582a834bbd38f",
+        "notes": "Purok 4 Sta. Maria, Nabunturan and phone 0917 304 0026 match municipal tourism catalogue.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_primary",
+          "detail": "Municipal and provincial tourism sources identify the grape-growing visitor farm in Sta. Maria, Nabunturan, including grape-picking. The barangay marker is not the farm location. Harvest availability, visit reservations, gate fee and hours remain unknown.",
+          "sources": [
+            "https://www.nabunturan.gov.ph/tourist-destination",
+            "https://davaodeoro.gov.ph/2023/09/27/tourism-and-green-investments-ddos-efforts-towards-sustainable-tourism-in-the-province/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Purok 4 Sta. Maria, Nabunturan and phone 0917 304 0026 match municipal tourism catalogue.",
+          "sources": [
+            "https://www.google.com/maps/place/The%20Grape%20Valley/data=!4m2!3m1!1s0x32fc035c3f298795:0xbb8582a834bbd38f"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.nabunturan.gov.ph/tourist-destination",
+          "https://davaodeoro.gov.ph/2023/09/27/tourism-and-green-investments-ddos-efforts-towards-sustainable-tourism-in-the-province/"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "The Grape Valley",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/The%20Grape%20Valley/data=!4m2!3m1!1s0x32fc035c3f298795:0xbb8582a834bbd38f"
+        ],
+        "opening_hours": {
+          "value": "Daily 08:00–17:00",
+          "status": "map_published_operator_confirmation_pending",
+          "source": "https://www.google.com/maps/place/The%20Grape%20Valley/data=!4m2!3m1!1s0x32fc035c3f298795:0xbb8582a834bbd38f",
+          "checked_on": "2026-11-19"
+        }
+      }
+    },
+    {
+      "id": 176,
+      "name": "Mount Candalaga Rafflesia viewing area",
+      "location": "Maragusan, Davao de Oro",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "confirmed_natural_area",
+          "detail": "Botanical research records Rafflesia mira on Mount Candalaga in Maragusan, including New Albay. These are biological population/locality records, not a visitor viewing platform or entrance. Flowering is seasonal and sightings are not guaranteed. No population coordinate was repurposed as a tourism arrival point.",
+          "sources": [
+            "https://parasiticplants.siu.edu/RaffPhil/mira.html",
+            "https://parasiticplants.siu.edu/RaffPhil/RaffPhilLit/Barcelona2009Blumea.pdf",
+            "https://www.mtapoadventures.com/other-mountains-for-trekking/mt-kandalaga/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "rafflesia_locality_not_fixed_viewing_platform",
+          "detail": "Regional tourism confirms Rafflesia in Mount Candalaga, Maragusan, and March 2026 documentary footage shows a flowering encounter. Neither establishes a fixed visitor platform or guaranteed flowering date. No botanical population or mountain summit coordinate substituted for a visitor arrival point.",
+          "sources": [
+            "https://www.experiencedavao.com/destinations/davao-de-oro/maragusan/attractions/rafflesia",
+            "https://www.youtube.com/watch?v=yGJW5CC8ARM"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_natural_area",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://parasiticplants.siu.edu/RaffPhil/mira.html",
+          "https://parasiticplants.siu.edu/RaffPhil/RaffPhilLit/Barcelona2009Blumea.pdf",
+          "https://www.mtapoadventures.com/other-mountains-for-trekking/mt-kandalaga/"
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "rafflesia_locality_not_fixed_viewing_platform",
+        "sources": [
+          "https://www.experiencedavao.com/destinations/davao-de-oro/maragusan/attractions/rafflesia",
+          "https://www.youtube.com/watch?v=yGJW5CC8ARM"
+        ]
+      }
+    },
+    {
+      "id": 177,
+      "name": "Digos City Ecopark and Arboretum",
+      "location": "Digos City, Davao del Sur",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.77553,
+        "longitude": 125.34392,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W1382022448",
+        "notes": "Digos eco-park area; city ordinance independently identifies Sitio San Nicolas, Tres de Mayo.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 2
+      },
+      "detail_findings": [
+        {
+          "status": "primary_location_evidence",
+          "detail": "Digos city ordinance 2022-114 establishes the eco-park and arboretum in Sitio San Nicolas, Tres de Mayo, Digos City; this provides an independent identity/location check for the map feature.",
+          "sources": [
+            "https://digoscity.gov.ph/site_assets/pdf/Table-of-Ordinances.pdf"
+          ],
+          "source_date": null,
+          "research_pass": 2
+        }
+      ]
+    },
+    {
+      "id": 178,
+      "name": "Mount Lamabal",
+      "location": "Matanao, Davao del Sur",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.673391,
+        "longitude": 125.0756925,
+        "kind": "summit",
+        "source": "https://api.openstreetmap.org/api/0.6/node/10134434854.json",
+        "notes": "OSM explicitly names Mount Lamabal. Matanao race route corroborates the mountain identity; adjacent municipality/province labels remain disputed and this is not the park gate.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 3
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_activity_area_boundary_review",
+          "detail": "A public Mount Lamabal peak record gives 6.673391,125.0756925 and elevation 810m. The Matanao trail-race organiser includes Lamabal in its route, while some mapping services assign the vicinity to Columbio/Sultan Kudarat. This is a summit reference only; municipality boundary and jump-off must be checked. A race registration fee is not the normal park tariff.",
+          "sources": [
+            "https://api.openstreetmap.org/api/0.6/node/10134434854.json",
+            "https://www.verticaltosky.com/matanaorace.html"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_activity_area_boundary_review",
+        "coordinate_status": "reference_found_not_field_verified",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://api.openstreetmap.org/api/0.6/node/10134434854.json",
+          "https://www.verticaltosky.com/matanaorace.html"
+        ]
+      }
+    },
+    {
+      "id": 179,
+      "name": "Salinta Monon Weaving Center",
+      "location": "Barangay Bitaug, Bansalan, Davao del Sur",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "confirmed_primary",
+          "detail": "TPB and regional tourism identify the Salinta Monon weaving centre in Bitaug, Bansalan, preserving Bagobo textile weaving. No exact publicly verified visitor pin, opening schedule or demonstration fee was established. A general barangay point or the artist's biographical location is insufficient.",
+          "sources": [
+            "https://phworldexpo.tpb.gov.ph/salinta-monon-weaving-center/",
+            "https://www.experiencedavao.com/attractions/salinta-monon-weaving-center"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "official_barangay_without_precise_pin",
+          "detail": "Regional tourism confirms the weaving centre in Bitaug, Bansalan, and describes weaving demonstrations and textiles. No precise centre coordinate, normal visit timetable or fee established; Bansalan town and Bitaug barangay centres remain rejected substitutes.",
+          "sources": [
+            "https://www.experiencedavao.com/destinations/davao-del-sur/bansalan/attractions/salinta-monon-weaving-center"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://phworldexpo.tpb.gov.ph/salinta-monon-weaving-center/",
+          "https://www.experiencedavao.com/attractions/salinta-monon-weaving-center"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "coordinate_status": "not_selected",
+        "notes": "Search returned Bansalan town rather than the weaving centre; town coordinate rejected."
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "official_barangay_without_precise_pin",
+        "sources": [
+          "https://www.experiencedavao.com/destinations/davao-del-sur/bansalan/attractions/salinta-monon-weaving-center"
+        ]
+      }
+    },
+    {
+      "id": 180,
+      "name": "Baganga Sunrise Boulevard",
+      "location": "Baganga, Davao Oriental",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.6511994,
+        "longitude": 126.556293,
+        "kind": "venue_area",
+        "source": "https://www.google.com/maps/place/Baganga%20Sunrise%20Boulevard/data=!4m2!3m1!1s0x32fc6104bb095e3b:0x2f4120688c506d97",
+        "notes": "Exact boulevard profile on Dapnan coastline; photo shows dead-mangrove coastal scene matching inauguration report. Distinct from older Lambajon directory point.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "pin_conflict",
+          "detail": "A WorldPlaces pin is in/near Lambajon, while the reported site is in Dapnan and the same directory shows another same-name place several kilometres away. The directory pin was rejected.",
+          "sources": [
+            "https://philippines.worldplaces.me/view-place/39049028-baganga-sunrise-boulevard.html",
+            "https://edgedavao.net/suburbia/2014/12/davor-remembers-pablo-with-new-landmark/"
+          ],
+          "source_date": null
+        },
+        {
+          "status": "confirmed_place_pin_conflict",
+          "detail": "Sources place the memorial coastal park in Dapnan. A directory pin points near Lambajon, while a similarly named Baganga Sunrise guesthouse is a different establishment. Neither is accepted as the boulevard's entrance. A 2016 report describes free admission, but this is not a verified 2026 fee.",
+          "sources": [
+            "https://edgedavao.net/suburbia/2014/12/davor-remembers-pablo-with-new-landmark/",
+            "https://www.sunstar.com.ph/amp/story/more-articles/sweet-escape-exploring-baganga-davao-oriental",
+            "https://mapcarta.com/N3933172563"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Exact boulevard profile on Dapnan coastline; photo shows dead-mangrove coastal scene matching inauguration report. Distinct from older Lambajon directory point.",
+          "sources": [
+            "https://www.google.com/maps/place/Baganga%20Sunrise%20Boulevard/data=!4m2!3m1!1s0x32fc6104bb095e3b:0x2f4120688c506d97"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_place_pin_conflict",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://edgedavao.net/suburbia/2014/12/davor-remembers-pablo-with-new-landmark/",
+          "https://www.sunstar.com.ph/amp/story/more-articles/sweet-escape-exploring-baganga-davao-oriental",
+          "https://mapcarta.com/N3933172563"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "Baganga Sunrise Boulevard",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/Baganga%20Sunrise%20Boulevard/data=!4m2!3m1!1s0x32fc6104bb095e3b:0x2f4120688c506d97"
+        ],
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        }
+      }
+    },
+    {
+      "id": 181,
+      "name": "Poo Sandbar",
+      "location": "Kinablangan, Baganga, Davao Oriental",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.702554,
+        "longitude": 126.5628147,
+        "kind": "natural_feature",
+        "source": "https://www.google.com/maps/place/Poo%20Sandbar/data=!4m2!3m1!1s0x32fc5fd922efa0e1:0x7fea9395d500438",
+        "notes": "Poo Island, Kinablangan; phone 0905 071 9791 matches directory listing. Marine sandbar reference, not a boat departure point; schedule is not a tide/access guarantee.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_secondary_conflicting_hours",
+          "detail": "Listings consistently identify Poo Island/Sandbar in Kinablangan, Baganga. Different regional versions of the same travel directory list 07:00–15:00 and 07:00–17:00. Neither schedule is accepted as current; a boat operator, landing point and tide-dependent access need confirmation.",
+          "sources": [
+            "https://sg.trip.com/travel-guide/attraction/baganga/poo-sandbar-138561566/",
+            "https://www.trip.com/travel-guide/attraction/baganga/poo-sandbar-138561566/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Poo Island, Kinablangan; phone 0905 071 9791 matches directory listing. Marine sandbar reference, not a boat departure point; schedule is not a tide/access guarantee.",
+          "sources": [
+            "https://www.google.com/maps/place/Poo%20Sandbar/data=!4m2!3m1!1s0x32fc5fd922efa0e1:0x7fea9395d500438"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_secondary_conflicting_hours",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://sg.trip.com/travel-guide/attraction/baganga/poo-sandbar-138561566/",
+          "https://www.trip.com/travel-guide/attraction/baganga/poo-sandbar-138561566/"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "Poo Sandbar",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/Poo%20Sandbar/data=!4m2!3m1!1s0x32fc5fd922efa0e1:0x7fea9395d500438"
+        ],
+        "opening_hours": {
+          "value": "Mon–Fri 07:00–17:00; Sat 07:00–15:00; Sun 07:00–14:00",
+          "status": "map_published_operator_confirmation_pending",
+          "source": "https://www.google.com/maps/place/Poo%20Sandbar/data=!4m2!3m1!1s0x32fc5fd922efa0e1:0x7fea9395d500438",
+          "checked_on": "2026-11-19"
+        }
+      }
+    },
+    {
+      "id": 182,
+      "name": "Christ the Redeemer",
+      "location": "Jose Abad Santos, Davao Occidental",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "confirmed_primary",
+          "detail": "Regional tourism gives Barangay Culaman, Jose Abad Santos; a 2026 report identifies the statue at Joyce Paradise. This excludes the Rio statue and similarly named landmarks in other Philippine provinces. No precise entrance pin or current venue tariff was established.",
+          "sources": [
+            "https://www.experiencedavao.com/attractions/christ-the-redeemer",
+            "https://www.sunstar.com.ph/amp/story/davao/davao-occidental-reopens-tourism-after-78-m-earthquake"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "landmark_operator_alias_corroborated",
+          "detail": "Dated reporting identifies the Christ the Redeemer statue at Joyce Paradise in Culaman, Jose Abad Santos. No exact statue coordinate established; Culaman locality coordinates remain rejected. Reported statue heights differ between sources and were not used as a listing correction.",
+          "sources": [
+            "https://www.sunstar.com.ph/superbalita-davao/balita/ip-christ-the-redeemer-nga-istatwa-atraksyon-sa-davocc",
+            "https://www.sunstar.com.ph/amp/story/davao/davao-occidental-reopens-tourism-after-78-m-earthquake"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.experiencedavao.com/attractions/christ-the-redeemer",
+          "https://www.sunstar.com.ph/amp/story/davao/davao-occidental-reopens-tourism-after-78-m-earthquake"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "coordinate_status": "not_selected",
+        "notes": "Landmark search returned Culaman locality, not the statue; locality coordinate rejected."
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "landmark_operator_alias_corroborated",
+        "sources": [
+          "https://www.sunstar.com.ph/superbalita-davao/balita/ip-christ-the-redeemer-nga-istatwa-atraksyon-sa-davocc",
+          "https://www.sunstar.com.ph/amp/story/davao/davao-occidental-reopens-tourism-after-78-m-earthquake"
+        ]
+      }
+    },
+    {
+      "id": 183,
+      "name": "Divine Mercy Shrine",
+      "location": "Malita, Davao Occidental",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.4276298,
+        "longitude": 125.5767557,
+        "kind": "venue_area",
+        "source": "https://www.google.com/maps/place/Divine%20Mercy%20Shrine/data=!4m2!3m1!1s0x32f9e7a130e2fa09:0xd7455dda1a0b39f7",
+        "notes": "Explicit Malita profile, CHHG+3P2, agrees with Kidalapong church directory; not Mati or Misamis Oriental.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_locality_pin_review",
+          "detail": "A church directory identifies the shrine in Kidalapong, Malita; another directory gives CHHG+3P2 on Davao–Sarangani Coastal Road. The decoded point is a low-confidence lead, pending parish confirmation. Same-name shrines in Mati, Misamis Oriental and Leyte are different places. Mass times would not establish general visitor hours.",
+          "sources": [
+            "https://www.mass-schedules.com/catholic-church/3895/divine-mercy-shrine.html",
+            "https://www.cybo.com/PH/malita-davao-occidental/churches/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Explicit Malita profile, CHHG+3P2, agrees with Kidalapong church directory; not Mati or Misamis Oriental.",
+          "sources": [
+            "https://www.google.com/maps/place/Divine%20Mercy%20Shrine/data=!4m2!3m1!1s0x32f9e7a130e2fa09:0xd7455dda1a0b39f7"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_locality_pin_review",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.mass-schedules.com/catholic-church/3895/divine-mercy-shrine.html",
+          "https://www.cybo.com/PH/malita-davao-occidental/churches/"
+        ],
+        "unselected_coordinate_alternatives": [
+          {
+            "latitude": 6.4276375,
+            "longitude": 125.5767656,
+            "kind": "decoded directory plus code",
+            "source": "https://www.cybo.com/PH/malita-davao-occidental/churches/",
+            "reason": "Decoded CHHG+3P2 with Malita context; needs parish confirmation, not enough to select.",
+            "accepted_for_import": false
+          }
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "Divine Mercy Shrine",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/Divine%20Mercy%20Shrine/data=!4m2!3m1!1s0x32f9e7a130e2fa09:0xd7455dda1a0b39f7"
+        ],
+        "opening_hours": {
+          "value": "Daily 06:00–18:00",
+          "status": "map_published_operator_confirmation_pending",
+          "source": "https://www.google.com/maps/place/Divine%20Mercy%20Shrine/data=!4m2!3m1!1s0x32f9e7a130e2fa09:0xd7455dda1a0b39f7",
+          "checked_on": "2026-11-19"
+        }
+      }
+    },
+    {
+      "id": 184,
+      "name": "Sanctuario de Santo Rosario",
+      "location": "Malita, Davao Occidental",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.4143416,
+        "longitude": 125.5937868,
+        "kind": "venue_area",
+        "source": "https://www.google.com/maps/place/Santo%20Rosario%20Shrine%2C%20Malita/data=!4m2!3m1!1s0x32f9e1fe150b6ca9:0xf249d8202c014f6d",
+        "notes": "Specific Malita shrine on Davao–Sarangani Coastal Road, distinct from downtown Sto Rosario parish. Generic 24-hour map label not adopted.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_primary_name_only",
+          "detail": "Regional tourism lists Sanctuario de Santo Rosario as a Malita religious landmark. This is insufficient to equate it with the downtown Sto. Rosario parish church or its directory pin. Exact sanctuary site, visitor access and hours remain unconfirmed.",
+          "sources": [
+            "https://www.experiencedavao.com/destinations/davao-occidental",
+            "https://dot-cms-mkt.corecastdigital.com/destination/davao-region/davao-occidental/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Specific Malita shrine on Davao–Sarangani Coastal Road, distinct from downtown Sto Rosario parish. Generic 24-hour map label not adopted.",
+          "sources": [
+            "https://www.google.com/maps/place/Santo%20Rosario%20Shrine%2C%20Malita/data=!4m2!3m1!1s0x32f9e1fe150b6ca9:0xf249d8202c014f6d"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary_name_only",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.experiencedavao.com/destinations/davao-occidental",
+          "https://dot-cms-mkt.corecastdigital.com/destination/davao-region/davao-occidental/"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "Santo Rosario Shrine, Malita",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/Santo%20Rosario%20Shrine%2C%20Malita/data=!4m2!3m1!1s0x32f9e1fe150b6ca9:0xf249d8202c014f6d"
+        ],
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        }
+      }
+    },
+    {
+      "id": 185,
+      "name": "Bilawa Mainit Hot Waterfall",
+      "location": "Mainit, Maco, Davao de Oro",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.40122,
+        "longitude": 126.02915,
+        "kind": "natural_feature",
+        "source": "https://mapcarta.com/N6035786485",
+        "notes": "Bilawa/Mainit waterfall feature, not nearby Mainit resort.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": [
+        {
+          "status": "location_access_evidence",
+          "detail": "Provincial tourism information identifies Mainit, Maco. Travel time from Mawab is an access estimate, not a duration to spend at the waterfall.",
+          "sources": [
+            "https://davaodeoro.gov.ph/bilawa-mainit-hot-waterfalls/"
+          ],
+          "source_date": null
+        }
+      ]
+    },
+    {
+      "id": 186,
+      "name": "Pyalitan Falls",
+      "location": "Maragusan, Davao de Oro",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.29919,
+        "longitude": 126.1707,
+        "kind": "natural_feature",
+        "source": "https://mapcarta.com/N7345718185",
+        "notes": "Waterfall feature in Maragusan, historically called San Mariano. Trailhead and current access remain unverified.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 2
+      },
+      "detail_findings": [
+        {
+          "status": "location_access_evidence",
+          "detail": "The provincial government identifies Barangay Mapawa, northeast of the barangay and around 7km from Poblacion. Its one-hour travel description concerns reaching the site; it is not a visit duration. Exact pin and current access requirements unresolved.",
+          "sources": [
+            "https://davaodeoro.gov.ph/pyalitan-falls/"
+          ],
+          "source_date": null
+        }
+      ]
+    },
+    {
+      "id": 187,
+      "name": "Mipangi Hilltop",
+      "location": "Mipangi, Nabunturan, Davao de Oro",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "primary_identity_evidence",
+          "detail": "The municipal tourism catalogue lists Mipangi Hilltop. This supports the listing identity, but provides no selected precise coordinate in this pass.",
+          "sources": [
+            "https://www.nabunturan.gov.ph/tourist-destination"
+          ],
+          "source_date": null,
+          "research_pass": 2
+        },
+        {
+          "status": "confirmed_primary",
+          "detail": "Municipal tourism describes Mipangi Hilltop as a 700–800m highland viewpoint and suggests an early-morning sunrise hike. The 04:00 suggestion is not an opening time. The municipality's Mipangi barangay marker is not a verified hilltop or trailhead coordinate.",
+          "sources": [
+            "https://www.nabunturan.gov.ph/tourist-destination"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "municipal_hiking_description_not_full_schedule",
+          "detail": "Nabunturan LGU describes Mipangi Hills around 700–800 masl and recommends an early morning hike around 04:00 for sunrise. This is activity advice, not proof of a daily 04:00 opening time. The competing tourist-site and summit pins remain unresolved.",
+          "sources": [
+            "https://www.nabunturan.gov.ph/tourist-destination"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.nabunturan.gov.ph/tourist-destination"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "coordinate_status": "not_selected",
+        "notes": "Mipangi Hilltop tourist profile at 7.5512395,125.9342721 in New Sibonga and Top of Mipangi Hilltop hiking profile at 7.5425427,125.8897773 are several kilometres apart. Confirm access versus summit before selecting a coordinate. Generic 24-hour label rejected."
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "municipal_hiking_description_not_full_schedule",
+        "sources": [
+          "https://www.nabunturan.gov.ph/tourist-destination"
+        ]
+      }
+    },
+    {
+      "id": 188,
+      "name": "Malumagpak Falls",
+      "location": "Manurigao, New Bataan, Davao de Oro",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.4845625,
+        "longitude": 126.3079844,
+        "kind": "natural_feature",
+        "source": "https://www.google.com/maps/place/Malumagpak%20Falls/data=!4m2!3m1!1s0x32fc75eb399912b1:0x18085ee52a2ae16a",
+        "notes": "Profile explicitly says New Bataan and lies near OSM waterfall. Retain Baganga boundary-label conflict; no database address/region change.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "identity_boundary_conflict",
+          "detail": "The map feature N2400304982 is labelled Baganga, while the listing and travel references describe Mount Manurigao/New Bataan. Do not reuse the map pin until exact identity and boundary are settled.",
+          "sources": [
+            "https://mapcarta.com/N2400304982",
+            "https://www.localphilippines.com/attractions/malumagpak-falls"
+          ],
+          "source_date": null
+        },
+        {
+          "status": "confirmed_name_boundary_conflict",
+          "detail": "The mapped Malumagpak waterfall has a Baganga regional label while place descriptions associate it with Manurigao/New Bataan. Its nearby Manurigao lake/settlement context does not settle the administrative boundary or visitor route. The 7.48396,126.30765 pin remains an alternative, not an accepted route point.",
+          "sources": [
+            "https://mapcarta.com/N2400304982",
+            "https://www.localphilippines.com/attractions/malumagpak-falls"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Profile explicitly says New Bataan and lies near OSM waterfall. Retain Baganga boundary-label conflict; no database address/region change.",
+          "sources": [
+            "https://www.google.com/maps/place/Malumagpak%20Falls/data=!4m2!3m1!1s0x32fc75eb399912b1:0x18085ee52a2ae16a"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_name_boundary_conflict",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://mapcarta.com/N2400304982",
+          "https://www.localphilippines.com/attractions/malumagpak-falls"
+        ],
+        "unselected_coordinate_alternatives": [
+          {
+            "latitude": 7.48396,
+            "longitude": 126.30765,
+            "kind": "mapped waterfall",
+            "source": "https://mapcarta.com/N2400304982",
+            "reason": "Municipal boundary/access conflict with catalogue's Manurigao/New Bataan description.",
+            "accepted_for_import": false
+          }
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "Malumagpak Falls",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/Malumagpak%20Falls/data=!4m2!3m1!1s0x32fc75eb399912b1:0x18085ee52a2ae16a"
+        ],
+        "opening_hours": {
+          "value": "Daily 07:00–17:00",
+          "status": "map_published_operator_confirmation_pending",
+          "source": "https://www.google.com/maps/place/Malumagpak%20Falls/data=!4m2!3m1!1s0x32fc75eb399912b1:0x18085ee52a2ae16a",
+          "checked_on": "2026-11-19"
+        }
+      }
+    },
+    {
+      "id": 189,
+      "name": "Mount Pandadagsaan",
+      "location": "New Bataan, Davao de Oro",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.445,
+        "longitude": 126.2267,
+        "kind": "summit",
+        "source": "https://www.gunungbagging.com/mount-tagubud-mount-pandadagsaan/",
+        "notes": "Mount Tagubud/Pandadagsaan summit; jump-off point required for driving routes.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 190,
+      "name": "Aguacan Cold Spring",
+      "location": "Maragusan, Davao de Oro",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.3254488,
+        "longitude": 126.1282411,
+        "kind": "venue_area",
+        "source": "https://www.google.com/maps/place/Aguakan/data=!4m2!3m1!1s0x32fbf04dcfd0c7a7:0xb378602af344dca4",
+        "notes": "Maragusan resort profile links Aguakan Resort & Spa and shows swimming pools. Specific resort, not Aguakan hamlet centre. Hotel rates are not day-use admission.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_place_no_resort_pin",
+          "detail": "Visitor reports identify Aguacan/Aguakan Cold Spring Resort in Maragusan. The mapped Aguakan hamlet at 7.33238,126.13284 is a settlement, not evidence of the resort pool's position. Old blog prices and a directory without a schedule are insufficient for current fees or hours.",
+          "sources": [
+            "https://wayph.com/aguacan-coldspring-resort-maragusan/",
+            "https://lakingdavao.wordpress.com/2019/09/04/aguakan-cold-spring-resort/",
+            "https://mapcarta.com/N2080091444"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Maragusan resort profile links Aguakan Resort & Spa and shows swimming pools. Specific resort, not Aguakan hamlet centre. Hotel rates are not day-use admission.",
+          "sources": [
+            "https://www.google.com/maps/place/Aguakan/data=!4m2!3m1!1s0x32fbf04dcfd0c7a7:0xb378602af344dca4"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_place_no_resort_pin",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://wayph.com/aguacan-coldspring-resort-maragusan/",
+          "https://lakingdavao.wordpress.com/2019/09/04/aguakan-cold-spring-resort/",
+          "https://mapcarta.com/N2080091444"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "Aguakan",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/Aguakan/data=!4m2!3m1!1s0x32fbf04dcfd0c7a7:0xb378602af344dca4"
+        ],
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        }
+      }
+    },
+    {
+      "id": 191,
+      "name": "City of Tagum Cultural Center",
+      "location": "Rizal Street, Tagum City, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.447591,
+        "longitude": 125.8043537,
+        "kind": "mapped_main_entrance",
+        "source": "https://api.openstreetmap.org/api/0.6/way/365973107/full.json",
+        "notes": "Node10185207458 is tagged entrance=main on the named cultural-centre footprint. This is a map-labelled entrance, not independent confirmation of vehicle access or operating status.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 3
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_primary_and_map",
+          "detail": "Regional tourism and a 2025 DepEd event memorandum identify the City of Tagum Cultural Center. The exact building footprint is OSM way365973107, with a mapped main entrance at 7.447591,125.8043537. The neighbouring Rizal statue and Center for Justice are not substitutes. Event schedules do not establish regular museum hours.",
+          "sources": [
+            "https://www.experiencedavao.com/attractions/city-of-tagum-cultural-center",
+            "https://depeddavnor.ph/records/cidmemo/DM-CID-2025-0502%20-%20INVITATION%20TO%20MINDANAO%20NATIONAL%20RONDALLA%20SUMMER%20WORKSHOP%202025.pdf",
+            "https://api.openstreetmap.org/api/0.6/way/365973107/full.json"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary_and_map",
+        "coordinate_status": "reference_found_not_field_verified",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.experiencedavao.com/attractions/city-of-tagum-cultural-center",
+          "https://depeddavnor.ph/records/cidmemo/DM-CID-2025-0502%20-%20INVITATION%20TO%20MINDANAO%20NATIONAL%20RONDALLA%20SUMMER%20WORKSHOP%202025.pdf",
+          "https://api.openstreetmap.org/api/0.6/way/365973107/full.json"
+        ]
+      }
+    },
+    {
+      "id": 192,
+      "name": "Davao del Norte Sports and Tourism Complex",
+      "location": "Mankilam, Tagum City, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.4551,
+        "longitude": 125.78364,
+        "kind": "venue_area",
+        "source": "https://en.wikipedia.org/wiki/Davao_del_Norte_Sports_Complex",
+        "notes": "Sports complex reference corroborated by WorldPlaces 7.45485,125.78362; entrance unresolved.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 193,
+      "name": "New City Hall of Tagum",
+      "location": "Apokon, Tagum City, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.4408,
+        "longitude": 125.82647,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W753444490",
+        "notes": "New Apokon hall, not old city hall/Cultural Center.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 194,
+      "name": "Island Buenavista",
+      "location": "Island Garden City of Samal, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.1920073,
+        "longitude": 125.7731512,
+        "kind": "island_area",
+        "source": "https://www.google.com/maps/place/The%20Island%20Buenavista%20Resort/data=!4m2!3m1!1s0x32f97002bdfb58bb:0xbed067b6009ec82",
+        "notes": "Island profile phone (082) 2992992 and website match operator contact page. Little Cruz/Little Ligid island, not Matina booking office. Website suspension does not establish closure.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_primary_historical_site",
+          "detail": "The island operator's cached contact page distinguishes its Davao booking office from the island and describes a boat transfer. Its historical website currently returns a hosting suspension page. Office hours are not island visitor hours. No precise island or boarding pin was selected.",
+          "sources": [
+            "https://buenavistaislandresort.com/contact-us/",
+            "https://www.experiencedavao.com/destinations/davao-del-norte/island-garden-city-of-samal/attractions/island-buenavista"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Island profile phone (082) 2992992 and website match operator contact page. Little Cruz/Little Ligid island, not Matina booking office. Website suspension does not establish closure.",
+          "sources": [
+            "https://www.google.com/maps/place/The%20Island%20Buenavista%20Resort/data=!4m2!3m1!1s0x32f97002bdfb58bb:0xbed067b6009ec82"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary_historical_site",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://buenavistaislandresort.com/contact-us/",
+          "https://www.experiencedavao.com/destinations/davao-del-norte/island-garden-city-of-samal/attractions/island-buenavista"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "The Island Buenavista Resort",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/The%20Island%20Buenavista%20Resort/data=!4m2!3m1!1s0x32f97002bdfb58bb:0xbed067b6009ec82"
+        ],
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        }
+      }
+    },
+    {
+      "id": 195,
+      "name": "Mount Puting Bato",
+      "location": "Guilon, Island Garden City of Samal, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.066,
+        "longitude": 125.7681,
+        "kind": "summit",
+        "source": "https://www.gunungbagging.com/puting-bato/",
+        "notes": "Samal summit. Exclude same-name Rizal mountain near 14.62,121.20.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": [
+        {
+          "status": "reported_access_and_fee_recheck",
+          "detail": "A climbing guide reports weekend-only access, PHP30 registration and PHP50 camping. These are different products, not one entry-fee range. Summit coordinates cannot serve as a driving entrance; current operator confirmation needed.",
+          "sources": [
+            "https://www.gunungbagging.com/puting-bato/"
+          ],
+          "source_date": null
+        }
+      ]
+    },
+    {
+      "id": 196,
+      "name": "Mabunao Eco-Park",
+      "location": "Mabunao, Panabo City, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.25615,
+        "longitude": 125.57523,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/N13155150684",
+        "notes": "Mabunao park reference.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 197,
+      "name": "General Moncado White House",
+      "location": "Limao, Island Garden City of Samal, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.0879676,
+        "longitude": 125.6782937,
+        "kind": "secondary_pin",
+        "source": "https://evendo.com/locations/philippines/davao-region/landmark/general-moncado-white-house",
+        "notes": "Secondary guide pin agrees with Urbexology; operator/entrance confirmation pending.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 198,
+      "name": "Davao City Coastal Road Public Parks",
+      "location": "Coastal Road public leisure areas, Davao City",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "confirmed_primary_multiple_sites",
+          "detail": "The city names two distinct Coastal Road parks: Bago Esplanade and Gulf View Esplanade. The catalogue row groups them. One arbitrary road midpoint would misrepresent access; retain separate component entrances for a future reviewed data change. No general road opening schedule was reused as park hours.",
+          "sources": [
+            "https://davaocity.gov.ph/sustainable-environment/city-to-open-more-green-spaces-parks/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "multi_park_listing_scope_confirmed",
+          "detail": "Government reporting distinguishes Bago Aplaya and Gulf View esplanades along the Coastal Road. The car-free Sunday event window applies to a road stretch, not the normal opening hours of every park. A single Bago playground pin does not represent this multi-park listing; retain the need to choose a specific park or revise listing scope before assigning a canonical point.",
+          "sources": [
+            "https://pia.gov.ph/news/davao-city-coastal-road-chosen-as-site-for-car-free-sundays/",
+            "https://www.tourism.gov.ph/sports/venues/bago-aplaya-esplanade"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary_multiple_sites",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://davaocity.gov.ph/sustainable-environment/city-to-open-more-green-spaces-parks/"
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "multi_park_listing_scope_confirmed",
+        "sources": [
+          "https://pia.gov.ph/news/davao-city-coastal-road-chosen-as-site-for-car-free-sundays/",
+          "https://www.tourism.gov.ph/sports/venues/bago-aplaya-esplanade"
+        ]
+      }
+    },
+    {
+      "id": 199,
+      "name": "Davao City Library and Information Center",
+      "location": "203 C. Bangoy Street, Poblacion, Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.07278,
+        "longitude": 125.61095,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W31756392",
+        "notes": "C. Bangoy Street library; visitor hours require operator confirmation.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 200,
+      "name": "Sicao Falls",
+      "location": "Sitio Sicao, Tamayong, Calinan, Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.0854246,
+        "longitude": 125.3132627,
+        "kind": "natural_feature",
+        "source": "https://api.openstreetmap.org/api/0.6/node/4874930699.json",
+        "notes": "Named Datu Sicao Falls node, distinct from Ombes Sicao. Local Tamayong accounts support the intended place; trailhead and route still need confirmation.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 3
+      },
+      "detail_findings": [
+        {
+          "status": "same_area_multiple_falls_review",
+          "detail": "Map results distinguish Ombes Sicao from Datu Sicao and several nearby waterfalls. The local mountaineering club identifies Datu Sicao in Tamayong. The similarly named Ombes pin was not automatically assigned to this listing.",
+          "sources": [
+            "https://rcbasanal.wixsite.com/tamoc"
+          ],
+          "source_date": null,
+          "research_pass": 2
+        },
+        {
+          "status": "confirmed_identity_with_map",
+          "detail": "The Tamayong mountaineering-club source and visitor accounts identify Datu Sicao Falls. OSM node4874930699 gives 7.0854246,125.3132627 and names that waterfall explicitly. Ombes Sicao is a different mapped feature. A 2017 account describes a 4–6 hour approach; that historical trek time is not a standard visit duration or current route guarantee.",
+          "sources": [
+            "https://rcbasanal.wixsite.com/tamoc",
+            "https://simplicitycazar.wordpress.com/2017/10/19/sicao-falls-in-tamayong/",
+            "https://api.openstreetmap.org/api/0.6/node/4874930699.json"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_identity_with_map",
+        "coordinate_status": "reference_found_not_field_verified",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://rcbasanal.wixsite.com/tamoc",
+          "https://simplicitycazar.wordpress.com/2017/10/19/sicao-falls-in-tamayong/",
+          "https://api.openstreetmap.org/api/0.6/node/4874930699.json"
+        ]
+      }
+    },
+    {
+      "id": 201,
+      "name": "Mount Loay",
+      "location": "Santa Cruz, Davao del Sur",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.8842,
+        "longitude": 125.4081,
+        "kind": "summit",
+        "source": "https://mapcarta.com/N5459336564",
+        "notes": "Mount Loay summit; not its trailhead.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 202,
+      "name": "Balite Hot Spring",
+      "location": "Kinablangan, Baganga, Davao Oriental",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.68245,
+        "longitude": 126.54718,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W208192451",
+        "notes": "Balite hot spring resort in Baganga; no fee or operating schedule inferred.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 2
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 203,
+      "name": "Mount Karilongan",
+      "location": "Carmen, Baguio District, Davao City",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "confirmed_event_location",
+          "detail": "A 2024 trail-marathon report and the organiser identify Mount Karilongan in Carmen, Baguio District, Davao City. The event used the barangay hall/covered court as its assembly venue; that does not verify a permanent attraction entrance or summit coordinate. Race fees do not represent general access charges.",
+          "sources": [
+            "https://www.sunstar.com.ph/amp/story/davao/1st-mt-karilongan-trail-marathon-participants-plant-120-trees",
+            "https://www.verticaltosky.com/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "research_location_lead_not_tourism_arrival",
+          "detail": "DSWD confirms Sitio Karilongan in Carmen, Baguio District. A collector-authored specimen record reports Karilongan mountain at approximately 7.126,125.357 (850 m, riverside), and another label gives 7.126816,125.357420. These are scientific collection localities, not proof of the tourism summit, village meeting point or stairway entrance; keep them as unselected leads.",
+          "sources": [
+            "https://fo11.dswd.gov.ph/2024/06/project-lawa-at-binhi-eyes-promotion-of-tourism-activities-provides-livelihood-to-ip-community-in-baguio-district-davao-city/",
+            "https://carabidae.org/gallery?taxon=20755",
+            "https://carabidae.org/gallery?taxon=12956"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_event_location",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.sunstar.com.ph/amp/story/davao/1st-mt-karilongan-trail-marathon-participants-plant-120-trees",
+          "https://www.verticaltosky.com/"
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "research_location_lead_not_tourism_arrival",
+        "sources": [
+          "https://fo11.dswd.gov.ph/2024/06/project-lawa-at-binhi-eyes-promotion-of-tourism-activities-provides-livelihood-to-ip-community-in-baguio-district-davao-city/",
+          "https://carabidae.org/gallery?taxon=20755",
+          "https://carabidae.org/gallery?taxon=12956"
+        ],
+        "unselected_coordinate_alternatives": [
+          {
+            "latitude": 7.126,
+            "longitude": 125.357,
+            "kind": "specimen_collection_area",
+            "source": "https://carabidae.org/gallery?taxon=12956",
+            "accepted_for_import": false,
+            "reason": "Scientific riverside collection locality, not visitor summit or entrance."
+          }
+        ]
+      }
+    },
+    {
+      "id": 204,
+      "name": "Bluebird View Deck",
+      "location": "Island Garden City of Samal, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.99207,
+        "longitude": 125.73393,
+        "kind": "viewpoint",
+        "source": "https://mapcarta.com/N6059404886",
+        "notes": "Bluebird Lookout viewpoint in Samal; not nearby Jarona resort or the Malipano hamlet.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 2
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 205,
+      "name": "Matol Falls",
+      "location": "Kapalong, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.77277,
+        "longitude": 125.6322,
+        "kind": "natural_feature",
+        "source": "https://mapcarta.com/N1778736643",
+        "notes": "Matol waterfall position; trail access not verified.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 206,
+      "name": "Alina Cave",
+      "location": "Suawon, Kapalong, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.74272,
+        "longitude": 125.66918,
+        "kind": "mapped_cave_entrance",
+        "source": "https://mapcarta.com/N1778736625",
+        "notes": "Alena alias matched to Alina, Sitio Sambayon, Suaon. OSM cave-entrance node 1778736625; guide/access and vehicle gate not field-verified.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 5,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_primary",
+          "detail": "Kapalong's official tourism page groups the Alina area with Suaon Nature Park. The cave inventory identifies Alena/Alina at Purok14, Sitio Sambayon, Suaon, historically ClassII. That classification does not prove current unrestricted access. Coordinate and guide/permit arrangements require the municipal tourism section; no village-centre pin or unrelated cruise fee was selected.",
+          "sources": [
+            "https://kapalong.gov.ph/tourism/attractions/",
+            "https://www.philchm.ph/wp-content/uploads/2019/05/list-of-classified-caves-as-of-2018.pdf"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "mapped_cave_entrance_locality_crosscheck",
+          "detail": "Alena/Alina is listed by DENR in Purok 14, Sitio Sambayon, Suaon, Kapalong. The mapped cave entrance at 7.74272,125.66918 is near Sambayon Elementary School and is tagged natural=cave_entrance (OSM node 1778736625). This resolves the alias and supports an entrance research reference, not field-verified vehicle access. LGU tourism requires coordination with local guides for approved access routes.",
+          "sources": [
+            "https://mapcarta.com/N1778736625",
+            "https://www.openstreetmap.org/node/1778736625",
+            "https://www.philchm.ph/wp-content/uploads/2019/05/list-of-classified-caves-as-of-2018.pdf",
+            "https://kapalong.gov.ph/tourism/attractions/"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://kapalong.gov.ph/tourism/attractions/",
+          "https://www.philchm.ph/wp-content/uploads/2019/05/list-of-classified-caves-as-of-2018.pdf"
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "mapped_cave_entrance_locality_crosscheck",
+        "sources": [
+          "https://mapcarta.com/N1778736625",
+          "https://www.openstreetmap.org/node/1778736625",
+          "https://www.philchm.ph/wp-content/uploads/2019/05/list-of-classified-caves-as-of-2018.pdf",
+          "https://kapalong.gov.ph/tourism/attractions/"
+        ]
+      }
+    },
+    {
+      "id": 207,
+      "name": "Fabian's Peak",
+      "location": "Araibo, Pantukan, Davao de Oro",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.2671049,
+        "longitude": 126.147696,
+        "kind": "summit",
+        "source": "https://www.google.com/maps/place/Fabians%20Peak/data=!4m2!3m1!1s0x32fbefe8fa97b8fd:0xecb31c56c23d3a2e",
+        "notes": "Exact profile says Maragusan (San Mariano), agreeing with dedicated visitor report. Catalogue Araibo/Pantukan location needs correction review; no database address/region change.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "locality_conflict",
+          "detail": "The catalogue says Araibo/Pantukan, while a dedicated visitor account identifies Fabian's Peak in Maragusan near Calamba Farms and Cleo Heights. Directory distances also differ. This is an unresolved identity/location issue; neither locality's centre was used. Fee and opening hours remain unknown.",
+          "sources": [
+            "https://babycubero.blogspot.com/2020/04/in-celebration-of-13th-bulawan-festival.html",
+            "https://www.trivago.com.ph/en-PH/oar/magnaga-waters-beach-resort-pantukan?search=100-17163744"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Exact profile says Maragusan (San Mariano), agreeing with dedicated visitor report. Catalogue Araibo/Pantukan location needs correction review; no database address/region change.",
+          "sources": [
+            "https://www.google.com/maps/place/Fabians%20Peak/data=!4m2!3m1!1s0x32fbefe8fa97b8fd:0xecb31c56c23d3a2e"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "locality_conflict",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://babycubero.blogspot.com/2020/04/in-celebration-of-13th-bulawan-festival.html",
+          "https://www.trivago.com.ph/en-PH/oar/magnaga-waters-beach-resort-pantukan?search=100-17163744"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "Fabians Peak",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/Fabians%20Peak/data=!4m2!3m1!1s0x32fbefe8fa97b8fd:0xecb31c56c23d3a2e"
+        ],
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        }
+      }
+    },
+    {
+      "id": 208,
+      "name": "D'Fortees Nature Park and Inland Resort",
+      "location": "Montevista, Davao de Oro",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.70996,
+        "longitude": 125.98857,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/N13302680666",
+        "notes": "D'Fortees resort in Montevista; identity corroborated by provincial tourism page.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 2
+      },
+      "detail_findings": [
+        {
+          "status": "primary_identity_evidence",
+          "detail": "The provincial tourism catalogue identifies D'Fortees Nature Park and Inland Resort in Montevista. Generic office hours in the government website header were not treated as resort opening hours.",
+          "sources": [
+            "https://davaodeoro.gov.ph/dfortess-nature-park-and-inland-resort/"
+          ],
+          "source_date": null,
+          "research_pass": 2
+        }
+      ]
+    },
+    {
+      "id": 209,
+      "name": "Jorge Town",
+      "location": "National Highway, Montevista, Davao de Oro",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.71322,
+        "longitude": 125.99034,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/N9377737317",
+        "notes": "Jorge Town Montevista resort reference.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 210,
+      "name": "New Barili Heights and Sights",
+      "location": "New Barili, Maco, Davao de Oro",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.35411,
+        "longitude": 126.01136,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/N9671315617",
+        "notes": "Specific Heights & Sights attraction; do not use New Barili village centre at 7.3585,126.0123.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 2
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 211,
+      "name": "Fyingi Sol Cave",
+      "location": "Matanao, Davao del Sur",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "confirmed_primary",
+          "detail": "Regional tourism describes Fyingi Sol as a Matanao solution cave with a horizontal entrance. PIA confirms it in the April2025 Lungib Festival programme. The PHP1,000 festival registration bundled guides, equipment, food and other benefits; it is not an ordinary single-cave entrance fee. Exact cave entrance and normal booking tariff remain unconfirmed.",
+          "sources": [
+            "https://www.experiencedavao.com/activities/fyingi-sol-cave",
+            "https://pia.gov.ph/news/matanao-town-set-to-hold-lungib-festival/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "regional_cave_identity_no_precise_pin",
+          "detail": "Regional tourism confirms Fyingi Sol Cave in Matanao and describes its horizontal entrance and 78 m main chamber. The 2025 Lungib Festival package covers several caves and other inclusions; do not use its PHP1,000 price as the ordinary single-cave admission or infer a 78-minute duration from chamber length. Precise entrance remains unconfirmed.",
+          "sources": [
+            "https://www.experiencedavao.com/activities/fyingi-sol-cave",
+            "https://pia.gov.ph/news/matanao-town-set-to-hold-lungib-festival/"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.experiencedavao.com/activities/fyingi-sol-cave",
+          "https://pia.gov.ph/news/matanao-town-set-to-hold-lungib-festival/"
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "regional_cave_identity_no_precise_pin",
+        "sources": [
+          "https://www.experiencedavao.com/activities/fyingi-sol-cave",
+          "https://pia.gov.ph/news/matanao-town-set-to-hold-lungib-festival/"
+        ]
+      }
+    },
+    {
+      "id": 212,
+      "name": "Crocodile Hill",
+      "location": "Punta Piape, Padada, Davao del Sur",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.6435,
+        "longitude": 125.3806,
+        "kind": "summit",
+        "source": "https://mapcarta.com/N332021070",
+        "notes": "Crocodile Hill summit in Padada; not hike starting point.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 213,
+      "name": "Daya Farm & Adventure",
+      "location": "Purok 8, Maputi, Banaybanay, Davao Oriental",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.0210114,
+        "longitude": 126.00481,
+        "kind": "venue_area",
+        "source": "https://www.google.com/maps/place/Daya%20Farm%20%26%20Adventure/data=!4m2!3m1!1s0x32fbd122788fd95d:0xba178b90d88c4148",
+        "notes": "Purok 8 Maputi and phone 0992 530 5473 match operator information. Separate same-phone entry profile recorded below; main venue is not a verified gate. Hotel rates are not day admission.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_operator_address",
+          "detail": "The operator's indexed site and hotel listings agree on Purok8, Maputi, Banaybanay. A secondary lodging directory publishes 7.019569,126.004822 for a Daya Farm accommodation unit, but this is not confirmed as the adventure-park gate. Overnight room prices and bundled activity packages were not treated as an admission fee.",
+          "sources": [
+            "https://dayafarmandadventure.com/",
+            "https://www.booking.com/hotel/ph/daya-farm-and-adventure-banaybanay.en-gb.html",
+            "https://infodijogja.com/hotel/52130607-modern-bahay-kubo-inland-mountain-resort-daya-farm-adventure"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Purok 8 Maputi and phone 0992 530 5473 match operator information. Separate same-phone entry profile recorded below; main venue is not a verified gate. Hotel rates are not day admission.",
+          "sources": [
+            "https://www.google.com/maps/place/Daya%20Farm%20%26%20Adventure/data=!4m2!3m1!1s0x32fbd122788fd95d:0xba178b90d88c4148"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_operator_address",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://dayafarmandadventure.com/",
+          "https://www.booking.com/hotel/ph/daya-farm-and-adventure-banaybanay.en-gb.html",
+          "https://infodijogja.com/hotel/52130607-modern-bahay-kubo-inland-mountain-resort-daya-farm-adventure"
+        ],
+        "unselected_coordinate_alternatives": [
+          {
+            "latitude": 7.019569,
+            "longitude": 126.004822,
+            "kind": "accommodation-unit reference",
+            "source": "https://infodijogja.com/hotel/52130607-modern-bahay-kubo-inland-mountain-resort-daya-farm-adventure",
+            "reason": "An accommodation-unit pin is not verified as the adventure-park gate.",
+            "accepted_for_import": false
+          }
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "Daya Farm & Adventure",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/Daya%20Farm%20%26%20Adventure/data=!4m2!3m1!1s0x32fbd122788fd95d:0xba178b90d88c4148"
+        ],
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "alternate_access_references": [
+          {
+            "latitude": 7.0143519,
+            "longitude": 125.9910882,
+            "profile_name": "Daya Farm and Adventure Entry Point",
+            "source": "https://www.google.com/maps/place/Daya%20Farm%20and%20Adventure%20Entry%20Point/data=!4m2!3m1!1s0x32fbd7005abf18ad:0x408f617d7eba4279",
+            "notes": "Separate same-phone entry-point profile; access and vehicle suitability not independently verified.",
+            "verified_vehicle_entrance": false
+          }
+        ]
+      }
+    },
+    {
+      "id": 214,
+      "name": "Kagan Dinagsaan Peak",
+      "location": "Banaybanay, Davao Oriental",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.04477,
+        "longitude": 125.976511,
+        "kind": "summit",
+        "source": "https://www.google.com/maps/place/Kagan%20Dinagsaan%20Peak/data=!4m2!3m1!1s0x32fbd94c517502bd:0xa699c7daa3855b66",
+        "notes": "Named Banaybanay peak; separate registration profile explicitly gives Puntalinao, matching municipal tourism. Summit is not a vehicle arrival point. Unusual map hours not adopted.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_primary",
+          "detail": "Banaybanay's own tourism page identifies Kagan Dinagsaan Peak in Puntalinao. A hiking guide describes registration at a barangay tribal hall and an approximately two-hour ascent. A January2025 visitor report quotes PHP250 combining guide, barangay permit and environmental charges; that is not a verified standalone admission fee.",
+          "sources": [
+            "https://banaybanay.gov.ph/activities-in-banaybanay/",
+            "https://akyat.app/mountains/mt-dinagsaan",
+            "https://meiyara.art.blog/2025/01/23/dinagsaan-peak/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Named Banaybanay peak; separate registration profile explicitly gives Puntalinao, matching municipal tourism. Summit is not a vehicle arrival point. Unusual map hours not adopted.",
+          "sources": [
+            "https://www.google.com/maps/place/Kagan%20Dinagsaan%20Peak/data=!4m2!3m1!1s0x32fbd94c517502bd:0xa699c7daa3855b66"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://banaybanay.gov.ph/activities-in-banaybanay/",
+          "https://akyat.app/mountains/mt-dinagsaan",
+          "https://meiyara.art.blog/2025/01/23/dinagsaan-peak/"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "Kagan Dinagsaan Peak",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/Kagan%20Dinagsaan%20Peak/data=!4m2!3m1!1s0x32fbd94c517502bd:0xa699c7daa3855b66"
+        ],
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "alternate_access_references": [
+          {
+            "latitude": 7.0389991,
+            "longitude": 125.9691735,
+            "profile_name": "Kagan Dinagsaan Peak Registration Area",
+            "source": "https://www.google.com/maps/place/Kagan%20Dinagsaan%20Peak%20Registration%20Area/data=!4m2!3m1!1s0x32fbd9000659451f:0x9e4638da60df2cb7",
+            "notes": "Registration profile identifies Puntalinao; not verified as a vehicle entrance.",
+            "verified_vehicle_entrance": false
+          }
+        ]
+      }
+    },
+    {
+      "id": 215,
+      "name": "Sigaboy Island",
+      "location": "Tibanban, Governor Generoso, Davao Oriental",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.62873,
+        "longitude": 126.06688,
+        "kind": "island_area",
+        "source": "https://mapcarta.com/15718968",
+        "notes": "Sigaboy island reference, not a boat departure/landing point.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 216,
+      "name": "Burias Islet",
+      "location": "Banaybanay, Davao Oriental",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "confirmed_primary_access_review",
+          "detail": "Banaybanay lists Burias Islet among its attractions, and local footage identifies the Maputi islet. This excludes other Burias islands, including the one associated with San Isidro. Historical footage says the Maputi sanctuary is not open to the public; current visitor permission and landing arrangements must be obtained before recommending a visit.",
+          "sources": [
+            "https://banaybanay.gov.ph/activities-in-banaybanay/",
+            "https://www.youtube.com/watch?v=OTWVV2G9SKs"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "primary_name_and_environmental_study_only",
+          "detail": "Banaybanay LGU lists Burias Islet. An EMB-hosted environmental impact report describes Burias Islet marine sampling near the Maputi/Piso coast, but no usable exact islet position was established in this pass. Public landing permission remains unresolved. Reject the unrelated Masbate Burias Island coordinate.",
+          "sources": [
+            "https://banaybanay.gov.ph/local-attractions/",
+            "https://eia.emb.gov.ph/wp-content/uploads/2022/06/ZMRC_EIS-Report_Zetosa.pdf"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary_access_review",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://banaybanay.gov.ph/activities-in-banaybanay/",
+          "https://www.youtube.com/watch?v=OTWVV2G9SKs"
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "primary_name_and_environmental_study_only",
+        "sources": [
+          "https://banaybanay.gov.ph/local-attractions/",
+          "https://eia.emb.gov.ph/wp-content/uploads/2022/06/ZMRC_EIS-Report_Zetosa.pdf"
+        ]
+      }
+    },
+    {
+      "id": 217,
+      "name": "Kepiya Falls",
+      "location": "Lawa, Don Marcelino, Davao Occidental",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "confirmed_secondary_locality",
+          "detail": "A Davao Occidental travel guide identifies Kepiya Falls in Lawa, Don Marcelino. Barangay-centre pages do not locate the falls itself. Exact trailhead, guide arrangement, fee and schedule remain unconfirmed; no barangay-hall coordinate was selected.",
+          "sources": [
+            "https://www.escapemanila.com/top-tourist-spots-in-davao-occidental/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "locality_corroborated_no_waterfall_pin",
+          "detail": "Visitor footage identifies Kepiya Falls in Don Marcelino. Government reporting also identifies Sitio Kepiya in Lawa, but a sitio road or school location is not the falls. No waterfall coordinate, regular schedule or current fee established. Historical road damage reports are not evidence of current closure.",
+          "sources": [
+            "https://www.youtube.com/watch?v=5Q_UWFBpuPA",
+            "https://ndrrmc.gov.ph/attachments/article/4281/Progress_Report_No_5_for_the_Effects-of_ITCZ_in_Davao_Region_REGION_XI.pdf"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_secondary_locality",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.escapemanila.com/top-tourist-spots-in-davao-occidental/"
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "locality_corroborated_no_waterfall_pin",
+        "sources": [
+          "https://www.youtube.com/watch?v=5Q_UWFBpuPA",
+          "https://ndrrmc.gov.ph/attachments/article/4281/Progress_Report_No_5_for_the_Effects-of_ITCZ_in_Davao_Region_REGION_XI.pdf"
+        ]
+      }
+    },
+    {
+      "id": 218,
+      "name": "Doña Vicenta Park",
+      "location": "Barangay 9-A, Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.0811111,
+        "longitude": 125.6058333,
+        "kind": "approximate_area",
+        "source": "https://journals.umt.edu.pk/index.php/JAABE/article/download/5539/3582?inline=1",
+        "notes": "Research article describes this position as approximate; do not label exact.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": [
+        {
+          "status": "tentative_historical_schedule",
+          "detail": "The 2023 opening announcement only proposed the usual 06:00–21:00 schedule; it was not a firm current operating schedule.",
+          "sources": [
+            "https://davaocity.gov.ph/tourism/dona-vicenta-park-now-open/"
+          ],
+          "source_date": "2023-08-03"
+        }
+      ]
+    },
+    {
+      "id": 219,
+      "name": "Los Amigos Park",
+      "location": "Los Amigos, Calinan, Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.14118,
+        "longitude": 125.48023,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W1060515995",
+        "notes": "Los Amigos park footprint.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": [
+        {
+          "status": "historical_schedule_recheck",
+          "detail": "The 2022 city announcement reports 05:00–08:00 and 13:00–19:00, with maintenance in between. This is dated evidence, not confirmation of today's schedule.",
+          "sources": [
+            "https://davaocity.gov.ph/environment/los-amigos-park-opens-to-public/"
+          ],
+          "source_date": "2022-09-21"
+        }
+      ]
+    },
+    {
+      "id": 220,
+      "name": "DECA Wakeboard Park Davao",
+      "location": "Tacunan, Tugbok, Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.10836,
+        "longitude": 125.50072,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W669042983",
+        "notes": "Wakeboarding sports-centre area. Maps.me 7.1090727,125.501816 differs by roughly 150m; entrance needs checking.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 221,
+      "name": "Toril Public Park",
+      "location": "Agton Street, Toril, Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.0188,
+        "longitude": 125.49687,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W845223168",
+        "notes": "Toril park beside district hall.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": [
+        {
+          "status": "historical_schedule_recheck",
+          "detail": "The city reported 08:00–20:00 after renovation in October 2024. Reconfirm with CENRO before presenting it as current.",
+          "sources": [
+            "https://davaocity.gov.ph/infrastructure-development/renovated-toril-public-park-offers-amenities-for-visitors/"
+          ],
+          "source_date": "2024-10-01"
+        }
+      ]
+    },
+    {
+      "id": 222,
+      "name": "Candelaria Park",
+      "location": "Candelaria Street corner Quimpo Boulevard, Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.05694,
+        "longitude": 125.60165,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W783620055",
+        "notes": "Park by city archives; matches Google Maps locality.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 223,
+      "name": "Tagtugonan Falls",
+      "location": "Kapalong, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.7793125,
+        "longitude": 125.6548906,
+        "kind": "natural_feature",
+        "source": "https://www.google.com/maps/place/Tagtugonan%20Falls/data=!4m2!3m1!1s0x32febd893055eedf:0x64576b320744ecc2",
+        "notes": "Exact waterfall profile links Kapalong Tourism and matches published plus code. Reverse address says San Isidro while regional tourism says Gupitan/Kapalong. Retain locality warning; no address change or automatic routing.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "primary_location_activity_evidence",
+          "detail": "Regional tourism material places Tagtugonan Falls in Gupitan, Kapalong and describes canyoneering. It does not establish an independently visitable gate, daily hours or tariff.",
+          "sources": [
+            "https://www.experiencedavao.com/activities/canyoneering"
+          ],
+          "source_date": null,
+          "research_pass": 2
+        },
+        {
+          "status": "confirmed_primary_pin_review",
+          "detail": "Regional tourism places Tagtugonan in Gupitan, Kapalong and describes a 15–20 minute approach from a bridge. A directory publishes short plus code QMH3+PXC, whose decoded point still needs a locality/feature check; it was not accepted merely because the name matched. Approach time is not the total canyoneering duration.",
+          "sources": [
+            "https://www.experiencedavao.com/activities/canyoneering",
+            "https://www.lookph.com/p/tagtugonan-water-falls-35f9d.html"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Exact waterfall profile links Kapalong Tourism and matches published plus code. Reverse address says San Isidro while regional tourism says Gupitan/Kapalong. Retain locality warning; no address change or automatic routing.",
+          "sources": [
+            "https://www.google.com/maps/place/Tagtugonan%20Falls/data=!4m2!3m1!1s0x32febd893055eedf:0x64576b320744ecc2"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary_pin_review",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.experiencedavao.com/activities/canyoneering",
+          "https://www.lookph.com/p/tagtugonan-water-falls-35f9d.html"
+        ],
+        "unselected_coordinate_alternatives": [
+          {
+            "latitude": 7.7793125,
+            "longitude": 125.6548906,
+            "kind": "decoded directory plus code",
+            "source": "https://www.lookph.com/p/tagtugonan-water-falls-35f9d.html",
+            "reason": "Decoded QMH3+PXC in Kapalong context; locality and exact feature need corroboration.",
+            "accepted_for_import": false
+          }
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "Tagtugonan Falls",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/Tagtugonan%20Falls/data=!4m2!3m1!1s0x32febd893055eedf:0x64576b320744ecc2"
+        ],
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        }
+      }
+    },
+    {
+      "id": 224,
+      "name": "Big Ligid Island",
+      "location": "Off the coast of Samal, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.1695,
+        "longitude": 125.7807,
+        "kind": "island_area",
+        "source": "https://mapcarta.com/15796414",
+        "notes": "Big Cruz/Big Ligid island-area reference. Nautical directions and a Samal dive operator corroborate the alias and northeast-Samal setting. Incorrect Misamis Oriental metadata must not be copied.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 3
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_alias_area_reference",
+          "detail": "Samal city confirms Big and Little Ligid as separate islands. A local dive operator identifies Big Ligid as Big Cruz. Nautical directions place the Cruz group off northeast Samal around 7°11'N,125°46'E; the geographic feature point 7.1695,125.7807 is retained only as an island-area reference. The aggregator's Misamis Oriental label is wrong and must not be copied.",
+          "sources": [
+            "https://www.samalcity.gov.ph/our-city/profile",
+            "https://southshorediversph.com/scuba-snorkel-services/snorkel-tours/north-samal-package/",
+            "https://www.petersoncutter.org/ftp/SailingDirections/162%20Philippine%20Islands%20Pilot/Pub162bk.pdf",
+            "https://mapcarta.com/15796414"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_alias_area_reference",
+        "coordinate_status": "reference_found_not_field_verified",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.samalcity.gov.ph/our-city/profile",
+          "https://southshorediversph.com/scuba-snorkel-services/snorkel-tours/north-samal-package/",
+          "https://www.petersoncutter.org/ftp/SailingDirections/162%20Philippine%20Islands%20Pilot/Pub162bk.pdf",
+          "https://mapcarta.com/15796414"
+        ]
+      }
+    },
+    {
+      "id": 225,
+      "name": "Bamboo Peak",
+      "location": "Jose Rizal, Santa Cruz, Davao del Sur",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.9217,
+        "longitude": 125.4067,
+        "kind": "summit",
+        "source": "https://mapcarta.com/N9673368628",
+        "notes": "Bamboo Peak summit, not trailhead.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 226,
+      "name": "Mount Fortune View",
+      "location": "Sitio Malusing, Zone I, Santa Cruz, Davao del Sur",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.8859361,
+        "longitude": 125.4291139,
+        "kind": "viewpoint",
+        "source": "https://www.google.com/maps/place/Mt.%20Fortune%20View/data=!4m2!3m1!1s0x32f9a70002c71a39:0x6b2328bfe268546d",
+        "notes": "Santa Cruz viewpoint VCPH+7J. Second Mt Fortune profile about 30 m away; matches local Malusing/Zone I reporting. No verified vehicle gate.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_secondary_historical_price",
+          "detail": "Independent local footage identifies Mount Fortune View in Sitio Malusing, ZoneI, Santa Cruz. A February2022 video reports PHP30 entrance and PHP150–250 cottages, which are distinct charges and not current confirmed prices. Neither an exact gate nor summit coordinate was established.",
+          "sources": [
+            "https://www.youtube.com/watch?v=FV1gHJsMS4c",
+            "https://www.youtube.com/watch?v=h_ZhCAeAfDY"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Santa Cruz viewpoint VCPH+7J. Second Mt Fortune profile about 30 m away; matches local Malusing/Zone I reporting. No verified vehicle gate.",
+          "sources": [
+            "https://www.google.com/maps/place/Mt.%20Fortune%20View/data=!4m2!3m1!1s0x32f9a70002c71a39:0x6b2328bfe268546d"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_secondary_historical_price",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.youtube.com/watch?v=FV1gHJsMS4c",
+          "https://www.youtube.com/watch?v=h_ZhCAeAfDY"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "Mt. Fortune View",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/Mt.%20Fortune%20View/data=!4m2!3m1!1s0x32f9a70002c71a39:0x6b2328bfe268546d"
+        ],
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        }
+      }
+    },
+    {
+      "id": 227,
+      "name": "Tomari Falls",
+      "location": "Sibulan, Santa Cruz, Davao del Sur",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.9681,
+        "longitude": 125.37412,
+        "kind": "identity_review",
+        "source": "https://mapcarta.com/N5093108556",
+        "notes": "Tumari waterfall candidate. Nearby Tomari entry N13653855901 is tourism information office; municipality/boundary needs checking.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 228,
+      "name": "Sinoron Ecotourism Park",
+      "location": "Sinoron, Santa Cruz, Davao del Sur",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "confirmed_primary_area",
+          "detail": "PIA and local tourism reporting identify Sinoron Eco Park in Santa Cruz. The listing covers an ecotourism area and does not specify one trail, river bridge or visitor centre. A generic Sinoron point would not resolve that ambiguity. Access route, itinerary duration, fee and hours remain unconfirmed.",
+          "sources": [
+            "https://mirror.pia.gov.ph/news/2022/05/31/sta-cruz-tourists-mostly-seek-outdoor-adventure-sites",
+            "https://edgedavao.net/latest-news/2024/01/sta-cruz-records-248968-tourist-arrivals-in-2023/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "provincial_ecotourism_priority_no_specific_gate",
+          "detail": "Provincial government identifies Sinoron Ecopark as a priority ecotourism site in its March 2026 DOT-XI planning meeting. This corroborates the broad ecopark identity without establishing one public visitor entrance, current tour schedule or tariff.",
+          "sources": [
+            "https://davaodelsur.gov.ph/tourism/meeting-with-the-department-of-tourism-xi/"
+          ],
+          "source_date": "2026-03-12",
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary_area",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://mirror.pia.gov.ph/news/2022/05/31/sta-cruz-tourists-mostly-seek-outdoor-adventure-sites",
+          "https://edgedavao.net/latest-news/2024/01/sta-cruz-records-248968-tourist-arrivals-in-2023/"
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "provincial_ecotourism_priority_no_specific_gate",
+        "sources": [
+          "https://davaodelsur.gov.ph/tourism/meeting-with-the-department-of-tourism-xi/"
+        ]
+      }
+    },
+    {
+      "id": 229,
+      "name": "Tagabuli Sea Rock Garden",
+      "location": "Tagabuli, Santa Cruz, Davao del Sur",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "confirmed_primary",
+          "detail": "The province names Tagabuli Sea Rock Garden separately from Passig Islet in Bato. Their shared promotional paragraph is not evidence that they have the same boat landing or tariff. No Passig coordinate or booking fee was assigned to Tagabuli.",
+          "sources": [
+            "https://davaodelsur.gov.ph/place-to-stay-and-dine/",
+            "https://davaodelsur.gov.ph/tourism/passig-islet/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "separate_attraction_no_transferred_tariff",
+          "detail": "Provincial directory identifies Tagabuli Sea Rock Garden in Tagabuli, Santa Cruz. The provincial citizen charter describes a booking service for Passig Islet; its transaction processing times and fee references are not Tagabuli admission prices or visit durations. Keep the attractions and their access arrangements separate.",
+          "sources": [
+            "https://davaodelsur.gov.ph/place-to-stay-and-dine/",
+            "https://davaodelsur.gov.ph/wp-content/uploads/CC-Charter-final.pdf"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://davaodelsur.gov.ph/place-to-stay-and-dine/",
+          "https://davaodelsur.gov.ph/tourism/passig-islet/"
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "separate_attraction_no_transferred_tariff",
+        "sources": [
+          "https://davaodelsur.gov.ph/place-to-stay-and-dine/",
+          "https://davaodelsur.gov.ph/wp-content/uploads/CC-Charter-final.pdf"
+        ]
+      }
+    },
+    {
+      "id": 230,
+      "name": "Sandunganan Peak",
+      "location": "Banaybanay, Davao Oriental",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "confirmed_primary_area",
+          "detail": "PIA describes Sandunganan in Banaybanay's Kagan ancestral domains. Local hiking footage identifies the Sandunganan/Gorilla Peak circuit in Maputi. The circuit names do not establish one exact summit or start point. Guided access, permit, total trek duration and current fees remain unconfirmed.",
+          "sources": [
+            "https://pia.gov.ph/features/retracing-watchers-trail-gazing-at-same-skyline-atop-sandunganan-peak/",
+            "https://www.youtube.com/watch?v=s_u2-YQ60jU"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "dated_guide_report_schedule_duration",
+          "detail": "PIA reports local guide Jiar Pandacupan describing weekend/holiday hiking batches, first departure 03:30–04:00 and last departure 07:30, with approximately four hours for the return trek and longer for beginners. Report published 11 November 2025. These are guided departure windows, not continuous site opening hours, and the route still lacks an exact verified jump-off/summit. Reconfirm availability and charges before use.",
+          "sources": [
+            "https://pia.gov.ph/news/retracing-watchers-trail-gazing-at-same-skyline-atop-sandunganan-peak/"
+          ],
+          "source_date": "2025-11-11",
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary_area",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://pia.gov.ph/features/retracing-watchers-trail-gazing-at-same-skyline-atop-sandunganan-peak/",
+          "https://www.youtube.com/watch?v=s_u2-YQ60jU"
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "dated_guide_report_schedule_duration",
+        "sources": [
+          "https://pia.gov.ph/news/retracing-watchers-trail-gazing-at-same-skyline-atop-sandunganan-peak/"
+        ],
+        "reported_schedule": {
+          "days": "Weekends and holidays",
+          "first_departure": "03:30–04:00",
+          "last_departure": "07:30",
+          "kind": "guided_departure_windows",
+          "status": "historical_guide_report_reconfirmation_required"
+        },
+        "reported_duration": {
+          "minutes": 240,
+          "scope": "Round-trip hike; beginners may take longer",
+          "status": "historical_guide_estimate_reconfirmation_required"
+        }
+      }
+    },
+    {
+      "id": 231,
+      "name": "Mayor Francisco G. Rabat Park and Baywalk",
+      "location": "Mati City, Davao Oriental",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.95012,
+        "longitude": 126.21707,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W809236769",
+        "notes": "City-operated Mati Baywalk park area. Municipal investment-promotion material identifies the Rabat park/baywalk; not the separate amphitheatre or fountain.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 3
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_primary_and_map",
+          "detail": "Mati's investment-promotion account names Mayor Francisco G.Rabat Park and Baywalk as a public gathering space. The mapped Baywalk park at 6.95012,126.21707 is operated by the City of Mati and is distinct from its nearby amphitheatre and dancing fountain. No event schedule or fountain show time was treated as park opening hours.",
+          "sources": [
+            "https://matiinvestmentpromotioncenter.weebly.com/index.html",
+            "https://mapcarta.com/W809236769"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary_and_map",
+        "coordinate_status": "reference_found_not_field_verified",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://matiinvestmentpromotioncenter.weebly.com/index.html",
+          "https://mapcarta.com/W809236769"
+        ]
+      }
+    },
+    {
+      "id": 232,
+      "name": "Langan Falls",
+      "location": "Langan River, Santa Cruz, Davao del Sur",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.89659,
+        "longitude": 125.41982,
+        "kind": "natural_feature",
+        "source": "https://mapcarta.com/N5166405752",
+        "notes": "Langan falls feature, not Langan River Park or hamlet.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 233,
+      "name": "Epol Falls",
+      "location": "Baganihan, Marilog District, Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.455851,
+        "longitude": 125.236992,
+        "kind": "study_area",
+        "source": "https://www.innspub.net/wp-content/uploads/2022/10/JBES-V8-No5-p36-44.pdf",
+        "notes": "Field-study sampling location along Epol Falls in Marilog. Retained as a study-area reference, with nearby conflicting cascade/entrance coordinates still unresolved.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 3
+      },
+      "detail_findings": [
+        {
+          "status": "boundary_conflict",
+          "detail": "The named waterfall map feature is 7.45756,125.23659, labelled Arakan/Cotabato by OSM-derived maps, while the listing describes Baganihan/Marilog/Davao City. The nearby Epol hamlet is a different feature. Boundary/access review required; no coordinate selected.",
+          "sources": [
+            "https://mapcarta.com/N1240670407",
+            "https://mapcarta.com/N5394941645"
+          ],
+          "source_date": null
+        },
+        {
+          "status": "confirmed_feature_conflicting_positions",
+          "detail": "A field study explicitly locates its Epol Falls sampling area in Baganihan, Marilog at 7.455851,125.236992. Wikipedia and OSM-derived maps give other nearby points. The study coordinate is retained as a sampling-area reference, not an exact cascade or entrance. Regional boundary and route discrepancies remain recorded.",
+          "sources": [
+            "https://www.innspub.net/wp-content/uploads/2022/10/JBES-V8-No5-p36-44.pdf",
+            "https://en.wikipedia.org/wiki/Epol_Falls",
+            "https://mapcarta.com/N1240670407"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_feature_conflicting_positions",
+        "coordinate_status": "reference_found_not_field_verified",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://www.innspub.net/wp-content/uploads/2022/10/JBES-V8-No5-p36-44.pdf",
+          "https://en.wikipedia.org/wiki/Epol_Falls",
+          "https://mapcarta.com/N1240670407"
+        ]
+      }
+    },
+    {
+      "id": 234,
+      "name": "Roxas Greenway Park",
+      "location": "Roxas Avenue, Davao City",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "confirmed_primary",
+          "detail": "The city's December22,2025 report confirms opening of the 398-linear-metre Roxas Greenway Park. It is a separate daytime green-space feature from the Roxas Night Market. No night-market coordinate or nightly schedule was copied into the park listing.",
+          "sources": [
+            "https://davaocity.gov.ph/local-government/davao-citys-roxas-greenway-park-opens/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "primary_reported_public_access",
+          "detail": "City CENRO report published 22 December 2025 describes a 398-linear-metre park and quotes its parks division head describing walking access around the clock. Record as dated city-reported 24-hour walking access, rather than assuming it from a map label. Exact park geometry/entrance remains unresolved; the night-market pin and night-market trading hours are not substitutes. The report has an internally inconsistent inauguration weekday/date; do not use that ceremony date as a precise event record.",
+          "sources": [
+            "https://davaocity.gov.ph/local-government/davao-citys-roxas-greenway-park-opens/"
+          ],
+          "source_date": "2025-12-22",
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://davaocity.gov.ph/local-government/davao-citys-roxas-greenway-park-opens/"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "coordinate_status": "not_selected",
+        "notes": "Search returned Roxas Night Market and other parks rather than a distinct Greenway Park; unrelated pins rejected."
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "primary_reported_public_access",
+        "sources": [
+          "https://davaocity.gov.ph/local-government/davao-citys-roxas-greenway-park-opens/"
+        ],
+        "reported_schedule": {
+          "value": "24-hour walking access reported by the city parks division head",
+          "status": "dated_city_report_current_confirmation_pending"
+        }
+      }
+    },
+    {
+      "id": 235,
+      "name": "Marawer Hot Spring",
+      "location": "Kapatagan, Digos City, Davao del Sur",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 6.9377279,
+        "longitude": 125.3082323,
+        "kind": "natural_feature",
+        "source": "https://www.google.com/maps/place/Marawer%20Hot%20Spring/data=!4m2!3m1!1s0x32f9a9b226542d8d:0x8e00dbe64bf2ecfe",
+        "notes": "W8Q5+37X agrees with Waze and nearby OSM spring. Retain Digos/Santa Cruz boundary discrepancy; no address or region change. Linked website is a visitor guide, not the operator.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "entrance_boundary_review",
+          "detail": "Mapcarta gives 6.93773,125.30837 and WorldPlaces gives 6.93641,125.30841, about 150m apart. Waze's plus code aligns with the former. Administrative labels also differ between Santa Cruz and Digos; record the discrepancy before using a routing point.",
+          "sources": [
+            "https://mapcarta.com/N4864295921",
+            "https://philippines.worldplaces.me/view-place/66765122-marawer-hot-spring-kapatagan.html",
+            "https://www.waze.com/af/live-map/directions/ph/davao-region/digos/marawer-hot-spring?to=place.ChIJjS1UJrKp-TIR_uzyS-bbAI4"
+          ],
+          "source_date": null
+        },
+        {
+          "status": "confirmed_feature_pin_conflict",
+          "detail": "Current search results still provide two Marawer spring points about150m apart and conflicting Santa Cruz/Digos labels. A September2026 visitor field guide confirms a Kapatagan hot-spring experience, not a surveyed administrative boundary or current operator tariff. Both alternatives remain documented; no new selected pin.",
+          "sources": [
+            "https://mapcarta.com/N4864295921",
+            "https://philippines.worldplaces.me/view-place/66765122-marawer-hot-spring-kapatagan.html",
+            "https://manakaayugbukid.com/marawer-hot-springs-kapatagan-guide/"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "W8Q5+37X agrees with Waze and nearby OSM spring. Retain Digos/Santa Cruz boundary discrepancy; no address or region change. Linked website is a visitor guide, not the operator.",
+          "sources": [
+            "https://www.google.com/maps/place/Marawer%20Hot%20Spring/data=!4m2!3m1!1s0x32f9a9b226542d8d:0x8e00dbe64bf2ecfe"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_feature_pin_conflict",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://mapcarta.com/N4864295921",
+          "https://philippines.worldplaces.me/view-place/66765122-marawer-hot-spring-kapatagan.html",
+          "https://manakaayugbukid.com/marawer-hot-springs-kapatagan-guide/"
+        ],
+        "unselected_coordinate_alternatives": [
+          {
+            "latitude": 6.93773,
+            "longitude": 125.30837,
+            "kind": "mapped spring",
+            "source": "https://mapcarta.com/N4864295921",
+            "reason": "Boundary and entrance differ across sources.",
+            "accepted_for_import": false
+          },
+          {
+            "latitude": 6.93641,
+            "longitude": 125.30841,
+            "kind": "directory point",
+            "source": "https://philippines.worldplaces.me/view-place/66765122-marawer-hot-spring-kapatagan.html",
+            "reason": "About150m from the other spring point; exact entrance unconfirmed.",
+            "accepted_for_import": false
+          }
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "Marawer Hot Spring",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/Marawer%20Hot%20Spring/data=!4m2!3m1!1s0x32f9a9b226542d8d:0x8e00dbe64bf2ecfe"
+        ],
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        }
+      }
+    },
+    {
+      "id": 236,
+      "name": "Sibulan River Tubing",
+      "location": "Sibulan / Darong, Santa Cruz, Davao del Sur",
+      "research_status": "no_coordinate_selected",
+      "coordinate_reference": null,
+      "detail_findings": [
+        {
+          "status": "confirmed_primary_activity_area",
+          "detail": "Regional tourism confirms river tubing on the Sibulan River in Santa Cruz; local trip accounts describe access through Darong. This is an operator-led route rather than a fixed attraction building. Meeting point, upstream launch, river exit, weather conditions and package inclusions need separate confirmation. No random river coordinate or town centre was selected.",
+          "sources": [
+            "https://cms-bmco.dmtlph.com/destination/davao-region/davao-del-sur/",
+            "https://www.youtube.com/watch?v=ZyqdWe5n6Qw"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "environmental_monitoring_points_not_activity_meeting_point",
+          "detail": "EMB XI publishes Sibulan River monitoring coordinates at the river mouth, bridge and Ayala Picnic Site. These are water-monitoring stations, not confirmed tubing launch, exit or meeting points. River location is corroborated in Darong/Sibulan; do not populate a guided activity with an arbitrary monitoring station.",
+          "sources": [
+            "https://r11.emb.gov.ph/wp-content/uploads/2022/01/2020-Regional-State-of-Brwon-Environmental-Report.pdf",
+            "https://www.youtube.com/watch?v=ZyqdWe5n6Qw"
+          ],
+          "source_date": null,
+          "research_pass": 5,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_primary_activity_area",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://cms-bmco.dmtlph.com/destination/davao-region/davao-del-sur/",
+          "https://www.youtube.com/watch?v=ZyqdWe5n6Qw"
+        ]
+      },
+      "additional_source_review": {
+        "research_pass": 5,
+        "reviewed_on": "2026-11-19",
+        "status": "environmental_monitoring_points_not_activity_meeting_point",
+        "sources": [
+          "https://r11.emb.gov.ph/wp-content/uploads/2022/01/2020-Regional-State-of-Brwon-Environmental-Report.pdf",
+          "https://www.youtube.com/watch?v=ZyqdWe5n6Qw"
+        ]
+      }
+    },
+    {
+      "id": 237,
+      "name": "Battle of Ising Memorial",
+      "location": "Ising, Carmen, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.36163,
+        "longitude": 125.70634,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/N8653966797",
+        "notes": "Memorial marker, not nearby Ising Bridge.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 238,
+      "name": "Freedom Park, Tagum",
+      "location": "Arellano Street, Tagum City, Davao del Norte",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.44707,
+        "longitude": 125.80408,
+        "kind": "venue_area",
+        "source": "https://mapcarta.com/W289142619",
+        "notes": "Freedom Park Tagum; avoid same-name Davao City park.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 239,
+      "name": "Davao City Hall",
+      "location": "San Pedro Street / City Hall Drive, Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.06439,
+        "longitude": 125.6077,
+        "kind": "venue_area",
+        "source": "https://en.wikipedia.org/wiki/Davao_City_Hall",
+        "notes": "City hall building reference corroborated by facade marker coordinates; not generic city centroid.",
+        "verified_vehicle_entrance": false
+      },
+      "detail_findings": []
+    },
+    {
+      "id": 240,
+      "name": "Almendras Falls",
+      "location": "Manuel Guianga, Tugbok District, Davao City",
+      "research_status": "coordinate_reference_found",
+      "coordinate_reference": {
+        "latitude": 7.0814553,
+        "longitude": 125.363577,
+        "kind": "natural_feature",
+        "source": "https://www.google.com/maps/place/Almendras%20Falls/data=!4m2!3m1!1s0x32f91b1394829619:0x733bebfb44977e16",
+        "notes": "Named Davao City waterfall, 39J7+HCP. Geopark listing and Manuel Guianga footage corroborate identity. No verified trailhead or hours.",
+        "verified_vehicle_entrance": false,
+        "research_pass": 4,
+        "checked_on": "2026-11-19"
+      },
+      "detail_findings": [
+        {
+          "status": "confirmed_geosite_locality_review",
+          "detail": "The geopark catalogue identifies Almendras Falls; local footage identifies the Sitio Saro trail in Manuel Guianga, Tugbok. No exact entrance/cascade coordinate was verified. Same-name Central Luzon places and Almendras Gym are unrelated and were excluded.",
+          "sources": [
+            "https://mountapogeopark.com/geosite/almendras-falls/",
+            "https://www.youtube.com/watch?v=1iNN1AusEok"
+          ],
+          "source_date": null,
+          "research_pass": 3,
+          "checked_on": "2026-11-19"
+        },
+        {
+          "status": "map_profile_identity_crosscheck",
+          "detail": "Named Davao City waterfall, 39J7+HCP. Geopark listing and Manuel Guianga footage corroborate identity. No verified trailhead or hours.",
+          "sources": [
+            "https://www.google.com/maps/place/Almendras%20Falls/data=!4m2!3m1!1s0x32f91b1394829619:0x733bebfb44977e16"
+          ],
+          "source_date": null,
+          "research_pass": 4,
+          "checked_on": "2026-11-19"
+        }
+      ],
+      "follow_up_review": {
+        "reviewed_on": "2026-11-19",
+        "research_pass": 3,
+        "identity_status": "confirmed_geosite_locality_review",
+        "coordinate_status": "not_selected",
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "admission_fee": {
+          "value": null,
+          "currency": "PHP",
+          "status": "not_confirmed"
+        },
+        "visit_duration": {
+          "value": null,
+          "status": "not_confirmed"
+        },
+        "sources": [
+          "https://mountapogeopark.com/geosite/almendras-falls/",
+          "https://www.youtube.com/watch?v=1iNN1AusEok"
+        ]
+      },
+      "additional_map_review": {
+        "research_pass": 4,
+        "reviewed_on": "2026-11-19",
+        "profile_name": "Almendras Falls",
+        "coordinate_status": "reference_selected_not_field_verified",
+        "sources": [
+          "https://www.google.com/maps/place/Almendras%20Falls/data=!4m2!3m1!1s0x32f91b1394829619:0x733bebfb44977e16"
+        ],
+        "opening_hours": {
+          "value": null,
+          "status": "not_confirmed"
+        }
+      }
+    }
+  ],
+  "research_passes": [
+    {
+      "pass": 1,
+      "coordinate_references_added": 36
+    },
+    {
+      "pass": 2,
+      "coordinate_references_added": 15
+    },
+    {
+      "pass": 3,
+      "reviewed_remaining_destinations": 48,
+      "coordinate_references_added": 9,
+      "field_verified_vehicle_entrances_added": 0
+    },
+    {
+      "pass": 4,
+      "coordinate_references_added": 18,
+      "map_reported_schedules_pending_confirmation": 5,
+      "field_verified_vehicle_entrances_added": 0,
+      "notes": "Direct visible Google Maps profile checks cross-referenced with existing identity research. Further browsing stopped by automatic approval usage limit."
+    },
+    {
+      "pass": 5,
+      "reviewed_remaining_destinations": 21,
+      "coordinate_references_added": 2,
+      "field_verified_vehicle_entrances_added": 0,
+      "notes": "Two specific references selected; dated access and duration reports recorded separately. Scientific monitoring/collection points rejected as visitor arrivals. No database import."
+    }
+  ]
+}

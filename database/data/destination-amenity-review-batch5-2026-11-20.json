@@ -1,0 +1,778 @@
+{
+  "audited_on": "2026-11-20",
+  "starting_cohort": 65,
+  "newly_with_amenities": 12,
+  "still_without_confirmed_amenities": 53,
+  "canonical_companion": "National Museum canonical record updated alongside its clearly matched legacy alias; identities and public visibility unchanged.",
+  "records": [
+    {
+      "id": 14,
+      "name": "Isla- Agri Ventures Inc",
+      "slug": "isla-agri-ventures-inc",
+      "status": "details_updated_amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [
+        "website_url"
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 17,
+      "name": "JKM Mini Zoo",
+      "slug": "jkm-mini-zoo",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 22,
+      "name": "IMIN The Philippine-Japan Historical Museum",
+      "slug": "imin-the-philippine-japan-historical-museum",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://www.visitmuseums.ph/listings/imin-the-philippine-japan-historical-museum",
+          "evidence": "Museum Foundation directory explicitly lists guided tours for the Calinan museum. Confirm arrangements.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Guided museum visits (reported)"
+        },
+        {
+          "key": "parking",
+          "source": "https://www.visitmuseums.ph/listings/imin-the-philippine-japan-historical-museum",
+          "evidence": "Exact museum directory entry lists parking available. Generic accessibility is not converted into ramp or accessible-toilet claims.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Parking (reported)"
+        }
+      ],
+      "updated_fields": [
+        "facebook_url"
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 23,
+      "name": "Elysia Wellness Spa",
+      "slug": "elysia-wellness-spa",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 25,
+      "name": "Elysia Wellness Spa",
+      "slug": "elysia-wellness-spa-3",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 29,
+      "name": "San Pedro Cathedral",
+      "slug": "san-pedro-cathedral",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 33,
+      "name": "Bankerohan Public Market",
+      "slug": "bankerohan-public-market",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 34,
+      "name": "Shrine of the Holy Infant Jesus of Prague",
+      "slug": "shrine-of-the-holy-infant-jesus-of-prague",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 36,
+      "name": "Talikud Island",
+      "slug": "talikud-island",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 39,
+      "name": "Aliwagwag Falls",
+      "slug": "aliwagwag-falls",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 41,
+      "name": "San Salvador del Mundo Church",
+      "slug": "san-salvador-del-mundo-church",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 42,
+      "name": "Pusan Point",
+      "slug": "pusan-point",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 44,
+      "name": "Wishing Island",
+      "slug": "wishing-island",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 45,
+      "name": "Sabang Cliff",
+      "slug": "sabang-cliff",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 46,
+      "name": "Kaputian Beach",
+      "slug": "kaputian-beach",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "info",
+          "source": "https://samalcity.gov.ph/images/pdf/IGACOS_CC_2025.pdf",
+          "evidence": "PDF pages 392 and 397 describe park reception, payment orders and front-desk assistance.",
+          "status": "published_facility",
+          "display_name": "Visitor reception"
+        },
+        {
+          "key": "overnight_lodging",
+          "source": "https://samalcity.gov.ph/images/pdf/IGACOS_CC_2025.pdf",
+          "evidence": "PDF pages 382-391 describe White Sands hostel reservations associated with Kaputian Beach Park; room-only amenities are not copied to the park.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "White Sands hostel (separate booking) (reported)"
+        },
+        {
+          "key": "day_use_cottages",
+          "source": "https://samalcity.gov.ph/images/pdf/IGACOS_CC_2025.pdf",
+          "evidence": "PDF page 396 lists bahay kubo/open huts in the service schedule; confirm current availability and charges.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Open huts (reported)"
+        },
+        {
+          "key": "campsites",
+          "source": "https://samalcity.gov.ph/images/pdf/IGACOS_CC_2025.pdf",
+          "evidence": "PDF page 394 lists tent services and guest-owned tent charges under a proposed-fees heading; no price or current operating guarantee imported.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Tent/camping services (reported)"
+        },
+        {
+          "key": "charging_stations",
+          "source": "https://samalcity.gov.ph/images/pdf/IGACOS_CC_2025.pdf",
+          "evidence": "PDF page 397 explicitly lists cellphone charging as a service; no dedicated charging hardware is claimed.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Phone charging service (reported)"
+        }
+      ],
+      "updated_fields": [
+        "description"
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 51,
+      "name": "Diaz Island",
+      "slug": "diaz-island",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 59,
+      "name": "Pujada Bay and Pujada Island [SAMPLE]",
+      "slug": "pujada-bay-and-pujada-island-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 60,
+      "name": "Oak Island [SAMPLE]",
+      "slug": "oak-island-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 61,
+      "name": "Guang-guang Mangrove Forest [SAMPLE]",
+      "slug": "guang-guang-mangrove-forest-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 66,
+      "name": "National Museum of the Philippines Davao [SAMPLE]",
+      "slug": "national-museum-of-the-philippines-davao-sample",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://www.visitmuseums.ph/listings/national-museum-of-the-philippines-davao",
+          "evidence": "Exact People’s Park museum directory entry lists guided tours. Legacy alias and canonical record remain separate existing records.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Guided museum visits (reported)"
+        },
+        {
+          "key": "parking",
+          "source": "https://www.visitmuseums.ph/listings/national-museum-of-the-philippines-davao",
+          "evidence": "Museum Foundation directory lists parking available; current availability needs confirmation. No specific accessibility facility inferred.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Parking (reported)"
+        }
+      ],
+      "updated_fields": [
+        "description",
+        "hours",
+        "website_url"
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 69,
+      "name": "Linow tu Gabon (Ocean of Fogs) [SAMPLE]",
+      "slug": "linow-tu-gabon-ocean-of-fogs-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 72,
+      "name": "Balut Island & Sabang Hot Spring [SAMPLE]",
+      "slug": "balut-island-sabang-hot-spring-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 73,
+      "name": "Olanivan Island [SAMPLE]",
+      "slug": "olanivan-island-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 75,
+      "name": "Santa Maria Viewdeck [SAMPLE]",
+      "slug": "santa-maria-viewdeck-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 78,
+      "name": "Tuke Makil / Tuke Nunsol Marine Cove [SAMPLE]",
+      "slug": "tuke-makil-tuke-nunsol-marine-cove-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 80,
+      "name": "Lake Leonard [SAMPLE]",
+      "slug": "lake-leonard-sample",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "campsites",
+          "source": "https://edgedavao.net/indulge-lifestyle/2022/10/discovering-the-riveting-lake-leonard/",
+          "evidence": "October 2022 firsthand report describes lakeside tent camping. No sleeping quarters or neighboring Tagbibinta facilities copied.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Lakeside tent camping (reported)"
+        },
+        {
+          "key": "picnic",
+          "source": "https://edgedavao.net/indulge-lifestyle/2022/10/discovering-the-riveting-lake-leonard/",
+          "evidence": "Same Lake Leonard account describes picnicking on the grounds. No lake-swimming safety claim inferred.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Picnic grounds (reported)"
+        }
+      ],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 83,
+      "name": "Lunod Island Mangrove Forest [SAMPLE]",
+      "slug": "lunod-island-mangrove-forest-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 86,
+      "name": "Malanog-lanog Cave [SAMPLE]",
+      "slug": "malanog-lanog-cave-sample",
+      "status": "details_updated_amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [
+        "location",
+        "website_url"
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 90,
+      "name": "Virgin Falls [SAMPLE]",
+      "slug": "virgin-falls-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 98,
+      "name": "San Salvador del Mundo Church (Caraga Church) [SAMPLE]",
+      "slug": "san-salvador-del-mundo-church-caraga-church-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 101,
+      "name": "Centennial Balite Tree (500-Year-Old Balite) [SAMPLE]",
+      "slug": "centennial-balite-tree-500-year-old-balite-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 105,
+      "name": "Tagum City Night Market & Rotary Park [SAMPLE]",
+      "slug": "tagum-city-night-market-rotary-park-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 110,
+      "name": "Carmen Mangrove Sanctuary & Boardwalk [SAMPLE]",
+      "slug": "carmen-mangrove-sanctuary-boardwalk-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 113,
+      "name": "San Pedro Cathedral [SAMPLE]",
+      "slug": "san-pedro-cathedral-sample",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 171,
+      "name": "Davao Museum of History and Ethnography",
+      "slug": "davao-museum-of-history-and-ethnography",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 175,
+      "name": "The Grape Valley",
+      "slug": "the-grape-valley",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 176,
+      "name": "Mount Candalaga Rafflesia viewing area",
+      "slug": "mount-candalaga-rafflesia-viewing-area",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 181,
+      "name": "Poo Sandbar",
+      "slug": "poo-sandbar",
+      "status": "details_updated_amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [
+        "best_time"
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 182,
+      "name": "Christ the Redeemer",
+      "slug": "christ-the-redeemer",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 183,
+      "name": "Divine Mercy Shrine",
+      "slug": "divine-mercy-shrine",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 184,
+      "name": "Sanctuario de Santo Rosario",
+      "slug": "sanctuario-de-santo-rosario",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 186,
+      "name": "Pyalitan Falls",
+      "slug": "pyalitan-falls",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://davaodeoro.gov.ph/tourist-circuit-wellness-loop/",
+          "evidence": "Provincial tourism describes trekking access via Coronobe to undeveloped Pyalitan Falls. This denotes a natural route, not built facilities or guaranteed maintenance.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Trekking access route (reported)"
+        }
+      ],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 188,
+      "name": "Malumagpak Falls",
+      "slug": "malumagpak-falls",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 189,
+      "name": "Mount Pandadagsaan",
+      "slug": "mount-pandadagsaan",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 193,
+      "name": "New City Hall of Tagum",
+      "slug": "new-city-hall-of-tagum",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "event_spaces",
+          "source": "https://tagumcity.gov.ph/wp-content/uploads/2025/03/LGU-Tagum-Citizens-Charter-2024-Version-2.pdf",
+          "evidence": "PDF pages 37-39 describe City Hall atrium rental, availability checks and a mayor’s special permit. Equipment rental is not a free public amenity.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "City Hall atrium (permit required) (reported)"
+        }
+      ],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 194,
+      "name": "Island Buenavista",
+      "slug": "island-buenavista",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "overnight_lodging",
+          "source": "https://edgedavao.net/maya-on-the-block/2023/04/maya-on-the-block-finding-paradise-at-the-island-buenavista-davao/",
+          "evidence": "April 2023 firsthand report describes guest villas and suites.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Private guest lodging (reported)"
+        },
+        {
+          "key": "pool",
+          "source": "https://edgedavao.net/maya-on-the-block/2023/04/maya-on-the-block-finding-paradise-at-the-island-buenavista-davao/",
+          "evidence": "Firsthand report describes a swimming pool within the private resort.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Pool (reserved guests) (reported)"
+        },
+        {
+          "key": "day_use_cottages",
+          "source": "https://edgedavao.net/maya-on-the-block/2023/04/maya-on-the-block-finding-paradise-at-the-island-buenavista-davao/",
+          "evidence": "Firsthand report identifies a gazebo at the reserved-guest resort; no public day-use entitlement inferred.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Gazebo (reserved guests) (reported)"
+        }
+      ],
+      "updated_fields": [
+        "website_url",
+        "description"
+      ],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 197,
+      "name": "General Moncado White House",
+      "slug": "general-moncado-white-house",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 207,
+      "name": "Fabian's Peak",
+      "slug": "fabian-s-peak",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 211,
+      "name": "Fyingi Sol Cave",
+      "slug": "fyingi-sol-cave",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://pia.gov.ph/news/davsur-towns-reap-gains-from-davao-adventure-challenge/",
+          "evidence": "August 2025 PIA account quotes Matanao tourism on Blaan community guides and identifies Fyingi Sol Cave among added cave visits. Confirm permissions, equipment and guide availability.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Community-guided cave visits (reported)"
+        }
+      ],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 212,
+      "name": "Crocodile Hill",
+      "slug": "crocodile-hill",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 215,
+      "name": "Sigaboy Island",
+      "slug": "sigaboy-island",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 216,
+      "name": "Burias Islet",
+      "slug": "burias-islet",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 217,
+      "name": "Kepiya Falls",
+      "slug": "kepiya-falls",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 222,
+      "name": "Candelaria Park",
+      "slug": "candelaria-park",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 224,
+      "name": "Big Ligid Island",
+      "slug": "big-ligid-island",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 227,
+      "name": "Tomari Falls",
+      "slug": "tomari-falls",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 228,
+      "name": "Sinoron Ecotourism Park",
+      "slug": "sinoron-ecotourism-park",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://logsac.blogspot.com/2019/11/sinoron-water-world-of-sta-cruz.html",
+          "evidence": "November 2019 firsthand barangay assessment follows forest trekking routes from Sinoron. Natural route, not a paved or maintained-trail guarantee.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Forest trekking routes (reported)"
+        },
+        {
+          "key": "visitor_bridges",
+          "source": "https://logsac.blogspot.com/2019/11/sinoron-water-world-of-sta-cruz.html",
+          "evidence": "Same account specifically traverses Pilan River Hanging Bridge. Condition/access needs local confirmation.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Pilan hanging bridge (reported)"
+        }
+      ],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 229,
+      "name": "Tagabuli Sea Rock Garden",
+      "slug": "tagabuli-sea-rock-garden",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 231,
+      "name": "Mayor Francisco G. Rabat Park and Baywalk",
+      "slug": "mayor-francisco-g-rabat-park-and-baywalk",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "event_spaces",
+          "source": "https://pia.gov.ph/news/taekwondo-athlete-crowned-as-first-binbining-mati/",
+          "evidence": "June 2026 PIA report confirms the Binibining Mati finale at Mayor Francisco G. Rabat Park and Baywalk. No permanent stage or booking service assumed.",
+          "status": "published_facility",
+          "display_name": "Outdoor cultural events (confirm schedule)"
+        }
+      ],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 232,
+      "name": "Langan Falls",
+      "slug": "langan-falls",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 233,
+      "name": "Epol Falls",
+      "slug": "epol-falls",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://www.thetravelingnomad.com/2011/08/everlasting-power-of-love-waterfalls.html",
+          "evidence": "Authored 2011 firsthand Epol visit documents a forest access path that becomes slippery after rain. Old cottages and fees are not treated as current facilities.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Forest access path (reported)"
+        }
+      ],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 237,
+      "name": "Battle of Ising Memorial",
+      "slug": "battle-of-ising-memorial",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 238,
+      "name": "Freedom Park, Tagum",
+      "slug": "freedom-park-tagum",
+      "status": "source_backed_amenities_added",
+      "added_amenities": [
+        {
+          "key": "event_spaces",
+          "source": "https://tagumcity.gov.ph/wp-content/uploads/2025/03/LGU-Tagum-Citizens-Charter-2024-Version-2.pdf",
+          "evidence": "PDF page 40 identifies Freedom Park cultural/social events; preceding application procedure requires approval. No Rotary Park facilities copied.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Cultural event space (permit required) (reported)"
+        }
+      ],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 239,
+      "name": "Davao City Hall",
+      "slug": "davao-city-hall",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    },
+    {
+      "id": 240,
+      "name": "Almendras Falls",
+      "slug": "almendras-falls",
+      "status": "amenities_unconfirmed",
+      "added_amenities": [],
+      "updated_fields": [],
+      "note": "Unconfirmed does not mean unavailable or absent. No unpublished fee or visit duration inferred."
+    }
+  ]
+}
