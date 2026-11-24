@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
  *
  * What a budget means differs by catalogue, because the data does:
  *   - Destinations: the entry fee on file (entry_fee_min to entry_fee_max). A place fits when its fee range
- *     overlaps the budget. A place with no fee on file never fits a budget; "Any budget" keeps it.
+ *     overlaps the budget. A place with no fee on file never fits a budget; "Flexible" (no budget) keeps it.
  *   - Overnight stays: overlap with the displayed recorded, published or estimated nightly range.
  *     Day-use stays: the separate, optional price_per_day, never nightly estimates.
  *   - Packages: price_per_pax times the travellers asked for (one, when none is given).
@@ -96,14 +96,14 @@ final class BudgetRanges
     }
 
     /**
-     * The dropdown's options for one catalogue: [key => label], Any budget first and Custom budget last
+     * The dropdown's options for one catalogue: [key => label], Flexible (no budget) first and Custom budget last
      * where an amount can be typed. Dining lists its three levels and nothing else.
      *
      * @return array<string, string>
      */
     public static function options(string $purpose): array
     {
-        $options = ['' => 'Any budget'];
+        $options = ['' => 'Flexible'];
 
         if ($purpose === 'restaurants') {
             foreach (self::DINING_LEVELS as $value => $label) {
