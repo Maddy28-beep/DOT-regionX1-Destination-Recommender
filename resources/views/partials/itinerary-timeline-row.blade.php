@@ -116,6 +116,10 @@
         @elseif ($isCard)
             <article class="tl-card tl-card--{{ $kind }}">
                 <div class="tl-card__media">
+                    @if ($listing && ! $accreditationOk && $accreditationLabel && ($isStay || in_array($kind, ['activity', 'meal'], true)))
+                        {{-- No pill for a place without a DOT record: a small info mark on the photo says why, on hover, focus or tap. --}}
+                        <span class="tl-card__info" tabindex="0" role="img" aria-label="{{ $accreditationLabel }}" title="{{ $accreditationLabel }}"><x-icon name="info" aria-hidden="true" /></span>
+                    @endif
                     @if ($realPhoto)
                         <img src="{{ $realPhoto->url() }}" alt="" loading="lazy" decoding="async">
                         @include('partials.photo-scope-label', ['photo' => $realPhoto])
@@ -204,9 +208,6 @@
                                     <ul class="pairing-why__stats">
                                         @foreach ($why['facts'] as $fact)<li>{{ $fact }}</li>@endforeach
                                     </ul>
-                                    @if (app(\App\Support\SampleData::class)->status($listing) === \App\Support\SampleData::SAMPLE)
-                                        <div class="pairing-why__sample"><x-provenance-badge :ok="false" :label="$accreditationLabel" /></div>
-                                    @endif
                                 </div>
                             </div>
                         </div>

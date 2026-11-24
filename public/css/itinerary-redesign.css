@@ -446,6 +446,8 @@
    Green is only for a genuine DOT accreditation record. Amber, outlined, is for sample or unverified data. Both are the
    same pill (shape, size, weight), so they read as one badge in two opposite states. Neutral gray carries everything that
    is not a positive or a warning. */
+.tl-card__info { position: absolute; top: 6px; left: 6px; z-index: 2; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(255, 255, 255, .92); color: #8a4b00; box-shadow: 0 1px 4px rgba(0, 0, 0, .25); cursor: help; }
+.tl-card__info svg { width: 14px; height: 14px; }
 .tl-badges { margin: 0 0 8px; }
 .tl-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border: 1px solid transparent; border-radius: 999px; font: 600 .72rem/1.35 'Poppins', sans-serif; }
 .tl-badge svg { flex: none; width: 12px; height: 12px; }

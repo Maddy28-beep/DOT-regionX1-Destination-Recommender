@@ -1,8 +1,9 @@
 @props(['ok' => false, 'label'])
 {{--
-    The accreditation badge on an itinerary card. One pill shape in two states: green with a check when the place has a
-    genuine DOT accreditation record, amber with an outline and an info mark when it is sample data or not verified.
-    The wording is whatever SampleData says (never decided here), so the two states can never disagree with the rest of
-    the site.
+    The accreditation badge on an itinerary card. Only a place with a genuine DOT accreditation record gets the green pill, as on the listing pages.
+    Sample data and places not verified get no pill; the card shows a small info mark on its photo instead (see
+    itinerary-timeline-row), and the wording is still whatever SampleData says.
 --}}
-<p class="tl-badges"><span class="tl-badge {{ $ok ? 'tl-badge--ok' : 'tl-badge--warn' }}"><x-icon :name="$ok ? 'check' : 'info'" aria-hidden="true" />{{ $label }}</span></p>
+@if ($ok)
+<p class="tl-badges"><span class="tl-badge tl-badge--ok"><x-icon name="check" aria-hidden="true" />{{ $label }}</span></p>
+@endif
