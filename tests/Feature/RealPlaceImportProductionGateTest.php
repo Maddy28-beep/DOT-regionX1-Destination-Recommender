@@ -55,6 +55,15 @@ class RealPlaceImportProductionGateTest extends TestCase
         $this->assertSame(0, Destination::count() + Restaurant::count() + ListingPhoto::count());
     }
 
+    public function test_the_restaurant_photo_batch_follows_the_same_gate(): void
+    {
+        $this->app['env'] = 'production';
+
+        $this->artisan('restaurants:apply-photos', ['--apply' => true])->expectsOutputToContain('--allow-production')->assertFailed();
+        $this->artisan('restaurants:apply-photos', ['--allow-production' => true])->expectsOutputToContain('photos ready (dry run)')->assertSuccessful();
+        $this->assertSame(0, ListingPhoto::count());
+    }
+
     public function test_the_enrichment_gets_past_the_gate_with_the_flag_and_stops_on_a_missing_file(): void
     {
         $this->app->instance('env', 'production');
