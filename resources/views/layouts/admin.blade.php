@@ -22,6 +22,9 @@
             <div class="group-label">Directory &amp; approvals</div>
             <a href="{{ route('admin.listings.index', 'destinations') }}" class="{{ request()->routeIs('admin.listings.*') ? 'active' : '' }}"><x-icon name="building" /><span>Listings</span></a>
             <a href="{{ route('admin.establishments') }}" class="{{ request()->routeIs('admin.establishments') ? 'active' : '' }}"><x-icon name="shield-check" /><span>Establishments</span></a>
+            <a href="{{ route('admin.listing-approvals') }}" class="{{ request()->routeIs('admin.listing-approvals*') ? 'active' : '' }}"><x-icon name="check" /><span>Listing approvals</span>
+                @if ($navListingsWaiting > 0)<b class="adm-nb" title="{{ $navListingsWaiting }} waiting for review">{{ $navListingsWaiting }}<span class="sr-only"> waiting for review</span></b>@endif
+            </a>
             <a href="{{ route('admin.package-approvals') }}" class="{{ request()->routeIs('admin.package-approvals*') ? 'active' : '' }}"><x-icon name="package" /><span>Tour packages</span>
                 @if ($navPackagesWaiting > 0)<b class="adm-nb" title="{{ $navPackagesWaiting }} waiting for review">{{ $navPackagesWaiting }}<span class="sr-only"> waiting for review</span></b>@endif
             </a>

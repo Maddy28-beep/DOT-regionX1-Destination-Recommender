@@ -13,7 +13,6 @@ use App\Http\Controllers\Admin\AdminPostcardSlideController;
 use App\Http\Controllers\AdvisoryController;
 use App\Http\Controllers\Auth\EstablishmentRegistrationController;
 use App\Http\Controllers\Auth\PortalAuthController;
-use App\Http\Controllers\Auth\TouristAuthController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\DestinationController;
@@ -31,8 +30,6 @@ use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\SavedListingController;
 use App\Http\Controllers\SouvenirCenterController;
 use App\Http\Controllers\TourOperatorController;
-use App\Http\Controllers\Tourist\TouristItineraryController;
-use App\Http\Controllers\Tourist\TouristSavedDestinationController;
 use App\Http\Controllers\ItinerarySwapController;
 use App\Http\Controllers\TripPlannerController;
 use Illuminate\Support\Facades\Route;
@@ -155,10 +152,11 @@ Route::get('/plan/itinerary/alternatives/{destinationId}', [ItinerarySwapControl
     ->whereNumber('destinationId')
     ->name('plan.alternatives');
 Route::post('/plan/itinerary/swap', [ItinerarySwapController::class, 'swap'])->middleware('throttle:trip-build')->name('plan.swap');
-// Claims the session's current itinerary onto an optional tourist account. Not
-// gated by auth:tourist -- a guest must be able to hit this, get sent to
-// register, and land back here to finish. See TouristItineraryController.
-Route::post('/plan/itinerary/save', [TouristItineraryController::class, 'store'])->middleware('throttle:trip-build')->name('plan.itinerary.save');
+// Keeping a plan without an account: a private link carries it on, a second link only shows it.
+Route::post('/plan/itinerary/keep', [\App\Http\Controllers\ItineraryKeepController::class, 'store'])->middleware('throttle:keep')->name('plan.keep');
+Route::post('/plan/itinerary/keep/renew', [\App\Http\Controllers\ItineraryKeepController::class, 'renew'])->middleware('throttle:keep')->name('plan.keep.renew');
+Route::get('/plan/saved/{secret}', [\App\Http\Controllers\ItineraryKeepController::class, 'open'])->middleware('throttle:keep-open')->where('secret', '[A-Za-z0-9]{48}')->name('plan.kept.open');
+Route::get('/plan/shared/{secret}', [\App\Http\Controllers\ItineraryKeepController::class, 'shared'])->middleware('throttle:keep-open')->where('secret', '[A-Za-z0-9]{48}')->name('plan.kept.shared');
 
 // Exit survey (2.2.1.7, Figures 13-15) — anonymous by design, no login required
 Route::get('/exit-survey', [ExitSurveyController::class, 'create'])->name('exit-survey.create');
@@ -180,37 +178,11 @@ Route::post('/chatbot/message', [ChatbotController::class, 'respond'])
  *
  * Trip planning needs no account by default, so this list is kept against an
  * opaque random browser token rather than a person; see EnsureVisitorToken
- * and SavedListingController. A tourist who wants this to survive past the
- * browser can optionally create the separate account below instead.
+ * and SavedListingController. A plan the traveler wants to keep
+ * is saved by a private link instead; see ItineraryKeepController.
  */
 Route::get('/saved', [SavedListingController::class, 'index'])->name('saved.index');
 Route::post('/saved/{type}/{id}', [SavedListingController::class, 'toggle'])->middleware('throttle:toggle')->name('saved.toggle');
-
-/*
- * Optional tourist account (alias + password, no real identity) -- purely a
- * convenience for saving an itinerary/favorites past the browser session.
- * Every core feature above keeps working with no account at all; see
- * TouristAuthController / TouristItineraryController / TouristSavedDestinationController.
- */
-Route::prefix('account')->name('account.')->group(function () {
-    Route::get('/register', [TouristAuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [TouristAuthController::class, 'register'])->middleware('throttle:register');
-    Route::get('/login', [TouristAuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [TouristAuthController::class, 'login'])->middleware('throttle:login');
-    Route::post('/logout', [TouristAuthController::class, 'logout'])->name('logout');
-});
-
-Route::prefix('account')->name('account.')->middleware('auth:tourist')->group(function () {
-    Route::get('/', fn () => redirect()->route('account.itineraries'));
-
-    Route::get('/itineraries', [TouristItineraryController::class, 'index'])->name('itineraries');
-    Route::get('/itineraries/{itinerary}', [TouristItineraryController::class, 'show'])->name('itineraries.show');
-    Route::get('/itineraries/{itinerary}/edit', [TouristItineraryController::class, 'edit'])->name('itineraries.edit');
-    Route::delete('/itineraries/{itinerary}', [TouristItineraryController::class, 'destroy'])->name('itineraries.destroy');
-
-    Route::get('/saved', [TouristSavedDestinationController::class, 'index'])->name('saved');
-    Route::post('/saved/{type}/{id}', [TouristSavedDestinationController::class, 'toggle'])->middleware('throttle:toggle')->name('saved.toggle');
-});
 
 // Partner Portal (2.3.2 Tourism Administrator + DOT-Accredited Establishment, Figure 7)
 Route::prefix('portal')->name('portal.')->group(function () {
@@ -232,6 +204,8 @@ Route::prefix('portal/admin')->name('admin.')->middleware(['auth:admin', \App\Ht
     Route::post('/establishments/{establishment}/match', [AdminDashboardController::class, 'matchEstablishmentListing'])->name('establishments.match');
 
     // Packages tour operators sent in: approved here before travellers can see them
+    Route::get('/listing-approvals', [\App\Http\Controllers\Admin\AdminListingApprovalController::class, 'index'])->name('listing-approvals');
+    Route::post('/listing-approvals/{submission}/decide', [\App\Http\Controllers\Admin\AdminListingApprovalController::class, 'decide'])->whereNumber('submission')->name('listing-approvals.decide');
     Route::get('/package-approvals', [\App\Http\Controllers\Admin\AdminPackageApprovalController::class, 'index'])->name('package-approvals');
     Route::get('/package-approvals/{package}', [\App\Http\Controllers\Admin\AdminPackageApprovalController::class, 'review'])->whereNumber('package')->name('package-approvals.review');
     Route::post('/package-approvals/{package}/decide', [\App\Http\Controllers\Admin\AdminPackageApprovalController::class, 'decide'])->whereNumber('package')->name('package-approvals.decide');
@@ -306,6 +280,9 @@ Route::prefix('portal/establishment')->name('establishment.')->middleware('auth:
     Route::get('/', [EstablishmentDashboardController::class, 'overview'])->name('overview');
     Route::get('/listing', [EstablishmentDashboardController::class, 'editListing'])->name('listing.edit');
     Route::put('/listing', [EstablishmentDashboardController::class, 'updateListing'])->name('listing.update');
+    Route::post('/listing/submit', [EstablishmentDashboardController::class, 'submitDraft'])->middleware('throttle:20,1')->name('listing.submit');
+    Route::post('/listing/discard', [EstablishmentDashboardController::class, 'discardDraft'])->name('listing.discard');
+    Route::post('/listing/reopen/{submission}', [EstablishmentDashboardController::class, 'reopenSubmission'])->whereNumber('submission')->name('listing.reopen');
     Route::get('/listing/{section}', [EstablishmentDashboardController::class, 'form'])->whereIn('section', array_keys(EstablishmentDashboardController::SECTIONS))->name('listing.form');
     Route::get('/listing/qr-code', [QrCodeController::class, 'establishment'])->name('listing.qr-code');
     Route::get('/reviews', [EstablishmentDashboardController::class, 'reviews'])->name('reviews');

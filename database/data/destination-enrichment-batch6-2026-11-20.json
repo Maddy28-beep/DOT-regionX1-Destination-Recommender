@@ -1,0 +1,423 @@
+{
+  "format": "destination-enrichment-v1",
+  "researched_on": "2026-11-20",
+  "scope": "Sixth local pass over the 53 amenity-empty existing destination records. Source-backed services and details only; no unpublished fees/durations, identities, coordinates, photos, accreditation, publication or planner logic changes.",
+  "records": [
+    {
+      "slug": "elysia-wellness-spa",
+      "name": "Elysia Wellness Spa",
+      "fields": {
+        "description": {
+          "expected": "Elysia Wellness Spa is a DOT Region XI-accredited Wellness & Spa in Davao City (accreditation no. DOT-R11-SPA-01236-2024).",
+          "value": "Elysia Wellness Spa’s Ecoland branch is on Quimpo Boulevard at Mangga Street. A 2026 firsthand visitor account describes a booked Filipino Hilot massage here. Confirm current treatments, availability and opening times with this branch. Services at the separate Obrero and Agdao branches are not assumed to be the same.",
+          "source": "https://thetravelintern.com/davao-guide/",
+          "reason": "Firsthand account gives the exact Quimpo/Mangga address and describes a received massage. No treatment price or session length imported as admission or visit duration."
+        }
+      },
+      "amenities": [
+        {
+          "key": "spa",
+          "source": "https://thetravelintern.com/davao-guide/",
+          "evidence": "Author reports receiving a Filipino Hilot massage at the Ecoland/Quimpo branch.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Massage treatments (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "shrine-of-the-holy-infant-jesus-of-prague",
+      "name": "Shrine of the Holy Infant Jesus of Prague",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://www.gojavalava.com/davaotours",
+          "evidence": "Operator includes the Matina shrine in its city tour with a driver-guide. Vehicle facilities are not shrine facilities.",
+          "status": "published_facility",
+          "display_name": "Guided visits by arrangement"
+        }
+      ]
+    },
+    {
+      "slug": "talikud-island",
+      "name": "Talikud Island",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://www.seantric.com/samal-island-tour",
+          "evidence": "Operator lists Talicud Island among its guided boat-tour stops. Confirm itinerary and sea conditions; no shore facilities inferred.",
+          "status": "published_facility",
+          "display_name": "Guided boat tours by arrangement"
+        }
+      ]
+    },
+    {
+      "slug": "wishing-island",
+      "name": "Wishing Island",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://aplreysamalislandhoppingtour23.my.canva.site/",
+          "evidence": "Operator names this stop and includes a tour guide. Boat equipment and prices are not site amenities or entrance fees.",
+          "status": "published_facility",
+          "display_name": "Guided boat visits by arrangement"
+        }
+      ]
+    },
+    {
+      "slug": "sabang-cliff",
+      "name": "Sabang Cliff",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://aplreysamalislandhoppingtour23.my.canva.site/",
+          "evidence": "Operator names this stop and includes a tour guide. Boat equipment and prices are not site amenities or entrance fees.",
+          "status": "published_facility",
+          "display_name": "Guided boat visits by arrangement"
+        }
+      ]
+    },
+    {
+      "slug": "diaz-island",
+      "name": "Diaz Island",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://aplreysamalislandhoppingtour23.my.canva.site/",
+          "evidence": "Operator explicitly describes Diaz Island as a pass-by on its guided route. This does not grant landing access.",
+          "status": "published_facility",
+          "display_name": "Guided boat viewing (pass-by only)"
+        }
+      ]
+    },
+    {
+      "slug": "pujada-bay-and-pujada-island-sample",
+      "name": "Pujada Bay and Pujada Island [SAMPLE]",
+      "fields": {
+        "description": {
+          "expected": "Protected landscape and seascape (declared 1994) with coral reefs and white-sand beaches; Pujada Island, about 156 hectares, sits at the bay entrance with a small lighthouse.",
+          "value": "Pujada Island sits at the entrance to Pujada Bay in Mati. A 2023 firsthand campsite visit reported tent and hammock camping and rentable open cottages. These facilities relate to the visited island campsite, not the whole bay. Confirm current campsite access and availability before arranging a boat trip.",
+          "source": "https://contentbydorz.wordpress.com/2023/04/11/what-to-do-and-expect-when-in-isla-pujada-campsite-mati/",
+          "reason": "Exact named-island campsite account; preserve the legacy record identity. No historical rates, travel times or boat schedules imported."
+        }
+      },
+      "amenities": [
+        {
+          "key": "campsites",
+          "source": "https://contentbydorz.wordpress.com/2023/04/11/what-to-do-and-expect-when-in-isla-pujada-campsite-mati/",
+          "evidence": "April 2023 visitors describe pitching tents and hammocks at the island campsite.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Island campsite (reported)"
+        },
+        {
+          "key": "day_use_cottages",
+          "source": "https://contentbydorz.wordpress.com/2023/04/11/what-to-do-and-expect-when-in-isla-pujada-campsite-mati/",
+          "evidence": "Same visit documents rented open and umbrella cottages. Current availability unconfirmed.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Open cottages at island campsite (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "balut-island-sabang-hot-spring-sample",
+      "name": "Balut Island & Sabang Hot Spring [SAMPLE]",
+      "fields": {
+        "description": {
+          "expected": "A dramatic volcanic island at the southernmost frontier of the Philippines featuring thermal sulfuric springs, sea turtle habitats, and pristine coral reefs.",
+          "value": "Balut Island is a volcanic island in Sarangani, Davao Occidental. A 2016 firsthand trek followed a route from Barangay Lipol towards the volcano and Sabang Hot Spring. That visit described the spring as viewing-only rather than a swimming facility. Confirm present access, local permission and guidance; historical pools are not treated as working visitor amenities.",
+          "source": "https://www.pinoymountaineer.com/2016/07/hiking-matters-517-balut-volcano-the-only-philippine-mountain-where-you-can-see-indonesia.html",
+          "reason": "Named island and Lipol route matched. Historical swimming-pool disrepair is not used to change present operating status."
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://www.pinoymountaineer.com/2016/07/hiking-matters-517-balut-volcano-the-only-philippine-mountain-where-you-can-see-indonesia.html",
+          "evidence": "Firsthand 2016 trek describes the Lipol route and variants to Sabang. This is a historical natural route, not a current maintained-trail guarantee.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Lipol trekking route (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "virgin-falls-sample",
+      "name": "Virgin Falls [SAMPLE]",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://edgedavao.net/indulge-lifestyle/2016/03/why-i-love-the-highlands-of-kapatagan/",
+          "evidence": "Authored 2016 account describes trekking down to Virgin Falls in Kapatagan, Digos. Camp Sabros facilities and Lanao del Norte namesake results are excluded.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Waterfall trekking access (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "crocodile-hill",
+      "name": "Crocodile Hill",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://p600.org/articles/a-viewpoint-without-crocodiles-on-crocodile-hill",
+          "evidence": "April 2023 firsthand visit documents paths at Punta Piape, Padada; some facilities appeared unused. No viewing-deck structure or current facility operation inferred.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Hill walking paths (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "tomari-falls",
+      "name": "Tomari Falls",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://mountapogeopark.com/geosite/tarusuban-ka-mallong-tumari-falls/",
+          "source": "https://mountapogeopark.com/geosite/tarusuban-ka-mallong-tumari-falls/",
+          "reason": "Exact Tumari/Tomari geosite visitor profile directs visitors to confirm current access with management; coordinates remain untouched."
+        }
+      },
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://realestateblogph.com/2021/11/mt-apo-town-opens-all-ecotourism-cultural-sites/",
+          "evidence": "Syndicated BusinessWorld report by Maya M. Padilla quotes Santa Cruz tourism officer Julius Paner on local-guide arrangements for the town’s sites, including Tomari. Historical fees and reopening statements not imported.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Local guide arrangements (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "langan-falls",
+      "name": "Langan Falls",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://meanttogo.com/a-day-hike-guide-to-mt-loay-traverse-langan-falls-11-things-to-know-prior-to-your-adventure/",
+          "evidence": "Firsthand guide updated 2021 describes the steeper Loay-to-Langan route; Loay summit camping and stores are not assigned to the falls.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Langan trekking route (reported)"
+        },
+        {
+          "key": "visitor_bridges",
+          "source": "https://meanttogo.com/a-day-hike-guide-to-mt-loay-traverse-langan-falls-11-things-to-know-prior-to-your-adventure/",
+          "evidence": "Author describes crossing a hanging bridge on the walk out from Langan Falls; access-route facility, not a bridge over the waterfall.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Access-route hanging bridge (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "davao-city-hall",
+      "name": "Davao City Hall",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "info",
+          "source": "https://davaocity.gov.ph/wp-content/uploads/2026/03/CGD_CC2026_VOLUMEIIE.pdf",
+          "evidence": "Rendered PDF page 641 of the 2026 city service guide places a Public Assistance Counter at the main entrance of Main City Hall. This is civic assistance, not a tourist booking desk.",
+          "status": "published_facility",
+          "display_name": "Public assistance counter"
+        }
+      ]
+    },
+    {
+      "slug": "big-ligid-island",
+      "name": "Big Ligid Island",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://southshorediversph.com/special-diving-destinations/",
+          "source": "https://southshorediversph.com/special-diving-destinations/",
+          "reason": "Dive operator explicitly names Big Ligid and Balet. This is an activity provider page, not an island-owned website."
+        },
+        "description": {
+          "expected": "The larger Ligid island off Samal, with a rocky shoreline and nearby dive sites. This is distinct from Little Ligid, already listed as Island Buenavista. The photograph shows visitors on the Big Ligid shoreline. Arrange local permission and boat access before travelling.",
+          "value": "Big Ligid is one of the small islands off Samal. A local dive operator publishes a boat-based diving trip that includes Big Ligid and Balet. Confirm qualifications, conditions and reservations directly with the provider. Boat equipment and meals do not establish facilities on the island, and a dive trip does not imply permission to land.",
+          "source": "https://southshorediversph.com/special-diving-destinations/",
+          "reason": "Named destination matched; no boat amenities, package prices or trip duration applied to the island."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "almendras-falls",
+      "name": "Almendras Falls",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://mountapogeopark.com/geosite/almendras-falls/",
+          "source": "https://mountapogeopark.com/geosite/almendras-falls/",
+          "reason": "Named Almendras Falls geosite profile with access-confirmation contact. Geopark office address is not copied as the waterfall address."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "candelaria-park",
+      "name": "Candelaria Park",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://davaocity.gov.ph/environment/six-new-public-parks-to-open-in-davao-city/",
+          "source": "https://davaocity.gov.ph/environment/six-new-public-parks-to-open-in-davao-city/",
+          "reason": "City identifies Candelaria among existing parks. Announced amenities at other pocket parks are not assigned to Candelaria."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "christ-the-redeemer",
+      "name": "Christ the Redeemer",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://www.experiencedavao.com/destinations/davao-occidental/jose-abad-santos/attractions/christ-the-redeemer",
+          "source": "https://www.experiencedavao.com/destinations/davao-occidental/jose-abad-santos/attractions/christ-the-redeemer",
+          "reason": "Exact DOT regional attraction profile; this is visitor background, not an operator booking page. No accessibility, facilities or mass schedule inferred."
+        },
+        "location": {
+          "expected": "Jose Abad Santos, Davao Occidental",
+          "value": "Barangay Culaman, Jose Abad Santos, Davao Occidental",
+          "source": "https://www.experiencedavao.com/destinations/davao-occidental/jose-abad-santos/attractions/christ-the-redeemer",
+          "reason": "Regional tourism publishes the barangay address. No coordinates changed."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "divine-mercy-shrine",
+      "name": "Divine Mercy Shrine",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://www.experiencedavao.com/destinations/davao-occidental/malita/attractions/divine-mercy-shrine",
+          "source": "https://www.experiencedavao.com/destinations/davao-occidental/malita/attractions/divine-mercy-shrine",
+          "reason": "Exact DOT regional attraction profile; this is visitor background, not an operator booking page. No accessibility, facilities or mass schedule inferred."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "sanctuario-de-santo-rosario",
+      "name": "Sanctuario de Santo Rosario",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://www.experiencedavao.com/destinations/davao-occidental/malita/attractions/sanctuario-de-santo-rosario",
+          "source": "https://www.experiencedavao.com/destinations/davao-occidental/malita/attractions/sanctuario-de-santo-rosario",
+          "reason": "Exact DOT regional attraction profile; this is visitor background, not an operator booking page. No accessibility, facilities or mass schedule inferred."
+        }
+      },
+      "amenities": []
+    }
+  ],
+  "held": [
+    {
+      "ids": [
+        14,
+        17
+      ],
+      "reason": "Farm/company identification does not confirm visitor facilities; zoo subpage links remain empty."
+    },
+    {
+      "ids": [
+        25
+      ],
+      "reason": "Quimpo firsthand massage account does not establish services at the distinct Agdao/Phoenix branch."
+    },
+    {
+      "ids": [
+        29,
+        41,
+        98,
+        113
+      ],
+      "reason": "Parish history, mass schedules and nearby museum references do not prove specific visitor amenities. Preserve aliases and existing fields."
+    },
+    {
+      "ids": [
+        33
+      ],
+      "reason": "Older public-toilet/food-stall articles and current demolition reporting do not establish the present location or condition of market visitor facilities."
+    },
+    {
+      "ids": [
+        39,
+        42
+      ],
+      "reason": "Recent restoration planning does not confirm current opening or usable facilities; no old infrastructure claim promoted to confirmed."
+    },
+    {
+      "ids": [
+        60,
+        61,
+        73,
+        78,
+        83,
+        181,
+        215,
+        216
+      ],
+      "reason": "Island/mangrove identification and boat publicity do not establish onshore facilities. Proposed boardwalks, adjacent island camps and foreign namesakes excluded."
+    },
+    {
+      "ids": [
+        69,
+        75,
+        101
+      ],
+      "reason": "Viewpoints and landmarks are not automatically constructed viewing decks or campsites. Planned development is not an operating facility."
+    },
+    {
+      "ids": [
+        86,
+        110
+      ],
+      "reason": "Municipal cave identity does not prove guide service; exact Carmen mangrove identity/facilities remain insufficiently supported."
+    },
+    {
+      "ids": [
+        105
+      ],
+      "reason": "Combined legacy night-market/Rotary Park name spans distinct venues. No market food facilities or separate Freedom Park features assigned to Rotary Park."
+    },
+    {
+      "ids": [
+        171
+      ],
+      "source": "https://www.addu.edu.ph/museum-study-gallery-blessing-arrupe-hall/",
+      "reason": "Existing Arrupe Hall relocation details are correct. Ceremony guided viewing and climate-control wording do not establish regular bookable tours or a specific public air-conditioning amenity."
+    },
+    {
+      "ids": [
+        175,
+        176
+      ],
+      "reason": "Grape-picking is a published activity, not proof of a guided farm tour; full summit-climb facilities do not establish facilities at the Rafflesia viewing locality."
+    },
+    {
+      "ids": [
+        188,
+        189,
+        197,
+        207,
+        217
+      ],
+      "reason": "Remote trekking references, community history and name/location conflicts are insufficient for specific current facilities. No unverified campsite, water station or guide network imported."
+    },
+    {
+      "ids": [
+        229,
+        237
+      ],
+      "reason": "Provincial destination identification and memorial history do not by themselves confirm visitor amenities."
+    }
+  ]
+}

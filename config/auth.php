@@ -2,7 +2,6 @@
 
 use App\Models\AdminUser;
 use App\Models\EstablishmentAccount;
-use App\Models\TouristAccount;
 
 return [
 
@@ -18,10 +17,9 @@ return [
     | Trip planning itself still needs no account and collects no personal
     | data -- visits are counted by QR scan at the establishment, and saved
     | places and trip plans are kept against an opaque browser token by
-    | default (see EnsureVisitorToken). The `tourist` guard below is a
-    | separate, entirely OPTIONAL account (alias + password, no real
-    | identity) a traveler may create only if they want an itinerary to
-    | survive past the browser session -- it never gates any core feature.
+    | default (see EnsureVisitorToken).
+    | Travelers have no account at all: a plan they want to keep is saved by a
+    | private link (see ItineraryKeepController).
     | The default guard is the admin guard, which is the only one a bare
     | auth() call could sensibly mean.
     |
@@ -42,11 +40,6 @@ return [
             'driver' => 'session',
             'provider' => 'establishment_accounts',
         ],
-
-        'tourist' => [
-            'driver' => 'session',
-            'provider' => 'tourist_accounts',
-        ],
     ],
 
     'providers' => [
@@ -58,11 +51,6 @@ return [
         'establishment_accounts' => [
             'driver' => 'eloquent',
             'model' => EstablishmentAccount::class,
-        ],
-
-        'tourist_accounts' => [
-            'driver' => 'eloquent',
-            'model' => TouristAccount::class,
         ],
     ],
 

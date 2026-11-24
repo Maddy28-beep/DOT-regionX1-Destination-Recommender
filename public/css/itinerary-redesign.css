@@ -726,3 +726,30 @@
 /* The banner title in Barabara like the planner's "How would you like to plan your trip?" (the Poppins shorthand above
    loads after brand-accents.css and used to win). Sentence case, as on the planner. */
 .itin-banner__title { font-family: 'Barabara', 'Alfa Slab One', serif; font-weight: 400; text-transform: none; letter-spacing: .01em; color: #0a4f38; }
+
+/* Phone itinerary summary: compact text, readable actions and every day in view. */
+@media screen and (max-width: 760px) {
+    .itinerary-page .itin-banner { grid-template-columns: 56px minmax(0,1fr); gap: 5px 12px; padding: 14px; margin: 0 0 12px; border-radius: 16px; }
+    .itinerary-page .itin-banner__davo { width: 56px; max-height: 70px; }
+    .itinerary-page .itin-banner__title { font-size: clamp(1.1rem,5.1vw,1.4rem); line-height: 1.2; text-wrap: balance; }
+    .itinerary-page .itin-banner__name { margin: 4px 0 0; font-size: .9rem; line-height: 1.4; }
+    .itinerary-page .itin-banner__sub { margin: 4px 0 0; font-size: .82rem; line-height: 1.5; }
+    .itinerary-page .itin-banner__context { margin: 4px 0 0; gap: 5px; }
+    .itinerary-page .itin-banner .itin-around__chip { padding: 3px 9px; font-size: .7rem; line-height: 1.5; }
+    .itinerary-page .itin-trip-details { margin: 0; }
+    .itinerary-page .itin-trip-details > summary { min-height: 44px; padding-block: 8px; font-size: .8rem; }
+    .itinerary-page .itin-banner__actions { gap: 5px; margin-top: 0; }
+    .itinerary-page .itin-banner .itin-banner__buttons { grid-template-columns: minmax(0,1fr); gap: 8px; }
+    .itinerary-page .itin-banner .itin-banner__buttons .btn { min-height: 46px; padding: 10px 12px; font-size: .82rem; line-height: 1.35; white-space: nowrap; }
+    .itinerary-page .itin-banner__buttons .btn svg { width: 16px; height: 16px; flex: none; }
+    .itinerary-page .itin-banner__keep-state { margin: 2px 0 0; font-size: .72rem; line-height: 1.5; }
+    .itinerary-page .itin-bar { display: grid; grid-template-columns: minmax(0,1fr); gap: 10px; margin-bottom: 14px; }
+    .itinerary-page .itin-tabs { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; width: 100%; padding: 0; margin: 0; border: 0; background: transparent; overflow: visible; scroll-snap-type: none; }
+    .itinerary-page .itin-tabs a { min-width: 0; min-height: 58px; padding: 8px 6px; border-radius: 10px; gap: 3px; }
+    .itinerary-page .itin-tabs a strong { font-size: .86rem; line-height: 1.3; }
+    .itinerary-page .itin-tabs a small { font-size: .69rem; line-height: 1.4; white-space: normal; }
+    .itinerary-page .itin-bar__theme { justify-self: start; max-width: 100%; padding: 4px 9px; font-size: .7rem; line-height: 1.4; }
+    .itinerary-page .itin-bar__links { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; width: 100%; padding: 0; }
+    .itinerary-page .itin-bar__links > * { min-width: 0; min-height: 46px; margin: 0; padding: 8px; border-radius: 10px; font-size: .72rem; line-height: 1.3; gap: 6px; text-align: center; white-space: normal; justify-content: center; }
+    .itinerary-page .itin-bar__links > * svg { width: 15px; height: 15px; flex: none; }
+}

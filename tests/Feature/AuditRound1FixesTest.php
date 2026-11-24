@@ -10,7 +10,6 @@ use App\Models\EstablishmentAccount;
 use App\Models\ExitSurvey;
 use App\Models\ExitSurveyVisit;
 use App\Models\Region;
-use App\Models\TouristAccount;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
@@ -186,17 +185,14 @@ class AuditRound1FixesTest extends TestCase
     }
 
     // ---- lookalike accounts
-    public function test_an_email_or_alias_differing_only_in_case_is_refused(): void
+    public function test_an_email_differing_only_in_case_is_refused(): void
     {
         $this->partner('approved');
-        TouristAccount::create(['alias' => 'Maddy', 'password_hash' => Hash::make('x')]);
 
         $this->post('/portal/register', [
             'business_name' => 'Copy', 'listing_kind' => 'accommodation', 'email' => 'PARTNER@test.example.com', 'password' => 'password123',
             'password_confirmation' => 'password123', 'contact_person' => 'X', 'contact_number' => '0917', 'terms_accepted' => 1,
         ])->assertSessionHasErrors('email');
 
-        $this->post('/account/register', ['alias' => 'maddy', 'password' => 'password123', 'password_confirmation' => 'password123'])
-            ->assertSessionHasErrors('alias');
     }
 }

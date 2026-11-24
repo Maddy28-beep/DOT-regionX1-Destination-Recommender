@@ -32,9 +32,13 @@
     $tripMinHours = \App\Support\TripWindow::minHours();
     $tripMaxDays = \App\Support\TripWindow::maxDays();
     $typeIcons = ['Solo' => 'user', 'Couple' => 'users', 'Family' => 'family', 'Friends' => 'group', 'Business' => 'briefcase'];
-    $visitorIcons = ['First-time Visitor' => 'plane', 'Returning Visitor' => 'repeat', 'Regular / Local' => 'home'];
+    $visitorIcons = ['First-time Visitor' => 'plane', 'Returning Visitor' => 'repeat', 'Regular / Local' => 'home', 'Davao Region Resident' => 'home'];
     $chosenType = old('travel_type', $preference->travel_type) ?: 'Solo';
     $chosenVisitor = old('visitor_type', $preference->visitor_type);
+    $visitorCountry = old('visitor_origin_country', $preference->visitor_origin_country_code);
+    $visitorProvince = old('visitor_origin_province', $preference->visitor_origin_province);
+    $residentEligible = \App\Support\VisitorType::hasDavaoOrigin($visitorCountry, $visitorProvince);
+    if ($v2) $chosenVisitor = \App\Support\VisitorType::forDisplay($chosenVisitor, $visitorCountry, $visitorProvince);
     $isLocal = $chosenVisitor === 'Regular / Local';
     $arrivalValue = old('arrival_time', $preference->arrival_time ? substr((string) $preference->arrival_time, 0, 5) : '');
     $slots = ['08:00' => ['Morning', 'about 8 AM'], '12:00' => ['Midday', 'about noon'], '18:00' => ['Evening', 'about 6 PM']];
@@ -277,17 +281,22 @@
         </div>
         @endif
 
-        <fieldset class="pc-group pc-field pc-col-8">
-            <legend>Is this your first visit to Davao?</legend>
-            <div class="pc-cards pc-cards--3 pc-cards--rows">
+        <fieldset class="pc-group pc-field pc-col-8" @if ($v2) data-visitor-types @endif>
+            <legend>{{ $v2 ? 'Is this your first visit to Davao Region?' : 'Is this your first visit to Davao?' }}</legend>
+            <div class="pc-cards pc-cards--3 pc-cards--rows" @if ($v2) data-visitor-type-grid style="--visitor-columns: {{ $residentEligible ? 3 : 2 }}" @endif>
                 @foreach ($visitorTypes as $type)
-                    <label class="pc-card pc-card--row">
-                        <input type="radio" name="visitor_type" value="{{ $type }}" data-local-toggle @checked($chosenVisitor === $type) required>
+                    @php $residentChoice = $v2 && $type === \App\Support\VisitorType::RESIDENT; @endphp
+                    <label class="pc-card pc-card--row" @if ($residentChoice) data-resident-option @if (!$residentEligible) hidden style="display:none" @endif @endif>
+                        <input type="radio" name="visitor_type" value="{{ $type }}" data-local-toggle @if ($residentChoice) data-resident-choice @disabled(!$residentEligible) @endif @checked($chosenVisitor === $type) required>
                         <span class="pc-card__icon"><x-icon :name="$visitorIcons[$type] ?? 'user'" /></span>
-                        <strong>{{ $type }}</strong>
+                        <strong>{{ $residentChoice ? 'I live in Davao Region' : $type }}</strong>
                     </label>
                 @endforeach
             </div>
+            @if ($v2)
+                <p class="pc-hint" data-visitor-type-hint>{{ $residentEligible ? 'Choose the resident option only if you live in Davao Region.' : 'Visited Davao before, even many times? Choose Returning Visitor.' }}</p>
+            @endif
+            @error('visitor_type')<p class="pc-hint is-error" role="alert">{{ $message }}</p>@enderror
         </fieldset>
 
         @if (! $v2)

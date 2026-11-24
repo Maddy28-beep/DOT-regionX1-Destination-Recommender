@@ -619,11 +619,14 @@ class AdminDashboardController extends Controller
         // Which transaction sources to mine: everything, or one kind on its own.
         $source = in_array($request->get('source'), ['real', 'itinerary', 'demo'], true) ? $request->get('source') : 'all';
         $apriori = $apriori->onlySources($source === 'all' ? null : [$source]);
+        $rulesBuiltAt = $apriori->rulesBuiltAt();
 
         $sourceCounts = ExitSurvey::query()
             ->selectRaw('data_source, count(*) as total')->groupBy('data_source')->pluck('total', 'data_source');
 
-        $rules = $apriori->topRules(self::ASSOCIATION_RULE_LIMIT, self::ASSOCIATION_MIN_SUPPORT_COUNT, self::ASSOCIATION_MIN_CONFIDENCE);
+        // Mined once, uncapped: the table shows the strongest ASSOCIATION_RULE_LIMIT and "Rules Found" counts them all.
+        $allRules = $apriori->topRules(PHP_INT_MAX, self::ASSOCIATION_MIN_SUPPORT_COUNT, self::ASSOCIATION_MIN_CONFIDENCE);
+        $rules = $allRules->take(self::ASSOCIATION_RULE_LIMIT)->values();
 
         // Whitelisted so a crafted ?sort= can't reach an arbitrary key.
         $sort = in_array($request->get('sort'), ['co_count', 'support', 'confidence'], true)
@@ -648,13 +651,13 @@ class AdminDashboardController extends Controller
          * rather than changing what topRules() returns for its one other
          * caller (getAssociatedListings() has its own, separate limit).
          */
-        $totalRulesFound = $apriori->topRules(PHP_INT_MAX, self::ASSOCIATION_MIN_SUPPORT_COUNT, self::ASSOCIATION_MIN_CONFIDENCE)->count();
+        $totalRulesFound = $allRules->count();
 
         $minSupportPct = $totalTransactions > 0 ? round(self::ASSOCIATION_MIN_SUPPORT_COUNT / $totalTransactions * 100, 1) : null;
 
         return view('admin.association-rules', compact(
             'rules', 'sort', 'dir', 'totalTransactions', 'demoTransactions', 'sourceCounts', 'source', 'totalRulesFound',
-            'minSupportPct'
+            'minSupportPct', 'rulesBuiltAt'
         ))->with('minConfidencePct', round(self::ASSOCIATION_MIN_CONFIDENCE * 100));
     }
 

@@ -1,0 +1,897 @@
+{
+  "format": "destination-enrichment-v1",
+  "researched_on": "2026-11-20",
+  "scope": "Fourth local pass over remaining amenity gaps. Source-backed details only; fees, price tiers, durations, coordinates, photos, accreditation, identity, publication and planner eligibility unchanged.",
+  "records": [
+    {
+      "slug": "belviz-farm",
+      "name": "Belviz Farm",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://www.yearofthedurian.com/2023/11/belviz-farms-all-year-davao-durian-buffet.html",
+          "evidence": "Firsthand 2023 account explicitly describes booking a durian tasting tour directly with the farm. No fee or future homestay imported.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Durian tasting tours (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "bukid-amara-tourism-agriventures-corporation",
+      "name": "Bukid Amara Tourism Agriventures Corporation",
+      "fields": {
+        "description": {
+          "expected": "Bukid Amara Tourism Agriventures Corporation is a DOT Region XI-accredited Farm Tourism in Davao City (accreditation no. DOT-R11-FTC-01528-2025).",
+          "value": "Bukid Amara Davao is a farm-tourism site in Deca Homes Talomo. TIEZA describes flower fields, sunflower mazes and an edible urban garden used for educational visits. Confirm current access and tour arrangements with the operator; this is separate from Bukid Amara in Lucban, Quezon.",
+          "source": "https://tieza.gov.ph/tieza-expands-its-portfolio-with-seven-newly-registered-business-enterprises/",
+          "reason": "TIEZA explicitly names the Davao corporation; registration is not used to alter DOT accreditation."
+        }
+      },
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://tieza.gov.ph/tieza-expands-its-portfolio-with-seven-newly-registered-business-enterprises/",
+          "evidence": "TIEZA explicitly describes the Davao garden as a setting for educational tours.",
+          "status": "published_facility",
+          "display_name": "Educational farm tours"
+        }
+      ]
+    },
+    {
+      "slug": "damosa-land-inc-agriya-naturetainment",
+      "name": "Damosa Land Inc. / Agriya Naturetainment",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://www.experiencedavao.com/attractions/agriya-naturetainment",
+          "evidence": "Regional tourism identifies educational tours in the visitor attraction.",
+          "status": "published_facility",
+          "display_name": "Educational farm tours"
+        },
+        {
+          "key": "picnic",
+          "source": "https://www.sunstar.com.ph/davao/lifestyle/manlalakbay-biyaheng-davnor",
+          "evidence": "Firsthand 2022 DOT familiarization visit lists picnicking among attraction activities. No residential facilities copied.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Picnic area (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "jkm-mini-zoo",
+      "name": "JKM Mini Zoo",
+      "fields": {
+        "description": {
+          "expected": "JKM Mini Zoo is a DOT Region XI-accredited Wildlife in Davao del Norte (accreditation no. DOT-R11-TRE-01026-2024).",
+          "value": "A mini zoo at JKM Pag-asa Farms in Kapalong, Davao del Norte, promoted on the company website. Contact JKM before travelling to confirm visitor access and available activities. Facilities, entrance fees and visit duration remain unconfirmed.",
+          "source": "https://jkmsons.com.ph/",
+          "reason": "Replace accreditation-only description without assuming agricultural-company facilities are available to zoo visitors."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "imin-the-philippine-japan-historical-museum",
+      "name": "IMIN The Philippine-Japan Historical Museum",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://www.davao.ph.emb-japan.go.jp/itpr_ja/11_000001_00467.html",
+          "source": "https://www.davao.ph.emb-japan.go.jp/itpr_ja/11_000001_00467.html",
+          "reason": "Consulate visitor background for the named museum; not a museum-owned booking website."
+        },
+        "description": {
+          "expected": "IMIN The Philippine-Japan Historical Museum is a DOT Region XI-accredited Cultural Heritage in Davao City (accreditation no. DOT-R11-MSM-00462-2022).",
+          "value": "A museum in Calinan documenting the history of Japanese migration and the relationship between Davao and Japan. The Consulate-General of Japan in Davao features it as a place to learn about the community and its history. Contact the museum to confirm visitor arrangements.",
+          "source": "https://www.davao.ph.emb-japan.go.jp/itpr_ja/11_000001_00467.html",
+          "reason": "Museum identity matched to Calinan; conflicting Mintal references are not used to move the listing."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "elysia-wellness-spa-2",
+      "name": "Elysia Wellness Spa",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "spa",
+          "source": "https://www.sunstar.com.ph/davao/weekend/the-women-behind-elysia-wellness-spa",
+          "evidence": "Published report specifically identifies massage services at the Obrero branch. Not copied to Quimpo or Agdao branches.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Spa & massage (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "san-pedro-cathedral",
+      "name": "San Pedro Cathedral",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://www.sanpedrocathedral.com/",
+          "source": "https://www.sanpedrocathedral.com/",
+          "reason": "Named Davao cathedral parish site; service schedules are not imported as tourist opening hours."
+        },
+        "location": {
+          "expected": "Davao City",
+          "value": "San Pedro Street, Barangay 38-D, Poblacion District, Davao City",
+          "source": "https://www.sanpedrocathedral.com/",
+          "reason": "Published parish address; no coordinate changes."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "magsaysay-park",
+      "name": "Magsaysay Park",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "event_spaces",
+          "source": "https://davaocity.gov.ph/cooperative/davao-city-opens-coop-month/",
+          "evidence": "City documents an October 2025 event at the Magsaysay Park amphitheater. Temporary food stalls and proposed shops not imported.",
+          "status": "published_facility",
+          "display_name": "Amphitheater"
+        }
+      ]
+    },
+    {
+      "slug": "isla-reta",
+      "name": "Isla Reta",
+      "fields": {
+        "location": {
+          "expected": "Island Garden City of Samal, Davao del Norte",
+          "value": "Barangay Santa Cruz, Talikud Island, Island Garden City of Samal, Davao del Norte",
+          "source": "https://meanttogo.com/isla-reta-weekend-getaway/",
+          "reason": "Firsthand visitor account identifies the resort, separate from Samal main island and Isla Reta 2."
+        }
+      },
+      "amenities": [
+        {
+          "key": "day_use_cottages",
+          "source": "https://cebudavao.com/travel/tips/how-to-go-to-isla-reta-beach-resort/",
+          "evidence": "October 2026 guide lists basic cottages. Current availability needs operator confirmation.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Day-use cottages (reported)"
+        },
+        {
+          "key": "campsites",
+          "source": "https://cebudavao.com/travel/tips/how-to-go-to-isla-reta-beach-resort/",
+          "evidence": "Guide lists tent spaces; 2022 firsthand visit also describes shore camping. Current availability needs operator confirmation.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Campsites (reported)"
+        },
+        {
+          "key": "restroom",
+          "source": "https://cebudavao.com/travel/tips/how-to-go-to-isla-reta-beach-resort/",
+          "evidence": "Guide lists simple toilets. Current availability needs operator confirmation.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Restroom (reported)"
+        },
+        {
+          "key": "showers",
+          "source": "https://cebudavao.com/travel/tips/how-to-go-to-isla-reta-beach-resort/",
+          "evidence": "Guide lists showers. Current availability needs operator confirmation.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Showers (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "coral-garden",
+      "name": "Coral Garden",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://hofgoreiresortdavao.com/explore/island-hopping/",
+          "evidence": "Resort operator explicitly lists Coral Garden as a snorkeling stop on its guided private-boat itinerary. No onshore facilities or cruise duration copied.",
+          "status": "published_facility",
+          "display_name": "Guided boat visits by arrangement"
+        }
+      ]
+    },
+    {
+      "slug": "giant-clam-sanctuary",
+      "name": "Giant Clam Sanctuary",
+      "fields": {
+        "location": {
+          "expected": "Island Garden City of Samal, Davao del Norte",
+          "value": "Barangay Adecor, Kaputian District, Island Garden City of Samal, Davao del Norte",
+          "source": "https://dnsc.edu.ph/taklobo-tours/",
+          "reason": "Project operator publishes the sanctuary location."
+        }
+      },
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://dnsc.edu.ph/taklobo-tours/",
+          "evidence": "DNSC describes informative conservation tours and locally trained tour guides.",
+          "status": "published_facility",
+          "display_name": "Guided conservation tours"
+        }
+      ]
+    },
+    {
+      "slug": "malipano-island",
+      "name": "Malipano Island",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://pearlfarmresort.com/isla-malipano/",
+          "source": "https://pearlfarmresort.com/isla-malipano/",
+          "reason": "Operator visitor information specific to Isla Malipano."
+        },
+        "description": {
+          "expected": "Reference place: not DOT-accredited and not shown to travelers. Recorded so published itineraries that mention it can be matched.",
+          "value": "A private island operated as part of Pearl Farm, reserved for villa guests. The operator describes villas, a clubhouse restaurant, swimming pool and a bridge to nearby De la Paz islet. Visits and events require arrangements with the resort; these are not public day-use facilities.",
+          "source": "https://pearlfarmresort.com/isla-malipano/",
+          "reason": "Make villa-guest restrictions explicit; do not copy mainland resort facilities onto the island."
+        }
+      },
+      "amenities": [
+        {
+          "key": "overnight_lodging",
+          "source": "https://pearlfarmresort.com/isla-malipano/",
+          "evidence": "Operator offers private villas on this island.",
+          "status": "published_facility",
+          "display_name": "Villas (villa guests)"
+        },
+        {
+          "key": "restaurant",
+          "source": "https://pearlfarmresort.com/isla-malipano/",
+          "evidence": "Operator explicitly places a clubhouse restaurant on this island.",
+          "status": "published_facility",
+          "display_name": "Restaurant (villa guests)"
+        },
+        {
+          "key": "pool",
+          "source": "https://pearlfarmresort.com/isla-malipano/",
+          "evidence": "Operator explicitly lists an island swimming pool.",
+          "status": "published_facility",
+          "display_name": "Swimming pool (villa guests)"
+        },
+        {
+          "key": "visitor_bridges",
+          "source": "https://pearlfarmresort.com/isla-malipano/",
+          "evidence": "Operator describes a hanging bridge connecting to De la Paz islet.",
+          "status": "published_facility",
+          "display_name": "Bridge to De la Paz (villa guests)"
+        },
+        {
+          "key": "event_spaces",
+          "source": "https://pearlfarmresort.com/isla-malipano/events/",
+          "evidence": "Operator offers weddings and private corporate gatherings on the island.",
+          "status": "published_facility",
+          "display_name": "Private events by arrangement"
+        }
+      ]
+    },
+    {
+      "slug": "angels-cove",
+      "name": "Angels Cove",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://hofgoreiresortdavao.com/explore/island-hopping/",
+          "evidence": "Operator explicitly includes Angels Cove on its guided private-boat itinerary. Diving qualifications and conditions must be confirmed with provider.",
+          "status": "published_facility",
+          "display_name": "Guided boat visits by arrangement"
+        }
+      ]
+    },
+    {
+      "slug": "national-museum-davao",
+      "name": "National Museum of the Philippines - Davao",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://reservation.nationalmuseum.gov.ph/reservation/book/region-museum",
+          "source": "https://reservation.nationalmuseum.gov.ph/reservation/book/region-museum",
+          "reason": "Official regional visitor and reservation directory explicitly identifies Davao."
+        },
+        "location": {
+          "expected": "Davao City",
+          "value": "People’s Park Compound, J. Palma Gil Street, Barangay 4-A, Poblacion District, Davao City",
+          "source": "https://reservation.nationalmuseum.gov.ph/reservation/book/region-museum",
+          "reason": "Exact Davao museum address, not another regional branch."
+        },
+        "hours": {
+          "expected": "9:00 AM-6:00 PM",
+          "value": "Daily 9:00 AM-6:00 PM",
+          "source": "https://reservation.nationalmuseum.gov.ph/reservation/book/region-museum",
+          "reason": "Davao-specific published schedule; holiday changes require confirmation."
+        }
+      },
+      "amenities": [
+        {
+          "key": "elevator",
+          "source": "https://weblinks.nationalmuseum.gov.ph/wp-content/uploads/2025/11/24092537/Bidding-Documents-Per-Lot-PM-of-Elevators.docx.pdf",
+          "evidence": "FY2026 maintenance inventory, PDF page 36, identifies a passenger elevator at Davao Museum. Does not certify current serviceability or an entirely step-free visit.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Passenger elevator (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "osmena-park",
+      "name": "Osmeña Park",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "playgrounds",
+          "source": "https://www.pna.gov.ph/articles/1038329",
+          "evidence": "2018 PNA report documents the opening of playgrounds specifically at Osmena Park. Current access and equipment condition need confirmation.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Playground (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "urayas-peak-sample",
+      "name": "Uraya's Peak [SAMPLE]",
+      "fields": {
+        "location": {
+          "expected": "Talaingod",
+          "value": "Sitio Uraya, Santo Nino, Talaingod, Davao del Norte",
+          "source": "https://www.sunstar.com.ph/davao/lifestyle/manlalakbay-biyaheng-davnor",
+          "reason": "Match Talaingod peak; do not use Samal Uraya Beach Resort details."
+        }
+      },
+      "amenities": [
+        {
+          "key": "restaurant",
+          "source": "https://www.sunstar.com.ph/davao/lifestyle/manlalakbay-biyaheng-davnor",
+          "evidence": "Firsthand 2022 report describes a restaurant at the property base.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Restaurant (reported)"
+        },
+        {
+          "key": "overnight_lodging",
+          "source": "https://www.sunstar.com.ph/davao/lifestyle/manlalakbay-biyaheng-davnor",
+          "evidence": "Firsthand report describes accommodation rooms at the property base.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Overnight lodging (reported)"
+        },
+        {
+          "key": "walking_trails",
+          "source": "https://www.sunstar.com.ph/davao/lifestyle/manlalakbay-biyaheng-davnor",
+          "evidence": "Firsthand report describes the hiking route and stops to the peak.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Walking trails (reported)"
+        },
+        {
+          "key": "guided_tours",
+          "source": "https://www.sunstar.com.ph/davao/lifestyle/manlalakbay-biyaheng-davnor",
+          "evidence": "Firsthand report identifies two guides accompanying the hike.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Guided tours (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "malita-dives-marine-sanctuary-sample",
+      "name": "Malita Dives & Marine Sanctuary [SAMPLE]",
+      "fields": {
+        "description": {
+          "expected": "A thriving municipal marine sanctuary and diving destination noted for dense coral gardens, sea turtles, and pelagic fish species.",
+          "value": "A private beach-house destination in Tubalan Cove, Malita. A firsthand 2019 report describes overnight beds, a toilet and karaoke, with day visits and overnight stays by reservation. Confirm current bookings, guest access and available services directly; these are not public sanctuary facilities.",
+          "source": "https://www.sunstar.com.ph/davao/lifestyle/alcantara-malita-dives-resort-in-a-sanctuary",
+          "reason": "Older hosted visit is clearly identified; no dated rates or public-access assumption imported."
+        }
+      },
+      "amenities": [
+        {
+          "key": "overnight_lodging",
+          "source": "https://www.sunstar.com.ph/davao/lifestyle/alcantara-malita-dives-resort-in-a-sanctuary",
+          "evidence": "Report describes overnight beds and stay packages.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Overnight lodging by reservation (reported)"
+        },
+        {
+          "key": "restroom",
+          "source": "https://www.sunstar.com.ph/davao/lifestyle/alcantara-malita-dives-resort-in-a-sanctuary",
+          "evidence": "Firsthand account describes the beach-house toilet.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Restroom (reserved guests) (reported)"
+        },
+        {
+          "key": "games_karaoke",
+          "source": "https://www.sunstar.com.ph/davao/lifestyle/alcantara-malita-dives-resort-in-a-sanctuary",
+          "evidence": "Firsthand account identifies videoke in the dining area.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Karaoke (reserved guests) (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "lake-leonard-sample",
+      "name": "Lake Leonard [SAMPLE]",
+      "fields": {
+        "facebook_url": {
+          "expected": null,
+          "value": "https://www.facebook.com/lakeleonardecotourismpark",
+          "source": "https://davaodeoro.gov.ph/tourist-circuit-wellness-loop/",
+          "reason": "Provincial Lake Leonard entry explicitly publishes this operator contact."
+        },
+        "website_url": {
+          "expected": null,
+          "value": "https://davaodeoro.gov.ph/tourist-circuit-wellness-loop/",
+          "source": "https://davaodeoro.gov.ph/tourist-circuit-wellness-loop/",
+          "reason": "Provincial visitor information for the lake. Cottages and toilets elsewhere on this multi-site page belong to Tagbibinta Falls."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "baganga-sunrise-boulevard",
+      "name": "Baganga Sunrise Boulevard",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "restaurant",
+          "source": "https://www.sunstar.com.ph/amp/story/more-articles/sweet-escape-exploring-baganga-davao-oriental",
+          "evidence": "2016 firsthand report explicitly describes a restaurant at Sunrise Boulevard. Current operation must be confirmed; no old prices imported.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Restaurant (reported)"
+        },
+        {
+          "key": "playgrounds",
+          "source": "https://www.sunstar.com.ph/amp/story/more-articles/sweet-escape-exploring-baganga-davao-oriental",
+          "evidence": "Report identifies a children’s playground at the boulevard. Current operation must be confirmed; no old prices imported.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Playground (reported)"
+        },
+        {
+          "key": "day_use_cottages",
+          "source": "https://www.sunstar.com.ph/amp/story/more-articles/sweet-escape-exploring-baganga-davao-oriental",
+          "evidence": "Report describes beach huts at the boulevard. Current operation must be confirmed; no old prices imported.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Day-use cottages (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "pyalitan-falls",
+      "name": "Pyalitan Falls",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://davaodeoro.gov.ph/tourist-circuit-wellness-loop/",
+          "source": "https://davaodeoro.gov.ph/tourist-circuit-wellness-loop/",
+          "reason": "Provincial visitor information for Pyalitan, not Tagbibinta Falls."
+        },
+        "location": {
+          "expected": "Maragusan, Davao de Oro",
+          "value": "Barangay Mapawa, Maragusan, Davao de Oro",
+          "source": "https://davaodeoro.gov.ph/tourist-circuit-wellness-loop/",
+          "reason": "Provincial entry locates the falls northeast of Mapawa with access via Coronobe."
+        },
+        "description": {
+          "expected": "A waterfall in Maragusan featured in the regional tourism directory. Confirm trail access and guide arrangements before visiting.",
+          "value": "An undeveloped, multi-tier waterfall northeast of Barangay Mapawa in Maragusan, reached by trekking via Coronobe according to provincial tourism. Confirm the current access route, weather and local guidance before travelling. No built visitor facilities, fee or total visit duration are confirmed.",
+          "source": "https://davaodeoro.gov.ph/tourist-circuit-wellness-loop/",
+          "reason": "Do not assign neighboring falls’ cottages, toilets or picnic grounds to this site."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "mipangi-hilltop",
+      "name": "Mipangi Hilltop",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://www.nabunturan.gov.ph/tourist-destination",
+          "source": "https://www.nabunturan.gov.ph/tourist-destination",
+          "reason": "Municipal tourism directory specifically identifies Mipangi Hilltop; page requires JavaScript."
+        },
+        "best_time": {
+          "expected": null,
+          "value": "Early morning for sunrise; confirm access before travelling",
+          "source": "https://www.nabunturan.gov.ph/tourist-destination",
+          "reason": "Municipality recommends early morning hiking; this is not a gate-opening schedule."
+        }
+      },
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://www.nabunturan.gov.ph/tourist-destination",
+          "evidence": "Municipality describes hiking at Mipangi Hilltop. No paved or maintained-route claim.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Hiking route (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "davao-city-coastal-road-public-parks",
+      "name": "Davao City Coastal Road Public Parks",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://davaocity.gov.ph/transportation-planning-traffic-management/cttmo-to-ban-skating-allow-bikers-and-joggers-only-in-designated-areas-as-coastal-road-opens-saturday/",
+          "evidence": "City traffic office explicitly identifies sidewalk areas for jogging; normal traffic lanes are not walking paths.",
+          "status": "published_facility",
+          "display_name": "Designated pedestrian areas"
+        }
+      ]
+    },
+    {
+      "slug": "sicao-falls",
+      "name": "Sicao Falls",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://meanttogo.com/sicao-falls-trekking-guide/",
+          "evidence": "Firsthand 2018 account describes an uneven hiking route via Sicao Village; current community access and trail condition need confirmation.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Trekking route (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "fyingi-sol-cave",
+      "name": "Fyingi Sol Cave",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://www.experiencedavao.com/activities/fyingi-sol-cave",
+          "source": "https://www.experiencedavao.com/activities/fyingi-sol-cave",
+          "reason": "Regional visitor information identifies the Matanao cave; not a route or permission guarantee."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "daya-farm-adventure",
+      "name": "Daya Farm & Adventure",
+      "fields": {
+        "description": {
+          "expected": "A farm recreation destination in Maputi, Banaybanay. Contact the operator for current day-tour arrangements and available activities.",
+          "value": "A farm and resort in Maputi, Banaybanay. The accommodation provider reports overnight rooms, an outdoor pool, parking, a cafe, grills and meeting rooms. Confirm current bookings and which facilities day visitors may use; room-only Wi-Fi and air conditioning are not general day-visitor amenities.",
+          "source": "https://www.expedia.com/Banaybanay-Hotels-DAYA-FARM-AND-ADVENTURE.h101341542.Hotel-Information",
+          "reason": "Provider-listed facilities remain reported; no nightly or pool-access prices/hours used as destination fees or hours."
+        }
+      },
+      "amenities": [
+        {
+          "key": "pool",
+          "source": "https://www.expedia.com/Banaybanay-Hotels-DAYA-FARM-AND-ADVENTURE.h101341542.Hotel-Information",
+          "evidence": "Provider identifies an outdoor pool.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Swimming pool (confirm guest access) (reported)"
+        },
+        {
+          "key": "parking",
+          "source": "https://www.expedia.com/Banaybanay-Hotels-DAYA-FARM-AND-ADVENTURE.h101341542.Hotel-Information",
+          "evidence": "Provider identifies self-parking.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Parking (reported)"
+        },
+        {
+          "key": "restaurant",
+          "source": "https://www.expedia.com/Banaybanay-Hotels-DAYA-FARM-AND-ADVENTURE.h101341542.Hotel-Information",
+          "evidence": "Provider identifies an on-site cafe.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Cafe (confirm guest access) (reported)"
+        },
+        {
+          "key": "overnight_lodging",
+          "source": "https://www.expedia.com/Banaybanay-Hotels-DAYA-FARM-AND-ADVENTURE.h101341542.Hotel-Information",
+          "evidence": "Provider explicitly sells overnight accommodation.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Overnight lodging (reported)"
+        },
+        {
+          "key": "grilling",
+          "source": "https://www.expedia.com/Banaybanay-Hotels-DAYA-FARM-AND-ADVENTURE.h101341542.Hotel-Information",
+          "evidence": "Provider lists charcoal grills.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Grilling areas (confirm guest access) (reported)"
+        },
+        {
+          "key": "event_spaces",
+          "source": "https://www.expedia.com/Banaybanay-Hotels-DAYA-FARM-AND-ADVENTURE.h101341542.Hotel-Information",
+          "evidence": "Provider lists meeting rooms.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Meeting rooms by arrangement (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "deca-wakeboard-park-davao",
+      "name": "DECA Wakeboard Park Davao",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "adventure_facilities",
+          "source": "https://waketricks.com/parks/p/decawake-davao-cable-park",
+          "evidence": "Wake-park directory identifies the full-size Davao cable and obstacles, distinct from Clark and Iloilo.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Cable wakeboarding (reported)"
+        },
+        {
+          "key": "restaurant",
+          "source": "https://waketricks.com/parks/p/decawake-davao-cable-park",
+          "evidence": "Davao-specific directory explicitly lists an on-site restaurant.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Restaurant (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "mount-fortune-view",
+      "name": "Mount Fortune View",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "viewing_decks",
+          "source": "https://www.youtube.com/watch?v=FV1gHJsMS4c",
+          "evidence": "2022 visitor video description explicitly lists a viewing deck. Matches Sitio Malusing, Zone I, Santa Cruz. Current operation needs confirmation.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Viewing deck (reported)"
+        },
+        {
+          "key": "day_use_cottages",
+          "source": "https://www.youtube.com/watch?v=FV1gHJsMS4c",
+          "evidence": "Description lists open cottages. Matches Sitio Malusing, Zone I, Santa Cruz. Current operation needs confirmation.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Day-use cottages (reported)"
+        },
+        {
+          "key": "campsites",
+          "source": "https://www.youtube.com/watch?v=FV1gHJsMS4c",
+          "evidence": "Description lists a tent city. Matches Sitio Malusing, Zone I, Santa Cruz. Current operation needs confirmation.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Campsites (reported)"
+        },
+        {
+          "key": "restroom",
+          "source": "https://www.youtube.com/watch?v=FV1gHJsMS4c",
+          "evidence": "Description explicitly lists a comfort room. Matches Sitio Malusing, Zone I, Santa Cruz. Current operation needs confirmation.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Restroom (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "langan-falls",
+      "name": "Langan Falls",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://mountapogeopark.com/geosite/langan-falls/",
+          "source": "https://mountapogeopark.com/geosite/langan-falls/",
+          "reason": "Geosite visitor information directs visitors to confirm current access. No coordinates or built facilities assumed."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "sibulan-river-tubing",
+      "name": "Sibulan River Tubing",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://chinitowanders.wordpress.com/2016/06/19/davao-del-sur-the-thrill-with-sta-cruz-river-tubing/",
+          "evidence": "Firsthand 2016 Sibulan/Darong visit describes accompanying guides and equipment hire. Current providers and river conditions must be confirmed; no old package prices imported.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Guided river tubing (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "subon-cave-underground-stream-sample",
+      "name": "Sub'on Cave & Underground Stream [SAMPLE]",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://www.pna.gov.ph/articles/1174777",
+          "evidence": "Matanao tourism officer describes trained community guides and the opened Subon cave. Arrange present access with municipal tourism; no listing accreditation change.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Community-guided cave visits (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "davao-chinatown-sample",
+      "name": "Davao Chinatown [SAMPLE]",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://davaocity.gov.ph/tourism/bound-to-the-friendship-arch-davao-city-chinatown-walk-boosts-tourism-and-cultural-heritage/",
+          "source": "https://davaocity.gov.ph/tourism/bound-to-the-friendship-arch-davao-city-chinatown-walk-boosts-tourism-and-cultural-heritage/",
+          "reason": "City visitor information for the 2026 Chinatown walking-tour program."
+        }
+      },
+      "amenities": [
+        {
+          "key": "guided_tours",
+          "source": "https://davaocity.gov.ph/tourism/bound-to-the-friendship-arch-davao-city-chinatown-walk-boosts-tourism-and-cultural-heritage/",
+          "evidence": "City tourism documents organized Chinatown walking tours launched in June 2026. Dates vary; not a daily availability claim.",
+          "status": "published_facility",
+          "display_name": "City heritage walks (confirm schedule)"
+        }
+      ]
+    },
+    {
+      "slug": "davao-occidental-provincial-capitol-complex-sample",
+      "name": "Davao Occidental Provincial Capitol Complex [SAMPLE]",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://davaooccidental.gov.ph/provincial-tourism-culture-and-arts-office/",
+          "source": "https://davaooccidental.gov.ph/provincial-tourism-culture-and-arts-office/",
+          "reason": "Provincial directory publishes tourism-office contact and the capitol address."
+        }
+      },
+      "amenities": [
+        {
+          "key": "info",
+          "source": "https://davaooccidental.gov.ph/provincial-tourism-culture-and-arts-office/",
+          "evidence": "Provincial directory locates the tourism office on the ground floor of the capitol building in Barangay Lais. Visitor hours require confirmation.",
+          "status": "published_facility",
+          "display_name": "Provincial tourism office"
+        }
+      ]
+    },
+    {
+      "slug": "magongawon-falls-forest-trail",
+      "name": "Magongawon Falls — Forest Trail",
+      "fields": {},
+      "amenities": [
+        {
+          "key": "walking_trails",
+          "source": "https://thetravelintern.com/davao-guide/",
+          "evidence": "March 2026 firsthand visit describes steep stairs down through forest to Magongawon/Tagbaobo Falls. No walking time imported as total visit duration.",
+          "status": "reported_facility_confirm_availability",
+          "display_name": "Stepped forest path (reported)"
+        }
+      ]
+    },
+    {
+      "slug": "the-grape-valley",
+      "name": "The Grape Valley",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://www.nabunturan.gov.ph/tourist-destination",
+          "source": "https://www.nabunturan.gov.ph/tourist-destination",
+          "reason": "Municipal directory identifies the Sta. Maria vineyard and contact information; no farm facilities inferred."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "battle-of-ising-memorial",
+      "name": "Battle of Ising Memorial",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://mirror.pia.gov.ph/news/2023/04/07/pvao-assists-lgu-in-making-ising-monument-a-military-shrine",
+          "source": "https://mirror.pia.gov.ph/news/2023/04/07/pvao-assists-lgu-in-making-ising-monument-a-military-shrine",
+          "reason": "Government background identifies the Carmen memorial. Proposed national military-shrine designation is not treated as approved."
+        }
+      },
+      "amenities": []
+    },
+    {
+      "slug": "davao-city-hall",
+      "name": "Davao City Hall",
+      "fields": {
+        "website_url": {
+          "expected": null,
+          "value": "https://davaocity.gov.ph/tourism/davao-city-hall-postage-stamp-unveiled/",
+          "source": "https://davaocity.gov.ph/tourism/davao-city-hall-postage-stamp-unveiled/",
+          "reason": "City heritage information for City Hall; administrative hours are not assumed to be tourist hours."
+        }
+      },
+      "amenities": []
+    }
+  ],
+  "held": [
+    {
+      "names": [
+        "Isla- Agri Ventures Inc"
+      ],
+      "reason": "No branch-matched visitor facilities confirmed. Must not use Isla Reta or other Tagpopongan resorts by name similarity."
+    },
+    {
+      "names": [
+        "Elysia Wellness Spa (Quimpo)",
+        "Elysia Wellness Spa (Agdao)"
+      ],
+      "reason": "Obrero evidence does not confirm these branches; no spa service tags copied between branches."
+    },
+    {
+      "names": [
+        "Kaputian Beach"
+      ],
+      "source": "https://samalcity.gov.ph/images/pdf/IGACOS_CC_2025.pdf",
+      "reason": "Current charter PDF is too large for web extraction. Older indexed room-rate tables were not treated as current facility/access confirmation."
+    },
+    {
+      "names": [
+        "Pusan Point",
+        "Aliwagwag Falls"
+      ],
+      "source": "https://mindanao.politiko.com.ph/gov-nelson-l-dayanghirang-requests-tieza-inspection-of-aliwagwag-falls-pusan-point-for-restoration/",
+      "reason": "Recent restoration reporting warrants current operator confirmation before assigning old infrastructure claims."
+    },
+    {
+      "names": [
+        "Island Buenavista"
+      ],
+      "reason": "Previously reviewed operator site remains an unresolved availability/source issue; no historical facilities copied."
+    },
+    {
+      "names": [
+        "Lake Leonard [SAMPLE]",
+        "Pyalitan Falls"
+      ],
+      "source": "https://davaodeoro.gov.ph/tourist-circuit-wellness-loop/",
+      "reason": "Cottages, toilet and picnic-ground paragraph belongs to Tagbibinta Falls. No lake bathing or total visit duration inferred."
+    },
+    {
+      "names": [
+        "Divine Mercy Shrine (Malita)",
+        "Sanctuario de Santo Rosario"
+      ],
+      "reason": "Mati shrine and Quezon City Santo Rosario results do not establish facilities at the Malita listings."
+    },
+    {
+      "names": [
+        "Fabian’s Peak"
+      ],
+      "reason": "Araibo/Pantukan and Maragusan references remain conflicting; no different venue’s facilities copied."
+    },
+    {
+      "names": [
+        "Oak Island [SAMPLE]",
+        "Burias Islet",
+        "Crocodile Hill"
+      ],
+      "reason": "US Oak Island, Masbate Burias and foreign Crocodile Hill results rejected as unrelated destinations."
+    },
+    {
+      "names": [
+        "Poo Sandbar",
+        "Big Ligid Island",
+        "Sigaboy Island",
+        "Diaz Island",
+        "Olanivan Island",
+        "Tuke Makil / Tuke Nunsol Marine Cove"
+      ],
+      "reason": "Marine place identification does not confirm visitor toilets, cottages or shore infrastructure; facilities remain unconfirmed."
+    },
+    {
+      "names": [
+        "Carmen Mangrove Sanctuary & Boardwalk [SAMPLE]"
+      ],
+      "reason": "Del Carmen/Siargao results rejected; exact Davao venue identity and its facilities still need confirmation."
+    },
+    {
+      "names": [
+        "National Museum of the Philippines Davao [SAMPLE]",
+        "San Pedro Cathedral [SAMPLE]",
+        "San Salvador del Mundo Church (Caraga Church) [SAMPLE]"
+      ],
+      "reason": "Legacy duplicate/alias records left unchanged; do not inflate newly researched unique venues by copying details automatically."
+    },
+    {
+      "names": [
+        "Energy Park",
+        "New City Hall of Tagum"
+      ],
+      "reason": "Earlier charter PDF was unavailable; no facilities inferred from construction plans or snippets."
+    }
+  ]
+}

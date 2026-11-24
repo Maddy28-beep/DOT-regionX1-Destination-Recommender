@@ -6,6 +6,9 @@ use App\Models\ExitSurvey;
 use App\Models\ExitSurveyVisit;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
+use App\Support\Features;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 /**
  * Association Rule Mining through the Apriori Algorithm (manuscript Sec. 2.3.4).
@@ -40,6 +43,82 @@ class AprioriService
         return $copy;
     }
 
+    /**
+     * What the precomputed table (association_rules) holds: pairs seen in at least this many trips, at least this
+     * confident. A caller that asks for less than that is answered from the trips themselves.
+     */
+    public const TABLE_MIN_SUPPORT = 2;
+
+    public const TABLE_MIN_CONFIDENCE = 0.10;
+
+    /** The four mixes of sources that the table is built for. */
+    public const SOURCE_SETS = ['all' => null, 'real' => ['real'], 'itinerary' => ['itinerary'], 'demo' => ['demo']];
+
+    /** 'all', 'real', 'itinerary' or 'demo' when this copy mines exactly one of those; null for any other mix. */
+    public function sourceKey(): ?string
+    {
+        if ($this->sources === null) {
+            return 'all';
+        }
+
+        return count($this->sources) === 1 && in_array($this->sources[0], ['real', 'itinerary', 'demo'], true) ? $this->sources[0] : null;
+    }
+
+    /**
+     * The precomputed build to read from, or null to count from the trips themselves: the switch is off, no build has
+     * been made for this mix of sources yet, or anything at all goes wrong reading it.
+     */
+    private function build(): ?object
+    {
+        $key = $this->sourceKey();
+        if ($key === null || ! Features::on(Features::ASSOCIATION_RULES_TABLE)) {
+            return null;
+        }
+
+        try {
+            return DB::table('association_rule_builds')->where('source_set', $key)->first();
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    /** The pseudo source set under which the visit counts are recorded in association_rule_builds. */
+    public const VISIT_COUNTS_KEY = 'visitcounts';
+
+    /**
+     * Recorded visits per listing id of one kind, read from the precomputed counts; null means "count them live" (the
+     * switch is off, or the counts have not been built yet). Counts every source except trial ones, like the live count.
+     *
+     * @param  iterable<int>  $listingIds
+     * @return Collection<int, int>|null
+     */
+    public function precomputedVisitCounts(string $listingKind, iterable $listingIds): ?Collection
+    {
+        if (! Features::on(Features::ASSOCIATION_RULES_TABLE)) {
+            return null;
+        }
+
+        try {
+            if (! DB::table('association_rule_builds')->where('source_set', self::VISIT_COUNTS_KEY)->exists()) {
+                return null;
+            }
+
+            return DB::table('association_visit_counts')
+                ->where('listing_kind', $listingKind)
+                ->whereIn('listing_id', collect($listingIds)->values()->all())
+                ->pluck('visits', 'listing_id')
+                ->map(fn ($n) => (int) $n);
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    /** When the table the rules are read from was built (UTC), or null while they are counted live. */
+    public function rulesBuiltAt(): ?string
+    {
+        return $this->build()?->built_at;
+    }
+
     private function surveys(): \Illuminate\Database\Eloquent\Builder
     {
         return ExitSurvey::query()->when($this->sources, fn ($q) => $q->whereIn('data_source', $this->sources));
@@ -66,20 +145,28 @@ class AprioriService
         int $minSupportCount = 2,
         ?string $onlyKind = null
     ): Collection {
-        $surveyIdsWithA = $this->visits()->where('listing_kind', $listingKind)
-            ->where('listing_id', $listingId)
-            ->pluck('exit_survey_id')
-            ->unique()
-            ->values();
+        if ($minSupportCount >= self::TABLE_MIN_SUPPORT && $minConfidence >= self::TABLE_MIN_CONFIDENCE && ($build = $this->build())) {
+            return $this->associatedFromTable($build, $listingKind, $listingId, $limit, $minConfidence, $minSupportCount, $onlyKind);
+        }
 
-        $countA = $surveyIdsWithA->count();
+        // The trips that contain A stay inside the database as a subquery. Pulling their ids into PHP and sending them
+        // back as one huge IN (...) list failed outright once a place was in more than 65,535 trips (the Postgres
+        // limit on bound parameters) and made every lookup slower as the survey data grew.
+        $countA = $this->visits()->where('listing_kind', $listingKind)
+            ->where('listing_id', $listingId)
+            ->distinct()
+            ->count('exit_survey_id');
         $totalTransactions = $this->surveys()->count();
 
         if ($countA === 0 || $totalTransactions === 0) {
             return collect();
         }
 
-        $coOccurrences = $this->visits()->whereIn('exit_survey_id', $surveyIdsWithA)
+        $surveysWithA = $this->visits()->where('listing_kind', $listingKind)
+            ->where('listing_id', $listingId)
+            ->select('exit_survey_id');
+
+        $coOccurrences = $this->visits()->whereIn('exit_survey_id', $surveysWithA)
             // The kind the caller wants is chosen here, before the limit below: otherwise the strongest rules of
             // other kinds use up the limit and a restaurant or stay that is a good match is never seen.
             ->when($onlyKind !== null, fn ($q) => $q->where('listing_kind', $onlyKind))
@@ -102,6 +189,35 @@ class AprioriService
             ])
             ->filter(fn ($rule) => $rule['confidence'] >= $minConfidence)
             ->sortByDesc('confidence')
+            ->take($limit)
+            ->values();
+    }
+
+    /** The same answer as the live query below, read from the precomputed rows for this one listing. */
+    private function associatedFromTable(object $build, string $listingKind, int $listingId, int $limit, float $minConfidence, int $minSupportCount, ?string $onlyKind): Collection
+    {
+        $total = (int) $build->total_transactions;
+        if ($total === 0) {
+            return collect();
+        }
+
+        return DB::table('association_rules')
+            ->where('source_set', $build->source_set)
+            ->where('a_kind', $listingKind)
+            ->where('a_id', $listingId)
+            ->where('co_count', '>=', $minSupportCount)
+            ->when($onlyKind !== null, fn ($q) => $q->where('b_kind', $onlyKind))
+            ->orderByRaw('(co_count * 1.0 / ant_count) desc')
+            ->orderByDesc('co_count')->orderBy('b_kind')->orderBy('b_id')
+            ->get()
+            ->map(fn ($row) => [
+                'listing_kind' => $row->b_kind,
+                'listing_id' => (int) $row->b_id,
+                'co_count' => (int) $row->co_count,
+                'support' => round($row->co_count / $total, 4),
+                'confidence' => round($row->co_count / $row->ant_count, 4),
+            ])
+            ->filter(fn ($rule) => $rule['confidence'] >= $minConfidence)
             ->take($limit)
             ->values();
     }
@@ -167,88 +283,127 @@ class AprioriService
      */
     public function topRules(int $limit = 15, int $minSupportCount = 2, float $minConfidence = 0.15): Collection
     {
-        $totalTransactions = $this->surveys()->count();
+        $build = $minSupportCount >= self::TABLE_MIN_SUPPORT && $minConfidence >= self::TABLE_MIN_CONFIDENCE ? $this->build() : null;
+
+        $totalTransactions = $build ? (int) $build->total_transactions : $this->surveys()->count();
         if ($totalTransactions === 0) {
             return collect();
         }
 
-        $visitsByTransaction = $this->visits()
-            ->select('exit_survey_id', 'listing_kind', 'listing_id')
-            ->get()
-            ->groupBy('exit_survey_id');
+        $rows = $build
+            ? $this->tableRows($build, $limit, $minSupportCount, $minConfidence)
+            : $this->liveRows($limit, $minSupportCount, $minConfidence);
 
-        $antecedentCounts = [];
-        $pairCounts = [];
+        $rules = $rows
+            ->map(fn ($row) => [
+                'a_kind' => $row->a_kind,
+                'a_id' => (int) $row->a_id,
+                'b_kind' => $row->b_kind,
+                'b_id' => (int) $row->b_id,
+                'co_count' => (int) $row->co_count,
+                'support' => round($row->co_count / $totalTransactions, 4),
+                'confidence' => round($row->co_count / $row->ant_count, 4),
+            ])
+            ->filter(fn ($rule) => $rule['co_count'] >= $minSupportCount && $rule['confidence'] >= $minConfidence)
+            ->values();
 
-        foreach ($visitsByTransaction as $visits) {
-            $items = $visits->map(fn ($v) => $v->listing_kind.':'.$v->listing_id)->unique()->values();
-
-            /*
-             * Equation 9 divides by every transaction containing A, and that
-             * has to include the ones where A was the only place visited: a
-             * tourist who went to A and nowhere else is evidence AGAINST
-             * "people who visit A also visit B", so leaving them out only ever
-             * inflates confidence. This tally used to sit below the guard
-             * beneath it, which quietly dropped them -- Samal Island appears
-             * in 32 transactions but was counted as 26, reporting Samal ->
-             * BlueJaz at 73.1% where the data gives 59.4%. It also disagreed
-             * with getAssociatedListings(), which has always counted the full
-             * set, and with this method's own support figure, which has always
-             * divided by every transaction.
-             */
-            foreach ($items as $a) {
-                $antecedentCounts[$a] = ($antecedentCounts[$a] ?? 0) + 1;
-            }
-
-            // Counted above, but a lone visit yields no pair to mine.
-            if ($items->count() < 2) {
+        // Look every listing up once per kind, instead of one query per rule side.
+        $morphMap = Relation::morphMap();
+        $found = [];
+        $wanted = [];
+        foreach ($rules as $rule) {
+            $wanted[$rule['a_kind']][$rule['a_id']] = true;
+            $wanted[$rule['b_kind']][$rule['b_id']] = true;
+        }
+        foreach ($wanted as $kind => $idSet) {
+            $modelClass = $morphMap[$kind] ?? null;
+            if (! $modelClass) {
                 continue;
             }
-
-            foreach ($items as $a) {
-                foreach ($items as $b) {
-                    if ($a === $b) {
-                        continue;
-                    }
-                    $key = $a.'|'.$b;
-                    $pairCounts[$key] = ($pairCounts[$key] ?? 0) + 1;
+            foreach (array_chunk(array_keys($idSet), 1000) as $chunk) {
+                foreach ($modelClass::query()->whereIn((new $modelClass)->getQualifiedKeyName(), $chunk)->get() as $model) {
+                    $found[$kind][(int) $model->getKey()] = $model;
                 }
             }
         }
 
-        $rules = collect($pairCounts)
-            ->map(function ($coCount, $key) use ($antecedentCounts, $totalTransactions) {
-                [$a, $b] = explode('|', $key);
-                [$aKind, $aId] = explode(':', $a);
-                [$bKind, $bId] = explode(':', $b);
-
-                return [
-                    'a_kind' => $aKind,
-                    'a_id' => (int) $aId,
-                    'b_kind' => $bKind,
-                    'b_id' => (int) $bId,
-                    'co_count' => $coCount,
-                    'support' => round($coCount / $totalTransactions, 4),
-                    'confidence' => round($coCount / $antecedentCounts[$a], 4),
-                ];
-            })
-            ->filter(fn ($rule) => $rule['co_count'] >= $minSupportCount && $rule['confidence'] >= $minConfidence)
-            ->sortByDesc('confidence')
-            ->take($limit)
-            ->values();
-
-        $morphMap = Relation::morphMap();
-        $resolve = function (string $kind, int $id) use ($morphMap) {
-            $modelClass = $morphMap[$kind] ?? null;
-
-            return $modelClass ? $modelClass::find($id) : null;
-        };
-
-        return $rules->map(function (array $rule) use ($resolve) {
-            $rule['a_listing'] = $resolve($rule['a_kind'], $rule['a_id']);
-            $rule['b_listing'] = $resolve($rule['b_kind'], $rule['b_id']);
+        return $rules->map(function (array $rule) use ($found) {
+            $rule['a_listing'] = $found[$rule['a_kind']][$rule['a_id']] ?? null;
+            $rule['b_listing'] = $found[$rule['b_kind']][$rule['b_id']] ?? null;
 
             return $rule;
         })->filter(fn ($rule) => $rule['a_listing'] && $rule['b_listing'])->values();
+    }
+
+    /** The rows of the precomputed table that clear the thresholds, strongest first. */
+    private function tableRows(object $build, int $limit, int $minSupportCount, float $minConfidence): Collection
+    {
+        $query = DB::table('association_rules')
+            ->where('source_set', $build->source_set)
+            ->where('co_count', '>=', $minSupportCount)
+            ->whereRaw('(co_count * 1.0 / ant_count) >= CAST(? AS DECIMAL(10, 6))', [round($minConfidence - 0.0001, 6)])
+            ->select('a_kind', 'a_id', 'b_kind', 'b_id', 'co_count', 'ant_count')
+            ->orderByRaw('(co_count * 1.0 / ant_count) desc')
+            ->orderByDesc('co_count')
+            ->orderBy('a_kind')->orderBy('a_id')->orderBy('b_kind')->orderBy('b_id');
+
+        if ($limit < PHP_INT_MAX) {
+            $query->limit($limit);
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * Every pair counted by the database from the trips themselves, strongest first. This is also what the nightly
+     * build stores (see AssociationRuleBuilder), so the table and the live count can never disagree on the method.
+     *
+     * Equation 9 divides by every transaction containing A, and that has to include the ones where A was the only
+     * place visited: a tourist who went to A and nowhere else is evidence AGAINST "people who visit A also visit B",
+     * so leaving them out only ever inflates confidence. The antecedent count below is every trip that has A, pair or
+     * not; it agrees with getAssociatedListings(), which has always counted the full set, and with topRules()'s own
+     * support figure, which divides by every transaction. (Samal Island appears in 32 transactions but was once
+     * counted as 26, reporting Samal -> BlueJaz at 73.1% where the data gives 59.4%.)
+     *
+     * The pairs are counted by the database, not by looping over every visit in PHP: that loop held all visits in
+     * memory at once (about 345 MB at 100,000 trips). PHP only receives the pairs that already clear the thresholds.
+     */
+    public function liveRows(int $limit, int $minSupportCount, float $minConfidence): Collection
+    {
+        $items = fn () => $this->visits()->select('exit_survey_id', 'listing_kind', 'listing_id')->distinct()->toBase();
+
+        $antecedents = DB::query()->fromSub($items(), 'i')
+            ->selectRaw('i.listing_kind as ant_kind, i.listing_id as ant_id, count(*) as ant_count')
+            ->groupBy('i.listing_kind', 'i.listing_id');
+
+        $pairs = DB::query()->fromSub($items(), 'a')
+            ->joinSub($items(), 'b', fn ($join) => $join->on('a.exit_survey_id', '=', 'b.exit_survey_id'))
+            ->where(fn ($q) => $q->whereColumn('a.listing_kind', '!=', 'b.listing_kind')->orWhereColumn('a.listing_id', '!=', 'b.listing_id'))
+            ->selectRaw('a.listing_kind as a_kind, a.listing_id as a_id, b.listing_kind as b_kind, b.listing_id as b_id, count(*) as co_count')
+            ->groupBy('a.listing_kind', 'a.listing_id', 'b.listing_kind', 'b.listing_id')
+            ->havingRaw('count(*) >= ?', [$minSupportCount]);
+
+        $mined = DB::query()->fromSub($pairs, 'p')
+            ->joinSub($antecedents, 'n', fn ($join) => $join->on('p.a_kind', '=', 'n.ant_kind')->on('p.a_id', '=', 'n.ant_id'))
+            ->selectRaw('p.a_kind, p.a_id, p.b_kind, p.b_id, p.co_count, n.ant_count')
+            // A little under the threshold: the exact test is on the confidence rounded to 4 places, in the caller.
+            // Cast: a bare float is bound as text, and SQLite compares a number with text as always smaller.
+            ->whereRaw('(p.co_count * 1.0 / n.ant_count) >= CAST(? AS DECIMAL(10, 6))', [round($minConfidence - 0.0001, 6)])
+            ->orderByRaw('(p.co_count * 1.0 / n.ant_count) desc')
+            ->orderByDesc('p.co_count')
+            ->orderBy('p.a_kind')->orderBy('p.a_id')->orderBy('p.b_kind')->orderBy('p.b_id');
+
+        // The rows already come in confidence order, so the first $limit that pass are the top $limit.
+        if ($limit < PHP_INT_MAX) {
+            $mined->limit($limit);
+        }
+
+        return $mined->get();
+    }
+
+    /** How many trips this mix of sources counts (the total that support is measured against). */
+    public function transactionCount(): int
+    {
+        return $this->surveys()->count();
     }
 }

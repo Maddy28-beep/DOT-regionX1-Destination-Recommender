@@ -472,13 +472,16 @@ class ContentBasedRecommendationService
      */
     private function visitShares(Collection $candidates): array
     {
-        $counts = \App\Models\ExitSurveyVisit::query()
-            ->where('listing_kind', 'destination')
-            ->whereIn('listing_id', $candidates->pluck('id'))
-            ->whereIn('exit_survey_id', \App\Models\ExitSurvey::query()->select('id'))
-            ->selectRaw('listing_id, count(*) as visits')
-            ->groupBy('listing_id')
-            ->pluck('visits', 'listing_id');
+        // Read from the precomputed counts when the association_rules_table switch is on and they have been built:
+        // counting from every recorded visit on each plan slows down as the visits pile up. Same numbers either way.
+        $counts = app(AprioriService::class)->precomputedVisitCounts('destination', $candidates->pluck('id'))
+            ?? \App\Models\ExitSurveyVisit::query()
+                ->where('listing_kind', 'destination')
+                ->whereIn('listing_id', $candidates->pluck('id'))
+                ->whereIn('exit_survey_id', \App\Models\ExitSurvey::query()->select('id'))
+                ->selectRaw('listing_id, count(*) as visits')
+                ->groupBy('listing_id')
+                ->pluck('visits', 'listing_id');
 
         $max = (int) $counts->max();
 

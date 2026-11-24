@@ -149,7 +149,7 @@ class AuditCoverageTest extends TestCase
         $partner = $this->partnerFor($park);
 
         $this->actingAs($partner, 'establishment')->post('/portal/establishment/promotions', ['title' => '10% off'])->assertRedirect();
-        $this->assertSame(1, Promotion::count());
+        $this->assertSame(1, Promotion::withoutGlobalScopes()->count());
 
         $this->assertSame(0, SystemAuditLog::count(), 'GAP: a promotion added by a partner leaves no audit row');
     }

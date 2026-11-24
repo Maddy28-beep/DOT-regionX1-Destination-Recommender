@@ -12,7 +12,12 @@
  * trip_location_v2 -- the 13 November 2026 changes to Plan My Trip: no past arrival date, a start point must be inside
  * Region XI, a trip end ("finish by") instead of a departure point, visitor origin as country / province / city, and the
  * admin view of visitor origin. Off = the planner behaves exactly as it did before.
+ *
+ * association_rules_table -- "people who visit A also visit B" read from a precomputed table (php artisan
+ * association-rules:build, run nightly) instead of being counted from every recorded trip on each lookup. Off = counted
+ * live from the trips exactly as before. It also reads live when no build exists yet, so turning it on early is safe.
  */
 return [
     'trip_location_v2' => (bool) env('FEATURE_TRIP_LOCATION_V2', false),
+    'association_rules_table' => (bool) env('FEATURE_ASSOCIATION_RULES_TABLE', false),
 ];

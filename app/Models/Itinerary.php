@@ -16,8 +16,9 @@ class Itinerary extends Model
     protected $fillable = [
         'preference_id', 'package_id', 'total_days', 'est_budget_total',
         'est_party_size', 'generated_at', 'range_tier_used', 'range_widened', 'range_capped_places',
-        'tourist_account_id', 'title', 'swaps', 'day_themes', 'stay_plan',
+        'title', 'swaps', 'day_themes', 'stay_plan',
         'ml_skeleton_applied', 'ml_skeleton_seconds',
+        'edit_token_hash', 'share_token_hash', 'kept_at', 'last_opened_at',
     ];
 
     protected function casts(): array
@@ -30,6 +31,8 @@ class Itinerary extends Model
             'stay_plan' => 'array',
             'ml_skeleton_applied' => 'boolean',
             'ml_skeleton_seconds' => 'float',
+            'kept_at' => 'datetime',
+            'last_opened_at' => 'datetime',
         ];
     }
 
@@ -42,12 +45,6 @@ class Itinerary extends Model
     public function package(): BelongsTo
     {
         return $this->belongsTo(Package::class);
-    }
-
-    /** Set only once a tourist has chosen to save this plan permanently to their optional account. */
-    public function touristAccount(): BelongsTo
-    {
-        return $this->belongsTo(TouristAccount::class);
     }
 
     public function matches(): HasMany

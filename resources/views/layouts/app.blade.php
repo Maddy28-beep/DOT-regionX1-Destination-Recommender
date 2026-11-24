@@ -21,7 +21,6 @@
 
     @include('partials.footer')
     @include('partials.chatbot-widget')
-    @include('partials.login-modal')
 
     <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
     @unless (request()->routeIs('exit-survey.recap'))

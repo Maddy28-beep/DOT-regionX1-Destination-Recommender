@@ -10,6 +10,8 @@
 
 @section('content')
 
+@include('establishment.partials.draft-bar', ['establishment' => $establishment])
+
 @php $today = now('Asia/Manila')->startOfDay(); @endphp
 
 <div class="adm-card">
@@ -24,7 +26,7 @@
             <tbody>
                 @forelse ($promotions as $promotion)
                     @php
-                        $state = $promotion->ends_at && $promotion->ends_at->lt($today) ? 'ended' : ($promotion->starts_at && $promotion->starts_at->gt($today) ? 'scheduled' : 'live');
+                        $state = $promotion->review_status ? 'waiting' : ($promotion->ends_at && $promotion->ends_at->lt($today) ? 'ended' : ($promotion->starts_at && $promotion->starts_at->gt($today) ? 'scheduled' : 'live'));
                     @endphp
                     <tr>
                         <td><strong>{{ $promotion->title }}</strong>@if ($promotion->description)<div class="cell-sub">{{ \Illuminate\Support\Str::limit($promotion->description, 70) }}</div>@endif</td>
@@ -36,7 +38,7 @@
                                 Always on
                             @endif
                         </td>
-                        <td><span class="status-pill {{ ['live' => 'status-active', 'scheduled' => 'status-pending', 'ended' => 'status-expired'][$state] }}">{{ ['live' => 'Showing', 'scheduled' => 'Scheduled', 'ended' => 'Ended'][$state] }}</span></td>
+                        <td><span class="status-pill {{ ['live' => 'status-active', 'scheduled' => 'status-pending', 'ended' => 'status-expired', 'waiting' => 'status-pending'][$state] }}">{{ ['live' => 'Showing', 'scheduled' => 'Scheduled', 'ended' => 'Ended', 'waiting' => 'Not public yet'][$state] }}</span></td>
                         <td class="adm-table__actions">
                             <form method="POST" action="{{ route('establishment.promotions.destroy', $promotion) }}" onsubmit="return confirm('Remove this promo? Travelers will no longer see it.');">
                                 @csrf @method('DELETE')

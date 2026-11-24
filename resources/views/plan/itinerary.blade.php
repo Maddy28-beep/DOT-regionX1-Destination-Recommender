@@ -117,39 +117,18 @@
                         @unless ($itinerary->package)
                             <a href="{{ route('plan.edit') }}" class="btn btn-outline"><x-icon name="filter" /> Edit preferences</a>
                         @endunless
-                        @if ($itinerary->tourist_account_id)
-                            <a href="{{ route('account.itineraries.show', $itinerary) }}" class="btn btn-primary">Saved to My Itineraries &check;</a>
-                        @else
-                            <form id="itinerarySaveForm" method="POST" action="{{ route('plan.itinerary.save') }}">
-                                @csrf
-                                <button type="submit" class="btn btn-primary"><x-icon name="heart" /> Save Itinerary</button>
-                            </form>
-                        @endif
+                        <a href="#keep" class="btn btn-primary" @if ($itinerary->edit_token_hash) data-keep-manage aria-controls="keep" aria-expanded="{{ session('show_keep_panel') ? 'true' : 'false' }}" @else data-keep-open @endif><x-icon :name="$itinerary->edit_token_hash ? 'check' : 'heart'" /> {{ $itinerary->edit_token_hash ? 'Saved · Manage link' : 'Keep this plan' }}</a>
                     </div>
-                    {{-- Set expectations honestly: no account is needed to plan or view a trip, by design -- this is what
-                         happens if you do not save it. --}}
-                    @unless ($itinerary->tourist_account_id)
-                        <p class="itin-banner__unsaved" role="status"><x-icon name="info" aria-hidden="true" /><span>Not saved yet &mdash; this plan disappears when you close the tab.</span></p>
+                    @unless ($itinerary->edit_token_hash)
+                        <p class="itin-banner__keep-state">Not saved yet</p>
                     @endunless
                 </div>
             </section>
 
-            @if (session('pending_save_itinerary'))
-                <div class="privacy-note" role="status">
-                    <x-icon name="shield-check" />
-                    <p>
-                        <strong>Save your itinerary.</strong> Your current itinerary can now be saved to your
-                        new account.
-                        <form method="POST" action="{{ route('plan.itinerary.save') }}" style="display:inline;">
-                            @csrf
-                            <button type="submit" class="btn btn-primary btn-xs" style="margin-left:6px;">Save Itinerary</button>
-                        </form>
-                    </p>
-                </div>
-            @endif
+            @include('plan.partials.keep-panel', ['itinerary' => $itinerary, 'keep' => $keep ?? null])
 
-            @if ($itemsByDay->isNotEmpty())
                 <div class="itin-bar">
+                    @if ($itemsByDay->isNotEmpty())
                     <nav class="itin-tabs" aria-label="Jump to a day" data-day-tabs>
                         @foreach ($itemsByDay as $day => $items)
                             <a href="#itinerary-day-{{ $day }}" data-day-tab="{{ $day }}">
@@ -158,26 +137,26 @@
                             </a>
                         @endforeach
                     </nav>
+                    @endif
                     @if (data_get($itinerary->day_themes, 'summary.regrouped'))
                         <span class="plan-badge plan-badge--ai itin-bar__theme" title="A pretrained embedding model grouped similar places into the same day, without adding more than a quarter to the travelling."><span aria-hidden="true">&#10024;</span> Days grouped by theme</span>
                     @endif
-                    @unless ($itinerary->package)
                         <div class="itin-bar__links">
+                            @unless ($itinerary->package)
                             <button type="button" class="itinerary-explainer-trigger" id="itineraryExplainerOpen"
                                     aria-haspopup="dialog" aria-controls="itineraryExplainerModal" aria-expanded="false">
                                 <x-icon name="info" />
                                 How was this made?
                             </button>
                             <a href="#itinerary-recommendations" class="itin-more"><x-icon name="compass" /> More ideas</a>
-                            <button type="button" class="itin-more" data-print><x-icon name="printer" /> Print / PDF</button>
+                            @endunless
+                            <button type="button" class="itin-more" data-print aria-label="Print or save as PDF"><x-icon name="printer" /> Print / PDF</button>
                             <a href="{{ route('plan.itinerary.calendar') }}" class="itin-more"
                                @unless (filled($preference?->start_date)) title="Add an arrival date in your preferences first; a calendar needs the day your trip starts." @endunless>
                                 <x-icon name="calendar" /> Add to calendar
                             </a>
                         </div>
-                    @endunless
                 </div>
-            @endif
 
             @if ($itemsByDay->isNotEmpty() && ! $itinerary->package)
                 @include('partials.itinerary-stay-notices', [

@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Schema;
  * Deletes anonymous trip data once it is older than the retention period.
  *
  * What is removed:
- *   - anonymous itineraries (no tourist account) generated before the cutoff,
+ *   - itineraries generated before the cutoff, except those kept by private link, which go when
+ *     nobody has opened them for the longer kept-plan period,
  *     with their stops and rankings;
  *   - the trip preferences those itineraries were built from, with their health and
  *     accessibility answers, unless an exit survey still points at the preference
@@ -20,7 +21,6 @@ use Illuminate\Support\Facades\Schema;
  *   - trial-mode (?test=1) exit surveys older than a day.
  *
  * What is never touched:
- *   - itineraries a traveller saved to their own account;
  *   - preferences that no itinerary was built from, which is exactly what the demo
  *     data looks like, so the demo survives;
  *   - real exit surveys, reviews, check-ins, listings and accounts.
@@ -38,13 +38,20 @@ class AnonymousDataPurger
         $cutoff = $now->copy()->subDays($retentionDays);
         $chatCutoff = $now->copy()->subDays((int) config('privacy.chatbot_retention_days', 30));
         $testCutoff = $now->copy()->subHours((int) config('privacy.test_survey_hours', 24));
+        $keptCutoff = $now->copy()->subDays((int) config('privacy.kept_retention_days', 90));
 
         $counts = ['itineraries' => 0, 'preferences_deleted' => 0, 'preferences_scrubbed' => 0, 'chatbot_logs' => 0, 'test_surveys' => 0];
 
         DB::beginTransaction();
         try {
             // 1. old anonymous itineraries
-            $old = DB::table('itineraries')->whereNull('tourist_account_id')->where('generated_at', '<', $cutoff)->get(['id', 'preference_id']);
+            $old = DB::table('itineraries')
+                ->where(fn ($q) => $q
+                    // not kept by link: gone after the ordinary retention period
+                    ->where(fn ($q) => $q->whereNull('edit_token_hash')->where('generated_at', '<', $cutoff))
+                    // kept by link: gone when nobody has opened it for the longer period
+                    ->orWhere(fn ($q) => $q->whereNotNull('edit_token_hash')->where(fn ($q) => $q->where('last_opened_at', '<', $keptCutoff)->orWhere(fn ($q) => $q->whereNull('last_opened_at')->where('generated_at', '<', $keptCutoff)))))
+                ->get(['id', 'preference_id']);
             $itineraryIds = $old->pluck('id');
             $preferenceIds = $old->pluck('preference_id')->filter()->unique()->values();
 

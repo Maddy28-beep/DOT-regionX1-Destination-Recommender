@@ -14,7 +14,6 @@ use App\Models\Restaurant;
 use App\Models\SavedListing;
 use App\Models\SouvenirCenter;
 use App\Models\TourOperator;
-use App\Models\TouristSavedDestination;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use App\Services\Audit\AuditLogger;
 use Illuminate\Support\Facades\Event;
@@ -48,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
         // Audit trail for the DOT Admin console: who signed in, who tried and failed, who signed out.
         $audit = function (string $adminId, string $action) {
             try {
-                app(AuditLogger::class)->record($adminId, $action, 'admin_users', $adminId, 'from '.request()->ip());
+                app(AuditLogger::class)->record($adminId, $action, 'users', $adminId, 'from '.request()->ip());
             } catch (\Throwable $e) {
                 report($e); // never let the log stop a sign-in
             }
@@ -98,6 +97,10 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         // Heart / unheart buttons.
+        // Keeping a plan by private link: a few new links an hour per visitor address, and a generous limit on opening them
+        // so nobody can try secrets by the thousand.
+        RateLimiter::for('keep', fn (Request $request) => Limit::perHour(30)->by('keep:'.$request->ip())->response($tooMany));
+        RateLimiter::for('keep-open', fn (Request $request) => Limit::perMinute(20)->by('keep-open:'.$request->ip())->response($tooMany));
         RateLimiter::for('toggle', fn (Request $request) => Limit::perMinute(60)->by('toggle:'.$request->ip())->response($tooMany));
 
         // listing_kind values used by accreditation_records, reviews,
@@ -116,6 +119,7 @@ class AppServiceProvider extends ServiceProvider
 
         // The count beside "Package Approvals" in the DOT Admin sidebar: packages tour operators sent in that DOT has not decided.
         View::composer('layouts.admin', function ($view) {
+            $view->with('navListingsWaiting', \App\Models\ListingSubmission::where('status', \App\Models\ListingSubmission::PENDING)->count());
             $view->with('navPackagesWaiting', \App\Models\Package::where('status', \App\Models\Package::STATUS_IN_REVIEW)->count());
         });
 
@@ -185,15 +189,10 @@ class AppServiceProvider extends ServiceProvider
             $view->with('activeAdvisoryCount', Advisory::active()->count());
             $view->with('davaoWeather', app(\App\Services\DavaoWeather::class)->now());
 
-            // The number on the header's heart: the signed-in traveller's own list, otherwise this
-            // browser's. Nothing is counted for a first-time visitor who has no token yet.
+            // The number on the header's heart: this browser's own list. Nothing is counted for a
+            // first-time visitor who has no token yet.
             $token = request()->cookie(EnsureVisitorToken::COOKIE);
-            $view->with('accountItineraryCount', Auth::guard('tourist')->check()
-                ? Itinerary::where('tourist_account_id', Auth::guard('tourist')->id())->count()
-                : 0);
-            $view->with('savedCount', Auth::guard('tourist')->check()
-                ? TouristSavedDestination::where('tourist_account_id', Auth::guard('tourist')->id())->count()
-                : (is_string($token) ? SavedListing::where('visitor_token', $token)->count() : 0));
+            $view->with('savedCount', is_string($token) ? SavedListing::where('visitor_token', $token)->count() : 0);
         });
     }
 }
