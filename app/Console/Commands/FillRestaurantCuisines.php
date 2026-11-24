@@ -52,6 +52,7 @@ class FillRestaurantCuisines extends Command
         'Resto-Beach — Paradise Island Park & Beach Resort' => 'Filipino & International',
         'Chow2 Restaurant & Catering Services' => 'Filipino',
         "Leonora's Restaurant" => 'Cafe',
+        'Parola-Baywalk Restaurant' => 'International',
     ];
 
     public function handle(): int
