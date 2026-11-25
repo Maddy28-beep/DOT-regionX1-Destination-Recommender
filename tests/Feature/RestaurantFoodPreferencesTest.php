@@ -102,4 +102,15 @@ class RestaurantFoodPreferencesTest extends TestCase
         $this->assertSame(2, Preference::confirmed()->count());
         $this->assertSame($before, $restaurant->fresh()->getRawOriginal());
     }
+
+    public function test_a_live_server_needs_the_flag_and_still_dry_runs_without_apply(): void
+    {
+        $entry = collect(json_decode(file_get_contents(database_path('data/restaurant-food-preferences-2026-11-24.json')), true))->firstWhere('name', 'The Vegan Dinosaur');
+        Restaurant::create(['name' => $entry['name'], 'slug' => $entry['slug'], 'location' => $entry['location'], 'is_accredited' => true]);
+        $this->app['env'] = 'production';
+
+        $this->artisan('restaurants:food-preferences', ['--apply' => true])->expectsOutputToContain('--allow-production')->assertFailed();
+        $this->artisan('restaurants:food-preferences', ['--allow-production' => true])->expectsOutputToContain('3 preference records ready')->assertSuccessful();
+        $this->assertSame(0, Preference::count());
+    }
 }

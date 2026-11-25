@@ -9,13 +9,15 @@ use Illuminate\Support\Facades\DB;
 
 class ImportRestaurantFoodPreferences extends Command
 {
-    protected $signature = 'restaurants:food-preferences {--apply : Import reviewed evidence into the local database}';
+    protected $signature = 'restaurants:food-preferences {--apply : Import the reviewed evidence} {--allow-production : Apply on a live server}';
     protected $description = 'Record reviewed restaurant food preferences; unknowns remain Not confirmed (dry run by default).';
 
     public function handle(): int
     {
-        if (!app()->environment(['local', 'testing'])) {
-            $this->error('This evidence import is for local testing only.');
+        // A live server needs --allow-production (the project owner asked on 25 November 2026 for this on the live site).
+        // Nothing is written without --apply, and the dry run shows the plan.
+        if (!app()->environment(['local', 'testing']) && !$this->option('allow-production')) {
+            $this->error('This evidence import is applied locally unless you add --allow-production. Nothing changed.');
             return self::FAILURE;
         }
         $entries = json_decode(file_get_contents(database_path('data/restaurant-food-preferences-2026-11-24.json')), true, flags: JSON_THROW_ON_ERROR);
