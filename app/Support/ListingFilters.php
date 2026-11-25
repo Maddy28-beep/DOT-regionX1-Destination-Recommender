@@ -49,6 +49,16 @@ final class ListingFilters
         $cfg = self::KINDS[$kind];
         $groups = [];
 
+        if ($kind === 'restaurant') {
+            $counts = \App\Models\RestaurantFoodPreference::confirmed()
+                ->whereHas('restaurant', fn ($q) => $q->publiclyVisible())
+                ->select('preference', DB::raw('count(*) as total'))->groupBy('preference')->pluck('total', 'preference')->all();
+            $groups[] = ['key' => 'food', 'type' => 'checks', 'label' => 'Food preferences', 'names' => ['food'],
+                'options' => \App\Models\RestaurantFoodPreference::OPTIONS,
+                'counts' => array_replace(array_fill_keys(array_keys(\App\Models\RestaurantFoodPreference::OPTIONS), 0), $counts),
+                'fold' => 0, 'open' => true, 'description' => 'Source-confirmed options only. Multiple choices require all selected preferences.'];
+        }
+
         if ($cfg['price']) {
             $groups[] = ['key' => 'price', 'type' => 'range', 'label' => $cfg['price'], 'names' => ['price_min', 'price_max'], 'bounds' => self::priceBounds($kind)];
         }
@@ -103,6 +113,12 @@ final class ListingFilters
         $cfg = self::KINDS[$kind];
         $table = $cfg['table'];
 
+        if ($kind === 'restaurant') {
+            foreach (self::offered($request, 'food', array_keys(\App\Models\RestaurantFoodPreference::OPTIONS)) as $preference) {
+                $query->whereHas('foodPreferences', fn ($q) => $q->confirmed()->where('preference', $preference));
+            }
+        }
+
         $rating = self::scalar($request, 'rating_min');
         if (isset(self::RATINGS[$rating])) {
             $query->where("{$table}.rating", '>=', (float) $rating);
@@ -155,6 +171,10 @@ final class ListingFilters
     public static function labels(Request $request): array
     {
         $labels = [];
+        $food = self::offered($request, 'food', array_keys(\App\Models\RestaurantFoodPreference::OPTIONS));
+        if ($food) {
+            $labels['food'] = 'Food: '.implode(', ', array_map(fn ($key) => \App\Models\RestaurantFoodPreference::OPTIONS[$key], $food));
+        }
         $rating = self::scalar($request, 'rating_min');
         if (isset(self::RATINGS[$rating])) {
             $labels['rating_min'] = 'Rated '.self::RATINGS[$rating];

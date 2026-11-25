@@ -87,6 +87,13 @@ class SearchController extends Controller
                 break;
 
             case 'restaurants':
+                $food = array_values(array_unique(array_intersect(
+                    array_filter((array) $request->input('food', []), fn ($value) => is_string($value)),
+                    array_keys(\App\Models\RestaurantFoodPreference::OPTIONS)
+                )));
+                if ($food) {
+                    $filters['food'] = $food;
+                }
                 $this->carryText($request, $filters, 'cuisine_type');
                 $meal = (string) $request->string('meal');
                 if (MealTimes::valid($meal)) {

@@ -1,0 +1,9 @@
+.food-preferences { border: 1px solid #dfe6df; border-radius: 12px; background: #fff; }
+.food-preferences__intro { color: #46594f; font-size: .86rem; line-height: 1.6; }
+.food-preferences__row { padding: 14px 0; border-top: 1px solid #dfe6df; }
+.food-preferences__heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.food-preferences__status { border-radius: 20px; padding: 4px 10px; color: #465149; background: #f0f2f0; font-size: .8rem; }
+.food-preferences__status.is-confirmed { color: #084d39; background: #e4f2e9; }
+.food-preferences__row p { font-size: .86rem; line-height: 1.6; margin: 8px 0 0; overflow-wrap: anywhere; }
+.food-preferences__row a { color: #084d39; text-decoration: underline; }
+.food-preferences a:focus-visible { outline: 3px solid #0b6b4f; outline-offset: 3px; }

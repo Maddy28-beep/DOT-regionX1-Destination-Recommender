@@ -73,6 +73,11 @@ class Restaurant extends Model
         return $this->belongsTo(Region::class);
     }
 
+    public function foodPreferences(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(RestaurantFoodPreference::class);
+    }
+
     public function reviews(): MorphMany
     {
         return $this->morphMany(Review::class, 'listing', 'listing_kind', 'listing_id');

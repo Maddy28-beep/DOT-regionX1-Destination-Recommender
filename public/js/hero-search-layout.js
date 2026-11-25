@@ -8,7 +8,7 @@
     function arrange(purpose) {
         const order = purpose === 'accommodations'
             ? ['where', 'guests', 'budget', 'from', 'to', 'meal', 'date', 'cuisine', 'interest', 'duration', 'travelers']
-            : ['where', 'from', 'to', 'guests', 'meal', 'date', 'cuisine', 'interest', 'duration', 'travelers', 'budget'];
+            : ['where', 'from', 'to', 'guests', 'meal', 'date', 'cuisine', 'interest', 'duration', 'travelers', 'budget', 'food'];
         // Move original controls so visual and keyboard order agree in every tab.
         order.forEach(kind => grid.querySelectorAll(`[data-for="${kind}"]`).forEach(box => grid.append(box)));
         if (custom) grid.append(custom);

@@ -1,4 +1,24 @@
 /* Location-first search. All fields remain the existing GET search controls. */
+.hero-search .hero-food-preferences { grid-column: 1 / -1; min-width: 0; margin: 2px 0 0; padding: 12px 14px; border: 0; border-radius: 12px; background: #f0f5ee; }
+.hero-search .hero-food-preferences[hidden] { display: none; }
+.hero-food-preferences legend { float: left; width: 100%; padding: 0; font-size: .9rem; font-weight: 600; color: #084d39; }
+.hero-food-preferences legend span { font-weight: 400; color: #46594f; }
+.hero-food-preferences p { clear: both; margin: 0 0 8px; padding-top: 4px; font-size: .78rem; line-height: 1.5; color: #46594f; }
+.hero-food-preferences__options { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+.hero-food-preferences__options label { display: flex; align-items: center; gap: 9px; min-height: 44px; margin: 0; padding: 9px 14px; border: 1px solid #d3dcd4; border-radius: 12px; background: #fffefa; color: #084d39; font-size: .85rem; cursor: pointer; }
+.hero-food-preferences__options label:has(:checked) { border-color: #0b6b4f; background: #e3f0df; }
+.hero-food-preferences__options input { flex: none; width: 18px; height: 18px; margin: 0; accent-color: #0b6b4f; }
+.hero-food-preferences__options input:focus-visible { outline: 3px solid #0b6b4f; outline-offset: 3px; }
+@media(max-width:640px) {
+    .hero-food-preferences__options { display: grid; grid-template-columns: 1fr; }
+    body.hero-page .hero-search--compact[data-search-purpose="restaurants"] [data-for="date"] > svg { display: none; }
+    body.hero-page .hero-search--compact[data-search-purpose="restaurants"] [data-for="date"] > label { left: 12px; top: 7px; }
+    body.hero-page .hero-search--compact[data-search-purpose="restaurants"] [data-for="date"] input[type="date"] { padding: 24px 12px 6px; height: 58px; min-height: 58px; font-size: 16px; }
+}
+@media(min-width:641px) {
+    body.hero-page .hero-search--compact[data-search-purpose="restaurants"] .hero-search__grid > [data-for="cuisine"],
+    body.hero-page .hero-search--compact[data-search-purpose="restaurants"] .hero-search__grid > [data-budget-box="restaurants"] { grid-column: span 3; }
+}
 .poster-hero.has-photo { background-color: #153d32; background-size: cover; background-position: center 48%; background-repeat: no-repeat; }
 @media (max-width: 640px) { .poster-hero.has-photo { background-position: 52% center; } }
 body.hero-page .poster-hero .region-tagline {
