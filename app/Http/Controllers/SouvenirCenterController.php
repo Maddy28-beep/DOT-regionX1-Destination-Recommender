@@ -13,8 +13,10 @@ class SouvenirCenterController extends Controller
     {
         $query = SouvenirCenter::publiclyVisible()->with('region', 'photos')->withCount('reviews');
 
+        // Keywords, not one exact phrase: budget words fill the budget, the other words are matched in any of these columns.
+        \App\Support\KeywordSearch::prepare($request, 'souvenir_centers');
         if ($request->filled('q')) {
-            \App\Support\SearchTerm::contains($query, 'name', (string) $request->string('q'));
+            \App\Support\KeywordSearch::apply($query, (string) $request->string('q'), ['souvenir_centers.name', 'souvenir_centers.location', 'souvenir_centers.description'], ! $request->filled('sort'));
         }
 
         if ($request->filled('region_id')) {

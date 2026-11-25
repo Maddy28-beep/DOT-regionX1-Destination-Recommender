@@ -22,6 +22,7 @@ class RealPlaceImportProductionGateTest extends TestCase
         'destinations:import-real-local', 'destinations:import-more-real-local', 'destinations:import-third-real-local',
         'destinations:import-fourth-real-local', 'destinations:import-fifth-real-local',
         'restaurants:import-real-local', 'restaurants:import-more-real-local', 'restaurants:import-third-real-local',
+        'restaurants:import-sixteen-real-local',
     ];
 
     protected function setUp(): void

@@ -1168,7 +1168,7 @@ document.addEventListener('DOMContentLoaded', function () {
         radio.addEventListener('click', function () {
             var any = form.querySelector('.budget-tile input[data-any]');
             if (radio.dataset.was === '1' && radio !== any) {
-                // Clicking the chosen tile again clears it: back to "Any budget" where there is one.
+                // Clicking the chosen tile again clears it: back to "Flexible" (no budget) where there is one.
                 radio.checked = false;
                 radio.dataset.was = '0';
                 if (any) { any.checked = true; any.dataset.was = '1'; }

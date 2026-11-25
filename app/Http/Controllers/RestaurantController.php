@@ -16,8 +16,10 @@ class RestaurantController extends Controller
     {
         $query = Restaurant::publiclyVisible()->with('region', 'photos')->withCount('reviews');
 
+        // Keywords, not one exact phrase: budget words fill the budget, the other words are matched in any of these columns.
+        \App\Support\KeywordSearch::prepare($request, 'restaurants');
         if ($request->filled('q')) {
-            \App\Support\SearchTerm::contains($query, 'name', (string) $request->string('q'));
+            \App\Support\KeywordSearch::apply($query, (string) $request->string('q'), ['restaurants.name', 'restaurants.location', 'restaurants.cuisine_type', 'restaurants.description'], ! $request->filled('sort'));
         }
 
         if ($request->filled('region_id')) {

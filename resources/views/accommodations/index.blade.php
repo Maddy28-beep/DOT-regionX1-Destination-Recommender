@@ -68,7 +68,7 @@
 
                     @include('partials.pagination', ['paginator' => $accommodations, 'panel' => 'grid'])
                 @else
-                    <x-davo-empty-state :adjust-filters="true" title="No accommodations match your filters" :message="request('stay_mode') === 'day_use' ? 'No day-use stays match these filters. Daily budgets include recorded daily rates only. Try Any budget or another area.' : 'Try another category or clear your filters to explore more options.'" :action-url="route('accommodations.index')" action-label="Clear filters" />
+                    <x-davo-empty-state :adjust-filters="true" title="No accommodations match your filters" :message="request('stay_mode') === 'day_use' ? 'No day-use stays match these filters. Daily budgets include recorded daily rates only. Try a flexible budget or another area.' : 'Try another category or clear your filters to explore more options.'" :action-url="route('accommodations.index')" action-label="Clear filters" />
                 @endif
             </div>
         </div>
