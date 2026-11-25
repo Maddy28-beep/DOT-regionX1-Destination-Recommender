@@ -91,7 +91,7 @@ class VisitorOriginStatsTest extends TestCase
         $columns = Schema::getColumnListing('visitor_origin_daily');
         sort($columns);
 
-        $this->assertSame(['answer', 'city', 'country_code', 'day', 'id', 'province', 'visitors'], $columns);
+        $this->assertSame(['answer', 'city', 'country_code', 'day', 'generated_visitors', 'id', 'province', 'visitors'], $columns);
     }
 
     // ---- the six cases ------------------------------------------------------------------------------------

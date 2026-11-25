@@ -155,7 +155,8 @@ class SampleDataSurfacesTest extends TestCase
 
         $plan = $this->withSession([TripPlannerController::ITINERARY_KEY => $trip->id, TripPlannerController::PREFERENCE_KEY => $pref->id])
             ->get(route('plan.itinerary'))->assertOk()->getContent();
-        $this->assertMatchesRegularExpression('/3 destinations \(2 DOT Accredited,\s+1 Sample Data\)/', $plan);
+        // The 17 November itinerary refresh removed the technical count line from the traveler's plan; the split stays on the home page and the admin overview.
+        $this->assertDoesNotMatchRegularExpression('/3 destinations \(2 DOT Accredited,\s+1 Sample Data\)/', $plan);
     }
 
     public function test_a_catalogue_with_no_samples_keeps_the_plain_wording(): void

@@ -137,7 +137,7 @@ class AdminDataCompletenessTest extends TestCase
         $this->destination('Bare Falls');
         $html = $this->actingAs($this->admin(), 'admin')->get('/portal/admin/data-completeness')->assertOk()->getContent();
 
-        $this->assertStringContainsString('Data completeness', $html);
+        $this->assertStringContainsString('Data quality', $html);
         $this->assertStringContainsString('Bare Falls', $html);
         $this->assertStringContainsString('1 of 1 missing', $html);
         $this->assertStringContainsString('Map position', $html);
@@ -267,6 +267,6 @@ class AdminDataCompletenessTest extends TestCase
         $html = $this->actingAs($this->admin(), 'admin')->get('/portal/admin')->getContent();
 
         $this->assertStringContainsString(route('admin.data-completeness'), $html);
-        $this->assertStringContainsString('Data completeness', $html);
+        $this->assertStringContainsString('Data quality', $html);
     }
 }

@@ -246,12 +246,16 @@ class TripStartEndTest extends TestCase
         $this->assertStringContainsString('Philippine time', $html);
     }
 
-    public function test_the_pick_up_location_starts_as_the_arrival_airport_and_the_start_has_a_minimum(): void
+    public function test_the_pick_up_location_is_required_and_never_filled_in_for_the_visitor_and_the_start_has_a_minimum(): void
     {
         $html = $this->get(route('plan.edit'))->assertOk()->getContent();
 
-        $this->assertMatchesRegularExpression('/id="origin_label"[^>]*value="Davao International Airport"/s', $html);
-        $this->assertStringContainsString('id="origin_lat" value="7.13"', $html);
+        // The visitor chooses where to meet; no airport is put in the box for them.
+        $this->assertSame(1, preg_match('/<input[^>]*id="origin_label"[^>]*>/s', $html, $input));
+        $this->assertStringContainsString('required', $input[0]);
+        $this->assertStringContainsString('value=""', $input[0]);
+        $this->assertStringContainsString('id="origin_lat" value=""', $html);
+        $this->assertStringNotContainsString('value="Davao International Airport"', $input[0]);
         $this->assertStringContainsString('min="2026-11-20T20:00"', $html, 'the earliest start is now, in Philippine time');
     }
 
@@ -267,8 +271,8 @@ class TripStartEndTest extends TestCase
         $js = file_get_contents(public_path('js/plan-wizard.js'));
         $html = $this->get(route('plan.edit'))->assertOk()->getContent();
 
-        // Where from first (About you), then the start and end, then the pick-up location, then who is coming.
-        $this->assertStringContainsString('if (tripWindow) steps[0].append(visit, basics, origin, style);', $js);
+        // Where from and first visit (About you), then who is coming, then the start and end, then the pick-up location.
+        $this->assertStringContainsString('steps[0].append(visit, style, basics, origin);', $js);
         $this->assertStringContainsString('visitor_origin_country', $html);
     }
 

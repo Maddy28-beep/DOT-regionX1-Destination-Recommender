@@ -284,7 +284,7 @@ class AmenitiesTest extends TestCase
         $photo = ListingPhoto::firstOrFail();
         $this->assertSame('package', $photo->listing_kind);
         $this->assertSame('wheel', $photo->amenity);
-        $this->assertTrue($photo->is_primary);
+        $this->assertFalse($photo->is_primary, 'an amenity photo stays with its feature and never becomes the listing cover');
         $this->assertSame(['wheel'], app(AmenityStore::class)->keys('package', $package), 'it shows the trip is step-free, so that is ticked');
 
         $client->get("/portal/establishment/packages/{$package->id}")->assertOk()->assertSee('Shows: Wheelchair or step-free');
