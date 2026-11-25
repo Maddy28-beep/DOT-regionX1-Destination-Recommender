@@ -20,8 +20,9 @@
                     default => (bool) array_filter((array) request($g['names'][0], [])),
                 };
             @endphp
-            <details class="fgroup" @if ($isSet || $g['type'] === 'toggle') open @endif>
+            <details class="fgroup" @if ($isSet || $g['type'] === 'toggle' || ($g['open'] ?? false)) open @endif>
                 <summary class="fgroup__title">{{ $g['label'] }}@if ($isSet)<span class="fgroup__dot" role="img" aria-label="in use"></span>@endif</summary>
+                @if (!empty($g['description']))<p class="fgroup__help">{{ $g['description'] }}</p>@endif
 
                 @if ($g['type'] === 'range')
                     @php

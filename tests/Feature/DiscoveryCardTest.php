@@ -69,7 +69,7 @@ class DiscoveryCardTest extends TestCase
         foreach ([
             'destinations' => ['budget', 'where', 'interest'],
             'accommodations' => ['budget', 'where', 'stay_mode', 'from', 'to', 'guests'],
-            'restaurants' => ['budget', 'meal', 'date', 'cuisine', 'where'],
+            'restaurants' => ['budget', 'meal', 'date', 'cuisine', 'where', 'food'],
             'packages' => ['budget', 'where', 'interest', 'duration', 'travelers'],
             'souvenir_centers' => ['where'],
         ] as $purpose => $boxes) {
@@ -123,8 +123,8 @@ class DiscoveryCardTest extends TestCase
         foreach (['Halal', 'Vegetarian', 'Allergy', 'Buffet', 'Plated'] as $claim) {
             $this->assertStringNotContainsString('<option value="'.$claim, $html, "{$claim} is not stored on any restaurant, so it is not offered.");
         }
-        $this->assertStringContainsString('Dietary needs and plated or buffet service are not recorded', file_get_contents(public_path('js/hero-search.js')),
-            'The Dining tab says so instead of offering a filter it cannot apply.');
+        $this->assertStringContainsString('Meal filters use listed opening hours.', file_get_contents(public_path('js/hero-search.js')),
+            'The meal helper stays concise; food-source guidance is next to its controls.');
     }
 
     public function test_interests_are_the_ones_the_site_already_has(): void

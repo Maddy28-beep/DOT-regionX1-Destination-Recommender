@@ -1,0 +1,1816 @@
+[
+  {
+    "name": "Marina Tuna Restaurant",
+    "slug": "marina-tuna-restaurant",
+    "location": "Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Marina Tuna Restaurant\" Davao City halal vegetarian vegan menu"
+  },
+  {
+    "name": "Kublai Khan Mongolian Restaurant",
+    "slug": "kublai-khan-mongolian-restaurant",
+    "location": "Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Kublai Khan Mongolian Restaurant\" Davao City halal vegetarian vegan menu"
+  },
+  {
+    "name": "Blue Post Boiling Crabs & Shrimp",
+    "slug": "blue-post-boiling-crabs-shrimp",
+    "location": "Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Blue Post Boiling Crabs & Shrimp\" Davao City halal vegetarian vegan menu"
+  },
+  {
+    "name": "Arvie's Cafe",
+    "slug": "arvies-cafe",
+    "location": "Purok 4, Echavez St., Brgy. Pob., Nabunturan, Davao de Oro",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Arvie's Cafe\"  Davao de Oro halal vegetarian vegan menu"
+  },
+  {
+    "name": "Axl Dave Bibingka Food Corporation",
+    "slug": "axl-dave-bibingka-food-corporation",
+    "location": "Purok 7 Brgy. New Sibonga, Nabunturan, Davao de Oro",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Axl Dave Bibingka\"  Davao de Oro halal vegetarian vegan menu"
+  },
+  {
+    "name": "Balik Bukid Farm and Kitchen",
+    "slug": "balik-bukid-farm-and-kitchen",
+    "location": "Sandawa Plaza, Quimpo Blvd.,Ecoland, Brgy. Bucana, Davao City",
+    "reviewed_on": "2026-11-25",
+    "review_note": "Older farm-to-table coverage and aggregator labels do not establish current vegetarian or vegan ingredients.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Balik Bukid Farm and Kitchen\"  Davao City halal vegetarian vegan menu",
+    "review_sources": [
+      "https://www.mydavaocity.com/dining/balik-bukid-farm-kitchen/"
+    ]
+  },
+  {
+    "name": "BigFat Tummy's Steak and Seafood Restaurant",
+    "slug": "bigfat-tummys-steak-and-seafood-restaurant",
+    "location": "Purok Narra, Brgy. Visayan Village, Tagum City, Davao del Norte",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"BigFat Tummy's Steak and Seafood Restaurant\"  Davao del Norte halal vegetarian vegan menu"
+  },
+  {
+    "name": "Braytside Cakes Catering Services",
+    "slug": "braytside-cakes-catering-services",
+    "location": "National Highway, Brgy. Kingking, Pantukan, Davao de Oro",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Braytside Cakes\"  Davao de Oro halal vegetarian vegan menu"
+  },
+  {
+    "name": "Chow2 Restaurant & Catering Services",
+    "slug": "chow2-restaurant-catering-services",
+    "location": "Purok Lauaan B. Malnegro St. Poblacion Maragusan, Davao de Oro",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Chow2 Restaurant &\"  Davao de Oro halal vegetarian vegan menu"
+  },
+  {
+    "name": "ClareBites Cafe",
+    "slug": "clarebites-cafe",
+    "location": "Tinimbo, Brgy. Poblacion, Cateel, Davao Oriental",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"ClareBites Cafe\"  Davao Oriental halal vegetarian vegan menu"
+  },
+  {
+    "name": "Delmor's Grill House",
+    "slug": "delmor-s-grill-house",
+    "location": "Blk 9 mabua, Brgy. Lambajon, Baganga, Davao Oriental",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Delmor's Grill House\"  Davao Oriental halal vegetarian vegan menu"
+  },
+  {
+    "name": "Diskanso Cafe",
+    "slug": "diskanso-cafe",
+    "location": "Mendoza Highway, Brgy. Kingking (Pob.), Pantukan, Davao de Oro",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Diskanso Cafe\"  Davao de Oro halal vegetarian vegan menu"
+  },
+  {
+    "name": "Dongturks Catering Services",
+    "slug": "dongturks-catering-services",
+    "location": "Purok 1, Cabinuangan, New Bataan, Davao De Oro",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Dongturks\"  Davao De Oro halal vegetarian vegan menu"
+  },
+  {
+    "name": "Garden By The Bay Corporation",
+    "slug": "garden-by-the-bay-corporation",
+    "location": "Maryknoll St., Lanang Brgy. Pampanga, Buhangin, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Garden By The Bay\"  Davao City halal vegetarian vegan menu"
+  },
+  {
+    "name": "Garden Oases Restaurant",
+    "slug": "garden-oases-restaurant",
+    "location": "Davao Wescon Bldg., Porras St., Bo. Obrero Brgy. 15-B Poblacion District Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Garden Oases Restaurant\"  Bo. Obrero Brgy. 15-B Poblacion District Davao City halal vegetarian vegan menu"
+  },
+  {
+    "name": "George BBQ",
+    "slug": "george-bbq",
+    "location": "Purok 1, Brgy. Poblacion, Compostela, Davao De Oro",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"George BBQ\"  Davao De Oro halal vegetarian vegan menu"
+  },
+  {
+    "name": "Hillside 88 Bar and Restaurant",
+    "slug": "hillside-88-bar-and-restaurant",
+    "location": "Panaghiusa-2, Capitol Hill Brgy. Central, City of Mati, Davao Oriental",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Hillside 88 Bar and Restaurant\"  Davao Oriental halal vegetarian vegan menu"
+  },
+  {
+    "name": "Hugo - Montevista Branch",
+    "slug": "hugo-montevista-branch",
+    "location": "P-2 Poblacion, Brgy. San Jose, Montevista, Davao de Oro",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Hugo - Montevista Branch\"  Davao de Oro halal vegetarian vegan menu"
+  },
+  {
+    "name": "Hugo's Pizza",
+    "slug": "hugo-s-pizza",
+    "location": "Purok 13 Layug St., Brgy. Poblacion, Nabunturan, Davao de Oro",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Hugo's Pizza\"  Davao de Oro halal vegetarian vegan menu"
+  },
+  {
+    "name": "Ibing's Cafe",
+    "slug": "ibing-s-cafe",
+    "location": "Centro, Brgy. Sangay, Malita, Davao Occidental",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Ibing's Cafe\"  Davao Occidental halal vegetarian vegan menu"
+  },
+  {
+    "name": "Jack's Ridge Resort and Restaurant",
+    "slug": "jacks-ridge-resort-and-restaurant",
+    "location": "BCG Drive Shrine Hills, Brgy. Matina Crossing, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Jack's Ridge Resort and Restaurant\"  Davao City halal vegetarian vegan menu"
+  },
+  {
+    "name": "Jenniel's Caf",
+    "slug": "jenniel-s-caf",
+    "location": "Purok Bulahan, Rizal St., Poblacion, Maragusan, Davao de Oro",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Jenniel's Caf\"  Davao de Oro halal vegetarian vegan menu"
+  },
+  {
+    "name": "Kapehan sa Tambacan",
+    "slug": "kapehan-sa-tambacan",
+    "location": "Purok Tambacan, Brgy., Lizada, Toril, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Kapehan sa Tambacan\"  Davao City halal vegetarian vegan menu"
+  },
+  {
+    "name": "Kusina Kabacan",
+    "slug": "kusina-kabacan",
+    "location": "Brgy Sinawilan, Digos City, Davao del Sur",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Kusina Kabacan\"  Davao del Sur halal vegetarian vegan menu"
+  },
+  {
+    "name": "Kusina Kabacan",
+    "slug": "kusina-kabacan-2",
+    "location": "Patulangon Zone 1, Santa Cruz, Davao Del Sur",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Kusina Kabacan\"  Davao Del Sur halal vegetarian vegan menu"
+  },
+  {
+    "name": "Leonora's Restaurant",
+    "slug": "leonora-s-restaurant",
+    "location": "Poblacion, Brgy. Kingking, Pantukan, Davao de Oro",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Leonora's Restaurant\"  Davao de Oro halal vegetarian vegan menu"
+  },
+  {
+    "name": "Marinatuna",
+    "slug": "marinatuna",
+    "location": "Km. 8, Bo. Pampanga, Lanang, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Marinatuna\"  Davao City halal vegetarian vegan menu"
+  },
+  {
+    "name": "New Davao Famous Restaurant Corp",
+    "slug": "new-davao-famous-restaurant-corp",
+    "location": "401 Ramon Magsaysay Avenue, Brgy. 29-C, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"New Davao Famous\"  Davao City halal vegetarian vegan menu"
+  },
+  {
+    "name": "Nonki Japanese Restaurant",
+    "slug": "nonki-japanese-restaurant",
+    "location": "Door A-1 Commercial bldg., Davao Autoville Ctr. Dev. Corp., F Torres St., Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Nonki Japanese Restaurant\"  Davao City halal vegetarian vegan menu"
+  },
+  {
+    "name": "Parola-Baywalk Restaurant",
+    "slug": "parola-baywalk-restaurant",
+    "location": "Burgos St., Central, City of Mati, Davao Oriental",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Parola-Baywalk Restaurant\"  Davao Oriental halal vegetarian vegan menu"
+  },
+  {
+    "name": "Pizzakaya - Maco",
+    "slug": "pizzakaya-maco",
+    "location": "Purok Basak, Brgy. Binuangan, Maco, Davao de Oro",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Pizzakaya - Maco\"  Davao de Oro halal vegetarian vegan menu"
+  },
+  {
+    "name": "PortSide Grill House Food Corporation",
+    "slug": "portside-grill-house-food-corporation",
+    "location": "Baybay Pangasinan, Brgy. Kingking (Pob.), Pantukan, Davao de Oro",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"PortSide Grill House\"  Davao de Oro halal vegetarian vegan menu"
+  },
+  {
+    "name": "Qan's Bibingka and Eatery",
+    "slug": "qan-s-bibingka-and-eatery",
+    "location": "Purok 7 Brgy. New Sibonga, Nabunturan, Davao de Oro",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Qan's Bibingka and Eatery\"  Davao de Oro halal vegetarian vegan menu"
+  },
+  {
+    "name": "Rekado Filipino Cuisine",
+    "slug": "rekado-filipino-cuisine",
+    "location": "1050 Jacinto Extension St, Brgy 11-B Poblacion, Davao City",
+    "reviewed_on": "2026-11-25",
+    "review_note": "2015 reporting explicitly mentions Vegetarian Tofu but is too old to confirm current menu. Some vegetable dishes include fish; generic dish names not used.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Rekado Filipino Cuisine\"  Davao City halal vegetarian vegan menu",
+    "review_sources": [
+      "https://www.sunstar.com.ph/more-articles/enjoying-pinoy-comfort-food-sans-the-boneless-crispy-pata"
+    ]
+  },
+  {
+    "name": "Sabor Elas Cafe",
+    "slug": "sabor-elas-cafe",
+    "location": "Purok 9, Dalisay, Brgy. Poblacion, Mawab, Davao de Oro",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Sabor Elas Cafe\"  Davao de Oro halal vegetarian vegan menu"
+  },
+  {
+    "name": "Skyway21 Nature Park",
+    "slug": "skyway21-nature-park",
+    "location": "Purok Rambutan, New Bataan-Maragusan Highway, Brgy. Tupaz, Maragusan, Davao de Oro",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Skyway21 Nature Park\"  Davao de Oro halal vegetarian vegan menu"
+  },
+  {
+    "name": "The Swiss Deli Restaurant",
+    "slug": "the-swiss-deli-restaurant",
+    "location": "RMD Bldg., Mamay Road, Brgy. Alfonso Angliongto Sr., Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"The Swiss Deli Restaurant\"  Davao City halal vegetarian vegan menu"
+  },
+  {
+    "name": "Tsuru",
+    "slug": "tsuru",
+    "location": "Juna Ave., Matina Crossing, Davao City",
+    "reviewed_on": "2026-11-25",
+    "review_note": "Official site inaccessible; 2016 guide and 2024 diner reports mention vegetarian menu but no current operator menu verified. Branches remain unconfirmed.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Tsuru\"  Davao City halal vegetarian vegan menu",
+    "review_sources": [
+      "https://tsuru.com.ph/",
+      "https://www.thevegandinosaur.com/davao-vegans/category/all"
+    ]
+  },
+  {
+    "name": "Tsuru Incorporated(Camus)",
+    "slug": "tsuru-incorporated-camus",
+    "location": "J. Camus St., Davao City",
+    "reviewed_on": "2026-11-25",
+    "review_note": "Official site inaccessible; 2016 guide and 2024 diner reports mention vegetarian menu but no current operator menu verified. Branches remain unconfirmed.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Tsuru Incorporated(Camus)\"  Davao City halal vegetarian vegan menu",
+    "review_sources": [
+      "https://tsuru.com.ph/",
+      "https://www.thevegandinosaur.com/davao-vegans/category/all"
+    ]
+  },
+  {
+    "name": "Tsuru Japanese Restaurant & Sushi Bar",
+    "slug": "tsuru-japanese-restaurant-sushi-bar",
+    "location": "1092 G/F Abreeza Mall Jp Laurel Ave., Bajada, Brgy 20-B, Davao City",
+    "reviewed_on": "2026-11-25",
+    "review_note": "Official site inaccessible; 2016 guide and 2024 diner reports mention vegetarian menu but no current operator menu verified. Branches remain unconfirmed.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Tsuru Japanese Restaurant & Sushi Bar\"  Davao City halal vegetarian vegan menu",
+    "review_sources": [
+      "https://tsuru.com.ph/",
+      "https://www.thevegandinosaur.com/davao-vegans/category/all"
+    ]
+  },
+  {
+    "name": "Tsuru Japanese Restaurant & Sushi Bar",
+    "slug": "tsuru-japanese-restaurant-sushi-bar-2",
+    "location": "Unit 201 2nd Level SM Lanang, JP Laurel Ave., Brgy San Antonio, Agdao District, Davao City",
+    "reviewed_on": "2026-11-25",
+    "review_note": "Official site inaccessible; 2016 guide and 2024 diner reports mention vegetarian menu but no current operator menu verified. Branches remain unconfirmed.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Tsuru Japanese\" Davao halal vegetarian vegan menu",
+    "review_sources": [
+      "https://tsuru.com.ph/",
+      "https://www.thevegandinosaur.com/davao-vegans/category/all"
+    ]
+  },
+  {
+    "name": "Tsuru Japanese Restaurant & Sushi Bar",
+    "slug": "tsuru-japanese-restaurant-sushi-bar-3",
+    "location": "EA 160 SM City Davao, Quimpo Boulevard, Barangay Bucana, Davao City",
+    "reviewed_on": "2026-11-25",
+    "review_note": "Official site inaccessible; 2016 guide and 2024 diner reports mention vegetarian menu but no current operator menu verified. Branches remain unconfirmed.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Tsuru Japanese\" Davao halal vegetarian vegan menu",
+    "review_sources": [
+      "https://tsuru.com.ph/",
+      "https://www.thevegandinosaur.com/davao-vegans/category/all"
+    ]
+  },
+  {
+    "name": "Vikings",
+    "slug": "vikings",
+    "location": "150A-157B, Upper Grd For, The Fountain Court SM Lanang Premier, JP Laurel Ave, Brgy. Agdao, Davao City",
+    "reviewed_on": "2026-11-25",
+    "review_note": "Exact Davao branch verified, but no explicit current dietary menu or valid halal certificate verified.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Vikings\" Davao halal vegetarian vegan menu",
+    "review_sources": [
+      "https://www.vikings.ph/vikingsph",
+      "https://vikings.zapestore.com/branches/loc_01J933MGKNKGPFGKV9FVYG1YEV"
+    ]
+  },
+  {
+    "name": "Zorbox Cafe",
+    "slug": "zorbox-cafe",
+    "location": "Purok Ipil-Ipil, Barangay Poblacion, Cateel, Davao Oriental",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Zorbox Cafe\" Davao halal vegetarian vegan menu"
+  },
+  {
+    "name": "Matina Swiss Deli and Restaurant",
+    "slug": "matina-swiss-deli-and-restaurant",
+    "location": "Corner Duhat And Camia Sts., Juna Subd., Matina, Brgy.Matina Crossing, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Matina Swiss Deli and Restaurant\" Davao halal vegetarian vegan menu"
+  },
+  {
+    "name": "VANDA \u2014 Park Inn by Radisson Davao",
+    "slug": "vanda-park-inn-davao",
+    "location": "SM Lanang Complex, J.P. Laurel Ave., Lanang, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "confirmed",
+        "checked_on": "2026-11-24",
+        "source_url": "https://www.radissonhotels.com/en-us/hotels/park-inn-davao/dining",
+        "source_name": "Park Inn by Radisson Davao \u2014 official VANDA dining page",
+        "evidence": "The operator lists vegetarian and vegan options for VANDA. This describes available dishes, not an exclusively vegetarian or vegan kitchen."
+      },
+      "vegan": {
+        "status": "confirmed",
+        "checked_on": "2026-11-24",
+        "source_url": "https://www.radissonhotels.com/en-us/hotels/park-inn-davao/dining",
+        "source_name": "Park Inn by Radisson Davao \u2014 official VANDA dining page",
+        "evidence": "The operator lists vegetarian and vegan options for VANDA. This describes available dishes, not an exclusively vegetarian or vegan kitchen."
+      }
+    },
+    "review_query": "\"VANDA \" Davao halal vegetarian vegan menu"
+  },
+  {
+    "name": "Marinatuna \u2014 Rogen Inn Compound",
+    "slug": "marinatuna-rogen-inn",
+    "location": "Mt Apo St Corner Lopez Jaena St., Brgy 7-A, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Marinatuna \" Davao halal vegetarian vegan menu"
+  },
+  {
+    "name": "Rhapsody Asian Fusion \u2014 Aria Hotel & Residences",
+    "slug": "rhapsody-aria-davao",
+    "location": "JP Laurel Ave., Bajada, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Rhapsody Asian Fusion \" Davao halal vegetarian vegan menu"
+  },
+  {
+    "name": "Jollibee Davao Bolton",
+    "slug": "jollibee-davao-bolton",
+    "location": "Bolton Street corner J.P. Rizal Street, Barangay 12-B, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Jollibee Davao Bolton\" Davao halal vegetarian vegan menu"
+  },
+  {
+    "name": "Vista Restaurant \u2014 Eden Nature Park",
+    "slug": "vista-restaurant-eden",
+    "location": "Toril, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Vista Restaurant \" Davao halal vegetarian vegan menu"
+  },
+  {
+    "name": "Resto-Beach \u2014 Paradise Island Park & Beach Resort",
+    "slug": "resto-beach-paradise",
+    "location": "Island Garden City of Samal",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Resto-Beach \" Davao halal vegetarian vegan menu"
+  },
+  {
+    "name": "Viewdeck Cafe \u2014 Malagos Garden Resort",
+    "slug": "viewdeck-cafe-malagos",
+    "location": "Malagos, Baguio District, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Viewdeck Cafe \" Davao halal vegetarian vegan menu"
+  },
+  {
+    "name": "Koi Cafe \u2014 Malagos Garden Resort",
+    "slug": "koi-cafe-malagos",
+    "location": "Malagos, Baguio District, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Koi Cafe \" Davao halal vegetarian vegan menu"
+  },
+  {
+    "name": "Kusina Dabaw \u2014 San Pedro Street",
+    "slug": "kusina-dabaw-san-pedro",
+    "location": "178 San Pedro Street, Poblacion District, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Kusina Dabaw \" Davao halal vegetarian vegan menu"
+  },
+  {
+    "name": "Bondi & Bourke \u2014 Davao",
+    "slug": "bondi-bourke-davao",
+    "location": "Rizal Street, Davao City, beside The Bourke Hotel",
+    "reviewed_on": "2026-11-25",
+    "review_note": "Official page has no explicit dietary labels in readable content; review-site vegetarian labels are leads only.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Bondi & Bourke \" Davao halal vegetarian vegan menu",
+    "review_sources": [
+      "https://bondiandbourke.com/restaurant-davao/"
+    ]
+  },
+  {
+    "name": "Luz Kinilaw Place",
+    "slug": "luz-kinilaw-place",
+    "location": "Salmonan / Quezon Boulevard, Barangay 23-C, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Luz Kinilaw Place\" Davao halal vegetarian vegan menu"
+  },
+  {
+    "name": "Caf\u00e9 Tavera",
+    "slug": "cafe-tavera",
+    "location": "P. H. de Tavera corner Avance\u00f1a Street, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Caf\u00e9 Tavera\" Davao halal vegetarian vegan menu"
+  },
+  {
+    "name": "SkyView Restaurant \u2014 Blue Lotus Hotel",
+    "slug": "skyview-restaurant-blue-lotus-hotel",
+    "location": "7th floor, Blue Lotus Hotel, Quimpo Boulevard, Ecoland, Davao City",
+    "reviewed_on": "2026-11-25",
+    "review_note": "Official menu is image based; no explicit dietary labels verified. Booking-site halal options do not prove current halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"SkyView Restaurant \" Davao halal vegetarian vegan menu",
+    "review_sources": [
+      "https://www.bluelotushotel.com/skyview-menu/",
+      "https://www.bluelotushotel.com/dining/"
+    ]
+  },
+  {
+    "name": "Marugame Udon \u2014 SM Lanang Premier",
+    "slug": "marugame-udon-sm-lanang-premier",
+    "location": "SM Lanang Premier, J. P. Laurel Avenue, Davao City",
+    "reviewed_on": "2026-11-25",
+    "review_note": "US/UK vegan menus cannot establish availability at SM Lanang Philippines. No local operator dietary confirmation.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Marugame Udon \" Davao halal vegetarian vegan menu",
+    "review_sources": [
+      "https://www.marugameudon.com/menu/",
+      "https://www.marugameudon.com/allergen/",
+      "https://marugame.co.uk/faqs/"
+    ]
+  },
+  {
+    "name": "Bawud \u2014 Dahican",
+    "slug": "bawud-dahican",
+    "location": "Dahican Beach, Mati City, Davao Oriental",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Bawud \" Davao halal vegetarian vegan menu"
+  },
+  {
+    "name": "Mandarin Tea Garden \u2014 Mati",
+    "slug": "mandarin-tea-garden-mati",
+    "location": "Mati City, Davao Oriental",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Mandarin Tea Garden \" Davao vegetarian vegan halal menu"
+  },
+  {
+    "name": "Sala Bistro \u2014 Mati",
+    "slug": "sala-bistro-mati",
+    "location": "Mati City, Davao Oriental",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Sala Bistro \" Davao vegetarian vegan halal menu"
+  },
+  {
+    "name": "Hey Monday! Deli",
+    "slug": "hey-monday-deli-poblacion",
+    "location": "Unit 75, Poblacion Market Central, C. Bangoy Street, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Hey Monday! Deli\" Davao vegetarian vegan halal menu"
+  },
+  {
+    "name": "Tola - Kan-anan sa Balay Oboza",
+    "slug": "tola-kan-anan-sa-balay-oboza",
+    "location": "Oboza Compound, 143 Rizal Street, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Tola - Kan-anan sa Balay Oboza\" Davao vegetarian vegan halal menu"
+  },
+  {
+    "name": "Huckleberry Southern Kitchen & Bar",
+    "slug": "huckleberry-southern-kitchen-bar",
+    "location": "Oboza House, Rizal Street, Poblacion, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Huckleberry Southern Kitchen & Bar\" Davao vegetarian vegan halal menu"
+  },
+  {
+    "name": "Tiny Kitchen",
+    "slug": "tiny-kitchen-f-torres",
+    "location": "Gutierrez Building, F. Torres Street, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Tiny Kitchen\" Davao vegetarian vegan halal menu"
+  },
+  {
+    "name": "Made Simple",
+    "slug": "made-simple-matina",
+    "location": "2nd floor, CT Drive, C. Villa-Abrille Drive / Tulip Drive, Matina, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Current photographed menu explicitly marks vegetarian dishes. Plant-based labels and older reports do not establish current vegan ingredients; vegan remains Not confirmed.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "confirmed",
+        "checked_on": "2026-11-24",
+        "source_url": "https://eatsmejax.com/2026/11/05/tatler-dining-experience-made-simple/",
+        "source_name": "Made Simple menu photographs published by Eats Me, Jax! (5 November 2026)",
+        "evidence": "The published menu explicitly marks vegetarian dishes, including mushroom omelet and ricotta toast. Meat and seafood are also served."
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Made Simple\" Davao vegetarian vegan halal menu"
+  },
+  {
+    "name": "The Vegan Dinosaur",
+    "slug": "the-vegan-dinosaur-marfori",
+    "location": "Door A, Values School Building, Ruby Street, Marfori Heights, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "confirmed",
+        "checked_on": "2026-11-24",
+        "source_url": "https://www.thevegandinosaur.com/",
+        "source_name": "The Vegan Dinosaur \u2014 official website",
+        "evidence": "The restaurant describes its food as entirely plant-based and cruelty-free. Vegan dishes also meet the vegetarian preference."
+      },
+      "vegan": {
+        "status": "confirmed",
+        "checked_on": "2026-11-24",
+        "source_url": "https://www.thevegandinosaur.com/",
+        "source_name": "The Vegan Dinosaur \u2014 official website",
+        "evidence": "The restaurant describes its food as entirely plant-based and cruelty-free. Vegan dishes also meet the vegetarian preference."
+      }
+    },
+    "review_query": "\"The Vegan Dinosaur\" Davao vegetarian vegan halal menu"
+  },
+  {
+    "name": "Luk Foo Palace - Acacia Hotel Davao",
+    "slug": "luk-foo-palace-acacia-davao",
+    "location": "3rd floor, Acacia Hotel Davao, J.P. Laurel Avenue, Lanang, Davao City",
+    "reviewed_on": "2026-11-25",
+    "review_note": "Exact Davao operator menu link found; Canva menu not readable in research tool. Review-site vegetarian/vegan labels not promoted.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Luk Foo Palace - Acacia Hotel Davao\" Davao vegetarian vegan halal menu",
+    "review_sources": [
+      "https://acaciahotelsdavao.com/dining/",
+      "https://www.canva.com/design/DAF4J5ApjMY/drJJFPcgtT9cNyvSeyNqWQ/view"
+    ]
+  },
+  {
+    "name": "Madayaw Cafe - dusitD2 Davao",
+    "slug": "madayaw-cafe-dusitd2-davao",
+    "location": "Podium, dusitD2, Stella Hizon Reyes Drive, Pampanga, Davao City",
+    "reviewed_on": "2026-11-25",
+    "review_note": "Vegetarian symbols visually verified on page 4 of currently linked official menu. Menu undated; upload path includes 2020, so no new publication date inferred. Vegan and halal certification remain unconfirmed.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "confirmed",
+        "checked_on": "2026-11-24",
+        "source_url": "https://www.dusit.com/dusitd2-davao/wp-content/uploads/sites/18/2020/02/A-la-Carte-2.pdf",
+        "source_name": "Dusit Davao official a la carte menu, page 4 (currently linked, undated)",
+        "evidence": "The official menu marks Classic Margherita Pizza and Croissant Dough Pizza with its vegetarian symbol. These contain dairy; vegan options are not confirmed. Confirm current availability, ingredients and preparation with the restaurant."
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Madayaw Cafe - dusitD2 Davao\" Davao vegetarian vegan halal menu",
+    "review_sources": [
+      "https://www.dusit.com/dusitd2-davao/dining/madayaw-cafe/",
+      "https://www.dusit.com/dusitd2-davao/wp-content/uploads/sites/18/2020/02/A-la-Carte-2.pdf"
+    ],
+    "review_timezone_note": "Reviewed 25 November 2026 Asia/Manila; checked_on is 24 November in the existing application UTC date convention."
+  },
+  {
+    "name": "Pilgrim Restaurant",
+    "slug": "pilgrim-restaurant-baganihan",
+    "location": "Purok 2, Baganihan, Marilog District, Davao City, Davao City",
+    "reviewed_on": "2026-11-25",
+    "review_note": "No current operator dietary menu verified. Excluded foreign restaurants with the same name.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Pilgrim Restaurant\" Davao vegetarian vegan halal menu",
+    "review_sources": [
+      "https://www.facebook.com/pilgrimdvo"
+    ]
+  },
+  {
+    "name": "Yellow Fin Seafood Restaurant - Ecoland",
+    "slug": "yellow-fin-seafood-ecoland",
+    "location": "Sandawa Plaza, Quimpo Boulevard, Ecoland, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Yellow Fin Seafood Restaurant - Ecoland\" Davao vegetarian vegan halal menu"
+  },
+  {
+    "name": "Davao Dencia's Restaurant",
+    "slug": "davao-dencias-restaurant",
+    "location": "General Luna Street corner Ilustre Street, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Davao Dencia's Restaurant\" Davao vegetarian vegan halal menu"
+  },
+  {
+    "name": "Lachi's - Poblacion Market Central",
+    "slug": "lachis-poblacion-market-central",
+    "location": "Poblacion Market Central, Davao City, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Lachi's - Poblacion Market Central\" Davao vegetarian vegan halal menu"
+  },
+  {
+    "name": "Bairrada Churrasqueira",
+    "slug": "bairrada-churrasqueira-tulip",
+    "location": "The Compound, Tulip Drive, Juna Subdivision, Matina, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Bairrada Churrasqueira\" Davao vegetarian vegan halal menu"
+  },
+  {
+    "name": "Taichou Izakaya Japanese Pub",
+    "slug": "taichou-izakaya-suazo",
+    "location": "1st floor, Lacuesta Building, Suazo corner D. Ponce Street, Barangay 28-C, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Taichou Izakaya Japanese Pub\" Davao vegetarian vegan halal menu"
+  },
+  {
+    "name": "Lara Mia Cafe & Bistro",
+    "slug": "lara-mia-cafe-bistro-juna",
+    "location": "University Avenue corner Talisay Street, Juna Subdivision, Matina, Davao City",
+    "reviewed_on": "2026-11-25",
+    "review_note": "Older menu coverage and third-party vegetarian labels found; operator ordering site inaccessible. No current operator dietary confirmation.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Lara Mia Cafe & Bistro\" Davao vegetarian vegan halal menu",
+    "review_sources": [
+      "https://www.mydavaocity.com/tag/lara-mia/",
+      "https://laramiacafeandbistro.basicbros.ph/"
+    ]
+  },
+  {
+    "name": "De Bonte Koe European Bar and Restaurant - Rizal",
+    "slug": "de-bonte-koe-rizal",
+    "location": "Habana Compound, 29 J.P. Rizal Street, Barangay 3-A, Poblacion, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"De Bonte Koe European Bar and Restaurant - Rizal\" Davao vegetarian vegan halal menu"
+  },
+  {
+    "name": "Omerta Bistro & Lounge",
+    "slug": "omerta-bistro-lounge-bajada",
+    "location": "7th floor roof deck, Bormaheco Building Phase 2, J.P. Laurel Avenue, Bajada, Davao City",
+    "reviewed_on": "2026-11-24",
+    "review_note": "Public-source search completed. Only explicit, venue-matched evidence is used; search snippets, generic dishes, cuisine and DOT accreditation do not establish dietary suitability or halal certification.",
+    "preferences": {
+      "halal_certified": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegetarian": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      },
+      "vegan": {
+        "status": "not_confirmed",
+        "checked_on": "2026-11-24"
+      }
+    },
+    "review_query": "\"Omerta Bistro & Lounge\" Davao vegetarian vegan halal menu"
+  }
+]

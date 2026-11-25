@@ -6,6 +6,7 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/accommodation-gallery.css') }}?v={{ filemtime(public_path('css/accommodation-gallery.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/destination-detail.css') }}?v={{ filemtime(public_path('css/destination-detail.css')) }}">
+    <link rel="stylesheet" href="{{ \App\Support\StyleAsset::url('css/restaurant-food-preferences.css') }}">
 @endpush
 
 @section('content')
@@ -71,6 +72,8 @@
             ])
 
             @include('partials.listing-amenities-card', ['listing' => $restaurant, 'kind' => 'restaurant'])
+
+            @include('partials.restaurant-food-preferences')
 
             @include('partials.reviews-section', ['listing' => $restaurant, 'type' => 'restaurants', 'kind' => 'restaurant', 'emptyHint' => 'Be the first to dine and share your experience.'])
         </div>

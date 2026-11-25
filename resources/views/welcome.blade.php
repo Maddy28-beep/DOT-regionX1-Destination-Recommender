@@ -311,7 +311,7 @@
                 @foreach ([
                     ['destinations', 'Destinations', 'map-pin', 'budget where interest'],
                     ['accommodations', 'Stays', 'building', 'budget where stay_mode from to guests'],
-                    ['restaurants', 'Dining', 'utensils', 'budget meal date cuisine where'],
+                    ['restaurants', 'Dining', 'utensils', 'budget meal date cuisine where food'],
                     ['packages', 'Packages', 'ticket', 'budget where interest duration travelers'],
                     ['souvenir_centers', 'Souvenirs', 'tag', 'where'],
                 ] as [$value, $label, $icon, $fields])
@@ -384,6 +384,16 @@
                         @endforeach
                     </select>
                 </div>
+
+                <fieldset class="hero-food-preferences" data-for="food" hidden aria-describedby="heroFoodHint">
+                    <legend>Food preferences <span>· optional</span></legend>
+                    <p id="heroFoodHint">Confirmed options only. All selected preferences must match.</p>
+                    <div class="hero-food-preferences__options">
+                        @foreach (\App\Models\RestaurantFoodPreference::OPTIONS as $key => $label)
+                            <label><input type="checkbox" name="food[]" value="{{ $key }}" disabled><span>{{ $label }}</span></label>
+                        @endforeach
+                    </div>
+                </fieldset>
 
                 <div class="hero-search__box" data-for="where">
                     <x-icon name="map-pin" />

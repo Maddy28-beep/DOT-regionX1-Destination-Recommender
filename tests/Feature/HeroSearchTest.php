@@ -262,7 +262,7 @@ class HeroSearchTest extends TestCase
         foreach ([
             'destinations' => 'budget where interest',
             'accommodations' => 'budget where stay_mode from to guests',
-            'restaurants' => 'budget meal date cuisine where',
+            'restaurants' => 'budget meal date cuisine where food',
             'packages' => 'budget where interest duration travelers',
             'souvenir_centers' => 'where',
         ] as $purpose => $boxes) {

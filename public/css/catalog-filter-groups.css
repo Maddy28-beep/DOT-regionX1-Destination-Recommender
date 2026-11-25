@@ -1,6 +1,8 @@
 /* A listing's own filters, in the manner of a booking site's side panel, in the DOT green and stamp-orange.
    Each group is collapsible; headings carry the short green bar the Plan My Trip headings use. */
 .fgroups { margin-top: 18px; border-top: 1px solid #e3e9e4; }
+.fgroup__help { color: #46594f; font-size: .78rem; line-height: 1.5; margin: 10px 4px 2px; }
+.fgroup:has(input[name="food[]"]) .fcheck { min-height: 44px; }
 .fgroup { padding: 14px 0; border-bottom: 1px solid #e3e9e4; }
 .fgroup__title {
     display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; list-style: none;

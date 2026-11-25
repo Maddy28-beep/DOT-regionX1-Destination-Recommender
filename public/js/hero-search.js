@@ -82,7 +82,7 @@
     var HINTS = {
         destinations: 'All filters are optional.',
         accommodations: 'Dates and group size are optional. Availability is not checked.',
-        restaurants: 'A meal shows restaurants open at that hour. Dietary needs and plated or buffet service are not recorded for restaurants yet.',
+        restaurants: 'Meal filters use listed opening hours.',
         packages: 'The budget is the total: the per-person price times the number of travelers.',
         souvenir_centers: 'Souvenir shops are searched by place. Their prices and categories are not recorded.'
     };

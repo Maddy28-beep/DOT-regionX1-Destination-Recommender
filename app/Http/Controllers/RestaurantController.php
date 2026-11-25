@@ -78,7 +78,7 @@ class RestaurantController extends Controller
     {
         abort_if($restaurant->archived_at || ! $restaurant->is_accredited, 404);
 
-        $restaurant->load(['region', 'photos', 'reviews' => fn ($q) => $q->latest()->take(10)]);
+        $restaurant->load(['region', 'photos', 'foodPreferences', 'reviews' => fn ($q) => $q->latest()->take(10)]);
 
         $nearby = Restaurant::publiclyVisible()->with('region', 'photos')
             ->where('region_id', $restaurant->region_id)
