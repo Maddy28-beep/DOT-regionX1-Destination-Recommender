@@ -25,6 +25,7 @@
 <link rel="stylesheet" href="{{ asset('css/plan-sidebar.css') }}?v={{ filemtime(public_path('css/plan-sidebar.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/plan-origin-screen.css') }}?v={{ filemtime(public_path('css/plan-origin-screen.css')) }}">
 <link rel="stylesheet" href="{{ asset('css/plan-trip-screen.css') }}?v={{ filemtime(public_path('css/plan-trip-screen.css')) }}">
+<link rel="stylesheet" href="{{ asset('css/plan-datetime-picker.css') }}?v={{ filemtime(public_path('css/plan-datetime-picker.css')) }}">
 @if (\App\Support\Features::tripLocation())
 <script>document.documentElement.classList.add('plan-origin-gating');</script>
 @endif
@@ -561,6 +562,7 @@
 <script src="{{ asset('js/plan-origin-select.js') }}?v={{ filemtime(public_path('js/plan-origin-select.js')) }}" defer></script>
 <script src="{{ asset('js/plan-visitor-type.js') }}?v={{ filemtime(public_path('js/plan-visitor-type.js')) }}" defer></script>
 <script src="{{ asset('js/plan-trip-window.js') }}?v={{ filemtime(public_path('js/plan-trip-window.js')) }}" defer></script>
+<script src="{{ asset('js/plan-datetime-picker.js') }}?v={{ filemtime(public_path('js/plan-datetime-picker.js')) }}" defer></script>
 <script src="{{ asset('js/plan-comfort.js') }}?v={{ filemtime(public_path('js/plan-comfort.js')) }}" defer></script>
 <script src="{{ asset('js/plan-wizard.js') }}?v={{ filemtime(public_path('js/plan-wizard.js')) }}" defer></script>
 {{-- After the wizard script: it builds the step panels this one folds parts of. --}}
