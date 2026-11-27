@@ -1332,11 +1332,9 @@ body.mobile-menu-open #chatbot-widget { display: none; }
 body.hero-page .site-header {
     position: fixed;
     top: 0; left: 0; right: 0;
-    background: rgba(255, 247, 233, .82);
-    backdrop-filter: blur(14px) saturate(1.05);
-    -webkit-backdrop-filter: blur(14px) saturate(1.05);
+    background: #fff7e9;
     border-bottom: 1px solid rgba(11, 107, 79, .12);
-    transition: background-color .25s ease, backdrop-filter .25s ease, border-color .25s ease, box-shadow .25s ease;
+    transition: background-color .25s ease, border-color .25s ease, box-shadow .25s ease;
 }
 body.hero-page .site-header .brand,
 body.hero-page .site-header .main-nav a,
@@ -3097,10 +3095,10 @@ select.site-dropdown-native {
     .cta-banner h2 { margin: 0 0 10px; font-size: clamp(1.9rem, 11.4vw, 3.2rem); line-height: 1.04; }
     .cta-banner > .cta-banner__copy > p { font-size: .92rem; line-height: 1.5; }
     .cta-banner__paths { gap: 10px; }
-    .cta-banner__path { padding: 14px 16px; border-radius: 14px; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+    .cta-banner__path { padding: 14px 16px; border-radius: 14px; }
     /* Personalized itinerary: the lighter, more see-through glass. Tour packages: darker, less see-through. */
-    .cta-banner__path:first-child { background: rgba(255, 250, 240, .62); border-color: rgba(138, 47, 15, .22); }
-    .cta-banner__path:last-child { background: rgba(255, 250, 240, .30); border-color: rgba(138, 47, 15, .28); }
+    .cta-banner__path:first-child { background: rgba(255, 250, 240, .88); border-color: rgba(138, 47, 15, .22); }
+    .cta-banner__path:last-child { background: rgba(255, 250, 240, .72); border-color: rgba(138, 47, 15, .28); }
     .cta-banner__path h3 { margin: 0 0 4px; font-size: 1.05rem; line-height: 1.25; color: #4a1c0b; }
     .cta-banner__path p { margin: 0 0 10px; font-size: .86rem; line-height: 1.45; color: #3d1a0c; }
     .cta-banner .btn { min-height: 44px; padding: 10px 20px; }

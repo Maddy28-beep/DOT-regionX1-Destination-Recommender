@@ -571,9 +571,9 @@
                     <h3 class="poster-title dpost-banner__name">{{ $featuredDestination->name }}</h3>
                     @php $featuredProvenance = app(\App\Support\SampleData::class)->status($featuredDestination); @endphp
                     @if ($featuredProvenance === \App\Support\SampleData::OFFICIAL)
-                        <p class="dpost-banner__blurb">Region XI's highest-rated destination &mdash; a DOT-accredited must-see that sets the bar for every other stop on your itinerary.</p>
+                        <p class="dpost-banner__blurb">Region XI's highest-rated destination: a DOT-accredited must-see that sets the bar for every other stop on your itinerary.</p>
                     @elseif ($featuredProvenance === \App\Support\SampleData::SAMPLE)
-                        <p class="dpost-banner__blurb">A featured sample place &mdash; a temporary demonstration record, shown while the official DOT list is being completed.</p>
+                        <p class="dpost-banner__blurb">A featured sample place, a temporary demonstration record, shown while the official DOT list is being completed.</p>
                     @else
                         <p class="dpost-banner__blurb">A featured place whose DOT accreditation is not yet verified.</p>
                     @endif
@@ -631,7 +631,7 @@
         <div class="section-head">
             <div>
                 <span class="poster-kicker">how this works</span>
-                <h2 class="poster-title" style="color:var(--ocean-teal-dark);">Plan smarter, not harder</h2>
+                <h2 class="poster-title" style="color:var(--ocean-teal-dark);">Your Davao days, planned around you</h2>
                 <p>ExploreDVO connects travelers directly with destinations, stays, and experiences across the Davao Region. Official DOT records are marked DOT Accredited; temporary demonstration records are marked Sample Data.</p>
             </div>
         </div>
@@ -704,7 +704,7 @@
 
         <div class="about-grid">
             <div class="about-copy">
-                <p>Stretching inland from the Davao Gulf, Region XI climbs from lowland rainforest and coconut country into the cool, mist-held highlands around Mount Apo &mdash; at 2,954 metres, the highest ground in the Philippines. The change happens quickly: a single morning can take you from a beachfront on Samal to a highland trail where the temperature drops ten degrees and the birdsong changes entirely.</p>
+                <p>Stretching inland from the Davao Gulf, Region XI climbs from lowland rainforest and coconut country into the cool, mist-held highlands around Mount Apo (2,954 metres, the highest ground in the Philippines). The change happens quickly: a single morning can take you from a beachfront on Samal to a highland trail where the temperature drops ten degrees and the birdsong changes entirely.</p>
 
                 <button type="button" class="read-more" data-read-more="aboutMoreText" aria-expanded="false" aria-controls="aboutMoreText" hidden>Read more</button>
 
@@ -751,7 +751,7 @@
                 --}}
                 @include('partials.region-map', ['regions' => $regionMap])
                 <figcaption class="about-map__caption poster-kicker">
-                    Accredited listings by province &mdash; tap a circle to browse
+                    Accredited listings by province. Tap a circle to browse
                 </figcaption>
             </figure>
         </div>
@@ -775,7 +775,7 @@
                         <svg class="dyk-star" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                             <path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"/>
                         </svg>
-                        <p><strong>{{ $lead }}</strong> &mdash; {{ $tail }}</p>
+                        <p><strong>{{ $lead }}.</strong> {{ $tail }}</p>
                     </div>
                 @endforeach
             </div>
@@ -821,7 +821,7 @@
                 <span class="poster-kicker">your move</span>
                 <h2 class="poster-title">Plan Your Davao Trip</h2>
                 <p>
-                    Two ways to get started &mdash; build a day-by-day plan around your own
+                    Two ways to get started: build a day-by-day plan around your own
                     preferences, or pick a ready-made itinerary from a tour operator.
                 </p>
             </div>

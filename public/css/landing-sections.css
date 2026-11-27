@@ -149,9 +149,7 @@
 }
 @media (max-width: 640px) {
     /* The Davao and Love the Philippines marks are dark and colourful; straight on the hero they
-       nearly vanish. A light frosted pill keeps them legible on a phone without a solid block:
-       the footage shows faintly through it. The fallback is the earlier solid cream where
-       backdrop-filter is unsupported. */
+       nearly vanish. A light cream pill keeps them legible on a phone. */
     .hero-tourism-brands {
         width: fit-content;
         max-width: calc(100% - 40px);
@@ -159,15 +157,6 @@
         gap: 14px;
         background: rgba(255, 247, 233, .94);
         border-radius: 999px;
-    }
-    @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-        .hero-tourism-brands {
-            background: rgba(255, 247, 233, .8);
-            -webkit-backdrop-filter: blur(10px) saturate(1.15);
-            backdrop-filter: blur(10px) saturate(1.15);
-            border: 1px solid rgba(255, 255, 255, .5);
-            box-shadow: 0 4px 18px rgba(0, 0, 0, .12);
-        }
     }
     .hero-tourism-brands .hero-tourism-brands__davao { width: 78px; }
     .hero-tourism-brands .hero-tourism-brands__dot { width: 38px; }
