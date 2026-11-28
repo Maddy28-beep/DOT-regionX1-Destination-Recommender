@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Destination;
 use App\Models\Region;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\UsesHeroFixtures;
 use Tests\TestCase;
 
 /**
@@ -22,6 +23,7 @@ use Tests\TestCase;
 class MobilePerformanceTest extends TestCase
 {
     use RefreshDatabase;
+    use UsesHeroFixtures;
 
     private function home(): string
     {
@@ -55,22 +57,24 @@ class MobilePerformanceTest extends TestCase
         $this->assertStringContainsString('The interactive map needs JavaScript', $html);
     }
 
-    public function test_the_hero_poster_is_preloaded_at_high_priority(): void
+    public function test_the_hero_photograph_is_preloaded_at_high_priority(): void
     {
-        $html = $this->home();
+        $this->putHeroPhoto();
 
-        if (! file_exists(public_path('video/hero.mp4'))) {
-            $this->markTestSkipped('No hero clip in this checkout.');
-        }
+        $this->assertMatchesRegularExpression('/<link rel="preload" as="image" href="[^"]*mt-apo-kapatagan-hero\.jpg" fetchpriority="high">/', $this->home());
+    }
 
-        $this->assertMatchesRegularExpression('/<link rel="preload" as="image" href="[^"]*hero-poster\.jpg" fetchpriority="high">/', $html);
+    public function test_the_hero_poster_is_preloaded_at_high_priority_when_footage_is_the_hero(): void
+    {
+        $this->putHeroFile('hero.mp4');
+        $this->putHeroFile('hero-poster.jpg');
+
+        $this->assertMatchesRegularExpression('/<link rel="preload" as="image" href="[^"]*hero-poster\.jpg" fetchpriority="high">/', $this->home());
     }
 
     public function test_the_hero_clip_waits_for_the_load_event_on_a_phone_only(): void
     {
-        if (! file_exists(public_path('video/hero.mp4'))) {
-            $this->markTestSkipped('No hero clip in this checkout.');
-        }
+        $this->putHeroFile('hero.mp4');
         $html = $this->home();
 
         // Everything that touches the network is inside begin(); a phone waits for 'load', a computer runs it at once.
@@ -135,7 +139,8 @@ class MobilePerformanceTest extends TestCase
     {
         $html = $this->home();
 
-        foreach (['davao', 'dot', 'love-philippines'] as $logo) {
+        // The header carries the Davao and DOT marks; the Love the Philippines mark is no longer on the landing page.
+        foreach (['davao', 'dot'] as $logo) {
             $this->assertStringContainsString("images/tourism-logos/{$logo}.webp", $html);
             $this->assertStringNotContainsString("images/tourism-logos/{$logo}.png", $html);
             $this->assertLessThan(15 * 1024, filesize(public_path("images/tourism-logos/{$logo}.webp")));

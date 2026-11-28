@@ -246,12 +246,15 @@ class TripStartEndTest extends TestCase
         $this->assertStringContainsString('Philippine time', $html);
     }
 
-    public function test_the_pick_up_location_starts_as_the_arrival_airport_and_the_start_has_a_minimum(): void
+    public function test_the_pick_up_location_starts_empty_with_the_airport_one_tap_away_and_the_start_has_a_minimum(): void
     {
         $html = $this->get(route('plan.edit'))->assertOk()->getContent();
 
-        $this->assertMatchesRegularExpression('/id="origin_label"[^>]*value="Davao International Airport"/s', $html);
-        $this->assertStringContainsString('id="origin_lat" value="7.13"', $html);
+        // Nothing is chosen for the visitor: the pick-up is required and empty, and the airport is offered as a button.
+        $this->assertMatchesRegularExpression('/id="origin_label"[^>]*required[^>]*value=""/s', $html);
+        $this->assertStringContainsString('id="origin_lat" value=""', $html);
+        $this->assertStringContainsString('data-suggest-airport', $html);
+        $this->assertStringContainsString('Start from the airport', $html);
         $this->assertStringContainsString('min="2026-11-20T20:00"', $html, 'the earliest start is now, in Philippine time');
     }
 
@@ -267,14 +270,15 @@ class TripStartEndTest extends TestCase
         $js = file_get_contents(public_path('js/plan-wizard.js'));
         $html = $this->get(route('plan.edit'))->assertOk()->getContent();
 
-        // Where from first (About you), then the start and end, then the pick-up location, then who is coming.
-        $this->assertStringContainsString('if (tripWindow) steps[0].append(visit, basics, origin, style);', $js);
+        // Where from and first visit first (About you), then who is coming, the start and end, then the pick-up location.
+        $this->assertStringContainsString('steps[0].append(visit, style, basics, origin);', $js);
         $this->assertStringContainsString('visitor_origin_country', $html);
     }
 
     public function test_the_wide_layout_is_one_column_so_the_order_is_the_asked_order(): void
     {
-        $css = str_replace("
+        $css = str_replace("
+
 ", "
 ", file_get_contents(public_path('css/plan-trip-layout.css')));
 

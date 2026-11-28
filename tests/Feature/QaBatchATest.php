@@ -29,23 +29,41 @@ class QaBatchATest extends TestCase
         ]);
     }
 
-    public function test_the_trip_page_says_how_many_of_the_visits_are_simulated(): void
+    /**
+     * The page no longer prints a total of visits; the disclosure sits on the stop whose pick rests on an association rule:
+     * "Includes simulated demonstration trips" when some of the visits behind the rules are simulated, and "These are
+     * simulated demonstration trips" when all of them are.
+     */
+    public function test_a_paired_stop_says_whether_the_visits_behind_it_are_simulated(): void
     {
         ExitSurvey::create(['overall_rating' => 5, 'would_recommend' => 'Yes', 'data_source' => 'demo']);
         ExitSurvey::create(['overall_rating' => 4, 'would_recommend' => 'Yes', 'data_source' => 'demo']);
-        ExitSurvey::create(['overall_rating' => 4, 'would_recommend' => 'Yes', 'data_source' => 'real']);
+        $real = ExitSurvey::create(['overall_rating' => 4, 'would_recommend' => 'Yes', 'data_source' => 'real']);
 
+        $stop = $this->destination('Paired Place');
         $pref = TouristPreference::create([
             'travel_days' => 1, 'travel_type' => 'Solo', 'travel_purpose' => 'Leisure', 'visitor_type' => 'First-time visitor',
             'budget' => 'Mid-range', 'accommodation_pref' => 'Any', 'distance_pref' => 'near',
         ]);
         $trip = Itinerary::create(['preference_id' => $pref->id, 'total_days' => 1, 'generated_at' => now()]);
+        $trip->items()->create([
+            'day_number' => 1, 'sort_order' => 1, 'slot' => 'Morning', 'kind' => 'activity', 'title' => 'Visit Paired Place',
+            'destination_id' => $stop->id, 'starts_at' => '09:00:00', 'ends_at' => '11:00:00',
+            'rule_basis' => 'Another Place', 'rule_confidence' => 0.5, 'rule_support' => 0.1, 'rule_co_count' => 3,
+        ]);
+        $page = fn () => $this->withSession([TripPlannerController::ITINERARY_KEY => $trip->id, TripPlannerController::PREFERENCE_KEY => $pref->id])
+            ->get(route('plan.itinerary'))->assertOk();
 
-        $html = $this->withSession([TripPlannerController::ITINERARY_KEY => $trip->id, TripPlannerController::PREFERENCE_KEY => $pref->id])
-            ->get(route('plan.itinerary'))->assertOk()->getContent();
-        $text = preg_replace('/[\s\x{00A0}]+/u', ' ', html_entity_decode(strip_tags($html)));
+        $page()->assertSee('Popular pairing with Another Place')->assertSee('Includes simulated demonstration trips.');
 
-        $this->assertStringContainsString('3 visitation transactions (2 simulated for demonstration, 1 from real tourist surveys)', $text);
+        // With only simulated visits recorded, the note is the stronger one.
+        $real->delete();
+        $page()->assertSee('These are simulated demonstration trips, not real traveller visits.');
+
+        // With only real visits there is no note.
+        ExitSurvey::query()->delete();
+        ExitSurvey::create(['overall_rating' => 4, 'would_recommend' => 'Yes', 'data_source' => 'real']);
+        $page()->assertDontSee('simulated demonstration trips');
     }
 
     public function test_the_watchlist_lists_places_about_to_expire_even_when_many_have_already_expired(): void

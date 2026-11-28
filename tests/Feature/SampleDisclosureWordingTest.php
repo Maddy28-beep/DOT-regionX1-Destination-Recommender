@@ -50,8 +50,8 @@ class SampleDisclosureWordingTest extends TestCase
         $admin = AdminUser::create(['email' => 'a@x.test', 'password_hash' => Hash::make('x'), 'full_name' => 'Admin', 'role' => 'super_admin']);
         $html = $this->actingAs($admin, 'admin')->get(route('admin.overview'))->assertOk()->getContent();
 
-        $this->assertMatchesRegularExpression('/adm-kpi__val">2<\/div><div class="adm-kpi__lab">Accredited Destinations</', $html);
-        $this->assertMatchesRegularExpression('/adm-kpi__val">3<\/div><div class="adm-kpi__lab">Sample Destinations</', $html);
+        $this->assertMatchesRegularExpression('/adm-kpi__lab">Official destinations<\/span>.*?adm-kpi__val">2<\/strong>/s', $html);
+        $this->assertMatchesRegularExpression('/adm-kpi__lab">Sample destinations<\/span>.*?adm-kpi__val">3<\/strong>/s', $html);
 
         // The two tiles are not the total: the unflagged landmark is reported, and the line adds up to the total.
         $text = preg_replace('/\s+/', ' ', strip_tags($html));

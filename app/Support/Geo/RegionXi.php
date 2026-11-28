@@ -44,5 +44,5 @@ final class RegionXi
         return json_encode(self::POLYGON, JSON_THROW_ON_ERROR);
     }
 
-    public const MESSAGE = 'That place looks to be outside Davao Region (Region XI). Choose where you will stay or arrive in the region, for example Davao International Airport, or leave this blank and we will plan from Davao City centre.';
+    public const MESSAGE = 'Your pick-up location must be in Davao Region (Region XI). Choose the hotel, airport, port or address where you will meet your driver or tour operator.';
 }

@@ -267,6 +267,7 @@ class AdminDataCompletenessTest extends TestCase
         $html = $this->actingAs($this->admin(), 'admin')->get('/portal/admin')->getContent();
 
         $this->assertStringContainsString(route('admin.data-completeness'), $html);
-        $this->assertStringContainsString('Data completeness', $html);
+        // The sidebar entry is called "Data quality"; the page it opens keeps its own title.
+        $this->assertStringContainsString('Data quality', $html);
     }
 }

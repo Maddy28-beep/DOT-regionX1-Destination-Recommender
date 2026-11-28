@@ -128,7 +128,8 @@ class VisitorOriginAdminTest extends TestCase
 
         $page = $this->actingAs($this->admin(), 'admin')->get(route('admin.visitor-origin'))->assertOk();
 
-        $page->assertSee('Not enough answers yet');
+        $page->assertSee('2 recorded');
+        $page->assertSee('Waiting for at least 5 responses');
         $page->assertDontSee('South Korea');
     }
 
@@ -138,7 +139,7 @@ class VisitorOriginAdminTest extends TestCase
         $this->visitors(6, 'KR');
 
         $this->actingAs($this->admin(), 'admin')->get(route('admin.visitor-origin', ['from' => '2099-01-01']))
-            ->assertOk()->assertSee('Not enough answers yet');
+            ->assertOk()->assertSee('0 recorded')->assertSee('Waiting for at least 5 responses');
     }
 
     public function test_an_empty_table_always_says_why_and_how_many_answers_there_are(): void
@@ -147,13 +148,13 @@ class VisitorOriginAdminTest extends TestCase
         $admin = $this->admin();
 
         $this->actingAs($admin, 'admin')->get(route('admin.visitor-origin'))->assertOk()
-            ->assertSee('Not enough answers yet: 0 answers so far; at least 5 are needed.');
+            ->assertSee('0 recorded')->assertSee('Waiting for at least 5 responses');
 
         $this->visitors(1, 'KR');
         $this->visitors(1, 'PH', 'Cebu');
         $html = $this->actingAs($admin, 'admin')->get(route('admin.visitor-origin'))->assertOk()->getContent();
-        $this->assertStringContainsString('Not enough answers yet: 2 answers so far; at least 5 are needed.', $html);
-        $this->assertStringContainsString('Not enough answers yet: 1 answer so far; at least 5 are needed.', $html);
+        $this->assertStringContainsString('<span>2 recorded</span><span>Waiting for at least 5 responses</span>', $html);
+        $this->assertStringContainsString('<span>1 recorded</span><span>Waiting for at least 5 responses</span>', $html);
         $this->assertStringNotContainsString('South Korea', $html);
         $this->assertSame(4, substr_count($html, 'data-origin-empty'), 'one message per table');
     }
@@ -174,7 +175,8 @@ class VisitorOriginAdminTest extends TestCase
 
         $html = $this->actingAs($this->admin(), 'admin')->get(route('admin.visitor-origin'))->assertOk()->getContent();
 
-        $this->assertMatchesRegularExpression('#<button class="btn btn-primary btn-sm" type="submit">Apply</button>\s*<a class="btn btn-outline btn-sm" data-origin-export#', $html);
+        // The Apply button, the optional clear-filters icon, then the Export CSV button, in one toolbar row.
+        $this->assertMatchesRegularExpression('#<button class="btn btn-primary btn-sm" type="submit">.*?Apply filters</button>\s*(?:<a class="adm-icon-btn"[^>]*>.*?</a>\s*)?<a class="btn btn-outline btn-sm" data-origin-export#s', $html);
     }
 
     public function test_the_page_states_the_counting_rule_and_that_the_counts_are_kept(): void
@@ -184,8 +186,9 @@ class VisitorOriginAdminTest extends TestCase
         $html = $this->actingAs($this->admin(), 'admin')->get(route('admin.visitor-origin'))->assertOk()->getContent();
 
         $this->assertStringContainsString('Counting rule:', $html);
-        $this->assertStringContainsString('one count per browser session; a changed answer replaces the earlier one', $html);
-        $this->assertStringContainsString('counts twice', $html);
+        $this->assertStringContainsString('once per browser per Philippine day', $html);
+        $this->assertStringContainsString('A changed answer replaces that day', $html);
+        $this->assertStringContainsString('may still count separately', $html);
         $this->assertStringContainsString('kept permanently and are anonymous', $html);
         $this->assertStringNotContainsString('kept for 30 days only', $html);
     }

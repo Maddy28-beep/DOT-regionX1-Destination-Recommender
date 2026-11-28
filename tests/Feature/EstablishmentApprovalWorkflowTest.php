@@ -94,7 +94,7 @@ class EstablishmentApprovalWorkflowTest extends TestCase
             ->get(route('admin.establishments', ['status' => 'pending']))
             ->getContent();
 
-        $this->assertMatchesRegularExpression('/<button[^>]*disabled[^>]*>\s*Approve\s*<\/button>/', $html);
+        $this->assertMatchesRegularExpression('/<button[^>]*disabled[^>]*>(?:(?!<\/button>).)*?Approve\s*<\/button>/s', $html);
         $this->assertStringContainsString('Link this establishment to an existing listing before approving.', $html);
     }
 }

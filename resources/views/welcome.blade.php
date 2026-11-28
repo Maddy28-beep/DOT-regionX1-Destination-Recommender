@@ -1,6 +1,6 @@
 @php
     // The selected DOT Mount Apo photograph takes precedence over optional footage.
-    $heroPhoto = is_file(public_path('images/mt-apo-kapatagan-hero.jpg')) ? asset('images/mt-apo-kapatagan-hero.jpg') : null;
+    $heroPhoto = is_file(config('hero.photo_path')) ? asset('images/mt-apo-kapatagan-hero.jpg') : null;
 @endphp
 <!DOCTYPE html>
 <html lang="en" class="home-slides">

@@ -95,7 +95,7 @@ class AdminConsoleUiTest extends TestCase
     }
 
     /** Sidebar collapses six listing links into one. */
-    public function test_sidebar_has_single_manage_listings_entry(): void
+    public function test_sidebar_has_single_listings_entry(): void
     {
         $this->seedListings();
 
@@ -108,7 +108,7 @@ class AdminConsoleUiTest extends TestCase
         $sidebar = $m[0] ?? '';
         $this->assertNotSame('', $sidebar, 'Could not locate the admin sidebar.');
 
-        $this->assertSame(1, substr_count($sidebar, '<span>Manage Listings</span></a>'));
+        $this->assertSame(1, substr_count($sidebar, '<span>Listings</span></a>'));
         $this->assertStringNotContainsString('Souvenir Centers', $sidebar);
         $this->assertStringNotContainsString('Tour Operators', $sidebar);
 
@@ -227,7 +227,7 @@ class AdminConsoleUiTest extends TestCase
 
         $html = $this->actingAs($this->admin(), 'admin')->get('/portal/admin/')->getContent();
 
-        $this->assertStringContainsString('QR Check-ins Today', $html);
+        $this->assertStringContainsString('Check-ins today', $html);
         $this->assertStringNotContainsString('Registered Tourists', $html);
     }
 
@@ -307,7 +307,7 @@ class AdminConsoleUiTest extends TestCase
 
         // Midpoints: 15,000 and 35,000. Avg. per trip: (15000 + 35000) / 2 = 25000.
         $this->assertStringContainsString('₱25,000.00', $html);
-        $this->assertStringContainsString('Avg. Spend per Trip', $html);
+        $this->assertStringContainsString('Approximate average (bracket-based)', $html);
         // By residency: Domestic Tourist = 15000, Foreign Tourist = 35000.
         $this->assertStringContainsString('₱15,000.00', $html);
         $this->assertStringContainsString('₱35,000.00', $html);
@@ -331,7 +331,7 @@ class AdminConsoleUiTest extends TestCase
 
         $html = $this->actingAs($this->admin(), 'admin')->get('/portal/admin/')->getContent();
 
-        preg_match('/<div class="adm-kpi__val">(\d+)<\/div><div class="adm-kpi__lab">QR Check-ins Today/', $html, $m);
+        preg_match('/adm-kpi__lab">Check-ins today<\/span>.*?<strong class="adm-kpi__val">(\d+)<\/strong>/s', $html, $m);
 
         $this->assertNotEmpty($m, 'Could not read the check-ins stat card.');
         $this->assertSame('2', $m[1], "Two check-ins were recorded today but the card shows {$m[1]}.");
