@@ -192,7 +192,7 @@ class DestinationDetailRedesignTest extends TestCase
         $html = $this->get(route('accommodations.show', $stay))->assertOk()->getContent();
 
         $this->assertStringContainsString('stat-strip', $html);
-        $this->assertStringContainsString('Per night', $html);
+        $this->assertMatchesRegularExpression('#(Recorded|Published|Estimated) / night#', $html);
         $this->assertStringContainsString('3,500', $html);
         $this->assertStringContainsString('2.5 km', $html);
         $this->assertStringNotContainsString('stat-strip__meter', $html, 'Premium is a word; there is no row of peso symbols.');
@@ -374,7 +374,8 @@ class DestinationDetailRedesignTest extends TestCase
 
         $html = $this->get('/accommodations')->assertOk()->getContent();
 
-        $this->assertStringContainsString('<small class="dcard__from">from</small>', $html);
+        // A rate per night is shown as the rate; only a day-use price carries a "from".
+        $this->assertStringNotContainsString('dcard__from', $html);
         $this->assertStringContainsString('2,800', $html);
         $this->assertStringContainsString('<small>/ night</small>', $html);
         $this->assertStringContainsString('<span class="dpost-tag">Hotel</span>', $html);

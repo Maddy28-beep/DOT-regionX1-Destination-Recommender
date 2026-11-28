@@ -42,14 +42,16 @@ class HomeController extends Controller
      */
     private function heroVideo(): ?array
     {
-        if (! file_exists(public_path('video/hero.mp4'))) {
+        $dir = rtrim((string) config('hero.video_directory'), '/\\');
+
+        if (! file_exists($dir.'/hero.mp4')) {
             return null;
         }
 
         return [
             'mp4' => asset('video/hero.mp4'),
-            'webm' => file_exists(public_path('video/hero.webm')) ? asset('video/hero.webm') : null,
-            'poster' => file_exists(public_path('video/hero-poster.jpg')) ? asset('video/hero-poster.jpg') : null,
+            'webm' => file_exists($dir.'/hero.webm') ? asset('video/hero.webm') : null,
+            'poster' => file_exists($dir.'/hero-poster.jpg') ? asset('video/hero-poster.jpg') : null,
         ];
     }
 

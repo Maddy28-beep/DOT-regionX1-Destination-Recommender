@@ -3,11 +3,12 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\UsesHeroFixtures;
 use Tests\TestCase;
 
 /**
  * Hero footage is optional and additive: drop a file at public/video/hero.mp4
- * and the landing page uses it, remove it and the painted hero is exactly as
+ * (and no Mount Apo photograph is installed) and the landing page uses it, remove it and the painted hero is exactly as
  * it was.
  *
  * The painted hero is withheld server-side via .has-footage whenever a clip
@@ -20,54 +21,29 @@ use Tests\TestCase;
 class HeroVideoTest extends TestCase
 {
     use RefreshDatabase;
-
-    private const FILES = ['hero.mp4', 'hero.webm', 'hero-poster.jpg'];
-
-    private function videoPath(string $file): string
-    {
-        return public_path('video/'.$file);
-    }
+    use UsesHeroFixtures;
 
     /**
-     * Real footage may already be installed on the machine running these
-     * tests. Move it aside for the duration rather than deleting it: an
-     * earlier version of this file removed these paths unconditionally in
-     * tearDown, which would have destroyed the actual hero video every time
-     * the suite ran.
+     * The footage and the photograph are looked up in a temporary folder (config/hero.php, UsesHeroFixtures), never in
+     * public/. Real footage and the real photograph may be installed on the machine running these tests, and an earlier
+     * version of this file moved and deleted those paths itself: a failed rename on Windows once left the real hero video
+     * deleted and stopped the database rollback of every test after it.
      */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        if (! is_dir(public_path('video'))) {
-            mkdir(public_path('video'), 0755, true);
-        }
-
-        foreach (self::FILES as $file) {
-            if (file_exists($this->videoPath($file))) {
-                rename($this->videoPath($file), $this->videoPath($file.'.testbackup'));
-            }
-        }
-    }
-
-    protected function tearDown(): void
-    {
-        foreach (self::FILES as $file) {
-            if (file_exists($this->videoPath($file))) {
-                unlink($this->videoPath($file));
-            }
-
-            if (file_exists($this->videoPath($file.'.testbackup'))) {
-                rename($this->videoPath($file.'.testbackup'), $this->videoPath($file));
-            }
-        }
-
-        parent::tearDown();
-    }
-
     private function putVideo(string $file = 'hero.mp4'): void
     {
-        file_put_contents($this->videoPath($file), 'not-really-a-video');
+        $this->putHeroFile($file);
+    }
+
+    public function test_the_photograph_takes_precedence_over_footage(): void
+    {
+        $this->putHeroPhoto();
+        $this->putVideo();
+
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertStringContainsString('has-photo', $html);
+        $this->assertStringNotContainsString('<video class="poster-hero__video"', $html);
+        $this->assertStringNotContainsString('has-footage', preg_match('/<section class="poster-hero[^"]*"/', $html, $m) ? $m[0] : '');
     }
 
     public function test_the_illustrated_hero_stands_alone_when_no_footage_is_supplied(): void

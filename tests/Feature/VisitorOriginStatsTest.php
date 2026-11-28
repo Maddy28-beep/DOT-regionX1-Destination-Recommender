@@ -91,7 +91,8 @@ class VisitorOriginStatsTest extends TestCase
         $columns = Schema::getColumnListing('visitor_origin_daily');
         sort($columns);
 
-        $this->assertSame(['answer', 'city', 'country_code', 'day', 'id', 'province', 'visitors'], $columns);
+        // generated_visitors is a count of those who went on to generate an itinerary; like the others it names no one.
+        $this->assertSame(['answer', 'city', 'country_code', 'day', 'generated_visitors', 'id', 'province', 'visitors'], $columns);
     }
 
     // ---- the six cases ------------------------------------------------------------------------------------

@@ -452,7 +452,7 @@ class AiSkeletonAdvisorTest extends TestCase
         $on = $text();
         $this->assertStringContainsString('AI-assisted day plan (Groq). When you generate an itinerary, ExploreDVO\'s server sends Groq, an outside AI service whose servers are outside the Philippines, a description of the trip so that it can suggest which of the places the planner has already chosen go together on each day and name each day. It receives the number of days, the distance range, budget level and interests you chose, and, for each candidate place, its name, type, price level and category tags. It does not receive your name, browser token, starting point, dates, arrival time or anything you typed.', $on);
         $this->assertStringContainsString('if Groq does not answer in time or answers badly, the itinerary is made without it.', $on);
-        $this->assertStringContainsString('Last updated November 5, 2026', $on);
+        $this->assertStringContainsString('Last updated November 19, 2026', $on);
         Carbon::setTestNow();
     }
 }

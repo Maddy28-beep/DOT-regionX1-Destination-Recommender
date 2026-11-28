@@ -515,7 +515,7 @@ class TripPlannerController extends Controller
         if ($point === null) {
             $errors['origin_label'] = 'Choose a recognized pick-up location in Davao Region from the suggestions, arrival points, or your current location. Your itinerary needs a confirmed starting point.';
         } elseif (! RegionXi::contains($point[0], $point[1])) {
-            $errors['origin_label'] = 'Your pick-up location must be in Davao Region (Region XI). Choose the hotel, airport, port or address where you will meet your driver or tour operator.';
+            $errors['origin_label'] = RegionXi::MESSAGE;
         }
 
         if ($errors !== []) {
