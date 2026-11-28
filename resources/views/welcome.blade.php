@@ -527,7 +527,6 @@
         <div class="slide-part">
         <div class="dpost-head">
             <div>
-                <span class="dpost-kicker poster-kicker">handpicked for you</span>
                 <h2 class="poster-title" style="color:var(--ocean-teal-dark);">Popular Destinations</h2>
                 {{-- Both this line and the banner's "Top Rated" ribbon below are
                      claims about traveller ratings, so they hold only while some
@@ -609,7 +608,6 @@
     <div class="container">
         <div class="dpost-head">
             <div>
-                <span class="dpost-kicker poster-kicker">ready when you are</span>
                 <h2 class="poster-title" style="color:var(--ocean-teal-dark);">Featured Tour Packages</h2>
                 <p>All-inclusive experiences worth planning around.</p>
             </div>
@@ -630,8 +628,7 @@
     <div class="container">
         <div class="section-head">
             <div>
-                <span class="poster-kicker">how this works</span>
-                <h2 class="poster-title" style="color:var(--ocean-teal-dark);">Plan smarter, not harder</h2>
+                <h2 class="poster-title" style="color:var(--ocean-teal-dark);">Your Davao days, planned around you</h2>
                 <p>ExploreDVO connects travelers directly with destinations, stays, and experiences across the Davao Region. Official DOT records are marked DOT Accredited; temporary demonstration records are marked Sample Data.</p>
             </div>
         </div>
@@ -653,8 +650,8 @@
                         <circle cx="12" cy="12" r="1.5" style="fill:var(--stamp-ink)"/>
                     </svg>
                 </div>
-                <h3>Browse By Travel Style</h3>
-                <p>Filter destinations, accommodations, and tour packages by your travel purpose, budget, duration, and interests.</p>
+                <h3>Every stop has a reason</h3>
+                <p>Each stop in your itinerary says why it was picked: it matched your interests, or past visitors often paired it with another stop on your list.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-stamp feature-stamp--red">
@@ -663,7 +660,7 @@
                         <path fill="none" style="stroke:var(--stamp-ink)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" d="m8.3 12.1 2.6 2.6 4.8-5.3"/>
                     </svg>
                 </div>
-                <h3>Clear Accreditation Labels</h3>
+                <h3>Accredited means accredited</h3>
                 <p>Official DOT Region XI records are marked DOT Accredited, temporary demonstration records are marked Sample Data, and anything we cannot confirm is marked Not Yet Verified.</p>
             </div>
             <div class="feature-card">
@@ -673,8 +670,8 @@
                         <circle cx="12" cy="9.2" r="2.7" style="fill:var(--stamp-ink)"/>
                     </svg>
                 </div>
-                <h3>Pinpoint Locations</h3>
-                <p>See exactly where every destination, accommodation, and restaurant sits on an embedded map.</p>
+                <h3>Each day on one map</h3>
+                <p>See the stops of a day in order on a single map, with the driving time between them and a link to open the route in Google Maps.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-stamp feature-stamp--gold">
@@ -696,7 +693,6 @@
         <div class="slide-part">
         <div class="section-head">
             <div>
-                <span class="poster-kicker">the region</span>
                 <h2 class="poster-title" style="color:var(--ocean-teal-dark);">About Davao Region</h2>
                 <p>Home to the country's highest peak and the last strongholds of the Philippine Eagle.</p>
             </div>
@@ -818,7 +814,6 @@
             <div class="halftone"></div>
 
             <div class="cta-banner__copy">
-                <span class="poster-kicker">your move</span>
                 <h2 class="poster-title">Plan Your Davao Trip</h2>
                 <p>
                     Two ways to get started &mdash; build a day-by-day plan around your own
