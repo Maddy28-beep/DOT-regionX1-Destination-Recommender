@@ -266,13 +266,16 @@ body.hero-page .site-header:not(.scrolled) .header-weather svg { color: #fff; }
     body.hero-page .poster-hero .hero-tourism-brands { display: none; }
 }
 
-/* ===== The three colours of the flag, in the regional line itself ===== */
-/* Lightened a step from the flag's blue, red and yellow so each reads on the picture and on the dark green behind it. */
+/* ===== The three colours of the flag, as a short bar under the regional line ===== */
+/* The line itself is one solid colour. The bar is three flat blocks (blue, red, yellow), lightened a step so each reads on the picture. */
 .poster-hero .region-tagline {
-    background: linear-gradient(90deg, #7aa2ff 0%, #ff6b79 50%, #ffd94a 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+    color: #fff7e9;
     text-shadow: none; filter: drop-shadow(0 1px 2px rgba(6, 26, 19, .7)) drop-shadow(0 3px 14px rgba(6, 26, 19, .45));
     width: fit-content; margin-inline: auto;
+}
+.poster-hero .region-tagline::after {
+    content: ""; display: block; width: 84px; height: 4px; margin: 10px auto 0; border-radius: 2px;
+    background: linear-gradient(90deg, #7aa2ff 0 33.33%, #ff6b79 33.33% 66.66%, #ffd94a 66.66% 100%);
 }
 .poster-hero p.region-tagline { font-size: clamp(1.05rem, 1.6vw, 1.4rem); letter-spacing: .07em; }
 
